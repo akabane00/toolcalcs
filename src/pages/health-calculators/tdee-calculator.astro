@@ -1,0 +1,266 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+---
+
+<BaseLayout
+  title="TDEE Calculator - Total Daily Energy Expenditure"
+  description="Calculate your Total Daily Energy Expenditure (TDEE) to find how many calories you burn per day. Plan your diet for weight loss, maintenance, or muscle gain."
+  type="article"
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/health-calculators/">Health Calculators</a> &rsaquo;
+    <span>TDEE Calculator</span>
+  </nav>
+
+  <h1>TDEE Calculator</h1>
+  <p class="page-desc">Find out how many calories you burn per day based on your activity level.</p>
+
+  <div class="calculator-box">
+    <div class="unit-toggle">
+      <button class="toggle-btn active" data-unit="imperial">Imperial</button>
+      <button class="toggle-btn" data-unit="metric">Metric</button>
+    </div>
+
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="age">Age</label>
+        <input type="number" id="age" value="30" min="15" max="100" />
+      </div>
+      <div class="input-group">
+        <label>Sex</label>
+        <div class="radio-group">
+          <label class="radio-label"><input type="radio" name="sex" value="male" checked /> Male</label>
+          <label class="radio-label"><input type="radio" name="sex" value="female" /> Female</label>
+        </div>
+      </div>
+      <div id="imperialFields">
+        <div class="input-row">
+          <div class="input-group">
+            <label for="feet">Height (ft)</label>
+            <input type="number" id="feet" value="5" min="3" max="8" />
+          </div>
+          <div class="input-group">
+            <label for="inches">in</label>
+            <input type="number" id="inches" value="10" min="0" max="11" />
+          </div>
+          <div class="input-group">
+            <label for="weightLbs">Weight (lbs)</label>
+            <input type="number" id="weightLbs" value="170" min="50" />
+          </div>
+        </div>
+      </div>
+      <div id="metricFields" class="hidden">
+        <div class="input-row">
+          <div class="input-group">
+            <label for="heightCm">Height (cm)</label>
+            <input type="number" id="heightCm" value="178" min="100" max="250" />
+          </div>
+          <div class="input-group">
+            <label for="weightKg">Weight (kg)</label>
+            <input type="number" id="weightKg" value="77" min="30" />
+          </div>
+        </div>
+      </div>
+      <div class="input-group full-width">
+        <label for="activity">Activity Level</label>
+        <select id="activity">
+          <option value="1.2">Sedentary (office job, little exercise)</option>
+          <option value="1.375">Lightly Active (light exercise 1-3 days/week)</option>
+          <option value="1.55" selected>Moderately Active (moderate exercise 3-5 days/week)</option>
+          <option value="1.725">Very Active (hard exercise 6-7 days/week)</option>
+          <option value="1.9">Extra Active (very hard exercise, physical job)</option>
+        </select>
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate TDEE</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card">
+          <span class="result-label">BMR (Basal Metabolic Rate)</span>
+          <span class="result-value" id="bmrValue">0</span>
+          <span class="result-unit">calories/day</span>
+        </div>
+        <div class="result-card primary">
+          <span class="result-label">TDEE (Maintenance)</span>
+          <span class="result-value" id="tdeeValue">0</span>
+          <span class="result-unit">calories/day</span>
+        </div>
+      </div>
+
+      <div class="goal-cards">
+        <div class="goal-card deficit">
+          <h3>Weight Loss</h3>
+          <div class="goal-row"><span>Mild (-0.5 lb/week)</span><span id="mildDeficit">0</span></div>
+          <div class="goal-row"><span>Moderate (-1 lb/week)</span><span id="modDeficit">0</span></div>
+          <div class="goal-row"><span>Aggressive (-1.5 lb/week)</span><span id="aggDeficit">0</span></div>
+        </div>
+        <div class="goal-card surplus">
+          <h3>Weight Gain</h3>
+          <div class="goal-row"><span>Mild (+0.5 lb/week)</span><span id="mildSurplus">0</span></div>
+          <div class="goal-row"><span>Moderate (+1 lb/week)</span><span id="modSurplus">0</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>What Is TDEE?</h2>
+    <p>Total Daily Energy Expenditure (TDEE) is the total number of calories you burn in a day. It includes your Basal Metabolic Rate (BMR)—the calories your body needs at complete rest—plus the calories burned through physical activity and digestion.</p>
+
+    <h2>How TDEE Is Calculated</h2>
+    <p>This calculator uses the <strong>Mifflin-St Jeor equation</strong>, which research has shown to be the most accurate for estimating BMR:</p>
+    <div class="formula-box">
+      <code>Male: BMR = 10 &times; weight(kg) + 6.25 &times; height(cm) - 5 &times; age - 161 + 166</code><br/>
+      <code>Female: BMR = 10 &times; weight(kg) + 6.25 &times; height(cm) - 5 &times; age - 161</code>
+    </div>
+    <p>Your BMR is then multiplied by an activity factor to get your TDEE:</p>
+    <ul>
+      <li><strong>Sedentary (1.2):</strong> Little or no exercise</li>
+      <li><strong>Lightly Active (1.375):</strong> Light exercise 1-3 days/week</li>
+      <li><strong>Moderately Active (1.55):</strong> Moderate exercise 3-5 days/week</li>
+      <li><strong>Very Active (1.725):</strong> Hard exercise 6-7 days/week</li>
+      <li><strong>Extra Active (1.9):</strong> Very hard exercise or physical job</li>
+    </ul>
+
+    <h2>Using TDEE for Your Goals</h2>
+    <h3>Weight Loss</h3>
+    <p>To lose weight, eat fewer calories than your TDEE. A deficit of 500 calories per day leads to approximately 1 pound of weight loss per week. Do not go below 1,200 calories (women) or 1,500 calories (men) without medical supervision.</p>
+
+    <h3>Weight Gain / Muscle Building</h3>
+    <p>To gain weight or build muscle, eat more than your TDEE. A surplus of 250-500 calories per day, combined with resistance training, supports lean muscle growth while minimizing fat gain.</p>
+
+    <h3>Maintenance</h3>
+    <p>Eating at your TDEE maintains your current weight. This is useful once you have reached your goal weight.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>How accurate is TDEE?</h3>
+    <p>TDEE calculators provide an estimate. Individual metabolism varies by 5-10%. Use your calculated TDEE as a starting point, then adjust based on real-world results over 2-4 weeks.</p>
+
+    <h3>Should I eat back exercise calories?</h3>
+    <p>Your TDEE already accounts for exercise through the activity multiplier. If you track exercise separately (e.g., with a fitness tracker), be careful not to double-count activity calories.</p>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .breadcrumb { font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 16px; }
+  .breadcrumb a { color: var(--color-text-muted); }
+  .breadcrumb a:hover { color: var(--color-primary); }
+  h1 { font-size: 1.8rem; margin-bottom: 8px; }
+  .page-desc { color: var(--color-text-muted); margin-bottom: 24px; }
+
+  .calculator-box {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 32px;
+  }
+  .unit-toggle { display: flex; gap: 4px; margin-bottom: 20px; background: var(--color-bg); border-radius: var(--radius); padding: 4px; width: fit-content; }
+  .toggle-btn { padding: 8px 16px; border: none; border-radius: 6px; background: transparent; font-size: 0.85rem; font-weight: 500; cursor: pointer; color: var(--color-text-muted); }
+  .toggle-btn.active { background: var(--color-surface); color: var(--color-primary); box-shadow: var(--shadow-sm); }
+  .calc-inputs { display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; }
+  .input-row { display: flex; gap: 16px; flex-wrap: wrap; }
+  .input-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 120px; }
+  .input-group.full-width { flex: 100%; }
+  .input-group label { font-size: 0.85rem; font-weight: 600; color: var(--color-text-muted); }
+  .input-group input, .input-group select {
+    padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius); font-size: 1rem; background: var(--color-bg);
+  }
+  .input-group input:focus, .input-group select:focus { outline: none; border-color: var(--color-primary); }
+  .radio-group { display: flex; gap: 16px; padding-top: 4px; }
+  .radio-label { display: flex; align-items: center; gap: 4px; font-size: 0.95rem; cursor: pointer; }
+  .hidden { display: none; }
+  .calc-btn { padding: 10px 24px; background: var(--color-primary); color: #fff; border: none; border-radius: var(--radius); font-size: 1rem; font-weight: 600; cursor: pointer; align-self: start; }
+  .calc-btn:hover { background: var(--color-primary-dark); }
+
+  .result-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .result-card { background: var(--color-bg); border-radius: var(--radius); padding: 16px; text-align: center; }
+  .result-card.primary { background: #eff6ff; }
+  .result-label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--color-text-muted); margin-bottom: 4px; }
+  .result-value { display: block; font-size: 1.8rem; font-weight: 800; }
+  .result-card.primary .result-value { color: var(--color-primary); }
+  .result-unit { display: block; font-size: 0.75rem; color: var(--color-text-muted); }
+
+  .goal-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; }
+  .goal-card { background: var(--color-bg); border-radius: var(--radius); padding: 16px; }
+  .goal-card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 12px; }
+  .goal-card.deficit h3 { color: #dc2626; }
+  .goal-card.surplus h3 { color: var(--color-success); }
+  .goal-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--color-border); font-size: 0.9rem; }
+  .goal-row:last-child { border-bottom: none; }
+  .goal-row span:last-child { font-weight: 700; }
+
+  .content-section { max-width: 800px; line-height: 1.8; }
+  .content-section h2 { font-size: 1.3rem; margin: 32px 0 12px; padding-top: 16px; border-top: 1px solid var(--color-border); }
+  .content-section h2:first-child { border-top: none; margin-top: 0; }
+  .content-section h3 { font-size: 1.1rem; margin: 24px 0 8px; }
+  .content-section p { margin-bottom: 12px; }
+  .content-section ul { margin: 0 0 16px 24px; }
+  .content-section li { margin-bottom: 6px; }
+  .formula-box { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius); padding: 16px 24px; margin: 16px 0; font-size: 1rem; text-align: center; line-height: 2; }
+
+  @media (max-width: 640px) { .input-row { flex-direction: column; } .result-cards { grid-template-columns: 1fr; } .goal-cards { grid-template-columns: 1fr; } }
+</style>
+
+<script>
+  let unit: 'imperial' | 'metric' = 'imperial';
+
+  document.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      unit = (btn as HTMLElement).dataset.unit as 'imperial' | 'metric';
+      document.getElementById('imperialFields')!.classList.toggle('hidden', unit !== 'imperial');
+      document.getElementById('metricFields')!.classList.toggle('hidden', unit !== 'metric');
+    });
+  });
+
+  function calculate() {
+    const age = parseInt((document.getElementById('age') as HTMLInputElement).value) || 30;
+    const sex = (document.querySelector('input[name="sex"]:checked') as HTMLInputElement)?.value || 'male';
+    const activityFactor = parseFloat((document.getElementById('activity') as HTMLSelectElement).value);
+
+    let weightKg: number, heightCm: number;
+
+    if (unit === 'imperial') {
+      const feet = parseFloat((document.getElementById('feet') as HTMLInputElement).value) || 0;
+      const inches = parseFloat((document.getElementById('inches') as HTMLInputElement).value) || 0;
+      const lbs = parseFloat((document.getElementById('weightLbs') as HTMLInputElement).value) || 0;
+      heightCm = (feet * 12 + inches) * 2.54;
+      weightKg = lbs * 0.453592;
+    } else {
+      heightCm = parseFloat((document.getElementById('heightCm') as HTMLInputElement).value) || 0;
+      weightKg = parseFloat((document.getElementById('weightKg') as HTMLInputElement).value) || 0;
+    }
+
+    // Mifflin-St Jeor
+    let bmr: number;
+    if (sex === 'male') {
+      bmr = 10 * weightKg + 6.25 * heightCm - 5 * age + 5;
+    } else {
+      bmr = 10 * weightKg + 6.25 * heightCm - 5 * age - 161;
+    }
+
+    const tdee = bmr * activityFactor;
+
+    document.getElementById('bmrValue')!.textContent = Math.round(bmr).toLocaleString();
+    document.getElementById('tdeeValue')!.textContent = Math.round(tdee).toLocaleString();
+
+    // Goals
+    document.getElementById('mildDeficit')!.textContent = Math.round(tdee - 250) + ' cal';
+    document.getElementById('modDeficit')!.textContent = Math.round(tdee - 500) + ' cal';
+    document.getElementById('aggDeficit')!.textContent = Math.round(tdee - 750) + ' cal';
+    document.getElementById('mildSurplus')!.textContent = Math.round(tdee + 250) + ' cal';
+    document.getElementById('modSurplus')!.textContent = Math.round(tdee + 500) + ' cal';
+  }
+
+  document.getElementById('calculateBtn')?.addEventListener('click', calculate);
+  calculate();
+</script>

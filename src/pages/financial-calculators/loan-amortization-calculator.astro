@@ -1,0 +1,271 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+---
+
+<BaseLayout
+  title="Loan Amortization Calculator - Monthly Payment & Schedule"
+  description="Free loan amortization calculator. Calculate monthly payments and generate a full amortization schedule showing principal, interest, and remaining balance."
+  type="article"
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/financial-calculators/">Financial Calculators</a> &rsaquo;
+    <span>Loan Amortization Calculator</span>
+  </nav>
+
+  <h1>Loan Amortization Calculator</h1>
+  <p class="page-desc">Calculate your monthly payment and see a full breakdown of principal vs. interest over time.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="loanAmount">Loan Amount ($)</label>
+        <input type="number" id="loanAmount" value="250000" min="0" step="1000" />
+      </div>
+      <div class="input-group">
+        <label for="interestRate">Annual Interest Rate (%)</label>
+        <input type="number" id="interestRate" value="6.5" min="0" max="30" step="0.1" />
+      </div>
+      <div class="input-group">
+        <label for="loanTerm">Loan Term (Years)</label>
+        <input type="number" id="loanTerm" value="30" min="1" max="50" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="extraPayment">Extra Monthly Payment ($)</label>
+        <input type="number" id="extraPayment" value="0" min="0" step="50" />
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Monthly Payment</span>
+          <span class="result-value" id="monthlyPayment">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Payment</span>
+          <span class="result-value" id="totalPayment">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Interest</span>
+          <span class="result-value" id="totalInterest">$0</span>
+        </div>
+        <div class="result-card success" id="savingsCard" style="display:none">
+          <span class="result-label">Interest Saved</span>
+          <span class="result-value" id="interestSaved">$0</span>
+        </div>
+      </div>
+
+      <details class="schedule-toggle">
+        <summary>View Full Amortization Schedule</summary>
+        <div class="table-container">
+          <table id="scheduleTable">
+            <thead>
+              <tr>
+                <th>Month</th>
+                <th>Payment</th>
+                <th>Principal</th>
+                <th>Interest</th>
+                <th>Balance</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>What Is Loan Amortization?</h2>
+    <p>Loan amortization is the process of paying off a debt over time through regular payments. Each payment covers both the interest accrued and a portion of the principal balance. In the early years of a loan, most of your payment goes toward interest. As the balance decreases, more of each payment goes toward the principal.</p>
+
+    <h2>How the Monthly Payment Is Calculated</h2>
+    <div class="formula-box">
+      <code>M = P &times; [r(1+r)<sup>n</sup>] / [(1+r)<sup>n</sup> - 1]</code>
+    </div>
+    <p>Where:</p>
+    <ul>
+      <li><strong>M</strong> = Monthly payment</li>
+      <li><strong>P</strong> = Principal (loan amount)</li>
+      <li><strong>r</strong> = Monthly interest rate (annual rate / 12)</li>
+      <li><strong>n</strong> = Total number of payments (years &times; 12)</li>
+    </ul>
+
+    <h2>The Impact of Extra Payments</h2>
+    <p>Making extra payments toward your loan principal can dramatically reduce the total interest you pay and shorten the loan term. Even an extra $100 per month on a 30-year mortgage can save tens of thousands of dollars and cut years off the loan.</p>
+    <p>Use the "Extra Monthly Payment" field above to see exactly how much you could save.</p>
+
+    <h2>Types of Amortizing Loans</h2>
+    <ul>
+      <li><strong>Fixed-rate mortgages:</strong> The most common amortizing loan, with a consistent interest rate and payment throughout the loan term.</li>
+      <li><strong>Auto loans:</strong> Typically 3-7 year terms with fixed monthly payments.</li>
+      <li><strong>Personal loans:</strong> Usually 2-5 year terms, fully amortizing.</li>
+      <li><strong>Student loans:</strong> Federal student loans use standard amortization over 10-25 years.</li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>Why does most of my payment go to interest at first?</h3>
+    <p>Interest is calculated on the outstanding balance. When your balance is highest (at the beginning), the interest portion is largest. As you pay down the principal, less interest accrues each month, so more of your payment goes toward principal.</p>
+
+    <h3>Should I make extra payments?</h3>
+    <p>If your loan allows it without penalties, extra payments can save significant money over the life of the loan. However, first ensure you have an emergency fund and have paid off higher-interest debt.</p>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .breadcrumb { font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 16px; }
+  .breadcrumb a { color: var(--color-text-muted); }
+  .breadcrumb a:hover { color: var(--color-primary); }
+  h1 { font-size: 1.8rem; margin-bottom: 8px; }
+  .page-desc { color: var(--color-text-muted); margin-bottom: 24px; }
+
+  .calculator-box {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 32px;
+  }
+  .calc-inputs {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .input-group { display: flex; flex-direction: column; gap: 4px; }
+  .input-group label { font-size: 0.85rem; font-weight: 600; color: var(--color-text-muted); }
+  .input-group input {
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    background: var(--color-bg);
+  }
+  .input-group input:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+  .calc-btn {
+    padding: 10px 24px;
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    align-self: end;
+  }
+  .calc-btn:hover { background: var(--color-primary-dark); }
+
+  .result-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .result-card { background: var(--color-bg); border-radius: var(--radius); padding: 16px; text-align: center; }
+  .result-card.primary { background: #eff6ff; }
+  .result-card.success { background: #f0fdf4; }
+  .result-label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--color-text-muted); margin-bottom: 4px; }
+  .result-value { display: block; font-size: 1.3rem; font-weight: 700; }
+  .result-card.primary .result-value { color: var(--color-primary); }
+  .result-card.success .result-value { color: var(--color-success); }
+
+  .schedule-toggle { margin-top: 16px; }
+  .schedule-toggle summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--color-primary);
+    padding: 8px 0;
+  }
+  .table-container { overflow-x: auto; margin-top: 12px; max-height: 500px; overflow-y: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th, td { padding: 6px 10px; text-align: right; border-bottom: 1px solid var(--color-border); }
+  th { font-weight: 600; color: var(--color-text-muted); font-size: 0.8rem; text-transform: uppercase; position: sticky; top: 0; background: var(--color-surface); }
+  th:first-child, td:first-child { text-align: left; }
+
+  .content-section { max-width: 800px; line-height: 1.8; }
+  .content-section h2 { font-size: 1.3rem; margin: 32px 0 12px; padding-top: 16px; border-top: 1px solid var(--color-border); }
+  .content-section h2:first-child { border-top: none; margin-top: 0; }
+  .content-section h3 { font-size: 1.1rem; margin: 24px 0 8px; }
+  .content-section p { margin-bottom: 12px; }
+  .content-section ul { margin: 0 0 16px 24px; }
+  .content-section li { margin-bottom: 6px; }
+  .formula-box { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius); padding: 16px 24px; margin: 16px 0; font-size: 1.2rem; text-align: center; }
+
+  @media (max-width: 640px) { .calc-inputs { grid-template-columns: 1fr; } .result-cards { grid-template-columns: 1fr; } }
+</style>
+
+<script>
+  function fmt(n: number): string {
+    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+  function fmt2(n: number): string {
+    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function calculate() {
+    const P = parseFloat((document.getElementById('loanAmount') as HTMLInputElement).value) || 0;
+    const annualRate = parseFloat((document.getElementById('interestRate') as HTMLInputElement).value) || 0;
+    const years = parseInt((document.getElementById('loanTerm') as HTMLInputElement).value) || 1;
+    const extra = parseFloat((document.getElementById('extraPayment') as HTMLInputElement).value) || 0;
+
+    const r = annualRate / 100 / 12;
+    const n = years * 12;
+
+    if (P === 0 || r === 0) return;
+
+    const monthlyPayment = P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+
+    // Generate schedule
+    let balance = P;
+    let totalInterestPaid = 0;
+    const rows: string[] = [];
+
+    for (let month = 1; month <= n && balance > 0; month++) {
+      const interestPart = balance * r;
+      let principalPart = monthlyPayment - interestPart + extra;
+      if (principalPart > balance) principalPart = balance;
+      balance -= principalPart;
+      totalInterestPaid += interestPart;
+
+      if (balance < 0) balance = 0;
+
+      rows.push(`<tr>
+        <td>${month}</td>
+        <td>${fmt2(principalPart + interestPart)}</td>
+        <td>${fmt2(principalPart)}</td>
+        <td>${fmt2(interestPart)}</td>
+        <td>${fmt2(balance)}</td>
+      </tr>`);
+
+      if (balance === 0) break;
+    }
+
+    const totalPayment = P + totalInterestPaid;
+
+    document.getElementById('monthlyPayment')!.textContent = fmt(monthlyPayment + extra);
+    document.getElementById('totalPayment')!.textContent = fmt(totalPayment);
+    document.getElementById('totalInterest')!.textContent = fmt(totalInterestPaid);
+
+    // Show savings if extra payments
+    if (extra > 0) {
+      const totalInterestNoExtra = (monthlyPayment * n) - P;
+      const saved = totalInterestNoExtra - totalInterestPaid;
+      document.getElementById('interestSaved')!.textContent = fmt(saved);
+      (document.getElementById('savingsCard') as HTMLElement).style.display = '';
+    } else {
+      (document.getElementById('savingsCard') as HTMLElement).style.display = 'none';
+    }
+
+    document.querySelector('#scheduleTable tbody')!.innerHTML = rows.join('');
+  }
+
+  document.getElementById('calculateBtn')?.addEventListener('click', calculate);
+  calculate();
+</script>

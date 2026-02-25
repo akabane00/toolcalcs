@@ -1,0 +1,143 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import AdUnit from '../components/AdUnit.astro';
+import { categories, calculators } from '../data/calculators';
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'ToolCalcs',
+  url: 'https://toolcalcs.com',
+  description: 'Free online calculators for finance, health, and math. Simple, fast, and accurate tools.',
+};
+---
+
+<BaseLayout
+  title="Free Online Calculators - Financial, Health & Math Tools | ToolCalcs"
+  description="Free online calculators for finance, health, and everyday math. Compound interest, BMI, percentage calculators and more. Simple, fast, and accurate."
+  structuredData={structuredData}
+>
+  <section class="hero">
+    <h1>Free Online Calculators</h1>
+    <p>Simple, fast, and accurate tools for finance, health, and everyday math.</p>
+  </section>
+
+  <AdUnit slot="home-top" format="horizontal" />
+
+  {categories.map(cat => {
+    const catCalcs = calculators.filter(c => c.categorySlug === cat.slug);
+    return (
+      <section class="category-section">
+        <div class="category-header">
+          <h2>
+            <span class="category-icon">{cat.icon}</span>
+            <a href={`/${cat.slug}/`}>{cat.name}</a>
+          </h2>
+          <a href={`/${cat.slug}/`} class="view-all">View all &rarr;</a>
+        </div>
+        <div class="calc-grid">
+          {catCalcs.map(calc => (
+            <a href={`/${calc.categorySlug}/${calc.slug}/`} class="calc-card">
+              <span class="calc-icon">{calc.icon}</span>
+              <h3>{calc.title}</h3>
+              <p>{calc.description}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+    );
+  })}
+
+  <AdUnit slot="home-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .hero {
+    text-align: center;
+    padding: 40px 0 32px;
+  }
+  .hero h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+  .hero p {
+    font-size: 1.1rem;
+    color: var(--color-text-muted);
+  }
+
+  .category-section {
+    margin-bottom: 40px;
+  }
+  .category-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--color-border);
+  }
+  .category-header h2 {
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .category-header h2 a {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+  .category-header h2 a:hover {
+    color: var(--color-primary);
+  }
+  .category-icon {
+    font-size: 1.4rem;
+  }
+  .view-all {
+    font-size: 0.9rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .calc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+  }
+  .calc-card {
+    display: block;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 20px;
+    transition: box-shadow 0.15s, border-color 0.15s;
+    text-decoration: none;
+    color: var(--color-text);
+  }
+  .calc-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-md);
+    text-decoration: none;
+  }
+  .calc-icon {
+    font-size: 1.6rem;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .calc-card h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--color-text);
+  }
+  .calc-card p {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+  }
+
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 1.5rem; }
+    .calc-grid { grid-template-columns: 1fr; }
+  }
+</style>

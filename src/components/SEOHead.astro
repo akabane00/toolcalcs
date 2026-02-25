@@ -1,0 +1,41 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  canonical?: string;
+  type?: 'website' | 'article';
+  structuredData?: object;
+}
+
+const { title, description, canonical, type = 'website', structuredData } = Astro.props;
+const siteUrl = 'https://toolcalcs.com';
+const pageUrl = canonical || `${siteUrl}${Astro.url.pathname}`;
+const fullTitle = title.includes('ToolCalcs') ? title : `${title} | ToolCalcs`;
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={pageUrl} />
+<meta name="robots" content="index, follow" />
+
+<!-- Open Graph -->
+<meta property="og:type" content={type} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={pageUrl} />
+<meta property="og:site_name" content="ToolCalcs" />
+<meta property="og:locale" content="en_US" />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+{structuredData && (
+  <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+)}
