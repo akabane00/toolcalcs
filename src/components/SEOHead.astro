@@ -4,13 +4,17 @@ interface Props {
   description: string;
   canonical?: string;
   type?: 'website' | 'article';
-  structuredData?: object;
+  noindex?: boolean;
+  structuredData?: object | object[];
 }
 
-const { title, description, canonical, type = 'website', structuredData } = Astro.props;
+const { title, description, canonical, type = 'website', noindex = false, structuredData } = Astro.props;
 const siteUrl = 'https://toolcalcs.com';
 const pageUrl = canonical || `${siteUrl}${Astro.url.pathname}`;
 const fullTitle = title.includes('ToolCalcs') ? title : `${title} | ToolCalcs`;
+const schemaList = structuredData
+  ? Array.isArray(structuredData) ? structuredData : [structuredData]
+  : [];
 ---
 
 <meta charset="utf-8" />
@@ -18,7 +22,10 @@ const fullTitle = title.includes('ToolCalcs') ? title : `${title} | ToolCalcs`;
 <title>{fullTitle}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={pageUrl} />
-<meta name="robots" content="index, follow" />
+{noindex
+  ? <meta name="robots" content="noindex, nofollow" />
+  : <meta name="robots" content="index, follow" />
+}
 
 <!-- Open Graph -->
 <meta property="og:type" content={type} />
@@ -27,15 +34,26 @@ const fullTitle = title.includes('ToolCalcs') ? title : `${title} | ToolCalcs`;
 <meta property="og:url" content={pageUrl} />
 <meta property="og:site_name" content="ToolCalcs" />
 <meta property="og:locale" content="en_US" />
+<meta property="og:image" content={`${siteUrl}/og-image.png`} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
 
 <!-- Twitter -->
-<meta name="twitter:card" content="summary" />
+<meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={fullTitle} />
 <meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={`${siteUrl}/og-image.png`} />
 
 <!-- Favicon -->
+<link rel="icon" href="/favicon.ico" sizes="32x32" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<meta name="theme-color" content="#2563eb" />
 
-{structuredData && (
-  <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
-)}
+<!-- Resource Hints -->
+<link rel="preconnect" href="https://www.googletagmanager.com" />
+<link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+
+{schemaList.map(sd => (
+  <script type="application/ld+json" set:html={JSON.stringify(sd)} />
+))}

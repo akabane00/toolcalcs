@@ -5,7 +5,12 @@ import sitemap from '@astrojs/sitemap';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://toolcalcs.com',
-  integrations: [sitemap()],
+  integrations: [sitemap({
+    serialize(item) {
+      item.lastmod = new Date().toISOString();
+      return item;
+    },
+  })],
   build: {
     format: 'directory',
   },
