@@ -1,0 +1,498 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'Are online random number generators truly random?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Most online random number generators, including this one, use pseudo-random number generators (PRNGs). These algorithms produce sequences that appear random and pass statistical tests for randomness, but are technically deterministic because they start from a seed value. For everyday purposes like games, raffles, and sampling, PRNGs are more than adequate. True random number generators (TRNGs) rely on physical phenomena like atmospheric noise or radioactive decay and are used in cryptography and high-security applications.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Can I generate random numbers without duplicates?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes, this random number generator includes an "Allow Duplicates" option. When unchecked, every number generated will be unique. This is useful for lottery-style draws, assigning unique IDs, or selecting distinct samples from a population. Note that the count of numbers requested cannot exceed the size of the range when duplicates are not allowed.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is the difference between random and pseudo-random numbers?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'True random numbers are generated from unpredictable physical processes such as thermal noise, radioactive decay, or atmospheric noise. Pseudo-random numbers are produced by mathematical algorithms (PRNGs) that use a seed value to generate a deterministic sequence that mimics randomness. While pseudo-random numbers are not truly unpredictable, modern PRNGs like the Mersenne Twister produce sequences that are statistically indistinguishable from true randomness for most practical applications.',
+      },
+    },
+  ],
+};
+---
+
+<BaseLayout
+  title="Random Number Generator - Generate Random Numbers Online | ToolCalcs"
+  description="Free random number generator. Generate one or multiple random numbers within any range. Options for unique numbers, quick presets for dice, coins, and lottery draws."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/math-calculators/">Math Calculators</a> &rsaquo;
+    <span>Random Number Generator</span>
+  </nav>
+
+  <h1>Random Number Generator</h1>
+  <p class="page-desc">Generate random numbers instantly within any range. Use quick presets for coin flips, dice rolls, and lottery picks, or customize your own parameters.</p>
+
+  <div class="calculator-box">
+    <div class="preset-btns">
+      <button class="preset-btn" id="presetCoin" title="Random 1 or 2 (Heads or Tails)">Coin Flip</button>
+      <button class="preset-btn" id="presetDice" title="Random 1 to 6">Dice Roll</button>
+      <button class="preset-btn" id="presetLottery" title="5 unique numbers from 1 to 69">Lottery</button>
+    </div>
+
+    <div class="input-grid">
+      <div class="input-group">
+        <label for="minVal">Minimum</label>
+        <input type="number" id="minVal" value="1" class="calc-input" />
+      </div>
+      <div class="input-group">
+        <label for="maxVal">Maximum</label>
+        <input type="number" id="maxVal" value="100" class="calc-input" />
+      </div>
+      <div class="input-group">
+        <label for="howMany">How Many</label>
+        <input type="number" id="howMany" value="1" min="1" max="100" class="calc-input" />
+      </div>
+      <div class="input-group checkbox-group">
+        <label class="checkbox-label">
+          <input type="checkbox" id="allowDuplicates" checked />
+          <span>Allow Duplicates</span>
+        </label>
+      </div>
+    </div>
+
+    <button class="calc-btn" id="generateBtn">Generate</button>
+
+    <div id="resultArea" class="result-area" style="display:none;">
+      <div id="singleResult" class="single-result" style="display:none;">
+        <div class="number-display" id="singleNumber"></div>
+      </div>
+      <div id="multiResult" class="multi-result" style="display:none;">
+        <div class="number-grid" id="numberGrid"></div>
+      </div>
+      <div class="action-btns">
+        <button class="action-btn" id="sortBtn" title="Sort numbers in ascending order">Sort Ascending</button>
+        <button class="action-btn" id="copyBtn" title="Copy numbers to clipboard">Copy to Clipboard</button>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>What Are Random Numbers</h2>
+    <p>Random numbers are values selected from a set where each possible outcome has an equal probability of being chosen. The concept of randomness is fundamental to mathematics, science, and everyday decision-making. When a number is truly random, there is no discernible pattern, formula, or predictable rule that determines its value. Each selection is independent of all previous and future selections.</p>
+    <p>In the simplest case, consider flipping a fair coin. The outcome is either heads or tails, each with a 50% chance. No matter how many times you flip the coin, the result of the next flip is independent of all prior flips. This fundamental principle of independence is what separates genuinely random processes from those that merely appear unpredictable.</p>
+    <p>Random numbers play a surprisingly large role in modern life. They underpin everything from the shuffling of songs in a playlist to the encryption protocols that keep your online banking secure. Scientists use random numbers to design experiments and run simulations. Businesses rely on random sampling for quality control and market research. Game designers use them to create unpredictable experiences that keep players engaged. Even the legal system depends on random selection for jury pools. Understanding randomness helps us appreciate the uncertain nature of the world and equips us with tools to manage that uncertainty effectively.</p>
+    <p>The range and distribution of random numbers depend on the context. A random number between 1 and 6 simulates a dice roll, while a random number between 0 and 1 drawn from a uniform distribution is the foundation for generating random values across virtually any probability distribution. The concept extends naturally from integers to real numbers, from single values to sequences, and from simple uniform distributions to complex multivariate distributions used in advanced statistical modeling.</p>
+
+    <h2>How Random Number Generators Work</h2>
+    <p>A random number generator (RNG) is a system or algorithm that produces a sequence of numbers that lack any predictable pattern. There are two broad categories: hardware random number generators that measure physical phenomena, and computational algorithms that use mathematical formulas to produce sequences of numbers that appear random.</p>
+    <p>Most software-based random number generators are <strong>pseudo-random number generators (PRNGs)</strong>. These algorithms start with an initial value called a <strong>seed</strong> and apply a deterministic mathematical formula to produce a sequence of numbers. Despite being completely deterministic, well-designed PRNGs produce sequences that are statistically indistinguishable from true randomness for most practical purposes.</p>
+    <p>The general operation of a PRNG follows these steps: an internal state is initialized with a seed value, a mathematical transformation is applied to the internal state to produce the next state, and an output function extracts a number from the internal state. This cycle repeats each time a new random number is requested. The quality of a PRNG depends on the length of its cycle (how many numbers it produces before repeating), the uniformity of its output distribution, and how well it passes statistical tests for randomness.</p>
+    <p>One of the most widely used PRNGs is the <strong>Mersenne Twister</strong>, which has a period of 2<sup>19937</sup> &minus; 1 (a number with over 6,000 digits). This enormous cycle length means the sequence will never repeat in any practical application. Modern web browsers use the <strong>xoshiro</strong> family of algorithms for their built-in <code>Math.random()</code> function, offering an excellent balance of speed and statistical quality. For cryptographic applications, specialized PRNGs called <strong>cryptographically secure pseudo-random number generators (CSPRNGs)</strong> are used, such as those based on AES encryption or the ChaCha20 stream cipher.</p>
+    <p>The seed value is critical to the behavior of a PRNG. If you use the same seed, you get the same sequence of numbers every time. This property, called <strong>reproducibility</strong>, is actually a feature in many applications. Scientists can reproduce their simulation results exactly by recording the seed, and game developers can use seeds to regenerate entire game worlds identically. However, for applications requiring unpredictability, the seed must itself be unpredictable, typically derived from high-resolution timestamps, mouse movements, or hardware entropy sources.</p>
+
+    <h2>True Random vs Pseudo-Random</h2>
+    <p>The distinction between true random numbers and pseudo-random numbers is important for understanding the strengths and limitations of different generation methods. True random number generators (TRNGs) derive their randomness from physical processes that are inherently unpredictable at a fundamental level. Pseudo-random number generators (PRNGs) use mathematical algorithms that produce deterministic sequences appearing random.</p>
+    <p><strong>True Random Number Generators (TRNGs)</strong> rely on physical phenomena such as thermal noise in electronic circuits, the timing of radioactive decay events, atmospheric noise captured by radio receivers, or quantum mechanical effects like photon behavior in beam splitters. These processes are governed by the laws of quantum mechanics, which dictate that their outcomes are genuinely unpredictable, not just difficult to predict. Organizations like RANDOM.ORG harvest atmospheric noise to generate true random numbers accessible via the internet.</p>
+    <p><strong>Pseudo-Random Number Generators (PRNGs)</strong> are mathematical algorithms. Given the same starting conditions, they always produce the same output. However, the sequences they generate exhibit excellent statistical properties: uniform distribution, lack of correlation between successive values, and long periods before repetition. For the vast majority of applications, including games, simulations, statistical sampling, and this random number generator, PRNGs provide perfectly adequate randomness.</p>
+    <p>The practical differences matter primarily in specific domains. Cryptography requires unpredictability, so TRNGs or CSPRNGs are essential for generating encryption keys, session tokens, and nonces. Gambling regulations in many jurisdictions require TRNGs or certified RNGs for slot machines and online gaming platforms. Scientific simulations that model quantum phenomena may need true randomness to avoid introducing systematic biases. For everyday use cases like picking raffle winners, assigning random groups, generating test data, or making decisions, PRNGs are fast, efficient, and more than sufficient.</p>
+    <p>An interesting middle ground exists in the form of hybrid approaches. Many modern systems use a TRNG to generate seeds for a CSPRNG, combining the unpredictability of physical randomness with the speed and convenience of algorithmic generation. Operating systems maintain entropy pools fed by hardware events (keystrokes, mouse movements, disk activity) and use these to seed their built-in random number facilities.</p>
+
+    <h2>Common Uses for Random Numbers</h2>
+    <p>Random numbers have an astonishing range of applications across nearly every field of human endeavor. Their utility stems from their ability to eliminate bias, introduce unpredictability, and simulate complex systems. Here are some of the most common and impactful uses of random numbers in the modern world.</p>
+    <p><strong>Decision-making and fairness:</strong> Random numbers provide an impartial method for making choices when fairness is paramount. Drawing names from a hat, flipping a coin, and rolling dice are all everyday examples of random selection. In professional settings, random number generators are used to assign participants to control and treatment groups in clinical trials, select audit targets from a pool of candidates, choose jury members from voter rolls, and allocate scarce resources when demand exceeds supply.</p>
+    <p><strong>Computer science and software engineering:</strong> Randomness is a fundamental building block in computing. Hash functions use random-like transformations to distribute data uniformly across storage structures. Load balancers use randomized algorithms to distribute network traffic. Randomized algorithms for sorting, searching, and optimization often outperform their deterministic counterparts. Software testing relies on random inputs (fuzz testing) to discover bugs that structured testing might miss.</p>
+    <p><strong>Security and cryptography:</strong> Encryption, digital signatures, secure communication protocols, and authentication systems all depend on high-quality random numbers. Every HTTPS connection to a website involves random number generation for session keys. Password salts, initialization vectors, and cryptographic nonces must be random to maintain security. A weakness in random number generation has been the root cause of several major security breaches in computing history.</p>
+    <p><strong>Art, music, and creativity:</strong> Artists and musicians use randomness as a creative tool. Algorithmic composition employs random selections of notes, rhythms, and timbres to generate novel musical pieces. Generative art uses random parameters to create unique visual works. Game designers use procedural generation powered by random numbers to create vast, unique worlds that would be impossible to design by hand. Even writers use random prompts to overcome creative blocks and explore unexpected narrative directions.</p>
+
+    <h2>Random Numbers in Games and Lotteries</h2>
+    <p>Games and lotteries represent some of the most visible and familiar applications of random number generation. From ancient dice games dating back thousands of years to modern video games and multi-billion-dollar lottery systems, randomness is the engine that drives excitement, fairness, and replayability in gaming.</p>
+    <p><strong>Board games and tabletop gaming:</strong> Dice have been used as random number generators for over 5,000 years. The standard six-sided die produces a uniform distribution of integers from 1 to 6. Modern tabletop gaming uses a variety of polyhedral dice (4-sided, 8-sided, 10-sided, 12-sided, and 20-sided) to generate different ranges of random outcomes. The randomness introduced by dice rolling creates drama, tension, and strategic uncertainty that make games engaging. Games like Dungeons &amp; Dragons, Monopoly, and Yahtzee would be fundamentally different experiences without the element of chance.</p>
+    <p><strong>Video games:</strong> Modern video games use random number generators extensively. Loot drops in role-playing games are determined by RNG, with different items having different probabilities. Procedurally generated worlds in games like Minecraft use seeds fed into PRNGs to create unique terrain, structures, and resource distributions. Enemy behavior, critical hit chances, random encounters, and card draws in digital card games all rely on random number generation. Game developers carefully tune their RNG systems to balance unpredictability with player satisfaction, sometimes using techniques like "pity timers" that guarantee rewards after a certain number of unsuccessful random attempts.</p>
+    <p><strong>Lotteries and gambling:</strong> Lottery systems represent perhaps the highest-stakes application of random number generation. Major lottery organizations use sophisticated hardware RNGs, often based on mechanical ball-drawing machines with transparent operation to ensure public trust. Some lotteries also use electronic RNGs that are regularly audited and certified by independent testing laboratories. The integrity of the random number generation process is critical &mdash; any predictability could be exploited, resulting in fraud and loss of public confidence. Slot machines in casinos use certified RNGs that must meet strict regulatory requirements for fairness and unpredictability.</p>
+    <p><strong>Sports and competitions:</strong> Random selection plays a role in many sports. The NFL draft order includes lottery elements for non-playoff teams. Tennis matches begin with a coin toss. The order of play in golf tournaments and the lane assignments in swimming competitions involve random or quasi-random selection. Fantasy sports platforms use random number generation to simulate game outcomes and determine contest rankings.</p>
+
+    <h2>Random Numbers in Statistics</h2>
+    <p>Statistics is perhaps the most intellectually rigorous application domain for random numbers. The entire framework of statistical inference rests on the assumption that samples are drawn randomly from populations. Without reliable random number generation, much of modern statistical practice would be impossible.</p>
+    <p><strong>Random sampling:</strong> The foundation of survey methodology is random sampling, where every member of a population has a known, non-zero probability of being selected. Simple random sampling gives every individual an equal chance. Stratified random sampling divides the population into subgroups and randomly samples from each. Cluster sampling randomly selects entire groups. Systematic sampling selects every k-th individual from a randomly ordered list. All of these methods require random number generators to function properly. Without random sampling, survey results can suffer from selection bias and may not generalize to the broader population.</p>
+    <p><strong>Monte Carlo simulation:</strong> Named after the famous casino in Monaco, Monte Carlo methods use random sampling to solve problems that might be deterministic in principle but are too complex for analytical solutions. These simulations generate thousands or millions of random scenarios to estimate probabilities, expected values, and risk distributions. Financial analysts use Monte Carlo simulation to model portfolio performance under different market conditions. Engineers use it to assess the reliability of complex systems. Physicists use it to model particle interactions. Climate scientists use it to explore the range of possible future temperature trajectories. The quality of these simulations depends directly on the quality of the random numbers used.</p>
+    <p><strong>Randomized controlled trials:</strong> The gold standard of scientific evidence, the randomized controlled trial (RCT), uses random assignment to allocate participants to treatment and control groups. Random assignment ensures that any confounding variables are distributed equally between groups on average, allowing researchers to attribute observed differences to the treatment rather than pre-existing differences between groups. The random number generator used for allocation must be unpredictable to prevent conscious or unconscious bias in group assignment. Modern clinical trials use computer-generated random allocation sequences that are concealed from researchers until after enrollment.</p>
+    <p><strong>Bootstrapping and resampling:</strong> Bootstrap methods, introduced by Bradley Efron in 1979, use random resampling with replacement from observed data to estimate the sampling distribution of a statistic. By drawing thousands of random samples from the original data and computing the statistic of interest for each sample, researchers can estimate confidence intervals and standard errors without making strong distributional assumptions. Permutation tests use random rearrangements of data to construct null distributions for hypothesis testing. These computationally intensive methods have become practical only with modern computing power and high-quality random number generators.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>Are online random number generators truly random?</h3>
+    <p>Most online random number generators, including this one, use pseudo-random number generators (PRNGs). These algorithms produce sequences that appear random and pass statistical tests for randomness, but are technically deterministic because they start from a seed value. For everyday purposes like games, raffles, and sampling, PRNGs are more than adequate. True random number generators (TRNGs) rely on physical phenomena like atmospheric noise or radioactive decay and are used in cryptography and high-security applications.</p>
+
+    <h3>Can I generate random numbers without duplicates?</h3>
+    <p>Yes, this random number generator includes an "Allow Duplicates" option. When you uncheck this box, every number generated will be unique within the set. This is useful for lottery-style draws, assigning unique IDs, or selecting distinct samples from a population. Keep in mind that the count of numbers you request cannot exceed the size of the available range when duplicates are not allowed. For example, if your range is 1 to 10, you can request at most 10 unique numbers.</p>
+
+    <h3>What is the difference between random and pseudo-random numbers?</h3>
+    <p>True random numbers are generated from unpredictable physical processes such as thermal noise, radioactive decay, or atmospheric noise. Pseudo-random numbers are produced by mathematical algorithms (PRNGs) that use a seed value to generate a deterministic sequence mimicking randomness. While pseudo-random numbers are not truly unpredictable, modern PRNGs produce sequences that are statistically indistinguishable from true randomness for most practical applications. The choice between the two depends on your specific needs: PRNGs are faster and perfectly suitable for simulations, games, and general use, while TRNGs are essential for cryptographic security and regulatory compliance in gambling.</p>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .breadcrumb { font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 16px; }
+  .breadcrumb a { color: var(--color-text-muted); }
+  .breadcrumb a:hover { color: var(--color-primary); }
+  h1 { font-size: 1.8rem; margin-bottom: 8px; }
+  .page-desc { color: var(--color-text-muted); margin-bottom: 24px; }
+
+  .calculator-box {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 32px;
+  }
+
+  .preset-btns {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .preset-btn {
+    padding: 8px 16px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--color-text);
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .preset-btn:hover {
+    border-color: var(--color-primary);
+    background: var(--color-surface);
+  }
+
+  .input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 16px;
+    align-items: end;
+    margin-bottom: 20px;
+  }
+  .input-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    margin-bottom: 6px;
+  }
+  .calc-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    background: var(--color-bg);
+    box-sizing: border-box;
+  }
+  .calc-input:focus { outline: none; border-color: var(--color-primary); }
+
+  .checkbox-group {
+    display: flex;
+    align-items: center;
+    padding-bottom: 10px;
+  }
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--color-primary);
+  }
+
+  .calc-btn {
+    width: 100%;
+    padding: 12px 24px;
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .calc-btn:hover { background: var(--color-primary-dark); }
+
+  .result-area {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .single-result {
+    text-align: center;
+    padding: 24px 16px;
+  }
+  .number-display {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: var(--color-primary);
+    line-height: 1.2;
+  }
+
+  .multi-result {
+    padding: 16px 0;
+  }
+  .number-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+  .number-badge {
+    display: inline-block;
+    padding: 10px 18px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    min-width: 48px;
+    text-align: center;
+  }
+
+  .action-btns {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    justify-content: center;
+  }
+  .action-btn {
+    padding: 8px 18px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--color-text);
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .action-btn:hover {
+    border-color: var(--color-primary);
+    background: var(--color-surface);
+  }
+
+  .content-section { max-width: 800px; line-height: 1.8; }
+  .content-section h2 { font-size: 1.3rem; margin: 32px 0 12px; padding-top: 16px; border-top: 1px solid var(--color-border); }
+  .content-section h2:first-child { border-top: none; margin-top: 0; }
+  .content-section h3 { font-size: 1.1rem; margin: 24px 0 8px; }
+  .content-section p { margin-bottom: 12px; }
+  .content-section ul { margin: 0 0 16px 24px; }
+  .content-section li { margin-bottom: 6px; }
+
+  @media (max-width: 640px) {
+    .input-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .checkbox-group {
+      grid-column: 1 / -1;
+    }
+    .number-display {
+      font-size: 2.5rem;
+    }
+    .number-badge {
+      padding: 8px 14px;
+      font-size: 1rem;
+      min-width: 40px;
+    }
+    .action-btns {
+      flex-direction: column;
+    }
+    .action-btn {
+      width: 100%;
+      text-align: center;
+    }
+  }
+</style>
+
+<script is:inline>
+  var generatedNumbers = [];
+
+  function generateNumbers() {
+    var min = parseInt(document.getElementById('minVal').value);
+    var max = parseInt(document.getElementById('maxVal').value);
+    var count = parseInt(document.getElementById('howMany').value);
+    var allowDups = document.getElementById('allowDuplicates').checked;
+
+    if (isNaN(min) || isNaN(max) || isNaN(count)) {
+      alert('Please enter valid numbers for all fields.');
+      return;
+    }
+    if (min > max) {
+      alert('Minimum value must be less than or equal to maximum value.');
+      return;
+    }
+    if (count < 1 || count > 100) {
+      alert('How Many must be between 1 and 100.');
+      return;
+    }
+
+    var range = max - min + 1;
+    if (!allowDups && count > range) {
+      alert('Cannot generate ' + count + ' unique numbers from a range of only ' + range + '. Please increase the range or reduce the count.');
+      return;
+    }
+
+    generatedNumbers = [];
+
+    if (allowDups) {
+      for (var i = 0; i < count; i++) {
+        generatedNumbers.push(Math.floor(Math.random() * range) + min);
+      }
+    } else {
+      // Fisher-Yates shuffle approach for unique numbers
+      if (count <= range * 0.5 || range > 10000) {
+        // Set-based approach for sparse selections
+        var used = {};
+        while (generatedNumbers.length < count) {
+          var num = Math.floor(Math.random() * range) + min;
+          if (!used[num]) {
+            used[num] = true;
+            generatedNumbers.push(num);
+          }
+        }
+      } else {
+        // Build full array and shuffle for dense selections
+        var pool = [];
+        for (var j = min; j <= max; j++) {
+          pool.push(j);
+        }
+        for (var k = pool.length - 1; k > 0; k--) {
+          var idx = Math.floor(Math.random() * (k + 1));
+          var tmp = pool[k];
+          pool[k] = pool[idx];
+          pool[idx] = tmp;
+        }
+        generatedNumbers = pool.slice(0, count);
+      }
+    }
+
+    displayResults();
+  }
+
+  function displayResults() {
+    var resultArea = document.getElementById('resultArea');
+    var singleResult = document.getElementById('singleResult');
+    var multiResult = document.getElementById('multiResult');
+
+    resultArea.style.display = 'block';
+
+    if (generatedNumbers.length === 1) {
+      singleResult.style.display = 'block';
+      multiResult.style.display = 'none';
+      document.getElementById('singleNumber').textContent = generatedNumbers[0].toLocaleString('en-US');
+    } else {
+      singleResult.style.display = 'none';
+      multiResult.style.display = 'block';
+      var grid = document.getElementById('numberGrid');
+      grid.innerHTML = '';
+      for (var i = 0; i < generatedNumbers.length; i++) {
+        var badge = document.createElement('span');
+        badge.className = 'number-badge';
+        badge.textContent = generatedNumbers[i].toLocaleString('en-US');
+        grid.appendChild(badge);
+      }
+    }
+  }
+
+  function sortNumbers() {
+    if (generatedNumbers.length === 0) return;
+    generatedNumbers.sort(function(a, b) { return a - b; });
+    displayResults();
+  }
+
+  function copyNumbers() {
+    if (generatedNumbers.length === 0) return;
+    var text = generatedNumbers.join(', ');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() {
+        showCopyFeedback();
+      });
+    } else {
+      // Fallback for older browsers
+      var textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      showCopyFeedback();
+    }
+  }
+
+  function showCopyFeedback() {
+    var btn = document.getElementById('copyBtn');
+    var original = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(function() {
+      btn.textContent = original;
+    }, 1500);
+  }
+
+  function applyPreset(min, max, count, allowDups) {
+    document.getElementById('minVal').value = min;
+    document.getElementById('maxVal').value = max;
+    document.getElementById('howMany').value = count;
+    document.getElementById('allowDuplicates').checked = allowDups;
+    generateNumbers();
+  }
+
+  // Event listeners
+  document.getElementById('generateBtn').addEventListener('click', generateNumbers);
+  document.getElementById('sortBtn').addEventListener('click', sortNumbers);
+  document.getElementById('copyBtn').addEventListener('click', copyNumbers);
+
+  document.getElementById('presetCoin').addEventListener('click', function() {
+    applyPreset(1, 2, 1, true);
+  });
+  document.getElementById('presetDice').addEventListener('click', function() {
+    applyPreset(1, 6, 1, true);
+  });
+  document.getElementById('presetLottery').addEventListener('click', function() {
+    applyPreset(1, 69, 5, false);
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') generateNumbers();
+  });
+
+  // Generate on load
+  generateNumbers();
+</script>

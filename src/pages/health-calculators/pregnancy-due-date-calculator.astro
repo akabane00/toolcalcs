@@ -1,0 +1,489 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'How is a pregnancy due date calculated?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'A pregnancy due date is most commonly calculated using Naegele\'s Rule, which adds 280 days (40 weeks) to the first day of your last menstrual period (LMP). If you know the conception date, you add 266 days (38 weeks) instead. Both methods estimate the same delivery window since conception typically occurs about 14 days after the start of the last period.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How accurate are pregnancy due date calculators?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Only about 4-5% of babies are born on their exact due date. A due date is an estimate, and most healthy babies arrive within a two-week window on either side of it, between 38 and 42 weeks of gestation. Ultrasound dating in the first trimester is generally considered more accurate than LMP-based calculations, especially for women with irregular cycles.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What are the three trimesters of pregnancy?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'The first trimester spans weeks 1 through 12 and is when the baby\'s major organs begin to form. The second trimester covers weeks 13 through 27 and is often considered the most comfortable period as morning sickness subsides and the baby grows rapidly. The third trimester runs from week 28 to week 40, during which the baby gains weight quickly and prepares for birth.',
+      },
+    },
+  ],
+};
+---
+
+<BaseLayout
+  title="Pregnancy Due Date Calculator - Estimate Your Baby's Arrival | ToolCalcs"
+  description="Free pregnancy due date calculator. Enter your last menstrual period or conception date to estimate your due date, current week of pregnancy, trimester, and key milestones."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/health-calculators/">Health Calculators</a> &rsaquo;
+    <span>Pregnancy Due Date Calculator</span>
+  </nav>
+
+  <h1>Pregnancy Due Date Calculator</h1>
+  <p class="page-desc">Estimate your baby's due date, current week of pregnancy, and key milestones based on your last menstrual period or conception date.</p>
+
+  <div class="calculator-box">
+    <div class="method-toggle">
+      <button class="toggle-btn active" data-method="lmp">Last Menstrual Period</button>
+      <button class="toggle-btn" data-method="conception">Conception Date</button>
+    </div>
+
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="lmpDate" id="dateLabel">First Day of Last Menstrual Period</label>
+        <input type="date" id="lmpDate" />
+      </div>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-primary">
+        <span class="result-primary-label">Estimated Due Date</span>
+        <span class="result-primary-value" id="dueDate">--</span>
+      </div>
+
+      <div class="result-cards">
+        <div class="result-card">
+          <span class="result-label">Current Week</span>
+          <span class="result-value" id="currentWeek">--</span>
+          <span class="result-detail" id="weekDay"></span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Trimester</span>
+          <span class="result-value" id="trimester">--</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Days Remaining</span>
+          <span class="result-value" id="daysRemaining">--</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Est. Conception Date</span>
+          <span class="result-value" id="conceptionDate">--</span>
+        </div>
+      </div>
+
+      <h3 class="milestones-heading">Key Milestones</h3>
+      <div class="milestone-cards">
+        <div class="milestone-card">
+          <span class="milestone-icon">&#9679;</span>
+          <div class="milestone-info">
+            <span class="milestone-label">End of 1st Trimester</span>
+            <span class="milestone-date" id="endTrimester1">--</span>
+            <span class="milestone-week">Week 12</span>
+          </div>
+        </div>
+        <div class="milestone-card">
+          <span class="milestone-icon">&#9679;</span>
+          <div class="milestone-info">
+            <span class="milestone-label">End of 2nd Trimester</span>
+            <span class="milestone-date" id="endTrimester2">--</span>
+            <span class="milestone-week">Week 27</span>
+          </div>
+        </div>
+        <div class="milestone-card">
+          <span class="milestone-icon">&#9679;</span>
+          <div class="milestone-info">
+            <span class="milestone-label">Viability Date</span>
+            <span class="milestone-date" id="viabilityDate">--</span>
+            <span class="milestone-week">Week 24</span>
+          </div>
+        </div>
+        <div class="milestone-card">
+          <span class="milestone-icon">&#9679;</span>
+          <div class="milestone-info">
+            <span class="milestone-label">Full Term</span>
+            <span class="milestone-date" id="fullTermDate">--</span>
+            <span class="milestone-week">Week 37</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>How Due Dates Are Calculated</h2>
+    <p>A pregnancy due date, also called the estimated date of delivery (EDD) or estimated date of confinement (EDC), is the projected date when a baby is expected to be born. Healthcare providers have used due date calculations for centuries to help expectant parents prepare for the arrival of their child and to monitor the progression of pregnancy against established developmental milestones.</p>
+    <p>The standard method for calculating a due date is based on the assumption that a typical pregnancy lasts approximately 280 days, or 40 weeks, from the first day of the last menstrual period (LMP). This method works because, while conception typically occurs about two weeks after the start of the last period, most women can more reliably recall when their last period began than when they actually conceived. The LMP method has been the clinical standard for decades and remains the initial calculation method used in virtually every obstetric practice worldwide.</p>
+    <p>If the exact date of conception is known, the calculation is slightly different. Since conception occurs roughly 14 days after the LMP, a pregnancy calculated from the conception date uses 266 days (38 weeks) rather than 280. This method is sometimes more accurate for women who underwent in vitro fertilization (IVF) or who tracked ovulation precisely using basal body temperature charting, ovulation predictor kits, or other fertility monitoring methods.</p>
+    <p>It is important to understand that a due date is an estimate, not a guarantee. Only about four to five percent of babies are born on their exact due date. The vast majority of healthy deliveries occur within a two-week window surrounding the estimated date, typically between 38 and 42 weeks of gestation. Your healthcare provider may adjust your due date based on early ultrasound measurements, which can provide a more precise estimate of gestational age, particularly for women with irregular menstrual cycles.</p>
+
+    <h2>Naegele's Rule</h2>
+    <p>The most widely used formula for calculating a due date is known as Naegele's Rule, named after Franz Karl Naegele, a German obstetrician who popularized the method in the early 19th century. The rule provides a simple way to estimate the delivery date without complex calculations or technology.</p>
+    <div class="formula-box">
+      <code>Due Date = LMP + 1 year - 3 months + 7 days</code>
+    </div>
+    <p>In practice, this formula adds 280 days to the first day of the last menstrual period. For example, if your last period began on January 1, you would subtract three months to get October 1 of the previous year, then add seven days and one year, arriving at a due date of October 8. This is mathematically equivalent to simply adding 280 days to the LMP date, which is the approach most modern calculators and medical software use.</p>
+    <p>Naegele's Rule assumes a 28-day menstrual cycle with ovulation occurring on day 14. For women whose cycles are longer or shorter than 28 days, the due date may need to be adjusted. If your cycle is typically 35 days, for instance, ovulation likely occurs around day 21 rather than day 14, meaning the due date should be pushed forward by approximately one week. Conversely, a shorter cycle would move the due date earlier.</p>
+    <p>Despite its simplicity, Naegele's Rule has stood the test of time remarkably well. Studies have shown that it provides a reasonably accurate estimate for the majority of pregnancies, though first-trimester ultrasound measurements may be used to refine the date when there is a discrepancy of more than five to seven days between the ultrasound estimate and the LMP-based calculation.</p>
+
+    <h2>Pregnancy Trimesters</h2>
+    <p>Pregnancy is divided into three trimesters, each lasting approximately 13 weeks. Each trimester is characterized by distinct developmental milestones for the baby and physical changes for the mother. Understanding which trimester you are in helps you know what to expect and when certain tests and screenings are recommended.</p>
+
+    <h3>First Trimester (Weeks 1-12)</h3>
+    <p>The first trimester is a period of rapid and foundational development. During the first few weeks after conception, the fertilized egg implants in the uterine wall and begins dividing rapidly. By week five, the embryo's heart begins to beat. By the end of the first trimester, all major organs and body systems have begun to form, including the brain, spinal cord, heart, lungs, and digestive system. The embryo transitions to being called a fetus at around week 10, and by week 12, the fetus is about 2.5 inches long.</p>
+    <p>For the mother, the first trimester often brings symptoms such as morning sickness, fatigue, breast tenderness, frequent urination, and mood changes driven by surging hormone levels. Many women experience their most intense nausea between weeks 6 and 10. The risk of miscarriage is highest during this period, which is why many couples choose to wait until the end of the first trimester to share the news of their pregnancy.</p>
+
+    <h3>Second Trimester (Weeks 13-27)</h3>
+    <p>The second trimester is often called the most comfortable period of pregnancy. Morning sickness usually subsides, energy levels return, and the visible baby bump begins to appear. The baby grows rapidly during this phase, developing fingers, toes, eyelashes, and eyebrows. By around week 18 to 22, many mothers feel the baby's first movements, known as quickening. The anatomy scan ultrasound, typically performed around week 20, provides a detailed look at the baby's organs and can reveal the baby's sex.</p>
+    <p>By the end of the second trimester, the baby is approximately 14 inches long and weighs about 2 pounds. The lungs are developing but are not yet mature enough to function outside the womb without medical support. The baby can hear sounds, respond to light, and has established regular sleep and wake cycles.</p>
+
+    <h3>Third Trimester (Weeks 28-40)</h3>
+    <p>The third trimester is a period of significant weight gain for the baby. The brain develops rapidly, bones harden, and the baby accumulates the fat layer needed to regulate body temperature after birth. By week 37, the pregnancy is considered full term, and the baby's lungs are typically mature enough for life outside the womb.</p>
+    <p>For the mother, the third trimester brings increasing physical discomfort as the baby grows larger. Common symptoms include back pain, shortness of breath, difficulty sleeping, swelling in the feet and ankles, and Braxton Hicks contractions, which are practice contractions that help prepare the body for labor. As the due date approaches, the baby may drop lower into the pelvis in a process called lightening, which eases breathing but increases pressure on the bladder.</p>
+
+    <h2>Key Pregnancy Milestones</h2>
+    <p>Throughout pregnancy, several important milestones mark the baby's development and readiness for life outside the womb. Understanding these milestones can help expectant parents track progress and feel more connected to the pregnancy journey.</p>
+    <table class="info-table">
+      <thead>
+        <tr><th>Week</th><th>Milestone</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Week 5</td><td>Heart begins to beat</td></tr>
+        <tr><td>Week 8</td><td>All major organs have begun forming</td></tr>
+        <tr><td>Week 12</td><td>End of first trimester; risk of miscarriage drops significantly</td></tr>
+        <tr><td>Week 16</td><td>Baby may begin making facial expressions</td></tr>
+        <tr><td>Week 18-22</td><td>Mother may feel first fetal movements (quickening)</td></tr>
+        <tr><td>Week 20</td><td>Anatomy scan ultrasound; halfway point of pregnancy</td></tr>
+        <tr><td>Week 24</td><td>Viability milestone; baby has a chance of survival if born prematurely with intensive medical care</td></tr>
+        <tr><td>Week 27</td><td>End of second trimester; baby can open and close eyes</td></tr>
+        <tr><td>Week 28</td><td>Baby enters third trimester; brain develops rapidly</td></tr>
+        <tr><td>Week 32</td><td>Baby's bones are fully formed but still soft</td></tr>
+        <tr><td>Week 37</td><td>Pregnancy is considered full term; lungs are typically mature</td></tr>
+        <tr><td>Week 39-40</td><td>Baby is fully developed and ready for birth</td></tr>
+      </tbody>
+    </table>
+    <p>The viability milestone at week 24 is particularly significant. Before this point, a baby born prematurely has very limited chances of survival even with the most advanced neonatal care. After 24 weeks, survival rates improve dramatically with each additional week of gestation, though extended stays in the neonatal intensive care unit (NICU) are common for babies born before 34 weeks.</p>
+    <p>Full term at week 37 marks the point at which the baby's lungs, brain, and liver are generally mature enough to function independently. Babies born between 37 and 39 weeks are considered early term, those born between 39 and 40 weeks and 6 days are full term, and those born between 41 and 41 weeks and 6 days are late term. Post-term pregnancies extend beyond 42 weeks and carry increased risks that healthcare providers monitor closely.</p>
+
+    <h2>Factors That Affect Due Dates</h2>
+    <p>While due date calculations provide a useful estimate, many factors can influence when a baby actually arrives. Understanding these factors helps set realistic expectations and explains why due dates are considered estimates rather than exact predictions.</p>
+    <ul>
+      <li><strong>Irregular menstrual cycles:</strong> The LMP-based calculation assumes a regular 28-day cycle. Women with irregular, longer, or shorter cycles may ovulate on different days, making the standard calculation less accurate. If your cycles vary significantly in length, your healthcare provider may rely more heavily on early ultrasound dating.</li>
+      <li><strong>First-time vs. subsequent pregnancies:</strong> First-time mothers tend to deliver slightly later than their due date on average, while women who have given birth before often deliver a few days earlier. However, this is a statistical trend and does not predict any individual outcome.</li>
+      <li><strong>Maternal age:</strong> Older mothers, particularly those over 35, may have slightly different delivery timing patterns. Advanced maternal age is also associated with higher rates of medical inductions, which can shift the actual delivery date.</li>
+      <li><strong>Multiple pregnancies:</strong> Twins, triplets, and other multiples are typically born earlier than singletons. The average twin pregnancy delivers around 36 weeks, and triplets around 32 weeks. Due date calculations for multiples are adjusted accordingly.</li>
+      <li><strong>Genetic factors:</strong> Research suggests that the length of gestation has a genetic component. If your mother or sisters tended to deliver early or late, you may follow a similar pattern. Studies have identified specific genes associated with gestational duration.</li>
+      <li><strong>Health conditions:</strong> Conditions such as gestational diabetes, preeclampsia, and placenta previa can necessitate earlier delivery for the safety of the mother and baby. Conversely, some conditions may lead to post-term pregnancies that require induction.</li>
+      <li><strong>Lifestyle factors:</strong> Stress, nutrition, physical activity levels, and overall health can influence the timing of delivery. Women who maintain healthy lifestyles throughout pregnancy tend to have fewer complications that might lead to preterm or induced deliveries.</li>
+    </ul>
+    <p>Ultrasound dating, particularly when performed in the first trimester (before 13 weeks), is considered more accurate than LMP-based calculations. A first-trimester ultrasound measures the crown-rump length of the embryo and can estimate gestational age to within about five to seven days. If the ultrasound date differs from the LMP-based date by more than seven days, most healthcare providers will adjust the due date to match the ultrasound estimate.</p>
+
+    <h2>Tips for a Healthy Pregnancy</h2>
+    <p>Maintaining good health throughout pregnancy benefits both the mother and the developing baby. While every pregnancy is unique and you should always follow your healthcare provider's specific guidance, these general tips are supported by medical research and professional recommendations.</p>
+    <ul>
+      <li><strong>Start prenatal vitamins early:</strong> Begin taking a prenatal vitamin with at least 400 micrograms of folic acid before conception or as soon as you know you are pregnant. Folic acid is critical for preventing neural tube defects, which form in the first 28 days of pregnancy, often before a woman even knows she is expecting.</li>
+      <li><strong>Attend all prenatal appointments:</strong> Regular checkups allow your healthcare provider to monitor the baby's growth, check for complications, and perform important screenings and tests. First-trimester bloodwork and the nuchal translucency scan screen for chromosomal abnormalities, while the glucose tolerance test around week 24-28 checks for gestational diabetes.</li>
+      <li><strong>Eat a balanced, nutrient-dense diet:</strong> Focus on whole grains, lean proteins, fruits, vegetables, and healthy fats. Important nutrients during pregnancy include iron, calcium, vitamin D, omega-3 fatty acids, and choline. Avoid raw or undercooked meats, unpasteurized dairy, high-mercury fish, and excessive caffeine (limit to 200 milligrams per day).</li>
+      <li><strong>Stay physically active:</strong> The American College of Obstetricians and Gynecologists recommends at least 150 minutes of moderate-intensity aerobic activity per week during pregnancy. Walking, swimming, prenatal yoga, and stationary cycling are excellent options. Exercise during pregnancy can reduce the risk of gestational diabetes, preeclampsia, and excessive weight gain while improving mood and sleep quality.</li>
+      <li><strong>Get adequate sleep:</strong> Pregnancy increases the need for rest, particularly in the first and third trimesters. Aim for seven to nine hours of sleep per night. Sleeping on your left side is recommended after the first trimester as it improves blood flow to the uterus and kidneys. Use pillows to support your growing belly and relieve back pressure.</li>
+      <li><strong>Manage stress:</strong> Chronic stress during pregnancy has been linked to preterm birth and low birth weight. Practice relaxation techniques such as deep breathing, meditation, gentle prenatal yoga, or journaling. Maintaining a strong support network of family, friends, and healthcare providers is also important for emotional well-being.</li>
+      <li><strong>Avoid harmful substances:</strong> Completely avoid alcohol, tobacco, and recreational drugs during pregnancy. These substances can cause serious developmental problems including fetal alcohol spectrum disorders, low birth weight, premature birth, and stillbirth. Discuss all medications, including over-the-counter drugs and supplements, with your healthcare provider.</li>
+      <li><strong>Stay hydrated:</strong> Pregnant women need about 8 to 12 cups of water per day. Adequate hydration supports amniotic fluid levels, nutrient transport, and blood volume expansion. Dehydration during pregnancy can trigger Braxton Hicks contractions and increase the risk of urinary tract infections and preterm labor.</li>
+    </ul>
+    <p>Remember that every pregnancy is different, and what is normal for one woman may not be normal for another. Always consult your healthcare provider with any questions or concerns about your pregnancy. If you experience warning signs such as vaginal bleeding, severe abdominal pain, persistent headaches, sudden swelling, or a decrease in fetal movement, seek medical attention immediately.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>How is a pregnancy due date calculated?</h3>
+    <p>A pregnancy due date is most commonly calculated using Naegele's Rule, which adds 280 days (40 weeks) to the first day of your last menstrual period. This method assumes a 28-day menstrual cycle with ovulation occurring on day 14. If you know the exact date of conception, you can calculate the due date by adding 266 days (38 weeks) to that date instead. Both methods arrive at the same estimated delivery date because they account for the approximately two-week difference between the start of the last period and actual conception. Your healthcare provider may adjust the due date based on early ultrasound measurements for greater accuracy.</p>
+
+    <h3>How accurate are pregnancy due date calculators?</h3>
+    <p>Due date calculators provide a useful estimate, but they are not precise predictions. Only about four to five percent of babies are born on their exact estimated due date. Most healthy babies are born within a window of two weeks before or after the calculated date, between 38 and 42 weeks of gestation. First-trimester ultrasound dating is generally considered more accurate than LMP-based calculations because it directly measures the embryo rather than relying on assumptions about cycle length and ovulation timing. Factors such as irregular cycles, the mother's age, and whether this is a first pregnancy can all affect accuracy.</p>
+
+    <h3>What are the three trimesters of pregnancy?</h3>
+    <p>The first trimester spans weeks 1 through 12 and is the period of most rapid foundational development, during which all major organs and body systems begin forming. The second trimester covers weeks 13 through 27 and is often the most comfortable period for the mother as nausea subsides and the baby grows visibly. During this time, the mother typically feels the first fetal movements and has the anatomy scan ultrasound. The third trimester runs from week 28 through week 40, during which the baby gains weight rapidly, the brain develops extensively, and the body prepares for birth. The pregnancy is considered full term at week 37.</p>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .breadcrumb { font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 16px; }
+  .breadcrumb a { color: var(--color-text-muted); }
+  .breadcrumb a:hover { color: var(--color-primary); }
+  h1 { font-size: 1.8rem; margin-bottom: 8px; }
+  .page-desc { color: var(--color-text-muted); margin-bottom: 24px; }
+
+  .calculator-box {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 32px;
+  }
+  .method-toggle {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    padding: 4px;
+    width: fit-content;
+  }
+  .toggle-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    transition: all 0.15s;
+  }
+  .toggle-btn.active {
+    background: var(--color-surface);
+    color: var(--color-primary);
+    box-shadow: var(--shadow-sm);
+  }
+  .calc-inputs { margin-bottom: 24px; }
+  .input-group { display: flex; flex-direction: column; gap: 4px; max-width: 300px; }
+  .input-group label { font-size: 0.85rem; font-weight: 600; color: var(--color-text-muted); }
+  .input-group input {
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    background: var(--color-bg);
+  }
+  .input-group input:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+
+  .result-primary {
+    text-align: center;
+    margin-bottom: 24px;
+    padding: 20px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+  }
+  .result-primary-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    margin-bottom: 6px;
+  }
+  .result-primary-value {
+    display: block;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--color-primary);
+  }
+
+  .result-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .result-card { background: var(--color-bg); border-radius: var(--radius); padding: 16px; text-align: center; }
+  .result-label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--color-text-muted); margin-bottom: 4px; }
+  .result-value { display: block; font-size: 1.5rem; font-weight: 800; }
+  .result-detail { display: block; font-size: 0.8rem; color: var(--color-text-muted); margin-top: 2px; }
+
+  .milestones-heading { font-size: 1rem; font-weight: 700; margin-bottom: 12px; color: var(--color-text-muted); }
+  .milestone-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+  .milestone-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+  }
+  .milestone-icon {
+    font-size: 0.6rem;
+    color: var(--color-primary);
+    margin-top: 4px;
+    flex-shrink: 0;
+  }
+  .milestone-info { display: flex; flex-direction: column; gap: 2px; }
+  .milestone-label { font-size: 0.8rem; font-weight: 600; color: var(--color-text-muted); }
+  .milestone-date { font-size: 1rem; font-weight: 700; }
+  .milestone-week { font-size: 0.75rem; color: var(--color-text-muted); }
+
+  .content-section { max-width: 800px; line-height: 1.8; }
+  .content-section h2 { font-size: 1.3rem; margin: 32px 0 12px; padding-top: 16px; border-top: 1px solid var(--color-border); }
+  .content-section h2:first-child { border-top: none; margin-top: 0; }
+  .content-section h3 { font-size: 1.1rem; margin: 24px 0 8px; }
+  .content-section p { margin-bottom: 12px; }
+  .content-section ul, .content-section ol { margin: 0 0 16px 24px; }
+  .content-section li { margin-bottom: 6px; }
+  .formula-box {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 16px 24px;
+    margin: 16px 0;
+    font-size: 1.1rem;
+    text-align: center;
+  }
+  .info-table { width: 100%; max-width: 600px; border-collapse: collapse; margin: 16px 0; }
+  .info-table th, .info-table td { padding: 8px 16px; border: 1px solid var(--color-border); text-align: left; }
+  .info-table th { background: var(--color-bg); font-weight: 600; }
+
+  @media (max-width: 640px) {
+    .method-toggle { flex-direction: column; width: 100%; }
+    .toggle-btn { text-align: center; }
+    .input-group { max-width: 100%; }
+    .result-cards { grid-template-columns: 1fr 1fr; }
+    .milestone-cards { grid-template-columns: 1fr; }
+    .result-primary-value { font-size: 1.5rem; }
+  }
+</style>
+
+<script>
+  let method: 'lmp' | 'conception' = 'lmp';
+
+  const dateInput = document.getElementById('lmpDate') as HTMLInputElement;
+  const dateLabel = document.getElementById('dateLabel') as HTMLLabelElement;
+
+  // Method toggle
+  document.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      method = (btn as HTMLElement).dataset.method as 'lmp' | 'conception';
+      dateLabel.textContent = method === 'lmp' ? 'First Day of Last Menstrual Period' : 'Conception Date';
+      dateInput.value = '';
+      clearResults();
+    });
+  });
+
+  function formatDate(date: Date): string {
+    const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString('en-US', options);
+  }
+
+  function formatDateShort(date: Date): string {
+    const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' };
+    return date.toLocaleDateString('en-US', options);
+  }
+
+  function addDays(date: Date, days: number): Date {
+    const result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result;
+  }
+
+  function daysBetween(a: Date, b: Date): number {
+    const msPerDay = 1000 * 60 * 60 * 24;
+    const aUTC = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+    const bUTC = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+    return Math.floor((bUTC - aUTC) / msPerDay);
+  }
+
+  function clearResults() {
+    document.getElementById('dueDate')!.textContent = '--';
+    document.getElementById('currentWeek')!.textContent = '--';
+    document.getElementById('weekDay')!.textContent = '';
+    document.getElementById('trimester')!.textContent = '--';
+    document.getElementById('daysRemaining')!.textContent = '--';
+    document.getElementById('conceptionDate')!.textContent = '--';
+    document.getElementById('endTrimester1')!.textContent = '--';
+    document.getElementById('endTrimester2')!.textContent = '--';
+    document.getElementById('viabilityDate')!.textContent = '--';
+    document.getElementById('fullTermDate')!.textContent = '--';
+  }
+
+  function calculate() {
+    const val = dateInput.value;
+    if (!val) {
+      clearResults();
+      return;
+    }
+
+    // Parse the date input as local date
+    const parts = val.split('-');
+    const inputDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+
+    // Calculate LMP date and due date
+    let lmpDate: Date;
+    let conceptionEst: Date;
+    let dueDate: Date;
+
+    if (method === 'lmp') {
+      lmpDate = inputDate;
+      conceptionEst = addDays(lmpDate, 14);
+      dueDate = addDays(lmpDate, 280);
+    } else {
+      conceptionEst = inputDate;
+      lmpDate = addDays(conceptionEst, -14);
+      dueDate = addDays(conceptionEst, 266);
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Current gestational age in days (from LMP)
+    const gestationalDays = daysBetween(lmpDate, today);
+    const gestationalWeeks = Math.floor(gestationalDays / 7);
+    const gestationalRemainingDays = gestationalDays % 7;
+
+    // Days remaining until due date
+    const remaining = daysBetween(today, dueDate);
+
+    // Determine trimester
+    let trimesterText = '--';
+    if (gestationalWeeks >= 1 && gestationalWeeks <= 12) {
+      trimesterText = '1st';
+    } else if (gestationalWeeks >= 13 && gestationalWeeks <= 27) {
+      trimesterText = '2nd';
+    } else if (gestationalWeeks >= 28 && gestationalWeeks <= 42) {
+      trimesterText = '3rd';
+    } else if (gestationalDays < 7 && gestationalDays >= 0) {
+      trimesterText = '1st';
+    }
+
+    // Key milestone dates (calculated from LMP)
+    const endTrimester1 = addDays(lmpDate, 12 * 7); // End of week 12
+    const endTrimester2 = addDays(lmpDate, 27 * 7); // End of week 27
+    const viability = addDays(lmpDate, 24 * 7);      // Week 24
+    const fullTerm = addDays(lmpDate, 37 * 7);       // Week 37
+
+    // Update the DOM
+    document.getElementById('dueDate')!.textContent = formatDate(dueDate);
+
+    if (gestationalDays >= 0 && gestationalDays <= 300) {
+      document.getElementById('currentWeek')!.textContent = 'Week ' + gestationalWeeks;
+      document.getElementById('weekDay')!.textContent = gestationalRemainingDays + ' day' + (gestationalRemainingDays !== 1 ? 's' : '');
+    } else {
+      document.getElementById('currentWeek')!.textContent = '--';
+      document.getElementById('weekDay')!.textContent = '';
+    }
+
+    document.getElementById('trimester')!.textContent = trimesterText;
+    document.getElementById('daysRemaining')!.textContent = remaining > 0 ? remaining.toString() : '0';
+    document.getElementById('conceptionDate')!.textContent = formatDateShort(conceptionEst);
+
+    document.getElementById('endTrimester1')!.textContent = formatDateShort(endTrimester1);
+    document.getElementById('endTrimester2')!.textContent = formatDateShort(endTrimester2);
+    document.getElementById('viabilityDate')!.textContent = formatDateShort(viability);
+    document.getElementById('fullTermDate')!.textContent = formatDateShort(fullTerm);
+  }
+
+  // Auto-calculate on date change
+  dateInput.addEventListener('change', calculate);
+  dateInput.addEventListener('input', calculate);
+</script>

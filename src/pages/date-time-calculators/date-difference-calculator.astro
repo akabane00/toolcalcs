@@ -1,0 +1,375 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'How do you calculate the number of days between two dates?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'To calculate the number of days between two dates, convert both dates to a common reference point (such as milliseconds since January 1, 1970), subtract the earlier date from the later date, and divide the result by the number of milliseconds in one day (86,400,000). This method accounts for leap years and varying month lengths automatically.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is the difference between calendar days and business days?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Calendar days include every day between two dates, including weekends and holidays. Business days (also called working days) count only Monday through Friday, excluding Saturday and Sunday. For example, a span of 14 calendar days typically contains 10 business days. This calculator counts business days as Monday through Friday without accounting for public holidays.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Does the date difference calculator account for leap years?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes. The calculator uses precise date arithmetic that correctly handles leap years. When a date range spans February 29 of a leap year, that day is included in the total count. Month and year calculations also adjust for the extra day in February during leap years.',
+      },
+    },
+  ],
+};
+---
+
+<BaseLayout
+  title="Date Difference Calculator - Days Between Two Dates | ToolCalcs"
+  description="Free date difference calculator. Find the exact number of days, weeks, months, and years between any two dates, plus business days and weekend days."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/date-time-calculators/">Date & Time Calculators</a> &rsaquo;
+    <span>Date Difference Calculator</span>
+  </nav>
+
+  <h1>Date Difference Calculator</h1>
+  <p class="page-desc">Find the exact number of days, weeks, months, and years between any two dates.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="startDate">Start Date</label>
+        <input type="date" id="startDate" />
+      </div>
+      <div class="input-group">
+        <label for="endDate">End Date</label>
+        <input type="date" id="endDate" />
+      </div>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Total Days</span>
+          <span class="result-value" id="totalDays">--</span>
+          <span class="result-detail" id="totalDaysDetail"></span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Weeks</span>
+          <span class="result-value" id="totalWeeks">--</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Months</span>
+          <span class="result-value" id="totalMonths">--</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Years</span>
+          <span class="result-value" id="totalYears">--</span>
+        </div>
+      </div>
+      <div class="result-cards secondary">
+        <div class="result-card">
+          <span class="result-label">Business Days</span>
+          <span class="result-value small" id="businessDays">--</span>
+          <span class="result-detail">Mon &ndash; Fri</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Weekend Days</span>
+          <span class="result-value small" id="weekendDays">--</span>
+          <span class="result-detail">Sat &amp; Sun</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>How to Calculate Days Between Dates</h2>
+    <p>Calculating the number of days between two dates is one of the most common date arithmetic tasks, yet doing it by hand is surprisingly error-prone. The challenge arises because months have different lengths (28, 29, 30, or 31 days), and leap years add an extra day to February every four years (with exceptions for century years). Simply multiplying the number of months by 30 will give you an approximation, but it can be off by several days over longer periods.</p>
+    <p>The most reliable way to calculate the exact number of days between two dates is to convert both dates into a single reference number, such as a Julian Day Number or the number of milliseconds since a fixed point in time (JavaScript uses January 1, 1970, as its epoch). Once both dates are expressed as numbers, you subtract the smaller from the larger and convert the result into days by dividing by the number of milliseconds in 24 hours (86,400,000).</p>
+    <p>For example, to find the number of days between March 15, 2024, and November 28, 2025, you would convert both dates to their millisecond representations, subtract, and divide. The result is 624 days. Doing this by hand would require you to add the remaining days in March (16), then April through October of 2024 (214 days), November and December 2024 (61 days), January through October 2025 (304 days), and then 28 days in November, while remembering that 2024 is a leap year. The millisecond method is much simpler and eliminates the possibility of error.</p>
+    <p>This calculator does all the conversion and arithmetic automatically. Enter your two dates, and the result appears instantly. The calculator also handles cases where the start date comes after the end date by computing the absolute difference, so date order does not matter.</p>
+
+    <h2>Business Days vs Calendar Days</h2>
+    <p>The distinction between calendar days and business days matters enormously in professional, legal, and financial contexts. Calendar days count every single day in a date range, including weekends and holidays. Business days, also called working days, count only Monday through Friday.</p>
+    <p>In many business and legal situations, deadlines are specified in business days rather than calendar days. For instance, a contract might require a response within "10 business days," which translates to two full work weeks (14 calendar days, assuming no holidays). If you mistakenly count 10 calendar days instead, you might miss the actual deadline by four days.</p>
+    <p><strong>Legal deadlines</strong> often use business days. Court filing deadlines, regulatory response periods, and compliance windows frequently specify business days. Missing a court filing deadline by even one day can result in case dismissal, default judgments, or sanctions. Lawyers and paralegals rely heavily on accurate business-day counting.</p>
+    <p><strong>Financial markets</strong> operate on business days. Stock trades settle in T+1 (one business day after the trade date). Wire transfers between banks are typically processed within one to two business days. Payroll processing, invoice due dates, and accounts receivable aging are all measured in business days.</p>
+    <p><strong>Shipping and delivery</strong> estimates usually reference business days. When an online retailer promises "5-7 business days" for delivery, the package will arrive within 7 to 11 calendar days, depending on when the order was placed and whether any holidays fall within the period.</p>
+    <p>It is important to note that this calculator counts business days as Monday through Friday without excluding public holidays. If your calculation needs to account for holidays such as Christmas, New Year's Day, or Independence Day, you will need to subtract those holidays manually from the business day count.</p>
+
+    <h2>Common Date Calculations</h2>
+    <p>Certain date calculations come up frequently in everyday life. Understanding how they work helps you plan more effectively and avoid scheduling mistakes.</p>
+    <p><strong>90-day periods</strong> are standard in many contexts. Visa-free travel allowances (such as the 90-day Schengen zone limit), probationary employment periods, and warranty return windows are all commonly set at 90 days. Ninety calendar days is roughly three months but not exactly, because three consecutive months can span 89 to 92 days depending on which months are included.</p>
+    <p><strong>30-day calculations</strong> are equally common. Credit card billing cycles, free trial periods, and monthly subscription renewals often use 30-day intervals. However, a "month" is not always 30 days: January has 31, February has 28 or 29, and so on. Some systems use calendar months while others use a fixed 30-day period, and the difference can affect billing dates and deadlines.</p>
+    <p><strong>Year-based calculations</strong> appear in contexts like lease agreements, loan terms, and employee tenure. One year equals 365 days in a common year and 366 days in a leap year. For multi-year calculations, you need to account for how many leap years fall within the range. On average, one year equals approximately 365.25 days, which is why we add a leap day every four years to keep the calendar aligned with Earth's orbit around the Sun.</p>
+    <p><strong>Week-based calculations</strong> are useful for project planning, academic calendars, and fitness tracking. A week is always exactly 7 days, making it the most consistent time unit for calculations. When you need to convert days to weeks, simply divide the total days by 7. For example, 100 days equals 14 weeks and 2 days.</p>
+
+    <h2>How Leap Years Affect Date Calculations</h2>
+    <p>Leap years add a layer of complexity to date calculations that is easy to overlook. A leap year occurs every four years to correct for the fact that Earth takes approximately 365.2422 days to orbit the Sun. Without leap years, the calendar would drift by about one day every four years, causing seasons to shift over time.</p>
+    <p>The rules for determining leap years are as follows. A year is a leap year if it is divisible by 4, <strong>except</strong> for years that are divisible by 100, <strong>unless</strong> the year is also divisible by 400. Under these rules, the year 2000 was a leap year (divisible by 400), 1900 was not (divisible by 100 but not 400), and 2024 was a leap year (divisible by 4 and not by 100). The next leap year after 2024 is 2028.</p>
+    <p>When calculating the difference between two dates that span one or more leap years, the total day count must include February 29 for each leap year in the range. For example, the period from January 1, 2024, to December 31, 2024, is 366 days because 2024 is a leap year. The same period in 2025 is only 365 days.</p>
+    <p>Leap years also affect month and year calculations. If you are counting the number of months between February 28, 2024, and March 28, 2024, the answer is exactly one month regardless of whether it is a leap year. However, the number of days in that month is 29 in 2024 (a leap year) and 28 in 2025. This distinction matters when contracts or agreements specify durations in both months and days.</p>
+    <p>People born on February 29 face a unique situation. They technically have a birthday only once every four years. In non-leap years, some countries legally consider March 1 as their birthday, while others use February 28. This calculator handles leap day calculations correctly by using the precise day count between the two specified dates.</p>
+
+    <h2>Date Difference in Different Units</h2>
+    <p>The difference between two dates can be expressed in various units, and each unit serves a different purpose. Understanding how to convert between units and when to use each one is essential for accurate planning.</p>
+    <p><strong>Days</strong> are the most fundamental unit for date differences. Days are exact and unambiguous: each day is precisely 24 hours (ignoring daylight saving time shifts). When you need the most accurate count of time between two dates, days are the unit to use. This calculator shows the total number of calendar days between your two selected dates.</p>
+    <p><strong>Weeks</strong> are calculated by dividing the total number of days by 7. This unit is useful for project planning, where tasks are often assigned in weekly sprints. Academic semesters and school terms are commonly described in weeks. Pregnancy duration is measured in weeks (40 weeks for a full-term pregnancy). One important note: the result is often expressed as a decimal or as weeks and remaining days, since date ranges rarely divide evenly by 7.</p>
+    <p><strong>Months</strong> are trickier because they do not have a fixed length. The calculator determines the number of complete months by comparing the month and day components of the start and end dates. If the end day is earlier in the month than the start day, the month count decreases by one. This is the same borrowing technique used in age calculations. Because of the variable month length, expressing a duration in months is inherently approximate.</p>
+    <p><strong>Years</strong> are calculated similarly to months. The calculator counts the number of full years between the two dates, accounting for whether the anniversary date has passed in the final year. As with months, years are not a fixed number of days (365 or 366), so year-based calculations are best understood as approximate measures that describe complete calendar-year cycles.</p>
+    <p>For the highest precision in contracts, scheduling, and planning, it is best to use days as the primary unit and convert to weeks, months, or years only when a more human-readable format is needed.</p>
+
+    <h2>Practical Uses for Date Calculations</h2>
+    <p>Date difference calculations appear in a wide range of real-world scenarios. Here are some of the most common practical applications.</p>
+    <p><strong>Project management.</strong> Estimating project timelines requires knowing the number of working days between the start date and the deadline. If a project starts on March 3 and must be completed by June 30, a project manager needs to know exactly how many business days are available. This determines how many sprints can be scheduled, how resources are allocated, and whether the timeline is realistic.</p>
+    <p><strong>Travel planning.</strong> Many countries impose visa restrictions based on the number of days spent within their borders. The Schengen Area in Europe, for example, allows visa-free travel for up to 90 days within any 180-day period. Travelers need to calculate the exact number of days between their entry and exit dates to avoid overstaying. Similarly, frequent travelers track days across multiple trips to ensure compliance with cumulative limits.</p>
+    <p><strong>Contract and lease management.</strong> Rental agreements, service contracts, and subscriptions are defined by date ranges. Knowing the exact duration in days, months, or years helps both parties understand their obligations. Prorated charges for partial months are calculated by dividing the monthly rate by the number of days in the month and multiplying by the number of days occupied.</p>
+    <p><strong>Financial planning.</strong> Interest calculations for bonds, certificates of deposit, and savings accounts often require the exact number of days between two dates. Day-count conventions (such as Actual/360, Actual/365, and 30/360) are standard in the financial industry and produce slightly different results depending on which convention is used. Knowing the actual day count is the starting point for any of these calculations.</p>
+    <p><strong>Human resources.</strong> HR departments calculate employee tenure in days, months, and years for benefits eligibility, vesting schedules, and anniversary recognition. Sick leave and vacation accruals are often based on the number of days or months of service. Knowing the exact date difference helps ensure accurate payroll and benefits administration.</p>
+    <p><strong>Health and fitness.</strong> Tracking progress in a fitness program, counting days until a due date during pregnancy, or measuring the duration of a treatment plan all require date difference calculations. Patients and healthcare providers use these calculations to schedule follow-up appointments, determine medication durations, and plan recovery timelines.</p>
+    <p><strong>Education.</strong> Students and administrators calculate the number of school days in a semester, the time remaining until graduation, or how many days are left before an assignment deadline. Scholarship programs and academic probation rules may specify requirements in terms of calendar days or business days.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>How do you calculate the number of days between two dates?</h3>
+    <p>Convert both dates to a common numeric representation (such as milliseconds since January 1, 1970), subtract the earlier date from the later date, and divide by the number of milliseconds in one day. This approach automatically accounts for varying month lengths and leap years. This calculator performs this arithmetic instantly when you select your start and end dates.</p>
+
+    <h3>What is the difference between calendar days and business days?</h3>
+    <p>Calendar days include every day in a date range, including weekends and holidays. Business days include only weekdays (Monday through Friday), excluding Saturdays and Sundays. For example, a two-week span has 14 calendar days but only 10 business days. This calculator shows both counts so you can choose the one that applies to your situation. Note that public holidays are not excluded from the business day count.</p>
+
+    <h3>Does the date difference calculator account for leap years?</h3>
+    <p>Yes. The calculator uses JavaScript's built-in Date object, which correctly handles leap years in all calculations. When a date range includes February 29 of a leap year, that day is counted in the total. Leap years do not need to be identified manually; the calculation is handled automatically by the underlying date arithmetic.</p>
+
+    <h3>Can I calculate the difference if the start date is after the end date?</h3>
+    <p>Yes. The calculator computes the absolute difference between the two dates, so it does not matter which date comes first. Whether you enter the earlier date as the start or the end, the results will be the same positive number of days, weeks, months, and years.</p>
+
+    <h3>Why does the month count not always match what I expect?</h3>
+    <p>Months have variable lengths (28 to 31 days), so the month count depends on which specific months fall within your date range. The calculator counts complete months using the same borrowing method used in age calculations: if the end day is earlier in the month than the start day, the month count decreases by one and the remaining days are calculated from the previous month. This gives you the most accurate representation of complete months elapsed.</p>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .breadcrumb { font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 16px; }
+  .breadcrumb a { color: var(--color-text-muted); }
+  .breadcrumb a:hover { color: var(--color-primary); }
+  h1 { font-size: 1.8rem; margin-bottom: 8px; }
+  .page-desc { color: var(--color-text-muted); margin-bottom: 24px; }
+
+  .calculator-box {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 32px;
+  }
+  .calc-inputs {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .input-group { display: flex; flex-direction: column; gap: 4px; }
+  .input-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+  .input-group input {
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    background: var(--color-bg);
+    color: var(--color-text);
+  }
+  .input-group input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+
+  .result-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .result-cards.secondary {
+    margin-bottom: 0;
+  }
+  .result-card {
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-align: center;
+  }
+  .result-card.primary {
+    background: #eff6ff;
+    grid-column: 1 / -1;
+  }
+  .result-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    margin-bottom: 4px;
+  }
+  .result-value {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+  .result-card.primary .result-value {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: var(--color-primary);
+  }
+  .result-value.small {
+    font-size: 1.1rem;
+  }
+  .result-detail {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+  }
+
+  .content-section { max-width: 800px; line-height: 1.8; }
+  .content-section h2 {
+    font-size: 1.3rem;
+    margin: 32px 0 12px;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border);
+  }
+  .content-section h2:first-child { border-top: none; margin-top: 0; }
+  .content-section h3 { font-size: 1.1rem; margin: 24px 0 8px; }
+  .content-section p { margin-bottom: 12px; }
+  .content-section ul, .content-section ol { margin: 0 0 16px 24px; }
+  .content-section li { margin-bottom: 6px; }
+
+  @media (max-width: 640px) {
+    .calc-inputs { grid-template-columns: 1fr; }
+    .result-cards { grid-template-columns: 1fr; }
+    .result-card.primary { grid-column: auto; }
+  }
+</style>
+
+<script>
+  const startDateInput = document.getElementById('startDate') as HTMLInputElement;
+  const endDateInput = document.getElementById('endDate') as HTMLInputElement;
+
+  // Set default end date to today
+  const today = new Date();
+  endDateInput.value = formatDateForInput(today);
+
+  function formatDateForInput(date: Date): string {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  function calculateDifference() {
+    const startVal = startDateInput.value;
+    const endVal = endDateInput.value;
+    if (!startVal || !endVal) return;
+
+    let startDate = new Date(startVal + 'T00:00:00');
+    let endDate = new Date(endVal + 'T00:00:00');
+
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return;
+
+    // Ensure start is before end for consistent calculations
+    let earlier = startDate;
+    let later = endDate;
+    if (startDate > endDate) {
+      earlier = endDate;
+      later = startDate;
+    }
+
+    // Total days
+    const msPerDay = 1000 * 60 * 60 * 24;
+    const totalDays = Math.round((later.getTime() - earlier.getTime()) / msPerDay);
+
+    // Total weeks (decimal)
+    const totalWeeksExact = totalDays / 7;
+    const fullWeeks = Math.floor(totalWeeksExact);
+    const remainingDays = totalDays % 7;
+
+    // Total months and years using date arithmetic
+    let years = later.getFullYear() - earlier.getFullYear();
+    let months = later.getMonth() - earlier.getMonth();
+    let days = later.getDate() - earlier.getDate();
+
+    if (days < 0) {
+      months--;
+      const prevMonth = new Date(later.getFullYear(), later.getMonth(), 0);
+      days += prevMonth.getDate();
+    }
+
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+
+    const totalMonths = years * 12 + months;
+
+    // Business days and weekend days
+    let businessDays = 0;
+    let weekendDays = 0;
+    const tempDate = new Date(earlier.getTime());
+    tempDate.setDate(tempDate.getDate() + 1); // start from day after start date
+    for (let i = 0; i < totalDays; i++) {
+      const dayOfWeek = tempDate.getDay();
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        weekendDays++;
+      } else {
+        businessDays++;
+      }
+      tempDate.setDate(tempDate.getDate() + 1);
+    }
+
+    // Update the DOM
+    document.getElementById('totalDays')!.textContent = totalDays.toLocaleString();
+    const yearLabel = years === 1 ? 'year' : 'years';
+    const monthLabel = months === 1 ? 'month' : 'months';
+    const dayLabel = days === 1 ? 'day' : 'days';
+    document.getElementById('totalDaysDetail')!.textContent = `${years} ${yearLabel}, ${months} ${monthLabel}, ${days} ${dayLabel}`;
+
+    const weekLabel = fullWeeks === 1 ? 'week' : 'weeks';
+    const remDayLabel = remainingDays === 1 ? 'day' : 'days';
+    document.getElementById('totalWeeks')!.textContent = remainingDays > 0
+      ? `${fullWeeks.toLocaleString()} wk ${remainingDays} d`
+      : fullWeeks.toLocaleString();
+
+    document.getElementById('totalMonths')!.textContent = totalMonths.toLocaleString();
+    const yearsFraction = totalDays / 365.25;
+    document.getElementById('totalYears')!.textContent = yearsFraction < 1
+      ? yearsFraction.toFixed(2)
+      : `${years}.${String(Math.floor((months / 12) * 10))}`;
+
+    document.getElementById('businessDays')!.textContent = businessDays.toLocaleString();
+    document.getElementById('weekendDays')!.textContent = weekendDays.toLocaleString();
+  }
+
+  startDateInput.addEventListener('change', calculateDifference);
+  endDateInput.addEventListener('change', calculateDifference);
+</script>

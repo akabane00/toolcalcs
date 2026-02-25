@@ -1,0 +1,451 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'How do you count the number of days until a specific date?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'To count the days until a specific date, subtract today\'s date from the target date using millisecond-based date arithmetic. Convert both dates to milliseconds since January 1, 1970, find the difference, and divide by 86,400,000 (the number of milliseconds in one day). This method automatically accounts for varying month lengths and leap years.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is the difference between calendar days and business days in a countdown?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Calendar days include every day between now and the target date, including weekends and holidays. Business days count only Monday through Friday, excluding Saturdays and Sundays. For example, if there are 30 calendar days until an event, there are typically about 22 business days. This calculator shows both counts but does not exclude public holidays from the business day total.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How many days until Christmas from any date?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'The number of days until Christmas depends on today\'s date. If Christmas (December 25) has already passed this year, the countdown automatically targets December 25 of the following year. You can use a days-until calculator to get the exact count, which also shows the breakdown in weeks, months, and business days.',
+      },
+    },
+  ],
+};
+---
+
+<BaseLayout
+  title="Days Until Calculator - Countdown to Any Date | ToolCalcs"
+  description="Free days until calculator. Count the exact number of days until any date, including business days, weekend days, weeks, and months remaining. Quick countdowns to Christmas, New Year, and more."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/date-time-calculators/">Date & Time Calculators</a> &rsaquo;
+    <span>Days Until Calculator</span>
+  </nav>
+
+  <h1>Days Until Calculator</h1>
+  <p class="page-desc">Count down to any date and see the exact number of days, weeks, months, and business days remaining.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="targetDate">Target Date</label>
+        <input type="date" id="targetDate" />
+      </div>
+    </div>
+
+    <div class="quick-dates">
+      <button type="button" class="quick-btn" data-holiday="christmas">Christmas</button>
+      <button type="button" class="quick-btn" data-holiday="newyear">New Year</button>
+      <button type="button" class="quick-btn" data-holiday="halloween">Halloween</button>
+      <button type="button" class="quick-btn" data-holiday="july4">July 4th</button>
+      <button type="button" class="quick-btn" data-holiday="valentines">Valentine's Day</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Days Until</span>
+          <span class="result-value" id="daysUntil">--</span>
+          <span class="result-detail" id="daysUntilDetail"></span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Weeks &amp; Days</span>
+          <span class="result-value" id="weeksDays">--</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Months &amp; Days</span>
+          <span class="result-value" id="monthsDays">--</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Business Days</span>
+          <span class="result-value" id="businessDays">--</span>
+          <span class="result-detail">Mon &ndash; Fri</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Weekend Days</span>
+          <span class="result-value" id="weekendDays">--</span>
+          <span class="result-detail">Sat &amp; Sun</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">What Day</span>
+          <span class="result-value small" id="dayOfWeek">--</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>How to Count Days Until a Date</h2>
+    <p>Counting the number of days until a future date seems straightforward, but doing it accurately by hand is more difficult than most people expect. The challenge comes from the irregular structure of the calendar: months have 28, 29, 30, or 31 days, and leap years add an extra day to February every four years. Simply adding up the days in each remaining month is tedious and prone to error, especially when the target date is many months away.</p>
+    <p>The most reliable method for counting days until a date uses a technique called epoch-based arithmetic. Both today's date and the target date are converted into the number of milliseconds that have elapsed since a fixed reference point, known as the epoch (January 1, 1970, in JavaScript and most modern programming languages). Once both dates are expressed as numbers, you subtract today's value from the target date's value and divide the result by 86,400,000, which is the number of milliseconds in exactly one day. The result is the precise number of calendar days between now and your target.</p>
+    <p>For example, suppose today is March 10, 2026, and you want to know how many days remain until December 25, 2026. Converting both dates to their millisecond representations and performing the subtraction yields a difference of roughly 24,624,000,000 milliseconds. Dividing by 86,400,000 gives exactly 285 days. No manual month-by-month addition is required, and the calculation automatically accounts for the fact that some months in that range have 30 days and others have 31.</p>
+    <p>This calculator performs that arithmetic instantly. Select a target date from the date picker or use one of the quick-select buttons for popular holidays, and the countdown appears immediately. The result updates automatically whenever you change the date, so you can compare multiple dates without pressing a button.</p>
+
+    <h2>Business Days vs Calendar Days</h2>
+    <p>One of the most important distinctions in date counting is the difference between calendar days and business days. Calendar days count every single day between today and the target date, including Saturdays, Sundays, and holidays. Business days, also called working days, count only the weekdays from Monday through Friday.</p>
+    <p>This distinction matters in many professional and legal contexts. When a deadline is specified as "15 business days," that actually means three full weeks of calendar time, or 21 calendar days, assuming no holidays intervene. Confusing business days with calendar days can cause you to miss a deadline by nearly a week, which could have serious consequences in legal filings, financial transactions, or project deliveries.</p>
+    <p><strong>Legal deadlines</strong> frequently use business days. Court filing requirements, regulatory response windows, and compliance reporting periods are often measured in business days. A "10 business day" response period translates to 14 calendar days (two weeks), but if a public holiday falls within that window, it could stretch to 15 or more calendar days. Legal professionals must track these differences carefully to avoid sanctions or default judgments.</p>
+    <p><strong>Financial transactions</strong> operate on business-day schedules. Stock trades settle on T+1 (one business day after the trade). Wire transfers between banks process within one to two business days. Payroll processing, accounts payable cycles, and invoice due dates are all measured in business days. If you are waiting for a payment that is "5 business days away," you should expect to wait an entire calendar week.</p>
+    <p><strong>Shipping and delivery</strong> estimates commonly reference business days. When an online retailer promises delivery within "3-5 business days," the package will arrive in 5 to 9 calendar days depending on when the order was placed and whether weekends or holidays fall within that window. Orders placed on a Friday afternoon may not begin processing until the following Monday.</p>
+    <p>This calculator shows both calendar days and business days in every countdown, so you always know both figures. Note that the business day count excludes only Saturdays and Sundays; public holidays such as Christmas, New Year's Day, and Independence Day are not subtracted. If holidays fall within your countdown window, subtract them manually from the business day count for the most accurate result.</p>
+
+    <h2>Popular Countdown Dates</h2>
+    <p>Certain dates attract countdowns more than others. Whether it is the anticipation of a holiday, the excitement of a celebration, or the urgency of a deadline, people frequently want to know exactly how many days remain until a significant event.</p>
+    <p><strong>Christmas (December 25)</strong> is perhaps the most counted-down date worldwide. Retailers begin their Christmas countdowns months in advance, and Advent calendars formalize the 24-day countdown leading up to December 25. Knowing the exact day count helps with planning gift purchases, scheduling travel, and coordinating holiday gatherings.</p>
+    <p><strong>New Year's Day (January 1)</strong> carries both celebratory and practical significance. The countdown to midnight on December 31 is a global tradition, but the broader countdown to January 1 also matters for financial planning, as many budgets, tax years, and subscription renewals reset on this date. People setting annual goals often want to know how many days remain in the current year.</p>
+    <p><strong>Halloween (October 31)</strong> has become one of the most anticipated holidays, with elaborate costume planning, home decoration, and party organizing driving interest in the countdown. Many people begin preparing for Halloween weeks or even months in advance.</p>
+    <p><strong>Independence Day (July 4)</strong> in the United States marks the midpoint of summer and is associated with vacations, barbecues, fireworks shows, and community events. Countdown awareness helps with travel booking and event planning.</p>
+    <p><strong>Valentine's Day (February 14)</strong> drives significant commercial activity, from restaurant reservations to flower and gift purchases. Knowing the exact number of days remaining helps avoid the last-minute rush that leads to limited availability and higher prices.</p>
+    <p>This calculator includes quick-select buttons for each of these holidays. Clicking a button automatically sets the date picker to the next occurrence of that holiday, accounting for whether the date has already passed this year. If Christmas has already passed, the button jumps to December 25 of the following year.</p>
+
+    <h2>Using Countdowns for Goal Setting</h2>
+    <p>Countdowns are not just for holidays. They are a powerful psychological tool for goal setting and personal productivity. Research in behavioral psychology shows that having a clear, specific deadline increases motivation and the likelihood of completing a task. A countdown provides that specificity by converting a vague "sometime in the future" into an exact number of days.</p>
+    <p><strong>Fitness goals</strong> benefit enormously from countdowns. If you are training for a marathon that is 120 days away, knowing the exact number of days helps you structure a training plan with appropriate milestones. You might plan to increase your mileage by 10 percent every two weeks, and the countdown tells you exactly how many of those two-week blocks you have available. Without a specific day count, it is easy to procrastinate or misjudge the available preparation time.</p>
+    <p><strong>Financial goals</strong> become more tangible with countdowns. Suppose you want to save $5,000 by the end of the year and there are 200 days remaining. Simple division tells you that you need to save $25 per day, or $175 per week. The countdown transforms an abstract savings target into a concrete daily or weekly action. As the day count decreases, the sense of urgency increases, which helps maintain discipline.</p>
+    <p><strong>Academic deadlines</strong> are perfect candidates for countdown-based planning. A thesis due in 90 days can be broken into phases: research (days 1 through 30), drafting (days 31 through 60), and revision (days 61 through 90). The countdown keeps each phase on schedule and provides early warning if you fall behind.</p>
+    <p><strong>Career milestones</strong> also benefit from countdown thinking. If a certification exam is 60 days away, you can divide the study material into daily portions and track your progress against the shrinking day count. Job seekers who set a target date for landing a new position often find that the countdown motivates them to apply more consistently and prepare more thoroughly for interviews.</p>
+    <p>The key to effective countdown-based goal setting is specificity. Rather than counting down to a vague future date, tie the countdown to a concrete event or deadline. This calculator helps by giving you the exact number of days along with the business-day breakdown, which is particularly useful for work-related goals where only weekdays count.</p>
+
+    <h2>How Date Counting Works</h2>
+    <p>Understanding how date counting works at a technical level helps you interpret results correctly and avoid common mistakes. The Gregorian calendar, which is the internationally accepted civil calendar, is built on an irregular structure that makes date arithmetic more complex than it might seem.</p>
+    <p>The fundamental unit of the Gregorian calendar is the day, defined as one full rotation of the Earth on its axis. Days are grouped into months of varying lengths: January has 31 days, February has 28 (or 29 in a leap year), March has 31, April has 30, May has 31, June has 30, July has 31, August has 31, September has 30, October has 31, November has 30, and December has 31. This irregular pattern means that "one month from today" does not always represent the same number of days.</p>
+    <p>Leap years add another complication. A leap year occurs every four years to compensate for the fact that Earth's orbital period is approximately 365.2422 days, not exactly 365. The rule is: a year is a leap year if it is divisible by 4, except for century years (divisible by 100), which are only leap years if they are also divisible by 400. So 2024 and 2028 are leap years, 1900 was not (divisible by 100 but not 400), and 2000 was (divisible by 400). This means that depending on whether your countdown spans a February in a leap year, the total day count could differ by one compared to the same date range in a non-leap year.</p>
+    <p>When this calculator counts days until a future date, it uses the JavaScript Date object, which represents dates internally as the number of milliseconds since midnight UTC on January 1, 1970. This representation, called a Unix timestamp, removes all the complexity of month lengths and leap years from the arithmetic. The subtraction of two timestamps always produces the correct number of milliseconds between the dates, and dividing by 86,400,000 converts that to days.</p>
+    <p>The calculator also counts business days by iterating through each day in the range and checking whether it falls on a weekday (Monday through Friday) or a weekend (Saturday or Sunday). This loop-based approach is simple and reliable, producing an exact count of working days in the range.</p>
+
+    <h2>Planning Ahead with Countdowns</h2>
+    <p>Effective planning requires more than just knowing a deadline exists. It requires understanding exactly how much time remains and how that time is structured. A countdown calculator helps with this by providing multiple perspectives on the same time span.</p>
+    <p><strong>Event planning</strong> is one of the most common uses for countdowns. Whether you are organizing a wedding, a birthday party, or a corporate event, knowing the exact number of days remaining helps you create a realistic timeline for booking venues, sending invitations, arranging catering, and handling all the other logistics. Event planners often work backwards from the date, assigning tasks to specific countdown milestones: invitations sent at 60 days out, RSVP deadline at 30 days, final catering count at 14 days, and so on.</p>
+    <p><strong>Travel planning</strong> benefits from both the calendar day and business day counts. If you are traveling internationally, you need to know how many calendar days remain to apply for a visa, book flights and hotels, and arrange time off from work. The business day count tells you how many working days you have to complete pre-trip tasks at the office and how many days of paid leave you will need to request.</p>
+    <p><strong>Project management</strong> relies heavily on accurate day counting. Agile software development teams work in sprints that are typically one or two weeks long (5 or 10 business days). Knowing the exact number of business days between the project start date and the delivery deadline tells a project manager exactly how many sprints can be scheduled. This determines the total capacity of the team and whether the project scope is realistic within the available time.</p>
+    <p><strong>Personal milestones</strong> become more meaningful when you know the exact countdown. Expecting a baby? The due date countdown helps you prepare the nursery, schedule prenatal appointments, and plan parental leave. Retiring in a few years? Knowing the exact day count helps with financial planning and the emotional preparation for a major life transition. Even seemingly small countdowns, like the number of days until a vacation, can boost your mood and help you stay motivated through a busy work period.</p>
+    <p>The weeks-and-days breakdown is particularly useful for planning because it translates the total day count into a more intuitive format. Knowing that an event is "8 weeks and 3 days away" is easier to grasp and plan around than knowing it is "59 days away," even though both represent the same duration. Similarly, the months-and-days format helps when you are thinking in terms of calendar months rather than individual days.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>How do you count the number of days until a specific date?</h3>
+    <p>Subtract today's date from the target date using millisecond-based arithmetic. Both dates are converted to their millisecond representation since January 1, 1970, the difference is calculated, and the result is divided by the number of milliseconds in one day (86,400,000). This calculator performs the arithmetic automatically when you select a target date and shows the result in days, weeks, months, and business days.</p>
+
+    <h3>What is the difference between calendar days and business days in a countdown?</h3>
+    <p>Calendar days include every day between now and the target date, including Saturdays, Sundays, and holidays. Business days count only Monday through Friday, excluding weekends. A countdown of 30 calendar days typically contains about 22 business days, though the exact number depends on how many weekends fall within the range. This calculator displays both counts but does not exclude public holidays from the business day total.</p>
+
+    <h3>How many days until Christmas from any date?</h3>
+    <p>The number of days until Christmas changes daily. This calculator includes a quick-select button for Christmas that automatically sets the target date to the next December 25. If Christmas has already passed this year, the button targets December 25 of the following year. The result shows the exact calendar day count along with weeks, months, and business days remaining until Christmas Day.</p>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .breadcrumb { font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 16px; }
+  .breadcrumb a { color: var(--color-text-muted); }
+  .breadcrumb a:hover { color: var(--color-primary); }
+  h1 { font-size: 1.8rem; margin-bottom: 8px; }
+  .page-desc { color: var(--color-text-muted); margin-bottom: 24px; }
+
+  .calculator-box {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 32px;
+  }
+  .calc-inputs {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .input-group { display: flex; flex-direction: column; gap: 4px; }
+  .input-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+  .input-group input {
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    background: var(--color-bg);
+    color: var(--color-text);
+  }
+  .input-group input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+
+  .quick-dates {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .quick-btn {
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-bg);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .quick-btn:hover {
+    border-color: var(--color-primary);
+    background: #eff6ff;
+    color: var(--color-primary);
+  }
+
+  .result-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .result-card {
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-align: center;
+  }
+  .result-card.primary {
+    background: #eff6ff;
+    grid-column: 1 / -1;
+  }
+  .result-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    margin-bottom: 4px;
+  }
+  .result-value {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+  .result-card.primary .result-value {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: var(--color-primary);
+  }
+  .result-value.small {
+    font-size: 1.1rem;
+  }
+  .result-detail {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+  }
+
+  .content-section { max-width: 800px; line-height: 1.8; }
+  .content-section h2 {
+    font-size: 1.3rem;
+    margin: 32px 0 12px;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border);
+  }
+  .content-section h2:first-child { border-top: none; margin-top: 0; }
+  .content-section h3 { font-size: 1.1rem; margin: 24px 0 8px; }
+  .content-section p { margin-bottom: 12px; }
+  .content-section ul, .content-section ol { margin: 0 0 16px 24px; }
+  .content-section li { margin-bottom: 6px; }
+
+  @media (max-width: 640px) {
+    .calc-inputs { grid-template-columns: 1fr; }
+    .result-cards { grid-template-columns: 1fr; }
+    .result-card.primary { grid-column: auto; }
+    .quick-dates { gap: 6px; }
+    .quick-btn { padding: 5px 10px; font-size: 0.8rem; }
+  }
+</style>
+
+<script>
+  const targetDateInput = document.getElementById('targetDate') as HTMLInputElement;
+  const quickButtons = document.querySelectorAll('.quick-btn');
+
+  function formatDateForInput(date: Date): string {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  function getNextOccurrence(month: number, day: number): Date {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const thisYear = today.getFullYear();
+    let target = new Date(thisYear, month, day);
+    if (target <= today) {
+      target = new Date(thisYear + 1, month, day);
+    }
+    return target;
+  }
+
+  function setHoliday(holiday: string) {
+    let target: Date;
+    switch (holiday) {
+      case 'christmas':
+        target = getNextOccurrence(11, 25); // Dec 25
+        break;
+      case 'newyear':
+        target = getNextOccurrence(0, 1); // Jan 1
+        break;
+      case 'halloween':
+        target = getNextOccurrence(9, 31); // Oct 31
+        break;
+      case 'july4':
+        target = getNextOccurrence(6, 4); // Jul 4
+        break;
+      case 'valentines':
+        target = getNextOccurrence(1, 14); // Feb 14
+        break;
+      default:
+        return;
+    }
+    targetDateInput.value = formatDateForInput(target);
+    calculate();
+  }
+
+  quickButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const holiday = (btn as HTMLElement).dataset.holiday;
+      if (holiday) setHoliday(holiday);
+    });
+  });
+
+  function calculate() {
+    const targetVal = targetDateInput.value;
+    if (!targetVal) return;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const target = new Date(targetVal + 'T00:00:00');
+
+    if (isNaN(target.getTime())) return;
+
+    const msPerDay = 1000 * 60 * 60 * 24;
+    const diffMs = target.getTime() - today.getTime();
+    const totalDays = Math.ceil(diffMs / msPerDay);
+
+    // If the date is in the past, show 0 or the negative-aware result
+    const absDays = Math.abs(totalDays);
+    const isPast = totalDays < 0;
+
+    // Days Until (primary)
+    const daysUntilEl = document.getElementById('daysUntil')!;
+    const daysUntilDetailEl = document.getElementById('daysUntilDetail')!;
+    if (totalDays === 0) {
+      daysUntilEl.textContent = '0';
+      daysUntilDetailEl.textContent = "That's today!";
+    } else if (isPast) {
+      daysUntilEl.textContent = absDays.toLocaleString();
+      const pastLabel = absDays === 1 ? 'day ago' : 'days ago';
+      daysUntilDetailEl.textContent = pastLabel;
+    } else {
+      daysUntilEl.textContent = totalDays.toLocaleString();
+      const futureLabel = totalDays === 1 ? 'day remaining' : 'days remaining';
+      daysUntilDetailEl.textContent = futureLabel;
+    }
+
+    // Weeks & Days
+    const fullWeeks = Math.floor(absDays / 7);
+    const remainingDays = absDays % 7;
+    const weeksDaysEl = document.getElementById('weeksDays')!;
+    if (absDays === 0) {
+      weeksDaysEl.textContent = '--';
+    } else if (remainingDays === 0) {
+      const wkLabel = fullWeeks === 1 ? 'week' : 'weeks';
+      weeksDaysEl.textContent = `${fullWeeks} ${wkLabel}`;
+    } else if (fullWeeks === 0) {
+      const dLabel = remainingDays === 1 ? 'day' : 'days';
+      weeksDaysEl.textContent = `${remainingDays} ${dLabel}`;
+    } else {
+      const wkLabel = fullWeeks === 1 ? 'wk' : 'wks';
+      const dLabel = remainingDays === 1 ? 'day' : 'days';
+      weeksDaysEl.textContent = `${fullWeeks} ${wkLabel}, ${remainingDays} ${dLabel}`;
+    }
+
+    // Months & Days
+    const monthsDaysEl = document.getElementById('monthsDays')!;
+    if (absDays === 0) {
+      monthsDaysEl.textContent = '--';
+    } else {
+      const earlier = isPast ? target : today;
+      const later = isPast ? today : target;
+      let months = later.getFullYear() * 12 + later.getMonth() - (earlier.getFullYear() * 12 + earlier.getMonth());
+      let days = later.getDate() - earlier.getDate();
+      if (days < 0) {
+        months--;
+        const prevMonth = new Date(later.getFullYear(), later.getMonth(), 0);
+        days += prevMonth.getDate();
+      }
+      const moLabel = months === 1 ? 'mo' : 'mos';
+      const dLabel = days === 1 ? 'day' : 'days';
+      if (months === 0) {
+        monthsDaysEl.textContent = `${days} ${dLabel}`;
+      } else if (days === 0) {
+        monthsDaysEl.textContent = `${months} ${moLabel}`;
+      } else {
+        monthsDaysEl.textContent = `${months} ${moLabel}, ${days} ${dLabel}`;
+      }
+    }
+
+    // Business Days & Weekend Days
+    let businessDays = 0;
+    let weekendDays = 0;
+    if (absDays > 0) {
+      const start = isPast ? new Date(target.getTime()) : new Date(today.getTime());
+      const tempDate = new Date(start.getTime());
+      tempDate.setDate(tempDate.getDate() + 1); // start from day after start date
+      for (let i = 0; i < absDays; i++) {
+        const dayOfWeek = tempDate.getDay();
+        if (dayOfWeek === 0 || dayOfWeek === 6) {
+          weekendDays++;
+        } else {
+          businessDays++;
+        }
+        tempDate.setDate(tempDate.getDate() + 1);
+      }
+    }
+    document.getElementById('businessDays')!.textContent = absDays === 0 ? '--' : businessDays.toLocaleString();
+    document.getElementById('weekendDays')!.textContent = absDays === 0 ? '--' : weekendDays.toLocaleString();
+
+    // Day of Week
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayOfWeekEl = document.getElementById('dayOfWeek')!;
+    dayOfWeekEl.textContent = absDays === 0 ? dayNames[today.getDay()] : dayNames[target.getDay()];
+  }
+
+  targetDateInput.addEventListener('change', calculate);
+</script>

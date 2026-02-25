@@ -1,0 +1,435 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'How is a monthly mortgage payment calculated?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'A monthly mortgage payment is calculated using the amortization formula M = P[r(1+r)^n]/[(1+r)^n-1], where P is the loan principal, r is the monthly interest rate, and n is the total number of payments. Property taxes and homeowners insurance are then added to get the full monthly payment.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How much should I put down on a house?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'A 20% down payment is ideal because it lets you avoid private mortgage insurance (PMI), which typically costs 0.5-1% of the loan amount per year. However, many loan programs allow down payments as low as 3-5% for conventional loans or 0% for VA and USDA loans.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is included in a monthly mortgage payment?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'A monthly mortgage payment typically includes four components known as PITI: Principal (the loan balance), Interest (the cost of borrowing), Taxes (property taxes divided into monthly amounts), and Insurance (homeowners insurance). Some payments also include PMI if the down payment was less than 20%.',
+      },
+    },
+  ],
+};
+---
+
+<BaseLayout
+  title="Mortgage Calculator - Estimate Monthly Home Payments"
+  description="Free mortgage calculator with taxes and insurance. Estimate monthly payments for any home price, down payment, and interest rate. Compare 30-year vs. 15-year loans."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/financial-calculators/">Financial Calculators</a> &rsaquo;
+    <span>Mortgage Calculator</span>
+  </nav>
+
+  <h1>Mortgage Calculator</h1>
+  <p class="page-desc">Estimate your monthly mortgage payment including principal, interest, taxes, and insurance.</p>
+
+  <!-- Calculator Tool -->
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="homePrice">Home Price ($)</label>
+        <input type="number" id="homePrice" value="350000" min="0" step="1000" />
+      </div>
+      <div class="input-group">
+        <label for="downPayment">Down Payment</label>
+        <div class="dp-wrapper">
+          <input type="number" id="downPayment" value="20" min="0" step="1" />
+          <select id="dpType">
+            <option value="percent" selected>%</option>
+            <option value="dollar">$</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label for="interestRate">Interest Rate (%)</label>
+        <input type="number" id="interestRate" value="6.5" min="0" max="30" step="0.1" />
+      </div>
+      <div class="input-group">
+        <label for="loanTerm">Loan Term</label>
+        <select id="loanTerm">
+          <option value="30" selected>30 Years</option>
+          <option value="20">20 Years</option>
+          <option value="15">15 Years</option>
+          <option value="10">10 Years</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="propertyTax">Property Tax ($/year)</label>
+        <input type="number" id="propertyTax" value="4200" min="0" step="100" />
+      </div>
+      <div class="input-group">
+        <label for="homeInsurance">Home Insurance ($/year)</label>
+        <input type="number" id="homeInsurance" value="1200" min="0" step="100" />
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Monthly Payment</span>
+          <span class="result-value" id="monthlyTotal">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Principal & Interest</span>
+          <span class="result-value" id="monthlyPI">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Property Tax / mo</span>
+          <span class="result-value" id="monthlyTax">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Insurance / mo</span>
+          <span class="result-value" id="monthlyInsurance">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Interest</span>
+          <span class="result-value" id="totalInterest">$0</span>
+        </div>
+        <div class="result-card success">
+          <span class="result-label">Total Cost</span>
+          <span class="result-value" id="totalCost">$0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>What Is a Mortgage?</h2>
+    <p>A mortgage is a loan used to purchase real estate, where the property itself serves as collateral for the loan. The borrower agrees to repay the lender over a set period of time, typically 15 to 30 years, through regular monthly payments that include both principal and interest.</p>
+    <p>When you take out a mortgage, the lender provides the funds to buy the home, and you make monthly payments until the loan is fully repaid. If you fail to make payments, the lender has the legal right to take possession of the property through a process called foreclosure.</p>
+    <p>Mortgages are the most common way people finance home purchases. Very few buyers can afford to pay the full price of a home in cash, so a mortgage allows you to spread the cost over many years while you live in and enjoy the property. The total amount you pay over the life of the loan will exceed the original purchase price because of interest charges, which is why understanding your mortgage terms is so important.</p>
+    <p>Most mortgages require a down payment, which is the portion of the home price you pay upfront. The remaining amount becomes your loan principal. For example, if you buy a $350,000 home with a 20% down payment of $70,000, your mortgage loan amount would be $280,000.</p>
+
+    <h2>How Mortgage Payments Are Calculated</h2>
+    <p>Monthly mortgage payments are calculated using the standard amortization formula. This formula determines a fixed monthly payment that gradually pays off both the interest and the loan principal over the full term of the loan.</p>
+    <div class="formula-box">
+      <code>M = P &times; [r(1+r)<sup>n</sup>] / [(1+r)<sup>n</sup> - 1]</code>
+    </div>
+    <p>Where:</p>
+    <ul>
+      <li><strong>M</strong> = Monthly principal and interest payment</li>
+      <li><strong>P</strong> = Loan principal (home price minus down payment)</li>
+      <li><strong>r</strong> = Monthly interest rate (annual rate divided by 12)</li>
+      <li><strong>n</strong> = Total number of monthly payments (loan term in years multiplied by 12)</li>
+    </ul>
+    <p>For example, a $280,000 loan at 6.5% annual interest over 30 years would have a monthly interest rate of 0.005417 (6.5% / 12) and 360 total payments (30 x 12). Plugging these numbers into the formula yields a monthly principal and interest payment of approximately $1,770.</p>
+    <p>However, your total monthly mortgage payment usually includes more than just principal and interest. Most homeowners also pay property taxes, homeowners insurance, and potentially private mortgage insurance (PMI) as part of their monthly payment. These components are often collected by the lender and held in an escrow account, then paid on your behalf when they come due.</p>
+
+    <h2>Fixed-Rate vs. Adjustable-Rate Mortgages</h2>
+    <p>The two main types of mortgages are fixed-rate and adjustable-rate, and each has distinct advantages depending on your financial situation and how long you plan to stay in the home.</p>
+    <p>A <strong>fixed-rate mortgage</strong> locks in the same interest rate for the entire loan term. Your monthly principal and interest payment never changes, which makes budgeting predictable and protects you from rising interest rates. Fixed-rate loans are the most popular choice, with the 30-year fixed-rate mortgage being the standard in the United States. The 15-year fixed-rate option is also popular among borrowers who want to pay off their home faster and save on total interest.</p>
+    <p>An <strong>adjustable-rate mortgage (ARM)</strong> starts with a lower introductory interest rate for a set period, typically 5, 7, or 10 years. After the initial period, the rate adjusts periodically based on a market index plus a margin. A 5/1 ARM, for example, has a fixed rate for the first 5 years, then adjusts every year after that.</p>
+    <p>ARMs can be advantageous if you plan to sell or refinance before the adjustable period begins, since the initial rate is typically lower than a comparable fixed rate. However, they carry the risk of significantly higher payments if interest rates rise after the initial period ends. Many borrowers were caught off guard by payment increases during past housing downturns, which is why it is critical to understand the rate caps and worst-case scenarios before choosing an ARM.</p>
+
+    <h2>How Your Down Payment Affects Your Mortgage</h2>
+    <p>The size of your down payment has a significant impact on your mortgage in several ways. A larger down payment reduces the loan amount, which means lower monthly payments, less total interest paid, and more immediate equity in your home.</p>
+    <p>The most important threshold is 20%. If you put down less than 20% on a conventional mortgage, lenders typically require you to pay <strong>private mortgage insurance (PMI)</strong>. PMI protects the lender in case you default on the loan, and it can add anywhere from 0.5% to 1% of the loan amount per year to your monthly payment. On a $280,000 loan, PMI could cost $1,400 to $2,800 per year, or roughly $117 to $233 per month.</p>
+    <p>Once you have built 20% equity in the home, either through payments or appreciation, you can usually request that PMI be removed. By law, lenders must automatically cancel PMI when your equity reaches 22% of the original purchase price.</p>
+    <p>Here is how different down payment amounts affect a $350,000 home purchase at 6.5% interest over 30 years:</p>
+    <ul>
+      <li><strong>5% down ($17,500):</strong> Loan of $332,500 with a monthly P&I payment of about $2,102 plus PMI</li>
+      <li><strong>10% down ($35,000):</strong> Loan of $315,000 with a monthly P&I payment of about $1,991 plus PMI</li>
+      <li><strong>20% down ($70,000):</strong> Loan of $280,000 with a monthly P&I payment of about $1,770, no PMI required</li>
+    </ul>
+    <p>While saving for a 20% down payment takes longer, it can save you thousands of dollars over the life of the loan by eliminating PMI and reducing your overall interest costs.</p>
+
+    <h2>Factors That Determine Your Mortgage Rate</h2>
+    <p>Your mortgage interest rate is one of the biggest factors in determining your monthly payment and total cost. Even a small difference in rate can translate to tens of thousands of dollars over a 30-year term. Several key factors influence the rate a lender will offer you.</p>
+    <p><strong>Credit score</strong> is the most significant factor. Borrowers with excellent credit scores (740 and above) qualify for the lowest rates, while those with lower scores pay higher rates to compensate the lender for increased risk. Improving your credit score before applying for a mortgage can save you significant money.</p>
+    <p><strong>Debt-to-income ratio (DTI)</strong> measures how much of your monthly gross income goes toward debt payments. Lenders prefer a DTI below 36%, though some loan programs allow up to 43% or higher. A lower DTI signals that you can comfortably afford the mortgage payment.</p>
+    <p><strong>Loan-to-value ratio (LTV)</strong> compares the loan amount to the home's appraised value. A lower LTV, achieved through a larger down payment, generally earns a better rate because the lender has more protection if the home's value declines.</p>
+    <p><strong>Loan type and term</strong> also affect your rate. Shorter loan terms like 15 years typically have lower interest rates than 30-year loans. Government-backed loans such as FHA and VA loans may offer competitive rates, but they come with their own fees and requirements.</p>
+    <p><strong>Market conditions</strong> play a role as well. Mortgage rates are influenced by the Federal Reserve's monetary policy, inflation expectations, the bond market, and overall economic conditions. Rates can fluctuate daily based on these macroeconomic factors.</p>
+
+    <h2>Tips for Getting the Best Mortgage Rate</h2>
+    <p>Securing the best possible mortgage rate can save you tens of thousands of dollars over the life of your loan. Here are practical steps you can take to improve your chances of getting a favorable rate.</p>
+    <ol>
+      <li><strong>Improve your credit score.</strong> Pay down existing debts, correct errors on your credit report, and avoid opening new credit accounts in the months before applying. Even a 20-point improvement in your score can result in a meaningfully lower rate.</li>
+      <li><strong>Save for a larger down payment.</strong> Putting down at least 20% not only eliminates PMI but also demonstrates financial stability to lenders, which can result in better rate offers.</li>
+      <li><strong>Shop multiple lenders.</strong> Rates can vary significantly between lenders. Get quotes from at least three to five lenders, including banks, credit unions, and online lenders. The Consumer Financial Protection Bureau recommends getting a Loan Estimate from each lender to compare costs apples-to-apples.</li>
+      <li><strong>Consider buying discount points.</strong> Mortgage points are upfront fees paid to the lender in exchange for a lower interest rate. One point typically costs 1% of the loan amount and reduces the rate by about 0.25%. Points make sense if you plan to keep the loan long enough for the monthly savings to exceed the upfront cost.</li>
+      <li><strong>Lock your rate at the right time.</strong> Once you find a competitive rate, ask your lender about a rate lock to protect against increases while your loan is being processed. Most rate locks last 30 to 60 days.</li>
+      <li><strong>Reduce your debt-to-income ratio.</strong> Pay off credit cards, car loans, or other debts before applying. A lower DTI makes you a more attractive borrower and can help you qualify for better terms.</li>
+      <li><strong>Choose the right loan term.</strong> If you can afford higher monthly payments, a 15-year mortgage typically comes with a lower interest rate than a 30-year loan and saves you a massive amount of interest over the life of the loan.</li>
+    </ol>
+    <p>Taking the time to prepare before applying for a mortgage can make a substantial difference in your monthly payment and the total amount you pay for your home.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>How much house can I afford?</h3>
+    <p>A common guideline is the 28/36 rule: your monthly mortgage payment should not exceed 28% of your gross monthly income, and your total debt payments should stay below 36%. For example, if your household income is $8,000 per month, your mortgage payment should ideally be no more than $2,240. However, lenders may approve higher amounts, so it is important to consider your own comfort level and other financial obligations when deciding how much to spend.</p>
+
+    <h3>Should I choose a 30-year or 15-year mortgage?</h3>
+    <p>A 30-year mortgage offers lower monthly payments, which provides more flexibility in your monthly budget. A 15-year mortgage has higher monthly payments but a significantly lower interest rate and saves you a substantial amount of total interest. For example, on a $280,000 loan at 6.5% (30-year) vs. 5.9% (15-year), the 30-year loan costs about $357,000 in total interest, while the 15-year loan costs about $137,000. Choose the 30-year if you need breathing room; choose the 15-year if you can comfortably handle the higher payment and want to build equity faster.</p>
+
+    <h3>What are closing costs, and how much should I expect?</h3>
+    <p>Closing costs are fees charged by lenders, attorneys, and other third parties to finalize the mortgage. They typically range from 2% to 5% of the loan amount and include items like appraisal fees, title insurance, origination fees, and prepaid property taxes and insurance. On a $280,000 loan, closing costs could range from $5,600 to $14,000. Some lenders offer "no-closing-cost" loans, but these usually have a higher interest rate to compensate.</p>
+
+    <h3>Can I pay off my mortgage early?</h3>
+    <p>Most modern mortgages allow prepayment without penalties, but it is important to check your loan agreement. Making extra payments toward the principal each month can significantly reduce the total interest you pay and shorten the loan term. Even one additional payment per year can cut years off a 30-year mortgage. Before making extra mortgage payments, make sure you have an emergency fund and have paid off any higher-interest debt first.</p>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .breadcrumb { font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 16px; }
+  .breadcrumb a { color: var(--color-text-muted); }
+  .breadcrumb a:hover { color: var(--color-primary); }
+  h1 { font-size: 1.8rem; margin-bottom: 8px; }
+  .page-desc { color: var(--color-text-muted); margin-bottom: 24px; }
+
+  .calculator-box {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 32px;
+  }
+  .calc-inputs {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .input-group { display: flex; flex-direction: column; gap: 4px; }
+  .input-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+  .input-group input,
+  .input-group select {
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    background: var(--color-bg);
+    color: var(--color-text);
+  }
+  .input-group input:focus,
+  .input-group select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+  .dp-wrapper {
+    display: flex;
+    gap: 4px;
+  }
+  .dp-wrapper input {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    background: var(--color-bg);
+    color: var(--color-text);
+  }
+  .dp-wrapper input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+  .dp-wrapper select {
+    width: 60px;
+    padding: 10px 6px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    background: var(--color-bg);
+    color: var(--color-text);
+    cursor: pointer;
+  }
+  .dp-wrapper select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+  .calc-btn {
+    padding: 10px 24px;
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    align-self: end;
+    transition: background 0.15s;
+  }
+  .calc-btn:hover { background: var(--color-primary-dark); }
+
+  .result-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .result-card {
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-align: center;
+  }
+  .result-card.primary { background: #eff6ff; }
+  .result-card.success { background: #f0fdf4; }
+  .result-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    margin-bottom: 4px;
+  }
+  .result-value {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+  .result-card.primary .result-value { color: var(--color-primary); }
+  .result-card.success .result-value { color: var(--color-success); }
+
+  .content-section {
+    max-width: 800px;
+    line-height: 1.8;
+  }
+  .content-section h2 {
+    font-size: 1.3rem;
+    margin: 32px 0 12px;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border);
+  }
+  .content-section h2:first-child { border-top: none; margin-top: 0; }
+  .content-section h3 {
+    font-size: 1.1rem;
+    margin: 24px 0 8px;
+  }
+  .content-section p { margin-bottom: 12px; }
+  .content-section ul, .content-section ol {
+    margin: 0 0 16px 24px;
+  }
+  .content-section li { margin-bottom: 6px; }
+  .formula-box {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 16px 24px;
+    margin: 16px 0;
+    font-size: 1.2rem;
+    text-align: center;
+  }
+
+  @media (max-width: 640px) {
+    .calc-inputs { grid-template-columns: 1fr; }
+    .result-cards { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+  function formatCurrency(n: number): string {
+    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+
+  function calculate() {
+    const homePrice = parseFloat((document.getElementById('homePrice') as HTMLInputElement).value) || 0;
+    const dpValue = parseFloat((document.getElementById('downPayment') as HTMLInputElement).value) || 0;
+    const dpType = (document.getElementById('dpType') as HTMLSelectElement).value;
+    const annualRate = parseFloat((document.getElementById('interestRate') as HTMLInputElement).value) || 0;
+    const years = parseInt((document.getElementById('loanTerm') as HTMLSelectElement).value) || 30;
+    const propertyTaxYear = parseFloat((document.getElementById('propertyTax') as HTMLInputElement).value) || 0;
+    const insuranceYear = parseFloat((document.getElementById('homeInsurance') as HTMLInputElement).value) || 0;
+
+    // Calculate down payment amount
+    const downPayment = dpType === 'percent' ? homePrice * (dpValue / 100) : dpValue;
+    const principal = homePrice - downPayment;
+
+    if (principal <= 0 || annualRate <= 0) {
+      document.getElementById('monthlyTotal')!.textContent = '$0';
+      document.getElementById('monthlyPI')!.textContent = '$0';
+      document.getElementById('monthlyTax')!.textContent = '$0';
+      document.getElementById('monthlyInsurance')!.textContent = '$0';
+      document.getElementById('totalInterest')!.textContent = '$0';
+      document.getElementById('totalCost')!.textContent = '$0';
+      return;
+    }
+
+    const r = annualRate / 100 / 12;
+    const n = years * 12;
+
+    // Monthly P&I using standard amortization formula
+    const monthlyPI = principal * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+
+    // Monthly tax and insurance
+    const monthlyTax = propertyTaxYear / 12;
+    const monthlyInsurance = insuranceYear / 12;
+
+    // Total monthly payment
+    const monthlyTotal = monthlyPI + monthlyTax + monthlyInsurance;
+
+    // Total interest over loan life
+    const totalInterest = (monthlyPI * n) - principal;
+
+    // Total cost (all payments + down payment)
+    const totalCost = (monthlyTotal * n) + downPayment;
+
+    document.getElementById('monthlyTotal')!.textContent = formatCurrency(monthlyTotal);
+    document.getElementById('monthlyPI')!.textContent = formatCurrency(monthlyPI);
+    document.getElementById('monthlyTax')!.textContent = formatCurrency(monthlyTax);
+    document.getElementById('monthlyInsurance')!.textContent = formatCurrency(monthlyInsurance);
+    document.getElementById('totalInterest')!.textContent = formatCurrency(totalInterest);
+    document.getElementById('totalCost')!.textContent = formatCurrency(totalCost);
+  }
+
+  document.getElementById('calculateBtn')?.addEventListener('click', calculate);
+
+  // Update down payment placeholder when type changes
+  document.getElementById('dpType')?.addEventListener('change', () => {
+    const dpInput = document.getElementById('downPayment') as HTMLInputElement;
+    const dpType = (document.getElementById('dpType') as HTMLSelectElement).value;
+    if (dpType === 'percent') {
+      dpInput.value = '20';
+      dpInput.step = '1';
+      dpInput.max = '100';
+    } else {
+      const homePrice = parseFloat((document.getElementById('homePrice') as HTMLInputElement).value) || 350000;
+      dpInput.value = String(Math.round(homePrice * 0.2));
+      dpInput.step = '1000';
+      dpInput.removeAttribute('max');
+    }
+    calculate();
+  });
+
+  // Auto-calculate on load
+  calculate();
+</script>

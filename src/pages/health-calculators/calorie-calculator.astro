@@ -1,0 +1,366 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'How many calories should I eat per day?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Daily calorie needs vary based on age, sex, height, weight, and activity level. On average, adult women need about 1,600-2,400 calories per day and adult men need about 2,000-3,000 calories per day. Use a calorie calculator with the Mifflin-St Jeor equation for a personalized estimate.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is the best way to calculate daily calorie needs?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'The most accurate method is the Mifflin-St Jeor equation, which calculates your Basal Metabolic Rate (BMR) based on weight, height, age, and sex. Your BMR is then multiplied by an activity factor to determine your Total Daily Energy Expenditure (TDEE), which represents your maintenance calories.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How many calories should I eat to lose weight?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'To lose about one pound per week, create a calorie deficit of approximately 500 calories below your TDEE. For example, if your TDEE is 2,500 calories, aim for 2,000 calories per day. Avoid going below 1,200 calories (women) or 1,500 calories (men) without medical supervision.',
+      },
+    },
+  ],
+};
+---
+
+<BaseLayout
+  title="Calorie Calculator - Daily Calorie Needs for Your Goals | ToolCalcs"
+  description="Free calorie calculator using the Mifflin-St Jeor equation. Find your daily calorie needs for weight loss, maintenance, or muscle gain with a personalized macro breakdown."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/health-calculators/">Health Calculators</a> &rsaquo;
+    <span>Calorie Calculator</span>
+  </nav>
+
+  <h1>Calorie Calculator</h1>
+  <p class="page-desc">Calculate your daily calorie needs and macro breakdown based on your body stats, activity level, and goals.</p>
+
+  <div class="calculator-box">
+    <div class="unit-toggle">
+      <button class="toggle-btn active" data-unit="imperial">Imperial</button>
+      <button class="toggle-btn" data-unit="metric">Metric</button>
+    </div>
+
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="age">Age</label>
+        <input type="number" id="age" value="30" min="15" max="100" />
+      </div>
+      <div class="input-group">
+        <label>Sex</label>
+        <div class="radio-group">
+          <label class="radio-label"><input type="radio" name="sex" value="male" checked /> Male</label>
+          <label class="radio-label"><input type="radio" name="sex" value="female" /> Female</label>
+        </div>
+      </div>
+      <div id="imperialFields">
+        <div class="input-row">
+          <div class="input-group">
+            <label for="feet">Height (ft)</label>
+            <input type="number" id="feet" value="5" min="3" max="8" />
+          </div>
+          <div class="input-group">
+            <label for="inches">in</label>
+            <input type="number" id="inches" value="10" min="0" max="11" />
+          </div>
+          <div class="input-group">
+            <label for="weightLbs">Weight (lbs)</label>
+            <input type="number" id="weightLbs" value="170" min="50" />
+          </div>
+        </div>
+      </div>
+      <div id="metricFields" class="hidden">
+        <div class="input-row">
+          <div class="input-group">
+            <label for="heightCm">Height (cm)</label>
+            <input type="number" id="heightCm" value="178" min="100" max="250" />
+          </div>
+          <div class="input-group">
+            <label for="weightKg">Weight (kg)</label>
+            <input type="number" id="weightKg" value="77" min="30" />
+          </div>
+        </div>
+      </div>
+      <div class="input-group full-width">
+        <label for="activity">Activity Level</label>
+        <select id="activity">
+          <option value="1.2">Sedentary (office job, little exercise)</option>
+          <option value="1.375">Lightly Active (light exercise 1-3 days/week)</option>
+          <option value="1.55" selected>Moderately Active (moderate exercise 3-5 days/week)</option>
+          <option value="1.725">Very Active (hard exercise 6-7 days/week)</option>
+          <option value="1.9">Extra Active (very hard exercise, physical job)</option>
+        </select>
+      </div>
+      <div class="input-group full-width">
+        <label for="goal">Goal</label>
+        <select id="goal">
+          <option value="lose">Lose Weight (-500 cal/day)</option>
+          <option value="maintain" selected>Maintain Weight</option>
+          <option value="gain">Gain Weight (+500 cal/day)</option>
+        </select>
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate Calories</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Daily Calories</span>
+          <span class="result-value" id="dailyCalories">0</span>
+          <span class="result-unit">calories/day</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">BMR</span>
+          <span class="result-value" id="bmrValue">0</span>
+          <span class="result-unit">calories/day</span>
+        </div>
+      </div>
+      <div class="result-cards macro-cards">
+        <div class="result-card success">
+          <span class="result-label">Protein (30%)</span>
+          <span class="result-value" id="proteinValue">0g</span>
+          <span class="result-unit">4 cal per gram</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Carbs (40%)</span>
+          <span class="result-value" id="carbsValue">0g</span>
+          <span class="result-unit">4 cal per gram</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Fat (30%)</span>
+          <span class="result-value" id="fatValue">0g</span>
+          <span class="result-unit">9 cal per gram</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>What Are Calories?</h2>
+    <p>A calorie is a unit of energy. In nutrition, when we refer to "calories," we are actually talking about kilocalories (kcal), which represent the amount of energy needed to raise the temperature of one kilogram of water by one degree Celsius. Every function your body performs, from breathing and circulating blood to thinking and exercising, requires energy measured in calories.</p>
+    <p>The food and drinks you consume provide your body with calories from three primary macronutrients: protein, carbohydrates, and fat. Protein and carbohydrates each provide 4 calories per gram, while fat provides 9 calories per gram. Alcohol, while not a macronutrient, contributes 7 calories per gram.</p>
+    <p>Your body uses these calories in three main ways. The largest portion goes to your basal metabolic rate (BMR), which covers involuntary processes like breathing, organ function, and cellular repair. Physical activity accounts for the second-largest share, and the thermic effect of food, the energy required to digest and absorb nutrients, accounts for roughly 10% of your total calorie expenditure.</p>
+    <p>Understanding calories is the foundation of any nutrition plan. Whether your goal is weight loss, weight maintenance, or muscle gain, knowing how many calories your body needs each day gives you the information required to make informed dietary choices.</p>
+
+    <h2>How Daily Calorie Needs Are Calculated</h2>
+    <p>This calculator uses the <strong>Mifflin-St Jeor equation</strong>, which is widely regarded by dietitians and nutrition researchers as the most accurate formula for estimating resting metabolic rate. The equation was published in 1990 and has been validated in numerous studies across diverse populations.</p>
+    <div class="formula-box">
+      <code>Male: BMR = 10 &times; weight(kg) + 6.25 &times; height(cm) - 5 &times; age + 5</code><br/>
+      <code>Female: BMR = 10 &times; weight(kg) + 6.25 &times; height(cm) - 5 &times; age - 161</code>
+    </div>
+    <p>Once your BMR is determined, it is multiplied by an activity factor that reflects your typical daily movement and exercise habits. This produces your Total Daily Energy Expenditure (TDEE), which is the total number of calories you burn in an average day. Your TDEE represents your maintenance calories, the amount you would need to eat to maintain your current weight.</p>
+    <p>From there, calorie targets are adjusted based on your goal. A deficit of 500 calories per day below your TDEE is commonly recommended for steady weight loss of about one pound per week, while a surplus of 500 calories per day supports weight gain and muscle building when combined with resistance training.</p>
+    <p>Keep in mind that all calorie formulas provide estimates. Individual metabolic rates can vary by 5-15% due to genetics, hormones, body composition, and other factors. Use your calculated calorie target as a starting point and adjust based on real-world results over a period of two to four weeks.</p>
+
+    <h2>Understanding Your Basal Metabolic Rate (BMR)</h2>
+    <p>Your Basal Metabolic Rate is the number of calories your body burns at complete rest to maintain basic life-sustaining functions. These functions include breathing, blood circulation, cell production, nutrient processing, and temperature regulation. BMR typically accounts for 60-75% of your total daily calorie expenditure.</p>
+    <p>Several factors influence your BMR. Body size plays a significant role: taller and heavier individuals generally have a higher BMR because they have more tissue that requires energy. Muscle mass is another critical factor, as muscle tissue is metabolically active and burns more calories at rest than fat tissue. This is one reason why strength training can support long-term weight management.</p>
+    <p>Age causes a gradual decline in BMR, primarily because people tend to lose muscle mass as they age. On average, BMR decreases by about 1-2% per decade after the age of 20. Sex also influences BMR: men generally have a higher BMR than women due to greater muscle mass and lower body fat percentages on average.</p>
+    <p>Hormonal factors, particularly thyroid hormones, play a significant role in regulating metabolic rate. Conditions like hypothyroidism can lower BMR, while hyperthyroidism can raise it. Extreme calorie restriction can also temporarily lower BMR, a process known as metabolic adaptation, which is one reason crash diets are generally not recommended for sustainable weight loss.</p>
+
+    <h2>Activity Levels Explained</h2>
+    <p>Choosing the correct activity level is crucial for an accurate calorie estimate. The activity multiplier accounts for all physical activity throughout your day, not just formal exercise sessions. Here is a detailed breakdown of each level to help you choose the most appropriate one:</p>
+    <ul>
+      <li><strong>Sedentary (1.2):</strong> You have a desk job and get little to no formal exercise. Most of your day is spent sitting, with only light walking for daily tasks like commuting or grocery shopping. This level applies to most office workers who do not engage in regular exercise.</li>
+      <li><strong>Lightly Active (1.375):</strong> You engage in light exercise or sports one to three days per week, or your job involves a moderate amount of walking. Examples include casual walking, light yoga, or leisurely cycling a few times per week.</li>
+      <li><strong>Moderately Active (1.55):</strong> You exercise at a moderate intensity three to five days per week. This includes activities like jogging, swimming, cycling at a moderate pace, or attending fitness classes regularly. This level also suits people with physically active jobs like retail workers or teachers who are on their feet most of the day.</li>
+      <li><strong>Very Active (1.725):</strong> You engage in hard exercise or sports six to seven days per week. This level is appropriate for dedicated athletes, people training for competitions, or individuals with physically demanding jobs who also exercise regularly.</li>
+      <li><strong>Extra Active (1.9):</strong> You perform very hard exercise daily, often with a physically demanding job on top of training. This level applies to professional athletes, military personnel in active training, or people with extremely labor-intensive occupations combined with regular intense exercise.</li>
+    </ul>
+    <p>When in doubt, it is better to select a lower activity level. Overestimating your activity is one of the most common mistakes people make when calculating calorie needs, and it can stall progress toward weight-related goals.</p>
+
+    <h2>Macronutrients: Protein, Carbs, and Fat</h2>
+    <p>Macronutrients are the nutrients your body needs in large quantities. Each macronutrient serves distinct functions, and getting the right balance is important for health, performance, and body composition. This calculator uses a balanced macro split of 30% protein, 40% carbohydrates, and 30% fat, which is a solid starting point for most people.</p>
+
+    <h3>Protein</h3>
+    <p>Protein is essential for building and repairing muscle tissue, producing enzymes and hormones, and supporting immune function. At 4 calories per gram, protein is also the most satiating macronutrient, meaning it helps you feel full for longer. Research consistently shows that higher protein intakes support muscle retention during weight loss, improve body composition, and increase the thermic effect of food.</p>
+    <p>The 30% protein recommendation in this calculator typically translates to 0.7-1.0 grams of protein per pound of body weight for most people, which aligns with current sports nutrition guidelines. Good sources of protein include lean meats, poultry, fish, eggs, dairy products, legumes, and tofu.</p>
+
+    <h3>Carbohydrates</h3>
+    <p>Carbohydrates are your body's preferred and most efficient source of energy, particularly for high-intensity exercise and brain function. At 4 calories per gram, carbs are stored as glycogen in your muscles and liver, providing readily available fuel for physical activity. The 40% carbohydrate recommendation provides enough energy for daily activities and exercise performance.</p>
+    <p>Focus on complex carbohydrates such as whole grains, fruits, vegetables, and legumes, which provide fiber, vitamins, and minerals alongside energy. Minimize refined carbohydrates and added sugars, which provide calories without significant nutritional value.</p>
+
+    <h3>Fat</h3>
+    <p>Dietary fat is crucial for hormone production, nutrient absorption (vitamins A, D, E, and K are fat-soluble), brain function, and cell membrane integrity. At 9 calories per gram, fat is the most calorie-dense macronutrient, so portion awareness is important. The 30% fat recommendation ensures adequate intake for hormonal health without excessive calories.</p>
+    <p>Prioritize unsaturated fats from sources like olive oil, avocados, nuts, seeds, and fatty fish. Limit saturated fats and avoid trans fats. Omega-3 fatty acids from fish, flaxseeds, and walnuts are particularly beneficial for heart health and reducing inflammation.</p>
+
+    <h2>Tips for Healthy Calorie Management</h2>
+    <p>Successful calorie management goes beyond simply counting numbers. Here are evidence-based strategies for achieving and maintaining your calorie goals effectively:</p>
+    <ul>
+      <li><strong>Track your intake consistently:</strong> Use a food diary or calorie-tracking app to log your meals for at least two weeks. Research shows that people who track their food intake consistently are significantly more successful at achieving weight-related goals. Accurate tracking also helps you identify patterns and areas for improvement.</li>
+      <li><strong>Prioritize whole, nutrient-dense foods:</strong> Foods like vegetables, fruits, lean proteins, whole grains, and healthy fats provide more nutrition per calorie and keep you feeling satisfied longer. A diet rich in whole foods naturally makes it easier to stay within your calorie target.</li>
+      <li><strong>Stay hydrated:</strong> Thirst is sometimes mistaken for hunger. Drinking adequate water throughout the day can help prevent unnecessary snacking. Aim for at least eight glasses of water daily, more if you exercise regularly or live in a hot climate.</li>
+      <li><strong>Eat enough protein at every meal:</strong> Distributing protein intake across all meals supports muscle protein synthesis and helps control appetite. Aim for 20-40 grams of protein per meal as a general guideline.</li>
+      <li><strong>Avoid extreme restrictions:</strong> Very low calorie diets (below 1,200 for women or 1,500 for men) can lead to nutrient deficiencies, muscle loss, metabolic adaptation, and psychological stress around food. A moderate deficit of 500 calories per day is sustainable and effective for most people.</li>
+      <li><strong>Plan for flexibility:</strong> No one eats perfectly every day. Aiming for consistency over perfection means hitting your calorie and macro targets most of the time, while allowing room for social occasions, holidays, and the occasional treat without guilt.</li>
+      <li><strong>Reassess regularly:</strong> As your weight changes, your calorie needs will also change. Recalculate your calorie target every 10-15 pounds of weight change or at least once every couple of months to ensure your targets remain accurate.</li>
+      <li><strong>Get adequate sleep:</strong> Sleep deprivation affects hunger hormones ghrelin and leptin, increasing appetite and cravings. Aim for seven to nine hours of quality sleep per night to support your calorie management efforts.</li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>How many calories should I eat per day?</h3>
+    <p>Daily calorie needs are highly individual and depend on your age, sex, height, weight, and activity level. On average, adult women need approximately 1,600 to 2,400 calories per day, while adult men need approximately 2,000 to 3,000 calories per day. For a personalized estimate, use the calorie calculator above, which applies the Mifflin-St Jeor equation to your specific measurements and activity level. Remember that these are estimates, and you should adjust based on your real-world results over time.</p>
+
+    <h3>What is the best way to calculate daily calorie needs?</h3>
+    <p>The Mifflin-St Jeor equation, which this calculator uses, is considered the gold standard for estimating calorie needs. It was developed in 1990 and has been validated by the Academy of Nutrition and Dietetics as the most accurate predictive equation for most healthy adults. The formula calculates your Basal Metabolic Rate based on your weight, height, age, and sex, then applies an activity multiplier to determine your Total Daily Energy Expenditure. For even greater accuracy, some individuals opt for indirect calorimetry testing at a medical facility, but for the vast majority of people, the Mifflin-St Jeor equation provides a reliable starting point.</p>
+
+    <h3>How many calories should I eat to lose weight?</h3>
+    <p>A widely recommended approach is to eat 500 calories fewer than your TDEE (Total Daily Energy Expenditure), which creates a deficit that leads to approximately one pound of weight loss per week. For instance, if your TDEE is 2,500 calories, a target of 2,000 calories per day would support gradual, sustainable weight loss. It is important not to drop below 1,200 calories per day for women or 1,500 calories per day for men without medical supervision, as extremely low calorie diets can result in nutrient deficiencies, muscle loss, and metabolic slowdown. Combining a moderate calorie deficit with regular exercise and adequate protein intake yields the best long-term results.</p>
+
+    <h3>Do I need to count calories to be healthy?</h3>
+    <p>Not necessarily. Calorie counting is a powerful tool for achieving specific weight goals, but it is not the only approach to healthy eating. Some people find it helpful to focus on food quality, portion sizes, and hunger cues instead. However, if you have a specific weight loss or gain target, tracking calories at least temporarily can provide valuable insight into your eating habits and help you understand appropriate portion sizes. Many people track calories for a few months to build awareness and then transition to a more intuitive approach.</p>
+
+    <h3>How accurate are calorie calculators?</h3>
+    <p>Calorie calculators using the Mifflin-St Jeor equation are accurate within about 10% for most healthy adults. However, individual variations in metabolism, genetics, hormones, and body composition mean that the calculated number is an estimate rather than an exact figure. Use your calculated target as a starting point, then monitor your weight and energy levels over two to four weeks. If you are not seeing the expected results, adjust your calorie intake by 100-200 calories and reassess. Factors like stress, sleep quality, and medication can also influence your actual calorie needs.</p>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .breadcrumb { font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 16px; }
+  .breadcrumb a { color: var(--color-text-muted); }
+  .breadcrumb a:hover { color: var(--color-primary); }
+  h1 { font-size: 1.8rem; margin-bottom: 8px; }
+  .page-desc { color: var(--color-text-muted); margin-bottom: 24px; }
+
+  .calculator-box {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 32px;
+  }
+  .unit-toggle { display: flex; gap: 4px; margin-bottom: 20px; background: var(--color-bg); border-radius: var(--radius); padding: 4px; width: fit-content; }
+  .toggle-btn { padding: 8px 16px; border: none; border-radius: 6px; background: transparent; font-size: 0.85rem; font-weight: 500; cursor: pointer; color: var(--color-text-muted); }
+  .toggle-btn.active { background: var(--color-surface); color: var(--color-primary); box-shadow: var(--shadow-sm); }
+  .calc-inputs { display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; }
+  .input-row { display: flex; gap: 16px; flex-wrap: wrap; }
+  .input-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 120px; }
+  .input-group.full-width { flex: 100%; }
+  .input-group label { font-size: 0.85rem; font-weight: 600; color: var(--color-text-muted); }
+  .input-group input, .input-group select {
+    padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius); font-size: 1rem; background: var(--color-bg);
+  }
+  .input-group input:focus, .input-group select:focus { outline: none; border-color: var(--color-primary); }
+  .radio-group { display: flex; gap: 16px; padding-top: 4px; }
+  .radio-label { display: flex; align-items: center; gap: 4px; font-size: 0.95rem; cursor: pointer; }
+  .hidden { display: none; }
+  .calc-btn { padding: 10px 24px; background: var(--color-primary); color: #fff; border: none; border-radius: var(--radius); font-size: 1rem; font-weight: 600; cursor: pointer; align-self: start; }
+  .calc-btn:hover { background: var(--color-primary-dark); }
+
+  .result-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 12px; }
+  .macro-cards { grid-template-columns: repeat(3, 1fr); }
+  .result-card { background: var(--color-bg); border-radius: var(--radius); padding: 16px; text-align: center; }
+  .result-card.primary { background: #eff6ff; }
+  .result-card.success { background: #f0fdf4; }
+  .result-label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--color-text-muted); margin-bottom: 4px; }
+  .result-value { display: block; font-size: 1.8rem; font-weight: 800; }
+  .result-card.primary .result-value { color: var(--color-primary); }
+  .result-card.success .result-value { color: var(--color-success); }
+  .result-unit { display: block; font-size: 0.75rem; color: var(--color-text-muted); }
+
+  .content-section { max-width: 800px; line-height: 1.8; }
+  .content-section h2 { font-size: 1.3rem; margin: 32px 0 12px; padding-top: 16px; border-top: 1px solid var(--color-border); }
+  .content-section h2:first-child { border-top: none; margin-top: 0; }
+  .content-section h3 { font-size: 1.1rem; margin: 24px 0 8px; }
+  .content-section p { margin-bottom: 12px; }
+  .content-section ul { margin: 0 0 16px 24px; }
+  .content-section li { margin-bottom: 6px; }
+  .formula-box { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius); padding: 16px 24px; margin: 16px 0; font-size: 1rem; text-align: center; line-height: 2; }
+
+  @media (max-width: 640px) {
+    .input-row { flex-direction: column; }
+    .result-cards { grid-template-columns: 1fr; }
+    .macro-cards { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+  let unit: 'imperial' | 'metric' = 'imperial';
+
+  document.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      unit = (btn as HTMLElement).dataset.unit as 'imperial' | 'metric';
+      document.getElementById('imperialFields')!.classList.toggle('hidden', unit !== 'imperial');
+      document.getElementById('metricFields')!.classList.toggle('hidden', unit !== 'metric');
+    });
+  });
+
+  function calculate() {
+    const age = parseInt((document.getElementById('age') as HTMLInputElement).value) || 30;
+    const sex = (document.querySelector('input[name="sex"]:checked') as HTMLInputElement)?.value || 'male';
+    const activityFactor = parseFloat((document.getElementById('activity') as HTMLSelectElement).value);
+    const goal = (document.getElementById('goal') as HTMLSelectElement).value;
+
+    let weightKg: number, heightCm: number;
+
+    if (unit === 'imperial') {
+      const feet = parseFloat((document.getElementById('feet') as HTMLInputElement).value) || 0;
+      const inches = parseFloat((document.getElementById('inches') as HTMLInputElement).value) || 0;
+      const lbs = parseFloat((document.getElementById('weightLbs') as HTMLInputElement).value) || 0;
+      heightCm = (feet * 12 + inches) * 2.54;
+      weightKg = lbs * 0.453592;
+    } else {
+      heightCm = parseFloat((document.getElementById('heightCm') as HTMLInputElement).value) || 0;
+      weightKg = parseFloat((document.getElementById('weightKg') as HTMLInputElement).value) || 0;
+    }
+
+    // Mifflin-St Jeor equation
+    let bmr: number;
+    if (sex === 'male') {
+      bmr = 10 * weightKg + 6.25 * heightCm - 5 * age + 5;
+    } else {
+      bmr = 10 * weightKg + 6.25 * heightCm - 5 * age - 161;
+    }
+
+    const tdee = bmr * activityFactor;
+
+    // Goal adjustment
+    let dailyCalories: number;
+    if (goal === 'lose') {
+      dailyCalories = tdee - 500;
+    } else if (goal === 'gain') {
+      dailyCalories = tdee + 500;
+    } else {
+      dailyCalories = tdee;
+    }
+
+    // Macro split: Protein 30%, Carbs 40%, Fat 30%
+    const proteinCals = dailyCalories * 0.30;
+    const carbsCals = dailyCalories * 0.40;
+    const fatCals = dailyCalories * 0.30;
+
+    const proteinGrams = Math.round(proteinCals / 4);
+    const carbsGrams = Math.round(carbsCals / 4);
+    const fatGrams = Math.round(fatCals / 9);
+
+    // Display results
+    document.getElementById('dailyCalories')!.textContent = Math.round(dailyCalories).toLocaleString();
+    document.getElementById('bmrValue')!.textContent = Math.round(bmr).toLocaleString();
+    document.getElementById('proteinValue')!.textContent = proteinGrams + 'g';
+    document.getElementById('carbsValue')!.textContent = carbsGrams + 'g';
+    document.getElementById('fatValue')!.textContent = fatGrams + 'g';
+  }
+
+  document.getElementById('calculateBtn')?.addEventListener('click', calculate);
+  calculate();
+</script>

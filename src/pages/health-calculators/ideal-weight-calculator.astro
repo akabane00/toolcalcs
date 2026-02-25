@@ -1,0 +1,389 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'What is the most accurate ideal weight formula?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No single ideal weight formula is universally the most accurate. The Devine formula is the most widely used in clinical settings, but the Robinson and Miller formulas often provide more realistic targets for people at the extremes of height. Using an average of all four major formulas (Devine, Robinson, Miller, and Hamwi) gives a well-rounded estimate.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How is ideal body weight different from BMI?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Ideal body weight formulas estimate a single target weight based on height and sex, while BMI calculates a ratio of weight to height and places you in a category (underweight, normal, overweight, or obese). Ideal weight gives you a specific number to aim for, whereas a healthy BMI range of 18.5-24.9 corresponds to a broader range of acceptable weights.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Do ideal weight formulas account for muscle mass or body frame?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No, the classic ideal weight formulas (Devine, Robinson, Miller, and Hamwi) do not account for muscle mass, bone density, or body frame size. They were developed primarily for medication dosing and general population estimates. Athletes, bodybuilders, and people with large or small frames may find the results less applicable to their individual situation.',
+      },
+    },
+  ],
+};
+---
+
+<BaseLayout
+  title="Ideal Weight Calculator - Find Your Healthy Weight Range | ToolCalcs"
+  description="Free ideal weight calculator using four proven formulas (Devine, Robinson, Miller, Hamwi). Enter your height and sex to find your ideal body weight in pounds and kilograms."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/health-calculators/">Health Calculators</a> &rsaquo;
+    <span>Ideal Weight Calculator</span>
+  </nav>
+
+  <h1>Ideal Weight Calculator</h1>
+  <p class="page-desc">Calculate your ideal body weight using four established medical formulas and see your healthy BMI weight range.</p>
+
+  <div class="calculator-box">
+    <div class="unit-toggle">
+      <button class="toggle-btn active" data-unit="imperial">Imperial (ft/in)</button>
+      <button class="toggle-btn" data-unit="metric">Metric (cm)</button>
+    </div>
+
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label>Sex</label>
+        <div class="radio-group">
+          <label class="radio-label"><input type="radio" name="sex" value="male" checked /> Male</label>
+          <label class="radio-label"><input type="radio" name="sex" value="female" /> Female</label>
+        </div>
+      </div>
+
+      <div id="imperialFields">
+        <div class="input-row">
+          <div class="input-group">
+            <label for="feet">Height (ft)</label>
+            <input type="number" id="feet" value="5" min="3" max="8" step="1" />
+          </div>
+          <div class="input-group">
+            <label for="inches">Inches</label>
+            <input type="number" id="inches" value="10" min="0" max="11" step="1" />
+          </div>
+        </div>
+      </div>
+
+      <div id="metricFields" class="hidden">
+        <div class="input-row">
+          <div class="input-group">
+            <label for="heightCm">Height (cm)</label>
+            <input type="number" id="heightCm" value="178" min="100" max="250" step="1" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-primary">
+        <span class="result-primary-label">Average Ideal Weight</span>
+        <span class="result-primary-value" id="avgWeight">--</span>
+        <span class="result-primary-sub" id="avgWeightAlt"></span>
+      </div>
+
+      <table class="formula-table" id="formulaTable">
+        <thead>
+          <tr>
+            <th>Formula</th>
+            <th>Ideal Weight (lb)</th>
+            <th>Ideal Weight (kg)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Devine (1974)</td><td id="devineLb">--</td><td id="devineKg">--</td></tr>
+          <tr><td>Robinson (1983)</td><td id="robinsonLb">--</td><td id="robinsonKg">--</td></tr>
+          <tr><td>Miller (1983)</td><td id="millerLb">--</td><td id="millerKg">--</td></tr>
+          <tr><td>Hamwi (1964)</td><td id="hamwiLb">--</td><td id="hamwiKg">--</td></tr>
+        </tbody>
+      </table>
+
+      <div class="bmi-range-card" id="bmiRangeCard">
+        <span class="bmi-range-label">Healthy BMI Weight Range (18.5 - 24.9)</span>
+        <span class="bmi-range-value" id="bmiRange">--</span>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>What Is Ideal Body Weight?</h2>
+    <p>Ideal body weight (IBW) is an estimated weight that is associated with the lowest risk of health problems for a given height and sex. The concept has been used in medicine since the mid-twentieth century, originally developed by life insurance companies to determine mortality risk. Over the decades, researchers and clinicians refined the idea into mathematical formulas that provide a quick reference point for healthy weight targets.</p>
+    <p>It is important to understand that ideal body weight is not a single perfect number. Rather, it represents a general guideline that applies to the average person. Your actual optimal weight depends on a wide range of factors, including your body composition, bone structure, muscle mass, age, and overall fitness level. Two people of the same height and sex can have very different ideal weights based on their individual physiology.</p>
+    <p>Despite these limitations, ideal body weight calculations remain valuable in clinical practice. Physicians use IBW formulas to determine proper drug dosages, set ventilator tidal volumes, estimate kidney function, and establish nutritional targets for patients. In everyday life, knowing your ideal weight range can help you set realistic fitness goals, monitor your progress, and understand where you stand relative to population-level health recommendations.</p>
+
+    <h2>Four Formulas for Ideal Weight</h2>
+    <p>Several formulas have been developed over the years to estimate ideal body weight. The four most widely used formulas are the Devine, Robinson, Miller, and Hamwi methods. Each was developed in a different context and produces slightly different results, which is why our calculator shows all four side by side along with their average.</p>
+
+    <h3>Devine Formula (1974)</h3>
+    <p>The Devine formula is the most commonly used ideal body weight equation in clinical medicine. Dr. B.J. Devine originally created it to calculate drug dosages, but it quickly became a general-purpose IBW reference. The formula estimates ideal weight based on height in inches above five feet (60 inches).</p>
+    <div class="formula-box">
+      <code>Male: 50.0 + 2.3 &times; (height in inches - 60) kg</code><br/>
+      <code>Female: 45.5 + 2.3 &times; (height in inches - 60) kg</code>
+    </div>
+    <p>The Devine formula tends to produce lower ideal weight estimates for taller individuals compared to some other formulas, particularly for women. Despite this, it remains the standard reference in many pharmacological and clinical guidelines because of its long history of use and extensive validation in medical literature.</p>
+
+    <h3>Robinson Formula (1983)</h3>
+    <p>The Robinson formula was developed in 1983 as a modification of the Devine formula. Dr. J.D. Robinson and colleagues aimed to provide more accurate ideal weight estimates that better reflected actual population data. The Robinson formula tends to produce slightly higher estimates for men and somewhat different values for women compared to Devine.</p>
+    <div class="formula-box">
+      <code>Male: 52.0 + 1.9 &times; (height in inches - 60) kg</code><br/>
+      <code>Female: 49.0 + 1.7 &times; (height in inches - 60) kg</code>
+    </div>
+
+    <h3>Miller Formula (1983)</h3>
+    <p>Also published in 1983, the Miller formula takes a different approach by using a higher baseline weight with a smaller per-inch increment. This means it tends to estimate higher ideal weights for shorter individuals and lower weights for very tall individuals relative to the other formulas. Many people find the Miller formula produces the most generous and realistic targets.</p>
+    <div class="formula-box">
+      <code>Male: 56.2 + 1.41 &times; (height in inches - 60) kg</code><br/>
+      <code>Female: 53.1 + 1.36 &times; (height in inches - 60) kg</code>
+    </div>
+
+    <h3>Hamwi Formula (1964)</h3>
+    <p>The Hamwi formula is the oldest of the four, developed by Dr. G.J. Hamwi in 1964. It was originally created for quick clinical estimates of ideal weight and is still widely referenced in nutrition textbooks and dietetic practice. The Hamwi method uses slightly different coefficients that place it between the Devine and Miller formulas in terms of its estimates.</p>
+    <div class="formula-box">
+      <code>Male: 48.0 + 2.7 &times; (height in inches - 60) kg</code><br/>
+      <code>Female: 45.4 + 2.2 &times; (height in inches - 60) kg</code>
+    </div>
+    <p>Because each formula was developed using different populations and methodologies, no single one is considered definitively superior. By averaging all four results, you get a more balanced estimate that smooths out the individual biases of each method. This average is what our calculator highlights as your primary ideal weight result.</p>
+
+    <h2>Limitations of Ideal Weight Formulas</h2>
+    <p>While ideal body weight formulas are useful screening tools, they have significant limitations that everyone should understand before relying on them too heavily.</p>
+    <ul>
+      <li><strong>No account for body composition:</strong> These formulas use only height and sex as inputs. They do not consider muscle mass, bone density, or body fat distribution. A muscular athlete and a sedentary person of the same height will receive the same ideal weight estimate, even though their optimal weights are very different.</li>
+      <li><strong>Designed for average body frames:</strong> All four formulas were calibrated to medium-framed individuals. People with naturally larger or smaller skeletal frames may find the estimates too low or too high, respectively. Some older guidelines suggest adjusting by plus or minus 10 percent for large or small frames.</li>
+      <li><strong>Limited ethnic diversity:</strong> The original studies behind these formulas were conducted primarily on Caucasian populations in Western countries. Body proportions and optimal weight ranges can vary across different ethnic groups. For example, Asian populations tend to have higher health risks at lower BMI values compared to European populations.</li>
+      <li><strong>Age not considered:</strong> None of the formulas account for age-related changes in body composition. As people age, they naturally lose muscle mass and gain fat mass, even if their weight remains stable. The ideal weight for a 25-year-old may not be appropriate for a 65-year-old of the same height.</li>
+      <li><strong>Originally designed for clinical use:</strong> The Devine formula, which is the most widely used, was initially created for calculating drug dosages, not for defining healthy weight targets for the general population. Its adoption as a fitness benchmark was an unintended extension of its original purpose.</li>
+    </ul>
+    <p>For these reasons, ideal body weight should be viewed as one data point among many, not as an absolute target. Combining IBW with other metrics such as body fat percentage, waist circumference, and BMI provides a more comprehensive picture of your health.</p>
+
+    <h2>Healthy BMI Range</h2>
+    <p>Body Mass Index (BMI) offers an alternative way to assess whether your weight is within a healthy range. Unlike ideal weight formulas that give you a single number, the healthy BMI range of 18.5 to 24.9 corresponds to a range of weights for any given height. This weight range is associated with the lowest risk of weight-related health issues in large population studies.</p>
+    <p>Our calculator shows this healthy BMI weight range alongside the ideal weight estimates from the four formulas. This gives you both a specific target and a broader range to work within. For most people, the ideal weight estimates from the four formulas will fall somewhere within the healthy BMI range, which provides additional confidence in the results.</p>
+    <p>To calculate your healthy weight range, the formula works backward from the BMI equation. For a BMI of 18.5, your minimum healthy weight in kilograms equals 18.5 multiplied by your height in meters squared. For a BMI of 24.9, your maximum healthy weight is 24.9 multiplied by your height in meters squared. This gives you the full span of weights considered healthy by international health organizations, including the World Health Organization and the National Institutes of Health.</p>
+    <p>Keep in mind that the healthy BMI range has its own limitations. Like the ideal weight formulas, BMI does not distinguish between muscle and fat. A person who is very muscular may fall outside the healthy BMI range despite being in excellent health. Conversely, someone with very little muscle mass may be within the healthy BMI range but still carry excessive body fat, a condition sometimes called normal weight obesity.</p>
+
+    <h2>Factors Beyond Weight</h2>
+    <p>Your health is determined by far more than a number on the scale. While maintaining a weight within a healthy range is beneficial, several other factors play equally important or even more significant roles in your overall well-being.</p>
+    <ul>
+      <li><strong>Body composition:</strong> The ratio of muscle to fat in your body matters more than total weight. Two people at the same weight can have vastly different health profiles depending on how much of that weight is lean muscle versus adipose tissue. Resistance training and adequate protein intake help maintain a favorable body composition.</li>
+      <li><strong>Waist circumference:</strong> Where you carry your fat is a critical health factor. Abdominal or visceral fat, which accumulates around your internal organs, is far more metabolically dangerous than subcutaneous fat stored under the skin on your hips and thighs. A waist circumference above 40 inches for men or 35 inches for women is considered a risk factor for cardiovascular disease and metabolic syndrome, regardless of total body weight.</li>
+      <li><strong>Physical fitness:</strong> Regular physical activity dramatically reduces the risk of chronic diseases, even in people who are technically overweight by BMI or ideal weight standards. Research consistently shows that a fit person who carries some extra weight has lower mortality risk than a sedentary person at a so-called ideal weight.</li>
+      <li><strong>Metabolic health markers:</strong> Blood pressure, blood sugar levels, cholesterol profiles, and inflammatory markers provide direct evidence of your metabolic health. Some individuals maintain excellent metabolic health at weights above their calculated ideal, while others develop metabolic problems at seemingly normal weights.</li>
+      <li><strong>Mental health and relationship with food:</strong> Obsessing over a specific target weight can lead to disordered eating patterns, anxiety, and unhealthy behaviors. A balanced approach that focuses on sustainable habits, energy levels, and overall quality of life tends to produce better long-term outcomes than chasing a number on the scale.</li>
+      <li><strong>Genetics:</strong> Your genetic makeup influences your natural body shape, fat distribution, metabolic rate, and predisposition to weight gain or loss. Some people are genetically predisposed to carry more weight without adverse health effects, while others may face health risks at lower weights. Understanding your family history and personal health data is more valuable than any formula.</li>
+    </ul>
+
+    <h2>Tips for Reaching a Healthy Weight</h2>
+    <p>If the calculator suggests your current weight is significantly different from your ideal range, the following evidence-based strategies can help you move toward a healthier weight sustainably.</p>
+    <ul>
+      <li><strong>Set realistic goals:</strong> Aim for gradual progress of one to two pounds per week for weight loss, or half a pound per week for weight gain. Extreme approaches almost always backfire. Your ideal weight is a long-term destination, not a sprint finish line.</li>
+      <li><strong>Focus on nutrition quality:</strong> Prioritize whole foods including vegetables, fruits, lean proteins, whole grains, and healthy fats. Reducing ultra-processed foods, added sugars, and excessive sodium naturally helps regulate calorie intake without requiring strict counting. A diet rich in fiber and protein promotes satiety and supports stable energy levels throughout the day.</li>
+      <li><strong>Build an exercise routine:</strong> Combine cardiovascular exercise with resistance training for the best health outcomes. The American College of Sports Medicine recommends at least 150 minutes of moderate-intensity aerobic activity per week plus two or more days of strength training. Exercise not only burns calories but also builds muscle, improves mood, enhances sleep, and reduces disease risk.</li>
+      <li><strong>Monitor but do not obsess:</strong> Weigh yourself periodically under consistent conditions, such as first thing in the morning, to track trends over time. Daily weight can fluctuate by two to five pounds due to hydration, food intake, and hormonal cycles. Looking at weekly or monthly averages provides a much clearer picture of your actual progress.</li>
+      <li><strong>Get adequate sleep:</strong> Sleep deprivation disrupts the hormones that regulate hunger and satiety, specifically leptin and ghrelin. Most adults need seven to nine hours of quality sleep per night. Poor sleep also reduces motivation to exercise and increases cravings for high-calorie, low-nutrient foods.</li>
+      <li><strong>Stay hydrated:</strong> Drinking enough water supports metabolic function and can help with appetite regulation. Sometimes thirst is mistaken for hunger, leading to unnecessary snacking. Aim for at least eight glasses of water per day, and more if you are physically active or live in a warm climate.</li>
+      <li><strong>Seek professional guidance:</strong> If you have significant weight to lose or gain, or if you have underlying health conditions, working with a registered dietitian or healthcare provider can help you develop a personalized plan. They can account for factors that generic formulas cannot, such as your medical history, medications, and individual metabolic profile.</li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>What is the most accurate ideal weight formula?</h3>
+    <p>No single ideal weight formula is universally the most accurate because each was developed using different populations and for different purposes. The Devine formula is the most commonly used in clinical settings, particularly for medication dosing. The Robinson and Miller formulas often provide more realistic targets for everyday use, especially for people at the extremes of height. Using the average of all four formulas, as this calculator does, gives you a well-rounded estimate that accounts for the strengths and weaknesses of each individual method.</p>
+
+    <h3>How is ideal body weight different from BMI?</h3>
+    <p>Ideal body weight formulas estimate a specific target weight based solely on your height and sex. They give you a single number to aim for. BMI, on the other hand, is a ratio calculated from your weight and height that places you into a category such as underweight, normal weight, overweight, or obese. A healthy BMI range of 18.5 to 24.9 corresponds to a broader range of acceptable weights for your height. In practice, using both metrics together provides the most useful picture of where your weight falls relative to health guidelines.</p>
+
+    <h3>Do ideal weight formulas account for muscle mass or body frame?</h3>
+    <p>No, the classic ideal weight formulas (Devine, Robinson, Miller, and Hamwi) do not account for muscle mass, bone density, or body frame size. They rely only on height and sex to produce their estimates. This means that athletes, bodybuilders, and people with naturally large or small frames may find the results less applicable to their situation. If you have above-average muscle mass, your healthy weight is likely higher than what these formulas suggest. For a more complete assessment of your body composition, consider measuring your body fat percentage or consulting with a healthcare professional.</p>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .breadcrumb { font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 16px; }
+  .breadcrumb a { color: var(--color-text-muted); }
+  .breadcrumb a:hover { color: var(--color-primary); }
+  h1 { font-size: 1.8rem; margin-bottom: 8px; }
+  .page-desc { color: var(--color-text-muted); margin-bottom: 24px; }
+
+  .calculator-box {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 32px;
+  }
+  .unit-toggle { display: flex; gap: 4px; margin-bottom: 20px; background: var(--color-bg); border-radius: var(--radius); padding: 4px; width: fit-content; }
+  .toggle-btn { padding: 8px 16px; border: none; border-radius: 6px; background: transparent; font-size: 0.85rem; font-weight: 500; cursor: pointer; color: var(--color-text-muted); transition: all 0.15s; }
+  .toggle-btn.active { background: var(--color-surface); color: var(--color-primary); box-shadow: var(--shadow-sm); }
+  .calc-inputs { display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; }
+  .input-row { display: flex; gap: 16px; flex-wrap: wrap; }
+  .input-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 120px; }
+  .input-group label { font-size: 0.85rem; font-weight: 600; color: var(--color-text-muted); }
+  .input-group input {
+    padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius); font-size: 1rem; background: var(--color-bg);
+  }
+  .input-group input:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+  .radio-group { display: flex; gap: 16px; padding-top: 4px; }
+  .radio-label { display: flex; align-items: center; gap: 4px; font-size: 0.95rem; cursor: pointer; }
+  .hidden { display: none; }
+
+  .result-primary {
+    text-align: center;
+    margin: 0 0 20px;
+    padding: 20px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+  }
+  .result-primary-label { display: block; font-size: 0.85rem; font-weight: 500; color: var(--color-text-muted); margin-bottom: 4px; }
+  .result-primary-value { display: block; font-size: 2.4rem; font-weight: 800; color: var(--color-primary); }
+  .result-primary-sub { display: block; font-size: 0.95rem; color: var(--color-text-muted); margin-top: 2px; }
+
+  .formula-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+  .formula-table th, .formula-table td { padding: 10px 16px; border: 1px solid var(--color-border); text-align: left; font-size: 0.9rem; }
+  .formula-table th { background: var(--color-bg); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--color-text-muted); }
+  .formula-table td:first-child { font-weight: 600; }
+  .formula-table td:nth-child(2), .formula-table td:nth-child(3) { text-align: right; font-variant-numeric: tabular-nums; }
+
+  .bmi-range-card {
+    padding: 16px 20px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    text-align: center;
+  }
+  .bmi-range-label { display: block; font-size: 0.85rem; font-weight: 500; color: var(--color-text-muted); margin-bottom: 4px; }
+  .bmi-range-value { display: block; font-size: 1.3rem; font-weight: 700; }
+
+  .content-section { max-width: 800px; line-height: 1.8; }
+  .content-section h2 { font-size: 1.3rem; margin: 32px 0 12px; padding-top: 16px; border-top: 1px solid var(--color-border); }
+  .content-section h2:first-child { border-top: none; margin-top: 0; }
+  .content-section h3 { font-size: 1.1rem; margin: 24px 0 8px; }
+  .content-section p { margin-bottom: 12px; }
+  .content-section ul, .content-section ol { margin: 0 0 16px 24px; }
+  .content-section li { margin-bottom: 6px; }
+  .formula-box { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius); padding: 16px 24px; margin: 16px 0; font-size: 1rem; text-align: center; line-height: 2; }
+  .info-table { width: 100%; max-width: 500px; border-collapse: collapse; margin: 16px 0; }
+  .info-table th, .info-table td { padding: 8px 16px; border: 1px solid var(--color-border); text-align: left; }
+  .info-table th { background: var(--color-bg); font-weight: 600; }
+
+  @media (max-width: 640px) {
+    .input-row { flex-direction: column; }
+    .formula-table th, .formula-table td { padding: 8px 10px; font-size: 0.8rem; }
+    .result-primary-value { font-size: 2rem; }
+  }
+</style>
+
+<script>
+  let unit: 'imperial' | 'metric' = 'imperial';
+
+  function getSex(): string {
+    return (document.querySelector('input[name="sex"]:checked') as HTMLInputElement)?.value || 'male';
+  }
+
+  function getHeightInches(): number {
+    if (unit === 'imperial') {
+      const feet = parseFloat((document.getElementById('feet') as HTMLInputElement).value) || 0;
+      const inches = parseFloat((document.getElementById('inches') as HTMLInputElement).value) || 0;
+      return feet * 12 + inches;
+    } else {
+      const cm = parseFloat((document.getElementById('heightCm') as HTMLInputElement).value) || 0;
+      return cm / 2.54;
+    }
+  }
+
+  function calculate() {
+    const sex = getSex();
+    const totalInches = getHeightInches();
+
+    if (totalInches < 48 || totalInches > 96) return;
+
+    const inchesOver60 = totalInches - 60;
+
+    // Calculate ideal weights in kg
+    let devineKg: number, robinsonKg: number, millerKg: number, hamwiKg: number;
+
+    if (sex === 'male') {
+      devineKg = 50.0 + 2.3 * inchesOver60;
+      robinsonKg = 52.0 + 1.9 * inchesOver60;
+      millerKg = 56.2 + 1.41 * inchesOver60;
+      hamwiKg = 48.0 + 2.7 * inchesOver60;
+    } else {
+      devineKg = 45.5 + 2.3 * inchesOver60;
+      robinsonKg = 49.0 + 1.7 * inchesOver60;
+      millerKg = 53.1 + 1.36 * inchesOver60;
+      hamwiKg = 45.4 + 2.2 * inchesOver60;
+    }
+
+    const kgToLb = 2.20462;
+    const devineLb = devineKg * kgToLb;
+    const robinsonLb = robinsonKg * kgToLb;
+    const millerLb = millerKg * kgToLb;
+    const hamwiLb = hamwiKg * kgToLb;
+
+    // Average
+    const avgKg = (devineKg + robinsonKg + millerKg + hamwiKg) / 4;
+    const avgLb = avgKg * kgToLb;
+
+    // Healthy BMI range (18.5 - 24.9)
+    const heightM = (totalInches * 2.54) / 100;
+    const bmiLowKg = 18.5 * heightM * heightM;
+    const bmiHighKg = 24.9 * heightM * heightM;
+    const bmiLowLb = bmiLowKg * kgToLb;
+    const bmiHighLb = bmiHighKg * kgToLb;
+
+    // Update table
+    document.getElementById('devineLb')!.textContent = devineLb.toFixed(1) + ' lb';
+    document.getElementById('devineKg')!.textContent = devineKg.toFixed(1) + ' kg';
+    document.getElementById('robinsonLb')!.textContent = robinsonLb.toFixed(1) + ' lb';
+    document.getElementById('robinsonKg')!.textContent = robinsonKg.toFixed(1) + ' kg';
+    document.getElementById('millerLb')!.textContent = millerLb.toFixed(1) + ' lb';
+    document.getElementById('millerKg')!.textContent = millerKg.toFixed(1) + ' kg';
+    document.getElementById('hamwiLb')!.textContent = hamwiLb.toFixed(1) + ' lb';
+    document.getElementById('hamwiKg')!.textContent = hamwiKg.toFixed(1) + ' kg';
+
+    // Update primary result
+    document.getElementById('avgWeight')!.textContent = avgLb.toFixed(1) + ' lb (' + avgKg.toFixed(1) + ' kg)';
+    document.getElementById('avgWeightAlt')!.textContent = 'Average of Devine, Robinson, Miller & Hamwi formulas';
+
+    // Update BMI range
+    document.getElementById('bmiRange')!.textContent =
+      bmiLowLb.toFixed(0) + ' - ' + bmiHighLb.toFixed(0) + ' lb  (' +
+      bmiLowKg.toFixed(1) + ' - ' + bmiHighKg.toFixed(1) + ' kg)';
+  }
+
+  // Unit toggle
+  document.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      unit = (btn as HTMLElement).dataset.unit as 'imperial' | 'metric';
+      document.getElementById('imperialFields')!.classList.toggle('hidden', unit !== 'imperial');
+      document.getElementById('metricFields')!.classList.toggle('hidden', unit !== 'metric');
+      calculate();
+    });
+  });
+
+  // Auto-calculate on any input change
+  document.querySelectorAll('#feet, #inches, #heightCm').forEach(input => {
+    input.addEventListener('input', calculate);
+  });
+  document.querySelectorAll('input[name="sex"]').forEach(radio => {
+    radio.addEventListener('change', calculate);
+  });
+
+  // Initial calculation
+  calculate();
+</script>
