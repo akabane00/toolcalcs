@@ -1,12 +1,44 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import AdUnit from '../../components/AdUnit.astro';
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'Why does most of my payment go to interest at first?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Interest is calculated on the outstanding loan balance each month. At the start of a loan, your balance is at its highest, so the interest portion is largest. As you pay down the principal over time, less interest accrues and more of each payment goes toward reducing the balance.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Should I make extra payments on my loan?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Extra payments can save significant money by reducing total interest and shortening your loan term. For example, adding $200 per month to a $250,000 mortgage at 6.5% can save over $80,000 in interest and pay off the loan 7 years early. However, first ensure you have an emergency fund and no higher-interest debt.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is the difference between a 15-year and 30-year mortgage?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'A 15-year mortgage has higher monthly payments but significantly lower total interest costs and typically a lower interest rate. A 30-year mortgage offers lower monthly payments but you pay much more in total interest over the life of the loan. The right choice depends on your budget and financial goals.',
+      },
+    },
+  ],
+};
 ---
 
 <BaseLayout
   title="Loan Amortization Calculator - Monthly Payment & Schedule"
   description="Free loan amortization calculator. Calculate monthly payments and generate a full amortization schedule showing principal, interest, and remaining balance."
   type="article"
+  structuredData={structuredData}
 >
   <nav class="breadcrumb">
     <a href="/">Home</a> &rsaquo;
@@ -82,7 +114,8 @@ import AdUnit from '../../components/AdUnit.astro';
 
   <article class="content-section">
     <h2>What Is Loan Amortization?</h2>
-    <p>Loan amortization is the process of paying off a debt over time through regular payments. Each payment covers both the interest accrued and a portion of the principal balance. In the early years of a loan, most of your payment goes toward interest. As the balance decreases, more of each payment goes toward the principal.</p>
+    <p>Loan amortization is the process of paying off a debt over time through regular, fixed payments. Each payment covers both the interest accrued on the outstanding balance and a portion of the principal. The key characteristic of an amortized loan is that the payment amount stays the same each month, but the split between interest and principal shifts dramatically over the life of the loan.</p>
+    <p>For example, on a $250,000 mortgage at 6.5% for 30 years, the monthly payment is $1,580.17. In the very first month, approximately $1,354 (86%) goes to interest and only $226 (14%) reduces the principal. By month 180 (the halfway point), the split is roughly equal. In the final months, nearly the entire payment goes toward principal. This front-loaded interest structure is why early extra payments have such a powerful impact.</p>
 
     <h2>How the Monthly Payment Is Calculated</h2>
     <div class="formula-box">
@@ -95,25 +128,78 @@ import AdUnit from '../../components/AdUnit.astro';
       <li><strong>r</strong> = Monthly interest rate (annual rate / 12)</li>
       <li><strong>n</strong> = Total number of payments (years &times; 12)</li>
     </ul>
+    <p><strong>Example:</strong> For a $250,000 loan at 6.5% annual interest over 30 years: r = 0.065/12 = 0.005417, n = 360 payments. Plugging into the formula gives M = $1,580.17 per month. Over 30 years, you would pay a total of $568,861—meaning $318,861 goes to interest alone.</p>
 
     <h2>The Impact of Extra Payments</h2>
-    <p>Making extra payments toward your loan principal can dramatically reduce the total interest you pay and shorten the loan term. Even an extra $100 per month on a 30-year mortgage can save tens of thousands of dollars and cut years off the loan.</p>
-    <p>Use the "Extra Monthly Payment" field above to see exactly how much you could save.</p>
+    <p>Making extra payments toward your loan principal can dramatically reduce total interest and shorten the loan term. Using the $250,000 mortgage at 6.5% example:</p>
+    <ul>
+      <li><strong>$100/month extra:</strong> Saves approximately $55,000 in interest and pays off the loan about 5 years early.</li>
+      <li><strong>$200/month extra:</strong> Saves approximately $87,000 in interest and pays off the loan about 8 years early.</li>
+      <li><strong>$500/month extra:</strong> Saves approximately $148,000 in interest and pays off the loan about 14 years early.</li>
+    </ul>
+    <p>Use the "Extra Monthly Payment" field above to see exactly how much you could save on your specific loan.</p>
+
+    <h2>Understanding Your Amortization Schedule</h2>
+    <p>An amortization schedule is a table that shows every payment over the life of your loan. Each row contains:</p>
+    <ul>
+      <li><strong>Month:</strong> The payment number.</li>
+      <li><strong>Payment:</strong> The total amount paid that month (fixed for standard loans).</li>
+      <li><strong>Principal:</strong> The portion that reduces your loan balance.</li>
+      <li><strong>Interest:</strong> The portion that pays the lender for borrowing.</li>
+      <li><strong>Balance:</strong> The remaining loan amount after the payment.</li>
+    </ul>
+    <p>One important milestone in any amortization schedule is the <strong>crossover point</strong>—the month when the principal portion first exceeds the interest portion. For a 30-year mortgage at 6.5%, this crossover occurs around month 216 (year 18). Before that point, the majority of every payment is interest. After it, the majority reduces your balance.</p>
+
+    <h2>15-Year vs 30-Year Loans</h2>
+    <p>Choosing between a 15-year and 30-year loan term is one of the most important financial decisions when taking out a mortgage. Here is how they compare for a $250,000 loan:</p>
+    <ul>
+      <li><strong>30-year at 6.5%:</strong> Monthly payment of $1,580. Total interest paid: $318,861.</li>
+      <li><strong>15-year at 5.9%:</strong> Monthly payment of $2,098. Total interest paid: $127,603.</li>
+    </ul>
+    <p>The 15-year option has a monthly payment that is $518 higher, but saves <strong>$191,258</strong> in total interest. Fifteen-year loans also typically qualify for lower interest rates (0.5-0.75% lower), making them even more cost-effective. The tradeoff is flexibility: the higher required payment leaves less room in your budget for other expenses or investments.</p>
+
+    <h2>Refinancing and Amortization</h2>
+    <p>Refinancing replaces your current loan with a new one, typically at a lower interest rate. While this can reduce your monthly payment or total interest, it also <strong>resets your amortization schedule</strong>. If you are 10 years into a 30-year mortgage and refinance into a new 30-year term, you start over with interest-heavy payments.</p>
+    <p>To determine if refinancing is worthwhile, calculate the <strong>break-even point</strong>: divide the total closing costs by the monthly savings. For example, if refinancing costs $4,000 and saves you $150 per month, the break-even point is 4,000 / 150 = 27 months. If you plan to stay in the home longer than 27 months, refinancing makes financial sense.</p>
 
     <h2>Types of Amortizing Loans</h2>
     <ul>
-      <li><strong>Fixed-rate mortgages:</strong> The most common amortizing loan, with a consistent interest rate and payment throughout the loan term.</li>
-      <li><strong>Auto loans:</strong> Typically 3-7 year terms with fixed monthly payments.</li>
-      <li><strong>Personal loans:</strong> Usually 2-5 year terms, fully amortizing.</li>
-      <li><strong>Student loans:</strong> Federal student loans use standard amortization over 10-25 years.</li>
+      <li><strong>Fixed-rate mortgages:</strong> The most common amortizing loan. The interest rate and monthly payment stay the same for the entire term (typically 15 or 30 years), making budgeting predictable.</li>
+      <li><strong>Auto loans:</strong> Typically 3-7 year terms with fixed monthly payments. Since cars depreciate rapidly, shorter terms are generally recommended to avoid owing more than the vehicle is worth.</li>
+      <li><strong>Personal loans:</strong> Usually 2-5 year terms, fully amortizing with fixed rates. Often used for debt consolidation, home improvements, or large purchases.</li>
+      <li><strong>Student loans:</strong> Federal student loans use standard amortization over 10 years by default, though income-driven repayment plans can extend the term to 20-25 years with different payment structures.</li>
+    </ul>
+
+    <h2>Strategies to Pay Off Your Loan Faster</h2>
+    <p>Beyond making extra monthly payments, several strategies can accelerate your payoff:</p>
+    <ul>
+      <li><strong>Bi-weekly payments:</strong> Instead of making 12 monthly payments per year, pay half the monthly amount every two weeks. This results in 26 half-payments (equivalent to 13 full payments) per year—one extra payment annually. On a 30-year mortgage, this can shave 4-5 years off the term.</li>
+      <li><strong>Lump sum payments:</strong> Apply windfalls like tax refunds, bonuses, or inheritance directly to the principal. A single $5,000 lump sum early in a 30-year mortgage can save $15,000-$20,000 in interest over the remaining term.</li>
+      <li><strong>Loan recasting:</strong> Some lenders allow you to make a large lump sum payment and then re-amortize the remaining balance over the original term, resulting in a lower monthly payment. This differs from refinancing because there are no closing costs or credit checks.</li>
+      <li><strong>Rounding up payments:</strong> Simply rounding your payment up to the next $100 (e.g., $1,580 to $1,600) adds $20 to principal each month without a noticeable impact on your budget, but it adds up significantly over decades.</li>
     </ul>
 
     <h2>Frequently Asked Questions</h2>
     <h3>Why does most of my payment go to interest at first?</h3>
-    <p>Interest is calculated on the outstanding balance. When your balance is highest (at the beginning), the interest portion is largest. As you pay down the principal, less interest accrues each month, so more of your payment goes toward principal.</p>
+    <p>Interest is calculated on the outstanding balance. When your balance is highest (at the beginning), the interest portion is largest. As you pay down the principal, less interest accrues each month, so more of your payment goes toward principal. This is the fundamental nature of amortization.</p>
 
     <h3>Should I make extra payments?</h3>
-    <p>If your loan allows it without penalties, extra payments can save significant money over the life of the loan. However, first ensure you have an emergency fund and have paid off higher-interest debt.</p>
+    <p>If your loan allows it without prepayment penalties, extra payments can save significant money over the life of the loan. However, first ensure you have an emergency fund (3-6 months of expenses) and have paid off any higher-interest debt like credit cards. After that, extra mortgage payments are one of the safest financial moves you can make.</p>
+
+    <h3>What is the difference between a 15-year and 30-year mortgage?</h3>
+    <p>A 15-year mortgage has substantially higher monthly payments but saves you hundreds of thousands of dollars in interest over the life of the loan. It also typically carries a lower interest rate. A 30-year mortgage is more affordable month-to-month but costs significantly more in total. Choose 15 years if you can comfortably afford the payments; choose 30 years if you need budget flexibility.</p>
+
+    <h3>How does refinancing affect my amortization?</h3>
+    <p>Refinancing creates a brand-new loan with a fresh amortization schedule. Even if you have been paying your mortgage for 10 years, refinancing into a new 30-year term means you start over with interest-heavy payments. To avoid extending your timeline, consider refinancing into a shorter term (such as 15 or 20 years) or continuing to make your previous higher payment on the new loan.</p>
+
+    <h3>What is negative amortization?</h3>
+    <p>Negative amortization occurs when your monthly payment is less than the interest due, causing the unpaid interest to be added to your loan balance. This means you actually owe more over time rather than less. It can occur with certain adjustable-rate mortgages (ARMs) or payment-option loans. Negative amortization loans are risky and should be avoided by most borrowers.</p>
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/financial-calculators/mortgage-calculator/">Mortgage Calculator</a> - Estimate monthly mortgage payments with taxes and insurance.</li>
+      <li><a href="/financial-calculators/auto-loan-calculator/">Auto Loan Calculator</a> - Calculate your monthly car payment.</li>
+      <li><a href="/financial-calculators/compound-interest-calculator/">Compound Interest Calculator</a> - See how your investments grow over time.</li>
+    </ul>
   </article>
 
   <AdUnit slot="calc-bottom" format="horizontal" />

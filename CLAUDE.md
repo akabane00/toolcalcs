@@ -1,7 +1,7 @@
 # ToolCalcs - Free Online Calculator Site
 
 ## Project Overview
-- **Domain**: toolcalcs.com (pending registration)
+- **Domain**: toolcalcs.com
 - **Stack**: Astro (static site generator) + Vanilla CSS + Vanilla JS
 - **Hosting**: Cloudflare Pages (free tier, $0/month)
 - **Revenue**: Google AdSense (CPM model)
@@ -20,9 +20,12 @@ x:/toolcalcs/
 │   │   └── AdUnit.astro             # AdSense ad wrapper
 │   ├── pages/                       # Each .astro file = one page
 │   │   ├── index.astro              # Homepage
-│   │   ├── financial-calculators/   # Finance category
-│   │   ├── health-calculators/      # Health category
-│   │   ├── math-calculators/        # Math category
+│   │   ├── financial-calculators/   # Finance category (7 calcs)
+│   │   ├── health-calculators/      # Health category (6 calcs)
+│   │   ├── math-calculators/        # Math category (4 calcs)
+│   │   ├── date-time-calculators/   # Date & Time category (3 calcs)
+│   │   ├── conversion-calculators/  # Conversion category (2 calcs)
+│   │   ├── everyday-calculators/    # Everyday category (3 calcs)
 │   │   ├── about.astro
 │   │   ├── contact.astro
 │   │   ├── privacy-policy.astro
@@ -96,11 +99,11 @@ Each calculator page should include:
 - Content must provide unique value beyond the calculator tool itself
 
 ## Deployment Checklist
-- [ ] Register toolcalcs.com domain
-- [ ] Create Cloudflare account
-- [ ] Connect GitHub repo to Cloudflare Pages
-- [ ] Set custom domain in Cloudflare Pages
-- [ ] Update DNS records
-- [ ] Submit sitemap to Google Search Console
-- [ ] Set up Google Analytics 4
-- [ ] Apply for Google AdSense (after 30+ pages)
+- [x] Register toolcalcs.com domain
+- [x] Create Cloudflare account
+- [x] Connect GitHub repo to Cloudflare Pages
+- [x] Set custom domain in Cloudflare Pages
+- [x] Update DNS records
+- [x] Submit sitemap to Google Search Console
+- [x] Set up Google Analytics 4 (G-M0BQJJYZPX)
+- [ ] Apply for Google AdSense (36 pages ready)
