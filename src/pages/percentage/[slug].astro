@@ -1,0 +1,390 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import { getAllPercentagePages, percentages, baseNumbers, type PercentagePage } from '../../data/percentage-pages';
+
+export function getStaticPaths() {
+  return getAllPercentagePages().map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: PercentagePage };
+const { percentage, baseNumber, result } = page;
+
+// Format numbers for display
+function fmt(n: number): string {
+  if (Number.isInteger(n)) return n.toLocaleString('en-US');
+  if (Math.abs(n) >= 100) return n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+  if (Math.abs(n) >= 1) return n.toLocaleString('en-US', { maximumFractionDigits: 4 });
+  return n.toLocaleString('en-US', { maximumFractionDigits: 6 });
+}
+
+const resultStr = fmt(result);
+const baseStr = fmt(baseNumber);
+
+// SEO metadata
+const title = `What is ${percentage}% of ${baseStr}? Answer: ${resultStr} | ToolCalcs`;
+const description = `${percentage}% of ${baseStr} is ${resultStr}. Learn how to calculate ${percentage} percent of ${baseStr} with step-by-step formula and examples.`;
+
+// Related calculations: same percentage, different bases
+const allPages = getAllPercentagePages();
+const samePercentage = allPages
+  .filter((p) => p.percentage === percentage && p.baseNumber !== baseNumber)
+  .slice(0, 5);
+
+// Related calculations: same base, different percentages
+const sameBase = allPages
+  .filter((p) => p.baseNumber === baseNumber && p.percentage !== percentage)
+  .slice(0, 5);
+
+// Step-by-step intermediate value
+const intermediateStr = fmt(percentage / 100);
+
+// Contextual content generation
+function getContextSentence(pct: number, base: number): string {
+  if (pct <= 10) return `Calculating small percentages like ${pct}% is common when figuring out sales tax, service charges, or small discounts on purchases.`;
+  if (pct <= 25) return `Finding ${pct}% of a number is useful for calculating tips at restaurants, standard discounts during sales events, or down payments on purchases.`;
+  if (pct <= 50) return `Knowing ${pct}% of a value comes up frequently in contexts like splitting costs, determining half-off sale prices, or calculating partial payments.`;
+  if (pct <= 100) return `Calculating ${pct}% of a number is helpful when determining large portions, markdowns, or allocating budgets across categories.`;
+  return `Percentages above 100% represent values greater than the original number. Calculating ${pct}% of ${fmt(base)} is useful for understanding markups, growth rates, or compounding increases.`;
+}
+
+function getApplicationSentence(base: number): string {
+  if (base <= 100) return `When working with smaller values like ${fmt(base)}, percentage calculations commonly appear in test scoring, recipe adjustments, and small-item pricing.`;
+  if (base <= 500) return `Values in the range of ${fmt(base)} frequently appear in everyday scenarios such as utility bills, grocery budgets, and product pricing.`;
+  if (base <= 1000) return `Numbers around ${fmt(base)} are typical in personal finance contexts such as monthly rent, insurance premiums, and mid-range electronics pricing.`;
+  if (base <= 5000) return `With values like ${fmt(base)}, percentage calculations are important for things like salary bonuses, tax calculations on purchases, and investment returns.`;
+  return `When dealing with larger numbers like ${fmt(base)}, percentage calculations become critical in real estate transactions, annual salary computations, vehicle pricing, and business revenue analysis.`;
+}
+
+// Structured data
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Percentage Calculator", "item": "https://toolcalcs.com/math-calculators/percentage-calculator/" },
+      { "@type": "ListItem", "position": 3, "name": `What is ${percentage}% of ${baseStr}` },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": `What is ${percentage}% of ${baseStr}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `${percentage}% of ${baseStr} is ${resultStr}. You can calculate this by multiplying ${baseStr} by ${percentage}/100, which gives you ${resultStr}.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `How do you calculate ${percentage} percent of ${baseStr}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `To calculate ${percentage}% of ${baseStr}, convert the percentage to a decimal by dividing ${percentage} by 100 to get ${intermediateStr}. Then multiply ${intermediateStr} by ${baseStr}. The result is ${resultStr}.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `What is the formula for finding ${percentage}% of a number?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `The formula is: Result = (Percentage / 100) \u00D7 Number. For ${percentage}% of ${baseStr}: (${percentage} / 100) \u00D7 ${baseStr} = ${resultStr}. This formula works for any percentage and any number.`,
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout title={title} description={description} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/math-calculators/percentage-calculator/">Percentage Calculator</a> &rsaquo;
+    <span>What is {percentage}% of {baseStr}</span>
+  </nav>
+
+  <h1>What is {percentage}% of {baseStr}?</h1>
+  <p class="page-desc">Calculate {percentage} percent of {baseStr} with the formula, step-by-step solution, and interactive calculator.</p>
+
+  <!-- Quick Answer -->
+  <div class="quick-fact">
+    <span class="quick-fact-label">Quick Answer:</span>
+    <strong>{percentage}% of {baseStr} is {resultStr}</strong>
+  </div>
+
+  <!-- Step-by-Step Calculation -->
+  <div class="calculator-box">
+    <h2 class="calc-section-title">Step-by-Step Calculation</h2>
+    <div class="step-list">
+      <div class="step">
+        <span class="step-num">1</span>
+        <div class="step-content">
+          <p class="step-label">Write the formula</p>
+          <div class="formula-box"><code>Result = (Percentage / 100) &times; Number</code></div>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">2</span>
+        <div class="step-content">
+          <p class="step-label">Substitute the values</p>
+          <div class="formula-box"><code>Result = ({percentage} / 100) &times; {baseStr}</code></div>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">3</span>
+        <div class="step-content">
+          <p class="step-label">Convert percentage to decimal</p>
+          <div class="formula-box"><code>{percentage} / 100 = {intermediateStr}</code></div>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">4</span>
+        <div class="step-content">
+          <p class="step-label">Multiply to get the result</p>
+          <div class="formula-box"><code>{intermediateStr} &times; {baseStr} = {resultStr}</code></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mini Calculator -->
+  <h2 class="section-heading">Percentage Calculator</h2>
+  <div class="calculator-box">
+    <div class="pct-calc-row">
+      <div class="input-group">
+        <label for="pctInput">Percentage (%)</label>
+        <input type="number" id="pctInput" value={percentage} step="any" />
+      </div>
+      <span class="pct-of-label">of</span>
+      <div class="input-group">
+        <label for="baseInput">Number</label>
+        <input type="number" id="baseInput" value={baseNumber} step="any" />
+      </div>
+      <span class="pct-eq-label">=</span>
+      <div class="input-group">
+        <label for="resultOutput">Result</label>
+        <input type="number" id="resultOutput" value={result} readonly />
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="pct-mid" format="rectangle" />
+
+  <!-- Related Calculations -->
+  <article class="content-section">
+    <h2>Related Calculations</h2>
+
+    {samePercentage.length > 0 && (
+      <h3>{percentage}% of Other Numbers</h3>
+      <ul>
+        {samePercentage.map((p) => (
+          <li>
+            <a href={`/percentage/${p.slug}/`}>
+              What is {p.percentage}% of {fmt(p.baseNumber)}? = {fmt(p.result)}
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+
+    {sameBase.length > 0 && (
+      <h3>Other Percentages of {baseStr}</h3>
+      <ul>
+        {sameBase.map((p) => (
+          <li>
+            <a href={`/percentage/${p.slug}/`}>
+              What is {p.percentage}% of {fmt(p.baseNumber)}? = {fmt(p.result)}
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+
+    <!-- How to Calculate Percentages -->
+    <h2>How to Calculate Percentages</h2>
+    <p>
+      A percentage is a way of expressing a number as a fraction of 100. The word "percent" comes from the Latin <em>per centum</em>, meaning "by the hundred." When we say {percentage}% of {baseStr}, we are asking: what is {percentage} hundredths of {baseStr}?
+    </p>
+    <p>
+      The fundamental formula for calculating a percentage of a number is straightforward: divide the percentage by 100 to convert it to a decimal, then multiply by the number. In this case, {percentage} divided by 100 equals {intermediateStr}, and {intermediateStr} multiplied by {baseStr} gives us {resultStr}.
+    </p>
+    <p>
+      {getContextSentence(percentage, baseNumber)} {getApplicationSentence(baseNumber)}
+    </p>
+    <p>
+      There are a few mental math shortcuts you can use. To find 10% of any number, simply move the decimal point one place to the left. For 5%, take half of 10%. For 25%, divide the number by 4. For 50%, divide by 2. These building blocks let you estimate many common percentages quickly without a calculator.
+    </p>
+    <p>
+      Percentages are used everywhere in daily life: from calculating discounts during shopping sales and figuring out how much to tip at a restaurant, to understanding interest rates on loans, evaluating test scores, and interpreting statistics in news reports. Understanding how to compute percentages quickly is one of the most practical math skills you can have.
+    </p>
+    <p>
+      If you need to reverse the calculation and find what percentage one number is of another, use the formula: Percentage = (Part / Whole) &times; 100. For example, {resultStr} is {percentage}% of {baseStr} because ({resultStr} / {baseStr}) &times; 100 = {percentage}.
+    </p>
+
+    <!-- FAQ Section -->
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is {percentage}% of {baseStr}?</h3>
+    <p>
+      {percentage}% of {baseStr} is <strong>{resultStr}</strong>. This is calculated by converting {percentage}% to its decimal form ({intermediateStr}) and multiplying it by {baseStr}. The formula is: ({percentage} / 100) &times; {baseStr} = {resultStr}.
+    </p>
+
+    <h3>How do you calculate {percentage} percent of {baseStr}?</h3>
+    <p>
+      To calculate {percentage}% of {baseStr}, divide {percentage} by 100 to get {intermediateStr}. Then multiply {intermediateStr} by {baseStr}. The answer is {resultStr}. You can also use the interactive calculator above to verify this result or try different values.
+    </p>
+
+    <h3>What is the formula for finding {percentage}% of a number?</h3>
+    <p>
+      The general formula is: <strong>Result = (Percentage / 100) &times; Number</strong>. To find {percentage}% of any number, multiply that number by {intermediateStr}. For {baseStr} specifically, {intermediateStr} &times; {baseStr} = {resultStr}. This formula works universally for any percentage and any number.
+    </p>
+
+    <h2>Full Percentage Calculator</h2>
+    <p>
+      Need to calculate a different percentage? Use our <a href="/math-calculators/percentage-calculator/">full Percentage Calculator</a> for percentage increase/decrease, percentage difference, and more advanced percentage operations.
+    </p>
+  </article>
+
+  <AdUnit slot="pct-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .quick-fact {
+    background: #eff6ff;
+    border-radius: var(--radius);
+    padding: 16px 24px;
+    margin-bottom: 24px;
+    font-size: 1.1rem;
+  }
+  .quick-fact-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .quick-fact strong {
+    color: var(--color-primary);
+    font-size: 1.3rem;
+  }
+
+  .calc-section-title {
+    font-size: 1.15rem;
+    margin: 0 0 16px;
+    border: none;
+    padding: 0;
+  }
+
+  .step-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .step-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .step-content {
+    flex: 1;
+  }
+  .step-label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-size: 0.95rem;
+  }
+  .step .formula-box {
+    margin: 0;
+    padding: 10px 16px;
+    font-size: 1.05rem;
+    text-align: left;
+  }
+
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+
+  .pct-calc-row {
+    display: flex;
+    align-items: end;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .pct-calc-row .input-group {
+    flex: 1;
+    min-width: 100px;
+  }
+  .pct-of-label,
+  .pct-eq-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    padding-bottom: 10px;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 640px) {
+    .pct-calc-row {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .pct-of-label,
+    .pct-eq-label {
+      text-align: center;
+      padding-bottom: 0;
+    }
+  }
+</style>
+
+<script define:vars={{ percentage, baseNumber, result }}>
+  var pctInput = document.getElementById('pctInput');
+  var baseInput = document.getElementById('baseInput');
+  var resultOutput = document.getElementById('resultOutput');
+
+  function formatNum(n) {
+    if (Number.isInteger(n)) return n.toLocaleString('en-US');
+    if (Math.abs(n) >= 100) return n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+    if (Math.abs(n) >= 1) return n.toLocaleString('en-US', { maximumFractionDigits: 4 });
+    if (Math.abs(n) >= 0.01) return n.toLocaleString('en-US', { maximumFractionDigits: 6 });
+    return n.toExponential(4);
+  }
+
+  function calculate() {
+    var pct = parseFloat(pctInput.value);
+    var base = parseFloat(baseInput.value);
+    if (isNaN(pct) || isNaN(base)) {
+      resultOutput.value = '';
+      return;
+    }
+    var res = (pct / 100) * base;
+    resultOutput.value = formatNum(res);
+  }
+
+  pctInput.addEventListener('input', calculate);
+  baseInput.addEventListener('input', calculate);
+
+  // Initialize with pre-filled values
+  calculate();
+</script>

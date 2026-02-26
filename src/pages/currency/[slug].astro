@@ -1,0 +1,333 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import { currencyPairs, type CurrencyPairPage } from '../../data/currency-pairs';
+
+export function getStaticPaths() {
+  return currencyPairs.map((pair) => ({
+    params: { slug: pair.slug },
+    props: { pair },
+  }));
+}
+
+const { pair } = Astro.props as { pair: CurrencyPairPage };
+
+const {
+  slug, fromCode, fromName, fromSymbol, toCode, toName, toSymbol,
+  approximateRate, commonAmounts, metaTitle, metaDesc, contentBody,
+  faqItems, relatedSlugs,
+} = pair;
+
+// Reverse pair info
+const reverseSlug = `${toCode.toLowerCase()}-to-${fromCode.toLowerCase()}`;
+const reverseRate = Math.round((1 / approximateRate) * 10000) / 10000;
+
+// Build conversion table rows (both directions)
+const tableRows = commonAmounts.map((amt) => ({
+  fromAmt: amt,
+  toAmt: Math.round(amt * approximateRate * 100) / 100,
+}));
+
+// Check if reverse pair page exists
+const reversePairExists = currencyPairs.some((p) => p.slug === reverseSlug);
+
+// Related pairs that actually exist
+const validRelatedSlugs = relatedSlugs.filter((s) =>
+  currencyPairs.some((p) => p.slug === s)
+);
+
+// Formatted rate for display
+function fmtRate(n: number): string {
+  if (Number.isInteger(n)) return n.toLocaleString('en-US');
+  if (Math.abs(n) >= 100) return n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+  if (Math.abs(n) >= 1) return n.toLocaleString('en-US', { maximumFractionDigits: 4 });
+  if (Math.abs(n) >= 0.01) return n.toLocaleString('en-US', { maximumFractionDigits: 6 });
+  return n.toExponential(4);
+}
+
+function fmtAmount(n: number): string {
+  if (Number.isInteger(n)) return n.toLocaleString('en-US');
+  return n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+}
+
+// Structured data
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Currency Converter", "item": "https://toolcalcs.com/conversion-calculators/currency-converter/" },
+      { "@type": "ListItem", "position": 3, "name": `${fromCode} to ${toCode}` },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqItems.map((item) => ({
+      "@type": "Question",
+      "name": item.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": item.answer,
+      },
+    })),
+  },
+];
+---
+
+<BaseLayout title={metaTitle} description={metaDesc} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/conversion-calculators/currency-converter/">Currency Converter</a> &rsaquo;
+    <span>{fromCode} to {toCode}</span>
+  </nav>
+
+  <h1>Convert {fromName}s to {toName}s ({fromCode} to {toCode})</h1>
+  <p class="page-desc">Convert {fromName} ({fromCode}) to {toName} ({toCode}) using approximate exchange rates.</p>
+
+  <!-- Disclaimer Banner -->
+  <div class="disclaimer-banner">
+    <strong>Disclaimer:</strong> Exchange rates are approximate and for reference only. Rates reflect approximate mid-market values as of early 2026. For live rates and actual transaction rates, check with your bank or financial provider.
+  </div>
+
+  <!-- Quick Rate Display -->
+  <div class="quick-fact">
+    <span class="quick-fact-label">Approximate Rate:</span>
+    <strong>1 {fromCode} &asymp; {fmtRate(approximateRate)} {toCode}</strong>
+  </div>
+
+  <!-- Mini Converter -->
+  <div class="calculator-box">
+    <div class="calc-inputs converter-row">
+      <div class="input-group">
+        <label for="fromValue">{fromName} ({fromCode})</label>
+        <input type="number" id="fromValue" value="1" step="any" min="0" />
+      </div>
+      <div class="swap-cell">
+        <button class="swap-btn" id="swapBtn" title="Swap currencies">&#8646;</button>
+      </div>
+      <div class="input-group">
+        <label for="toValue">{toName} ({toCode})</label>
+        <input type="number" id="toValue" step="any" readonly />
+      </div>
+    </div>
+    <div class="conversion-summary" id="conversionSummary"></div>
+  </div>
+
+  <!-- Conversion Table -->
+  <h2 class="section-heading">{fromCode} to {toCode} Conversion Table</h2>
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>{fromName} ({fromCode})</th>
+          <th>{toName} ({toCode})</th>
+        </tr>
+      </thead>
+      <tbody>
+        {tableRows.map((row) => (
+          <tr>
+            <td>{fromSymbol}{fmtAmount(row.fromAmt)}</td>
+            <td>{toSymbol}{fmtAmount(row.toAmt)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Reverse Conversion Table -->
+  <h2 class="section-heading">{toCode} to {fromCode} Conversion Table</h2>
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>{toName} ({toCode})</th>
+          <th>{fromName} ({fromCode})</th>
+        </tr>
+      </thead>
+      <tbody>
+        {tableRows.map((row) => (
+          <tr>
+            <td>{toSymbol}{fmtAmount(row.toAmt)}</td>
+            <td>{fromSymbol}{fmtAmount(row.fromAmt)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <AdUnit slot="currency-mid" format="rectangle" />
+
+  <!-- Content Section -->
+  <article class="content-section">
+    <h2>About {fromCode} to {toCode} Conversion</h2>
+    {contentBody.split('\n\n').map((paragraph) => (
+      <p>{paragraph}</p>
+    ))}
+
+    <h2>Frequently Asked Questions</h2>
+    {faqItems.map((item) => (
+      <>
+        <h3>{item.question}</h3>
+        <p>{item.answer}</p>
+      </>
+    ))}
+
+    <h2>Related Currency Conversions</h2>
+    <ul>
+      {reversePairExists && (
+        <li><a href={`/currency/${reverseSlug}/`}>{toName} to {fromName} ({toCode} to {fromCode})</a></li>
+      )}
+      {validRelatedSlugs
+        .filter((s) => s !== reverseSlug)
+        .map((s) => {
+          const related = currencyPairs.find((p) => p.slug === s)!;
+          return (
+            <li><a href={`/currency/${s}/`}>{related.fromName} to {related.toName} ({related.fromCode} to {related.toCode})</a></li>
+          );
+        })}
+      <li><a href="/conversion-calculators/currency-converter/">Full Currency Converter</a></li>
+    </ul>
+  </article>
+
+  <AdUnit slot="currency-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .disclaimer-banner {
+    background: #fef3c7;
+    border: 1px solid #f59e0b;
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    color: #92400e;
+    line-height: 1.5;
+  }
+
+  .quick-fact {
+    background: #eff6ff;
+    border-radius: var(--radius);
+    padding: 16px 24px;
+    margin-bottom: 24px;
+    font-size: 1.1rem;
+  }
+  .quick-fact-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .quick-fact strong {
+    color: var(--color-primary);
+    font-size: 1.3rem;
+  }
+
+  .converter-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: end;
+    gap: 12px;
+  }
+  .swap-cell {
+    display: flex;
+    align-items: center;
+    padding-bottom: 2px;
+  }
+  .swap-btn {
+    padding: 8px 16px;
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 1.4rem;
+    cursor: pointer;
+    color: var(--color-text);
+    transition: all 0.15s;
+    line-height: 1;
+  }
+  .swap-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background: #eff6ff;
+  }
+
+  .conversion-summary {
+    text-align: center;
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    padding: 12px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    margin-top: 16px;
+    min-height: 20px;
+  }
+
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+
+  @media (max-width: 640px) {
+    .converter-row {
+      grid-template-columns: 1fr;
+    }
+    .swap-cell {
+      justify-content: center;
+    }
+  }
+</style>
+
+<script define:vars={{
+  rate: approximateRate,
+  fromCurrency: fromCode,
+  toCurrency: toCode,
+  fromSym: fromSymbol,
+  toSym: toSymbol,
+  reverseSlug,
+  reversePairExists,
+}}>
+  function formatNum(n) {
+    if (Number.isInteger(n)) return n.toLocaleString('en-US');
+    if (Math.abs(n) >= 100) return n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+    if (Math.abs(n) >= 1) return n.toLocaleString('en-US', { maximumFractionDigits: 4 });
+    if (Math.abs(n) >= 0.01) return n.toLocaleString('en-US', { maximumFractionDigits: 6 });
+    return n.toExponential(4);
+  }
+
+  var fromInput = document.getElementById('fromValue');
+  var toInput = document.getElementById('toValue');
+  var summaryEl = document.getElementById('conversionSummary');
+
+  function updateResult() {
+    var val = parseFloat(fromInput.value);
+    if (isNaN(val) || val < 0) {
+      toInput.value = '';
+      summaryEl.textContent = '';
+      return;
+    }
+    var result = val * rate;
+    toInput.value = formatNum(result);
+    summaryEl.textContent = fromSym + formatNum(val) + ' ' + fromCurrency + ' \u2248 ' + toSym + formatNum(result) + ' ' + toCurrency;
+  }
+
+  fromInput.addEventListener('input', updateResult);
+
+  document.getElementById('swapBtn').addEventListener('click', function () {
+    if (reversePairExists) {
+      window.location.href = '/currency/' + reverseSlug + '/';
+    } else {
+      // If no reverse page exists, just swap the values in place
+      var currentFrom = parseFloat(fromInput.value);
+      if (!isNaN(currentFrom)) {
+        var converted = currentFrom * rate;
+        fromInput.value = formatNum(converted);
+        updateResult();
+      }
+    }
+  });
+
+  // Calculate on load
+  updateResult();
+</script>

@@ -1,0 +1,293 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import { events, type CountdownEvent } from '../../data/days-until-events';
+
+export function getStaticPaths() {
+  return events.map((event) => ({
+    params: { slug: event.slug },
+    props: { event },
+  }));
+}
+
+const { event } = Astro.props as { event: CountdownEvent };
+
+// --- Countdown calculations (build time) ---
+const today = new Date('2026-02-26T00:00:00');
+const target = new Date(event.date + 'T00:00:00');
+const msPerDay = 1000 * 60 * 60 * 24;
+const diffMs = target.getTime() - today.getTime();
+const totalDays = Math.ceil(diffMs / msPerDay);
+const isPast = totalDays < 0;
+const absDays = Math.abs(totalDays);
+
+// Weeks + Days
+const fullWeeks = Math.floor(absDays / 7);
+const remainderDays = absDays % 7;
+
+// Months + Days
+let months = target.getFullYear() * 12 + target.getMonth() - (today.getFullYear() * 12 + today.getMonth());
+let mDays = target.getDate() - today.getDate();
+if (mDays < 0) {
+  months--;
+  const prevMonth = new Date(target.getFullYear(), target.getMonth(), 0);
+  mDays += prevMonth.getDate();
+}
+if (months < 0) { months = 0; mDays = absDays; }
+
+// Day of the week
+const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const targetDayOfWeek = dayNames[target.getDay()];
+
+// Format the target date for display
+const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const displayDate = `${monthNames[target.getMonth()]} ${target.getDate()}, ${target.getFullYear()}`;
+
+// Related events
+const relatedEvents = event.relatedSlugs
+  .map((slug) => events.find((e) => e.slug === slug))
+  .filter(Boolean) as CountdownEvent[];
+
+// Content paragraphs
+const contentParagraphs = event.contentBody.split('\n\n').filter((p) => p.trim());
+
+// Structured data
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Days Until Calculator", "item": "https://toolcalcs.com/date-time-calculators/days-until-calculator/" },
+      { "@type": "ListItem", "position": 3, "name": `Days Until ${event.name}` },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": event.faqItems.map((faq) => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer,
+      },
+    })),
+  },
+];
+---
+
+<BaseLayout title={event.metaTitle} description={event.metaDesc} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/date-time-calculators/days-until-calculator/">Days Until Calculator</a> &rsaquo;
+    <span>Days Until {event.name}</span>
+  </nav>
+
+  <h1>{event.emoji} {event.h1}</h1>
+  <p class="page-desc">Live countdown to {event.name} on {targetDayOfWeek}, {displayDate}.</p>
+
+  <!-- Countdown Display -->
+  <div class="calculator-box">
+    <div class="countdown-grid" id="countdownGrid">
+      <div class="countdown-card primary">
+        <span class="countdown-number" id="cdDays">{isPast ? 0 : totalDays}</span>
+        <span class="countdown-label">Days</span>
+      </div>
+      <div class="countdown-card">
+        <span class="countdown-number" id="cdWeeks">
+          {fullWeeks > 0 ? `${fullWeeks}w ${remainderDays}d` : `${remainderDays}d`}
+        </span>
+        <span class="countdown-label">Weeks & Days</span>
+      </div>
+      <div class="countdown-card">
+        <span class="countdown-number" id="cdMonths">
+          {months > 0 ? `${months}mo ${mDays}d` : `${mDays}d`}
+        </span>
+        <span class="countdown-label">Months & Days</span>
+      </div>
+      <div class="countdown-card">
+        <span class="countdown-number" id="cdDayOfWeek">{targetDayOfWeek}</span>
+        <span class="countdown-label">{displayDate}</span>
+      </div>
+    </div>
+    <div class="countdown-status" id="countdownStatus">
+      {isPast
+        ? 'This event has passed!'
+        : totalDays === 0
+          ? `${event.name} is today!`
+          : totalDays === 1
+            ? `${event.name} is tomorrow!`
+            : `${totalDays} days until ${event.name}`
+      }
+    </div>
+  </div>
+
+  <AdUnit slot="countdown-mid" format="rectangle" />
+
+  <!-- Content Section -->
+  <article class="content-section">
+    <h2>About {event.name}</h2>
+    {contentParagraphs.map((p) => <p>{p}</p>)}
+
+    <h2>Frequently Asked Questions</h2>
+    {event.faqItems.map((faq) => (
+      <h3>{faq.question}</h3>
+      <p>{faq.answer}</p>
+    ))}
+
+    <h2>Related Countdowns</h2>
+    <ul>
+      {relatedEvents.map((rel) => (
+        <li>
+          <a href={`/days-until/${rel.slug}/`}>{rel.emoji} Days Until {rel.name}</a>
+        </li>
+      ))}
+    </ul>
+
+    <p><a href="/date-time-calculators/days-until-calculator/">&larr; Back to Days Until Calculator</a></p>
+  </article>
+
+  <AdUnit slot="countdown-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .countdown-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .countdown-card {
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    padding: 24px 16px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .countdown-card.primary {
+    background: #eff6ff;
+  }
+  .countdown-number {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--color-text);
+    line-height: 1.1;
+  }
+  .countdown-card.primary .countdown-number {
+    font-size: 3.5rem;
+    color: var(--color-primary);
+  }
+  .countdown-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .countdown-status {
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    padding: 12px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+  }
+
+  @media (max-width: 640px) {
+    .countdown-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .countdown-card.primary {
+      grid-column: 1 / -1;
+    }
+    .countdown-card.primary .countdown-number {
+      font-size: 2.8rem;
+    }
+    .countdown-number {
+      font-size: 1.5rem;
+    }
+  }
+</style>
+
+<script define:vars={{ targetDate: event.date, eventName: event.name }}>
+  function updateCountdown() {
+    var now = new Date();
+    now.setHours(0, 0, 0, 0);
+    var target = new Date(targetDate + 'T00:00:00');
+    var msPerDay = 1000 * 60 * 60 * 24;
+    var diffMs = target.getTime() - now.getTime();
+    var totalDays = Math.ceil(diffMs / msPerDay);
+    var isPast = totalDays < 0;
+    var absDays = Math.abs(totalDays);
+
+    // Update days
+    var daysEl = document.getElementById('cdDays');
+    if (daysEl) {
+      daysEl.textContent = isPast ? '0' : String(totalDays);
+    }
+
+    // Update weeks & days
+    var fullWeeks = Math.floor(absDays / 7);
+    var remDays = absDays % 7;
+    var weeksEl = document.getElementById('cdWeeks');
+    if (weeksEl) {
+      if (isPast) {
+        weeksEl.textContent = '0d';
+      } else if (fullWeeks > 0) {
+        weeksEl.textContent = fullWeeks + 'w ' + remDays + 'd';
+      } else {
+        weeksEl.textContent = remDays + 'd';
+      }
+    }
+
+    // Update months & days
+    var months, mDays;
+    if (isPast || totalDays === 0) {
+      months = 0;
+      mDays = 0;
+    } else {
+      months = target.getFullYear() * 12 + target.getMonth() - (now.getFullYear() * 12 + now.getMonth());
+      mDays = target.getDate() - now.getDate();
+      if (mDays < 0) {
+        months--;
+        var prevMonth = new Date(target.getFullYear(), target.getMonth(), 0);
+        mDays += prevMonth.getDate();
+      }
+      if (months < 0) { months = 0; mDays = absDays; }
+    }
+    var monthsEl = document.getElementById('cdMonths');
+    if (monthsEl) {
+      if (isPast) {
+        monthsEl.textContent = '0d';
+      } else if (months > 0) {
+        monthsEl.textContent = months + 'mo ' + mDays + 'd';
+      } else {
+        monthsEl.textContent = mDays + 'd';
+      }
+    }
+
+    // Update status
+    var statusEl = document.getElementById('countdownStatus');
+    if (statusEl) {
+      if (isPast) {
+        statusEl.textContent = 'This event has passed!';
+      } else if (totalDays === 0) {
+        statusEl.textContent = eventName + ' is today!';
+      } else if (totalDays === 1) {
+        statusEl.textContent = eventName + ' is tomorrow!';
+      } else {
+        statusEl.textContent = totalDays + ' days until ' + eventName;
+      }
+    }
+  }
+
+  // Run immediately and then every 60 seconds
+  updateCountdown();
+  setInterval(updateCountdown, 60000);
+</script>

@@ -1,0 +1,298 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import { howManyPages, type HowManyPage } from '../../data/how-many-conversions';
+
+export function getStaticPaths() {
+  return howManyPages.map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: HowManyPage };
+
+// Build conversion table (10 rows: 1 through 10 large units)
+const tableRows = Array.from({ length: 10 }, (_, i) => {
+  const n = i + 1;
+  return { large: n, small: +(n * page.answer).toPrecision(10) };
+});
+
+// Reverse table (5 rows)
+const reverseRows = Array.from({ length: 5 }, (_, i) => {
+  const n = i + 1;
+  return { small: n, large: +(n / page.answer).toPrecision(10) };
+});
+
+function fmt(n: number): string {
+  if (Number.isInteger(n)) return n.toLocaleString('en-US');
+  if (Math.abs(n) >= 100) return n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+  if (Math.abs(n) >= 1) return n.toLocaleString('en-US', { maximumFractionDigits: 4 });
+  if (Math.abs(n) >= 0.001) return n.toLocaleString('en-US', { maximumFractionDigits: 6 });
+  return n.toExponential(4);
+}
+
+// Related pages
+const relatedPages = page.relatedSlugs
+  .map((s) => howManyPages.find((p) => p.slug === s))
+  .filter((p): p is HowManyPage => !!p);
+
+// Category slug for link to convert pages
+const categoryConvertMap: Record<string, string> = {
+  volume: 'cups-to-gallons',
+  length: 'feet-to-meters',
+  weight: 'pounds-to-kilograms',
+};
+
+// Structured data
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Unit Converter", "item": "https://toolcalcs.com/conversion-calculators/unit-converter/" },
+      { "@type": "ListItem", "position": 3, "name": `How Many ${page.smallUnit} in a ${page.largeUnit}` },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": page.faqItems.map((faq) => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer,
+      },
+    })),
+  },
+];
+
+// Values for client-side calculator
+const answer = page.answer;
+const smallUnitPlural = page.smallUnitPlural;
+const largeUnitSingular = page.largeUnitSingular;
+const smallUnit = page.smallUnit;
+const largeUnit = page.largeUnit;
+---
+
+<BaseLayout title={page.metaTitle} description={page.metaDesc} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/conversion-calculators/unit-converter/">Unit Converter</a> &rsaquo;
+    <span>How Many {page.smallUnit} in a {page.largeUnit}</span>
+  </nav>
+
+  <h1>How Many {page.smallUnit} in a {page.largeUnit}?</h1>
+  <p class="page-desc">Quick answer and conversion tool for {page.smallUnitPlural} and {page.largeUnitSingular}s.</p>
+
+  <!-- Prominent Answer -->
+  <div class="quick-fact">
+    <span class="quick-fact-label">Answer:</span>
+    <strong>There are {fmt(page.answer)} {page.smallUnitPlural} in 1 {page.largeUnitSingular}.</strong>
+  </div>
+
+  <!-- Formula Display -->
+  <div class="formula-box"><code>{page.formula}</code></div>
+
+  <!-- Mini Calculator -->
+  <div class="calculator-box">
+    <h2 class="calc-heading">{page.smallUnit} &harr; {page.largeUnit} Calculator</h2>
+    <div class="calc-inputs howmany-row">
+      <div class="input-group">
+        <label for="largeInput">{page.largeUnit}s</label>
+        <input type="number" id="largeInput" value="1" step="any" />
+      </div>
+      <div class="equals-cell">=</div>
+      <div class="input-group">
+        <label for="smallInput">{page.smallUnit}</label>
+        <input type="number" id="smallInput" step="any" readonly />
+      </div>
+    </div>
+    <div class="conversion-summary" id="calcSummary"></div>
+  </div>
+
+  <!-- Conversion Table -->
+  <h2 class="section-heading">{page.largeUnit}s to {page.smallUnit} Conversion Table</h2>
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>{page.largeUnit}s</th>
+          <th>{page.smallUnit}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {tableRows.map((row) => (
+          <tr>
+            <td>{fmt(row.large)}</td>
+            <td>{fmt(row.small)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <AdUnit slot="howmany-mid" format="rectangle" />
+
+  <!-- Reverse Conversion Table -->
+  <h2 class="section-heading">{page.smallUnit} to {page.largeUnit}s Conversion Table</h2>
+  <p class="reverse-note">{page.reverseFormula}</p>
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>{page.smallUnit}</th>
+          <th>{page.largeUnit}s</th>
+        </tr>
+      </thead>
+      <tbody>
+        {reverseRows.map((row) => (
+          <tr>
+            <td>{fmt(row.small)}</td>
+            <td>{fmt(row.large)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Content Section -->
+  <article class="content-section">
+    <h2>Understanding {page.smallUnit} and {page.largeUnit}s</h2>
+    <Fragment set:html={page.contentBody} />
+
+    <h2>Frequently Asked Questions</h2>
+    {page.faqItems.map((faq) => (
+      <h3>{faq.question}</h3>
+      <p>{faq.answer}</p>
+    ))}
+
+    <h2>Related "How Many" Conversions</h2>
+    <ul>
+      {relatedPages.map((related) => (
+        <li>
+          <a href={`/how-many/${related.slug}/`}>
+            How Many {related.smallUnit} in a {related.largeUnit}? ({fmt(related.answer)})
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <h2>More Conversion Tools</h2>
+    <ul>
+      <li><a href="/conversion-calculators/unit-converter/">Full Unit Converter</a> &mdash; convert between any units</li>
+      {categoryConvertMap[page.category] && (
+        <li><a href={`/convert/${categoryConvertMap[page.category]}/`}>Detailed {page.category} converter</a></li>
+      )}
+    </ul>
+  </article>
+
+  <AdUnit slot="howmany-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .quick-fact {
+    background: #eff6ff;
+    border-radius: var(--radius);
+    padding: 20px 28px;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+  }
+  .quick-fact-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .quick-fact strong {
+    color: var(--color-primary);
+    font-size: 1.4rem;
+  }
+
+  .calc-heading {
+    font-size: 1.1rem;
+    margin: 0 0 16px;
+    border: none;
+    padding: 0;
+  }
+
+  .howmany-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: end;
+    gap: 12px;
+  }
+  .equals-cell {
+    display: flex;
+    align-items: center;
+    padding-bottom: 6px;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--color-text-muted);
+  }
+
+  .conversion-summary {
+    text-align: center;
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    padding: 12px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    margin-top: 16px;
+    min-height: 20px;
+  }
+
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+
+  .reverse-note {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+
+  @media (max-width: 640px) {
+    .howmany-row {
+      grid-template-columns: 1fr;
+    }
+    .equals-cell {
+      justify-content: center;
+    }
+  }
+</style>
+
+<script define:vars={{ answer, smallUnitPlural, largeUnitSingular, smallUnit, largeUnit }}>
+  function formatNum(n) {
+    if (Number.isInteger(n)) return n.toLocaleString('en-US');
+    if (Math.abs(n) >= 100) return n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+    if (Math.abs(n) >= 1) return n.toLocaleString('en-US', { maximumFractionDigits: 4 });
+    if (Math.abs(n) >= 0.001) return n.toLocaleString('en-US', { maximumFractionDigits: 6 });
+    return n.toExponential(4);
+  }
+
+  var largeInput = document.getElementById('largeInput');
+  var smallInput = document.getElementById('smallInput');
+  var summaryEl = document.getElementById('calcSummary');
+
+  function updateCalc() {
+    var val = parseFloat(largeInput.value);
+    if (isNaN(val)) {
+      smallInput.value = '';
+      summaryEl.textContent = '';
+      return;
+    }
+    var result = val * answer;
+    smallInput.value = formatNum(result);
+    summaryEl.textContent = formatNum(val) + ' ' + largeUnitSingular + (val !== 1 ? 's' : '') + ' = ' + formatNum(result) + ' ' + smallUnitPlural;
+  }
+
+  largeInput.addEventListener('input', updateCalc);
+
+  // Calculate on load
+  updateCalc();
+</script>
