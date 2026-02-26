@@ -1,0 +1,146 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getAllPercentagePages, percentages, baseNumbers } from '../../data/percentage-pages';
+import '../../styles/category.css';
+
+const allPages = getAllPercentagePages();
+
+// Build a lookup map: `${percentage}-${baseNumber}` -> page
+const pageMap = new Map(allPages.map(p => [`${p.percentage}-${p.baseNumber}`, p]));
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://toolcalcs.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Percentage Calculator",
+      "item": "https://toolcalcs.com/math-calculators/percentage-calculator/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "All Calculations"
+    }
+  ]
+};
+---
+
+<BaseLayout
+  title="Percentage Calculations - What is X% of Y? | ToolCalcs"
+  description="Browse 285 instant percentage calculations. Find what is X% of Y with step-by-step solutions."
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/math-calculators/percentage-calculator/">Percentage Calculator</a> &rsaquo; <span>All Calculations</span>
+  </nav>
+
+  <h1>Percentage Calculations</h1>
+  <p class="page-desc">Browse 285 instant percentage calculations. Find what is X% of Y with step-by-step solutions.</p>
+
+  <AdUnit slot="cat-top" format="horizontal" />
+
+  <div class="pct-table-wrap">
+    <table class="pct-table">
+      <thead>
+        <tr>
+          <th class="pct-corner">% \ Base</th>
+          {baseNumbers.map(base => (
+            <th>{base.toLocaleString()}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {percentages.map(pct => (
+          <tr>
+            <th class="pct-row-header">{pct}%</th>
+            {baseNumbers.map(base => {
+              const page = pageMap.get(`${pct}-${base}`);
+              return (
+                <td>
+                  {page ? (
+                    <a href={`/percentage/${page.slug}/`}>
+                      {page.result % 1 === 0 ? page.result.toLocaleString() : page.result.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                    </a>
+                  ) : '—'}
+                </td>
+              );
+            })}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <p class="table-hint">Click any value to see the full calculation with step-by-step solution.</p>
+
+  <AdUnit slot="cat-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .pct-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 24px 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+  .pct-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+  .pct-table th,
+  .pct-table td {
+    padding: 6px 10px;
+    text-align: center;
+    border: 1px solid var(--color-border);
+  }
+  .pct-table thead th {
+    background: var(--color-surface);
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  .pct-corner {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: var(--color-surface);
+  }
+  .pct-row-header {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--color-surface);
+    font-weight: 600;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .pct-table td a {
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+  .pct-table td a:hover {
+    text-decoration: underline;
+  }
+  .pct-table tbody tr:hover {
+    background: var(--color-surface);
+  }
+  .table-hint {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    text-align: center;
+    margin-top: 8px;
+  }
+</style>

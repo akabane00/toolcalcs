@@ -1,0 +1,103 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { howManyPages } from '../../data/how-many-conversions';
+import '../../styles/category.css';
+
+// Group pages by category
+const categoryOrder = ['volume', 'length', 'weight'];
+const categoryLabels: Record<string, string> = {
+  volume: 'Volume',
+  length: 'Length',
+  weight: 'Weight',
+};
+
+const grouped: Record<string, typeof howManyPages> = {};
+for (const page of howManyPages) {
+  if (!grouped[page.category]) grouped[page.category] = [];
+  grouped[page.category].push(page);
+}
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://toolcalcs.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Unit Converter",
+      "item": "https://toolcalcs.com/conversion-calculators/unit-converter/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "How Many"
+    }
+  ]
+};
+---
+
+<BaseLayout
+  title="How Many? - Common Measurement Answers | ToolCalcs"
+  description="Browse 31 common measurement questions with instant answers. How many cups in a gallon, feet in a mile, and more."
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/conversion-calculators/unit-converter/">Unit Converter</a> &rsaquo; <span>How Many</span>
+  </nav>
+
+  <h1>How Many?</h1>
+  <p class="page-desc">Browse {howManyPages.length} common measurement questions with instant answers. How many cups in a gallon, feet in a mile, and more.</p>
+
+  <AdUnit slot="cat-top" format="horizontal" />
+
+  {categoryOrder.map(cat => (
+    <section class="howmany-section">
+      <h2>{categoryLabels[cat]} Conversions</h2>
+      <div class="calc-grid">
+        {(grouped[cat] || []).map(page => (
+          <a href={`/how-many/${page.slug}/`} class="calc-card">
+            <h3>How many {page.smallUnitPlural} in a {page.largeUnitSingular}?</h3>
+            <p class="howmany-answer">{page.answer.toLocaleString()} {page.smallUnitPlural}</p>
+            <p class="howmany-formula">{page.formula}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  ))}
+
+  <AdUnit slot="cat-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .howmany-section {
+    margin-bottom: 32px;
+  }
+  .howmany-section h2 {
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--color-border);
+  }
+  .calc-card h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .howmany-answer {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: 4px;
+  }
+  .howmany-formula {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+  }
+</style>

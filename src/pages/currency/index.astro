@@ -1,0 +1,120 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { currencyPairs } from '../../data/currency-pairs';
+import '../../styles/category.css';
+
+// Group currency pairs by base currency
+const groupOrder = ['USD', 'EUR', 'GBP'];
+const groupLabels: Record<string, string> = {
+  USD: 'US Dollar (USD) Pairs',
+  EUR: 'Euro (EUR) Pairs',
+  GBP: 'British Pound (GBP) Pairs',
+  Other: 'Other Currency Pairs',
+};
+
+const grouped: Record<string, typeof currencyPairs> = {};
+for (const pair of currencyPairs) {
+  const key = groupOrder.includes(pair.fromCode) ? pair.fromCode : 'Other';
+  if (!grouped[key]) grouped[key] = [];
+  grouped[key].push(pair);
+}
+
+const displayOrder = [...groupOrder.filter(k => grouped[k]), ...(grouped['Other'] ? ['Other'] : [])];
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://toolcalcs.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Currency Converter",
+      "item": "https://toolcalcs.com/financial-calculators/currency-converter/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "All Pairs"
+    }
+  ]
+};
+---
+
+<BaseLayout
+  title="Currency Exchange Rates - Popular Currency Pairs | ToolCalcs"
+  description="Browse 54 currency pair pages with conversion tables and approximate exchange rates."
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/financial-calculators/currency-converter/">Currency Converter</a> &rsaquo; <span>All Pairs</span>
+  </nav>
+
+  <h1>Currency Exchange Rates</h1>
+  <p class="page-desc">Browse {currencyPairs.length} currency pair pages with conversion tables and approximate exchange rates.</p>
+
+  <AdUnit slot="cat-top" format="horizontal" />
+
+  {displayOrder.map(key => (
+    <section class="currency-section">
+      <h2>{groupLabels[key]}</h2>
+      <div class="calc-grid">
+        {(grouped[key] || []).map(pair => (
+          <a href={`/currency/${pair.slug}/`} class="calc-card">
+            <h3 class="currency-pair">{pair.fromCode} &rarr; {pair.toCode}</h3>
+            <p class="currency-names">{pair.fromName} to {pair.toName}</p>
+            <p class="currency-rate">1 {pair.fromCode} &asymp; {pair.approximateRate} {pair.toCode}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  ))}
+
+  <div class="currency-disclaimer">
+    <p><strong>Disclaimer:</strong> Exchange rates shown are approximate and for reference only. Rates are based on approximate mid-market values and change continuously. Always check with your bank or financial provider for live rates before making any transactions.</p>
+  </div>
+
+  <AdUnit slot="cat-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .currency-section {
+    margin-bottom: 32px;
+  }
+  .currency-section h2 {
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--color-border);
+  }
+  .calc-card h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .currency-names {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-bottom: 6px;
+  }
+  .currency-rate {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+  .currency-disclaimer {
+    margin: 24px 0;
+    padding: 16px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+  }
+</style>

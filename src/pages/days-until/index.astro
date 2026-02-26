@@ -1,0 +1,101 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { events } from '../../data/days-until-events';
+import '../../styles/category.css';
+
+// Calculate days remaining for each event at build time
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
+const eventsWithDays = events.map(event => {
+  const eventDate = new Date(event.date + 'T00:00:00');
+  const diffMs = eventDate.getTime() - today.getTime();
+  const daysRemaining = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+  return { ...event, daysRemaining };
+});
+
+// Sort: upcoming events first (positive days ascending), then past events
+const sortedEvents = [...eventsWithDays].sort((a, b) => {
+  if (a.daysRemaining >= 0 && b.daysRemaining >= 0) return a.daysRemaining - b.daysRemaining;
+  if (a.daysRemaining < 0 && b.daysRemaining < 0) return b.daysRemaining - a.daysRemaining;
+  return a.daysRemaining >= 0 ? -1 : 1;
+});
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://toolcalcs.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Days Until Calculator",
+      "item": "https://toolcalcs.com/date-time-calculators/days-between-dates/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "All Countdowns"
+    }
+  ]
+};
+---
+
+<BaseLayout
+  title="Countdown Timers - Days Until Holidays & Events | ToolCalcs"
+  description="Browse countdown timers for 39 holidays and events. See how many days until Christmas, New Year, and more."
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/date-time-calculators/days-between-dates/">Days Until Calculator</a> &rsaquo; <span>All Countdowns</span>
+  </nav>
+
+  <h1>Days Until...</h1>
+  <p class="page-desc">Browse countdown timers for {events.length} holidays and events. See how many days until Christmas, New Year, and more.</p>
+
+  <AdUnit slot="cat-top" format="horizontal" />
+
+  <div class="calc-grid">
+    {sortedEvents.map(event => (
+      <a href={`/days-until/${event.slug}/`} class="calc-card countdown-card">
+        <span class="calc-icon">{event.emoji}</span>
+        <h2>{event.name}</h2>
+        <p class="countdown-date">{new Date(event.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+        <p class={`countdown-days ${event.daysRemaining < 0 ? 'past' : ''}`}>
+          {event.daysRemaining > 0
+            ? `${event.daysRemaining} days away`
+            : event.daysRemaining === 0
+              ? 'Today!'
+              : `${Math.abs(event.daysRemaining)} days ago`}
+        </p>
+      </a>
+    ))}
+  </div>
+
+  <AdUnit slot="cat-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .countdown-card {
+    text-align: center;
+  }
+  .countdown-date {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-bottom: 4px;
+  }
+  .countdown-days {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+  .countdown-days.past {
+    color: var(--color-text-muted);
+  }
+</style>

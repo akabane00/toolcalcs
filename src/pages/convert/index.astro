@@ -1,0 +1,96 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { conversionPairs, getUnit, convert, fmt, categoryNames } from '../../data/unit-conversions';
+import '../../styles/category.css';
+
+// Group conversion pairs by category
+const grouped: Record<string, { fromSlug: string; toSlug: string; fromName: string; toName: string; factor: string }[]> = {};
+
+for (const [fromSlug, toSlug] of conversionPairs) {
+  const from = getUnit(fromSlug)!;
+  const to = getUnit(toSlug)!;
+  const cat = from.category;
+  if (!grouped[cat]) grouped[cat] = [];
+  grouped[cat].push({
+    fromSlug,
+    toSlug,
+    fromName: from.name,
+    toName: to.name,
+    factor: fmt(convert(1, fromSlug, toSlug)),
+  });
+}
+
+const categoryOrder = ['length', 'weight', 'temperature', 'volume'];
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://toolcalcs.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Unit Conversions"
+    }
+  ]
+};
+---
+
+<BaseLayout
+  title="Unit Conversions - Instant Metric & Imperial Converters | ToolCalcs"
+  description="Browse 90+ specific unit conversion pages with formulas, tables, and calculators."
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <span>Unit Conversions</span>
+  </nav>
+
+  <h1>Unit Conversions</h1>
+  <p class="page-desc">Browse 90+ specific unit conversion pages with formulas, tables, and calculators.</p>
+
+  <AdUnit slot="cat-top" format="horizontal" />
+
+  {categoryOrder.map(cat => (
+    <section class="convert-section">
+      <h2>{categoryNames[cat]} Conversions</h2>
+      <div class="calc-grid">
+        {(grouped[cat] || []).map(pair => (
+          <a href={`/convert/${pair.fromSlug}-to-${pair.toSlug}/`} class="calc-card">
+            <h3 class="convert-pair">{pair.fromName} &rarr; {pair.toName}</h3>
+            <p>1 {pair.fromName.replace(/\s*\(.*\)/, '')} = {pair.factor} {pair.toName.replace(/\s*\(.*\)/, '')}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  ))}
+
+  <AdUnit slot="cat-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .convert-section {
+    margin-bottom: 32px;
+  }
+  .convert-section h2 {
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--color-border);
+  }
+  .convert-pair {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .calc-card h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+</style>
