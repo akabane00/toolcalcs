@@ -1,0 +1,491 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Health Calculators",
+        "item": "https://toolcalcs.com/health-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Sleep Calculator"
+      }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How many sleep cycles do I need per night?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Most adults need 5 to 6 complete sleep cycles per night, which equals 7.5 to 9 hours of sleep. Each cycle lasts approximately 90 minutes and includes stages of light sleep, deep sleep, and REM sleep. Waking at the end of a cycle rather than in the middle helps you feel more rested and alert.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why do I feel groggy even after 8 hours of sleep?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Grogginess after a full night of sleep is often caused by waking in the middle of a deep sleep cycle rather than at the end of one. This is called sleep inertia. Using a sleep calculator to align your wake time with the end of a 90-minute cycle can significantly reduce morning grogginess.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How long does it take to fall asleep?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The average healthy adult takes about 10 to 20 minutes to fall asleep, known as sleep onset latency. Falling asleep in under 5 minutes may indicate sleep deprivation, while taking longer than 30 minutes could suggest insomnia or poor sleep hygiene. This calculator defaults to 15 minutes but allows you to adjust based on your experience.',
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Sleep Calculator - Find Your Ideal Bedtime & Wake Time | ToolCalcs"
+  description="Free sleep calculator based on 90-minute sleep cycles. Find the best time to go to bed or wake up to feel refreshed and avoid grogginess."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/health-calculators/">Health Calculators</a> &rsaquo;
+    <span>Sleep Calculator</span>
+  </nav>
+
+  <h1>Sleep Calculator</h1>
+  <p class="page-desc">Find the best time to sleep or wake up based on 90-minute sleep cycles so you wake feeling refreshed.</p>
+
+  <div class="calculator-box">
+    <div class="mode-toggle">
+      <button class="mode-btn active" data-mode="wake">I want to wake up at...</button>
+      <button class="mode-btn" data-mode="sleep">I want to go to sleep at...</button>
+    </div>
+
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="hour">Hour</label>
+        <select id="hour">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7" selected>7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10</option>
+          <option value="11">11</option>
+          <option value="12">12</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="minute">Minute</label>
+        <select id="minute">
+          <option value="0" selected>00</option>
+          <option value="5">05</option>
+          <option value="10">10</option>
+          <option value="15">15</option>
+          <option value="20">20</option>
+          <option value="25">25</option>
+          <option value="30">30</option>
+          <option value="35">35</option>
+          <option value="40">40</option>
+          <option value="45">45</option>
+          <option value="50">50</option>
+          <option value="55">55</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="ampm">AM / PM</label>
+        <select id="ampm">
+          <option value="AM" selected>AM</option>
+          <option value="PM">PM</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="fallAsleep">Minutes to fall asleep</label>
+        <input type="number" id="fallAsleep" value="15" min="0" max="60" step="1" />
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate</button>
+    </div>
+
+    <div class="sleep-results" id="results">
+      <p class="results-heading" id="resultsHeading"></p>
+      <div class="sleep-cards" id="sleepCards"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>How the Sleep Calculator Works</h2>
+    <p>This sleep calculator helps you find the ideal time to go to bed or wake up by aligning your schedule with natural sleep cycles. Each sleep cycle lasts approximately 90 minutes and consists of multiple stages including light sleep, deep sleep, and REM (rapid eye movement) sleep. When you wake at the end of a complete cycle rather than in the middle of one, you feel significantly more refreshed and alert.</p>
+    <p>The calculator accounts for sleep onset latency, which is the time it takes you to fall asleep after getting into bed. The default is 15 minutes, but you can adjust this based on your own experience. It then counts backward or forward in 90-minute intervals to give you between 3 and 6 complete sleep cycles, which translates to 4.5 to 9 hours of actual sleep.</p>
+
+    <h2>Understanding Sleep Cycles</h2>
+    <p>A complete sleep cycle lasts about 90 minutes and moves through several distinct stages. Throughout the night, you repeat these cycles 4 to 6 times, and each cycle differs slightly in the proportion of time spent in each stage.</p>
+    <ul>
+      <li><strong>Stage 1 (N1) - Light Sleep:</strong> This transitional phase between wakefulness and sleep lasts only 1 to 7 minutes. Your muscles begin to relax, your heart rate slows, and your brain produces alpha and theta waves. You can be easily awakened during this stage and may experience hypnic jerks, those sudden muscle twitches that sometimes startle you awake.</li>
+      <li><strong>Stage 2 (N2) - True Sleep Onset:</strong> This stage lasts 10 to 25 minutes in the first cycle and gets longer with each subsequent cycle. Your body temperature drops, eye movements stop, and brain waves slow further with occasional bursts of activity called sleep spindles and K-complexes. These bursts are believed to help consolidate memory and protect your sleep from external disturbances.</li>
+      <li><strong>Stage 3 (N3) - Deep Sleep (Slow-Wave Sleep):</strong> Also called delta sleep, this is the most physically restorative stage. It lasts 20 to 40 minutes in early cycles and becomes shorter later in the night. During deep sleep, your body repairs tissues, builds bone and muscle, strengthens the immune system, and releases growth hormone. Waking during deep sleep causes the most severe grogginess and disorientation, a phenomenon called sleep inertia.</li>
+      <li><strong>REM Sleep:</strong> The first REM period begins about 90 minutes after falling asleep and lasts only about 10 minutes. Each subsequent REM period gets longer, with the final one lasting up to an hour. During REM sleep your brain is highly active, your eyes move rapidly beneath closed lids, and most vivid dreaming occurs. REM sleep plays a critical role in emotional regulation, memory consolidation, and learning. Your voluntary muscles are temporarily paralyzed during this stage to prevent you from acting out dreams.</li>
+    </ul>
+
+    <h2>NREM vs REM Sleep</h2>
+    <p>Sleep is divided into two broad categories: <strong>NREM (non-rapid eye movement)</strong> and <strong>REM (rapid eye movement)</strong> sleep. NREM sleep includes stages N1, N2, and N3, and accounts for roughly 75-80% of total sleep time. REM sleep makes up the remaining 20-25%.</p>
+    <p>The balance between NREM and REM shifts throughout the night. The first half of the night is dominated by deep NREM sleep (stage N3), which is crucial for physical restoration. The second half contains more REM sleep, which is essential for cognitive functions like memory consolidation and creativity. This is why cutting sleep short, even by just an hour or two, disproportionately reduces your REM sleep and can impair learning, mood, and emotional resilience the following day.</p>
+    <p>Both types of sleep are essential. Deep NREM sleep repairs the body and strengthens the immune system, while REM sleep processes emotions and strengthens neural connections formed during the day. Alcohol, for example, increases deep sleep but suppresses REM sleep, which is why you can sleep a full night after drinking and still feel mentally foggy the next morning.</p>
+
+    <h2>How Much Sleep Do You Need by Age?</h2>
+    <p>Sleep requirements change significantly across the lifespan. The National Sleep Foundation and the American Academy of Sleep Medicine recommend the following ranges:</p>
+    <table class="info-table">
+      <thead>
+        <tr><th>Age Group</th><th>Recommended Hours</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Newborns (0-3 months)</td><td>14-17 hours</td></tr>
+        <tr><td>Infants (4-11 months)</td><td>12-15 hours</td></tr>
+        <tr><td>Toddlers (1-2 years)</td><td>11-14 hours</td></tr>
+        <tr><td>Preschoolers (3-5 years)</td><td>10-13 hours</td></tr>
+        <tr><td>School Age (6-13 years)</td><td>9-11 hours</td></tr>
+        <tr><td>Teenagers (14-17 years)</td><td>8-10 hours</td></tr>
+        <tr><td>Young Adults (18-25 years)</td><td>7-9 hours</td></tr>
+        <tr><td>Adults (26-64 years)</td><td>7-9 hours</td></tr>
+        <tr><td>Older Adults (65+ years)</td><td>7-8 hours</td></tr>
+      </tbody>
+    </table>
+    <p>These are guidelines, not rigid rules. Some people function well on 7 hours while others genuinely need 9. Genetics play a role: a small percentage of the population carries a gene variant (DEC2) that allows them to function normally on 6 hours or less. However, this is extremely rare, and most people who claim to need less sleep are actually chronically sleep-deprived without realizing it.</p>
+
+    <h2>Sleep Debt and Its Effects</h2>
+    <p><strong>Sleep debt</strong> is the cumulative effect of not getting enough sleep over time. If you need 8 hours per night but only sleep 6, you accumulate 2 hours of sleep debt each day. After a full work week, that is 10 hours of lost sleep. Sleep debt cannot be fully erased by sleeping in on weekends, although extra sleep can help reduce some of its effects.</p>
+    <p>The consequences of accumulated sleep debt are significant and far-reaching:</p>
+    <ul>
+      <li><strong>Cognitive impairment:</strong> After 17-19 hours of wakefulness, your cognitive performance is equivalent to having a blood alcohol level of 0.05%. After 24 hours without sleep, it reaches 0.10%, which is above the legal driving limit in most countries. Reaction time, decision-making, and attention all deteriorate measurably.</li>
+      <li><strong>Health risks:</strong> Chronic sleep deprivation increases the risk of heart disease, stroke, type 2 diabetes, obesity, and depression. Even one week of sleeping less than 6 hours per night alters the expression of over 700 genes, including those involved in immune function and stress response.</li>
+      <li><strong>Weight gain:</strong> Sleep loss disrupts the hormones that regulate hunger. Ghrelin (the hunger hormone) increases while leptin (the satiety hormone) decreases, leading to increased appetite and cravings for high-calorie foods. Studies show that people who sleep less than 7 hours per night are 30% more likely to be obese.</li>
+      <li><strong>Emotional instability:</strong> The amygdala, the brain's emotional center, becomes 60% more reactive after a night of poor sleep. This leads to increased irritability, anxiety, and emotional overreaction to normal situations.</li>
+    </ul>
+    <p>To recover from sleep debt, gradually increase your sleep by 30 to 60 minutes per night over several weeks rather than trying to "catch up" all at once. Consistency is more effective than occasional long sleep sessions.</p>
+
+    <h2>Circadian Rhythm: Your Internal Clock</h2>
+    <p>Your <strong>circadian rhythm</strong> is a roughly 24-hour internal clock that regulates your sleep-wake cycle, body temperature, hormone release, and metabolism. It is controlled by a small region in the brain called the suprachiasmatic nucleus (SCN), which responds primarily to light signals from your eyes.</p>
+    <p>When light enters your eyes in the morning, the SCN signals the pineal gland to stop producing melatonin, the hormone that promotes sleepiness. As evening approaches and light levels drop, melatonin production ramps up, preparing your body for sleep. This is why exposure to bright light, especially blue light from screens, in the evening can delay your natural sleep onset and make it harder to fall asleep.</p>
+    <p>Your circadian rhythm also determines your <strong>chronotype</strong>, which is your natural tendency to be a morning person or an evening person. Chronotype is largely genetic and shifts across the lifespan. Teenagers naturally shift toward later sleep and wake times, a phenomenon called delayed sleep phase, which is why many adolescents struggle with early school start times. As people age, their circadian rhythm tends to shift earlier, which is why older adults often wake naturally at dawn.</p>
+    <p>To maintain a healthy circadian rhythm, try to keep a consistent sleep and wake schedule even on weekends. Get bright light exposure within 30 minutes of waking, limit screen use in the hour before bed, and keep your bedroom cool and dark.</p>
+
+    <h2>Sleep Hygiene: Tips for Better Sleep</h2>
+    <p>Sleep hygiene refers to the habits and environmental factors that promote consistent, high-quality sleep. Improving your sleep hygiene is one of the most effective and low-cost ways to improve your sleep without medication.</p>
+    <ul>
+      <li><strong>Stick to a schedule:</strong> Go to bed and wake up at the same time every day, including weekends. Consistency reinforces your circadian rhythm and makes it easier to fall asleep and wake naturally.</li>
+      <li><strong>Create a cool, dark, quiet environment:</strong> The ideal bedroom temperature for sleep is 60-67 degrees Fahrenheit (15-19 degrees Celsius). Use blackout curtains or a sleep mask to block light, and earplugs or a white noise machine to block sound.</li>
+      <li><strong>Limit screen time before bed:</strong> Blue light from phones, tablets, and computers suppresses melatonin production and shifts your circadian rhythm later. Stop using screens at least 30-60 minutes before bed, or use blue-light-filtering glasses and device settings.</li>
+      <li><strong>Avoid caffeine after noon:</strong> Caffeine has a half-life of 5 to 6 hours, meaning half of the caffeine from an afternoon coffee is still in your system at bedtime. Even if you can fall asleep after drinking coffee late in the day, caffeine reduces the amount of deep sleep you get.</li>
+      <li><strong>Limit alcohol before bed:</strong> While alcohol may help you fall asleep faster, it significantly disrupts sleep architecture in the second half of the night, reducing REM sleep and causing more frequent awakenings.</li>
+      <li><strong>Exercise regularly, but not too late:</strong> Regular physical activity improves sleep quality and duration. However, vigorous exercise within 2-3 hours of bedtime can raise your core body temperature and stimulate your nervous system, making it harder to fall asleep.</li>
+      <li><strong>Establish a wind-down routine:</strong> Spend 30 to 60 minutes before bed doing relaxing activities such as reading a physical book, gentle stretching, taking a warm bath, or practicing meditation. A consistent routine signals your brain that it is time to prepare for sleep.</li>
+    </ul>
+
+    <h2>Napping: The Science of Short Sleep</h2>
+    <p>Strategic napping can be a powerful tool for boosting alertness, mood, and cognitive performance, but timing and duration matter. The two most effective nap types are:</p>
+    <ul>
+      <li><strong>Power nap (10-20 minutes):</strong> This keeps you in light sleep (stages N1 and N2) and provides a quick boost in alertness and energy without leaving you groggy. It is ideal for a midday slump and will not interfere with nighttime sleep.</li>
+      <li><strong>Full-cycle nap (90 minutes):</strong> A 90-minute nap allows you to complete one full sleep cycle, including deep sleep and REM. You wake at the end of the cycle feeling refreshed rather than groggy. This type of nap is beneficial when you are significantly sleep-deprived.</li>
+    </ul>
+    <p>Avoid naps longer than 20 minutes but shorter than 90 minutes, as waking from deep sleep causes severe sleep inertia, the heavy grogginess that can last 30 minutes or more. Also avoid napping after 3:00 PM, as late naps can interfere with your ability to fall asleep at your regular bedtime.</p>
+    <p>The best time to nap is between 1:00 PM and 3:00 PM, when your circadian rhythm naturally dips and your body experiences a slight increase in sleepiness. This is the post-lunch dip, and it occurs regardless of whether you have eaten lunch.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>How many sleep cycles do I need per night?</h3>
+    <p>Most adults need 5 to 6 complete sleep cycles per night, which translates to 7.5 to 9 hours of sleep. The minimum for adequate function is generally 4 cycles (6 hours), though this should not be a regular occurrence. Waking at the end of a complete cycle, rather than in the middle of one, is the key to feeling rested regardless of how many cycles you get.</p>
+
+    <h3>Why do I feel groggy even after 8 hours of sleep?</h3>
+    <p>Morning grogginess, called sleep inertia, is usually caused by your alarm waking you during deep sleep (stage N3) rather than at the end of a cycle. Eight hours does not align perfectly with 90-minute cycles (which would be 7.5 or 9 hours). Other causes include sleep disorders like sleep apnea, inconsistent sleep schedules, alcohol consumption before bed, or sleeping in a room that is too warm.</p>
+
+    <h3>How long does it take to fall asleep?</h3>
+    <p>The average healthy adult takes 10 to 20 minutes to fall asleep. This is called sleep onset latency. Falling asleep in less than 5 minutes often indicates significant sleep deprivation, while consistently taking more than 30 minutes suggests insomnia or other sleep issues. If your sleep onset time differs from the default 15 minutes, adjust the setting in the calculator for more accurate results.</p>
+
+    <h3>Is it better to sleep 6 hours or 7.5 hours?</h3>
+    <p>From a sleep cycle perspective, both 6 hours (4 cycles) and 7.5 hours (5 cycles) align with complete cycles, so you will wake feeling less groggy with either option compared to an arbitrary time like 7 hours. However, 7.5 hours provides significantly more total sleep and an extra full cycle of deep and REM sleep, which benefits memory, immune function, and emotional health. If you have the time, 5 cycles is always preferable to 4.</p>
+
+    <h3>Can I train myself to need less sleep?</h3>
+    <p>No. While you can adapt to functioning on less sleep and may feel subjectively fine, objective tests show that cognitive performance, reaction time, and decision-making continue to decline with insufficient sleep. The very small percentage of people who genuinely need less than 7 hours carry a rare genetic mutation. For everyone else, consistently sleeping less than the recommended amount accumulates sleep debt that impairs health and performance over time.</p>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/health-calculators/tdee-calculator/">TDEE Calculator</a> - Calculate your total daily energy expenditure for better health planning.</li>
+      <li><a href="/health-calculators/calorie-calculator/">Calorie Calculator</a> - Find your daily calorie and macro needs based on your goals.</li>
+      <li><a href="/health-calculators/bmi-calculator/">BMI Calculator</a> - Check your Body Mass Index and health category.</li>
+      <li><a href="/date-time-calculators/age-calculator/">Age Calculator</a> - Calculate your exact age in years, months, and days.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .mode-toggle {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    padding: 4px;
+    width: fit-content;
+  }
+  .mode-btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .mode-btn.active {
+    background: var(--color-surface);
+    color: var(--color-primary);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .sleep-results {
+    margin-top: 24px;
+  }
+  .results-heading {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-bottom: 16px;
+  }
+  .sleep-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 12px;
+  }
+  .sleep-card {
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    padding: 20px 16px;
+    text-align: center;
+    border: 2px solid transparent;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .sleep-card.recommended {
+    background: #eff6ff;
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.12);
+  }
+  .sleep-card-time {
+    display: block;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--color-text);
+    line-height: 1.2;
+  }
+  .sleep-card.recommended .sleep-card-time {
+    color: var(--color-primary);
+  }
+  .sleep-card-cycles {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-top: 6px;
+  }
+  .sleep-card-hours {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+  }
+  .sleep-card-tag {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .sleep-card.recommended .sleep-card-tag {
+    background: var(--color-primary);
+    color: #fff;
+  }
+  .sleep-card:not(.recommended) .sleep-card-tag {
+    background: var(--color-border);
+    color: var(--color-text-muted);
+  }
+
+  @media (max-width: 640px) {
+    .mode-toggle {
+      flex-direction: column;
+      width: 100%;
+    }
+    .mode-btn {
+      text-align: center;
+    }
+    .sleep-cards {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>
+
+<script>
+  type Mode = 'wake' | 'sleep';
+  let mode: Mode = 'wake';
+
+  const CYCLE_MINUTES = 90;
+
+  interface SleepOption {
+    time: Date;
+    cycles: number;
+    totalHours: number;
+    recommended: boolean;
+  }
+
+  document.querySelectorAll('.mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      mode = (btn as HTMLElement).dataset.mode as Mode;
+      calculate();
+    });
+  });
+
+  function to24Hour(hour: number, ampm: string): number {
+    if (ampm === 'AM') {
+      return hour === 12 ? 0 : hour;
+    }
+    return hour === 12 ? 12 : hour + 12;
+  }
+
+  function formatTime(date: Date): string {
+    let hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    if (hours === 0) hours = 12;
+    const minuteStr = minutes < 10 ? '0' + minutes : String(minutes);
+    return hours + ':' + minuteStr + ' ' + ampm;
+  }
+
+  function calculate(): void {
+    const hour = parseInt((document.getElementById('hour') as HTMLSelectElement).value);
+    const minute = parseInt((document.getElementById('minute') as HTMLSelectElement).value);
+    const ampm = (document.getElementById('ampm') as HTMLSelectElement).value;
+    const fallAsleep = parseInt((document.getElementById('fallAsleep') as HTMLInputElement).value) || 15;
+
+    const hour24 = to24Hour(hour, ampm);
+
+    const baseDate = new Date();
+    baseDate.setHours(hour24, minute, 0, 0);
+
+    const options: SleepOption[] = [];
+
+    if (mode === 'wake') {
+      // Working backward from wake time to find bedtimes
+      for (let cycles = 6; cycles >= 3; cycles--) {
+        const sleepMinutes = cycles * CYCLE_MINUTES;
+        const bedtime = new Date(baseDate.getTime() - (sleepMinutes + fallAsleep) * 60 * 1000);
+        options.push({
+          time: bedtime,
+          cycles,
+          totalHours: (cycles * CYCLE_MINUTES) / 60,
+          recommended: cycles >= 5,
+        });
+      }
+    } else {
+      // Working forward from sleep time to find wake times
+      for (let cycles = 6; cycles >= 3; cycles--) {
+        const sleepMinutes = cycles * CYCLE_MINUTES;
+        const wakeTime = new Date(baseDate.getTime() + (sleepMinutes + fallAsleep) * 60 * 1000);
+        options.push({
+          time: wakeTime,
+          cycles,
+          totalHours: (cycles * CYCLE_MINUTES) / 60,
+          recommended: cycles >= 5,
+        });
+      }
+    }
+
+    const heading = document.getElementById('resultsHeading')!;
+    if (mode === 'wake') {
+      heading.textContent = 'To wake up at ' + formatTime(baseDate) + ', go to bed at one of these times:';
+    } else {
+      heading.textContent = 'If you go to sleep at ' + formatTime(baseDate) + ', wake up at one of these times:';
+    }
+
+    const container = document.getElementById('sleepCards')!;
+    container.innerHTML = '';
+
+    options.forEach(opt => {
+      const card = document.createElement('div');
+      card.className = 'sleep-card' + (opt.recommended ? ' recommended' : '');
+
+      const timeSpan = document.createElement('span');
+      timeSpan.className = 'sleep-card-time';
+      timeSpan.textContent = formatTime(opt.time);
+
+      const cyclesSpan = document.createElement('span');
+      cyclesSpan.className = 'sleep-card-cycles';
+      cyclesSpan.textContent = opt.cycles + ' cycles';
+
+      const hoursSpan = document.createElement('span');
+      hoursSpan.className = 'sleep-card-hours';
+      hoursSpan.textContent = opt.totalHours + ' hours of sleep';
+
+      const tag = document.createElement('span');
+      tag.className = 'sleep-card-tag';
+      if (opt.recommended) {
+        tag.textContent = 'Recommended';
+      } else if (opt.cycles === 4) {
+        tag.textContent = 'Minimum';
+      } else {
+        tag.textContent = 'Short';
+      }
+
+      card.appendChild(timeSpan);
+      card.appendChild(cyclesSpan);
+      card.appendChild(hoursSpan);
+      card.appendChild(tag);
+      container.appendChild(card);
+    });
+  }
+
+  document.getElementById('calculateBtn')?.addEventListener('click', calculate);
+
+  // Auto-calculate on any input change
+  ['hour', 'minute', 'ampm', 'fallAsleep'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('change', calculate);
+      el.addEventListener('input', calculate);
+    }
+  });
+
+  calculate();
+</script>

@@ -18,25 +18,25 @@ export const categories: Category[] = [
   {
     name: 'Financial Calculators',
     slug: 'financial-calculators',
-    description: 'Compound interest, mortgage, loan amortization, retirement savings, and more financial planning tools.',
+    description: 'Compound interest, mortgage, loan amortization, paycheck, inflation, and more financial planning tools.',
     icon: '💰',
   },
   {
     name: 'Health Calculators',
     slug: 'health-calculators',
-    description: 'BMI, TDEE, calorie needs, body fat, and other health & fitness calculators.',
+    description: 'BMI, TDEE, calorie, pace, ovulation, sleep, and other health & fitness calculators.',
     icon: '❤️',
   },
   {
     name: 'Math Calculators',
     slug: 'math-calculators',
-    description: 'Percentage, fraction, GPA, and everyday math calculators.',
+    description: 'Percentage, fraction, GPA, standard deviation, area, probability, and more math tools.',
     icon: '🔢',
   },
   {
     name: 'Date & Time Calculators',
     slug: 'date-time-calculators',
-    description: 'Age calculator, date difference, countdown timers, and other date & time tools.',
+    description: 'Age calculator, date difference, countdown timers, time zone converter, and other date & time tools.',
     icon: '📅',
   },
   {
@@ -48,7 +48,7 @@ export const categories: Category[] = [
   {
     name: 'Everyday Calculators',
     slug: 'everyday-calculators',
-    description: 'Tip calculator, discount calculator, and practical tools for daily life.',
+    description: 'Tip, discount, square footage, gas cost, electricity, word counter, and practical tools for daily life.',
     icon: '🧮',
   },
 ];
@@ -111,6 +111,22 @@ export const calculators: Calculator[] = [
     categorySlug: 'financial-calculators',
     icon: '🚗',
   },
+  {
+    title: 'Paycheck Calculator',
+    slug: 'paycheck-calculator',
+    description: 'Estimate your paycheck after taxes and deductions. Calculate hourly, weekly, biweekly, and monthly take-home pay.',
+    category: 'Financial Calculators',
+    categorySlug: 'financial-calculators',
+    icon: '💸',
+  },
+  {
+    title: 'Inflation Calculator',
+    slug: 'inflation-calculator',
+    description: 'Calculate the impact of inflation on purchasing power over time. See how prices change with CPI data.',
+    category: 'Financial Calculators',
+    categorySlug: 'financial-calculators',
+    icon: '📊',
+  },
   // Health
   {
     title: 'BMI Calculator',
@@ -160,6 +176,30 @@ export const calculators: Calculator[] = [
     categorySlug: 'health-calculators',
     icon: '🤰',
   },
+  {
+    title: 'Pace Calculator',
+    slug: 'pace-calculator',
+    description: 'Calculate running pace, speed, distance, or finish time. Plan your training for 5K, 10K, half marathon, and marathon.',
+    category: 'Health Calculators',
+    categorySlug: 'health-calculators',
+    icon: '🏃',
+  },
+  {
+    title: 'Ovulation Calculator',
+    slug: 'ovulation-calculator',
+    description: 'Predict your most fertile days and ovulation date based on your menstrual cycle. Plan or prevent pregnancy naturally.',
+    category: 'Health Calculators',
+    categorySlug: 'health-calculators',
+    icon: '🌸',
+  },
+  {
+    title: 'Sleep Calculator',
+    slug: 'sleep-calculator',
+    description: 'Find the best time to sleep or wake up based on 90-minute sleep cycles. Optimize your rest for better energy.',
+    category: 'Health Calculators',
+    categorySlug: 'health-calculators',
+    icon: '😴',
+  },
   // Math
   {
     title: 'Percentage Calculator',
@@ -193,6 +233,30 @@ export const calculators: Calculator[] = [
     categorySlug: 'math-calculators',
     icon: '🎲',
   },
+  {
+    title: 'Standard Deviation Calculator',
+    slug: 'standard-deviation-calculator',
+    description: 'Calculate mean, standard deviation, variance, and other statistics for any data set. Supports population and sample.',
+    category: 'Math Calculators',
+    categorySlug: 'math-calculators',
+    icon: '📉',
+  },
+  {
+    title: 'Area Calculator',
+    slug: 'area-calculator',
+    description: 'Calculate the area of common shapes including circle, rectangle, triangle, trapezoid, and more with formulas.',
+    category: 'Math Calculators',
+    categorySlug: 'math-calculators',
+    icon: '📐',
+  },
+  {
+    title: 'Probability Calculator',
+    slug: 'probability-calculator',
+    description: 'Calculate single event, multiple event, and conditional probability. Includes permutations and combinations.',
+    category: 'Math Calculators',
+    categorySlug: 'math-calculators',
+    icon: '🎯',
+  },
   // Date & Time
   {
     title: 'Age Calculator',
@@ -217,6 +281,14 @@ export const calculators: Calculator[] = [
     category: 'Date & Time Calculators',
     categorySlug: 'date-time-calculators',
     icon: '⏳',
+  },
+  {
+    title: 'Time Zone Converter',
+    slug: 'time-zone-converter',
+    description: 'Convert times between world time zones instantly. See current time in any city and plan across time zones.',
+    category: 'Date & Time Calculators',
+    categorySlug: 'date-time-calculators',
+    icon: '🌍',
   },
   // Conversion
   {
@@ -259,6 +331,38 @@ export const calculators: Calculator[] = [
     category: 'Everyday Calculators',
     categorySlug: 'everyday-calculators',
     icon: '⏰',
+  },
+  {
+    title: 'Square Footage Calculator',
+    slug: 'square-footage-calculator',
+    description: 'Calculate square footage for rooms, floors, walls, and yards. Estimate material costs for your project.',
+    category: 'Everyday Calculators',
+    categorySlug: 'everyday-calculators',
+    icon: '📏',
+  },
+  {
+    title: 'Gas Cost Calculator',
+    slug: 'gas-cost-calculator',
+    description: 'Estimate fuel costs for any trip based on distance, gas mileage, and fuel price. Compare vehicle efficiency.',
+    category: 'Everyday Calculators',
+    categorySlug: 'everyday-calculators',
+    icon: '⛽',
+  },
+  {
+    title: 'Electricity Cost Calculator',
+    slug: 'electricity-cost-calculator',
+    description: 'Calculate electricity usage and costs for any appliance. Estimate monthly and yearly power bills.',
+    category: 'Everyday Calculators',
+    categorySlug: 'everyday-calculators',
+    icon: '⚡',
+  },
+  {
+    title: 'Word Counter',
+    slug: 'word-counter',
+    description: 'Count words, characters, sentences, and paragraphs in any text. Estimate reading and speaking time.',
+    category: 'Everyday Calculators',
+    categorySlug: 'everyday-calculators',
+    icon: '📝',
   },
 ];
 

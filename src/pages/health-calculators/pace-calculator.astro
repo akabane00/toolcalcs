@@ -1,0 +1,439 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Health Calculators",
+        "item": "https://toolcalcs.com/health-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Pace Calculator"
+      }
+    ]
+  },
+  {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'What is a good running pace for beginners?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'A good running pace for beginners is typically between 10:00 and 13:00 minutes per mile (6:13 to 8:04 per km). The most important thing for new runners is to maintain a conversational pace where you can speak in full sentences. As fitness improves over weeks and months, pace will naturally decrease.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How do I calculate my running pace?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Divide your total running time by the distance covered. For example, if you run 3 miles in 27 minutes, your pace is 27 / 3 = 9:00 minutes per mile. To convert to speed, divide the distance by time in hours: 3 miles / 0.45 hours = 6.67 mph.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is the difference between pace and speed?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Pace is the time it takes to cover one unit of distance (e.g., 8:00 per mile), while speed is the distance covered in one unit of time (e.g., 7.5 mph). Pace is the inverse of speed. Runners typically use pace because it directly relates to split times and race planning.',
+      },
+    },
+  ],
+},
+];
+---
+
+<BaseLayout
+  title="Pace Calculator - Running Pace, Speed & Finish Time | ToolCalcs"
+  description="Free pace calculator for runners. Calculate pace per mile or km, speed in mph or km/h, and projected finish times for 5K, 10K, half marathon, and marathon distances."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/health-calculators/">Health Calculators</a> &rsaquo;
+    <span>Pace Calculator</span>
+  </nav>
+
+  <h1>Pace Calculator</h1>
+  <p class="page-desc">Calculate your running pace, speed, and projected finish times for any distance.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group full-width">
+        <label>Distance</label>
+        <div class="quick-distances">
+          <button class="quick-dist-btn active" data-dist="5" data-unit-val="km">5K</button>
+          <button class="quick-dist-btn" data-dist="10" data-unit-val="km">10K</button>
+          <button class="quick-dist-btn" data-dist="21.0975" data-unit-val="km">Half Marathon</button>
+          <button class="quick-dist-btn" data-dist="42.195" data-unit-val="km">Marathon</button>
+          <button class="quick-dist-btn" data-dist="custom" data-unit-val="">Custom</button>
+        </div>
+      </div>
+      <div class="input-group" id="distanceGroup" style="display:none;">
+        <label for="distance">Distance</label>
+        <input type="number" id="distance" value="5" min="0.01" step="0.01" />
+      </div>
+      <div class="input-group">
+        <label for="distanceUnit">Distance Unit</label>
+        <select id="distanceUnit">
+          <option value="km" selected>Kilometers (km)</option>
+          <option value="miles">Miles</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="hours">Hours</label>
+        <input type="number" id="hours" value="0" min="0" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="minutes">Minutes</label>
+        <input type="number" id="minutes" value="25" min="0" max="59" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="seconds">Seconds</label>
+        <input type="number" id="seconds" value="0" min="0" max="59" step="1" />
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate Pace</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Pace per Mile</span>
+          <span class="result-value" id="pacePerMile">--:--</span>
+          <span class="result-unit">min/mile</span>
+        </div>
+        <div class="result-card primary">
+          <span class="result-label">Pace per Kilometer</span>
+          <span class="result-value" id="pacePerKm">--:--</span>
+          <span class="result-unit">min/km</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Speed (mph)</span>
+          <span class="result-value" id="speedMph">0</span>
+          <span class="result-unit">miles/hour</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Speed (km/h)</span>
+          <span class="result-value" id="speedKmh">0</span>
+          <span class="result-unit">km/hour</span>
+        </div>
+      </div>
+
+      <div class="projections" id="projections">
+        <h3 class="projections-title">Finish Time Projections</h3>
+        <div class="result-cards">
+          <div class="result-card">
+            <span class="result-label">5K</span>
+            <span class="result-value" id="proj5k">--:--:--</span>
+          </div>
+          <div class="result-card">
+            <span class="result-label">10K</span>
+            <span class="result-value" id="proj10k">--:--:--</span>
+          </div>
+          <div class="result-card">
+            <span class="result-label">Half Marathon</span>
+            <span class="result-value" id="projHalf">--:--:--</span>
+          </div>
+          <div class="result-card">
+            <span class="result-label">Marathon</span>
+            <span class="result-value" id="projFull">--:--:--</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>Understanding Running Pace</h2>
+    <p>Running pace is the amount of time it takes to cover a specific distance, typically expressed as minutes per mile or minutes per kilometer. For example, a pace of 8:00 per mile means it takes eight minutes to run one mile. Pace is the primary metric runners use to measure effort and plan their training because it directly translates to race times and split goals.</p>
+    <p>Unlike speed, which measures distance covered per unit of time (such as miles per hour), pace measures time per unit of distance. The two are inversely related: a faster speed corresponds to a lower pace number. Most runners prefer pace over speed because it makes it easy to calculate expected finish times. If you know your pace per mile, you can multiply by the race distance in miles to get your approximate finish time.</p>
+    <p>Pace varies significantly between individuals based on fitness level, running experience, age, and body composition. A recreational jogger might run at a 10:00 to 12:00 per mile pace, while an experienced club runner might maintain 7:00 to 8:00 per mile. Elite marathon runners typically hold a pace under 5:00 per mile for the entire 26.2 miles, which translates to a finish time around or under 2 hours and 10 minutes. What matters most is not how your pace compares to others but how it relates to your own training goals and fitness progression.</p>
+
+    <h2>Pace vs Speed: What Is the Difference?</h2>
+    <p>Pace and speed measure the same thing from opposite perspectives. <strong>Pace</strong> answers the question "how long does it take me to cover one mile (or one kilometer)?" while <strong>speed</strong> answers "how many miles (or kilometers) do I cover in one hour?" The mathematical relationship is straightforward:</p>
+    <div class="formula-box">
+      <code>Speed (mph) = 60 / Pace (min per mile)</code><br/>
+      <code>Pace (min per mile) = 60 / Speed (mph)</code>
+    </div>
+    <p>For example, a runner maintaining a pace of 8:00 per mile is running at 7.5 mph (60 / 8 = 7.5). Conversely, someone running on a treadmill at 6.0 mph is running a 10:00 per mile pace (60 / 6 = 10).</p>
+    <p>Runners overwhelmingly prefer pace for training and racing because of its practical utility. If you are running a 10K (6.2 miles) at an 8:00 pace, you can quickly estimate your finish time: approximately 49 minutes and 43 seconds. Pace also makes it easy to set split targets for each mile or kilometer during a race. Speed, on the other hand, is more commonly used in cycling, driving, and treadmill settings where the machine displays speed rather than pace.</p>
+
+    <h2>Common Race Distances</h2>
+    <p>Running races come in standardized distances recognized worldwide. Understanding these distances helps you set meaningful pace goals and plan your training cycles accordingly.</p>
+    <table class="info-table">
+      <thead>
+        <tr><th>Race</th><th>Distance</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>5K</td><td>3.107 miles / 5.0 km</td></tr>
+        <tr><td>10K</td><td>6.214 miles / 10.0 km</td></tr>
+        <tr><td>Half Marathon</td><td>13.109 miles / 21.0975 km</td></tr>
+        <tr><td>Marathon</td><td>26.219 miles / 42.195 km</td></tr>
+      </tbody>
+    </table>
+    <p>The <strong>5K</strong> is the most popular race distance worldwide and an excellent starting point for new runners. It is short enough that most healthy adults can train for one in six to eight weeks, yet long enough to require sustained effort beyond a casual jog. Competitive 5K times range from under 15 minutes for elite runners to 25-35 minutes for recreational runners.</p>
+    <p>The <strong>10K</strong> doubles the 5K distance and demands greater aerobic endurance. Training typically requires 8-12 weeks for someone who can already run a 5K. The <strong>half marathon</strong> at 13.1 miles is a significant step up that requires dedicated training of 10-16 weeks. The <strong>marathon</strong> at 26.2 miles is considered the ultimate distance running challenge for most recreational runners, typically requiring 16-20 weeks of structured training with weekly long runs progressively building to 18-22 miles.</p>
+
+    <h2>Training Zones and Pace</h2>
+    <p>Effective running training involves running at different paces to develop various energy systems and physiological adaptations. Understanding training zones helps you get the most out of every workout while avoiding overtraining and injury.</p>
+    <ul>
+      <li><strong>Easy/Recovery pace (60-70% max heart rate):</strong> This is a conversational pace where you can speak in full sentences without gasping. For most runners, easy pace is 1:30 to 2:30 minutes per mile slower than their 5K race pace. The majority of your weekly mileage—typically 70-80%—should be at this effort level. Easy runs build aerobic fitness, strengthen connective tissues, and aid recovery between hard sessions.</li>
+      <li><strong>Tempo/Threshold pace (80-85% max heart rate):</strong> Also called lactate threshold pace, this is the fastest pace you could sustain for about one hour in a race. It feels "comfortably hard"—you can speak in short phrases but not carry on a full conversation. Tempo runs improve your body's ability to clear lactate from the blood, allowing you to hold faster paces for longer periods.</li>
+      <li><strong>Interval pace (90-95% max heart rate):</strong> These are hard, fast repetitions typically run at your 5K race pace or faster, with recovery jogs between efforts. Intervals improve your VO2 max (the maximum amount of oxygen your body can use during exercise) and running economy. Common interval workouts include 400-meter, 800-meter, or 1,600-meter repeats on a track.</li>
+      <li><strong>Sprint/Repetition pace (95-100% max heart rate):</strong> Short, very fast bursts lasting 10-30 seconds, followed by full recovery. These develop neuromuscular coordination, running form, and leg speed. Sprint work is typically a small portion of overall training but can help improve finishing kicks and overall speed.</li>
+    </ul>
+    <p>A well-structured training plan incorporates all of these zones across the week. A common weekly structure for a recreational runner training for a half marathon might include three easy runs, one tempo run, one interval session, and one long run at easy to moderate pace.</p>
+
+    <h2>What Are Negative Splits?</h2>
+    <p>A negative split means running the second half of a race faster than the first half. This is widely regarded as the optimal pacing strategy for distance races and is used by many elite runners to achieve their best performances. The world records for the marathon and many other distances have been set using negative split strategies.</p>
+    <p>The physiological logic behind negative splits is sound. Starting conservatively allows your body to warm up gradually, preserves glycogen stores for when you need them most, and prevents the premature buildup of lactate that leads to the dreaded "wall" in the later miles. Runners who start too fast often experience dramatic slowdowns in the second half, resulting in a slower overall finish time than if they had been more patient early on.</p>
+    <p>To execute a negative split, aim to run the first half of your race at your goal pace or 5-10 seconds per mile slower. Focus on feeling controlled and relaxed through the first half. In the second half, gradually increase effort. If you feel strong in the final miles, you can push harder toward the finish. Even if you do not dramatically speed up in the second half, maintaining your pace while others around you are slowing down is a sign of excellent pacing discipline.</p>
+    <p>Practicing negative splits in training runs helps develop the restraint needed on race day. During long runs and tempo workouts, deliberately start at a relaxed pace and pick up speed in the second half. This teaches your body and mind to resist the urge to start fast when adrenaline is high.</p>
+
+    <h2>How to Improve Your Running Pace</h2>
+    <p>Improving running pace takes consistent training over weeks and months. There are no shortcuts, but several evidence-based strategies will help you get faster efficiently and safely.</p>
+    <ul>
+      <li><strong>Increase weekly mileage gradually:</strong> The single most effective way to improve pace is to run more miles. Higher weekly volume builds aerobic fitness, strengthens muscles and connective tissues, and improves running economy. Follow the 10% rule: increase total weekly mileage by no more than 10% per week to reduce injury risk.</li>
+      <li><strong>Incorporate speed work:</strong> Interval training and tempo runs stimulate physiological adaptations that make you faster. Start with one speed session per week and build to two as your fitness allows. Common workouts include track intervals (e.g., 6 x 800m at 5K pace), tempo runs (20-40 minutes at threshold pace), and fartlek runs (alternating fast and easy efforts).</li>
+      <li><strong>Run long:</strong> A weekly long run of 90 minutes or more at an easy pace builds endurance and teaches your body to burn fat as fuel. For half marathon and marathon training, the long run is the cornerstone workout. Gradually extend your long run by 1-2 miles every one to two weeks.</li>
+      <li><strong>Strength train:</strong> Two to three strength training sessions per week targeting the legs, hips, and core can significantly improve running economy and injury resistance. Key exercises include squats, lunges, deadlifts, calf raises, and planks. Stronger muscles generate more force per stride, allowing you to run faster at the same effort level.</li>
+      <li><strong>Prioritize recovery:</strong> Improvement happens during rest, not during the workout itself. Get 7-9 hours of sleep per night, take at least one complete rest day per week, and alternate hard and easy days. Chronic fatigue from overtraining will make you slower, not faster.</li>
+      <li><strong>Lose excess weight:</strong> Carrying extra body weight requires more energy per stride. Research suggests that every pound of body weight lost translates to approximately 1.4 seconds per mile faster. However, weight loss should be pursued gradually and should never come at the expense of adequate fueling for training.</li>
+      <li><strong>Improve running form:</strong> Small biomechanical improvements can yield meaningful pace gains. Focus on a slight forward lean from the ankles, a cadence of 170-180 steps per minute, landing with your foot beneath your center of mass rather than ahead of it, and relaxed shoulders and arms.</li>
+    </ul>
+
+    <h2>Race Pace Strategies</h2>
+    <p>Race day pacing can make or break your performance. Even with months of solid training, poor pacing can result in a disappointing finish time. Here are proven strategies for common race distances.</p>
+    <h3>5K Race Strategy</h3>
+    <p>The 5K is short enough that you can afford to run near your maximum sustainable effort. Start at your goal pace and try to hold it steady throughout. The first mile often feels easy due to adrenaline, so resist the temptation to bank time early. Focus on maintaining form in the third mile when fatigue sets in, and save a strong kick for the final 400 meters.</p>
+    <h3>10K Race Strategy</h3>
+    <p>The 10K requires slightly more restraint than the 5K. Run the first two miles at goal pace or a few seconds slower. Settle into a rhythm through the middle miles and begin to push slightly harder in the final two miles. A common mistake in the 10K is going out at 5K pace, which leads to a significant slowdown after the halfway point.</p>
+    <h3>Half Marathon Race Strategy</h3>
+    <p>For the half marathon, patience in the first half pays enormous dividends in the second half. Run miles 1-6 at your goal pace or 5-10 seconds per mile slower. From miles 7-10, settle into your target pace. Use miles 11-13.1 to push if you feel strong. The half marathon is long enough that going out too fast can result in a very painful final three miles.</p>
+    <h3>Marathon Race Strategy</h3>
+    <p>The marathon demands the most disciplined pacing of any race distance. Many experienced coaches recommend running the first 10 miles at goal pace or slightly slower, running miles 11-20 at goal pace, and then racing the final 10K based on how you feel. The "wall" that many marathoners hit around mile 20 is largely a result of starting too fast and depleting glycogen stores prematurely. Conservative early pacing, combined with proper fueling during the race (30-60 grams of carbohydrates per hour after the first hour), dramatically reduces the likelihood of hitting the wall.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>What is a good running pace for beginners?</h3>
+    <p>A good beginning running pace is typically between 10:00 and 13:00 minutes per mile, which translates to roughly 6:13 to 8:04 minutes per kilometer. The most important factor for new runners is not pace but consistency and comfort. You should be able to carry on a conversation while running. If you are gasping for breath, slow down. As your aerobic fitness develops over weeks and months of consistent training, your pace will naturally improve without specifically trying to run faster.</p>
+
+    <h3>How do I calculate my running pace?</h3>
+    <p>To calculate pace, divide your total running time by the distance covered. For instance, if you complete a 5K (3.107 miles) in 28 minutes, your pace per mile is 28 / 3.107 = 9:01 per mile. To find your pace per kilometer, divide 28 by 5 = 5:36 per km. For speed in miles per hour, convert your time to hours (28 minutes = 0.467 hours) and divide: 3.107 / 0.467 = 6.65 mph. This calculator handles all of these conversions automatically.</p>
+
+    <h3>What is the difference between pace and speed?</h3>
+    <p>Pace measures time per unit of distance (e.g., 8:30 per mile), while speed measures distance per unit of time (e.g., 7.06 mph). They are mathematical inverses of each other. Runners prefer pace because it maps directly to race strategy: if you know your pace per mile, you can predict your split at each mile marker and your total finish time. Speed is more commonly used for cycling, driving, and treadmill displays.</p>
+
+    <h3>How fast should I run a 5K?</h3>
+    <p>The average 5K finish time for recreational runners is approximately 28-35 minutes. Competitive amateur runners often target sub-25 minutes (8:02/mile pace), while serious club runners aim for sub-20 minutes (6:26/mile pace). Elite runners finish in under 15 minutes. Your target should be based on your current fitness level and training history rather than comparing yourself to others. A realistic first goal is to run the entire distance without stopping, then progressively work on improving your time.</p>
+
+    <h3>How do I convert treadmill speed to outdoor pace?</h3>
+    <p>Treadmills display speed in miles per hour (mph). To convert to pace, divide 60 by the treadmill speed. For example, a treadmill speed of 6.5 mph equals a pace of 60 / 6.5 = 9:14 per mile. At 7.0 mph, pace is 8:34 per mile. At 8.0 mph, pace is 7:30 per mile. Note that treadmill running is generally slightly easier than outdoor running due to the lack of wind resistance and the belt assisting leg turnover. Setting the treadmill incline to 1% roughly simulates outdoor running conditions.</p>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/health-calculators/bmi-calculator/">BMI Calculator</a> - Calculate your Body Mass Index and understand your weight category.</li>
+      <li><a href="/health-calculators/tdee-calculator/">TDEE Calculator</a> - Find your total daily energy expenditure for nutrition planning.</li>
+      <li><a href="/health-calculators/calorie-calculator/">Calorie Calculator</a> - Determine daily calorie needs to fuel your running.</li>
+      <li><a href="/health-calculators/body-fat-calculator/">Body Fat Calculator</a> - Estimate your body fat percentage using the Navy method.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .quick-distances {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .quick-dist-btn {
+    padding: 8px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: transparent;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--color-text);
+    transition: all 0.15s;
+  }
+  .quick-dist-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  .quick-dist-btn.active {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+  }
+
+  .input-group.full-width { flex: 100%; }
+
+  .result-unit { display: block; font-size: 0.75rem; color: var(--color-text-muted); }
+
+  .projections { margin-top: 16px; }
+  .projections-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--color-text);
+  }
+
+  @media (max-width: 640px) {
+    .quick-distances { gap: 6px; }
+    .quick-dist-btn { padding: 6px 12px; font-size: 0.85rem; }
+  }
+</style>
+
+<script>
+  const KM_PER_MILE = 1.60934;
+
+  const raceDistancesKm: Record<string, number> = {
+    '5k': 5,
+    '10k': 10,
+    'half': 21.0975,
+    'full': 42.195,
+  };
+
+  let currentDistKm = 5;
+  let isCustom = false;
+
+  const distanceInput = document.getElementById('distance') as HTMLInputElement;
+  const distanceGroup = document.getElementById('distanceGroup') as HTMLElement;
+  const distanceUnit = document.getElementById('distanceUnit') as HTMLSelectElement;
+  const hoursInput = document.getElementById('hours') as HTMLInputElement;
+  const minutesInput = document.getElementById('minutes') as HTMLInputElement;
+  const secondsInput = document.getElementById('seconds') as HTMLInputElement;
+
+  // Quick distance buttons
+  document.querySelectorAll('.quick-dist-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.quick-dist-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const distVal = (btn as HTMLElement).dataset.dist!;
+      const unitVal = (btn as HTMLElement).dataset.unitVal!;
+
+      if (distVal === 'custom') {
+        isCustom = true;
+        distanceGroup.style.display = '';
+        distanceInput.focus();
+      } else {
+        isCustom = false;
+        distanceGroup.style.display = 'none';
+        currentDistKm = parseFloat(distVal);
+        if (unitVal === 'km') {
+          distanceUnit.value = 'km';
+        }
+      }
+    });
+  });
+
+  function getDistanceKm(): number {
+    if (isCustom) {
+      const val = parseFloat(distanceInput.value) || 0;
+      if (distanceUnit.value === 'miles') {
+        return val * KM_PER_MILE;
+      }
+      return val;
+    }
+    return currentDistKm;
+  }
+
+  function getDistanceMiles(): number {
+    return getDistanceKm() / KM_PER_MILE;
+  }
+
+  function formatPace(totalSeconds: number): string {
+    if (!isFinite(totalSeconds) || totalSeconds <= 0) return '--:--';
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = Math.round(totalSeconds % 60);
+    return mins + ':' + (secs < 10 ? '0' : '') + secs;
+  }
+
+  function formatTime(totalSeconds: number): string {
+    if (!isFinite(totalSeconds) || totalSeconds <= 0) return '--:--:--';
+    const hrs = Math.floor(totalSeconds / 3600);
+    const mins = Math.floor((totalSeconds % 3600) / 60);
+    const secs = Math.round(totalSeconds % 60);
+    if (hrs > 0) {
+      return hrs + ':' + (mins < 10 ? '0' : '') + mins + ':' + (secs < 10 ? '0' : '') + secs;
+    }
+    return mins + ':' + (secs < 10 ? '0' : '') + secs;
+  }
+
+  function calculate() {
+    const hours = parseFloat(hoursInput.value) || 0;
+    const minutes = parseFloat(minutesInput.value) || 0;
+    const seconds = parseFloat(secondsInput.value) || 0;
+    const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+
+    const distKm = getDistanceKm();
+    const distMiles = getDistanceMiles();
+
+    if (totalSeconds <= 0 || distKm <= 0) {
+      document.getElementById('pacePerMile')!.textContent = '--:--';
+      document.getElementById('pacePerKm')!.textContent = '--:--';
+      document.getElementById('speedMph')!.textContent = '0';
+      document.getElementById('speedKmh')!.textContent = '0';
+      return;
+    }
+
+    // Pace calculations
+    const pacePerMileSec = totalSeconds / distMiles;
+    const pacePerKmSec = totalSeconds / distKm;
+
+    // Speed calculations
+    const totalHours = totalSeconds / 3600;
+    const speedMph = distMiles / totalHours;
+    const speedKmh = distKm / totalHours;
+
+    // Display results
+    document.getElementById('pacePerMile')!.textContent = formatPace(pacePerMileSec);
+    document.getElementById('pacePerKm')!.textContent = formatPace(pacePerKmSec);
+    document.getElementById('speedMph')!.textContent = speedMph.toFixed(2);
+    document.getElementById('speedKmh')!.textContent = speedKmh.toFixed(2);
+
+    // Finish time projections
+    const proj5k = pacePerKmSec * raceDistancesKm['5k'];
+    const proj10k = pacePerKmSec * raceDistancesKm['10k'];
+    const projHalf = pacePerKmSec * raceDistancesKm['half'];
+    const projFull = pacePerKmSec * raceDistancesKm['full'];
+
+    document.getElementById('proj5k')!.textContent = formatTime(proj5k);
+    document.getElementById('proj10k')!.textContent = formatTime(proj10k);
+    document.getElementById('projHalf')!.textContent = formatTime(projHalf);
+    document.getElementById('projFull')!.textContent = formatTime(projFull);
+  }
+
+  document.getElementById('calculateBtn')?.addEventListener('click', calculate);
+  distanceInput.addEventListener('input', calculate);
+  distanceUnit.addEventListener('change', calculate);
+  hoursInput.addEventListener('input', calculate);
+  minutesInput.addEventListener('input', calculate);
+  secondsInput.addEventListener('input', calculate);
+
+  calculate();
+</script>

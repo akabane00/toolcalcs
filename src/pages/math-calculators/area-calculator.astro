@@ -1,0 +1,461 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Math Calculators",
+        "item": "https://toolcalcs.com/math-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Area Calculator"
+      }
+    ]
+  },
+  {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'How do you calculate the area of a shape?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'The formula depends on the shape. For a rectangle, multiply length by width. For a circle, use pi times the radius squared. For a triangle, multiply the base by the height and divide by two. Each shape has its own specific formula based on its geometric properties.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is the difference between area and perimeter?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Area measures the amount of two-dimensional space inside a shape, expressed in square units (such as square meters or square feet). Perimeter measures the total length of the boundary or outline of a shape, expressed in linear units (such as meters or feet).',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How do you convert between different area units?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'To convert area units, square the linear conversion factor. For example, since 1 foot equals 12 inches, 1 square foot equals 144 square inches (12 squared). Similarly, 1 square meter equals 10,000 square centimeters (100 squared), and 1 acre equals 43,560 square feet.',
+      },
+    },
+  ],
+},
+];
+---
+
+<BaseLayout
+  title="Area Calculator - Calculate Area of Any Shape | ToolCalcs"
+  description="Free area calculator for rectangle, circle, triangle, trapezoid, and ellipse. Get area, perimeter, and formulas instantly. Easy-to-use with step-by-step results."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/math-calculators/">Math Calculators</a> &rsaquo;
+    <span>Area Calculator</span>
+  </nav>
+
+  <h1>Area Calculator</h1>
+  <p class="page-desc">Calculate the area and perimeter of common geometric shapes with step-by-step formulas.</p>
+
+  <div class="calculator-box">
+    <div class="shape-tabs">
+      <button class="shape-btn active" data-shape="rectangle">Rectangle</button>
+      <button class="shape-btn" data-shape="circle">Circle</button>
+      <button class="shape-btn" data-shape="triangle">Triangle</button>
+      <button class="shape-btn" data-shape="trapezoid">Trapezoid</button>
+      <button class="shape-btn" data-shape="ellipse">Ellipse</button>
+    </div>
+
+    <!-- Rectangle -->
+    <div class="shape-inputs" id="rectangle-inputs">
+      <div class="calc-inputs">
+        <div class="input-group">
+          <label for="rect-length">Length</label>
+          <input type="number" id="rect-length" value="10" min="0" step="any" />
+        </div>
+        <div class="input-group">
+          <label for="rect-width">Width</label>
+          <input type="number" id="rect-width" value="6" min="0" step="any" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Circle -->
+    <div class="shape-inputs hidden" id="circle-inputs">
+      <div class="calc-inputs">
+        <div class="input-group">
+          <label for="circle-radius">Radius</label>
+          <input type="number" id="circle-radius" value="5" min="0" step="any" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Triangle -->
+    <div class="shape-inputs hidden" id="triangle-inputs">
+      <div class="calc-inputs">
+        <div class="input-group">
+          <label for="tri-base">Base</label>
+          <input type="number" id="tri-base" value="8" min="0" step="any" />
+        </div>
+        <div class="input-group">
+          <label for="tri-height">Height</label>
+          <input type="number" id="tri-height" value="6" min="0" step="any" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Trapezoid -->
+    <div class="shape-inputs hidden" id="trapezoid-inputs">
+      <div class="calc-inputs">
+        <div class="input-group">
+          <label for="trap-base1">Base 1 (a)</label>
+          <input type="number" id="trap-base1" value="10" min="0" step="any" />
+        </div>
+        <div class="input-group">
+          <label for="trap-base2">Base 2 (b)</label>
+          <input type="number" id="trap-base2" value="6" min="0" step="any" />
+        </div>
+        <div class="input-group">
+          <label for="trap-height">Height</label>
+          <input type="number" id="trap-height" value="4" min="0" step="any" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Ellipse -->
+    <div class="shape-inputs hidden" id="ellipse-inputs">
+      <div class="calc-inputs">
+        <div class="input-group">
+          <label for="ellipse-a">Semi-Major Axis (a)</label>
+          <input type="number" id="ellipse-a" value="7" min="0" step="any" />
+        </div>
+        <div class="input-group">
+          <label for="ellipse-b">Semi-Minor Axis (b)</label>
+          <input type="number" id="ellipse-b" value="4" min="0" step="any" />
+        </div>
+      </div>
+    </div>
+
+    <button class="calc-btn" id="calculateBtn">Calculate Area</button>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Area</span>
+          <span class="result-value" id="areaValue">60</span>
+          <span class="result-unit">sq units</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label" id="perimeterLabel">Perimeter</span>
+          <span class="result-value" id="perimeterValue">32</span>
+          <span class="result-unit">units</span>
+        </div>
+      </div>
+      <div class="formula-display" id="formulaDisplay">
+        <span class="formula-title">Formula Used</span>
+        <code id="formulaText">Area = length &times; width = 10 &times; 6 = 60</code>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>What Is Area?</h2>
+    <p>Area is the measure of the two-dimensional space enclosed within a boundary. It tells you how much surface a flat shape covers. Area is expressed in square units such as square meters (m<sup>2</sup>), square feet (ft<sup>2</sup>), square centimeters (cm<sup>2</sup>), or acres. Whether you are painting a wall, laying carpet in a room, planting a garden, or calculating the material needed for a construction project, understanding area is fundamental.</p>
+    <p>The concept of area dates back thousands of years to ancient civilizations. Egyptian surveyors calculated the area of agricultural fields along the Nile River to determine taxes after annual floods reshaped the land. The Greek mathematician Euclid formalized geometric principles around 300 BCE, and many of the area formulas we use today originate from his foundational work, <em>Elements</em>. Today, area calculations are indispensable in architecture, engineering, agriculture, interior design, and everyday tasks like determining how much paint to buy.</p>
+
+    <h2>Area Formulas for Common Shapes</h2>
+    <p>Each geometric shape has its own formula for calculating area. Below are the formulas for the five shapes supported by this calculator, along with detailed explanations and worked examples.</p>
+
+    <h3>Rectangle</h3>
+    <div class="formula-box"><code>Area = length &times; width</code></div>
+    <div class="formula-box"><code>Perimeter = 2 &times; (length + width)</code></div>
+    <p>A rectangle has four right angles and two pairs of parallel sides. The area is simply the product of its length and width. For example, a room that is 12 feet long and 10 feet wide has an area of 12 &times; 10 = 120 square feet. The perimeter of this room is 2 &times; (12 + 10) = 44 feet, which is useful when calculating how much baseboard or trim you need. A square is a special case of a rectangle where all four sides are equal, so its area is simply side<sup>2</sup>.</p>
+
+    <h3>Circle</h3>
+    <div class="formula-box"><code>Area = &pi; &times; r<sup>2</sup></code></div>
+    <div class="formula-box"><code>Circumference = 2 &times; &pi; &times; r</code></div>
+    <p>The area of a circle depends on its radius, which is the distance from the center to any point on the boundary. Pi (&pi;) is the mathematical constant approximately equal to 3.14159. For a circle with a radius of 5 meters, the area is &pi; &times; 5<sup>2</sup> = &pi; &times; 25 &approx; 78.54 square meters. The circumference (the distance around the circle) is 2 &times; &pi; &times; 5 &approx; 31.42 meters. If you know the diameter instead of the radius, simply divide the diameter by 2 to get the radius.</p>
+
+    <h3>Triangle</h3>
+    <div class="formula-box"><code>Area = &frac12; &times; base &times; height</code></div>
+    <p>The area of a triangle is half the product of its base and its corresponding height (the perpendicular distance from the base to the opposite vertex). This formula works for all triangles—right, acute, or obtuse—as long as you use the correct height. For a triangle with a base of 8 cm and a height of 6 cm, the area is 0.5 &times; 8 &times; 6 = 24 square centimeters. For the perimeter, you need the lengths of all three sides. If the triangle sides are 8, 6, and 10, the perimeter is 8 + 6 + 10 = 24 cm. Another useful formula for triangles when all three sides are known is Heron's formula: Area = &radic;(s(s-a)(s-b)(s-c)), where s is the semi-perimeter (a + b + c) / 2.</p>
+
+    <h3>Trapezoid</h3>
+    <div class="formula-box"><code>Area = &frac12; &times; (base<sub>1</sub> + base<sub>2</sub>) &times; height</code></div>
+    <p>A trapezoid (also called a trapezium in British English) is a quadrilateral with exactly one pair of parallel sides called bases. The height is the perpendicular distance between these two parallel sides. The area formula averages the two bases and multiplies by the height. For a trapezoid with bases of 10 and 6 units and a height of 4 units, the area is 0.5 &times; (10 + 6) &times; 4 = 32 square units. To calculate the perimeter, you need all four side lengths. If the non-parallel sides (legs) measure 5 units each, the perimeter is 10 + 6 + 5 + 5 = 26 units.</p>
+
+    <h3>Ellipse</h3>
+    <div class="formula-box"><code>Area = &pi; &times; a &times; b</code></div>
+    <p>An ellipse is an elongated circle defined by two radii: the semi-major axis (a), which is the longer radius, and the semi-minor axis (b), the shorter one. The area is the product of &pi;, the semi-major axis, and the semi-minor axis. For an ellipse with a semi-major axis of 7 and a semi-minor axis of 4, the area is &pi; &times; 7 &times; 4 &approx; 87.96 square units. The perimeter (circumference) of an ellipse has no simple exact formula. The Ramanujan approximation provides a good estimate: P &approx; &pi; &times; (3(a + b) - &radic;((3a + b)(a + 3b))). When a = b, the ellipse becomes a circle, and this formula simplifies to the standard circumference formula.</p>
+
+    <h2>Real-World Applications of Area</h2>
+    <p>Understanding how to calculate area is essential in many practical situations:</p>
+    <ul>
+      <li><strong>Home improvement:</strong> When painting a room, you need the wall area to determine how many gallons of paint to buy. A gallon of interior paint typically covers 350-400 square feet. For flooring, knowing the room area helps you buy the right amount of tile, hardwood, or carpet.</li>
+      <li><strong>Landscaping and gardening:</strong> Calculating the area of a lawn helps determine how much seed, fertilizer, or sod you need. A circular garden bed with a 6-foot radius has an area of about 113 square feet, which tells you exactly how much mulch to order.</li>
+      <li><strong>Construction and architecture:</strong> Builders use area calculations to estimate materials for roofing, siding, and concrete. The area of a roof determines the number of shingles needed, while the area of a concrete slab determines how many cubic yards of concrete to order (area multiplied by thickness).</li>
+      <li><strong>Real estate:</strong> Property value is often expressed in price per square foot or square meter. Knowing the exact area of a home or lot helps buyers and sellers arrive at a fair price. In the United States, the median home price per square foot was approximately $200 in 2024.</li>
+      <li><strong>Agriculture:</strong> Farmers calculate field areas to plan seed quantities, irrigation coverage, and fertilizer application rates. A rectangular field 400 meters by 250 meters has an area of 100,000 square meters, or 10 hectares (about 24.7 acres).</li>
+      <li><strong>Manufacturing:</strong> Manufacturers use area calculations to minimize material waste when cutting fabric, sheet metal, or plywood. Optimizing the layout of shapes on a flat material (known as the cutting stock problem) can save significant costs.</li>
+    </ul>
+
+    <h2>Units of Area and Conversions</h2>
+    <p>Area is always expressed in square units. The key principle for converting between area units is that you must square the linear conversion factor. Here are the most commonly used area conversions:</p>
+    <table class="info-table">
+      <thead>
+        <tr><th>Conversion</th><th>Factor</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1 sq foot (ft<sup>2</sup>)</td><td>144 sq inches</td></tr>
+        <tr><td>1 sq yard (yd<sup>2</sup>)</td><td>9 sq feet</td></tr>
+        <tr><td>1 sq meter (m<sup>2</sup>)</td><td>10.764 sq feet</td></tr>
+        <tr><td>1 acre</td><td>43,560 sq feet</td></tr>
+        <tr><td>1 hectare</td><td>10,000 sq meters (2.471 acres)</td></tr>
+        <tr><td>1 sq mile</td><td>640 acres</td></tr>
+        <tr><td>1 sq meter</td><td>10,000 sq centimeters</td></tr>
+        <tr><td>1 sq kilometer</td><td>1,000,000 sq meters</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Example conversion:</strong> To convert 250 square feet to square meters, divide by 10.764: 250 / 10.764 &approx; 23.23 square meters. To go the other direction, multiply square meters by 10.764. A common mistake is to use the linear conversion factor (1 meter = 3.281 feet) instead of squaring it. Always remember that area conversions require the squared factor.</p>
+
+    <h2>Calculating Area of Irregular Shapes</h2>
+    <p>Not all shapes fit neatly into standard geometric formulas. For irregular shapes, several strategies can help:</p>
+    <ul>
+      <li><strong>Decomposition:</strong> Break the irregular shape into smaller standard shapes (rectangles, triangles, circles) whose areas you can calculate individually. Add the areas together for the total. For example, an L-shaped room can be split into two rectangles.</li>
+      <li><strong>Subtraction:</strong> Sometimes it is easier to calculate the area of a larger shape and subtract the area of sections that are missing. A rectangular yard with a circular pool in the center has a usable area equal to the rectangle area minus the circle area.</li>
+      <li><strong>Grid method:</strong> Overlay a grid of squares on the shape. Count the full squares inside the shape and estimate partial squares. This is a practical approach for very irregular shapes drawn on graph paper.</li>
+      <li><strong>Coordinate geometry:</strong> If the vertices of a polygon are known as coordinates, use the Shoelace formula: Area = &frac12; |&sum;(x<sub>i</sub>y<sub>i+1</sub> - x<sub>i+1</sub>y<sub>i</sub>)|. This works for any simple polygon and is widely used in GIS (Geographic Information Systems) software.</li>
+    </ul>
+    <p><strong>Practical example:</strong> Suppose you need to find the area of an L-shaped room where the longer section is 15 ft by 10 ft and the shorter section is 8 ft by 6 ft. Split it into two rectangles: 15 &times; 10 = 150 sq ft and 8 &times; 6 = 48 sq ft. Total area = 150 + 48 = 198 square feet.</p>
+
+    <h2>Practical Area Examples</h2>
+    <p>Below are step-by-step area calculations for common real-world scenarios:</p>
+
+    <h3>Painting a Room</h3>
+    <p>You want to paint the four walls of a 14 ft &times; 12 ft room with 9 ft ceilings. Two walls are 14 &times; 9 = 126 sq ft each, and two walls are 12 &times; 9 = 108 sq ft each. Total wall area = 2(126) + 2(108) = 252 + 216 = 468 sq ft. Subtract a 3 ft &times; 7 ft door (21 sq ft) and two 4 ft &times; 3 ft windows (24 sq ft total). Paintable area = 468 - 21 - 24 = 423 sq ft. At 375 sq ft per gallon, you need about 1.13 gallons, so buy 2 gallons to be safe (accounting for two coats).</p>
+
+    <h3>Circular Patio</h3>
+    <p>You are building a circular stone patio with a diameter of 16 feet. The radius is 16 / 2 = 8 feet. Area = &pi; &times; 8<sup>2</sup> = &pi; &times; 64 &approx; 201.06 sq ft. If paving stones cost $4.50 per square foot installed, the total cost is 201.06 &times; 4.50 &approx; $904.77. The circumference is 2 &times; &pi; &times; 8 &approx; 50.27 feet, which tells you how much edging material to buy.</p>
+
+    <h3>Triangular Garden Bed</h3>
+    <p>A triangular garden bed has a base of 10 feet and a height of 7 feet. Area = 0.5 &times; 10 &times; 7 = 35 sq ft. If you need 3 inches (0.25 ft) of mulch, the volume is 35 &times; 0.25 = 8.75 cubic feet. Since one bag of mulch contains 2 cubic feet, you need 5 bags (8.75 / 2 = 4.375, rounded up).</p>
+
+    <h2>Area vs. Volume vs. Surface Area</h2>
+    <p>It is important to distinguish between these three related but different measurements:</p>
+    <ul>
+      <li><strong>Area</strong> is a two-dimensional measurement of a flat surface, expressed in square units (m<sup>2</sup>, ft<sup>2</sup>). Examples: the floor of a room, a piece of paper, a plot of land.</li>
+      <li><strong>Surface area</strong> is the total area of all the outer faces of a three-dimensional object. For a rectangular box (length l, width w, height h), the surface area is 2(lw + lh + wh). Surface area is used to determine how much wrapping paper or paint is needed to cover a 3D object.</li>
+      <li><strong>Volume</strong> is a three-dimensional measurement of the space inside an object, expressed in cubic units (m<sup>3</sup>, ft<sup>3</sup>). Volume measures capacity—how much a container can hold. A swimming pool that is 30 ft long, 15 ft wide, and 5 ft deep has a volume of 30 &times; 15 &times; 5 = 2,250 cubic feet.</li>
+    </ul>
+    <p>These concepts are related but serve different purposes. When buying carpet, you need area. When buying paint for the exterior of a shed, you need surface area. When filling a container with soil, you need volume.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>How do you calculate the area of a shape?</h3>
+    <p>Each shape has its own formula. For a rectangle, multiply length by width. For a circle, use &pi; &times; radius<sup>2</sup>. For a triangle, use &frac12; &times; base &times; height. For a trapezoid, use &frac12; &times; (base<sub>1</sub> + base<sub>2</sub>) &times; height. For an ellipse, use &pi; &times; semi-major axis &times; semi-minor axis. This calculator handles all five shapes automatically.</p>
+
+    <h3>What is the difference between area and perimeter?</h3>
+    <p>Area measures the amount of space inside a shape, expressed in square units. Perimeter measures the total distance around the outside edge of a shape, expressed in linear units. For example, a 10 ft &times; 8 ft rectangle has an area of 80 sq ft (the amount of carpet needed) and a perimeter of 36 ft (the length of border trim needed).</p>
+
+    <h3>How do you convert between different area units?</h3>
+    <p>Square the linear conversion factor. Since 1 foot = 12 inches, 1 square foot = 144 square inches (12<sup>2</sup>). Since 1 meter = 100 centimeters, 1 square meter = 10,000 square centimeters (100<sup>2</sup>). Common conversions include 1 acre = 43,560 sq ft, 1 hectare = 10,000 sq m, and 1 sq m = 10.764 sq ft.</p>
+
+    <h3>Can you calculate the area of an irregular shape?</h3>
+    <p>Yes. The most common approach is to decompose the irregular shape into standard shapes (rectangles, triangles, circles) and add their areas together. You can also use subtraction, where you calculate a larger enclosing shape and subtract the parts that do not belong. For polygons with known vertex coordinates, the Shoelace formula provides an exact calculation.</p>
+
+    <h3>Why do area units use "square" (sq ft, sq m)?</h3>
+    <p>Area is measured in square units because it represents two-dimensional space. A square foot, for instance, is the area of a square that measures 1 foot on each side. When you multiply length (feet) by width (feet), the result is feet &times; feet = feet squared (ft<sup>2</sup>). This is why converting area units requires squaring the linear conversion factor rather than simply multiplying by it.</p>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/everyday-calculators/square-footage-calculator/">Square Footage Calculator</a> - Calculate square footage for rooms, floors, and material estimates.</li>
+      <li><a href="/math-calculators/percentage-calculator/">Percentage Calculator</a> - Calculate percentages, percentage change, and more.</li>
+      <li><a href="/math-calculators/standard-deviation-calculator/">Standard Deviation Calculator</a> - Calculate mean, standard deviation, and variance for data sets.</li>
+      <li><a href="/conversion-calculators/unit-converter/">Unit Converter</a> - Convert between units of length, weight, temperature, and volume.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .shape-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    padding: 4px;
+    flex-wrap: wrap;
+  }
+  .shape-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    transition: all 0.15s;
+  }
+  .shape-btn.active {
+    background: var(--color-surface);
+    color: var(--color-primary);
+    box-shadow: var(--shadow-sm);
+  }
+  .shape-btn:hover:not(.active) {
+    color: var(--color-text);
+  }
+  .shape-inputs.hidden { display: none; }
+
+  .calc-results { margin-top: 20px; }
+  .result-unit {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+  }
+  .formula-display {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    text-align: center;
+  }
+  .formula-title {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-bottom: 6px;
+  }
+  .formula-display code {
+    font-size: 0.95rem;
+    color: var(--color-text);
+  }
+
+  @media (max-width: 640px) {
+    .shape-tabs { justify-content: center; }
+    .shape-btn { padding: 6px 12px; font-size: 0.8rem; }
+  }
+</style>
+
+<script>
+  type Shape = 'rectangle' | 'circle' | 'triangle' | 'trapezoid' | 'ellipse';
+  let currentShape: Shape = 'rectangle';
+
+  // Shape tab switching
+  document.querySelectorAll('.shape-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.shape-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentShape = (btn as HTMLElement).dataset.shape as Shape;
+
+      document.querySelectorAll('.shape-inputs').forEach(el => {
+        (el as HTMLElement).classList.add('hidden');
+      });
+      document.getElementById(`${currentShape}-inputs`)!.classList.remove('hidden');
+      calculate();
+    });
+  });
+
+  function getVal(id: string): number {
+    return parseFloat((document.getElementById(id) as HTMLInputElement).value) || 0;
+  }
+
+  function fmt(n: number): string {
+    return n.toLocaleString('en-US', { maximumFractionDigits: 4 });
+  }
+
+  function calculate() {
+    let area = 0;
+    let perimeter = 0;
+    let perimeterLabel = 'Perimeter';
+    let formulaText = '';
+
+    switch (currentShape) {
+      case 'rectangle': {
+        const l = getVal('rect-length');
+        const w = getVal('rect-width');
+        area = l * w;
+        perimeter = 2 * (l + w);
+        formulaText = `Area = length \u00d7 width = ${fmt(l)} \u00d7 ${fmt(w)} = ${fmt(area)}`;
+        break;
+      }
+      case 'circle': {
+        const r = getVal('circle-radius');
+        area = Math.PI * r * r;
+        perimeter = 2 * Math.PI * r;
+        perimeterLabel = 'Circumference';
+        formulaText = `Area = \u03c0 \u00d7 r\u00b2 = \u03c0 \u00d7 ${fmt(r)}\u00b2 = ${fmt(area)}`;
+        break;
+      }
+      case 'triangle': {
+        const b = getVal('tri-base');
+        const h = getVal('tri-height');
+        area = 0.5 * b * h;
+        // For perimeter, approximate assuming isosceles triangle with known base and height
+        const side = Math.sqrt((b / 2) * (b / 2) + h * h);
+        perimeter = b + 2 * side;
+        formulaText = `Area = \u00bd \u00d7 base \u00d7 height = \u00bd \u00d7 ${fmt(b)} \u00d7 ${fmt(h)} = ${fmt(area)}`;
+        break;
+      }
+      case 'trapezoid': {
+        const a = getVal('trap-base1');
+        const b = getVal('trap-base2');
+        const h = getVal('trap-height');
+        area = 0.5 * (a + b) * h;
+        // Approximate perimeter assuming isosceles trapezoid
+        const offset = Math.abs(a - b) / 2;
+        const leg = Math.sqrt(offset * offset + h * h);
+        perimeter = a + b + 2 * leg;
+        formulaText = `Area = \u00bd \u00d7 (a + b) \u00d7 h = \u00bd \u00d7 (${fmt(a)} + ${fmt(b)}) \u00d7 ${fmt(h)} = ${fmt(area)}`;
+        break;
+      }
+      case 'ellipse': {
+        const a = getVal('ellipse-a');
+        const b = getVal('ellipse-b');
+        area = Math.PI * a * b;
+        // Ramanujan approximation for ellipse perimeter
+        perimeter = Math.PI * (3 * (a + b) - Math.sqrt((3 * a + b) * (a + 3 * b)));
+        perimeterLabel = 'Circumference (approx.)';
+        formulaText = `Area = \u03c0 \u00d7 a \u00d7 b = \u03c0 \u00d7 ${fmt(a)} \u00d7 ${fmt(b)} = ${fmt(area)}`;
+        break;
+      }
+    }
+
+    document.getElementById('areaValue')!.textContent = fmt(area);
+    document.getElementById('perimeterLabel')!.textContent = perimeterLabel;
+    document.getElementById('perimeterValue')!.textContent = fmt(perimeter);
+    document.getElementById('formulaText')!.textContent = formulaText;
+  }
+
+  document.getElementById('calculateBtn')?.addEventListener('click', calculate);
+
+  // Also recalculate on input change
+  document.querySelectorAll('.shape-inputs input').forEach(input => {
+    input.addEventListener('input', calculate);
+  });
+
+  calculate();
+</script>

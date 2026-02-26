@@ -1,0 +1,366 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Health Calculators",
+        "item": "https://toolcalcs.com/health-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Ovulation Calculator"
+      }
+    ]
+  },
+  {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'How is the ovulation date calculated?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'The ovulation date is estimated by subtracting the luteal phase length from the total cycle length, then adding that number of days to the first day of your last menstrual period. For a standard 28-day cycle with a 14-day luteal phase, ovulation typically occurs on day 14. The fertile window spans from five days before ovulation through one day after.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How long is the fertile window?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'The fertile window lasts approximately six days, starting five days before ovulation and ending one day after. This accounts for the fact that sperm can survive in the reproductive tract for up to five days, while an egg remains viable for about 12 to 24 hours after release. The two days before ovulation and the ovulation day itself are the most fertile.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Can you ovulate at different times each month?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes, ovulation timing can vary from cycle to cycle even in women with regular periods. Stress, illness, travel, weight changes, and hormonal fluctuations can all shift the ovulation date by several days. This is why tracking multiple fertility signs such as basal body temperature and cervical mucus provides more reliable predictions than calendar-based calculations alone.',
+      },
+    },
+  ],
+},
+];
+---
+
+<BaseLayout
+  title="Ovulation Calculator - Predict Your Fertile Window | ToolCalcs"
+  description="Free ovulation calculator. Enter your last period date and cycle length to predict your ovulation date, fertile window, and next period. Plan for conception or track your cycle."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/health-calculators/">Health Calculators</a> &rsaquo;
+    <span>Ovulation Calculator</span>
+  </nav>
+
+  <h1>Ovulation Calculator</h1>
+  <p class="page-desc">Estimate your ovulation date and fertile window based on your menstrual cycle to help plan for conception or better understand your body.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="lastPeriod">First Day of Last Period</label>
+        <input type="date" id="lastPeriod" />
+      </div>
+      <div class="input-group">
+        <label for="cycleLength">Average Cycle Length (days)</label>
+        <input type="number" id="cycleLength" value="28" min="21" max="35" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="lutealPhase">Average Luteal Phase (days)</label>
+        <input type="number" id="lutealPhase" value="14" min="10" max="16" step="1" />
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate Ovulation</button>
+    </div>
+
+    <div class="calc-results" id="results" style="display:none;">
+      <div class="fertile-window-display" id="fertileWindowDisplay">
+        <span class="fw-label">Your Fertile Window</span>
+        <div class="fw-dates">
+          <span class="fw-date-start" id="fwStart">--</span>
+          <span class="fw-arrow">&rarr;</span>
+          <span class="fw-date-end" id="fwEnd">--</span>
+        </div>
+        <span class="fw-ovulation-tag">Ovulation: <strong id="fwOvulationDay">--</strong></span>
+      </div>
+
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Estimated Ovulation Date</span>
+          <span class="result-value" id="ovulationDate">--</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Fertile Window Start</span>
+          <span class="result-value" id="fertileStart">--</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Fertile Window End</span>
+          <span class="result-value" id="fertileEnd">--</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Next Period Date</span>
+          <span class="result-value" id="nextPeriod">--</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Next Cycle Ovulation</span>
+          <span class="result-value" id="nextOvulation">--</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>How Ovulation Works</h2>
+    <p>Ovulation is the process by which a mature egg is released from one of the ovaries and travels down the fallopian tube, where it becomes available for fertilization. This event is the central moment of the menstrual cycle and the key to understanding fertility. Each month, hormonal signals from the brain trigger a group of follicles in the ovaries to begin maturing. Typically, only one follicle becomes dominant and releases a single egg, although occasionally two eggs are released, which can result in fraternal twins if both are fertilized.</p>
+    <p>The process is orchestrated by a complex interplay of hormones. During the first half of the cycle, known as the follicular phase, rising levels of follicle-stimulating hormone (FSH) prompt the ovaries to develop follicles. As the dominant follicle matures, it produces increasing amounts of estrogen. When estrogen levels reach a critical threshold, the pituitary gland releases a surge of luteinizing hormone (LH). This LH surge is the trigger that causes the dominant follicle to rupture and release the egg, typically within 24 to 36 hours. Ovulation predictor kits (OPKs) work by detecting this LH surge in urine, giving you advance notice that ovulation is imminent.</p>
+    <p>After the egg is released, it survives for only about 12 to 24 hours unless it is fertilized by a sperm cell. However, sperm can live in the female reproductive tract for up to five days under favorable conditions, which is why the fertile window extends well beyond the ovulation day itself. Understanding this biological window is essential for couples who are trying to conceive as well as for those who wish to avoid pregnancy through natural family planning methods.</p>
+
+    <h2>The Luteal Phase Explained</h2>
+    <p>The luteal phase is the second half of the menstrual cycle, spanning from the day after ovulation to the day before the next period begins. After the egg is released, the empty follicle transforms into a temporary endocrine structure called the corpus luteum. This structure produces progesterone, a hormone that prepares the uterine lining (endometrium) for potential implantation of a fertilized egg.</p>
+    <p>The luteal phase is remarkably consistent for each individual woman, typically lasting between 10 and 16 days, with 14 days being the most common duration. Unlike the follicular phase, which can vary significantly from cycle to cycle and from woman to woman, the luteal phase length tends to remain stable within one or two days for any given individual. This consistency is what makes it useful for predicting ovulation: if you know your cycle length and luteal phase length, you can estimate when ovulation occurs by subtracting the luteal phase from the total cycle length.</p>
+    <p>A luteal phase shorter than 10 days is considered a luteal phase defect and may make it difficult for a fertilized egg to implant successfully. This condition can be a factor in infertility or recurrent early miscarriage. If the egg is not fertilized, the corpus luteum breaks down after about 10 to 16 days, progesterone levels drop, and the uterine lining sheds, resulting in menstruation and the start of a new cycle. If fertilization and implantation do occur, the developing embryo produces human chorionic gonadotropin (hCG), which signals the corpus luteum to continue producing progesterone until the placenta takes over hormone production around week 10 of pregnancy.</p>
+
+    <h2>Signs and Symptoms of Ovulation</h2>
+    <p>While a calculator provides estimated dates based on averages, your body offers several physical signs that can help confirm when ovulation is actually occurring. Learning to recognize these signs can improve the accuracy of your fertility tracking significantly.</p>
+    <ul>
+      <li><strong>Cervical mucus changes:</strong> As ovulation approaches, cervical mucus becomes more abundant, clear, slippery, and stretchy, often compared to raw egg whites. This fertile-quality mucus helps sperm survive longer and travel more easily through the cervix. After ovulation, mucus typically becomes thicker, cloudy, or sticky, or may decrease significantly.</li>
+      <li><strong>Basal body temperature (BBT) shift:</strong> After ovulation, progesterone causes your basal body temperature to rise by approximately 0.2 to 0.5 degrees Celsius (0.4 to 1.0 degrees Fahrenheit). By charting your temperature every morning before getting out of bed, you can identify a sustained temperature shift that confirms ovulation has occurred. While BBT tracking confirms ovulation after the fact rather than predicting it in advance, patterns over several cycles can help forecast future ovulation timing.</li>
+      <li><strong>Mittelschmerz (ovulation pain):</strong> Some women experience a brief, one-sided lower abdominal pain or twinge around the time of ovulation. This sensation, called mittelschmerz (German for "middle pain"), is thought to result from the follicle stretching or rupturing on the ovary. It can last from a few minutes to a few hours and typically alternates sides from month to month.</li>
+      <li><strong>Increased libido:</strong> Many women notice a natural increase in sexual desire around ovulation. This is thought to be an evolutionary adaptation driven by the hormonal surge that accompanies the fertile window, particularly the peak in estrogen and the LH surge.</li>
+      <li><strong>Breast tenderness:</strong> Some women experience mild breast soreness or sensitivity after ovulation due to the rise in progesterone. This symptom is more commonly associated with the luteal phase and the approach of menstruation.</li>
+      <li><strong>Light spotting:</strong> A small number of women notice light spotting or a slight pinkish discharge around ovulation. This is believed to be caused by the rapid hormonal changes that occur when the egg is released and is generally considered normal.</li>
+    </ul>
+
+    <h2>Cycle Tracking Methods</h2>
+    <p>There are several approaches to tracking your menstrual cycle and identifying your fertile window. Each method has its strengths and limitations, and many women find that combining multiple methods provides the most reliable results.</p>
+    <ul>
+      <li><strong>Calendar method:</strong> The simplest approach involves tracking your period start dates over several months to determine your average cycle length. Ovulation is estimated by subtracting the luteal phase length from the cycle length. This is the method used by most ovulation calculators, including this one. It works best for women with regular, predictable cycles but is less reliable for those with irregular periods.</li>
+      <li><strong>Basal body temperature (BBT) charting:</strong> This method requires taking your temperature at the same time every morning before any activity. You record the readings on a chart and look for the characteristic post-ovulation temperature rise. While effective for confirming ovulation patterns over time, it requires consistency and does not predict ovulation in advance for the current cycle.</li>
+      <li><strong>Ovulation predictor kits (OPKs):</strong> These over-the-counter urine tests detect the luteinizing hormone surge that precedes ovulation by 24 to 36 hours. They provide a more immediate prediction of ovulation and are simple to use. Testing should begin a few days before your estimated ovulation date to ensure you catch the surge.</li>
+      <li><strong>Cervical mucus monitoring:</strong> Observing changes in cervical mucus throughout the cycle can indicate when the fertile window is opening. The appearance of clear, stretchy, egg-white-like mucus signals peak fertility. This method is free and always available but requires practice to interpret correctly.</li>
+      <li><strong>Fertility monitors and wearable devices:</strong> Digital fertility monitors measure hormone levels in urine to provide a wider window of fertility prediction. Wearable devices track continuous basal body temperature, heart rate, and other physiological parameters to predict and confirm ovulation using algorithms. These high-tech solutions offer convenience and often greater accuracy but come at a higher cost.</li>
+      <li><strong>Symptothermal method:</strong> This combines BBT charting, cervical mucus observation, and calendar tracking into a comprehensive approach. By cross-referencing multiple fertility signs, the symptothermal method achieves higher accuracy than any single method alone. Studies have found it to be over 99% effective for identifying the fertile window when used correctly.</li>
+    </ul>
+
+    <h2>Fertility Tips for Conception</h2>
+    <p>If you are trying to conceive, understanding your fertile window is just one piece of the puzzle. The following evidence-based tips can help maximize your chances of becoming pregnant.</p>
+    <ul>
+      <li><strong>Time intercourse within the fertile window:</strong> The highest probability of conception occurs when intercourse takes place in the two days leading up to ovulation and on the day of ovulation itself. Having intercourse every one to two days during the fertile window ensures that sperm are present when the egg is released.</li>
+      <li><strong>Maintain a healthy weight:</strong> Both underweight and overweight conditions can disrupt ovulation. A body mass index (BMI) between 18.5 and 24.9 is associated with the most regular ovulatory cycles. Even a modest weight change of 5 to 10 percent can significantly improve ovulation regularity for women who are overweight or underweight.</li>
+      <li><strong>Take prenatal vitamins:</strong> Begin taking a prenatal vitamin with at least 400 micrograms of folic acid before you start trying to conceive. Folic acid is essential for preventing neural tube defects, which develop in the first 28 days of pregnancy, often before a woman knows she is pregnant. Vitamins containing iron, calcium, vitamin D, and omega-3 fatty acids also support reproductive health.</li>
+      <li><strong>Limit alcohol and caffeine:</strong> Heavy alcohol consumption is associated with reduced fertility in both men and women. While moderate caffeine intake (under 200 milligrams per day) is generally considered safe, some research suggests that higher amounts may slightly reduce the chances of conception. Eliminating or reducing both substances during the conception period is a prudent approach.</li>
+      <li><strong>Manage stress:</strong> Chronic stress can disrupt the hormonal signals that regulate ovulation. High cortisol levels may interfere with the release of gonadotropin-releasing hormone (GnRH), which in turn affects FSH and LH production. Regular exercise, adequate sleep, mindfulness, and social support can all help reduce stress levels and support hormonal balance.</li>
+      <li><strong>Consult a healthcare provider:</strong> If you have been trying to conceive for 12 months without success (or 6 months if you are over 35), consult a fertility specialist. Early evaluation can identify treatable causes of infertility such as polycystic ovary syndrome (PCOS), endometriosis, blocked fallopian tubes, or male factor issues.</li>
+    </ul>
+
+    <h2>When to Take an Ovulation or Pregnancy Test</h2>
+    <p>Timing is critical when using ovulation predictor kits or pregnancy tests. Using them at the wrong time can lead to false negatives or unnecessary confusion.</p>
+    <p>For ovulation tests, begin testing about three to four days before your estimated ovulation date. If your cycle is 28 days and you expect ovulation on day 14, start testing on day 10 or 11. Test in the afternoon or early evening, as LH levels in urine tend to peak during these hours. Avoid drinking large amounts of fluid for two hours before testing, as diluted urine may reduce the test's ability to detect the LH surge. Once you get a positive result, ovulation is likely to occur within 24 to 36 hours.</p>
+    <p>For pregnancy tests, the most accurate results come from testing on or after the day your period is expected. Most home pregnancy tests detect hCG levels starting around 25 mIU/mL, which typically reaches detectable levels about 10 to 14 days after conception. Testing too early is the most common reason for false negative results. If you receive a negative result but your period does not arrive, wait three to five days and test again. First-morning urine is recommended for pregnancy tests because it contains the highest concentration of hCG.</p>
+
+    <h2>Understanding Irregular Cycles</h2>
+    <p>Not every woman has a textbook 28-day cycle, and cycle irregularity is more common than many people realize. A menstrual cycle is considered irregular if it consistently falls outside the 21- to 35-day range, varies by more than seven to nine days from cycle to cycle, or if periods are frequently skipped. Understanding the causes and implications of irregular cycles is important for accurate ovulation prediction.</p>
+    <p>Common causes of irregular cycles include polycystic ovary syndrome (PCOS), which affects up to 10 percent of women of reproductive age and is characterized by hormonal imbalances that can prevent regular ovulation. Thyroid disorders, both hypothyroidism and hyperthyroidism, can disrupt the menstrual cycle by altering the production of reproductive hormones. Extreme stress, significant weight changes, excessive exercise, and perimenopause can all contribute to cycle irregularity as well.</p>
+    <p>For women with irregular cycles, calendar-based ovulation calculators are less reliable because the underlying assumption of consistent cycle length does not hold. In these cases, combining multiple tracking methods is especially important. OPKs can detect the LH surge regardless of cycle length, BBT charting can confirm whether ovulation occurred, and cervical mucus monitoring provides real-time fertility information. Women with persistent cycle irregularity should consult a healthcare provider, as it may indicate an underlying condition that benefits from treatment.</p>
+    <p>Some degree of cycle variation is entirely normal, even in healthy women. A study published in the journal <em>npj Digital Medicine</em> analyzing over 600,000 menstrual cycles found that only 13 percent of cycles were exactly 28 days long, and the average cycle length was closer to 29.3 days. Cycle length tends to be most variable in adolescents and women approaching menopause, and most consistent during the late twenties through mid-thirties.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>How is the ovulation date calculated?</h3>
+    <p>The ovulation date is estimated by subtracting the luteal phase length from the total menstrual cycle length, then adding that number of days to the first day of your last period. For example, with a 28-day cycle and a 14-day luteal phase, ovulation is estimated to occur on cycle day 14, which is 14 days after the start of your last period. The fertile window extends from five days before ovulation through one day after, giving a total of six fertile days per cycle. This calculation assumes a consistent cycle and luteal phase length, so tracking your cycle over several months improves accuracy.</p>
+
+    <h3>How long is the fertile window?</h3>
+    <p>The fertile window lasts approximately six days per cycle. It begins five days before the estimated ovulation date and ends one day after ovulation. This range accounts for the lifespan of sperm (up to five days in the reproductive tract) and the egg (12 to 24 hours after release). The three most fertile days are the two days before ovulation and the ovulation day itself, during which the probability of conception is highest. Having intercourse during this peak window maximizes the chances of sperm being present when the egg is released.</p>
+
+    <h3>Can stress affect ovulation?</h3>
+    <p>Yes, stress can significantly affect ovulation timing and even prevent ovulation entirely in some cycles. The hypothalamic-pituitary-adrenal (HPA) axis, which manages the body's stress response, directly interacts with the hypothalamic-pituitary-gonadal (HPG) axis that controls reproduction. Elevated cortisol levels from chronic stress can suppress gonadotropin-releasing hormone (GnRH), leading to delayed or absent ovulation. This is why women under significant stress may experience irregular periods or missed cycles. Managing stress through regular exercise, adequate sleep, and relaxation techniques can help maintain regular ovulatory cycles.</p>
+
+    <h3>Is it possible to ovulate more than once per cycle?</h3>
+    <p>While it is possible for two eggs to be released in a single cycle (which can result in fraternal twins), both eggs are released within the same 24-hour window during a single ovulation event. The body does not ovulate at two separate times within one cycle. Once ovulation occurs and progesterone levels rise, the hormonal environment prevents additional follicles from maturing and releasing eggs until the next cycle begins. Claims of double ovulation occurring days apart within the same cycle are not supported by scientific evidence.</p>
+
+    <h3>How accurate are ovulation calculators?</h3>
+    <p>Ovulation calculators provide a reasonable estimate for women with regular cycles, but they are not precise enough to be relied upon as the sole method of fertility tracking. The calculation assumes that your cycle length and luteal phase remain constant, which is not always the case. Studies show that even women with regular 28-day cycles can ovulate anywhere from day 11 to day 20. For the most accurate fertility prediction, combine calculator estimates with physical signs like cervical mucus changes, basal body temperature charting, and ovulation predictor kits. This multi-method approach provides confirmation rather than relying on a single estimate.</p>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/health-calculators/pregnancy-due-date-calculator/">Pregnancy Due Date Calculator</a> - Estimate your baby's arrival date based on your last period or conception date.</li>
+      <li><a href="/health-calculators/bmi-calculator/">BMI Calculator</a> - Check your Body Mass Index to understand your weight relative to your height.</li>
+      <li><a href="/health-calculators/tdee-calculator/">TDEE Calculator</a> - Calculate your total daily energy expenditure for diet planning.</li>
+      <li><a href="/health-calculators/calorie-calculator/">Calorie Calculator</a> - Find your daily calorie needs and macro breakdown for your goals.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .fertile-window-display {
+    text-align: center;
+    margin-bottom: 24px;
+    padding: 24px 20px;
+    background: linear-gradient(135deg, #fef3f2, #fdf2f8);
+    border-radius: var(--radius);
+    border: 1px solid #fecdd3;
+  }
+  .fw-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .fw-dates {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+  .fw-date-start,
+  .fw-date-end {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-text);
+    background: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid #fecdd3;
+  }
+  .fw-arrow {
+    font-size: 1.4rem;
+    color: #e11d48;
+    font-weight: 700;
+  }
+  .fw-ovulation-tag {
+    display: inline-block;
+    font-size: 0.9rem;
+    color: #be123c;
+    background: #fff1f2;
+    padding: 4px 14px;
+    border-radius: 20px;
+    border: 1px solid #fecdd3;
+  }
+  .fw-ovulation-tag strong {
+    color: #9f1239;
+  }
+
+  .result-cards {
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  }
+
+  @media (max-width: 640px) {
+    .fw-dates {
+      flex-direction: column;
+      gap: 8px;
+    }
+    .fw-arrow {
+      transform: rotate(90deg);
+    }
+    .result-cards {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>
+
+<script>
+  function addDays(date: Date, days: number): Date {
+    const result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result;
+  }
+
+  function formatDate(date: Date): string {
+    return date.toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+    });
+  }
+
+  function parseLocalDate(value: string): Date {
+    const parts = value.split('-');
+    return new Date(
+      parseInt(parts[0]),
+      parseInt(parts[1]) - 1,
+      parseInt(parts[2])
+    );
+  }
+
+  function calculate(): void {
+    const lastPeriodInput = document.getElementById('lastPeriod') as HTMLInputElement;
+    const cycleLengthInput = document.getElementById('cycleLength') as HTMLInputElement;
+    const lutealPhaseInput = document.getElementById('lutealPhase') as HTMLInputElement;
+    const resultsEl = document.getElementById('results') as HTMLElement;
+
+    const lastPeriodVal = lastPeriodInput.value;
+    if (!lastPeriodVal) {
+      resultsEl.style.display = 'none';
+      return;
+    }
+
+    const lastPeriod = parseLocalDate(lastPeriodVal);
+    const cycleLength = parseInt(cycleLengthInput.value) || 28;
+    const lutealPhase = parseInt(lutealPhaseInput.value) || 14;
+
+    // Clamp values to valid ranges
+    const clampedCycle = Math.min(Math.max(cycleLength, 21), 35);
+    const clampedLuteal = Math.min(Math.max(lutealPhase, 10), 16);
+
+    // Ovulation = last period + cycle length - luteal phase
+    const daysToOvulation = clampedCycle - clampedLuteal;
+    const ovulationDate = addDays(lastPeriod, daysToOvulation);
+
+    // Fertile window = ovulation day -5 to +1
+    const fertileStart = addDays(ovulationDate, -5);
+    const fertileEnd = addDays(ovulationDate, 1);
+
+    // Next period date = last period + cycle length
+    const nextPeriod = addDays(lastPeriod, clampedCycle);
+
+    // Next cycle ovulation = next period + (cycle length - luteal phase)
+    const nextOvulation = addDays(nextPeriod, daysToOvulation);
+
+    // Update fertile window display
+    document.getElementById('fwStart')!.textContent = formatDate(fertileStart);
+    document.getElementById('fwEnd')!.textContent = formatDate(fertileEnd);
+    document.getElementById('fwOvulationDay')!.textContent = formatDate(ovulationDate);
+
+    // Update result cards
+    document.getElementById('ovulationDate')!.textContent = formatDate(ovulationDate);
+    document.getElementById('fertileStart')!.textContent = formatDate(fertileStart);
+    document.getElementById('fertileEnd')!.textContent = formatDate(fertileEnd);
+    document.getElementById('nextPeriod')!.textContent = formatDate(nextPeriod);
+    document.getElementById('nextOvulation')!.textContent = formatDate(nextOvulation);
+
+    resultsEl.style.display = 'block';
+  }
+
+  document.getElementById('calculateBtn')?.addEventListener('click', calculate);
+
+  // Also recalculate when inputs change
+  document.getElementById('lastPeriod')?.addEventListener('change', calculate);
+  document.getElementById('cycleLength')?.addEventListener('input', calculate);
+  document.getElementById('lutealPhase')?.addEventListener('input', calculate);
+</script>

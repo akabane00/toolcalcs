@@ -1,0 +1,478 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Financial Calculators",
+        "item": "https://toolcalcs.com/financial-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Paycheck Calculator"
+      }
+    ]
+  },
+  {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'How is my paycheck calculated?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Your paycheck is calculated by starting with your gross pay for the pay period, then subtracting federal income tax, state income tax, Social Security tax (6.2%), Medicare tax (1.45%), and any pre-tax deductions such as 401(k) contributions or health insurance premiums. The remaining amount is your net pay, or take-home pay.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What percentage of my paycheck goes to taxes?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'The percentage of your paycheck that goes to taxes depends on your income level, filing status, and state of residence. Most workers pay between 20% and 35% of their gross income in combined federal income tax, state income tax, Social Security (6.2%), and Medicare (1.45%). Pre-tax deductions like 401(k) contributions can reduce your taxable income and lower the overall tax percentage.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How can I increase my take-home pay from each paycheck?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'You can increase your take-home pay by adjusting your W-4 withholding allowances so less federal tax is withheld, contributing to pre-tax accounts like a 401(k) or HSA to reduce taxable income, and reviewing your state tax obligations. Be careful not to under-withhold, as this could result in a tax bill when you file your return.',
+      },
+    },
+  ],
+},
+];
+---
+
+<BaseLayout
+  title="Paycheck Calculator - Estimate Your Take-Home Pay | ToolCalcs"
+  description="Free paycheck calculator. Estimate your net take-home pay after federal and state taxes, Social Security, Medicare, and pre-tax deductions for any pay frequency."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/financial-calculators/">Financial Calculators</a> &rsaquo;
+    <span>Paycheck Calculator</span>
+  </nav>
+
+  <h1>Paycheck Calculator</h1>
+  <p class="page-desc">Estimate your net take-home pay after federal and state taxes, FICA deductions, and pre-tax contributions for each pay period.</p>
+
+  <!-- Calculator Tool -->
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="grossSalary">Annual Gross Salary ($)</label>
+        <input type="number" id="grossSalary" value="65000" min="0" step="1000" />
+      </div>
+      <div class="input-group">
+        <label for="payFrequency">Pay Frequency</label>
+        <select id="payFrequency">
+          <option value="52">Weekly</option>
+          <option value="26" selected>Bi-weekly</option>
+          <option value="24">Semi-monthly</option>
+          <option value="12">Monthly</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="filingStatus">Filing Status</label>
+        <select id="filingStatus">
+          <option value="single" selected>Single</option>
+          <option value="married">Married Filing Jointly</option>
+          <option value="hoh">Head of Household</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="federalBracket">Federal Tax Bracket</label>
+        <select id="federalBracket">
+          <option value="progressive" selected>Progressive (Auto)</option>
+          <option value="0.10">10%</option>
+          <option value="0.12">12%</option>
+          <option value="0.22">22%</option>
+          <option value="0.24">24%</option>
+          <option value="0.32">32%</option>
+          <option value="0.35">35%</option>
+          <option value="0.37">37%</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="stateRate">State Tax Rate (%)</label>
+        <input type="number" id="stateRate" value="5" min="0" max="15" step="0.1" />
+      </div>
+      <div class="input-group">
+        <label for="preTaxDeductions">Pre-Tax Deductions per Year ($)</label>
+        <input type="number" id="preTaxDeductions" value="0" min="0" step="100" />
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <h3 class="results-heading">Per-Period Breakdown</h3>
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Gross Pay</span>
+          <span class="result-value" id="grossPeriod">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Federal Tax</span>
+          <span class="result-value" id="fedTaxPeriod">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">State Tax</span>
+          <span class="result-value" id="stateTaxPeriod">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Social Security (6.2%)</span>
+          <span class="result-value" id="ssPeriod">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Medicare (1.45%)</span>
+          <span class="result-value" id="medicarePeriod">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Pre-Tax Deductions</span>
+          <span class="result-value" id="deductionsPeriod">$0</span>
+        </div>
+        <div class="result-card success">
+          <span class="result-label">Net Pay (Take-Home)</span>
+          <span class="result-value" id="netPeriod">$0</span>
+        </div>
+      </div>
+
+      <h3 class="results-heading">Annual Summary</h3>
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Gross Annual Pay</span>
+          <span class="result-value" id="grossAnnual">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Federal Tax</span>
+          <span class="result-value" id="fedTaxAnnual">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">State Tax</span>
+          <span class="result-value" id="stateTaxAnnual">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Social Security</span>
+          <span class="result-value" id="ssAnnual">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Medicare</span>
+          <span class="result-value" id="medicareAnnual">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Pre-Tax Deductions</span>
+          <span class="result-value" id="deductionsAnnual">$0</span>
+        </div>
+        <div class="result-card success">
+          <span class="result-label">Net Annual Pay</span>
+          <span class="result-value" id="netAnnual">$0</span>
+        </div>
+      </div>
+
+      <div class="summary-bar">
+        <div class="summary-item">
+          <span class="summary-label">Effective Tax Rate</span>
+          <span class="summary-value" id="effectiveRate">0%</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Total Annual Withholdings</span>
+          <span class="summary-value" id="totalWithholdings">$0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>How Your Paycheck Is Calculated</h2>
+    <p>Every time you receive a paycheck from your employer, the amount deposited into your bank account is significantly less than the gross salary you agreed to when you accepted the job. This difference exists because your employer is required by law to withhold certain taxes and deductions before paying you. Understanding exactly how your paycheck is calculated empowers you to make better financial decisions, plan your monthly budget, and evaluate whether your current withholding is appropriate.</p>
+    <p>The process begins with your gross pay for the pay period, which is simply your annual salary divided by the number of pay periods in the year. For example, if you earn $65,000 per year and are paid bi-weekly, your gross pay per paycheck is $65,000 divided by 26, or approximately $2,500. From this gross amount, your employer subtracts federal income tax, state income tax, Social Security tax, Medicare tax, and any pre-tax deductions you have elected, such as 401(k) contributions or health insurance premiums.</p>
+    <p>The amount remaining after all withholdings is your net pay, also known as take-home pay. For most American workers, net pay falls somewhere between 65% and 80% of gross pay, depending on income level, filing status, state of residence, and the pre-tax benefits they choose. This paycheck calculator helps you estimate your per-period net pay so you can plan your finances with confidence.</p>
+
+    <h2>Understanding Federal Income Tax Withholding</h2>
+    <p>Federal income tax is typically the largest single deduction from your paycheck. The United States uses a progressive tax system, which means different portions of your income are taxed at different rates. As of the 2024 tax year, there are seven federal income tax brackets: 10%, 12%, 22%, 24%, 32%, 35%, and 37%.</p>
+    <p>A common misconception is that moving into a higher tax bracket means all your income is taxed at that higher rate. In reality, only the income that falls within each bracket is taxed at that bracket's rate. For example, a single filer with $60,000 in taxable income does not pay 22% on the entire amount. Instead, the first $11,600 is taxed at 10%, the next $35,550 (from $11,601 to $47,150) is taxed at 12%, and the remaining $12,850 (from $47,151 to $60,000) is taxed at 22%. This produces a much lower effective tax rate than the marginal bracket might suggest.</p>
+    <p>The amount of federal tax actually withheld from each paycheck depends on the information you provide on your W-4 form. Your filing status, number of dependents, and any additional withholding amounts you request all affect how much your employer deducts. If your W-4 is not filled out correctly, you may end up owing a large tax bill at the end of the year or receiving an unnecessarily large refund, which means you have been giving the government an interest-free loan.</p>
+    <p>For the 2024 tax year, the standard deduction is $14,600 for single filers, $29,200 for married couples filing jointly, and $21,900 for head of household filers. The standard deduction reduces your taxable income before the tax brackets are applied, which is why it plays such an important role in determining your overall tax liability.</p>
+
+    <h2>State Income Tax: How It Varies</h2>
+    <p>In addition to federal taxes, most states impose their own income tax that is withheld from your paycheck. State income tax rates and structures vary dramatically across the country, and your state of residence can have a significant impact on your take-home pay.</p>
+    <p>As of 2024, nine states have no state income tax at all: Alaska, Florida, Nevada, New Hampshire (which taxes only investment income), South Dakota, Tennessee, Texas, Washington, and Wyoming. If you live and work in one of these states, your paycheck will be noticeably larger compared to someone earning the same salary in a high-tax state like California or New York.</p>
+    <p>States that do impose income tax generally use one of two approaches. Some states, like Illinois (4.95%), Pennsylvania (3.07%), and North Carolina (4.75%), use a flat tax rate where every dollar of taxable income is taxed at the same percentage. Other states, like California, New York, and Georgia, use progressive bracket systems similar to the federal system, where higher income is taxed at higher rates.</p>
+    <p>The variation in state taxes means that two workers earning $80,000 per year can have very different take-home pay depending on where they live. A worker in Texas with no state income tax might take home more than $3,000 per year extra compared to a worker in California, where the effective state tax rate on that income could be close to 6%. This is an important factor to consider when evaluating job offers in different states or deciding where to relocate.</p>
+
+    <h2>FICA Taxes: Social Security and Medicare</h2>
+    <p>FICA stands for the Federal Insurance Contributions Act, and it funds two critical federal programs: Social Security and Medicare. Unlike income tax, which uses a progressive bracket system, FICA taxes are calculated as flat percentages of your gross wages.</p>
+    <p><strong>Social Security tax</strong> is 6.2% of your gross earnings up to the annual wage base limit, which is $168,600 for 2024. This means the maximum Social Security tax any employee pays in a year is $10,453.20. Your employer also pays 6.2%, bringing the total Social Security contribution to 12.4%. Once your earnings exceed the wage base limit in a given year, no additional Social Security tax is withheld from your remaining paychecks.</p>
+    <p><strong>Medicare tax</strong> is 1.45% of all your gross earnings with no income cap. Unlike Social Security, every dollar you earn is subject to Medicare tax. Your employer matches this with another 1.45%, for a combined rate of 2.9%. Additionally, if your individual earnings exceed $200,000 (or $250,000 for married couples filing jointly), you owe an Additional Medicare Tax of 0.9% on earnings above that threshold. This surtax is paid only by the employee.</p>
+    <p>Together, the employee portion of FICA taxes is 7.65% (6.2% + 1.45%) on wages up to $168,600, and 1.45% (Medicare only) on wages above that threshold. For a worker earning $65,000 per year, FICA taxes total approximately $4,972.50 annually, or about $191.25 per bi-weekly paycheck. These taxes are not optional and apply regardless of your filing status or deductions.</p>
+
+    <h2>Common Pre-Tax Deductions That Affect Your Paycheck</h2>
+    <p>Pre-tax deductions are amounts subtracted from your gross pay before taxes are calculated, which effectively reduces your taxable income and lowers the amount of federal and state income tax you owe. While these deductions reduce your net paycheck, they provide valuable benefits and tax savings.</p>
+    <p><strong>401(k) and 403(b) contributions</strong> are among the most common pre-tax deductions. For 2024, you can contribute up to $23,000 per year to a traditional 401(k), or $30,500 if you are age 50 or older. Each dollar contributed reduces your taxable income dollar for dollar. For example, if you earn $65,000 and contribute $6,000 per year to your 401(k), your taxable income for federal and state purposes drops to $59,000.</p>
+    <p><strong>Health insurance premiums</strong> paid through your employer are almost always deducted pre-tax. The average employee contribution for employer-sponsored health insurance is approximately $1,400 per year for individual coverage and $6,100 per year for family coverage, though this varies widely by plan and employer.</p>
+    <p><strong>Health Savings Account (HSA) contributions</strong> are fully tax-deductible if you have a qualifying high-deductible health plan. For 2024, you can contribute up to $4,150 for individual coverage or $8,300 for family coverage. HSA contributions reduce your taxable income, grow tax-free, and can be withdrawn tax-free for qualified medical expenses.</p>
+    <p><strong>Flexible Spending Accounts (FSAs)</strong> allow you to set aside up to $3,200 pre-tax for healthcare expenses or up to $5,000 for dependent care expenses. Like other pre-tax deductions, FSA contributions lower your taxable income and reduce your per-paycheck tax withholding.</p>
+    <p>By taking advantage of these pre-tax deductions, you can significantly reduce your tax burden. A worker who contributes $10,000 to a 401(k) and $4,150 to an HSA reduces their taxable income by $14,150. If that worker is in the 22% federal bracket and pays 5% state tax, the tax savings amount to approximately $3,820 per year, or about $147 per bi-weekly paycheck.</p>
+
+    <h2>W-4 Considerations for Accurate Withholding</h2>
+    <p>Your W-4 form is the primary tool that determines how much federal income tax your employer withholds from each paycheck. The form was redesigned in 2020 to be simpler, eliminating the concept of "allowances" and replacing it with a more straightforward system based on filing status, dependents, other income, and additional deductions.</p>
+    <p>Getting your W-4 right matters more than most people realize. If too much tax is withheld, you will receive a large refund when you file your tax return, but you will have had less money in each paycheck throughout the year. If too little tax is withheld, you may owe the IRS at tax time and could face underpayment penalties.</p>
+    <p>You should review and potentially update your W-4 whenever you experience a major life change, such as getting married or divorced, having a child, buying a home, starting a second job, or receiving a significant pay raise. The IRS provides a free Tax Withholding Estimator tool that can help you determine the optimal withholding based on your specific situation.</p>
+    <p>For workers with multiple jobs or dual-income households, the W-4 includes a Multiple Jobs Worksheet to help ensure enough tax is withheld across all positions. Failing to account for multiple income sources is one of the most common reasons people end up owing taxes when they file their return.</p>
+
+    <h2>Tips to Maximize Your Take-Home Pay</h2>
+    <p>While taxes are unavoidable, there are several legitimate strategies to keep more of your hard-earned money in each paycheck:</p>
+    <ul>
+      <li><strong>Optimize your W-4 withholding.</strong> Use the IRS Tax Withholding Estimator to ensure you are not over-withholding. Many workers could have an extra $50 to $200 per paycheck by adjusting their W-4 to more accurately reflect their tax liability.</li>
+      <li><strong>Maximize pre-tax retirement contributions.</strong> Contributing to a traditional 401(k) or 403(b) reduces your taxable income. While your gross paycheck decreases, the tax savings mean your net pay does not drop by the full contribution amount. For someone in the 22% federal bracket, every $100 contributed to a 401(k) only reduces take-home pay by about $78.</li>
+      <li><strong>Use an HSA if eligible.</strong> HSA contributions are triple tax-advantaged: they reduce your taxable income now, grow tax-free, and can be withdrawn tax-free for medical expenses. This makes them one of the most powerful tax-saving tools available.</li>
+      <li><strong>Elect pre-tax commuter benefits.</strong> If your employer offers commuter benefits, you can set aside up to $315 per month pre-tax for transit passes or qualified parking, reducing your taxable income by up to $3,780 per year.</li>
+      <li><strong>Review your state tax situation.</strong> If you work remotely and have flexibility in where you live, moving to a state with no income tax can provide a substantial boost to your take-home pay. The difference can be thousands of dollars per year for higher earners.</li>
+      <li><strong>Claim all eligible tax credits.</strong> Tax credits such as the Child Tax Credit, Earned Income Tax Credit, and education credits directly reduce the amount of tax you owe. Some of these credits can be factored into your W-4 withholding, increasing your per-paycheck take-home pay rather than waiting for a refund.</li>
+    </ul>
+
+    <h2>Pay Frequency: How It Affects Each Paycheck</h2>
+    <p>Your pay frequency determines how many paychecks you receive per year and the size of each one. The four most common pay frequencies in the United States are:</p>
+    <ul>
+      <li><strong>Weekly (52 paychecks per year):</strong> Each paycheck is smaller but you are paid more frequently. This is common in hourly and trade positions.</li>
+      <li><strong>Bi-weekly (26 paychecks per year):</strong> The most common pay frequency in the U.S. You receive a paycheck every two weeks, which means two months per year you receive three paychecks instead of two.</li>
+      <li><strong>Semi-monthly (24 paychecks per year):</strong> You are paid twice per month, typically on the 1st and 15th or the 15th and last day of the month. Each paycheck is slightly larger than bi-weekly because there are fewer pay periods.</li>
+      <li><strong>Monthly (12 paychecks per year):</strong> Each paycheck is the largest but least frequent. This is more common for salaried professionals and executives.</li>
+    </ul>
+    <p>While pay frequency does not change your annual gross or net pay, it does affect how you budget. Workers paid bi-weekly sometimes use the two "extra" paychecks per year as opportunities to boost savings or pay down debt, since their regular monthly budget is based on two paychecks per month.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>How is my paycheck calculated?</h3>
+    <p>Your paycheck is calculated by starting with your gross pay for the pay period, which is your annual salary divided by the number of pay periods. From this amount, your employer withholds federal income tax based on your W-4 and the IRS tax brackets, state income tax based on your state's rates, Social Security tax at 6.2% of gross wages (up to the $168,600 wage base), Medicare tax at 1.45% of all gross wages, and any pre-tax deductions you have elected such as 401(k) contributions or health insurance premiums. The remaining amount is your net pay.</p>
+
+    <h3>What percentage of my paycheck goes to taxes?</h3>
+    <p>The total tax percentage depends on your income, filing status, and state. Most workers pay between 20% and 35% of their gross income in combined taxes. This includes federal income tax (which varies by bracket from 10% to 37%), state income tax (0% to over 13% depending on the state), Social Security at 6.2%, and Medicare at 1.45%. Higher earners tend to pay a larger percentage due to the progressive federal tax system.</p>
+
+    <h3>How can I increase my take-home pay?</h3>
+    <p>The most effective ways to increase your take-home pay include adjusting your W-4 withholding to avoid over-withholding, contributing to pre-tax accounts like a 401(k) or HSA to reduce taxable income, and taking advantage of all available tax credits. You should also review your benefit elections annually to ensure you are not paying for coverage you do not need.</p>
+
+    <h3>What is the difference between gross pay and net pay?</h3>
+    <p>Gross pay is the total amount you earn before any deductions are taken out. It is the salary or hourly rate multiplied by hours worked that your employer has agreed to pay you. Net pay, or take-home pay, is the amount you actually receive in your paycheck after federal tax, state tax, FICA taxes, and pre-tax deductions have been subtracted. Net pay is always lower than gross pay.</p>
+
+    <h3>Why did my paycheck amount change even though my salary stayed the same?</h3>
+    <p>Several factors can cause your paycheck amount to change without a salary adjustment. Common reasons include updated tax brackets at the start of a new tax year, changes to your W-4 withholding, increases in health insurance premiums during open enrollment, reaching the Social Security wage base limit (after which Social Security tax stops being withheld), and changes to your pre-tax contribution amounts such as 401(k) increases. Review your pay stub carefully to identify which deduction changed.</p>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/financial-calculators/take-home-pay-calculator/">Take-Home Pay Calculator</a> - Estimate your annual and per-period net pay with state-specific rates.</li>
+      <li><a href="/financial-calculators/compound-interest-calculator/">Compound Interest Calculator</a> - See how your savings and investments grow over time.</li>
+      <li><a href="/financial-calculators/savings-goal-calculator/">Savings Goal Calculator</a> - Plan monthly savings to reach your financial goals.</li>
+      <li><a href="/financial-calculators/retirement-savings-calculator/">Retirement Savings Calculator</a> - Project your retirement nest egg growth.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .results-heading {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin: 0 0 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .results-heading:not(:first-child) {
+    margin-top: 24px;
+  }
+
+  .summary-bar {
+    display: flex;
+    gap: 24px;
+    margin-top: 20px;
+    padding: 16px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    flex-wrap: wrap;
+  }
+  .summary-item { display: flex; flex-direction: column; gap: 4px; }
+  .summary-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+  }
+  .summary-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+
+  @media (max-width: 640px) {
+    .calc-inputs { grid-template-columns: 1fr; }
+    .result-cards { grid-template-columns: 1fr; }
+    .summary-bar { flex-direction: column; gap: 12px; }
+  }
+</style>
+
+<script>
+  function formatCurrency(n: number): string {
+    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+
+  // 2024 Federal Tax Brackets
+  const federalBrackets = {
+    single: [
+      { min: 0, max: 11600, rate: 0.10 },
+      { min: 11600, max: 47150, rate: 0.12 },
+      { min: 47150, max: 100525, rate: 0.22 },
+      { min: 100525, max: 191950, rate: 0.24 },
+      { min: 191950, max: 243725, rate: 0.32 },
+      { min: 243725, max: 609350, rate: 0.35 },
+      { min: 609350, max: Infinity, rate: 0.37 },
+    ],
+    married: [
+      { min: 0, max: 23200, rate: 0.10 },
+      { min: 23200, max: 94300, rate: 0.12 },
+      { min: 94300, max: 201050, rate: 0.22 },
+      { min: 201050, max: 383900, rate: 0.24 },
+      { min: 383900, max: 487450, rate: 0.32 },
+      { min: 487450, max: 731200, rate: 0.35 },
+      { min: 731200, max: Infinity, rate: 0.37 },
+    ],
+    hoh: [
+      { min: 0, max: 16550, rate: 0.10 },
+      { min: 16550, max: 63100, rate: 0.12 },
+      { min: 63100, max: 100500, rate: 0.22 },
+      { min: 100500, max: 191950, rate: 0.24 },
+      { min: 191950, max: 243725, rate: 0.32 },
+      { min: 243725, max: 609350, rate: 0.35 },
+      { min: 609350, max: Infinity, rate: 0.37 },
+    ],
+  };
+
+  const standardDeductions: Record<string, number> = {
+    single: 14600,
+    married: 29200,
+    hoh: 21900,
+  };
+
+  function calculateProgressiveFederalTax(taxableIncome: number, brackets: { min: number; max: number; rate: number }[]): number {
+    let tax = 0;
+    for (const bracket of brackets) {
+      if (taxableIncome <= bracket.min) break;
+      const taxableInBracket = Math.min(taxableIncome, bracket.max) - bracket.min;
+      tax += taxableInBracket * bracket.rate;
+    }
+    return tax;
+  }
+
+  function calculateSocialSecurity(grossSalary: number): number {
+    const wageBase = 168600;
+    const rate = 0.062;
+    return Math.min(grossSalary, wageBase) * rate;
+  }
+
+  function calculateMedicare(grossSalary: number): number {
+    const baseRate = 0.0145;
+    const surtaxThreshold = 200000;
+    const surtaxRate = 0.009;
+    let tax = grossSalary * baseRate;
+    if (grossSalary > surtaxThreshold) {
+      tax += (grossSalary - surtaxThreshold) * surtaxRate;
+    }
+    return tax;
+  }
+
+  function calculate(): void {
+    const grossSalary = parseFloat((document.getElementById('grossSalary') as HTMLInputElement).value) || 0;
+    const payPeriods = parseInt((document.getElementById('payFrequency') as HTMLSelectElement).value) || 26;
+    const filingStatus = (document.getElementById('filingStatus') as HTMLSelectElement).value;
+    const federalBracketValue = (document.getElementById('federalBracket') as HTMLSelectElement).value;
+    const stateRate = (parseFloat((document.getElementById('stateRate') as HTMLInputElement).value) || 0) / 100;
+    const preTaxDeductions = parseFloat((document.getElementById('preTaxDeductions') as HTMLInputElement).value) || 0;
+
+    // Taxable income after standard deduction and pre-tax deductions
+    const stdDeduction = standardDeductions[filingStatus] || 14600;
+    const taxableIncome = Math.max(0, grossSalary - preTaxDeductions - stdDeduction);
+
+    // Federal income tax
+    let federalTax: number;
+    if (federalBracketValue === 'progressive') {
+      const brackets = federalBrackets[filingStatus as keyof typeof federalBrackets] || federalBrackets.single;
+      federalTax = calculateProgressiveFederalTax(taxableIncome, brackets);
+    } else {
+      const flatRate = parseFloat(federalBracketValue);
+      federalTax = taxableIncome * flatRate;
+    }
+
+    // State income tax (flat rate on taxable income)
+    const stateTax = taxableIncome * stateRate;
+
+    // Social Security (on gross salary, not reduced by pre-tax deductions for FICA purposes)
+    const socialSecurity = calculateSocialSecurity(grossSalary);
+
+    // Medicare (on gross salary)
+    const medicare = calculateMedicare(grossSalary);
+
+    // Total withholdings and net pay
+    const totalWithholdings = federalTax + stateTax + socialSecurity + medicare + preTaxDeductions;
+    const netAnnual = grossSalary - totalWithholdings;
+
+    // Effective tax rate (taxes only, excluding pre-tax deductions)
+    const taxOnlyTotal = federalTax + stateTax + socialSecurity + medicare;
+    const effectiveRate = grossSalary > 0 ? (taxOnlyTotal / grossSalary) * 100 : 0;
+
+    // Per-period amounts
+    const grossPeriod = grossSalary / payPeriods;
+    const fedTaxPeriod = federalTax / payPeriods;
+    const stateTaxPeriod = stateTax / payPeriods;
+    const ssPeriod = socialSecurity / payPeriods;
+    const medicarePeriod = medicare / payPeriods;
+    const deductionsPeriod = preTaxDeductions / payPeriods;
+    const netPeriod = netAnnual / payPeriods;
+
+    // Update per-period breakdown
+    document.getElementById('grossPeriod')!.textContent = formatCurrency(grossPeriod);
+    document.getElementById('fedTaxPeriod')!.textContent = formatCurrency(fedTaxPeriod);
+    document.getElementById('stateTaxPeriod')!.textContent = formatCurrency(stateTaxPeriod);
+    document.getElementById('ssPeriod')!.textContent = formatCurrency(ssPeriod);
+    document.getElementById('medicarePeriod')!.textContent = formatCurrency(medicarePeriod);
+    document.getElementById('deductionsPeriod')!.textContent = formatCurrency(deductionsPeriod);
+    document.getElementById('netPeriod')!.textContent = formatCurrency(netPeriod);
+
+    // Update annual breakdown
+    document.getElementById('grossAnnual')!.textContent = formatCurrency(grossSalary);
+    document.getElementById('fedTaxAnnual')!.textContent = formatCurrency(federalTax);
+    document.getElementById('stateTaxAnnual')!.textContent = formatCurrency(stateTax);
+    document.getElementById('ssAnnual')!.textContent = formatCurrency(socialSecurity);
+    document.getElementById('medicareAnnual')!.textContent = formatCurrency(medicare);
+    document.getElementById('deductionsAnnual')!.textContent = formatCurrency(preTaxDeductions);
+    document.getElementById('netAnnual')!.textContent = formatCurrency(netAnnual);
+
+    // Update summary
+    document.getElementById('effectiveRate')!.textContent = effectiveRate.toFixed(1) + '%';
+    document.getElementById('totalWithholdings')!.textContent = formatCurrency(totalWithholdings);
+  }
+
+  document.getElementById('calculateBtn')?.addEventListener('click', calculate);
+  // Auto-calculate on load
+  calculate();
+</script>

@@ -1,0 +1,480 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Math Calculators",
+        "item": "https://toolcalcs.com/math-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Probability Calculator"
+      }
+    ]
+  },
+  {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'What is the difference between permutations and combinations?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Permutations count the number of ways to arrange items where order matters, while combinations count the number of ways to choose items where order does not matter. For example, choosing 3 officers (president, vice president, treasurer) from 10 people is a permutation (720 ways), but choosing a 3-person committee from 10 people is a combination (120 ways).',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How do you calculate the probability of two independent events both occurring?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'For two independent events A and B, the probability of both occurring is P(A and B) = P(A) times P(B). For example, the probability of flipping heads on a coin and rolling a 6 on a die is 1/2 times 1/6 = 1/12, or about 8.33%. Independence means one event does not affect the outcome of the other.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is the addition rule of probability?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'The addition rule states that P(A or B) = P(A) + P(B) - P(A and B). You subtract the intersection to avoid double-counting outcomes that belong to both events. If the events are mutually exclusive (cannot both occur), P(A and B) = 0, and the formula simplifies to P(A or B) = P(A) + P(B).',
+      },
+    },
+  ],
+},
+];
+---
+
+<BaseLayout
+  title="Probability Calculator - Single & Multiple Events | ToolCalcs"
+  description="Free probability calculator for single events, two events, permutations, and combinations. Calculate P(A or B), P(A and B), nPr, and nCr with instant results."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/math-calculators/">Math Calculators</a> &rsaquo;
+    <span>Probability Calculator</span>
+  </nav>
+
+  <h1>Probability Calculator</h1>
+  <p class="page-desc">Calculate probability for single events, multiple events, permutations, and combinations. Enter your values below for instant results.</p>
+
+  <div class="calculator-box">
+    <!-- Section 1: Single Event Probability -->
+    <div class="calc-section">
+      <h2 class="calc-title">Single Event Probability</h2>
+      <div class="calc-inputs">
+        <div class="input-group">
+          <label for="favorable">Favorable Outcomes</label>
+          <input type="number" id="favorable" value="3" min="0" />
+        </div>
+        <div class="input-group">
+          <label for="total">Total Outcomes</label>
+          <input type="number" id="total" value="10" min="1" />
+        </div>
+      </div>
+      <button class="calc-btn" id="calcSingleBtn">Calculate</button>
+      <div id="singleResults" class="result-cards" style="display:none;">
+        <div class="result-card primary">
+          <span class="result-label">Fraction</span>
+          <span class="result-value" id="singleFraction"></span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Decimal</span>
+          <span class="result-value" id="singleDecimal"></span>
+        </div>
+        <div class="result-card success">
+          <span class="result-label">Percentage</span>
+          <span class="result-value" id="singlePercent"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Two Events Probability -->
+    <div class="calc-section">
+      <h2 class="calc-title">Two Events Probability</h2>
+      <div class="calc-inputs">
+        <div class="input-group">
+          <label for="probA">P(A) — probability of event A</label>
+          <input type="number" id="probA" value="0.5" min="0" max="1" step="0.01" />
+        </div>
+        <div class="input-group">
+          <label for="probB">P(B) — probability of event B</label>
+          <input type="number" id="probB" value="0.3" min="0" max="1" step="0.01" />
+        </div>
+        <div class="input-group">
+          <label for="relationship">Relationship</label>
+          <select id="relationship">
+            <option value="independent">Independent</option>
+            <option value="dependent">Dependent (mutually exclusive)</option>
+          </select>
+        </div>
+      </div>
+      <button class="calc-btn" id="calcTwoBtn">Calculate</button>
+      <div id="twoResults" class="result-cards" style="display:none;">
+        <div class="result-card primary">
+          <span class="result-label">P(A or B)</span>
+          <span class="result-value" id="pAorB"></span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">P(A and B)</span>
+          <span class="result-value" id="pAandB"></span>
+        </div>
+        <div class="result-card success">
+          <span class="result-label">P(not A)</span>
+          <span class="result-value" id="pNotA"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: Permutations & Combinations -->
+    <div class="calc-section">
+      <h2 class="calc-title">Permutations &amp; Combinations</h2>
+      <div class="calc-inputs">
+        <div class="input-group">
+          <label for="nVal">n (total items)</label>
+          <input type="number" id="nVal" value="10" min="0" max="170" />
+        </div>
+        <div class="input-group">
+          <label for="rVal">r (items chosen)</label>
+          <input type="number" id="rVal" value="3" min="0" max="170" />
+        </div>
+      </div>
+      <button class="calc-btn" id="calcPermBtn">Calculate</button>
+      <div id="permResults" class="result-cards" style="display:none;">
+        <div class="result-card primary">
+          <span class="result-label">Permutations (nPr)</span>
+          <span class="result-value" id="nPrResult"></span>
+        </div>
+        <div class="result-card success">
+          <span class="result-label">Combinations (nCr)</span>
+          <span class="result-value" id="nCrResult"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>What Is Probability?</h2>
+    <p>Probability is the branch of mathematics that measures how likely an event is to occur. Expressed as a number between 0 and 1, a probability of 0 means the event is impossible, while a probability of 1 means it is certain. A coin flip that lands on heads has a probability of 0.5, or 50%, because there are two equally likely outcomes and one of them is heads.</p>
+    <p>The formal definition of probability for equally likely outcomes is straightforward: divide the number of favorable outcomes by the total number of possible outcomes. If a standard six-sided die is rolled, the probability of landing on a 4 is 1/6, because there is one favorable outcome out of six total possibilities. This simple ratio underpins everything from casino games to weather forecasts to medical diagnoses.</p>
+    <p>Probability plays a central role in virtually every scientific discipline and area of daily life. Insurance companies use probability to set premiums. Doctors use it to assess the likelihood of diseases. Engineers use it to predict failure rates. Financial analysts use it to model market behavior. Even something as mundane as deciding whether to carry an umbrella involves an implicit probability assessment. Understanding probability gives you a framework for making better decisions under uncertainty.</p>
+
+    <h2>Types of Probability</h2>
+    <p>There are three major interpretations of probability, each with distinct philosophical foundations and practical applications.</p>
+    <h3>Classical (Theoretical) Probability</h3>
+    <p>Classical probability applies when all outcomes are equally likely. The formula is P(E) = Number of favorable outcomes / Total number of outcomes. Rolling a fair die, drawing a card from a well-shuffled deck, and flipping a fair coin are all examples where classical probability applies directly. The probability of drawing an ace from a standard 52-card deck is 4/52 = 1/13 because there are 4 aces among 52 cards.</p>
+    <h3>Empirical (Experimental) Probability</h3>
+    <p>Empirical probability is based on observed data rather than theoretical assumptions. If a factory produces 10,000 widgets and 150 are defective, the empirical probability of a defective widget is 150/10,000 = 0.015, or 1.5%. This approach is essential when outcomes are not equally likely or when the theoretical model is unknown. Weather forecasting relies heavily on empirical probability: a "30% chance of rain" means that in historical situations with similar atmospheric conditions, it rained about 30% of the time.</p>
+    <h3>Subjective Probability</h3>
+    <p>Subjective probability reflects personal judgment or belief about how likely an event is. A venture capitalist estimating a 20% chance that a startup succeeds is expressing a subjective probability based on experience, market knowledge, and intuition rather than a mathematical formula or historical dataset. Bayesian statistics provides a rigorous framework for updating subjective probabilities as new evidence becomes available.</p>
+
+    <h2>The Addition Rule of Probability</h2>
+    <p>The addition rule answers the question: what is the probability that event A or event B (or both) occurs? The general formula is:</p>
+    <div class="formula-box"><code>P(A or B) = P(A) + P(B) &minus; P(A and B)</code></div>
+    <p>The subtraction of P(A and B) is necessary to avoid double-counting outcomes that satisfy both conditions. For example, what is the probability of drawing a king or a heart from a standard deck? P(king) = 4/52, P(heart) = 13/52, and P(king and heart) = 1/52 (the king of hearts). So P(king or heart) = 4/52 + 13/52 &minus; 1/52 = 16/52 = 4/13.</p>
+    <p>When two events are <strong>mutually exclusive</strong> (they cannot both occur simultaneously), P(A and B) = 0, and the formula simplifies to P(A or B) = P(A) + P(B). For instance, a single die roll cannot be both a 2 and a 5, so the probability of rolling a 2 or a 5 is simply 1/6 + 1/6 = 2/6 = 1/3.</p>
+
+    <h2>The Multiplication Rule of Probability</h2>
+    <p>The multiplication rule answers: what is the probability that both event A and event B occur? The answer depends on whether the events are independent or dependent.</p>
+    <h3>Independent Events</h3>
+    <div class="formula-box"><code>P(A and B) = P(A) &times; P(B)</code></div>
+    <p>Two events are independent when the occurrence of one does not affect the probability of the other. Flipping a coin and rolling a die are independent events. The probability of getting heads and rolling a 6 is (1/2) &times; (1/6) = 1/12. Another example: if the probability of rain today is 0.4 and the probability that your bus is late is 0.1, and these events are independent, the probability of both happening is 0.4 &times; 0.1 = 0.04, or 4%.</p>
+    <h3>Dependent Events</h3>
+    <div class="formula-box"><code>P(A and B) = P(A) &times; P(B | A)</code></div>
+    <p>When events are dependent, the outcome of the first event changes the probability of the second. Drawing cards without replacement is a classic example. The probability of drawing two aces in a row from a standard deck is (4/52) &times; (3/51) = 12/2652 = 1/221. After drawing the first ace, only 3 aces remain among 51 cards, so the second probability changes from 4/52 to 3/51.</p>
+
+    <h2>Conditional Probability</h2>
+    <p>Conditional probability measures the likelihood of an event given that another event has already occurred. The notation P(B | A) reads as "the probability of B given A." The formula is:</p>
+    <div class="formula-box"><code>P(B | A) = P(A and B) / P(A)</code></div>
+    <p>Suppose a company has 200 employees, 120 of whom have a college degree. Among those with a degree, 36 are in management. The probability that a randomly selected employee with a college degree is in management is P(management | degree) = 36/120 = 0.30, or 30%. Note that this is different from the unconditional probability of being in management, which depends on the total number of managers regardless of education.</p>
+    <p>Conditional probability is the backbone of many real-world applications. Medical testing relies on it extensively. If a disease affects 1% of the population and a test has a 95% true positive rate and a 5% false positive rate, the probability that a person who tests positive actually has the disease (the positive predictive value) is surprisingly lower than most people expect. This counterintuitive result is best understood through conditional probability and Bayes' theorem.</p>
+
+    <h2>Introduction to Bayes' Theorem</h2>
+    <p>Bayes' theorem provides a systematic way to update probabilities based on new evidence. Named after the Reverend Thomas Bayes, who first formulated the idea in the 18th century, the theorem is expressed as:</p>
+    <div class="formula-box"><code>P(A | B) = [P(B | A) &times; P(A)] / P(B)</code></div>
+    <p>In words: the probability of hypothesis A given observed evidence B equals the probability of observing B if A is true, multiplied by the prior probability of A, divided by the overall probability of observing B. The power of Bayes' theorem lies in its ability to "flip" conditional probabilities, allowing you to calculate P(A | B) when you know P(B | A).</p>
+    <p>Consider a medical example. A rare disease affects 0.1% of the population (P(disease) = 0.001). A diagnostic test correctly identifies the disease 99% of the time (P(positive | disease) = 0.99), but it also produces false positives 5% of the time (P(positive | no disease) = 0.05). If a person tests positive, what is the probability they actually have the disease?</p>
+    <p>Using Bayes' theorem: P(disease | positive) = (0.99 &times; 0.001) / [(0.99 &times; 0.001) + (0.05 &times; 0.999)] = 0.00099 / (0.00099 + 0.04995) = 0.00099 / 0.05094 = approximately 0.0194, or about 1.94%. Despite the test being 99% accurate, a positive result only means a roughly 2% chance of actually having the disease, because the disease is so rare that false positives far outnumber true positives.</p>
+
+    <h2>Permutations and Combinations</h2>
+    <p>Permutations and combinations are counting techniques used in probability to determine the total number of possible outcomes.</p>
+    <h3>Permutations (Order Matters)</h3>
+    <div class="formula-box"><code>nPr = n! / (n &minus; r)!</code></div>
+    <p>A permutation counts the number of ways to arrange r items from a set of n items where the order of arrangement matters. If you want to know how many ways to award gold, silver, and bronze medals to 3 out of 8 athletes, you use permutations: 8P3 = 8! / 5! = 8 &times; 7 &times; 6 = 336. Each distinct ordering counts as a different permutation because gold-silver-bronze assigned to athletes A-B-C is different from B-A-C.</p>
+    <h3>Combinations (Order Does Not Matter)</h3>
+    <div class="formula-box"><code>nCr = n! / [r! &times; (n &minus; r)!]</code></div>
+    <p>A combination counts the number of ways to choose r items from n items where order does not matter. Choosing a committee of 3 from 8 people uses combinations: 8C3 = 8! / (3! &times; 5!) = 56. It does not matter what order the committee members are chosen in, so the number is much smaller than the corresponding permutation.</p>
+    <p>The relationship between the two is straightforward: nCr = nPr / r!, because each combination corresponds to r! permutations (the number of ways to rearrange the chosen r items). Understanding when to use permutations versus combinations is one of the most important skills in probability and combinatorics.</p>
+
+    <h2>Real-World Examples of Probability</h2>
+    <p><strong>Lottery odds:</strong> The Powerball lottery requires matching 5 numbers from 1 to 69 (order does not matter) plus a Powerball number from 1 to 26. The number of ways to choose 5 from 69 is 69C5 = 11,238,513, and there are 26 Powerball options, giving total odds of 1 in 292,201,338. This is a direct application of combinations.</p>
+    <p><strong>Insurance:</strong> Auto insurance companies analyze historical data to estimate the probability of accidents for different demographics, locations, and driving records. A driver with a clean record in a rural area might have a 2% annual probability of filing a claim, while a driver with two prior accidents in a dense urban area might have a 12% probability. These empirical probabilities directly determine premium pricing.</p>
+    <p><strong>Sports analytics:</strong> Baseball teams use probability models to determine batting orders, defensive alignments, and bullpen strategies. A hitter with a 0.300 batting average has a 30% probability of getting a hit in any given at-bat. The probability that the same hitter gets at least one hit in four at-bats is 1 &minus; (0.7)<sup>4</sup> = 1 &minus; 0.2401 = 0.7599, or about 76%.</p>
+    <p><strong>Quality control:</strong> A manufacturer tests a sample of 50 units from a production batch of 5,000. If 2 defective units are found in the sample, the estimated defect probability is 2/50 = 0.04, or 4%. Using this, the manufacturer can estimate approximately 200 defective units in the full batch and decide whether the batch meets quality standards.</p>
+    <p><strong>Medicine:</strong> Clinical trials use probability to evaluate drug effectiveness. If 120 out of 200 patients in the treatment group recover compared to 80 out of 200 in the placebo group, probability analysis (including hypothesis testing and confidence intervals) determines whether the difference is statistically significant or could have occurred by chance.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>What is the difference between permutations and combinations?</h3>
+    <p>Permutations count the number of ways to arrange items where order matters, while combinations count the number of ways to choose items where order does not matter. Use permutations when the arrangement or sequence is important (like assigning ranked positions), and use combinations when you are simply selecting a group (like choosing committee members). The formula for permutations is nPr = n! / (n - r)!, and for combinations it is nCr = n! / [r! &times; (n - r)!].</p>
+
+    <h3>How do you calculate the probability of two independent events both occurring?</h3>
+    <p>For two independent events A and B, multiply their individual probabilities: P(A and B) = P(A) &times; P(B). For example, the probability of flipping heads (1/2) and rolling a 6 on a die (1/6) is 1/2 &times; 1/6 = 1/12, approximately 8.33%. Events are independent when the outcome of one has no effect on the probability of the other.</p>
+
+    <h3>What is the addition rule of probability?</h3>
+    <p>The addition rule calculates the probability that at least one of two events occurs: P(A or B) = P(A) + P(B) &minus; P(A and B). The subtraction prevents double-counting outcomes common to both events. If events are mutually exclusive (they cannot happen simultaneously), P(A and B) = 0, and the formula simplifies to P(A or B) = P(A) + P(B).</p>
+
+    <h3>Can probability be greater than 1 or less than 0?</h3>
+    <p>No. Probability values always fall between 0 and 1 (or equivalently, between 0% and 100%). A probability of 0 means the event is impossible, and a probability of 1 means it is certain. If a calculation produces a value outside this range, there is an error in the inputs or the formula was applied incorrectly.</p>
+
+    <h3>What is Bayes' theorem used for?</h3>
+    <p>Bayes' theorem is used to update the probability of a hypothesis based on new evidence. It is widely applied in medical testing (calculating the real probability of having a disease given a positive test), spam filtering (determining the probability that an email is spam based on its content), machine learning (training classifiers), and any scenario where you need to revise prior beliefs in light of observed data.</p>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/math-calculators/standard-deviation-calculator/">Standard Deviation Calculator</a> - Calculate mean, variance, and standard deviation for any data set.</li>
+      <li><a href="/math-calculators/percentage-calculator/">Percentage Calculator</a> - Quick percentage calculations for everyday use.</li>
+      <li><a href="/math-calculators/random-number-generator/">Random Number Generator</a> - Generate random numbers within any range.</li>
+      <li><a href="/math-calculators/fraction-calculator/">Fraction Calculator</a> - Add, subtract, multiply, and divide fractions.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .calc-section {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .calc-section:last-child { border-bottom: none; }
+  .calc-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--color-text);
+  }
+  .calc-section .calc-inputs {
+    margin-bottom: 16px;
+  }
+  .calc-section .calc-btn {
+    width: auto;
+    padding: 10px 24px;
+  }
+  .calc-section .result-cards {
+    margin-top: 16px;
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 640px) {
+    .calc-section .calc-btn {
+      width: 100%;
+    }
+  }
+</style>
+
+<script>
+  // --- Helpers ---
+  function gcd(a: number, b: number): number {
+    a = Math.abs(a);
+    b = Math.abs(b);
+    while (b !== 0) {
+      const t = b;
+      b = a % b;
+      a = t;
+    }
+    return a;
+  }
+
+  function toFraction(decimal: number): string {
+    if (decimal === 0) return '0';
+    if (decimal === 1) return '1';
+    const precision = 1000000;
+    let num = Math.round(decimal * precision);
+    let den = precision;
+    const g = gcd(num, den);
+    num = num / g;
+    den = den / g;
+    return num + '/' + den;
+  }
+
+  function factorial(n: number): number {
+    if (n < 0) return NaN;
+    if (n === 0 || n === 1) return 1;
+    let result = 1;
+    for (let i = 2; i <= n; i++) {
+      result *= i;
+    }
+    return result;
+  }
+
+  function formatNumber(n: number): string {
+    if (!isFinite(n)) return 'Undefined';
+    if (n > 999999999999999) return n.toExponential(6);
+    return n.toLocaleString('en-US');
+  }
+
+  // --- Single Event ---
+  const favorableInput = document.getElementById('favorable') as HTMLInputElement;
+  const totalInput = document.getElementById('total') as HTMLInputElement;
+  const calcSingleBtn = document.getElementById('calcSingleBtn') as HTMLButtonElement;
+  const singleResults = document.getElementById('singleResults') as HTMLElement;
+  const singleFraction = document.getElementById('singleFraction') as HTMLElement;
+  const singleDecimal = document.getElementById('singleDecimal') as HTMLElement;
+  const singlePercent = document.getElementById('singlePercent') as HTMLElement;
+
+  function calcSingle() {
+    const favorable = parseFloat(favorableInput.value) || 0;
+    const total = parseFloat(totalInput.value) || 0;
+
+    if (total <= 0) {
+      alert('Total outcomes must be greater than zero.');
+      return;
+    }
+    if (favorable < 0) {
+      alert('Favorable outcomes cannot be negative.');
+      return;
+    }
+    if (favorable > total) {
+      alert('Favorable outcomes cannot exceed total outcomes.');
+      return;
+    }
+
+    const prob = favorable / total;
+    const g = gcd(Math.round(favorable), Math.round(total));
+    const fracNum = Math.round(favorable) / g;
+    const fracDen = Math.round(total) / g;
+
+    singleFraction.textContent = fracNum + '/' + fracDen;
+    singleDecimal.textContent = prob.toFixed(6);
+    singlePercent.textContent = (prob * 100).toFixed(2) + '%';
+    singleResults.style.display = '';
+  }
+
+  calcSingleBtn.addEventListener('click', calcSingle);
+
+  // --- Two Events ---
+  const probAInput = document.getElementById('probA') as HTMLInputElement;
+  const probBInput = document.getElementById('probB') as HTMLInputElement;
+  const relationshipSelect = document.getElementById('relationship') as HTMLSelectElement;
+  const calcTwoBtn = document.getElementById('calcTwoBtn') as HTMLButtonElement;
+  const twoResults = document.getElementById('twoResults') as HTMLElement;
+  const pAorBEl = document.getElementById('pAorB') as HTMLElement;
+  const pAandBEl = document.getElementById('pAandB') as HTMLElement;
+  const pNotAEl = document.getElementById('pNotA') as HTMLElement;
+
+  function calcTwo() {
+    const pA = parseFloat(probAInput.value);
+    const pB = parseFloat(probBInput.value);
+
+    if (isNaN(pA) || isNaN(pB)) {
+      alert('Please enter valid probabilities for both events.');
+      return;
+    }
+    if (pA < 0 || pA > 1 || pB < 0 || pB > 1) {
+      alert('Probabilities must be between 0 and 1.');
+      return;
+    }
+
+    const rel = relationshipSelect.value;
+    let pAandB: number;
+    let pAorB: number;
+
+    if (rel === 'independent') {
+      pAandB = pA * pB;
+      pAorB = pA + pB - pAandB;
+    } else {
+      // Mutually exclusive: P(A and B) = 0
+      pAandB = 0;
+      pAorB = pA + pB;
+    }
+
+    const pNotA = 1 - pA;
+
+    // Clamp pAorB to [0,1] for display
+    pAorB = Math.min(pAorB, 1);
+
+    pAorBEl.textContent = pAorB.toFixed(6) + ' (' + (pAorB * 100).toFixed(2) + '%)';
+    pAandBEl.textContent = pAandB.toFixed(6) + ' (' + (pAandB * 100).toFixed(2) + '%)';
+    pNotAEl.textContent = pNotA.toFixed(6) + ' (' + (pNotA * 100).toFixed(2) + '%)';
+    twoResults.style.display = '';
+  }
+
+  calcTwoBtn.addEventListener('click', calcTwo);
+
+  // --- Permutations & Combinations ---
+  const nInput = document.getElementById('nVal') as HTMLInputElement;
+  const rInput = document.getElementById('rVal') as HTMLInputElement;
+  const calcPermBtn = document.getElementById('calcPermBtn') as HTMLButtonElement;
+  const permResults = document.getElementById('permResults') as HTMLElement;
+  const nPrResult = document.getElementById('nPrResult') as HTMLElement;
+  const nCrResult = document.getElementById('nCrResult') as HTMLElement;
+
+  function calcPerm() {
+    const n = parseInt(nInput.value);
+    const r = parseInt(rInput.value);
+
+    if (isNaN(n) || isNaN(r)) {
+      alert('Please enter valid integers for n and r.');
+      return;
+    }
+    if (n < 0 || r < 0) {
+      alert('Values of n and r must be non-negative.');
+      return;
+    }
+    if (r > n) {
+      alert('r cannot be greater than n.');
+      return;
+    }
+    if (n > 170) {
+      alert('n must be 170 or less to avoid overflow.');
+      return;
+    }
+
+    const nPr = factorial(n) / factorial(n - r);
+    const nCr = factorial(n) / (factorial(r) * factorial(n - r));
+
+    nPrResult.textContent = formatNumber(nPr);
+    nCrResult.textContent = formatNumber(nCr);
+    permResults.style.display = '';
+  }
+
+  calcPermBtn.addEventListener('click', calcPerm);
+
+  // --- Enter key support ---
+  document.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      const active = document.activeElement as HTMLElement;
+      if (active) {
+        const section = active.closest('.calc-section');
+        if (section) {
+          const btn = section.querySelector('.calc-btn') as HTMLButtonElement | null;
+          btn?.click();
+        }
+      }
+    }
+  });
+
+  // --- Run on load ---
+  calcSingle();
+  calcTwo();
+  calcPerm();
+</script>

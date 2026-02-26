@@ -1,0 +1,319 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Everyday Calculators",
+        "item": "https://toolcalcs.com/everyday-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Electricity Cost Calculator"
+      }
+    ]
+  },
+  {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'How do you calculate electricity cost for an appliance?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'To calculate electricity cost, multiply the appliance wattage by the number of hours used per day, then divide by 1,000 to get kilowatt-hours (kWh). Multiply the kWh by your electricity rate. For example, a 1,500-watt space heater running 8 hours per day at $0.16/kWh costs: 1,500 × 8 / 1,000 × $0.16 = $1.92 per day, or about $57.60 per month.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is a kilowatt-hour (kWh)?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'A kilowatt-hour (kWh) is a unit of energy equal to using 1,000 watts of power for one hour. It is the standard billing unit on electricity bills. For example, running a 100-watt light bulb for 10 hours uses 1 kWh. The average U.S. household uses about 886 kWh per month.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is the average electricity rate in the United States?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'The average U.S. residential electricity rate is approximately $0.16 per kWh, but rates vary significantly by state. Hawaii has the highest rates at over $0.40/kWh, while states like Louisiana, Idaho, and Washington have some of the lowest rates at around $0.10 to $0.11/kWh. Rates also vary by time of day and season in areas with time-of-use pricing.',
+      },
+    },
+  ],
+},
+];
+---
+
+<BaseLayout
+  title="Electricity Cost Calculator - Estimate Power Usage & Bills | ToolCalcs"
+  description="Free electricity cost calculator. Calculate how much power any appliance uses and estimate daily, monthly, and yearly energy costs. Includes common appliance presets and energy-saving tips."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/everyday-calculators/">Everyday Calculators</a> &rsaquo;
+    <span>Electricity Cost Calculator</span>
+  </nav>
+
+  <h1>Electricity Cost Calculator</h1>
+  <p class="page-desc">Calculate electricity usage and costs for any appliance. Estimate daily, monthly, and yearly power bills instantly.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="wattage">Wattage (watts)</label>
+        <input type="number" id="wattage" value="1500" min="0" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="hoursPerDay">Hours of Use per Day</label>
+        <input type="number" id="hoursPerDay" value="8" min="0" max="24" step="0.5" />
+      </div>
+      <div class="input-group">
+        <label for="electricityRate">Electricity Rate ($/kWh)</label>
+        <input type="number" id="electricityRate" value="0.16" min="0" step="0.01" />
+      </div>
+      <div class="input-group">
+        <label for="daysPerMonth">Days per Month</label>
+        <input type="number" id="daysPerMonth" value="30" min="1" max="31" step="1" />
+      </div>
+    </div>
+
+    <div class="appliance-presets">
+      <span class="presets-label">Common Appliances:</span>
+      <div class="preset-btns">
+        <button class="preset-btn active" data-watts="1500">AC (1500W)</button>
+        <button class="preset-btn" data-watts="150">Refrigerator (150W)</button>
+        <button class="preset-btn" data-watts="100">TV (100W)</button>
+        <button class="preset-btn" data-watts="500">Washing Machine (500W)</button>
+        <button class="preset-btn" data-watts="200">Computer (200W)</button>
+        <button class="preset-btn" data-watts="10">LED Bulb (10W)</button>
+      </div>
+    </div>
+
+    <div class="calc-results">
+      <div class="result-cards">
+        <div class="result-card">
+          <span class="result-label">Daily kWh</span>
+          <span class="result-value" id="dailyKwh">12.00</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Monthly kWh</span>
+          <span class="result-value" id="monthlyKwh">360.00</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Daily Cost</span>
+          <span class="result-value" id="dailyCost">$1.92</span>
+        </div>
+        <div class="result-card primary">
+          <span class="result-label">Monthly Cost</span>
+          <span class="result-value" id="monthlyCost">$57.60</span>
+        </div>
+        <div class="result-card success">
+          <span class="result-label">Yearly Cost</span>
+          <span class="result-value" id="yearlyCost">$700.80</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>Understanding Your Electricity Bill</h2>
+    <p>Your electricity bill can feel like a mystery, but once you understand the basics it becomes a powerful tool for managing your household expenses. The most important number on your bill is total kilowatt-hours (kWh) consumed during the billing period. This is the number that determines the bulk of what you pay. Most utility companies charge a base rate per kWh, and some add tiered pricing, demand charges, or time-of-use rates on top of that.</p>
+    <p>The average American household uses approximately 886 kWh of electricity per month, according to the U.S. Energy Information Administration (EIA). That translates to roughly 10,632 kWh per year. However, consumption varies enormously depending on where you live, the size of your home, the number of occupants, and which appliances you use. A household in Louisiana might average over 1,100 kWh per month due to heavy air conditioning use, while a household in Hawaii might use closer to 500 kWh because of the mild climate and high electricity prices that incentivize conservation.</p>
+    <p>Beyond the energy charge, your bill typically includes several other line items. A customer charge or service fee is a flat monthly fee that covers the cost of maintaining the grid and your connection to it, regardless of how much electricity you use. This fee typically ranges from $5 to $15 per month. Some utilities also include fuel adjustment charges that fluctuate with the cost of natural gas, coal, or other fuels used to generate electricity. Taxes, regulatory fees, and renewable energy surcharges may also appear as separate line items.</p>
+    <p>Understanding these components is the first step toward taking control of your energy costs. By identifying which appliances consume the most electricity and how your usage patterns affect your bill, you can make targeted changes that save real money every month.</p>
+
+    <h2>What Is a Kilowatt-Hour (kWh)?</h2>
+    <p>A kilowatt-hour is the standard unit of energy used by electric utilities to measure and bill for electricity consumption. One kilowatt-hour equals 1,000 watts of power consumed continuously for one hour. It is a measure of energy, not power. Power (measured in watts) describes the rate at which electricity is being used at any given moment, while energy (measured in kilowatt-hours) describes the total amount of electricity used over a period of time.</p>
+    <div class="formula-box">
+      <code>kWh = Watts &times; Hours of Use / 1,000</code><br />
+      <code>Cost = kWh &times; Electricity Rate ($/kWh)</code>
+    </div>
+    <p>To put this in practical terms, a 100-watt incandescent light bulb running for 10 hours consumes exactly 1 kWh of energy (100 watts &times; 10 hours / 1,000 = 1 kWh). At the national average rate of about $0.16 per kWh, that single kWh costs you 16 cents. By contrast, a 10-watt LED bulb producing the same amount of light would need to run for 100 hours to consume 1 kWh, making it roughly 10 times cheaper to operate.</p>
+    <p>The wattage rating printed on an appliance or its nameplate tells you the maximum power the device can draw. However, many appliances do not run at their maximum wattage continuously. A refrigerator might be rated at 150 watts, but its compressor cycles on and off throughout the day, so its average or "effective" wattage is lower. Similarly, a washing machine draws different amounts of power during the fill, wash, and spin cycles. For more accurate estimates, look for the appliance's annual energy consumption on its EnergyGuide label, which accounts for these variations.</p>
+
+    <h2>Average Electricity Rates by State</h2>
+    <p>Electricity prices in the United States vary dramatically from state to state due to differences in fuel sources, infrastructure costs, regulatory policies, and climate. Understanding where your state falls on the pricing spectrum helps you contextualize your own bills and evaluate whether investing in energy efficiency or solar power makes financial sense for your situation.</p>
+    <p>As of recent EIA data, the states with the highest average residential electricity rates include Hawaii at roughly $0.42 per kWh, Massachusetts at about $0.28 per kWh, Connecticut at approximately $0.27 per kWh, Rhode Island at around $0.26 per kWh, and California at about $0.25 per kWh. Hawaii's extreme rates are driven by the state's dependence on imported petroleum for electricity generation. The New England states face high prices due to natural gas pipeline constraints, aging infrastructure, and higher regulatory costs.</p>
+    <p>On the other end of the spectrum, the cheapest electricity can be found in states like Louisiana at about $0.10 per kWh, Idaho at around $0.10 per kWh, Washington at roughly $0.11 per kWh, Utah at approximately $0.11 per kWh, and Oklahoma at about $0.12 per kWh. These states benefit from abundant hydroelectric power (Idaho and Washington), low-cost natural gas (Louisiana and Oklahoma), or a combination of cheap fuel sources and lower regulatory overhead.</p>
+    <p>The national average residential rate hovers around $0.16 per kWh, but this number masks enormous variation. Even within a single state, rates can differ by utility provider and rate structure. Some utilities offer time-of-use (TOU) pricing, where electricity costs more during peak demand hours (typically late afternoon and early evening) and less during off-peak hours (late night and early morning). Under TOU pricing, shifting energy-intensive activities like running the dishwasher or doing laundry to off-peak hours can significantly reduce your monthly bill.</p>
+
+    <h2>How Much Electricity Do Common Appliances Use?</h2>
+    <p>Knowing the approximate wattage of your household appliances helps you identify the biggest contributors to your electricity bill. While every appliance model is different, the following ranges give you a practical starting point for estimating energy consumption and costs.</p>
+    <p><strong>Heating and cooling systems</strong> are by far the largest electricity consumers in most homes, accounting for roughly 40% to 50% of total energy use. A central air conditioning system typically draws 3,000 to 5,000 watts when running. A window AC unit uses 500 to 1,500 watts. A portable space heater draws 1,000 to 1,500 watts. Because these systems run for many hours during extreme weather, their energy costs add up rapidly. Running a 3,500-watt central AC for 8 hours a day at $0.16 per kWh costs about $4.48 per day, or $134.40 per month.</p>
+    <p><strong>Kitchen appliances</strong> account for a significant portion of home energy use. A refrigerator runs continuously and typically uses 100 to 200 watts on average, costing $3.50 to $7.00 per month. An electric oven draws 2,000 to 2,500 watts but usually runs for shorter periods. A dishwasher uses about 1,200 to 1,800 watts per cycle. A microwave oven draws 600 to 1,200 watts but typically runs for only a few minutes at a time, making its monthly cost negligible.</p>
+    <p><strong>Laundry appliances</strong> can be surprisingly expensive to operate. A washing machine uses 400 to 600 watts per cycle, but the real cost comes from the electric dryer, which draws 2,000 to 5,000 watts and runs for 30 to 60 minutes per load. A family doing 8 loads of laundry per week with an electric dryer at 4,000 watts for 45 minutes per load consumes about 24 kWh per week on drying alone, costing roughly $15 to $16 per month at average rates.</p>
+    <p><strong>Electronics and entertainment</strong> include TVs (50 to 200 watts depending on size and type), desktop computers (100 to 300 watts), laptops (30 to 70 watts), and gaming consoles (45 to 200 watts). While individual devices use modest amounts of power, the cumulative effect of multiple devices running for several hours daily can be substantial.</p>
+    <p><strong>Lighting</strong> costs have dropped dramatically thanks to LED technology. A traditional 60-watt incandescent bulb has been replaced by a 10-watt LED that produces the same brightness. For a household with 30 light fixtures, switching entirely to LEDs can reduce lighting electricity use by more than 80%, saving $100 to $200 per year.</p>
+
+    <h2>Energy-Saving Tips to Lower Your Electricity Bill</h2>
+    <p>Reducing your electricity consumption does not always require expensive upgrades or sacrificing comfort. Many of the most effective energy-saving strategies are simple behavioral changes that cost nothing to implement. Here are practical tips organized from the easiest to the most impactful.</p>
+    <p><strong>Adjust your thermostat.</strong> Heating and cooling account for the largest share of most electricity bills. Setting your thermostat just 2 degrees higher in summer (from 72 to 74 degrees Fahrenheit) or 2 degrees lower in winter can reduce your HVAC energy use by 5% to 10%. A programmable or smart thermostat can automate these adjustments, raising the temperature when you are away at work and lowering it before you return home. The Department of Energy estimates that proper thermostat management can save the average homeowner about $180 per year.</p>
+    <p><strong>Switch to LED lighting.</strong> If you have not already replaced your incandescent or CFL bulbs with LEDs, this is one of the highest-return investments you can make. LED bulbs use 75% to 80% less electricity than incandescent bulbs, last 15 to 25 times longer, and have dropped in price to just a few dollars each. Replacing 20 incandescent bulbs with LEDs saves approximately $150 per year in electricity costs and eliminates the hassle and cost of frequent bulb replacements.</p>
+    <p><strong>Unplug phantom loads.</strong> Many electronic devices continue to draw power even when they are turned off or in standby mode. This phenomenon, known as phantom load, vampire power, or standby power, can account for 5% to 10% of your total household electricity use. Common phantom load offenders include cable boxes, gaming consoles, phone chargers, printers, and microwaves with digital displays. Using smart power strips that cut power to devices when they are not in use can eliminate phantom loads without requiring you to manually unplug devices every day.</p>
+    <p><strong>Run full loads.</strong> Running your dishwasher and washing machine with full loads rather than partial loads reduces the number of cycles needed and saves both water and electricity. If you must run a partial load, use the appropriate water level and cycle settings. For your dryer, clean the lint filter before every load to maintain airflow and efficiency, and avoid over-drying clothes by using the moisture sensor setting if your dryer has one.</p>
+    <p><strong>Seal air leaks.</strong> Air leaks around windows, doors, and ductwork force your HVAC system to work harder to maintain the desired temperature. Weatherstripping around doors and windows and caulking around gaps and cracks are inexpensive fixes that can save 10% to 20% on heating and cooling costs. Insulating your attic, if it is under-insulated, can yield even greater savings, particularly in climates with extreme temperatures.</p>
+    <p><strong>Use ceiling fans strategically.</strong> A ceiling fan uses only 15 to 75 watts, far less than an air conditioner. In summer, fans create a wind-chill effect that makes a room feel 4 to 6 degrees cooler, allowing you to raise your thermostat by the same amount without sacrificing comfort. In winter, reversing the fan direction (clockwise on low speed) pushes warm air down from the ceiling. Remember that fans cool people, not rooms, so turn them off when you leave.</p>
+
+    <h2>Phantom Loads and Standby Power</h2>
+    <p>Phantom loads, also called vampire power or standby power, represent one of the most overlooked sources of wasted electricity in modern homes. A phantom load is the electricity consumed by a device when it is plugged in but not actively being used. This power keeps clocks running on microwaves, maintains network connections on smart TVs, keeps remote control receivers active on cable boxes, and charges internal batteries in cordless devices.</p>
+    <p>The Lawrence Berkeley National Laboratory estimates that the average American home has 40 or more devices drawing phantom power at any given time. Individually, each device may draw only 1 to 10 watts in standby mode, but collectively these phantom loads can add up to 50 to 100 watts of continuous power draw, translating to 36 to 73 kWh per month, or roughly $6 to $12 per month at average electricity rates. Over a year, phantom loads can cost a typical household $70 to $140, roughly equivalent to powering a new refrigerator.</p>
+    <p>The worst offenders for phantom loads include cable and satellite boxes (which can draw 20 to 35 watts even when turned off), gaming consoles in standby mode (10 to 25 watts), desktop computers in sleep mode (3 to 10 watts), printers (5 to 10 watts), and chargers left plugged in without a device attached (0.5 to 2 watts each). Set-top boxes are particularly problematic because many older models draw nearly as much power in standby mode as they do when actively streaming content.</p>
+    <p>The most practical solution for managing phantom loads is to use smart power strips. These strips detect when a primary device (such as a TV or computer) is turned off and automatically cut power to connected peripheral devices (such as speakers, game consoles, and chargers). Advanced smart plugs can be controlled via smartphone apps and scheduled to turn off at specific times, such as cutting power to your home office setup at 6 PM and restoring it at 8 AM.</p>
+
+    <h2>Smart Home Technology and Energy Savings</h2>
+    <p>Smart home devices have made it easier than ever to monitor and reduce energy consumption. From smart thermostats to whole-home energy monitors, these technologies provide visibility into exactly where your electricity dollars go and automate savings that would be difficult to achieve manually.</p>
+    <p><strong>Smart thermostats</strong> like the Nest Learning Thermostat and Ecobee use occupancy sensors, learning algorithms, and weather forecasts to optimize heating and cooling schedules. Google reports that the Nest thermostat saves customers an average of 10% to 12% on heating bills and 15% on cooling bills. These savings result from the thermostat automatically adjusting the temperature when you leave home, learning your preferences over time, and providing monthly energy reports that highlight opportunities for improvement.</p>
+    <p><strong>Whole-home energy monitors</strong> attach to your electrical panel and provide real-time visibility into your total household energy consumption. More advanced models can identify individual appliances by their unique electrical signatures, showing you exactly how much energy your refrigerator, HVAC system, or dryer uses. This data-driven approach makes it easy to identify the biggest energy consumers and measure the impact of changes you make.</p>
+    <p><strong>Smart plugs and outlets</strong> allow you to control individual devices remotely and set schedules for when they receive power. You can schedule your coffee maker to turn on at 6 AM and off at 7 AM, ensure your space heater turns off when you leave for work, or set your entertainment center to completely power down at midnight. Many smart plugs also track the energy consumption of the connected device, giving you appliance-level usage data without a whole-home monitor.</p>
+    <p><strong>Smart lighting systems</strong> go beyond simple LED efficiency by adding automation and scheduling. Lights can turn on and off based on occupancy, dim automatically based on ambient light levels, and follow preset schedules. While the energy savings from smart lighting are incremental compared to simply switching to LEDs, the convenience factor means lights are far less likely to be left on unnecessarily in empty rooms.</p>
+
+    <h2>Solar Power: Should You Make the Switch?</h2>
+    <p>With residential solar panel costs dropping more than 70% over the past decade, solar energy has become a financially viable option for millions of American homeowners. Whether solar makes sense for you depends on your electricity rates, roof characteristics, local incentives, and how long you plan to stay in your home.</p>
+    <p>A typical residential solar panel system in the United States is 6 to 10 kilowatts (kW) in capacity and costs $15,000 to $25,000 before incentives. The federal Investment Tax Credit (ITC) currently covers 30% of the installation cost, bringing a $20,000 system down to $14,000. Many states offer additional rebates, tax credits, or solar renewable energy certificates (SRECs) that further reduce the net cost.</p>
+    <p>The payback period for a solar installation depends primarily on your local electricity rate. In high-rate states like California, Massachusetts, or Hawaii, a solar system can pay for itself in 5 to 7 years, after which the electricity it generates is essentially free for the remaining 18 to 20 years of the system's 25-year warranty. In low-rate states like Louisiana or Idaho, the payback period stretches to 10 to 14 years, making the investment less compelling unless rates rise significantly.</p>
+    <p>Net metering policies, which allow you to sell excess solar electricity back to the grid at or near the retail rate, dramatically improve the economics of solar. Under net metering, your meter effectively runs backward when your panels produce more electricity than you consume, giving you a credit that offsets nighttime and cloudy-day electricity purchases. However, some states and utilities have reduced or eliminated net metering benefits in recent years, so check your local policies before making a decision.</p>
+    <p>If buying a solar system outright is not in your budget, solar leases and power purchase agreements (PPAs) allow you to host panels on your roof with no upfront cost. Under these arrangements, a solar company owns and maintains the panels and sells you the electricity they produce at a rate lower than your utility's rate. While leases and PPAs offer immediate savings, the long-term financial benefit is smaller than owning the system outright because you do not benefit from the tax credits or the free electricity after the payback period.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>How do you calculate electricity cost for an appliance?</h3>
+    <p>To calculate the electricity cost for any appliance, you need three numbers: the appliance's wattage, the number of hours you use it per day, and your electricity rate in dollars per kilowatt-hour. First, multiply the wattage by the hours of daily use and divide by 1,000 to convert to kilowatt-hours. Then multiply the daily kWh by your rate to get the daily cost. For example, a 1,500-watt space heater running 8 hours per day at $0.16/kWh costs: (1,500 &times; 8) / 1,000 = 12 kWh per day, and 12 &times; $0.16 = $1.92 per day. Multiply by 30 for the monthly estimate of $57.60. You can find the wattage on the appliance's label, nameplate, or in its owner's manual.</p>
+
+    <h3>What is a kilowatt-hour (kWh) and how is it measured?</h3>
+    <p>A kilowatt-hour (kWh) is a unit of energy that represents using 1,000 watts of power for one hour. It is the standard unit that electric utilities use to measure and bill for electricity consumption. Your electric meter records cumulative kWh usage, and the utility reads this meter monthly to determine how many kWh you consumed during the billing period. One kWh is equivalent to running ten 100-watt light bulbs for one hour, or running a single 100-watt bulb for ten hours. The average U.S. household consumes about 886 kWh per month, translating to roughly 29 kWh per day.</p>
+
+    <h3>What uses the most electricity in a typical home?</h3>
+    <p>Heating and cooling systems are the largest electricity consumers in most American homes, accounting for 40% to 50% of total usage. Water heaters come in second at about 14% to 18%. Laundry (washers and especially dryers) and refrigeration each account for roughly 5% to 8%. Lighting, cooking, and electronics each contribute smaller shares. The exact breakdown varies by climate, home size, and household habits. In hot, humid climates, air conditioning dominates the bill, while in cold climates, electric heating (if not gas) can be the primary driver.</p>
+
+    <h3>How can I reduce my electric bill without sacrificing comfort?</h3>
+    <p>The most effective no-sacrifice strategies include switching to LED bulbs (saves $100 or more per year), using a smart or programmable thermostat (saves 10% to 15% on HVAC costs), unplugging phantom loads or using smart power strips (saves $70 to $140 per year), running appliances during off-peak hours if your utility offers time-of-use rates, and ensuring your home is properly insulated and sealed against air leaks. Ceiling fans cost only pennies per hour to run and can make a room feel several degrees cooler, allowing you to raise your thermostat setpoint without noticing a difference in comfort.</p>
+
+    <h3>Are smart power strips worth the investment?</h3>
+    <p>Yes, smart power strips typically cost $25 to $45 and can save $50 to $100 or more per year by eliminating phantom loads from entertainment centers, computer setups, and other device clusters. They pay for themselves within a few months. Advanced models detect when the primary device is turned off and automatically cut power to all connected peripherals. Some smart strips also include USB charging ports and surge protection, adding additional value beyond energy savings.</p>
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/everyday-calculators/gas-cost-calculator/">Gas Cost Calculator</a> - Estimate fuel costs for any road trip.</li>
+      <li><a href="/everyday-calculators/discount-calculator/">Discount Calculator</a> - Calculate sale prices and savings on purchases.</li>
+      <li><a href="/everyday-calculators/square-footage-calculator/">Square Footage Calculator</a> - Measure rooms and estimate material costs.</li>
+      <li><a href="/conversion-calculators/unit-converter/">Unit Converter</a> - Convert between units of measurement.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .appliance-presets {
+    margin-bottom: 24px;
+  }
+  .presets-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-bottom: 8px;
+  }
+  .preset-btns {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .preset-btn {
+    padding: 8px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: transparent;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--color-text);
+    transition: all 0.15s;
+  }
+  .preset-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  .preset-btn.active {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+  }
+</style>
+
+<script>
+  function formatCurrency(n: number): string {
+    return '$' + n.toFixed(2);
+  }
+
+  function calculate(): void {
+    const wattage = parseFloat((document.getElementById('wattage') as HTMLInputElement).value) || 0;
+    const hoursPerDay = parseFloat((document.getElementById('hoursPerDay') as HTMLInputElement).value) || 0;
+    const rate = parseFloat((document.getElementById('electricityRate') as HTMLInputElement).value) || 0;
+    const daysPerMonth = parseFloat((document.getElementById('daysPerMonth') as HTMLInputElement).value) || 30;
+
+    const dailyKwh = (wattage * hoursPerDay) / 1000;
+    const monthlyKwh = dailyKwh * daysPerMonth;
+    const dailyCost = dailyKwh * rate;
+    const monthlyCost = monthlyKwh * rate;
+    const yearlyCost = dailyCost * 365;
+
+    document.getElementById('dailyKwh')!.textContent = dailyKwh.toFixed(2);
+    document.getElementById('monthlyKwh')!.textContent = monthlyKwh.toFixed(2);
+    document.getElementById('dailyCost')!.textContent = formatCurrency(dailyCost);
+    document.getElementById('monthlyCost')!.textContent = formatCurrency(monthlyCost);
+    document.getElementById('yearlyCost')!.textContent = formatCurrency(yearlyCost);
+  }
+
+  // Real-time calculation on input changes
+  (document.getElementById('wattage') as HTMLInputElement).addEventListener('input', () => {
+    const val = parseFloat((document.getElementById('wattage') as HTMLInputElement).value) || 0;
+    document.querySelectorAll('.preset-btn').forEach((btn) => {
+      const btnWatts = parseInt((btn as HTMLElement).dataset.watts!);
+      if (btnWatts === val) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+    calculate();
+  });
+  (document.getElementById('hoursPerDay') as HTMLInputElement).addEventListener('input', calculate);
+  (document.getElementById('electricityRate') as HTMLInputElement).addEventListener('input', calculate);
+  (document.getElementById('daysPerMonth') as HTMLInputElement).addEventListener('input', calculate);
+
+  // Appliance preset button handlers
+  document.querySelectorAll('.preset-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const watts = parseInt((btn as HTMLElement).dataset.watts!);
+      (document.getElementById('wattage') as HTMLInputElement).value = String(watts);
+      document.querySelectorAll('.preset-btn').forEach((b) => {
+        b.classList.remove('active');
+      });
+      btn.classList.add('active');
+      calculate();
+    });
+  });
+
+  // Initial calculation on load
+  calculate();
+</script>

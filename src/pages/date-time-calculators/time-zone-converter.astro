@@ -1,0 +1,465 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Date & Time Calculators",
+        "item": "https://toolcalcs.com/date-time-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Time Zone Converter"
+      }
+    ]
+  },
+  {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'How do I convert time between time zones?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'To convert time between time zones, determine the UTC offset of both the source and target time zones. Subtract the source offset from the time to get UTC, then add the target offset to get the converted time. For example, to convert 3:00 PM Eastern Time (UTC-5) to Central European Time (UTC+1), add 6 hours to get 9:00 PM CET. This converter handles the math automatically, including daylight saving time adjustments.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is the difference between UTC and GMT?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'UTC (Coordinated Universal Time) and GMT (Greenwich Mean Time) represent the same time in practice, but they are defined differently. GMT is a time zone based on the mean solar time at the Royal Observatory in Greenwich, England. UTC is a time standard maintained by atomic clocks and is the basis for civil timekeeping worldwide. UTC does not observe daylight saving time, making it the preferred reference for international scheduling and computing.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Does this converter account for daylight saving time?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes. This converter uses the Intl.DateTimeFormat API built into modern browsers, which automatically applies the correct daylight saving time rules for each time zone based on the date you select. If you pick a summer date, zones that observe DST will reflect their summer offsets (such as EDT instead of EST). If you pick a winter date, the standard offsets apply.',
+      },
+    },
+  ],
+},
+];
+---
+
+<BaseLayout
+  title="Time Zone Converter - Convert Times Between Zones | ToolCalcs"
+  description="Free time zone converter. Convert times between any world time zones instantly. See current time in major cities, time differences, and plan meetings across zones."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/date-time-calculators/">Date & Time Calculators</a> &rsaquo;
+    <span>Time Zone Converter</span>
+  </nav>
+
+  <h1>Time Zone Converter</h1>
+  <p class="page-desc">Convert times between world time zones instantly and see the current time in any zone.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="inputDate">Date</label>
+        <input type="date" id="inputDate" />
+      </div>
+      <div class="input-group">
+        <label for="inputTime">Time</label>
+        <input type="time" id="inputTime" />
+      </div>
+    </div>
+    <div class="calc-inputs tz-row">
+      <div class="input-group">
+        <label for="fromTz">From Time Zone</label>
+        <select id="fromTz">
+          <option value="America/New_York">Eastern Time (ET) - New York</option>
+          <option value="America/Chicago">Central Time (CT) - Chicago</option>
+          <option value="America/Denver">Mountain Time (MT) - Denver</option>
+          <option value="America/Los_Angeles">Pacific Time (PT) - Los Angeles</option>
+          <option value="America/Anchorage">Alaska Time (AKT) - Anchorage</option>
+          <option value="Pacific/Honolulu">Hawaii Time (HST) - Honolulu</option>
+          <option value="UTC">UTC / GMT</option>
+          <option value="Europe/London">GMT - London</option>
+          <option value="Europe/Paris">Central European (CET) - Paris</option>
+          <option value="Europe/Helsinki">Eastern European (EET) - Helsinki</option>
+          <option value="Europe/Moscow">Moscow Time (MSK)</option>
+          <option value="Asia/Dubai">Gulf Standard (GST) - Dubai</option>
+          <option value="Asia/Kolkata">India Standard (IST) - Mumbai</option>
+          <option value="Asia/Bangkok">Indochina (ICT) - Bangkok</option>
+          <option value="Asia/Shanghai">China Standard (CST) - Shanghai</option>
+          <option value="Asia/Tokyo">Japan Standard (JST) - Tokyo</option>
+          <option value="Asia/Seoul">Korea Standard (KST) - Seoul</option>
+          <option value="Australia/Sydney">Australian Eastern (AEST) - Sydney</option>
+          <option value="Pacific/Auckland">New Zealand (NZST) - Auckland</option>
+        </select>
+      </div>
+      <div class="input-group swap-group">
+        <label>&nbsp;</label>
+        <button type="button" class="swap-btn" id="swapBtn" title="Swap time zones">&#8644;</button>
+      </div>
+      <div class="input-group">
+        <label for="toTz">To Time Zone</label>
+        <select id="toTz">
+          <option value="America/New_York">Eastern Time (ET) - New York</option>
+          <option value="America/Chicago">Central Time (CT) - Chicago</option>
+          <option value="America/Denver">Mountain Time (MT) - Denver</option>
+          <option value="America/Los_Angeles">Pacific Time (PT) - Los Angeles</option>
+          <option value="America/Anchorage">Alaska Time (AKT) - Anchorage</option>
+          <option value="Pacific/Honolulu">Hawaii Time (HST) - Honolulu</option>
+          <option value="UTC" selected>UTC / GMT</option>
+          <option value="Europe/London">GMT - London</option>
+          <option value="Europe/Paris">Central European (CET) - Paris</option>
+          <option value="Europe/Helsinki">Eastern European (EET) - Helsinki</option>
+          <option value="Europe/Moscow">Moscow Time (MSK)</option>
+          <option value="Asia/Dubai">Gulf Standard (GST) - Dubai</option>
+          <option value="Asia/Kolkata">India Standard (IST) - Mumbai</option>
+          <option value="Asia/Bangkok">Indochina (ICT) - Bangkok</option>
+          <option value="Asia/Shanghai">China Standard (CST) - Shanghai</option>
+          <option value="Asia/Tokyo">Japan Standard (JST) - Tokyo</option>
+          <option value="Asia/Seoul">Korea Standard (KST) - Seoul</option>
+          <option value="Australia/Sydney">Australian Eastern (AEST) - Sydney</option>
+          <option value="Pacific/Auckland">New Zealand (NZST) - Auckland</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Converted Time</span>
+          <span class="result-value" id="convertedTime">--</span>
+          <span class="result-detail" id="convertedDetail"></span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Time Difference</span>
+          <span class="result-value" id="timeDiff">--</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label" id="fromNowLabel">Current Time (From)</span>
+          <span class="result-value small" id="fromNow">--</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label" id="toNowLabel">Current Time (To)</span>
+          <span class="result-value small" id="toNow">--</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>Understanding Time Zones</h2>
+    <p>Time zones are regions of the Earth that observe the same standard time. The concept was introduced in the late 19th century to replace the chaotic system of local mean time, where every city set its clocks based on the position of the Sun. Before standardized time zones, a traveler moving from one town to another might need to adjust their watch by a few minutes at every stop, and railroad companies struggled to publish accurate schedules.</p>
+    <p>The modern time zone system divides the world into 24 primary zones, each roughly 15 degrees of longitude wide and offset from Coordinated Universal Time (UTC) by a whole number of hours. In practice, however, time zone boundaries follow political and geographic borders rather than strict lines of longitude. This means some time zones are irregularly shaped, and several zones use offsets of 30 or 45 minutes rather than whole hours. India, for example, uses UTC+5:30, and Nepal uses UTC+5:45.</p>
+    <p>As of today, there are more than 30 distinct UTC offsets in use around the world, ranging from UTC-12 (Baker Island) to UTC+14 (Line Islands in Kiribati). Some countries span multiple time zones: the United States uses six (Eastern, Central, Mountain, Pacific, Alaska, and Hawaii-Aleutian), Russia spans eleven, and China, despite its vast size, uses a single time zone (UTC+8) for the entire country.</p>
+    <p>Time zones are essential for coordinating activities across different parts of the world. International flights, video conference calls, stock market trading hours, live broadcast schedules, and shipping logistics all depend on accurate time zone conversion. A mistake of even one hour can cause a missed flight, a failed meeting, or a delayed shipment.</p>
+
+    <h2>UTC and GMT: The World's Reference Time</h2>
+    <p>Coordinated Universal Time (UTC) is the primary time standard by which the world regulates clocks and time. It replaced Greenwich Mean Time (GMT) as the international standard in 1960, though the two terms are still used interchangeably in many everyday contexts.</p>
+    <p><strong>GMT</strong> was established in 1884 at the International Meridian Conference, which selected the Royal Observatory in Greenwich, England, as the location of the prime meridian (0 degrees longitude). GMT was originally defined by the mean solar time at Greenwich, meaning it was based on astronomical observations of the Sun's position. Because Earth's rotation is not perfectly uniform, GMT is not perfectly precise by modern standards.</p>
+    <p><strong>UTC</strong> is maintained by a network of over 400 atomic clocks distributed around the world. These clocks are extraordinarily precise, losing less than one second over millions of years. UTC is occasionally adjusted by adding a "leap second" to keep it within 0.9 seconds of the Earth's observed rotation. The most recent leap second was added on December 31, 2016, and the practice of adding leap seconds is being phased out by international agreement.</p>
+    <p>For all practical purposes, UTC and GMT show the same time. The difference matters only in scientific and technical contexts where sub-second precision is required. When converting between time zones, you can treat UTC and GMT as identical. All time zone offsets are expressed relative to UTC: Eastern Time in the United States is UTC-5 in winter and UTC-4 in summer (when daylight saving time is in effect).</p>
+    <p>UTC is the standard used in aviation (where it is called "Zulu time"), international shipping, weather forecasting, the Internet (servers often log events in UTC), and scientific research. Using UTC as a common reference eliminates ambiguity when coordinating across time zones.</p>
+
+    <h2>Daylight Saving Time Explained</h2>
+    <p>Daylight saving time (DST) is the practice of advancing clocks by one hour during the warmer months so that evenings have more daylight. In the Northern Hemisphere, DST typically begins in March or April and ends in October or November. The exact dates vary by country and sometimes by region within a country.</p>
+    <p>In the United States, DST begins on the second Sunday of March at 2:00 AM local time (clocks "spring forward" to 3:00 AM) and ends on the first Sunday of November at 2:00 AM (clocks "fall back" to 1:00 AM). During DST, Eastern Daylight Time (EDT) is UTC-4, compared to Eastern Standard Time (EST) at UTC-5. This one-hour shift affects every time zone in the U.S. except Arizona (which does not observe DST, with the exception of the Navajo Nation) and Hawaii.</p>
+    <p>In Europe, DST begins on the last Sunday of March and ends on the last Sunday of October. European countries shift their clocks by one hour, so Central European Time (CET, UTC+1) becomes Central European Summer Time (CEST, UTC+2). The European Union has debated abolishing DST entirely, but as of 2026, the changes have not been formally enacted.</p>
+    <p>Not all countries observe DST. Most of Africa, Asia, and South America do not change their clocks. Australia observes DST in some states but not others: New South Wales, Victoria, South Australia, Tasmania, and the Australian Capital Territory observe it, while Queensland, the Northern Territory, and Western Australia do not. This creates additional complexity when converting times to and from Australian zones.</p>
+    <p>DST has a significant impact on time zone conversions. During the summer months, the offset between New York (EDT, UTC-4) and London (BST, UTC+1) is 5 hours. During winter, when New York is on EST (UTC-5) and London is on GMT (UTC+0), the offset is also 5 hours. However, during the brief periods when one location has changed its clocks but the other has not yet, the offset can be 4 or 6 hours. This converter accounts for DST automatically based on the date you select, so you always get the correct offset for that specific day.</p>
+
+    <h2>The International Date Line</h2>
+    <p>The International Date Line (IDL) is an imaginary line running roughly along the 180th meridian in the Pacific Ocean. When you cross the date line traveling westward, you advance the calendar by one day. When traveling eastward, you go back one day. The date line exists because the 24-hour time zone system creates a full day's difference between the easternmost and westernmost time zones.</p>
+    <p>The IDL does not follow the 180th meridian exactly. It zigzags around political boundaries to keep island nations and territories on the same date as their closest trading partners. For example, the line swings east around the tip of Siberia so that all of Russia is on the same side, and it bends west around the Aleutian Islands so they share dates with the rest of Alaska. Kiribati moved the date line in 1995 so that its eastern islands (in the Line Islands group) would be on the same day as the rest of the country, creating the UTC+14 time zone, the farthest ahead of UTC in the world.</p>
+    <p>The date line matters most for international travelers and global businesses. A flight from Los Angeles to Tokyo that departs on Monday evening will typically arrive on Wednesday, even though the flight is only about 11 hours long, because it crosses the date line westward. Conversely, a flight from Tokyo to Los Angeles that departs on Wednesday might arrive on the same Wednesday, because crossing the date line eastward effectively "gives back" a day.</p>
+    <p>For time zone conversions involving locations on opposite sides of the date line, it is important to pay attention to the date as well as the time. This converter handles date changes automatically. If you convert 11:00 PM in New York to Auckland time (which is 17 hours ahead), the result will show the next day's date.</p>
+
+    <h2>Common Time Zone Abbreviations</h2>
+    <p>Time zone abbreviations are shorthand codes used to identify specific time zones. While convenient, they can be ambiguous because some abbreviations represent more than one time zone. Here are the most commonly referenced abbreviations:</p>
+    <ul>
+      <li><strong>EST / EDT</strong> - Eastern Standard Time (UTC-5) / Eastern Daylight Time (UTC-4). Used by the U.S. East Coast, including New York, Washington D.C., Miami, and Atlanta.</li>
+      <li><strong>CST / CDT</strong> - Central Standard Time (UTC-6) / Central Daylight Time (UTC-5). Used by Chicago, Dallas, Houston, and Mexico City. Note that CST also refers to China Standard Time (UTC+8), so context matters.</li>
+      <li><strong>MST / MDT</strong> - Mountain Standard Time (UTC-7) / Mountain Daylight Time (UTC-6). Used by Denver, Phoenix (MST year-round), and Salt Lake City.</li>
+      <li><strong>PST / PDT</strong> - Pacific Standard Time (UTC-8) / Pacific Daylight Time (UTC-7). Used by Los Angeles, San Francisco, Seattle, and Vancouver.</li>
+      <li><strong>GMT</strong> - Greenwich Mean Time (UTC+0). Used by the United Kingdom during winter and several West African countries year-round.</li>
+      <li><strong>BST</strong> - British Summer Time (UTC+1). Used by the United Kingdom during daylight saving time, from March to October.</li>
+      <li><strong>CET / CEST</strong> - Central European Time (UTC+1) / Central European Summer Time (UTC+2). Used by France, Germany, Italy, Spain, and most of Western Europe.</li>
+      <li><strong>EET / EEST</strong> - Eastern European Time (UTC+2) / Eastern European Summer Time (UTC+3). Used by Finland, Greece, Romania, and the Baltic states.</li>
+      <li><strong>IST</strong> - India Standard Time (UTC+5:30). Used across all of India. This abbreviation also represents Irish Standard Time (UTC+1) and Israel Standard Time (UTC+2), making it one of the most ambiguous time zone codes.</li>
+      <li><strong>JST</strong> - Japan Standard Time (UTC+9). Used by Japan and does not observe daylight saving time.</li>
+      <li><strong>AEST / AEDT</strong> - Australian Eastern Standard Time (UTC+10) / Australian Eastern Daylight Time (UTC+11). Used by Sydney, Melbourne, and Canberra.</li>
+      <li><strong>NZST / NZDT</strong> - New Zealand Standard Time (UTC+12) / New Zealand Daylight Time (UTC+13). Used by New Zealand.</li>
+    </ul>
+    <p>Because of these ambiguities, the IANA time zone database (used by this converter) identifies zones by region and city, such as "America/New_York" or "Asia/Kolkata," rather than by abbreviation. This eliminates confusion and ensures that daylight saving time rules are applied correctly for each specific location.</p>
+
+    <h2>Tips for Scheduling Across Time Zones</h2>
+    <p>Scheduling meetings and coordinating work across multiple time zones is one of the most common challenges in modern business. Remote teams, international partnerships, and global customers all require careful time management. Here are practical strategies that help.</p>
+    <p><strong>Use UTC as a common reference.</strong> When communicating times to people in multiple time zones, stating the time in UTC eliminates ambiguity. Instead of saying "the meeting is at 3 PM," say "the meeting is at 3 PM ET / 20:00 UTC." Anyone in the world can convert from UTC to their local time without needing to know your time zone. This is especially useful in written communications like emails and calendar invitations.</p>
+    <p><strong>Be aware of overlapping business hours.</strong> For teams spread across time zones, the window of overlapping working hours determines when synchronous communication (meetings, calls, real-time collaboration) can happen. A team split between New York (ET) and London (GMT/BST) has about 4-5 hours of overlap during a standard workday. A team split between New York and Tokyo (JST) has almost no overlap during regular hours, which means one party must work early or late to accommodate synchronous meetings.</p>
+    <p><strong>Specify the date alongside the time.</strong> When the time difference between two locations exceeds 12 hours, a meeting scheduled for "Monday at 9 AM" in one location could fall on Sunday or Tuesday in another. Always include the full date and the time zone abbreviation or city name to prevent confusion. For example, "Monday, March 15 at 9:00 AM Pacific Time" is unambiguous.</p>
+    <p><strong>Account for daylight saving transitions.</strong> DST changes happen on different dates in different countries. The U.S. and Europe change clocks on different weekends, so for a few weeks each year, the time difference between New York and London is 4 hours instead of the usual 5. If you have recurring meetings across these time zones, verify the time conversion after each DST transition.</p>
+    <p><strong>Use world clock tools.</strong> When scheduling, check the current time in each participant's location. This converter shows the current time in both the source and target zones, which helps you confirm that a proposed meeting time falls within reasonable hours for everyone involved. Avoid scheduling meetings during late evening or early morning hours for any participant, as this leads to fatigue and disengagement.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>How do I convert time between time zones?</h3>
+    <p>Determine the UTC offset for both time zones, subtract the source offset from the original time to get UTC, then add the target offset. For example, to convert 2:00 PM Eastern Time (UTC-5) to Japan Standard Time (UTC+9), first convert to UTC by adding 5 hours (7:00 PM UTC), then add 9 hours to get 4:00 AM JST the next day. This converter does all the arithmetic automatically, including daylight saving adjustments based on the date you select.</p>
+
+    <h3>What is the difference between UTC and GMT?</h3>
+    <p>UTC and GMT show the same time for practical purposes. GMT is a time zone based on solar observations at Greenwich, England, while UTC is a precise time standard maintained by atomic clocks. UTC does not observe daylight saving time. In everyday use, the terms are interchangeable, but UTC is preferred in scientific, aviation, and computing contexts because of its atomic-clock precision.</p>
+
+    <h3>Does this converter account for daylight saving time?</h3>
+    <p>Yes. The converter uses the browser's built-in Intl.DateTimeFormat API, which applies the correct daylight saving time rules for each time zone based on the selected date. Summer dates will reflect DST offsets (for example, EDT instead of EST), while winter dates will use standard offsets. This ensures accurate conversions year-round, regardless of when DST transitions occur in each region.</p>
+
+    <h3>Why do some time zones have 30-minute or 45-minute offsets?</h3>
+    <p>While the standard time zone system uses whole-hour offsets from UTC, some countries adopted half-hour or 45-minute offsets to better align their clocks with local solar time. India uses UTC+5:30, Iran uses UTC+3:30, and Nepal uses UTC+5:45. These non-standard offsets exist because forcing a whole-hour offset would place the official noon too far from solar noon in those regions. This converter supports all major IANA time zones, including those with fractional offsets.</p>
+
+    <h3>How do I find the best time for a meeting across multiple time zones?</h3>
+    <p>Identify the overlapping business hours between all participant time zones. For two zones, convert the typical working hours (9 AM to 5 PM) of each zone into the other zone and find the overlap. For New York and London, the overlap is roughly 9 AM to 12 PM ET (2 PM to 5 PM GMT). For more than two zones, the overlap narrows further. Use this converter to check specific times in each zone, and aim for a time that falls within reasonable hours for all participants.</p>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/date-time-calculators/age-calculator/">Age Calculator</a> - Calculate your exact age in years, months, and days.</li>
+      <li><a href="/date-time-calculators/date-difference-calculator/">Date Difference Calculator</a> - Find the exact days between two dates.</li>
+      <li><a href="/date-time-calculators/days-until-calculator/">Days Until Calculator</a> - Count down to any upcoming date.</li>
+      <li><a href="/everyday-calculators/hours-calculator/">Hours Calculator</a> - Calculate total work hours from time entries.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .tz-row {
+    grid-template-columns: 1fr auto 1fr;
+    align-items: end;
+  }
+  .swap-group {
+    flex: 0 0 auto;
+    align-items: center;
+  }
+  .swap-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    font-size: 1.3rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-bg);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, color 0.15s;
+  }
+  .swap-btn:hover {
+    border-color: var(--color-primary);
+    background: #eff6ff;
+    color: var(--color-primary);
+  }
+
+  .result-card.primary {
+    background: #eff6ff;
+    grid-column: 1 / -1;
+  }
+  .result-card.primary .result-value {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: var(--color-primary);
+  }
+  .result-value.small {
+    font-size: 1.1rem;
+  }
+  .result-detail {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+  }
+
+  select {
+    min-width: 0;
+  }
+
+  @media (max-width: 640px) {
+    .calc-inputs { grid-template-columns: 1fr; }
+    .tz-row { grid-template-columns: 1fr; }
+    .swap-group { align-items: stretch; }
+    .swap-btn {
+      width: 100%;
+      height: 38px;
+      font-size: 1.1rem;
+    }
+    .swap-group label { display: none; }
+    .result-cards { grid-template-columns: 1fr; }
+    .result-card.primary { grid-column: auto; }
+  }
+</style>
+
+<script>
+  const inputDate = document.getElementById('inputDate') as HTMLInputElement;
+  const inputTime = document.getElementById('inputTime') as HTMLInputElement;
+  const fromTz = document.getElementById('fromTz') as HTMLSelectElement;
+  const toTz = document.getElementById('toTz') as HTMLSelectElement;
+  const swapBtn = document.getElementById('swapBtn') as HTMLButtonElement;
+
+  // Set defaults to current date and time
+  const now = new Date();
+  inputDate.value = formatDateForInput(now);
+  inputTime.value = formatTimeForInput(now);
+
+  function formatDateForInput(date: Date): string {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  function formatTimeForInput(date: Date): string {
+    const h = String(date.getHours()).padStart(2, '0');
+    const min = String(date.getMinutes()).padStart(2, '0');
+    return `${h}:${min}`;
+  }
+
+  function getOffsetMinutes(timeZone: string, date: Date): number {
+    // Build a formatter that outputs the UTC offset parts
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      timeZoneName: 'longOffset',
+    });
+    const parts = formatter.formatToParts(date);
+    const tzPart = parts.find(p => p.type === 'timeZoneName');
+    if (!tzPart) return 0;
+    // tzPart.value looks like "GMT", "GMT+5:30", "GMT-4", etc.
+    const val = tzPart.value;
+    if (val === 'GMT') return 0;
+    const match = val.match(/GMT([+-])(\d{1,2})(?::(\d{2}))?/);
+    if (!match) return 0;
+    const sign = match[1] === '+' ? 1 : -1;
+    const hours = parseInt(match[2], 10);
+    const minutes = match[3] ? parseInt(match[3], 10) : 0;
+    return sign * (hours * 60 + minutes);
+  }
+
+  function formatInZone(date: Date, timeZone: string): string {
+    return new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      weekday: 'short',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    }).format(date);
+  }
+
+  function formatTimeOnly(date: Date, timeZone: string): string {
+    return new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      hour: 'numeric',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+    }).format(date);
+  }
+
+  function getShortZoneName(date: Date, timeZone: string): string {
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      timeZoneName: 'short',
+    });
+    const parts = formatter.formatToParts(date);
+    const tzPart = parts.find(p => p.type === 'timeZoneName');
+    return tzPart ? tzPart.value : timeZone;
+  }
+
+  function convert() {
+    const dateVal = inputDate.value;
+    const timeVal = inputTime.value;
+    if (!dateVal || !timeVal) return;
+
+    const fromZone = fromTz.value;
+    const toZone = toTz.value;
+
+    // Build a date in the "from" time zone by computing the UTC equivalent
+    // Parse the user's input as local date/time components
+    const [year, month, day] = dateVal.split('-').map(Number);
+    const [hours, minutes] = timeVal.split(':').map(Number);
+
+    // Create a temporary date to figure out the from-zone offset
+    const tempDate = new Date(year, month - 1, day, hours, minutes, 0);
+    const fromOffset = getOffsetMinutes(fromZone, tempDate);
+    const localOffset = tempDate.getTimezoneOffset(); // in minutes, inverted sign
+
+    // Adjust the Date so it represents the correct UTC instant for the from-zone
+    const utcMs = tempDate.getTime() - (fromOffset + localOffset) * 60 * 1000;
+    const utcDate = new Date(utcMs);
+
+    // Format the converted time in the target zone
+    const convertedStr = formatInZone(utcDate, toZone);
+    const toZoneName = getShortZoneName(utcDate, toZone);
+    const fromZoneName = getShortZoneName(utcDate, fromZone);
+
+    document.getElementById('convertedTime')!.textContent = convertedStr;
+    document.getElementById('convertedDetail')!.textContent = toZoneName;
+
+    // Time difference
+    const fromOff = getOffsetMinutes(fromZone, utcDate);
+    const toOff = getOffsetMinutes(toZone, utcDate);
+    const diffMinutes = toOff - fromOff;
+    const diffHours = Math.floor(Math.abs(diffMinutes) / 60);
+    const diffMins = Math.abs(diffMinutes) % 60;
+    const sign = diffMinutes >= 0 ? '+' : '-';
+    let diffStr = `${sign}${diffHours}`;
+    if (diffMins > 0) {
+      diffStr += `:${String(diffMins).padStart(2, '0')}`;
+    }
+    diffStr += diffHours === 1 && diffMins === 0 ? ' hour' : ' hours';
+    document.getElementById('timeDiff')!.textContent = diffStr;
+
+    // Current time in both zones
+    const currentNow = new Date();
+    document.getElementById('fromNow')!.textContent = formatTimeOnly(currentNow, fromZone);
+    document.getElementById('toNow')!.textContent = formatTimeOnly(currentNow, toZone);
+
+    // Update labels with zone names
+    document.getElementById('fromNowLabel')!.textContent = `Now in ${fromZoneName}`;
+    document.getElementById('toNowLabel')!.textContent = `Now in ${toZoneName}`;
+  }
+
+  // Swap button
+  swapBtn.addEventListener('click', () => {
+    const temp = fromTz.value;
+    fromTz.value = toTz.value;
+    toTz.value = temp;
+    convert();
+  });
+
+  // Auto-calculate on any change
+  inputDate.addEventListener('change', convert);
+  inputTime.addEventListener('input', convert);
+  fromTz.addEventListener('change', convert);
+  toTz.addEventListener('change', convert);
+
+  // Initial calculation
+  convert();
+</script>
