@@ -56,23 +56,6 @@ const structuredData = {
       <div class="aim-message" id="aim-message" style="display:none;" aria-live="assertive"></div>
     </div>
 
-    <div class="aim-stats" id="aim-stats" style="display:none;">
-      <div class="aim-stat-row">
-        <div class="aim-stat">
-          <span class="aim-stat-value" id="stat-hits">0</span>
-          <span class="aim-stat-label">Targets Hit</span>
-        </div>
-        <div class="aim-stat">
-          <span class="aim-stat-value" id="stat-remaining">30</span>
-          <span class="aim-stat-label">Remaining</span>
-        </div>
-        <div class="aim-stat">
-          <span class="aim-stat-value" id="stat-avg">--</span>
-          <span class="aim-stat-label">Avg Time (ms)</span>
-        </div>
-      </div>
-    </div>
-
     <div class="score-display" id="score-display" style="display:none;">
       <span class="score-value" id="score-value">0</span>
       <span class="score-unit">ms average reaction time</span>
@@ -81,7 +64,7 @@ const structuredData = {
 
     <div class="game-controls">
       <button class="game-btn primary" id="btn-start" type="button">Start</button>
-      <button class="game-btn secondary" id="btn-retry" type="button" style="display:none;">Try Again</button>
+      <button class="game-btn primary" id="btn-retry" type="button" style="display:none;">Try Again</button>
     </div>
 
     <div class="attempt-history" id="attempt-history" style="display:none;">
@@ -163,7 +146,7 @@ const structuredData = {
   }
   .aim-hud.visible { opacity: 1; }
 
-  .aim-target {
+  :global(.aim-target) {
     position: absolute;
     border-radius: 50%;
     background: #ef4444;
@@ -173,7 +156,7 @@ const structuredData = {
     animation: aim-pulse 0.8s ease-in-out infinite alternate;
     transition: transform 0.1s;
   }
-  .aim-target::after {
+  :global(.aim-target)::after {
     content: '';
     position: absolute;
     top: 50%;
@@ -185,7 +168,7 @@ const structuredData = {
     transform: translate(-50%, -50%);
     pointer-events: none;
   }
-  .aim-target:hover {
+  :global(.aim-target):hover {
     transform: scale(1.1);
   }
 
@@ -194,7 +177,7 @@ const structuredData = {
     100% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.15), 0 2px 12px rgba(0,0,0,0.2); }
   }
 
-  .aim-hit-marker {
+  :global(.aim-hit-marker) {
     position: absolute;
     border-radius: 50%;
     border: 2px solid #22c55e;
@@ -215,33 +198,8 @@ const structuredData = {
     padding: 32px;
   }
 
-  .aim-stats {
-    margin-bottom: 20px;
-  }
-  .aim-stat-row {
-    display: flex;
-    justify-content: center;
-    gap: 32px;
-    flex-wrap: wrap;
-  }
-  .aim-stat {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .aim-stat-value {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: var(--color-text);
-  }
-  .aim-stat-label {
-    font-size: 0.8rem;
-    color: var(--color-text-muted);
-    margin-top: 2px;
-  }
-
   /* Countdown display */
-  .aim-countdown {
+  :global(.aim-countdown) {
     font-size: 4rem;
     font-weight: 800;
     color: var(--color-primary);
@@ -254,8 +212,6 @@ const structuredData = {
 
   @media (max-width: 640px) {
     .game-area { min-height: 320px; }
-    .aim-stat-row { gap: 16px; }
-    .aim-stat-value { font-size: 1.3rem; }
     .aim-message { font-size: 1.2rem; padding: 24px; }
   }
 </style>
@@ -284,10 +240,6 @@ const structuredData = {
     const aimHud = document.getElementById('aim-hud') as HTMLElement;
     const hudHit = document.getElementById('hud-hit') as HTMLElement;
     const hudAvg = document.getElementById('hud-avg') as HTMLElement;
-    const aimStats = document.getElementById('aim-stats') as HTMLElement;
-    const statHits = document.getElementById('stat-hits') as HTMLElement;
-    const statRemaining = document.getElementById('stat-remaining') as HTMLElement;
-    const statAvg = document.getElementById('stat-avg') as HTMLElement;
     const scoreDisplay = document.getElementById('score-display') as HTMLElement;
     const scoreValue = document.getElementById('score-value') as HTMLElement;
     const ratingBadge = document.getElementById('rating-badge') as HTMLElement;
@@ -414,16 +366,6 @@ const structuredData = {
       }
     }
 
-    function updateStats() {
-      statHits.textContent = String(hits);
-      statRemaining.textContent = String(TOTAL_TARGETS - hits);
-      if (times.length > 0) {
-        statAvg.textContent = String(Math.round(times.reduce((a, b) => a + b, 0) / times.length));
-      } else {
-        statAvg.textContent = '--';
-      }
-    }
-
     function onTargetHit(e: Event) {
       if (!isPlaying || !currentTarget) return;
       e.preventDefault();
@@ -441,7 +383,6 @@ const structuredData = {
 
       removeTarget();
       updateHud();
-      updateStats();
 
       if (hits >= TOTAL_TARGETS) {
         endGame();
@@ -462,7 +403,6 @@ const structuredData = {
 
       // Hide HUD, show results
       aimHud.classList.remove('visible');
-      aimStats.style.display = 'none';
 
       // Show completion message in game area
       instructions.style.display = 'none';
@@ -493,13 +433,11 @@ const structuredData = {
       instructions.style.display = 'none';
       aimMessage.style.display = '';
       scoreDisplay.style.display = 'none';
-      aimStats.style.display = '';
       aimHud.classList.add('visible');
       btnStart.style.display = 'none';
       btnRetry.style.display = 'none';
 
       updateHud();
-      updateStats();
 
       // Countdown 3-2-1
       let count = 3;
