@@ -1,0 +1,288 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getToolBySlug } from '../../data/tools';
+import '../../styles/tool.css';
+
+const tool = getToolBySlug('base64-encoder-decoder')!;
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Web Tools", "item": "https://toolcalcs.com/tools/" },
+    { "@type": "ListItem", "position": 3, "name": "Base64 Encoder/Decoder" }
+  ]
+};
+---
+
+<BaseLayout
+  title="Base64 Encoder/Decoder - Encode & Decode Base64 Online | ToolCalcs"
+  description={tool.description}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/tools/">Web Tools</a> &rsaquo; <span>Base64 Encoder/Decoder</span>
+  </nav>
+
+  <h1>Base64 Encoder/Decoder</h1>
+  <p class="page-desc">Encode plain text to Base64 or decode Base64 strings back to readable text. Handles Unicode characters, runs entirely in your browser, and never sends data to a server.</p>
+
+  <div class="tool-box">
+    <div class="tool-io">
+      <div class="tool-input-area">
+        <label class="tool-label" for="toolInput">Plain Text</label>
+        <textarea id="toolInput" class="tool-textarea" placeholder="Enter text to encode or paste Base64 to decode..." spellcheck="false"></textarea>
+      </div>
+      <div class="tool-output-area">
+        <div class="output-header">
+          <label class="tool-label" for="toolOutput">Base64</label>
+          <button type="button" class="copy-btn" id="copyBtn">Copy</button>
+        </div>
+        <textarea id="toolOutput" class="tool-textarea" placeholder="Encoded or decoded result will appear here..." spellcheck="false" readonly></textarea>
+      </div>
+    </div>
+
+    <div class="tool-controls">
+      <button type="button" class="tool-btn primary" id="encodeBtn">Encode &rarr;</button>
+      <button type="button" class="tool-btn primary" id="decodeBtn">&larr; Decode</button>
+      <button type="button" class="tool-btn secondary" id="swapBtn">Swap</button>
+      <button type="button" class="tool-btn secondary" id="clearBtn">Clear</button>
+    </div>
+
+    <div class="tool-error" id="toolError" hidden></div>
+  </div>
+
+  <div id="pasteHint" class="paste-hint" hidden>
+    This looks like Base64-encoded text. <button type="button" class="paste-hint-btn" id="autoDecodeBtn">Decode it?</button>
+  </div>
+
+  <AdUnit slot="tool-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is Base64 Encoding?</h2>
+    <p>Base64 is a binary-to-text encoding scheme that converts binary data into a sequence of printable ASCII characters. It uses a 64-character alphabet consisting of uppercase letters (A-Z), lowercase letters (a-z), digits (0-9), and two additional symbols (+ and /). A padding character (=) is appended when the input length is not a multiple of three bytes.</p>
+    <p>The encoding process works by taking every three bytes (24 bits) of binary data and splitting them into four groups of six bits each. Each six-bit group maps to one of the 64 characters in the Base64 alphabet. Because three input bytes become four output characters, Base64-encoded data is roughly 33% larger than the original.</p>
+
+    <h2>Why Use Base64?</h2>
+    <p>Base64 encoding exists to solve a fundamental problem: many communication protocols and storage systems are designed to handle text, not raw binary data. When you need to transmit images, files, or other binary content through text-only channels, Base64 provides a safe and reliable way to represent that data.</p>
+    <p>Common scenarios where Base64 encoding is essential include:</p>
+    <ul>
+      <li><strong>Email attachments</strong> -- MIME encoding uses Base64 to embed images, PDFs, and other files inside email messages that travel through text-based SMTP servers.</li>
+      <li><strong>Data URIs</strong> -- Embedding small images directly in HTML or CSS via <code>data:image/png;base64,...</code> reduces HTTP requests and can improve page load times for icons and thumbnails.</li>
+      <li><strong>API payloads</strong> -- REST and GraphQL APIs frequently use Base64 to include binary content (such as uploaded files or cryptographic signatures) inside JSON request and response bodies.</li>
+      <li><strong>Authentication tokens</strong> -- HTTP Basic Authentication encodes the username:password pair in Base64 before sending it in the Authorization header.</li>
+      <li><strong>Storing binary in text formats</strong> -- Configuration files (XML, JSON, YAML) sometimes embed certificates, keys, or binary blobs as Base64 strings.</li>
+    </ul>
+
+    <h2>How the Encoding Process Works</h2>
+    <p>Base64 encoding follows a straightforward algorithm. First, the input text is converted to its binary representation using a character encoding such as UTF-8. The resulting byte stream is then divided into groups of three bytes. Each three-byte group (24 bits) is split into four six-bit values. Each six-bit value is used as an index into the Base64 character table to produce four ASCII characters.</p>
+    <p>If the final group contains fewer than three bytes, padding is applied. One remaining byte produces two Base64 characters followed by two <code>=</code> signs. Two remaining bytes produce three Base64 characters followed by one <code>=</code> sign. This padding ensures the encoded output length is always a multiple of four.</p>
+
+    <h3>Example</h3>
+    <p>The word "Hi" in ASCII is represented as the bytes 72 and 105. In binary, that is <code>01001000 01101001</code>. Splitting into six-bit groups gives <code>010010 000110 100100</code> (with two zero-padding bits). These map to the Base64 characters <code>S</code>, <code>G</code>, <code>k</code>, producing the encoded string <code>SGk=</code> (with one padding character because the input was only two bytes).</p>
+
+    <h2>Base64 and Unicode</h2>
+    <p>Standard Base64 encoding operates on bytes, not characters. When your input contains Unicode characters -- such as accented letters, emoji, or CJK ideographs -- the text must first be encoded to a byte sequence using UTF-8 before Base64 encoding is applied. This tool handles that conversion automatically, so you can safely encode and decode strings in any language.</p>
+
+    <h2>Security Considerations</h2>
+    <p>It is important to understand that Base64 is an encoding scheme, not an encryption method. Base64 provides no confidentiality whatsoever: anyone can decode a Base64 string instantly using any decoder. Never use Base64 as a way to protect sensitive information such as passwords, API keys, or personal data. If you need to protect data in transit, use proper encryption protocols like TLS. If you need to protect data at rest, use authenticated encryption algorithms like AES-GCM.</p>
+
+    <h2>Variants of Base64</h2>
+    <p>Several Base64 variants exist for different use cases. The standard encoding (RFC 4648) uses <code>+</code> and <code>/</code> as the 62nd and 63rd characters. The URL-safe variant replaces these with <code>-</code> and <code>_</code> to avoid conflicts with URL-reserved characters. Some implementations omit the padding <code>=</code> characters entirely, since the original length can be inferred from the encoded length. This tool uses the standard Base64 alphabet as defined in RFC 4648.</p>
+
+    <h2>About This Tool</h2>
+    <p>This Base64 encoder/decoder runs entirely in your browser using JavaScript. No data is transmitted to any server -- your text stays on your device. It supports full Unicode input, automatically detects Base64-encoded content when you paste, and provides instant encoding and decoding with clear error messages for malformed input.</p>
+  </article>
+
+  <AdUnit slot="tool-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .paste-hint {
+    padding: 10px 16px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: var(--radius);
+    color: #1e40af;
+    font-size: 0.85rem;
+    margin: -20px 0 24px;
+  }
+  .paste-hint-btn {
+    background: none;
+    border: none;
+    color: #2563eb;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 0.85rem;
+    padding: 0;
+  }
+  .paste-hint-btn:hover {
+    color: #1d4ed8;
+  }
+</style>
+
+<script>
+  const inputEl = document.getElementById('toolInput') as HTMLTextAreaElement;
+  const outputEl = document.getElementById('toolOutput') as HTMLTextAreaElement;
+  const encodeBtn = document.getElementById('encodeBtn') as HTMLButtonElement;
+  const decodeBtn = document.getElementById('decodeBtn') as HTMLButtonElement;
+  const swapBtn = document.getElementById('swapBtn') as HTMLButtonElement;
+  const clearBtn = document.getElementById('clearBtn') as HTMLButtonElement;
+  const copyBtn = document.getElementById('copyBtn') as HTMLButtonElement;
+  const errorEl = document.getElementById('toolError') as HTMLDivElement;
+  const pasteHint = document.getElementById('pasteHint') as HTMLDivElement;
+  const autoDecodeBtn = document.getElementById('autoDecodeBtn') as HTMLButtonElement;
+
+  function showError(message: string): void {
+    errorEl.textContent = message;
+    errorEl.hidden = false;
+  }
+
+  function clearError(): void {
+    errorEl.textContent = '';
+    errorEl.hidden = true;
+  }
+
+  function hidePasteHint(): void {
+    pasteHint.hidden = true;
+  }
+
+  /**
+   * Encode a Unicode string to Base64.
+   * Uses encodeURIComponent + unescape to handle multi-byte characters
+   * before passing to btoa which only accepts Latin-1.
+   */
+  function encodeBase64(text: string): string {
+    return btoa(unescape(encodeURIComponent(text)));
+  }
+
+  /**
+   * Decode a Base64 string back to Unicode text.
+   * Uses escape + decodeURIComponent to reconstruct multi-byte characters
+   * from the Latin-1 output of atob.
+   */
+  function decodeBase64(encoded: string): string {
+    return decodeURIComponent(escape(atob(encoded)));
+  }
+
+  /**
+   * Test whether a string looks like valid Base64.
+   * Checks the character set and optional padding, and requires
+   * a minimum length to avoid false positives on short strings.
+   */
+  function looksLikeBase64(str: string): boolean {
+    const trimmed = str.trim();
+    if (trimmed.length < 8) return false;
+    if (trimmed.length % 4 !== 0) return false;
+    return /^[A-Za-z0-9+/]*={0,2}$/.test(trimmed);
+  }
+
+  // --- Encode ---
+  encodeBtn.addEventListener('click', () => {
+    clearError();
+    hidePasteHint();
+    const text = inputEl.value;
+    if (!text) {
+      outputEl.value = '';
+      return;
+    }
+    try {
+      outputEl.value = encodeBase64(text);
+    } catch (e) {
+      showError('Encoding failed. Please check your input text.');
+    }
+  });
+
+  // --- Decode ---
+  decodeBtn.addEventListener('click', () => {
+    clearError();
+    hidePasteHint();
+    const text = inputEl.value.trim();
+    if (!text) {
+      outputEl.value = '';
+      return;
+    }
+    try {
+      outputEl.value = decodeBase64(text);
+    } catch (e) {
+      showError('Invalid Base64 input. The string contains characters that are not part of the Base64 alphabet, or the padding is incorrect.');
+    }
+  });
+
+  // --- Swap ---
+  swapBtn.addEventListener('click', () => {
+    clearError();
+    hidePasteHint();
+    const temp = inputEl.value;
+    inputEl.value = outputEl.value;
+    outputEl.value = temp;
+  });
+
+  // --- Clear ---
+  clearBtn.addEventListener('click', () => {
+    inputEl.value = '';
+    outputEl.value = '';
+    clearError();
+    hidePasteHint();
+  });
+
+  // --- Copy ---
+  copyBtn.addEventListener('click', async () => {
+    const text = outputEl.value;
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      copyBtn.textContent = 'Copied!';
+      copyBtn.classList.add('copied');
+      setTimeout(() => {
+        copyBtn.textContent = 'Copy';
+        copyBtn.classList.remove('copied');
+      }, 1500);
+    } catch {
+      // Fallback for older browsers or non-secure contexts
+      outputEl.select();
+      document.execCommand('copy');
+      copyBtn.textContent = 'Copied!';
+      copyBtn.classList.add('copied');
+      setTimeout(() => {
+        copyBtn.textContent = 'Copy';
+        copyBtn.classList.remove('copied');
+      }, 1500);
+    }
+  });
+
+  // --- Auto-detect Base64 on paste ---
+  inputEl.addEventListener('paste', (e) => {
+    clearError();
+    // Use setTimeout to read the value after the paste event updates the textarea
+    setTimeout(() => {
+      const pasted = inputEl.value.trim();
+      if (looksLikeBase64(pasted)) {
+        try {
+          // Verify it actually decodes without error
+          decodeBase64(pasted);
+          pasteHint.hidden = false;
+        } catch {
+          pasteHint.hidden = true;
+        }
+      } else {
+        pasteHint.hidden = true;
+      }
+    }, 0);
+  });
+
+  // --- Auto-decode button in paste hint ---
+  autoDecodeBtn.addEventListener('click', () => {
+    clearError();
+    hidePasteHint();
+    const text = inputEl.value.trim();
+    try {
+      outputEl.value = decodeBase64(text);
+    } catch (e) {
+      showError('Failed to decode the pasted Base64 string.');
+    }
+  });
+</script>

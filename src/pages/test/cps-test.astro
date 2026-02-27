@@ -1,0 +1,565 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getGameBySlug, getRating } from '../../data/games';
+import '../../styles/game.css';
+
+const game = getGameBySlug('cps-test')!;
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://toolcalcs.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Tests & Games",
+      "item": "https://toolcalcs.com/test/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "CPS Test"
+    }
+  ]
+};
+---
+
+<BaseLayout
+  title="CPS Test - Measure Your Clicks Per Second | ToolCalcs"
+  description="Free CPS test to measure your clicks per second. Click as fast as you can, track your click speed over time, and compare your score. Works on desktop and mobile."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/test/">Tests & Games</a> &rsaquo;
+    <span>CPS Test</span>
+  </nav>
+
+  <h1>CPS Test - Clicks Per Second</h1>
+  <p class="page-desc">Click as fast as you can to measure your clicks per second. Challenge yourself and track your improvement over time.</p>
+
+  <div class="game-box">
+    <!-- Duration Toggle -->
+    <div class="duration-toggle" role="radiogroup" aria-label="Test duration">
+      <button class="duration-btn active" data-duration="5" role="radio" aria-checked="true">5 Seconds</button>
+      <button class="duration-btn" data-duration="10" role="radio" aria-checked="false">10 Seconds</button>
+    </div>
+
+    <!-- Game Area -->
+    <div class="game-area cps-area" id="cpsArea" role="button" tabindex="0" aria-label="Click area for CPS test">
+      <div class="game-instructions" id="cpsInstructions">
+        <span class="cps-icon" aria-hidden="true">🖱️</span>
+        <h2>Click Speed Test</h2>
+        <p>Click anywhere in this area to start, then click as fast as you can!</p>
+      </div>
+
+      <div class="cps-active-display" id="cpsActiveDisplay" hidden>
+        <div class="cps-timer" id="cpsTimer">5.0s</div>
+        <div class="cps-click-count" id="cpsClickCount">0</div>
+        <div class="cps-click-label">clicks</div>
+      </div>
+    </div>
+
+    <!-- Score Display (shown after test) -->
+    <div class="score-display" id="cpsScoreDisplay" hidden>
+      <span class="score-value" id="cpsScoreValue"></span>
+      <span class="score-unit">Clicks Per Second</span>
+      <div class="rating-badge" id="cpsRating"></div>
+      <div class="cps-stats" id="cpsStats"></div>
+    </div>
+
+    <!-- Controls -->
+    <div class="game-controls" id="cpsControls" hidden>
+      <button class="game-btn primary" id="cpsTryAgain" type="button">Try Again</button>
+    </div>
+
+    <!-- Attempt History -->
+    <div class="attempt-history" id="cpsHistory" hidden>
+      <h3>Recent Attempts</h3>
+      <div class="history-list" id="cpsHistoryList"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is a CPS Test?</h2>
+    <p>A CPS test, or clicks per second test, measures how many times you can click your mouse button (or tap your screen) within a set time period. It is one of the most popular online skill tests among gamers, competitive clickers, and anyone curious about their click speed. Your CPS score is calculated by dividing the total number of clicks by the duration of the test, giving you a precise measure of your clicking rate.</p>
+    <p>Click speed matters more than most people realize. In competitive gaming, especially in titles like Minecraft PvP, first-person shooters, and real-time strategy games, the ability to click rapidly can give you a measurable advantage. Higher CPS means more actions per second, which translates into faster combat, quicker building, and more responsive gameplay.</p>
+
+    <h2>How CPS Is Calculated</h2>
+    <p>The formula for CPS is straightforward:</p>
+    <p><strong>CPS = Total Clicks / Time (seconds)</strong></p>
+    <p>For example, if you click 38 times in 5 seconds, your CPS is 38 / 5 = 7.6 clicks per second. This test supports both 5-second and 10-second durations. The 5-second test measures your burst clicking speed, while the 10-second test gives a more accurate picture of your sustained clicking rate. Most people score slightly lower on longer tests because it is difficult to maintain peak speed over extended periods.</p>
+
+    <h2>Average CPS Scores and What They Mean</h2>
+    <p>Understanding where your score falls helps you set realistic improvement goals. Here is a general breakdown of CPS ranges:</p>
+    <ul>
+      <li><strong>1-3 CPS (Slow):</strong> This is a casual clicking pace. Most people who have never practiced click speed fall in this range when they first try the test.</li>
+      <li><strong>4-6 CPS (Average):</strong> The typical range for regular computer users. This is sufficient for everyday tasks and casual gaming.</li>
+      <li><strong>6-8 CPS (Fast):</strong> Above average speed that requires some practice or natural ability. Competitive gamers often aim for this range as a minimum.</li>
+      <li><strong>8-10 CPS (Amazing):</strong> Consistently clicking at this speed requires dedicated practice and good technique. This puts you well above most users.</li>
+      <li><strong>10+ CPS (Superhuman):</strong> Extremely fast clicking that typically requires advanced techniques like jitter clicking or butterfly clicking. Very few people can sustain this rate.</li>
+    </ul>
+
+    <h2>Clicking Techniques to Improve Your CPS</h2>
+    <p>There are several well-known techniques that competitive clickers use to increase their speed. Each one has trade-offs between speed, accuracy, and comfort.</p>
+    <h3>Regular Clicking</h3>
+    <p>This is the standard clicking method where you use your index finger to press and release the mouse button repeatedly. Most people achieve between 4 and 7 CPS with regular clicking. It is the most comfortable technique and offers the best accuracy, making it ideal for tasks that require precision alongside speed.</p>
+    <h3>Jitter Clicking</h3>
+    <p>Jitter clicking involves tensing your arm and hand muscles to create a vibrating motion that rapidly clicks the mouse button. Skilled jitter clickers can reach 10 to 14 CPS. The technique takes practice to master and can cause hand fatigue if used for long periods, so it is best reserved for short bursts during competitive play.</p>
+    <h3>Butterfly Clicking</h3>
+    <p>Butterfly clicking uses two fingers (usually the index and middle finger) alternating rapidly on the mouse button. This technique can produce 15 to 25 CPS in skilled practitioners. It requires a mouse with a button that registers double inputs well, and it takes significant practice to perform consistently.</p>
+    <h3>Drag Clicking</h3>
+    <p>Drag clicking exploits the friction between your finger and the mouse button to generate multiple clicks in a single swipe motion. Some players achieve 30 or more CPS with this method. However, it requires a specific type of mouse surface and is banned in many competitive settings because it is considered an exploit rather than a skill.</p>
+
+    <h2>Tips for Improving Your Click Speed</h2>
+    <p>Regardless of which technique you use, these general tips will help you click faster and more consistently:</p>
+    <ul>
+      <li><strong>Use a quality mouse:</strong> A responsive mouse with low click latency and a comfortable shape makes a significant difference. Gaming mice are designed for rapid clicking.</li>
+      <li><strong>Position your hand correctly:</strong> Keep your wrist relaxed and your fingers close to the mouse button. Tension in your hand slows you down and increases fatigue.</li>
+      <li><strong>Practice regularly:</strong> Like any skill, click speed improves with consistent practice. Spend a few minutes each day using this test to build muscle memory.</li>
+      <li><strong>Warm up first:</strong> Do a few slow practice rounds before attempting your best score. Cold muscles respond more slowly.</li>
+      <li><strong>Try different durations:</strong> Alternate between 5-second and 10-second tests. Short tests build burst speed, while longer tests build endurance.</li>
+      <li><strong>Stay relaxed:</strong> Paradoxically, tensing up too much slows most people down. Find a balance between effort and relaxation.</li>
+    </ul>
+
+    <h2>Why Click Speed Matters in Gaming</h2>
+    <p>Click speed is a critical skill in many competitive games. In Minecraft PvP, higher CPS means you can land more hits per second on your opponent, giving you a direct combat advantage. In first-person shooters, rapid clicking with semi-automatic weapons allows for faster firing rates. Strategy games benefit from quick clicking when issuing multiple commands in succession. Even in casual web-based games, faster clicking often means higher scores and faster completion times.</p>
+    <p>Beyond gaming, click speed can improve general computer productivity. Data entry, graphic design, and any task that involves repetitive mouse actions becomes more efficient when you can click faster without sacrificing accuracy. Many employers in fields like quality assurance testing value fast and accurate mouse skills.</p>
+
+    <h2>How to Use This CPS Test</h2>
+    <p>Using the CPS test on ToolCalcs is simple. Choose your preferred test duration (5 or 10 seconds) using the toggle at the top. Click or tap anywhere inside the blue target area to start the timer, then click as fast as you possibly can until the timer reaches zero. Your CPS score is calculated and displayed immediately along with a performance rating. All your attempts are saved locally in your browser so you can track your progress over time. Try to beat your personal best and see how your click speed improves with practice.</p>
+  </article>
+
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  /* Duration Toggle */
+  .duration-toggle {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin-bottom: 20px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    padding: 4px;
+    display: inline-flex;
+  }
+  .duration-btn {
+    padding: 8px 20px;
+    border: none;
+    border-radius: calc(var(--radius) - 2px);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    background: transparent;
+    color: var(--color-text-muted);
+    transition: background 0.15s, color 0.15s;
+  }
+  .duration-btn.active {
+    background: var(--color-primary);
+    color: #fff;
+  }
+  .duration-btn:hover:not(.active) {
+    color: var(--color-text);
+  }
+
+  /* CPS-specific game area styles */
+  .cps-area {
+    background: var(--color-primary);
+    border-color: var(--color-primary-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 320px;
+    transition: background 0.15s, transform 0.05s;
+  }
+  .cps-area:hover {
+    background: var(--color-primary-dark);
+  }
+  .cps-area:active {
+    transform: scale(0.995);
+  }
+  .cps-area .game-instructions {
+    color: #fff;
+    padding: 24px;
+  }
+  .cps-area .game-instructions h2 {
+    color: #fff;
+    font-size: 1.4rem;
+  }
+  .cps-area .game-instructions p {
+    color: rgba(255, 255, 255, 0.85);
+  }
+  .cps-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 12px;
+  }
+
+  /* Active display during test */
+  .cps-active-display {
+    color: #fff;
+    text-align: center;
+  }
+  .cps-timer {
+    font-size: 1.2rem;
+    font-weight: 600;
+    opacity: 0.9;
+    margin-bottom: 8px;
+  }
+  .cps-click-count {
+    font-size: 5rem;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+  .cps-click-label {
+    font-size: 1rem;
+    opacity: 0.85;
+    margin-top: 4px;
+  }
+
+  /* Click ripple effect */
+  .click-ripple {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%) scale(0);
+    animation: ripple-expand 0.4s ease-out forwards;
+    pointer-events: none;
+  }
+  @keyframes ripple-expand {
+    0% {
+      transform: translate(-50%, -50%) scale(0);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(-50%, -50%) scale(3);
+      opacity: 0;
+    }
+  }
+
+  /* Stats row after score */
+  .cps-stats {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 16px;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+  }
+  .cps-stats span {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  .cps-stats strong {
+    font-size: 1.1rem;
+    color: var(--color-text);
+  }
+
+  /* State when area is in "finished" mode */
+  .cps-area.finished {
+    background: var(--color-bg);
+    border-color: var(--color-border);
+    min-height: 80px;
+    cursor: default;
+  }
+
+  @media (max-width: 640px) {
+    .cps-click-count { font-size: 3.5rem; }
+    .cps-area { min-height: 260px; }
+    .cps-stats { gap: 16px; font-size: 0.8rem; }
+  }
+
+  /* Reduced motion: disable ripple */
+  @media (prefers-reduced-motion: reduce) {
+    .click-ripple { animation: none; display: none; }
+  }
+</style>
+
+<script>
+  (function () {
+    // --- Game configuration & DOM references ---
+    const ratingScale = [
+      { min: 10, label: 'Superhuman', color: '#9333ea' },
+      { min: 8, label: 'Amazing', color: '#16a34a' },
+      { min: 6, label: 'Fast', color: '#2563eb' },
+      { min: 4, label: 'Average', color: '#ca8a04' },
+      { min: 0, label: 'Slow', color: '#dc2626' },
+    ];
+
+    const STORAGE_KEY = 'toolcalcs_cps-test_history';
+    const MAX_HISTORY = 20;
+
+    const area = document.getElementById('cpsArea') as HTMLElement;
+    const instructions = document.getElementById('cpsInstructions') as HTMLElement;
+    const activeDisplay = document.getElementById('cpsActiveDisplay') as HTMLElement;
+    const timerDisplay = document.getElementById('cpsTimer') as HTMLElement;
+    const clickCountDisplay = document.getElementById('cpsClickCount') as HTMLElement;
+    const scoreDisplay = document.getElementById('cpsScoreDisplay') as HTMLElement;
+    const scoreValue = document.getElementById('cpsScoreValue') as HTMLElement;
+    const ratingBadge = document.getElementById('cpsRating') as HTMLElement;
+    const statsEl = document.getElementById('cpsStats') as HTMLElement;
+    const controls = document.getElementById('cpsControls') as HTMLElement;
+    const tryAgainBtn = document.getElementById('cpsTryAgain') as HTMLButtonElement;
+    const historySection = document.getElementById('cpsHistory') as HTMLElement;
+    const historyList = document.getElementById('cpsHistoryList') as HTMLElement;
+    const durationBtns = document.querySelectorAll('.duration-btn') as NodeListOf<HTMLButtonElement>;
+
+    // --- State ---
+    type GameState = 'idle' | 'playing' | 'finished';
+    let state: GameState = 'idle';
+    let duration = 5;
+    let clicks = 0;
+    let startTime = 0;
+    let timerInterval: ReturnType<typeof setInterval> | null = null;
+
+    // --- Duration toggle ---
+    durationBtns.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (state === 'playing') return;
+        duration = parseInt(btn.dataset.duration || '5', 10);
+        durationBtns.forEach((b) => {
+          b.classList.remove('active');
+          b.setAttribute('aria-checked', 'false');
+        });
+        btn.classList.add('active');
+        btn.setAttribute('aria-checked', 'true');
+        if (state === 'idle') {
+          timerDisplay.textContent = duration.toFixed(1) + 's';
+        }
+      });
+    });
+
+    // --- Rating lookup ---
+    function getScoreRating(score: number): { label: string; color: string } {
+      for (const level of ratingScale) {
+        if (score >= level.min) return level;
+      }
+      return ratingScale[ratingScale.length - 1];
+    }
+
+    // --- Ripple effect ---
+    function createRipple(x: number, y: number) {
+      const ripple = document.createElement('div');
+      ripple.className = 'click-ripple';
+      ripple.style.left = x + 'px';
+      ripple.style.top = y + 'px';
+      area.appendChild(ripple);
+      ripple.addEventListener('animationend', () => ripple.remove());
+    }
+
+    // --- Start game ---
+    function startGame() {
+      state = 'playing';
+      clicks = 0;
+      startTime = Date.now();
+
+      instructions.hidden = true;
+      activeDisplay.hidden = false;
+      scoreDisplay.hidden = true;
+      controls.hidden = true;
+      area.classList.remove('finished');
+
+      clickCountDisplay.textContent = '0';
+      timerDisplay.textContent = duration.toFixed(1) + 's';
+
+      // Disable duration toggle during play
+      durationBtns.forEach((b) => (b.disabled = true));
+
+      timerInterval = setInterval(updateTimer, 50);
+    }
+
+    // --- Update timer ---
+    function updateTimer() {
+      const elapsed = (Date.now() - startTime) / 1000;
+      const remaining = Math.max(0, duration - elapsed);
+      timerDisplay.textContent = remaining.toFixed(1) + 's';
+
+      if (remaining <= 0) {
+        endGame();
+      }
+    }
+
+    // --- End game ---
+    function endGame() {
+      state = 'finished';
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+
+      const cps = clicks / duration;
+      const rating = getScoreRating(cps);
+
+      // Update UI
+      area.classList.add('finished');
+      activeDisplay.hidden = true;
+      scoreDisplay.hidden = false;
+      controls.hidden = false;
+
+      scoreValue.textContent = cps.toFixed(1);
+      ratingBadge.textContent = rating.label;
+      ratingBadge.style.background = rating.color;
+
+      statsEl.innerHTML =
+        '<span><strong>' + clicks + '</strong>total clicks</span>' +
+        '<span><strong>' + duration + 's</strong>duration</span>' +
+        '<span><strong>' + cps.toFixed(1) + '</strong>CPS</span>';
+
+      // Re-enable duration toggle
+      durationBtns.forEach((b) => (b.disabled = false));
+
+      // Save to history
+      saveAttempt(cps, rating.label);
+      renderHistory();
+    }
+
+    // --- Click handler on game area ---
+    function handleAreaClick(e: MouseEvent | TouchEvent) {
+      if (state === 'finished') return;
+
+      if (state === 'idle') {
+        startGame();
+        // Count this first click
+        clicks = 1;
+        clickCountDisplay.textContent = '1';
+      } else if (state === 'playing') {
+        clicks++;
+        clickCountDisplay.textContent = String(clicks);
+      }
+
+      // Ripple at click position
+      const rect = area.getBoundingClientRect();
+      let clientX: number, clientY: number;
+      if ('touches' in e) {
+        clientX = e.touches[0]?.clientX ?? e.changedTouches[0]?.clientX ?? 0;
+        clientY = e.touches[0]?.clientY ?? e.changedTouches[0]?.clientY ?? 0;
+      } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+      }
+      createRipple(clientX - rect.left, clientY - rect.top);
+    }
+
+    area.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      handleAreaClick(e);
+    });
+
+    area.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      handleAreaClick(e);
+    }, { passive: false });
+
+    // Keyboard accessibility: Space or Enter to click
+    area.addEventListener('keydown', (e) => {
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        const fakeEvent = new MouseEvent('mousedown', {
+          clientX: area.getBoundingClientRect().left + area.offsetWidth / 2,
+          clientY: area.getBoundingClientRect().top + area.offsetHeight / 2,
+        });
+        handleAreaClick(fakeEvent);
+      }
+    });
+
+    // --- Try Again ---
+    tryAgainBtn.addEventListener('click', () => {
+      state = 'idle';
+      clicks = 0;
+      instructions.hidden = false;
+      activeDisplay.hidden = true;
+      scoreDisplay.hidden = true;
+      controls.hidden = true;
+      area.classList.remove('finished');
+      timerDisplay.textContent = duration.toFixed(1) + 's';
+    });
+
+    // --- LocalStorage history ---
+    interface HistoryEntry {
+      score: number;
+      rating: string;
+      timestamp: number;
+    }
+
+    function loadHistory(): HistoryEntry[] {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return [];
+        return JSON.parse(raw) as HistoryEntry[];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveAttempt(score: number, rating: string) {
+      const history = loadHistory();
+      history.unshift({
+        score: parseFloat(score.toFixed(1)),
+        rating,
+        timestamp: Date.now(),
+      });
+      if (history.length > MAX_HISTORY) history.length = MAX_HISTORY;
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+      } catch {
+        // Storage full or unavailable -- silently ignore
+      }
+    }
+
+    function renderHistory() {
+      const history = loadHistory();
+      if (history.length === 0) {
+        historySection.hidden = true;
+        return;
+      }
+
+      historySection.hidden = false;
+      historyList.innerHTML = '';
+
+      history.forEach((entry) => {
+        const rating = getScoreRating(entry.score);
+        const timeStr = formatTimeAgo(entry.timestamp);
+
+        const item = document.createElement('div');
+        item.className = 'history-item';
+        item.innerHTML =
+          '<span class="history-score">' + entry.score.toFixed(1) + ' CPS</span>' +
+          '<span class="history-rating" style="background:' + rating.color + '">' + entry.rating + '</span>' +
+          '<span class="history-time">' + timeStr + '</span>';
+        historyList.appendChild(item);
+      });
+    }
+
+    function formatTimeAgo(timestamp: number): string {
+      const diff = Date.now() - timestamp;
+      const seconds = Math.floor(diff / 1000);
+      if (seconds < 60) return 'just now';
+      const minutes = Math.floor(seconds / 60);
+      if (minutes < 60) return minutes + 'm ago';
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) return hours + 'h ago';
+      const days = Math.floor(hours / 24);
+      return days + 'd ago';
+    }
+
+    // --- Initial render ---
+    renderHistory();
+  })();
+</script>

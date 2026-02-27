@@ -1,15 +1,22 @@
 ---
-const navItems = [
+const calcCategories = [
   { label: 'Financial', href: '/financial-calculators/' },
   { label: 'Health', href: '/health-calculators/' },
   { label: 'Math', href: '/math-calculators/' },
   { label: 'Date & Time', href: '/date-time-calculators/' },
   { label: 'Conversion', href: '/conversion-calculators/' },
   { label: 'Everyday', href: '/everyday-calculators/' },
-  { label: 'Convert', href: '/convert/' },
-  { label: 'Currency', href: '/currency/' },
+];
+const sections = [
+  { label: 'Tests & Games', href: '/test/' },
+  { label: 'Web Tools', href: '/tools/' },
+  { label: 'Worksheets', href: '/worksheets/' },
 ];
 const currentPath = Astro.url.pathname;
+const isCalcActive = calcCategories.some(c => currentPath.startsWith(c.href))
+  || currentPath.startsWith('/convert/') || currentPath.startsWith('/currency/')
+  || currentPath.startsWith('/percentage/') || currentPath.startsWith('/how-many/')
+  || currentPath.startsWith('/days-until/');
 ---
 
 <header class="site-header">
@@ -34,7 +41,20 @@ const currentPath = Astro.url.pathname;
       </svg>
     </button>
     <nav class="main-nav" id="main-nav" aria-label="Main navigation">
-      {navItems.map(item => (
+      <!-- Calculators dropdown -->
+      <div class:list={['nav-dropdown', { active: isCalcActive }]}>
+        <button class="nav-link dropdown-trigger" aria-expanded="false" aria-haspopup="true">
+          Calculators
+          <svg class="chevron" viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,4 6,8 10,4" /></svg>
+        </button>
+        <div class="dropdown-menu" role="menu">
+          {calcCategories.map(item => (
+            <a href={item.href} role="menuitem" class:list={{ active: currentPath.startsWith(item.href) }}>{item.label}</a>
+          ))}
+        </div>
+      </div>
+      <!-- Direct section links -->
+      {sections.map(item => (
         <a
           href={item.href}
           class:list={['nav-link', { active: currentPath.startsWith(item.href) }]}
@@ -76,7 +96,8 @@ const currentPath = Astro.url.pathname;
   .logo-icon { flex-shrink: 0; }
   .main-nav {
     display: flex;
-    gap: 8px;
+    align-items: center;
+    gap: 4px;
     margin-left: auto;
   }
   .nav-link {
@@ -86,16 +107,75 @@ const currentPath = Astro.url.pathname;
     font-weight: 500;
     color: var(--color-text-muted);
     transition: background 0.15s, color 0.15s;
+    text-decoration: none;
+    white-space: nowrap;
   }
   .nav-link:hover {
     background: var(--color-bg);
     color: var(--color-text);
     text-decoration: none;
   }
-  .nav-link.active {
+  .nav-link.active,
+  .nav-dropdown.active > .dropdown-trigger {
     background: #eff6ff;
     color: var(--color-primary);
   }
+
+  /* --- Dropdown --- */
+  .nav-dropdown {
+    position: relative;
+  }
+  .dropdown-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .chevron {
+    transition: transform 0.2s;
+  }
+  .nav-dropdown:hover .chevron,
+  .nav-dropdown:focus-within .chevron {
+    transform: rotate(180deg);
+  }
+  .dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    min-width: 180px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 6px 0;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    z-index: 200;
+  }
+  .nav-dropdown:hover > .dropdown-menu,
+  .nav-dropdown:focus-within > .dropdown-menu {
+    display: flex;
+    flex-direction: column;
+  }
+  .dropdown-menu a {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    transition: background 0.1s, color 0.1s;
+  }
+  .dropdown-menu a:hover {
+    background: var(--color-bg);
+    color: var(--color-text);
+    text-decoration: none;
+  }
+  .dropdown-menu a.active {
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  /* --- Mobile --- */
   .menu-toggle {
     display: none;
     background: none;
@@ -106,7 +186,7 @@ const currentPath = Astro.url.pathname;
     margin-left: auto;
   }
 
-  @media (max-width: 640px) {
+  @media (max-width: 768px) {
     .menu-toggle { display: block; }
     .main-nav {
       display: none;
@@ -118,23 +198,74 @@ const currentPath = Astro.url.pathname;
       border-bottom: 1px solid var(--color-border);
       flex-direction: column;
       padding: 8px 20px 16px;
+      gap: 2px;
     }
     .main-nav.open { display: flex; }
+
+    /* Flatten dropdown on mobile */
+    .nav-dropdown {
+      display: flex;
+      flex-direction: column;
+    }
+    .dropdown-trigger {
+      width: 100%;
+      text-align: left;
+    }
+    .chevron { display: none; }
+    .dropdown-menu {
+      display: none;
+      position: static;
+      box-shadow: none;
+      border: none;
+      padding: 0 0 0 12px;
+      min-width: auto;
+    }
+    .nav-dropdown.open > .dropdown-menu {
+      display: flex;
+      flex-direction: column;
+    }
+    .dropdown-menu a {
+      padding: 6px 14px;
+    }
+    .nav-link {
+      width: 100%;
+    }
   }
 </style>
 
 <script>
   const toggle = document.querySelector('.menu-toggle');
   const nav = document.getElementById('main-nav');
+  const dropdown = document.querySelector('.nav-dropdown');
+  const dropdownTrigger = dropdown?.querySelector('.dropdown-trigger');
+
+  // Mobile hamburger toggle
   toggle?.addEventListener('click', () => {
     const open = nav?.classList.toggle('open');
     toggle.setAttribute('aria-expanded', String(open));
   });
+
+  // Mobile: dropdown toggle on click
+  dropdownTrigger?.addEventListener('click', () => {
+    if (window.innerWidth <= 768) {
+      dropdown?.classList.toggle('open');
+      const expanded = dropdown?.classList.contains('open');
+      dropdownTrigger.setAttribute('aria-expanded', String(expanded));
+    }
+  });
+
+  // Escape key closes menu
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && nav?.classList.contains('open')) {
-      nav.classList.remove('open');
-      toggle?.setAttribute('aria-expanded', 'false');
-      (toggle as HTMLElement)?.focus();
+    if (e.key === 'Escape') {
+      if (nav?.classList.contains('open')) {
+        nav.classList.remove('open');
+        toggle?.setAttribute('aria-expanded', 'false');
+        (toggle as HTMLElement)?.focus();
+      }
+      if (dropdown?.classList.contains('open')) {
+        dropdown.classList.remove('open');
+        dropdownTrigger?.setAttribute('aria-expanded', 'false');
+      }
     }
   });
 </script>

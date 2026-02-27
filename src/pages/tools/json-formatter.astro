@@ -1,0 +1,348 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getToolBySlug } from '../../data/tools';
+import '../../styles/tool.css';
+
+const tool = getToolBySlug('json-formatter')!;
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Web Tools", "item": "https://toolcalcs.com/tools/" },
+    { "@type": "ListItem", "position": 3, "name": "JSON Formatter" }
+  ]
+};
+---
+
+<BaseLayout
+  title="JSON Formatter & Validator - Format, Minify & Validate JSON Online | ToolCalcs"
+  description="Free online JSON formatter, validator, and minifier. Paste your JSON to beautify with custom indentation, minify for production, or validate with detailed error messages."
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/tools/">Web Tools</a> &rsaquo; <span>JSON Formatter</span>
+  </nav>
+
+  <h1>{tool.title}</h1>
+  <p class="page-desc">{tool.description}</p>
+
+  <div class="tool-box">
+    <div class="tool-options">
+      <div class="tool-option">
+        <label for="indentSelect">Indentation</label>
+        <select id="indentSelect">
+          <option value="2" selected>2 Spaces</option>
+          <option value="4">4 Spaces</option>
+          <option value="tab">Tab</option>
+          <option value="0">Minified</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="tool-io">
+      <div class="tool-input-area">
+        <div class="output-header">
+          <label class="tool-label" for="toolInput">Input JSON</label>
+          <span class="char-count" id="inputStats">0 chars, 0 lines</span>
+        </div>
+        <textarea
+          id="toolInput"
+          class="tool-textarea"
+          placeholder='Paste or type your JSON here...\n\nExample:\n{"name": "John", "age": 30, "active": true}'
+          spellcheck="false"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+        ></textarea>
+      </div>
+      <div class="tool-output-area">
+        <div class="output-header">
+          <label class="tool-label" for="toolOutput">Output</label>
+          <span class="char-count" id="outputStats">0 chars, 0 lines</span>
+          <button type="button" class="copy-btn" id="copyBtn" disabled>Copy</button>
+        </div>
+        <textarea id="toolOutput" class="tool-textarea" readonly></textarea>
+      </div>
+    </div>
+
+    <div class="tool-controls">
+      <button type="button" class="tool-btn primary" id="formatBtn">Format</button>
+      <button type="button" class="tool-btn secondary" id="minifyBtn">Minify</button>
+      <button type="button" class="tool-btn secondary" id="clearBtn">Clear</button>
+    </div>
+
+    <div class="tool-error" id="toolError" hidden></div>
+  </div>
+
+  <AdUnit slot="tool-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is JSON Formatting?</h2>
+    <p>
+      JSON (JavaScript Object Notation) is the most widely used data interchange format on the web.
+      APIs, configuration files, databases, and web applications all rely on JSON to transmit
+      structured data between systems. A JSON formatter takes raw or minified JSON and restructures
+      it with consistent indentation and line breaks, making it far easier for humans to read,
+      debug, and understand.
+    </p>
+    <p>
+      When JSON arrives from an API response or a log file, it is often compressed onto a single
+      line with no whitespace. This saves bandwidth during transmission but makes it nearly
+      impossible to scan visually. Formatting the JSON with proper indentation reveals the
+      hierarchy of objects and arrays, so you can quickly locate specific keys, spot missing values,
+      and trace nested structures.
+    </p>
+
+    <h2>Why Validate JSON?</h2>
+    <p>
+      JSON has strict syntax rules. Unlike JavaScript objects, JSON keys must be wrapped in double
+      quotes. Trailing commas after the last element in an array or object are not allowed. Single
+      quotes cannot be used in place of double quotes. A single misplaced character can cause an
+      entire payload to fail silently or throw a cryptic parse error in your application.
+    </p>
+    <p>
+      Validating JSON before sending it to an API, storing it in a database, or committing it to a
+      configuration file catches these issues early. Our formatter parses your input using the
+      browser's native <code>JSON.parse()</code> engine and reports the exact error message and
+      position, so you can jump straight to the problem.
+    </p>
+
+    <h2>Common JSON Errors and How to Fix Them</h2>
+    <ul>
+      <li>
+        <strong>Trailing commas:</strong> A comma after the last item in an array or object
+        (<code>[1, 2, 3,]</code>) is valid JavaScript but invalid JSON. Remove the trailing comma.
+      </li>
+      <li>
+        <strong>Single quotes:</strong> JSON requires double quotes around keys and string values.
+        Replace <code>'key'</code> with <code>"key"</code>.
+      </li>
+      <li>
+        <strong>Unquoted keys:</strong> Every key in a JSON object must be a double-quoted string.
+        <code>{"{"}name: "John"{"}"}</code> should be <code>{"{"}"name": "John"{"}"}</code>.
+      </li>
+      <li>
+        <strong>Missing commas:</strong> Forgetting a comma between elements produces an
+        "Unexpected token" error. Check that each key-value pair and array element is separated by
+        a comma.
+      </li>
+      <li>
+        <strong>Unescaped special characters:</strong> Characters like tabs, newlines, and
+        backslashes inside strings must be escaped (<code>\t</code>, <code>\n</code>,
+        <code>\\</code>).
+      </li>
+    </ul>
+
+    <h2>Formatting vs. Minifying</h2>
+    <p>
+      Formatting and minifying are opposite operations. Formatting adds whitespace and indentation
+      to make JSON human-readable. Minifying strips all unnecessary whitespace to produce the
+      smallest possible payload. Both operations preserve the data exactly; only the presentation
+      changes.
+    </p>
+    <p>
+      Use formatting during development, debugging, and code review when you need to read the
+      data. Switch to minified JSON for production API responses, configuration files served over
+      the network, and anywhere that reducing byte size matters. On large payloads, minification
+      can reduce file size by 30-60 percent compared to formatted JSON with 2-space indentation.
+    </p>
+
+    <h2>How to Use This Tool</h2>
+    <p>
+      Paste your JSON into the input area on the left. Click <strong>Format</strong> to beautify
+      the JSON using the selected indentation style, or click <strong>Minify</strong> to compress
+      it to a single line. The output appears on the right, where you can copy it to your clipboard
+      with one click. If the JSON is invalid, a detailed error message appears below the controls,
+      telling you exactly what went wrong and where.
+    </p>
+    <p>
+      You can also choose your preferred indentation: 2 spaces (the most common convention),
+      4 spaces, or tabs. Selecting "Minified" from the dropdown and clicking Format produces the
+      same result as clicking the Minify button. The tool also auto-formats JSON when you paste it,
+      giving you instant feedback without needing to click anything.
+    </p>
+
+    <h3>Tips for Working with JSON</h3>
+    <ul>
+      <li>
+        Always validate JSON from external sources before using it in your application. Malformed
+        JSON can cause runtime errors that are difficult to trace.
+      </li>
+      <li>
+        Use 2-space indentation for configuration files committed to version control. It keeps
+        diffs clean and readable.
+      </li>
+      <li>
+        When debugging API responses, format the JSON first, then use your browser's find feature
+        to search for specific keys or values.
+      </li>
+      <li>
+        For very large JSON files (over 1 MB), consider using a streaming parser or a desktop tool
+        to avoid browser memory limitations.
+      </li>
+    </ul>
+  </article>
+
+  <AdUnit slot="tool-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .char-count {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+</style>
+
+<script>
+  const inputEl = document.getElementById('toolInput') as HTMLTextAreaElement;
+  const outputEl = document.getElementById('toolOutput') as HTMLTextAreaElement;
+  const indentSelect = document.getElementById('indentSelect') as HTMLSelectElement;
+  const formatBtn = document.getElementById('formatBtn') as HTMLButtonElement;
+  const minifyBtn = document.getElementById('minifyBtn') as HTMLButtonElement;
+  const clearBtn = document.getElementById('clearBtn') as HTMLButtonElement;
+  const copyBtn = document.getElementById('copyBtn') as HTMLButtonElement;
+  const errorDiv = document.getElementById('toolError') as HTMLDivElement;
+  const inputStats = document.getElementById('inputStats') as HTMLSpanElement;
+  const outputStats = document.getElementById('outputStats') as HTMLSpanElement;
+
+  function countStats(text: string): string {
+    if (!text) return '0 chars, 0 lines';
+    const chars = text.length;
+    const lines = text.split('\n').length;
+    return `${chars.toLocaleString()} char${chars !== 1 ? 's' : ''}, ${lines.toLocaleString()} line${lines !== 1 ? 's' : ''}`;
+  }
+
+  function updateInputStats(): void {
+    inputStats.textContent = countStats(inputEl.value);
+  }
+
+  function updateOutputStats(): void {
+    outputStats.textContent = countStats(outputEl.value);
+    copyBtn.disabled = !outputEl.value;
+  }
+
+  function getIndent(): string | number | undefined {
+    const val = indentSelect.value;
+    if (val === 'tab') return '\t';
+    const num = parseInt(val, 10);
+    return num === 0 ? undefined : num;
+  }
+
+  function showError(message: string): void {
+    errorDiv.textContent = message;
+    errorDiv.hidden = false;
+  }
+
+  function hideError(): void {
+    errorDiv.textContent = '';
+    errorDiv.hidden = true;
+  }
+
+  function enhanceErrorMessage(error: unknown): string {
+    if (!(error instanceof SyntaxError)) return String(error);
+    const msg = error.message;
+    // Most browsers include position info in the SyntaxError message
+    return `Invalid JSON: ${msg}`;
+  }
+
+  function formatJSON(): void {
+    const raw = inputEl.value.trim();
+    hideError();
+
+    if (!raw) {
+      outputEl.value = '';
+      updateOutputStats();
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(raw);
+      const indent = getIndent();
+      outputEl.value = JSON.stringify(parsed, null, indent);
+      updateOutputStats();
+    } catch (err) {
+      outputEl.value = '';
+      updateOutputStats();
+      showError(enhanceErrorMessage(err));
+    }
+  }
+
+  function minifyJSON(): void {
+    const raw = inputEl.value.trim();
+    hideError();
+
+    if (!raw) {
+      outputEl.value = '';
+      updateOutputStats();
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(raw);
+      outputEl.value = JSON.stringify(parsed);
+      updateOutputStats();
+    } catch (err) {
+      outputEl.value = '';
+      updateOutputStats();
+      showError(enhanceErrorMessage(err));
+    }
+  }
+
+  function clearAll(): void {
+    inputEl.value = '';
+    outputEl.value = '';
+    hideError();
+    updateInputStats();
+    updateOutputStats();
+    inputEl.focus();
+  }
+
+  async function copyOutput(): Promise<void> {
+    const text = outputEl.value;
+    if (!text) return;
+
+    try {
+      await navigator.clipboard.writeText(text);
+      copyBtn.textContent = 'Copied!';
+      copyBtn.classList.add('copied');
+      setTimeout(() => {
+        copyBtn.textContent = 'Copy';
+        copyBtn.classList.remove('copied');
+      }, 2000);
+    } catch {
+      // Fallback for older browsers or non-HTTPS contexts
+      outputEl.select();
+      document.execCommand('copy');
+      copyBtn.textContent = 'Copied!';
+      copyBtn.classList.add('copied');
+      setTimeout(() => {
+        copyBtn.textContent = 'Copy';
+        copyBtn.classList.remove('copied');
+      }, 2000);
+    }
+  }
+
+  // Auto-format on paste
+  inputEl.addEventListener('paste', () => {
+    // Use setTimeout so the pasted value is available in the textarea
+    setTimeout(() => {
+      updateInputStats();
+      formatJSON();
+    }, 0);
+  });
+
+  inputEl.addEventListener('input', updateInputStats);
+
+  formatBtn.addEventListener('click', formatJSON);
+  minifyBtn.addEventListener('click', minifyJSON);
+  clearBtn.addEventListener('click', clearAll);
+  copyBtn.addEventListener('click', copyOutput);
+
+  // Initialize stats on load
+  updateInputStats();
+  updateOutputStats();
+</script>

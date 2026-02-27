@@ -1,0 +1,528 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getGameBySlug, getRating } from '../../data/games';
+import '../../styles/game.css';
+
+const game = getGameBySlug('aim-trainer')!;
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://toolcalcs.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Tests & Games",
+      "item": "https://toolcalcs.com/test/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Aim Trainer"
+    }
+  ]
+};
+---
+
+<BaseLayout
+  title="Aim Trainer - Test Your Mouse Accuracy & Speed | ToolCalcs"
+  description="Free online aim trainer to test and improve your mouse accuracy and click speed. Click 30 targets as fast as you can, track your average reaction time, and compare your scores."
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/test/">Tests & Games</a> &rsaquo; <span>Aim Trainer</span>
+  </nav>
+
+  <h1>{game.title}</h1>
+  <p class="page-desc">{game.description}</p>
+
+  <div class="game-box">
+    <div class="game-area" id="game-area" role="application" aria-label="Aim trainer game area. Click the targets as fast as you can.">
+      <div class="aim-hud" id="aim-hud" aria-live="polite">
+        <span class="hud-item" id="hud-hit">Hits: 0 / 30</span>
+        <span class="hud-item" id="hud-avg">Avg: -- ms</span>
+      </div>
+      <div class="game-instructions" id="game-instructions">
+        <h2>Aim Trainer</h2>
+        <p>Click "Start" then hit each target as quickly as you can. 30 targets will appear one at a time. Your average reaction time will be measured.</p>
+      </div>
+      <div class="aim-message" id="aim-message" style="display:none;" aria-live="assertive"></div>
+    </div>
+
+    <div class="aim-stats" id="aim-stats" style="display:none;">
+      <div class="aim-stat-row">
+        <div class="aim-stat">
+          <span class="aim-stat-value" id="stat-hits">0</span>
+          <span class="aim-stat-label">Targets Hit</span>
+        </div>
+        <div class="aim-stat">
+          <span class="aim-stat-value" id="stat-remaining">30</span>
+          <span class="aim-stat-label">Remaining</span>
+        </div>
+        <div class="aim-stat">
+          <span class="aim-stat-value" id="stat-avg">--</span>
+          <span class="aim-stat-label">Avg Time (ms)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="score-display" id="score-display" style="display:none;">
+      <span class="score-value" id="score-value">0</span>
+      <span class="score-unit">ms average reaction time</span>
+      <span class="rating-badge" id="rating-badge"></span>
+    </div>
+
+    <div class="game-controls">
+      <button class="game-btn primary" id="btn-start" type="button">Start</button>
+      <button class="game-btn secondary" id="btn-retry" type="button" style="display:none;">Try Again</button>
+    </div>
+
+    <div class="attempt-history" id="attempt-history" style="display:none;">
+      <h3>Attempt History</h3>
+      <div class="history-list" id="history-list"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is an Aim Trainer?</h2>
+    <p>An aim trainer is a tool designed to help you improve your mouse accuracy and reaction speed. Whether you are a competitive gamer looking to sharpen your reflexes or someone who simply wants to develop better hand-eye coordination, aim training exercises offer a structured way to measure and improve your pointing precision over time.</p>
+    <p>This free online aim trainer presents 30 targets one at a time at random positions across the game area. Your goal is to click each target as quickly and accurately as possible. At the end of the round, you receive your average reaction time in milliseconds, giving you a clear metric to track your improvement across sessions.</p>
+
+    <h2>How the Aim Trainer Works</h2>
+    <p>When you press "Start," a brightly colored target appears at a random location within the game area. As soon as you click on it, the timer records how long it took you to react, and a new target immediately appears at a different position. This process repeats for all 30 targets. Clicking on empty space does not count as a miss or penalty, so only accurate hits are measured.</p>
+    <p>After completing all 30 targets, the trainer calculates your average hit time and assigns a rating based on your performance:</p>
+    <ul>
+      <li><strong>Under 300 ms:</strong> Sharpshooter-level speed, comparable to professional esports players.</li>
+      <li><strong>300 to 450 ms:</strong> Fast reactions that indicate strong mouse control and coordination.</li>
+      <li><strong>450 to 600 ms:</strong> Good performance for a casual user with room for improvement.</li>
+      <li><strong>600 to 800 ms:</strong> Average speed that benefits from regular practice sessions.</li>
+      <li><strong>Above 800 ms:</strong> A starting point with significant potential for improvement through consistent training.</li>
+    </ul>
+
+    <h2>Why Mouse Accuracy Matters</h2>
+    <p>Mouse accuracy plays a critical role in many activities beyond gaming. Graphic designers depend on precise cursor placement for detailed editing work. Software developers benefit from quick, accurate clicking when navigating code editors and debugging tools. Video editors, CAD operators, and digital artists all rely on fine motor control with their pointing devices every day.</p>
+    <p>In the world of competitive gaming, aim speed often separates good players from great ones. First-person shooters like CS2, Valorant, and Overwatch 2 demand split-second targeting decisions, and players who consistently train their aim see measurable rank improvements. Even in strategy and MOBA games, faster and more precise clicking translates to better unit control and ability usage.</p>
+
+    <h2>Tips to Improve Your Aim</h2>
+    <p>Improving your aim is a gradual process that rewards consistent practice. Here are several evidence-based strategies to help you get faster:</p>
+    <ul>
+      <li><strong>Use a consistent mouse sensitivity:</strong> Pick a DPI and in-game sensitivity setting and stick with it. Frequently changing settings prevents muscle memory from developing.</li>
+      <li><strong>Practice in short sessions:</strong> Aim training for 10 to 15 minutes per day is more effective than occasional hour-long sessions. Frequent, focused practice builds neural pathways efficiently.</li>
+      <li><strong>Focus on accuracy first:</strong> Speed naturally follows accuracy. Concentrate on hitting every target cleanly before trying to go faster.</li>
+      <li><strong>Get a quality mouse pad:</strong> A large, consistent surface reduces friction variance and gives you more space for sweeping movements.</li>
+      <li><strong>Consider your mouse grip:</strong> The three common grips (palm, claw, and fingertip) each have trade-offs. Experiment to find which gives you the best balance of comfort and precision.</li>
+      <li><strong>Maintain your hardware:</strong> Clean your mouse sensor regularly, ensure your mouse pad is flat, and use a wired connection or a reliable low-latency wireless mouse to minimize input delay.</li>
+    </ul>
+
+    <h2>Understanding Reaction Time in Aim Training</h2>
+    <p>The reaction time measured in this aim trainer encompasses two components: visual processing time and motor response time. When a target appears, your brain first needs to detect the new stimulus and identify its location on screen. Then your motor cortex calculates the required hand movement, and your muscles execute the motion to position the cursor over the target and click.</p>
+    <p>Human visual reaction time to a simple stimulus typically falls between 150 and 300 milliseconds, but aim training involves more complexity because the target position changes each time, requiring spatial calculation in addition to raw reaction speed. This is why even experienced users rarely average below 250 ms across 30 randomized targets.</p>
+    <p>Factors like monitor refresh rate, display response time, mouse polling rate, and even your physical state (fatigue, caffeine levels, time of day) all influence your measured performance. For the most consistent results, try to test under similar conditions each time you practice.</p>
+
+    <h2>Tracking Your Progress</h2>
+    <p>This aim trainer automatically saves your last 20 attempts to your browser's local storage, so you can review your history and monitor improvement over time. Tracking your scores is one of the most effective motivational tools available. Seeing your average drop from 600 ms to 450 ms over a few weeks of practice provides concrete evidence that your training is working.</p>
+    <p>For best results, try to complete at least one full round per day. Record your scores, note any changes you made to your setup, and pay attention to patterns such as whether you perform better in the morning or evening. This data-driven approach to improvement mirrors the methods used by professional esports players and their coaches.</p>
+  </article>
+
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  /* --- Aim Trainer Specific Styles --- */
+  .game-area {
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .aim-hud {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    pointer-events: none;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .aim-hud.visible { opacity: 1; }
+
+  .aim-target {
+    position: absolute;
+    border-radius: 50%;
+    background: #ef4444;
+    cursor: pointer;
+    z-index: 10;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3), 0 2px 8px rgba(0,0,0,0.15);
+    animation: aim-pulse 0.8s ease-in-out infinite alternate;
+    transition: transform 0.1s;
+  }
+  .aim-target::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30%;
+    height: 30%;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  .aim-target:hover {
+    transform: scale(1.1);
+  }
+
+  @keyframes aim-pulse {
+    0% { box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3), 0 2px 8px rgba(0,0,0,0.15); }
+    100% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.15), 0 2px 12px rgba(0,0,0,0.2); }
+  }
+
+  .aim-hit-marker {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid #22c55e;
+    pointer-events: none;
+    z-index: 8;
+    animation: aim-hit-fade 0.4s ease-out forwards;
+  }
+  @keyframes aim-hit-fade {
+    0% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.6); }
+  }
+
+  .aim-message {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text);
+    text-align: center;
+    padding: 32px;
+  }
+
+  .aim-stats {
+    margin-bottom: 20px;
+  }
+  .aim-stat-row {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .aim-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .aim-stat-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+  .aim-stat-label {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+  }
+
+  /* Countdown display */
+  .aim-countdown {
+    font-size: 4rem;
+    font-weight: 800;
+    color: var(--color-primary);
+    animation: aim-countdown-pop 0.5s ease-out;
+  }
+  @keyframes aim-countdown-pop {
+    0% { transform: scale(1.5); opacity: 0.5; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  @media (max-width: 640px) {
+    .game-area { min-height: 320px; }
+    .aim-stat-row { gap: 16px; }
+    .aim-stat-value { font-size: 1.3rem; }
+    .aim-message { font-size: 1.2rem; padding: 24px; }
+  }
+</style>
+
+<script>
+  (function() {
+    const TOTAL_TARGETS = 30;
+    const TARGET_MIN_SIZE = 44;
+    const TARGET_MAX_SIZE = 58;
+    const STORAGE_KEY = 'toolcalcs_aim-trainer_history';
+    const MAX_HISTORY = 20;
+
+    // Rating scale (lower is better, matches getRating logic)
+    const ratingScale = [
+      { max: 300, label: 'Sharpshooter', color: '#9333ea' },
+      { max: 450, label: 'Fast', color: '#16a34a' },
+      { max: 600, label: 'Average', color: '#2563eb' },
+      { max: 800, label: 'Slow', color: '#ca8a04' },
+      { max: Infinity, label: 'Needs Practice', color: '#dc2626' },
+    ];
+
+    // DOM elements
+    const gameArea = document.getElementById('game-area') as HTMLElement;
+    const instructions = document.getElementById('game-instructions') as HTMLElement;
+    const aimMessage = document.getElementById('aim-message') as HTMLElement;
+    const aimHud = document.getElementById('aim-hud') as HTMLElement;
+    const hudHit = document.getElementById('hud-hit') as HTMLElement;
+    const hudAvg = document.getElementById('hud-avg') as HTMLElement;
+    const aimStats = document.getElementById('aim-stats') as HTMLElement;
+    const statHits = document.getElementById('stat-hits') as HTMLElement;
+    const statRemaining = document.getElementById('stat-remaining') as HTMLElement;
+    const statAvg = document.getElementById('stat-avg') as HTMLElement;
+    const scoreDisplay = document.getElementById('score-display') as HTMLElement;
+    const scoreValue = document.getElementById('score-value') as HTMLElement;
+    const ratingBadge = document.getElementById('rating-badge') as HTMLElement;
+    const btnStart = document.getElementById('btn-start') as HTMLButtonElement;
+    const btnRetry = document.getElementById('btn-retry') as HTMLButtonElement;
+    const attemptHistory = document.getElementById('attempt-history') as HTMLElement;
+    const historyList = document.getElementById('history-list') as HTMLElement;
+
+    // Game state
+    let hits = 0;
+    let times: number[] = [];
+    let targetSpawnTime = 0;
+    let currentTarget: HTMLElement | null = null;
+    let isPlaying = false;
+
+    function getRatingForScore(score: number) {
+      return ratingScale.find(r => score <= r.max) || ratingScale[ratingScale.length - 1];
+    }
+
+    function loadHistory(): { score: number; rating: string; color: string; date: string }[] {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveHistory(score: number, rating: { label: string; color: string }) {
+      const history = loadHistory();
+      history.unshift({
+        score: Math.round(score),
+        rating: rating.label,
+        color: rating.color,
+        date: new Date().toLocaleString(),
+      });
+      if (history.length > MAX_HISTORY) history.length = MAX_HISTORY;
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+      } catch { /* quota exceeded, silently fail */ }
+    }
+
+    function renderHistory() {
+      const history = loadHistory();
+      if (history.length === 0) {
+        attemptHistory.style.display = 'none';
+        return;
+      }
+      attemptHistory.style.display = '';
+      historyList.innerHTML = history.map(h =>
+        `<div class="history-item">
+          <span class="history-score">${h.score} ms</span>
+          <span class="history-rating" style="background:${h.color}">${h.rating}</span>
+          <span class="history-time">${h.date}</span>
+        </div>`
+      ).join('');
+    }
+
+    function removeTarget() {
+      if (currentTarget) {
+        currentTarget.remove();
+        currentTarget = null;
+      }
+    }
+
+    function spawnTarget() {
+      removeTarget();
+
+      const areaRect = gameArea.getBoundingClientRect();
+      const size = TARGET_MIN_SIZE + Math.floor(Math.random() * (TARGET_MAX_SIZE - TARGET_MIN_SIZE + 1));
+
+      // Compute available space, accounting for the HUD bar at the top (~32px)
+      const hudOffset = 36;
+      const padding = 4;
+      const maxX = areaRect.width - size - padding;
+      const maxY = areaRect.height - size - padding;
+      const minX = padding;
+      const minY = hudOffset;
+
+      const x = minX + Math.floor(Math.random() * Math.max(1, maxX - minX));
+      const y = minY + Math.floor(Math.random() * Math.max(1, maxY - minY));
+
+      const target = document.createElement('div');
+      target.className = 'aim-target';
+      target.style.width = size + 'px';
+      target.style.height = size + 'px';
+      target.style.left = x + 'px';
+      target.style.top = y + 'px';
+      target.setAttribute('role', 'button');
+      target.setAttribute('aria-label', `Target ${hits + 1} of ${TOTAL_TARGETS}`);
+      target.setAttribute('tabindex', '0');
+
+      target.addEventListener('pointerdown', onTargetHit);
+      target.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onTargetHit(e);
+        }
+      });
+
+      gameArea.appendChild(target);
+      currentTarget = target;
+      targetSpawnTime = performance.now();
+    }
+
+    function showHitMarker(x: number, y: number, size: number) {
+      const marker = document.createElement('div');
+      marker.className = 'aim-hit-marker';
+      marker.style.width = size + 'px';
+      marker.style.height = size + 'px';
+      marker.style.left = x + 'px';
+      marker.style.top = y + 'px';
+      gameArea.appendChild(marker);
+      setTimeout(() => marker.remove(), 400);
+    }
+
+    function updateHud() {
+      hudHit.textContent = `Hits: ${hits} / ${TOTAL_TARGETS}`;
+      if (times.length > 0) {
+        const avg = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
+        hudAvg.textContent = `Avg: ${avg} ms`;
+      } else {
+        hudAvg.textContent = 'Avg: -- ms';
+      }
+    }
+
+    function updateStats() {
+      statHits.textContent = String(hits);
+      statRemaining.textContent = String(TOTAL_TARGETS - hits);
+      if (times.length > 0) {
+        statAvg.textContent = String(Math.round(times.reduce((a, b) => a + b, 0) / times.length));
+      } else {
+        statAvg.textContent = '--';
+      }
+    }
+
+    function onTargetHit(e: Event) {
+      if (!isPlaying || !currentTarget) return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      const hitTime = performance.now() - targetSpawnTime;
+      times.push(hitTime);
+      hits++;
+
+      // Show hit marker at target position
+      const left = parseInt(currentTarget.style.left);
+      const top = parseInt(currentTarget.style.top);
+      const size = parseInt(currentTarget.style.width);
+      showHitMarker(left, top, size);
+
+      removeTarget();
+      updateHud();
+      updateStats();
+
+      if (hits >= TOTAL_TARGETS) {
+        endGame();
+      } else {
+        spawnTarget();
+      }
+    }
+
+    function endGame() {
+      isPlaying = false;
+      removeTarget();
+
+      const avg = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
+      const rating = getRatingForScore(avg);
+
+      // Save to history
+      saveHistory(avg, rating);
+
+      // Hide HUD, show results
+      aimHud.classList.remove('visible');
+      aimStats.style.display = 'none';
+
+      // Show completion message in game area
+      instructions.style.display = 'none';
+      aimMessage.style.display = '';
+      aimMessage.textContent = 'Round Complete!';
+
+      // Show score
+      scoreDisplay.style.display = '';
+      scoreValue.textContent = String(avg);
+      ratingBadge.textContent = rating.label;
+      ratingBadge.style.background = rating.color;
+
+      // Controls
+      btnStart.style.display = 'none';
+      btnRetry.style.display = '';
+
+      renderHistory();
+    }
+
+    function startGame() {
+      // Reset state
+      hits = 0;
+      times = [];
+      isPlaying = false;
+      removeTarget();
+
+      // UI reset
+      instructions.style.display = 'none';
+      aimMessage.style.display = '';
+      scoreDisplay.style.display = 'none';
+      aimStats.style.display = '';
+      aimHud.classList.add('visible');
+      btnStart.style.display = 'none';
+      btnRetry.style.display = 'none';
+
+      updateHud();
+      updateStats();
+
+      // Countdown 3-2-1
+      let count = 3;
+      aimMessage.innerHTML = `<span class="aim-countdown">${count}</span>`;
+
+      const countdownInterval = setInterval(() => {
+        count--;
+        if (count > 0) {
+          aimMessage.innerHTML = `<span class="aim-countdown">${count}</span>`;
+        } else {
+          clearInterval(countdownInterval);
+          aimMessage.style.display = 'none';
+          isPlaying = true;
+          spawnTarget();
+        }
+      }, 600);
+    }
+
+    // Event listeners
+    btnStart.addEventListener('click', startGame);
+    btnRetry.addEventListener('click', startGame);
+
+    // Load history on init
+    renderHistory();
+  })();
+</script>

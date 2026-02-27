@@ -1,0 +1,460 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getGameBySlug, getRating } from '../../data/games';
+import '../../styles/game.css';
+
+const game = getGameBySlug('reaction-time-test')!;
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://toolcalcs.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Tests & Games",
+      "item": "https://toolcalcs.com/test/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Reaction Time Test"
+    }
+  ]
+};
+---
+
+<BaseLayout
+  title="Reaction Time Test - Test Your Reflexes Online | ToolCalcs"
+  description="Measure your reaction time in milliseconds with this free online test. Click as fast as you can when the screen turns green and compare your score to the average."
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/test/">Tests & Games</a> &rsaquo; <span>Reaction Time Test</span>
+  </nav>
+
+  <h1>{game.title}</h1>
+  <p class="page-desc">{game.description}</p>
+
+  <div class="game-box">
+    <div
+      class="game-area"
+      id="game-area"
+      role="button"
+      tabindex="0"
+      aria-label="Reaction time test area. Press Enter or click to interact."
+    >
+      <div class="game-instructions" id="game-instructions">
+        <h2>Test Your Reaction Time</h2>
+        <p>Click the area below or press the Start button. Wait for the screen to turn green, then click as fast as you can!</p>
+      </div>
+      <div class="game-state-display" id="game-state-display" style="display:none;">
+        <span class="state-text" id="state-text"></span>
+      </div>
+    </div>
+
+    <div class="score-display" id="score-display" style="display:none;">
+      <span class="score-value" id="score-value"></span>
+      <span class="score-unit" id="score-unit"></span>
+    </div>
+    <div id="rating-container" style="display:none;">
+      <span class="rating-badge" id="rating-badge"></span>
+    </div>
+
+    <div class="game-controls">
+      <button class="game-btn primary" id="btn-start" type="button">Start Test</button>
+      <button class="game-btn secondary" id="btn-retry" type="button" style="display:none;">Try Again</button>
+    </div>
+
+    <div class="attempt-history" id="attempt-history" style="display:none;">
+      <h3>Attempt History</h3>
+      <div class="history-list" id="history-list"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is a Reaction Time Test?</h2>
+    <p>A reaction time test measures the interval between a stimulus appearing and your conscious response to it. In this test, you wait for the screen to change from red to green, then click or tap as quickly as possible. The elapsed time between the color change and your click is recorded in milliseconds, giving you a precise measurement of your visual reaction speed.</p>
+    <p>Reaction time is a fundamental component of human performance, affecting everything from driving safety to competitive gaming. Understanding your baseline reaction time can help you identify areas for improvement and track progress over time as you train your reflexes.</p>
+
+    <h2>How Does Reaction Time Work?</h2>
+    <p>When a visual stimulus reaches your eyes, photoreceptor cells in the retina convert light into electrical signals. These signals travel through the optic nerve to the visual cortex at the back of the brain, where the image is processed and identified. Once the brain recognizes the stimulus as the trigger (in this case, the green screen), it sends a motor command through the spinal cord to the muscles in your hand or finger, which execute the click.</p>
+    <p>This entire chain of events, from photon hitting retina to muscle contraction, typically takes between 150 and 300 milliseconds in healthy adults. The speed depends on multiple factors, including the efficiency of neural transmission, the complexity of the decision process, and the readiness of the motor system.</p>
+
+    <h2>Average Reaction Time Benchmarks</h2>
+    <p>Research in cognitive psychology has established well-documented benchmarks for visual reaction time in healthy adults:</p>
+    <ul>
+      <li><strong>Under 150 ms</strong> - Exceptional. Only a small percentage of people consistently achieve reaction times this fast. Common among professional esports athletes and trained fighter pilots.</li>
+      <li><strong>150-200 ms</strong> - Fast. Above-average reaction speed that suggests excellent neural processing and motor coordination.</li>
+      <li><strong>200-250 ms</strong> - Good. A solid reaction time that falls within the upper range of typical performance for young adults.</li>
+      <li><strong>250-350 ms</strong> - Average. Most healthy adults fall within this range. This is a perfectly normal reaction time for everyday activities.</li>
+      <li><strong>350-500 ms</strong> - Below average. May be influenced by fatigue, distraction, age, or other temporary factors.</li>
+      <li><strong>Over 500 ms</strong> - Slow. Could indicate fatigue, lack of focus, or other factors affecting cognitive processing speed.</li>
+    </ul>
+
+    <h2>Factors That Affect Reaction Time</h2>
+    <p>Several variables can significantly influence how quickly you react to a visual stimulus. Understanding these factors can help you optimize your performance and interpret your test results more accurately.</p>
+    <h3>Age</h3>
+    <p>Reaction time generally improves from childhood through early adulthood, peaking around ages 20 to 30. After that, reaction speed gradually declines due to changes in neural processing speed and nerve conduction velocity. However, regular practice and physical fitness can offset much of this age-related decline.</p>
+    <h3>Sleep and Fatigue</h3>
+    <p>Sleep deprivation is one of the strongest predictors of slowed reaction time. Studies show that being awake for 17 to 19 hours impairs reaction speed to a degree comparable to a blood alcohol concentration of 0.05 percent. Getting adequate rest before testing will give you the most accurate baseline measurement.</p>
+    <h3>Caffeine and Stimulants</h3>
+    <p>Moderate caffeine consumption has been shown to improve reaction time by approximately 10 to 15 milliseconds in controlled studies. The effect peaks about 30 to 60 minutes after consumption and can last several hours, though individual sensitivity varies widely.</p>
+    <h3>Practice and Training</h3>
+    <p>Repeated practice with reaction time tasks can lead to measurable improvements over time. Gamers, athletes, and musicians often demonstrate faster-than-average reaction times, partly due to the demands of their activities and partly due to self-selection.</p>
+
+    <h2>How to Improve Your Reaction Time</h2>
+    <p>While genetics play a role in determining your baseline reaction speed, several strategies can help you improve:</p>
+    <ul>
+      <li><strong>Regular practice</strong> - Take this test daily to train your neural pathways and build faster reflexes.</li>
+      <li><strong>Physical exercise</strong> - Cardiovascular fitness improves blood flow to the brain and supports faster neural processing.</li>
+      <li><strong>Adequate sleep</strong> - Aim for 7 to 9 hours of quality sleep each night to keep your cognitive systems performing optimally.</li>
+      <li><strong>Stay hydrated</strong> - Even mild dehydration can impair cognitive function and slow reaction times.</li>
+      <li><strong>Play action video games</strong> - Research from the University of Rochester found that action game players develop faster visual processing and decision-making abilities.</li>
+      <li><strong>Reduce distractions</strong> - Practice focusing on a single task to improve your attentional readiness and reduce processing delays.</li>
+    </ul>
+
+    <h2>Reaction Time in Everyday Life</h2>
+    <p>Your reaction time has practical implications beyond gaming and sports. When driving, the average human reaction time of 250 milliseconds translates to over 5 meters of travel at highway speed before you even begin to brake. For athletes, a difference of just 10 milliseconds can determine the outcome of a sprint start or a tennis return. In emergency situations, faster reaction times can be the difference between avoiding a hazard and a collision.</p>
+    <p>This test provides a simple, reliable way to measure and track your visual reaction speed over time. Try testing yourself at different times of day, under different conditions, and after various activities to understand how your reaction time fluctuates and what helps you perform at your best.</p>
+  </article>
+
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .game-state-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    min-height: 300px;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .state-text {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+  }
+
+  /* Game area color states */
+  #game-area.state-idle {
+    background: #3b82f6;
+    border-color: #2563eb;
+  }
+  #game-area.state-waiting {
+    background: #ef4444;
+    border-color: #dc2626;
+  }
+  #game-area.state-ready {
+    background: #22c55e;
+    border-color: #16a34a;
+  }
+  #game-area.state-result {
+    background: var(--color-bg);
+    border-color: var(--color-border);
+  }
+  #game-area.state-tooearly {
+    background: #f59e0b;
+    border-color: #d97706;
+  }
+
+  @media (max-width: 640px) {
+    .state-text {
+      font-size: 1.2rem;
+    }
+  }
+</style>
+
+<script define:vars={{ ratingScale: game.ratingScale, lowerIsBetter: game.lowerIsBetter, metricUnit: game.metricUnit }}>
+  (function () {
+    'use strict';
+
+    // --- DOM Elements ---
+    const gameArea = document.getElementById('game-area');
+    const instructions = document.getElementById('game-instructions');
+    const stateDisplay = document.getElementById('game-state-display');
+    const stateText = document.getElementById('state-text');
+    const scoreDisplay = document.getElementById('score-display');
+    const scoreValue = document.getElementById('score-value');
+    const scoreUnitEl = document.getElementById('score-unit');
+    const ratingContainer = document.getElementById('rating-container');
+    const ratingBadge = document.getElementById('rating-badge');
+    const btnStart = document.getElementById('btn-start');
+    const btnRetry = document.getElementById('btn-retry');
+    const attemptHistory = document.getElementById('attempt-history');
+    const historyList = document.getElementById('history-list');
+
+    // --- Constants ---
+    const STORAGE_KEY = 'toolcalcs_reaction-time-test_history';
+    const MAX_HISTORY = 20;
+
+    // --- State ---
+    let state = 'idle'; // idle | waiting | ready | result | tooearly
+    let timeoutId = null;
+    let startTime = 0;
+
+    // --- Rating Utility ---
+    function getRating(score) {
+      if (lowerIsBetter) {
+        for (let i = 0; i < ratingScale.length; i++) {
+          if (score <= ratingScale[i].max || ratingScale[i].max === null) {
+            return ratingScale[i];
+          }
+        }
+        return ratingScale[ratingScale.length - 1];
+      }
+      for (let i = ratingScale.length - 1; i >= 0; i--) {
+        if (i === 0) return ratingScale[0];
+        var prev = ratingScale[i - 1];
+        if (score >= (prev.max === null ? Infinity : prev.max)) return ratingScale[i];
+      }
+      return ratingScale[0];
+    }
+
+    // --- State Transitions ---
+    function setState(newState) {
+      state = newState;
+      gameArea.className = 'game-area state-' + newState;
+
+      instructions.style.display = 'none';
+      stateDisplay.style.display = 'none';
+      scoreDisplay.style.display = 'none';
+      ratingContainer.style.display = 'none';
+
+      switch (newState) {
+        case 'idle':
+          instructions.style.display = '';
+          gameArea.className = 'game-area';
+          btnStart.style.display = '';
+          btnRetry.style.display = 'none';
+          break;
+
+        case 'waiting':
+          stateDisplay.style.display = 'flex';
+          stateText.textContent = 'Wait for green...';
+          btnStart.style.display = 'none';
+          btnRetry.style.display = 'none';
+          scheduleReady();
+          break;
+
+        case 'ready':
+          stateDisplay.style.display = 'flex';
+          stateText.textContent = 'Click NOW!';
+          startTime = performance.now();
+          break;
+
+        case 'tooearly':
+          stateDisplay.style.display = 'flex';
+          stateText.textContent = 'Too early! Click to try again.';
+          btnStart.style.display = 'none';
+          btnRetry.style.display = '';
+          break;
+
+        case 'result':
+          btnStart.style.display = 'none';
+          btnRetry.style.display = '';
+          break;
+      }
+    }
+
+    function scheduleReady() {
+      // Random delay between 1000ms and 5000ms
+      var delay = 1000 + Math.random() * 4000;
+      timeoutId = setTimeout(function () {
+        if (state === 'waiting') {
+          setState('ready');
+        }
+      }, delay);
+    }
+
+    function clearPendingTimeout() {
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+    }
+
+    // --- Click / Tap Handler ---
+    function handleInteraction(e) {
+      e.preventDefault();
+
+      switch (state) {
+        case 'idle':
+          startGame();
+          break;
+
+        case 'waiting':
+          // Clicked too early
+          clearPendingTimeout();
+          setState('tooearly');
+          break;
+
+        case 'ready':
+          var elapsed = Math.round(performance.now() - startTime);
+          showResult(elapsed);
+          break;
+
+        case 'tooearly':
+          startGame();
+          break;
+
+        case 'result':
+          // Do nothing on game area click in result state
+          break;
+      }
+    }
+
+    function startGame() {
+      clearPendingTimeout();
+      scoreDisplay.style.display = 'none';
+      ratingContainer.style.display = 'none';
+      setState('waiting');
+    }
+
+    function showResult(reactionTime) {
+      state = 'result';
+      gameArea.className = 'game-area state-result';
+
+      stateDisplay.style.display = 'flex';
+      stateText.textContent = reactionTime + ' ms';
+      stateText.style.color = '';
+      stateText.style.textShadow = 'none';
+      stateText.style.color = 'var(--color-text)';
+
+      // Show score display below game area
+      scoreDisplay.style.display = '';
+      scoreValue.textContent = reactionTime;
+      scoreUnitEl.textContent = metricUnit + ' - Reaction Time';
+
+      // Show rating
+      var rating = getRating(reactionTime);
+      ratingContainer.style.display = '';
+      ratingBadge.textContent = rating.label;
+      ratingBadge.style.background = rating.color;
+
+      // Show buttons
+      btnStart.style.display = 'none';
+      btnRetry.style.display = '';
+
+      // Save to history
+      saveAttempt(reactionTime, rating);
+      renderHistory();
+    }
+
+    // --- History ---
+    function getHistory() {
+      try {
+        var data = localStorage.getItem(STORAGE_KEY);
+        return data ? JSON.parse(data) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveAttempt(score, rating) {
+      var history = getHistory();
+      history.unshift({
+        score: score,
+        rating: rating.label,
+        color: rating.color,
+        timestamp: Date.now()
+      });
+      if (history.length > MAX_HISTORY) {
+        history = history.slice(0, MAX_HISTORY);
+      }
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+      } catch (e) {
+        // Storage full or unavailable
+      }
+    }
+
+    function renderHistory() {
+      var history = getHistory();
+      if (history.length === 0) {
+        attemptHistory.style.display = 'none';
+        return;
+      }
+
+      attemptHistory.style.display = '';
+      historyList.innerHTML = '';
+
+      history.forEach(function (entry) {
+        var item = document.createElement('div');
+        item.className = 'history-item';
+
+        var scoreSpan = document.createElement('span');
+        scoreSpan.className = 'history-score';
+        scoreSpan.textContent = entry.score + ' ' + metricUnit;
+
+        var ratingSpan = document.createElement('span');
+        ratingSpan.className = 'history-rating';
+        ratingSpan.textContent = entry.rating;
+        ratingSpan.style.background = entry.color || '#6b7280';
+
+        var timeSpan = document.createElement('span');
+        timeSpan.className = 'history-time';
+        timeSpan.textContent = formatTimestamp(entry.timestamp);
+
+        item.appendChild(scoreSpan);
+        item.appendChild(ratingSpan);
+        item.appendChild(timeSpan);
+        historyList.appendChild(item);
+      });
+    }
+
+    function formatTimestamp(ts) {
+      var d = new Date(ts);
+      var now = new Date();
+      if (d.toDateString() === now.toDateString()) {
+        return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+      return d.toLocaleDateString([], { month: 'short', day: 'numeric' }) +
+        ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    // --- Event Listeners ---
+    gameArea.addEventListener('click', handleInteraction);
+    gameArea.addEventListener('touchend', function (e) {
+      e.preventDefault();
+      handleInteraction(e);
+    });
+    gameArea.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleInteraction(e);
+      }
+    });
+
+    btnStart.addEventListener('click', function (e) {
+      e.stopPropagation();
+      startGame();
+    });
+
+    btnRetry.addEventListener('click', function (e) {
+      e.stopPropagation();
+      // Reset the state-text styles for next round
+      stateText.style.color = '';
+      stateText.style.textShadow = '';
+      startGame();
+    });
+
+    // --- Initialize ---
+    renderHistory();
+  })();
+</script>

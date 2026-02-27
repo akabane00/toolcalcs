@@ -1,0 +1,661 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getGameBySlug, getRating } from '../../data/games';
+import '../../styles/game.css';
+
+const game = getGameBySlug('number-memory-test')!;
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://toolcalcs.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Tests & Games",
+      "item": "https://toolcalcs.com/test/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Number Memory Test"
+    }
+  ]
+};
+---
+
+<BaseLayout
+  title="Number Memory Test - How Many Digits Can You Remember? | ToolCalcs"
+  description="Test your short-term number memory. Memorize increasingly longer number sequences and see how many digits you can recall. Free online working memory test with score tracking."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/test/">Tests & Games</a> &rsaquo;
+    <span>Number Memory Test</span>
+  </nav>
+
+  <h1>Number Memory Test</h1>
+  <p class="page-desc">Memorize the number shown on screen, then type it back. Each level adds one more digit. How far can you go?</p>
+
+  <div class="game-box">
+    <div class="game-area" id="gameArea" role="region" aria-label="Number memory game area" aria-live="polite">
+      <div class="game-instructions" id="instructionsView">
+        <h2>Number Memory</h2>
+        <p>A number will flash on screen. Your job is to remember it and type it back correctly. Each round adds another digit.</p>
+        <div class="level-badge" id="levelBadgeInstructions" aria-label="Current level">Level 1</div>
+      </div>
+
+      <div class="memorize-view" id="memorizeView" hidden>
+        <div class="level-badge" id="levelBadgeMemorize" aria-label="Current level">Level 1</div>
+        <div class="number-display" id="numberDisplay" aria-label="Number to memorize" role="status">—</div>
+        <div class="progress-bar-container" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" id="progressBarContainer">
+          <div class="progress-bar-fill" id="progressBarFill"></div>
+        </div>
+        <p class="memorize-hint">Memorize this number</p>
+      </div>
+
+      <div class="input-view" id="inputView" hidden>
+        <div class="level-badge" id="levelBadgeInput" aria-label="Current level">Level 1</div>
+        <p class="input-prompt">What was the number?</p>
+        <input
+          type="text"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          id="answerInput"
+          class="answer-input"
+          autocomplete="off"
+          aria-label="Type the number you memorized"
+          maxlength="30"
+        />
+        <button class="game-btn primary submit-btn" id="submitBtn" type="button">Submit</button>
+      </div>
+
+      <div class="feedback-view" id="feedbackView" hidden>
+        <div class="feedback-icon" id="feedbackIcon" aria-hidden="true"></div>
+        <div class="feedback-label" id="feedbackLabel"></div>
+        <div class="feedback-numbers" id="feedbackNumbers"></div>
+        <button class="game-btn primary" id="nextBtn" type="button">Next Level</button>
+      </div>
+
+      <div class="result-view" id="resultView" hidden>
+        <div class="result-icon" aria-hidden="true">🧠</div>
+        <div class="result-label">Game Over</div>
+        <div class="score-display">
+          <span class="score-value" id="finalScore">0</span>
+          <span class="score-unit">digits remembered</span>
+        </div>
+        <div class="rating-badge" id="ratingBadge">—</div>
+      </div>
+    </div>
+
+    <div class="game-controls">
+      <button class="game-btn primary" id="startBtn" type="button">Start Test</button>
+      <button class="game-btn secondary" id="tryAgainBtn" type="button" hidden>Try Again</button>
+    </div>
+
+    <div class="attempt-history" id="attemptHistory" hidden>
+      <h3>Attempt History</h3>
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is the Number Memory Test?</h2>
+    <p>The Number Memory Test is a cognitive assessment that measures your ability to remember and recall sequences of digits. Starting with a single digit, the test progressively increases the length of the number shown on screen. Your task is to memorize each number during a brief display period and then type it back from memory. The level you reach before making an error represents your digit span, a widely used indicator of short-term memory capacity.</p>
+    <p>This type of test has its roots in clinical psychology and is closely related to the digit span task found in standardized intelligence tests such as the Wechsler Adult Intelligence Scale (WAIS). Researchers and clinicians have used digit span measurements for over a century to evaluate memory function, attention, and cognitive processing speed.</p>
+
+    <h2>Understanding Working Memory</h2>
+    <p>Working memory is the cognitive system responsible for temporarily holding and manipulating information in your mind. It is essential for a wide range of everyday tasks, from following multi-step directions and performing mental arithmetic to reading comprehension and reasoning through problems. Unlike long-term memory, which stores information indefinitely, working memory has a limited capacity and a short duration.</p>
+    <p>The psychologist George Miller famously proposed in 1956 that the average person can hold approximately seven items (plus or minus two) in working memory at any given time. This concept, often called "Miller's Law," suggests that most adults can reliably remember between five and nine digits. However, individual performance varies based on factors such as age, focus, fatigue, and practiced strategies.</p>
+    <p>Number memory specifically engages the phonological loop, a component of working memory described by psychologist Alan Baddeley. The phonological loop briefly stores verbal and acoustic information and relies on an internal rehearsal process. When you see a number on screen and mentally repeat it to yourself, you are using this phonological rehearsal mechanism to keep the digits active in your memory.</p>
+
+    <h2>How Scores Are Rated</h2>
+    <p>Your score on this test corresponds to the highest number of digits you successfully recalled in a single sequence. Here is how different levels of performance compare:</p>
+    <ul>
+      <li><strong>Below Average (fewer than 5 digits):</strong> This may indicate that short-term memory capacity is limited or that focus was disrupted during the test. Fatigue, distractions, and unfamiliarity with the task can all contribute to lower scores.</li>
+      <li><strong>Average (5 to 6 digits):</strong> Most adults fall in this range, which aligns closely with the classic seven plus or minus two model. This represents a typical working memory capacity.</li>
+      <li><strong>Good (7 to 8 digits):</strong> Scores in this range suggest strong short-term memory and effective rehearsal strategies. You likely have above-average attention and focus.</li>
+      <li><strong>Excellent (9 to 11 digits):</strong> Achieving this level indicates an exceptional working memory. People who score here often use chunking strategies, grouping digits into meaningful clusters to extend capacity.</li>
+      <li><strong>Genius (12 or more digits):</strong> This level of recall is rare and suggests extraordinary memory ability. Competitive memory athletes and individuals with highly trained cognitive skills tend to reach these levels.</li>
+    </ul>
+
+    <h2>Strategies to Improve Your Number Memory</h2>
+    <p>While working memory capacity has a genetic component, research consistently shows that it can be improved with targeted practice and effective strategies:</p>
+    <h3>Chunking</h3>
+    <p>Instead of memorizing each digit individually, group them into chunks of two or three. For example, the number 8374625 becomes 837-462-5. This technique reduces the number of items your working memory needs to track and is the most effective strategy for extending digit span.</p>
+    <h3>Visualization</h3>
+    <p>Some people find it helpful to create a mental image of the number on a page or screen. By visualizing the digits in their spatial arrangement, you engage visual working memory in addition to the phonological loop, effectively doubling your encoding pathways.</p>
+    <h3>Rhythmic Rehearsal</h3>
+    <p>Repeating the number in a rhythmic or musical pattern can aid retention. Research on the phonological loop suggests that rhythmic encoding strengthens the memory trace and makes it more resistant to decay during the recall period.</p>
+    <h3>Regular Practice</h3>
+    <p>Consistent practice with digit span tasks has been shown to produce measurable improvements in working memory performance. Even a few minutes of daily practice can lead to gains over several weeks. Beyond this specific test, number memory skills translate to practical benefits such as remembering phone numbers, PINs, and mental math.</p>
+
+    <h2>The Science of Short-Term Memory</h2>
+    <p>Short-term memory and working memory, while related, are distinct cognitive constructs. Short-term memory refers to the passive storage of information for brief periods, typically lasting 15 to 30 seconds without rehearsal. Working memory adds an active manipulation component, allowing you to rearrange, compare, and process stored information.</p>
+    <p>Neuroimaging studies have shown that working memory tasks like digit span recall activate the prefrontal cortex, the brain region most associated with executive function and decision-making. The dorsolateral prefrontal cortex, in particular, plays a critical role in maintaining and manipulating information in working memory. Regular engagement of these neural circuits through memory training has been associated with structural and functional changes in the brain.</p>
+    <p>Age is one of the most significant factors affecting working memory performance. Digit span tends to increase throughout childhood, peaks in early adulthood, and gradually declines with age. However, older adults who remain mentally active and engage in regular cognitive challenges often maintain higher working memory performance compared to their less active peers.</p>
+  </article>
+
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  /* --- Number Memory Game Specific Styles --- */
+
+  /* Number display */
+  .number-display {
+    font-size: 3.5rem;
+    font-weight: 700;
+    font-family: 'Courier New', Courier, monospace;
+    letter-spacing: 0.15em;
+    color: var(--color-text);
+    padding: 32px 16px;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    word-break: break-all;
+    line-height: 1.3;
+  }
+
+  /* Level badge */
+  .level-badge {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: var(--color-primary);
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  /* Progress bar */
+  .progress-bar-container {
+    width: 80%;
+    max-width: 400px;
+    height: 6px;
+    background: var(--color-border);
+    border-radius: 3px;
+    margin: 0 auto 8px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--color-primary);
+    border-radius: 3px;
+    width: 100%;
+    transition: width 0.1s linear;
+  }
+
+  /* Memorize view */
+  .memorize-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 280px;
+    padding: 24px;
+  }
+  .memorize-hint {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-top: 4px;
+  }
+
+  /* Input view */
+  .input-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 280px;
+    padding: 24px;
+  }
+  .input-prompt {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--color-text);
+  }
+  .answer-input {
+    width: 80%;
+    max-width: 360px;
+    padding: 14px 20px;
+    font-size: 1.8rem;
+    font-family: 'Courier New', Courier, monospace;
+    text-align: center;
+    letter-spacing: 0.12em;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    color: var(--color-text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .answer-input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  }
+  .submit-btn {
+    margin-top: 16px;
+    min-width: 140px;
+  }
+
+  /* Feedback view */
+  .feedback-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 280px;
+    padding: 24px;
+  }
+  .feedback-icon {
+    font-size: 3rem;
+    margin-bottom: 8px;
+  }
+  .feedback-label {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .feedback-numbers {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+    width: 80%;
+    max-width: 360px;
+  }
+  .feedback-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+  }
+  .feedback-row-label {
+    color: var(--color-text-muted);
+    font-weight: 500;
+  }
+  .feedback-row-value {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 600;
+    font-size: 1.1rem;
+    letter-spacing: 0.08em;
+  }
+
+  /* Correct / wrong flash */
+  .feedback-correct .feedback-label {
+    color: #16a34a;
+  }
+  .feedback-wrong .feedback-label {
+    color: #dc2626;
+  }
+
+  /* Result view */
+  .result-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 280px;
+    padding: 24px;
+  }
+  .result-icon {
+    font-size: 3rem;
+    margin-bottom: 8px;
+  }
+  .result-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .number-display {
+      font-size: 2.2rem;
+      padding: 24px 12px;
+    }
+    .answer-input {
+      font-size: 1.4rem;
+      padding: 12px 16px;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    // --- Rating scale (min-based, as specified) ---
+    const RATING_SCALE = [
+      { min: 12, label: 'Genius', color: '#9333ea' },
+      { min: 9, label: 'Excellent', color: '#16a34a' },
+      { min: 7, label: 'Good', color: '#2563eb' },
+      { min: 5, label: 'Average', color: '#ca8a04' },
+      { min: 0, label: 'Below Average', color: '#dc2626' },
+    ];
+
+    function getLocalRating(score: number): { label: string; color: string } {
+      for (const level of RATING_SCALE) {
+        if (score >= level.min) {
+          return { label: level.label, color: level.color };
+        }
+      }
+      return { label: 'Below Average', color: '#dc2626' };
+    }
+
+    // --- Storage ---
+    const STORAGE_KEY = 'toolcalcs_number-memory-test_history';
+    const MAX_HISTORY = 20;
+
+    function loadHistory(): Array<{ score: number; date: string; rating: string }> {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch {}
+      return [];
+    }
+
+    function saveHistory(history: Array<{ score: number; date: string; rating: string }>) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(history.slice(0, MAX_HISTORY)));
+      } catch {}
+    }
+
+    function addToHistory(score: number) {
+      const history = loadHistory();
+      const rating = getLocalRating(score);
+      history.unshift({
+        score,
+        date: new Date().toISOString(),
+        rating: rating.label,
+      });
+      saveHistory(history);
+    }
+
+    // --- DOM refs ---
+    const gameArea = document.getElementById('gameArea')!;
+    const instructionsView = document.getElementById('instructionsView')!;
+    const memorizeView = document.getElementById('memorizeView')!;
+    const inputView = document.getElementById('inputView')!;
+    const feedbackView = document.getElementById('feedbackView')!;
+    const resultView = document.getElementById('resultView')!;
+
+    const levelBadgeInstructions = document.getElementById('levelBadgeInstructions')!;
+    const levelBadgeMemorize = document.getElementById('levelBadgeMemorize')!;
+    const levelBadgeInput = document.getElementById('levelBadgeInput')!;
+
+    const numberDisplay = document.getElementById('numberDisplay')!;
+    const progressBarFill = document.getElementById('progressBarFill')!;
+    const progressBarContainer = document.getElementById('progressBarContainer')!;
+
+    const answerInput = document.getElementById('answerInput') as HTMLInputElement;
+    const submitBtn = document.getElementById('submitBtn')!;
+
+    const feedbackIcon = document.getElementById('feedbackIcon')!;
+    const feedbackLabel = document.getElementById('feedbackLabel')!;
+    const feedbackNumbers = document.getElementById('feedbackNumbers')!;
+    const nextBtn = document.getElementById('nextBtn')!;
+
+    const finalScore = document.getElementById('finalScore')!;
+    const ratingBadge = document.getElementById('ratingBadge')!;
+
+    const startBtn = document.getElementById('startBtn')!;
+    const tryAgainBtn = document.getElementById('tryAgainBtn')!;
+
+    const attemptHistorySection = document.getElementById('attemptHistory')!;
+    const historyList = document.getElementById('historyList')!;
+
+    // --- Game state ---
+    let currentLevel = 1;
+    let currentNumber = '';
+    let highestLevel = 0;
+    let timerInterval: ReturnType<typeof setInterval> | null = null;
+    let isPlaying = false;
+
+    // --- Utility ---
+    function generateNumber(digits: number): string {
+      let num = '';
+      // First digit should not be 0
+      num += Math.floor(Math.random() * 9) + 1;
+      for (let i = 1; i < digits; i++) {
+        num += Math.floor(Math.random() * 10);
+      }
+      return num;
+    }
+
+    function getDisplayTime(level: number): number {
+      return 1000 + level * 500;
+    }
+
+    function showView(view: HTMLElement) {
+      [instructionsView, memorizeView, inputView, feedbackView, resultView].forEach(v => {
+        v.hidden = true;
+      });
+      view.hidden = false;
+    }
+
+    function updateLevelBadges() {
+      const text = `Level ${currentLevel}`;
+      levelBadgeInstructions.textContent = text;
+      levelBadgeMemorize.textContent = text;
+      levelBadgeInput.textContent = text;
+    }
+
+    // --- Game flow ---
+    function startGame() {
+      currentLevel = 1;
+      highestLevel = 0;
+      isPlaying = true;
+      startBtn.hidden = true;
+      tryAgainBtn.hidden = true;
+      updateLevelBadges();
+      startRound();
+    }
+
+    function startRound() {
+      currentNumber = generateNumber(currentLevel);
+      updateLevelBadges();
+      showView(memorizeView);
+      numberDisplay.textContent = currentNumber;
+
+      // Start countdown progress bar
+      const displayTime = getDisplayTime(currentLevel);
+      progressBarFill.style.transition = 'none';
+      progressBarFill.style.width = '100%';
+      progressBarContainer.setAttribute('aria-valuenow', '100');
+
+      // Force reflow to reset animation
+      void progressBarFill.offsetWidth;
+
+      progressBarFill.style.transition = `width ${displayTime}ms linear`;
+      progressBarFill.style.width = '0%';
+
+      // Update aria-valuenow periodically
+      const startTime = Date.now();
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        const pct = Math.max(0, Math.round(100 - (elapsed / displayTime) * 100));
+        progressBarContainer.setAttribute('aria-valuenow', String(pct));
+      }, 200);
+
+      setTimeout(() => {
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+        progressBarContainer.setAttribute('aria-valuenow', '0');
+        showInputView();
+      }, displayTime);
+    }
+
+    function showInputView() {
+      showView(inputView);
+      answerInput.value = '';
+      answerInput.maxLength = currentNumber.length + 5;
+      // Small delay to ensure the view is rendered before focus
+      requestAnimationFrame(() => {
+        answerInput.focus();
+      });
+    }
+
+    function checkAnswer() {
+      const userAnswer = answerInput.value.trim();
+      if (userAnswer.length === 0) return;
+
+      if (userAnswer === currentNumber) {
+        // Correct
+        highestLevel = currentLevel;
+        showFeedback(true, userAnswer);
+      } else {
+        // Wrong
+        showFeedback(false, userAnswer);
+      }
+    }
+
+    function showFeedback(correct: boolean, userAnswer: string) {
+      showView(feedbackView);
+
+      if (correct) {
+        feedbackView.classList.remove('feedback-wrong');
+        feedbackView.classList.add('feedback-correct');
+        feedbackIcon.textContent = '\u2705';
+        feedbackLabel.textContent = 'Correct!';
+        nextBtn.textContent = 'Next Level';
+        nextBtn.hidden = false;
+        feedbackNumbers.innerHTML = `
+          <div class="feedback-row">
+            <span class="feedback-row-label">Your answer</span>
+            <span class="feedback-row-value" style="color:#16a34a">${escapeHtml(userAnswer)}</span>
+          </div>
+          <div class="feedback-row">
+            <span class="feedback-row-label">Digits</span>
+            <span class="feedback-row-value">${currentNumber.length}</span>
+          </div>
+        `;
+      } else {
+        feedbackView.classList.remove('feedback-correct');
+        feedbackView.classList.add('feedback-wrong');
+        feedbackIcon.textContent = '\u274C';
+        feedbackLabel.textContent = 'Incorrect';
+        nextBtn.hidden = true;
+        feedbackNumbers.innerHTML = `
+          <div class="feedback-row">
+            <span class="feedback-row-label">Your answer</span>
+            <span class="feedback-row-value" style="color:#dc2626">${escapeHtml(userAnswer)}</span>
+          </div>
+          <div class="feedback-row">
+            <span class="feedback-row-label">Correct number</span>
+            <span class="feedback-row-value" style="color:#16a34a">${escapeHtml(currentNumber)}</span>
+          </div>
+        `;
+
+        // Short delay then show result
+        setTimeout(() => {
+          endGame();
+        }, 2000);
+      }
+    }
+
+    function nextLevel() {
+      currentLevel++;
+      startRound();
+    }
+
+    function endGame() {
+      isPlaying = false;
+      const score = highestLevel;
+      showView(resultView);
+      finalScore.textContent = String(score);
+
+      const rating = getLocalRating(score);
+      ratingBadge.textContent = rating.label;
+      ratingBadge.style.background = rating.color;
+
+      startBtn.hidden = true;
+      tryAgainBtn.hidden = false;
+
+      // Save to history
+      addToHistory(score);
+      renderHistory();
+    }
+
+    function escapeHtml(text: string): string {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // --- History rendering ---
+    function renderHistory() {
+      const history = loadHistory();
+      if (history.length === 0) {
+        attemptHistorySection.hidden = true;
+        return;
+      }
+      attemptHistorySection.hidden = false;
+      historyList.innerHTML = history
+        .map((entry) => {
+          const rating = getLocalRating(entry.score);
+          const dateStr = formatDate(entry.date);
+          return `
+            <div class="history-item">
+              <span class="history-score">${entry.score} digit${entry.score !== 1 ? 's' : ''}</span>
+              <span class="history-rating" style="background:${rating.color}">${rating.label}</span>
+              <span class="history-time">${dateStr}</span>
+            </div>
+          `;
+        })
+        .join('');
+    }
+
+    function formatDate(iso: string): string {
+      try {
+        const d = new Date(iso);
+        return d.toLocaleDateString(undefined, {
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+      } catch {
+        return '';
+      }
+    }
+
+    // --- Event listeners ---
+    startBtn.addEventListener('click', startGame);
+    tryAgainBtn.addEventListener('click', startGame);
+    submitBtn.addEventListener('click', checkAnswer);
+    nextBtn.addEventListener('click', nextLevel);
+
+    answerInput.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        checkAnswer();
+      }
+    });
+
+    // Only allow digit input
+    answerInput.addEventListener('input', () => {
+      answerInput.value = answerInput.value.replace(/[^0-9]/g, '');
+    });
+
+    // --- Init ---
+    renderHistory();
+  })();
+</script>
