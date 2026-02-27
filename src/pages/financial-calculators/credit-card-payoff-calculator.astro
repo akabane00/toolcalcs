@@ -1,0 +1,356 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Financial Calculators",
+        "item": "https://toolcalcs.com/financial-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Credit Card Payoff Calculator"
+      }
+    ]
+  },
+  {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'How long will it take to pay off my credit card?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'The time to pay off your credit card depends on your balance, annual percentage rate (APR), and the amount you pay each month. For example, a $5,000 balance at 22.99% APR with a $150 monthly payment takes about 4 years to pay off, while making only minimum payments on the same balance can take over 20 years. Use the calculator above to find your exact payoff timeline.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Why does paying only the minimum take so long?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'When you make only the minimum payment, the majority of your payment goes toward interest rather than reducing your principal balance. As your balance slowly decreases, so does your minimum payment, which means you pay even less each month. This creates a cycle where you are barely outpacing the interest charges, resulting in payoff timelines that can stretch to 20 or 30 years and total interest that often exceeds the original balance.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is the best strategy to pay off credit card debt?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Two popular strategies are the avalanche method and the snowball method. The avalanche method prioritizes paying off the card with the highest interest rate first, saving you the most money overall. The snowball method prioritizes the smallest balance first, giving you quick psychological wins. Both are effective, but the avalanche method is mathematically optimal. You can also consider a balance transfer to a 0% APR card to stop interest from accruing while you pay down the principal.',
+      },
+    },
+  ],
+},
+];
+---
+
+<BaseLayout
+  title="Credit Card Payoff Calculator - Get Out of Debt Faster"
+  description="Free credit card payoff calculator. Find out how long it takes to pay off your balance and how much interest you will pay. Compare minimum vs fixed payment strategies."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/financial-calculators/">Financial Calculators</a> &rsaquo;
+    <span>Credit Card Payoff Calculator</span>
+  </nav>
+
+  <h1>Credit Card Payoff Calculator</h1>
+  <p class="page-desc">Find out how long it will take to pay off your credit card and how much interest you will pay. Compare fixed payments vs. minimum payments to see how much you can save.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="balance">Credit Card Balance ($)</label>
+        <input type="number" id="balance" value="5000" min="0" step="100" />
+      </div>
+      <div class="input-group">
+        <label for="apr">Annual Interest Rate (APR %)</label>
+        <input type="number" id="apr" value="22.99" min="0" max="40" step="0.01" />
+      </div>
+      <div class="input-group">
+        <label for="monthlyPayment">Monthly Payment ($)</label>
+        <input type="number" id="monthlyPayment" value="150" min="0" step="10" />
+      </div>
+      <div class="input-group">
+        <label for="minPaymentPct">Minimum Payment (% of balance)</label>
+        <input type="number" id="minPaymentPct" value="2" min="1" max="10" step="0.5" />
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <h3 class="scenario-heading">Fixed Payment Scenario</h3>
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Months to Pay Off</span>
+          <span class="result-value" id="fixedMonths">0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Interest Paid</span>
+          <span class="result-value" id="fixedInterest">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Amount Paid</span>
+          <span class="result-value" id="fixedTotal">$0</span>
+        </div>
+      </div>
+
+      <h3 class="scenario-heading">Minimum Payment Scenario</h3>
+      <div class="result-cards">
+        <div class="result-card">
+          <span class="result-label">Months to Pay Off</span>
+          <span class="result-value" id="minMonths">0</span>
+        </div>
+        <div class="result-card warning">
+          <span class="result-label">Total Interest Paid</span>
+          <span class="result-value" id="minInterest">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Amount Paid</span>
+          <span class="result-value" id="minTotal">$0</span>
+        </div>
+      </div>
+
+      <h3 class="scenario-heading">Your Savings by Paying More</h3>
+      <div class="result-cards">
+        <div class="result-card success">
+          <span class="result-label">Interest Savings</span>
+          <span class="result-value" id="interestSavings">$0</span>
+        </div>
+        <div class="result-card success">
+          <span class="result-label">Time Saved</span>
+          <span class="result-value" id="timeSaved">0 months</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>Understanding Credit Card Interest</h2>
+    <p>Credit card interest is one of the most misunderstood aspects of personal finance, and that misunderstanding costs consumers billions of dollars every year. When your credit card statement shows an annual percentage rate of 22.99%, that number represents the yearly cost of borrowing, but interest is actually calculated and compounded on a daily basis. The card issuer divides your APR by 365 to arrive at a daily periodic rate, which in this case would be approximately 0.063% per day.</p>
+    <p>Each day, the card issuer multiplies your outstanding balance by the daily periodic rate and adds that interest charge to your balance. This means you are paying interest on previously accrued interest, which is the essence of compound interest working against you. Over the course of a billing cycle, typically 28 to 31 days, these daily interest charges accumulate into the monthly interest charge you see on your statement.</p>
+    <p>For practical purposes, this calculator uses the monthly periodic rate (APR divided by 12) to estimate your payoff timeline and total interest. While the daily compounding method used by most issuers can result in slightly higher actual interest charges, the monthly approximation provides a reliable estimate that is close to what you will actually pay. On a $5,000 balance at 22.99% APR, the monthly interest charge is approximately $95.79, which means that if your payment is $150, only about $54 is actually reducing your balance in the first month.</p>
+    <p>Understanding this split between interest and principal is critical because it explains why credit card debt feels so persistent. When nearly two-thirds of your payment goes to interest, progress toward eliminating the balance is painfully slow. As your balance decreases over time, the interest portion shrinks and the principal portion grows, but this acceleration takes months or years to become noticeable, especially at high APRs.</p>
+
+    <h2>The Minimum Payment Trap</h2>
+    <p>Credit card minimum payments are designed to keep your account in good standing, not to help you pay off your debt efficiently. Most card issuers calculate the minimum payment as a percentage of your outstanding balance, typically 1% to 3%, with a floor of $25 to $35. This structure creates a mathematically devastating repayment scenario that can trap cardholders in debt for decades.</p>
+    <p>Consider a concrete example: a $5,000 balance at 22.99% APR with a minimum payment of 2% of the balance (or $25, whichever is greater). In the first month, your minimum payment is $100, but $95.79 goes to interest, leaving only $4.21 to reduce the principal. Your new balance is $4,995.79, and next month's minimum payment drops to $99.92. As the balance slowly decreases, so does the minimum payment, which means you are paying less and less each month, extending the payoff timeline dramatically.</p>
+    <p>Under these terms, it would take approximately 27 years to fully pay off that $5,000 balance, and you would pay over $8,000 in interest alone, bringing the total cost to more than $13,000. You would end up paying nearly three times the original balance. This is the minimum payment trap: the declining payment structure ensures that you make progress so slowly that interest charges consume the vast majority of your money.</p>
+    <p>By contrast, if you commit to a fixed payment of $150 per month on the same balance, you would pay it off in about 47 months (just under 4 years) and pay roughly $1,977 in total interest. The difference is staggering: the fixed payment strategy saves you over $6,000 in interest and more than 20 years of payments. This dramatic comparison illustrates why financial advisors universally recommend paying more than the minimum whenever possible.</p>
+    <p>Credit card companies are required by law to include a minimum payment warning on your monthly statement. This warning shows how long it will take to pay off your balance making only minimum payments and how much you would need to pay each month to eliminate the debt within three years. Reviewing this disclosure is a powerful reminder of the true cost of minimum payments.</p>
+
+    <h2>Payoff Strategies: Choosing the Right Approach</h2>
+    <p>When you carry balances on multiple credit cards, choosing the right payoff strategy can save you hundreds or thousands of dollars. The two most widely recommended approaches are the avalanche method and the snowball method, and each has distinct advantages depending on your financial situation and personality.</p>
+    <p><strong>The Avalanche Method</strong> prioritizes paying off the card with the highest interest rate first while making minimum payments on all other cards. Once the highest-rate card is paid off, you redirect that payment to the card with the next highest rate, and so on. This approach is mathematically optimal because it minimizes the total interest you pay across all your cards. For example, if you have three cards at 24.99%, 19.99%, and 14.99%, the avalanche method directs all extra payments to the 24.99% card first, eliminating the most expensive debt as quickly as possible.</p>
+    <p><strong>The Snowball Method</strong>, popularized by financial educator Dave Ramsey, prioritizes paying off the card with the smallest balance first, regardless of interest rate. The psychological advantage of this approach is that you experience quick wins early in the process, which builds momentum and motivation to continue. Once the smallest balance is eliminated, you roll that payment into the next smallest balance. While you may pay slightly more in total interest compared to the avalanche method, the behavioral benefits of quick wins keep many people on track who might otherwise give up.</p>
+    <p><strong>Balance Transfer</strong> is a third strategy that involves moving high-interest debt to a new credit card offering a 0% introductory APR, typically for 12 to 21 months. During the promotional period, every dollar of your payment goes directly to reducing the principal, dramatically accelerating your payoff. However, balance transfers usually charge a fee of 3% to 5% of the transferred amount, and any remaining balance after the promotional period reverts to the card's standard APR, which can be 20% or higher. To make a balance transfer worthwhile, you need a realistic plan to pay off the entire transferred balance before the promotional rate expires.</p>
+    <p>There is no single best strategy for everyone. If you are motivated by math and efficiency, the avalanche method saves the most money. If you need emotional momentum and quick progress, the snowball method works better. If you have strong credit and the discipline to pay off a balance within a promotional window, a balance transfer can eliminate interest charges entirely during the repayment period. Many people combine elements of all three strategies depending on their specific situation.</p>
+
+    <h2>How to Accelerate Credit Card Payoff</h2>
+    <p>Beyond choosing a payoff strategy, several practical tactics can help you eliminate credit card debt faster. These techniques work regardless of which strategy you follow and can shave months or years off your repayment timeline.</p>
+    <ul>
+      <li><strong>Round up your payments.</strong> If your calculated payment is $147, round up to $150 or even $200. The extra amount goes entirely to principal, and over time, these small increases compound into significant interest savings. Rounding up by just $25 per month on a $5,000 balance at 22.99% APR can save you over $400 in interest and pay off the balance several months sooner.</li>
+      <li><strong>Make bi-weekly payments.</strong> Instead of one monthly payment, split it in half and pay every two weeks. Because there are 26 bi-weekly periods in a year, you effectively make 13 monthly payments instead of 12. That extra payment each year goes entirely toward principal and accelerates your payoff without a noticeable impact on your budget.</li>
+      <li><strong>Apply windfalls directly to debt.</strong> Tax refunds, work bonuses, cash gifts, and any other unexpected income should be applied immediately to your highest-priority credit card balance. A single $1,500 tax refund applied to a $5,000 balance reduces the principal by 30% in one shot, dramatically cutting the interest charged in subsequent months and accelerating your payoff timeline by many months.</li>
+      <li><strong>Negotiate a lower interest rate.</strong> Call your card issuer and ask for a rate reduction. If you have a good payment history, many issuers will lower your APR by several percentage points to retain you as a customer. Even a reduction from 22.99% to 18.99% can save hundreds of dollars in interest over the life of the balance. The worst they can say is no, and the phone call takes five minutes.</li>
+      <li><strong>Cut discretionary spending temporarily.</strong> Review your monthly expenses and identify non-essential spending that can be temporarily redirected to debt repayment. Canceling one streaming service, eating out one fewer time per week, or pausing a gym membership can free up $50 to $200 per month that dramatically accelerates your payoff. This does not need to be permanent, just until the debt is eliminated.</li>
+      <li><strong>Generate additional income.</strong> Side work, freelancing, selling unused items, or taking on overtime shifts can provide a burst of extra cash specifically earmarked for debt elimination. Even a temporary side hustle earning an extra $300 per month can cut your payoff timeline by a third or more.</li>
+    </ul>
+
+    <h2>Impact of Credit Card Debt on Your Credit Score</h2>
+    <p>Credit card debt directly affects your credit score through a metric called credit utilization ratio, which measures the percentage of your available credit that you are currently using. This ratio accounts for approximately 30% of your FICO credit score, making it the second most important factor after payment history.</p>
+    <p>For example, if you have a credit card with a $10,000 limit and carry a $5,000 balance, your utilization ratio is 50%. Most credit scoring models consider utilization above 30% to be negative, and utilization above 50% can significantly damage your score. Ideal utilization is below 10%, though any reduction from high utilization to lower utilization will improve your score over time.</p>
+    <p>The good news is that credit utilization has no memory. Unlike late payments, which remain on your credit report for seven years, your utilization ratio reflects only your current balances. This means that as you pay down credit card debt, your credit score improves relatively quickly, often within one to two billing cycles. Paying off a maxed-out card can result in a score increase of 50 points or more.</p>
+    <p>Beyond the utilization ratio, high credit card debt can also indirectly hurt your score by making it harder to make payments on time. Payment history is the single most important factor in your credit score, accounting for 35% of your FICO score. A single missed payment can drop your score by 80 to 100 points and remain on your credit report for seven years. Keeping your debt manageable reduces the risk of missed payments and protects this critical component of your credit profile.</p>
+    <p>If you are carrying significant credit card debt and planning to apply for a mortgage, auto loan, or other major credit product, paying down your card balances before applying can meaningfully improve the interest rate you are offered. Even a 0.5% reduction in a mortgage rate, achieved by improving your credit score through lower utilization, can save tens of thousands of dollars over the life of a 30-year loan.</p>
+
+    <h2>When to Seek Help with Credit Card Debt</h2>
+    <p>While the strategies above are effective for many people, there are situations where credit card debt has grown beyond what you can manage on your own. Recognizing when to seek professional help is an important step in regaining control of your finances.</p>
+    <p><strong>Credit counseling</strong> is a free or low-cost service offered by nonprofit organizations. A certified credit counselor reviews your complete financial picture, helps you create a budget, and may recommend a debt management plan (DMP). Under a DMP, the counseling agency negotiates with your creditors to lower interest rates (often to 6% to 10%) and consolidates your payments into one monthly amount. The agency distributes the payment to your creditors on your behalf. Enrollment in a DMP typically requires closing your credit cards and committing to a 3 to 5 year repayment plan.</p>
+    <p><strong>Debt management plans</strong> work well for people who are employed and have enough income to make reduced payments but are struggling with high interest rates. The reduced rates can cut total interest by 50% or more compared to paying standard APRs, making the debt manageable on a realistic budget. Look for agencies accredited by the National Foundation for Credit Counseling (NFCC) or the Financial Counseling Association of America (FCAA).</p>
+    <p><strong>Debt settlement</strong> involves negotiating with creditors to accept less than the full amount owed. While this can reduce the total debt, it comes with significant drawbacks: your credit score will be severely damaged, settled accounts appear as negative marks on your credit report for seven years, and forgiven debt may be treated as taxable income by the IRS. Debt settlement should generally be considered only as a last resort before bankruptcy.</p>
+    <p><strong>Bankruptcy</strong> is the most extreme option and should only be considered when debt is truly insurmountable. Chapter 7 bankruptcy discharges most unsecured debt, including credit cards, but may require liquidating certain assets. Chapter 13 bankruptcy creates a court-supervised repayment plan over 3 to 5 years. Both types remain on your credit report for 7 to 10 years and make obtaining new credit significantly more difficult during that period. Consult with a bankruptcy attorney to understand whether filing is appropriate for your situation.</p>
+    <p>The key indicators that you should seek professional help include: spending more than 20% of your take-home pay on credit card payments, using one credit card to pay another, being unable to make minimum payments, receiving calls from collectors, or experiencing significant stress and anxiety related to your debt. There is no shame in seeking help, and acting sooner rather than later preserves more options and reduces the total cost of resolving the debt.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>How long will it take to pay off my credit card?</h3>
+    <p>The time required depends on three factors: your current balance, your APR, and how much you pay each month. A higher payment relative to your balance shortens the timeline dramatically. For a $5,000 balance at 22.99% APR, paying $150 per month takes approximately 47 months, while paying only the 2% minimum can stretch to over 300 months (25+ years). Use the calculator above to see your exact payoff timeline based on your specific numbers.</p>
+
+    <h3>Why does paying only the minimum take so long?</h3>
+    <p>Minimum payments are typically calculated as a small percentage of your balance (usually 1% to 3%), with most of that amount going to interest rather than principal. As your balance slowly decreases, the minimum payment drops too, meaning you pay less over time. This declining payment structure ensures that interest continues to consume the majority of each payment, resulting in an extremely slow payoff. The mathematical reality is that minimum payments are designed to be affordable, not efficient.</p>
+
+    <h3>What is the best strategy to pay off credit card debt?</h3>
+    <p>The avalanche method (paying off the highest interest rate card first) saves the most money. The snowball method (paying off the smallest balance first) provides motivational quick wins. A balance transfer to a 0% APR card eliminates interest entirely during the promotional period. The best strategy is the one you will actually follow consistently. Many financial experts recommend the avalanche method for its mathematical advantage, but any strategy that results in consistent, above-minimum payments will get you out of debt.</p>
+
+    <h3>Should I use savings to pay off credit card debt?</h3>
+    <p>If your credit card APR is 20% or higher and your savings account earns 4% to 5%, the math strongly favors using savings to pay off the card. However, always maintain a small emergency fund of at least $1,000 to $2,000 before aggressively paying down debt. Without an emergency cushion, unexpected expenses will force you back onto the credit card, undoing your progress. Pay off the debt aggressively while keeping a minimal emergency reserve, then rebuild your full savings once the debt is eliminated.</p>
+
+    <h3>Does paying off credit card debt improve my credit score?</h3>
+    <p>Yes, significantly. Credit utilization, which is the ratio of your balance to your credit limit, accounts for about 30% of your credit score. Reducing your utilization from 50% or more to below 30% can improve your score by 30 to 50 points or more. Unlike other credit factors, utilization updates with each billing cycle, so improvements appear quickly, often within one to two months of paying down the balance.</p>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/financial-calculators/loan-amortization-calculator/">Loan Amortization Calculator</a> - See a full amortization schedule for any loan.</li>
+      <li><a href="/financial-calculators/savings-goal-calculator/">Savings Goal Calculator</a> - Plan monthly savings to reach your financial goal.</li>
+      <li><a href="/financial-calculators/mortgage-calculator/">Mortgage Calculator</a> - Estimate monthly mortgage payments.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .scenario-heading {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 16px 0 8px;
+    color: var(--color-text-muted);
+  }
+  .scenario-heading:first-child {
+    margin-top: 0;
+  }
+  .result-card.warning { background: #fef2f2; }
+  .result-card.warning .result-value { color: #dc2626; }
+</style>
+
+<script>
+  function formatCurrency(n: number): string {
+    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+
+  function calcFixedPayment(balance: number, apr: number, monthlyPmt: number): { months: number; totalInterest: number; totalPaid: number } {
+    const monthlyRate = apr / 100 / 12;
+    let remaining = balance;
+    let totalInterest = 0;
+    let months = 0;
+    const maxMonths = 1200; // safety cap at 100 years
+
+    if (monthlyPmt <= remaining * monthlyRate) {
+      // Payment does not cover interest — will never pay off
+      return { months: -1, totalInterest: -1, totalPaid: -1 };
+    }
+
+    while (remaining > 0 && months < maxMonths) {
+      months++;
+      const interest = remaining * monthlyRate;
+      let principal = monthlyPmt - interest;
+      if (principal > remaining) principal = remaining;
+      remaining -= principal;
+      totalInterest += interest;
+      if (remaining < 0.01) remaining = 0;
+    }
+
+    return { months, totalInterest, totalPaid: balance + totalInterest };
+  }
+
+  function calcMinPayment(balance: number, apr: number, minPct: number): { months: number; totalInterest: number; totalPaid: number } {
+    const monthlyRate = apr / 100 / 12;
+    let remaining = balance;
+    let totalInterest = 0;
+    let totalPaid = 0;
+    let months = 0;
+    const maxMonths = 1200;
+
+    while (remaining > 0 && months < maxMonths) {
+      months++;
+      const minPayment = Math.max(remaining * minPct / 100, 25);
+      const interest = remaining * monthlyRate;
+
+      if (minPayment <= interest && minPayment < 25.01) {
+        // Minimum payment does not cover interest — will never pay off
+        return { months: -1, totalInterest: -1, totalPaid: -1 };
+      }
+
+      let payment = minPayment;
+      if (payment > remaining + interest) payment = remaining + interest;
+
+      let principal = payment - interest;
+      remaining -= principal;
+      totalInterest += interest;
+      totalPaid += payment;
+      if (remaining < 0.01) remaining = 0;
+    }
+
+    return { months, totalInterest, totalPaid };
+  }
+
+  function calculate() {
+    const balance = parseFloat((document.getElementById('balance') as HTMLInputElement).value) || 0;
+    const apr = parseFloat((document.getElementById('apr') as HTMLInputElement).value) || 0;
+    const monthlyPayment = parseFloat((document.getElementById('monthlyPayment') as HTMLInputElement).value) || 0;
+    const minPct = parseFloat((document.getElementById('minPaymentPct') as HTMLInputElement).value) || 2;
+
+    if (balance <= 0) return;
+
+    // Fixed payment scenario
+    const fixed = calcFixedPayment(balance, apr, monthlyPayment);
+
+    if (fixed.months === -1) {
+      document.getElementById('fixedMonths')!.textContent = 'Never';
+      document.getElementById('fixedInterest')!.textContent = 'N/A';
+      document.getElementById('fixedTotal')!.textContent = 'N/A';
+    } else {
+      document.getElementById('fixedMonths')!.textContent = String(fixed.months);
+      document.getElementById('fixedInterest')!.textContent = formatCurrency(fixed.totalInterest);
+      document.getElementById('fixedTotal')!.textContent = formatCurrency(fixed.totalPaid);
+    }
+
+    // Minimum payment scenario
+    const min = calcMinPayment(balance, apr, minPct);
+
+    if (min.months === -1) {
+      document.getElementById('minMonths')!.textContent = 'Never';
+      document.getElementById('minInterest')!.textContent = 'N/A';
+      document.getElementById('minTotal')!.textContent = 'N/A';
+    } else {
+      document.getElementById('minMonths')!.textContent = String(min.months);
+      document.getElementById('minInterest')!.textContent = formatCurrency(min.totalInterest);
+      document.getElementById('minTotal')!.textContent = formatCurrency(min.totalPaid);
+    }
+
+    // Savings comparison
+    if (fixed.months !== -1 && min.months !== -1) {
+      const interestSaved = min.totalInterest - fixed.totalInterest;
+      const monthsSaved = min.months - fixed.months;
+      document.getElementById('interestSavings')!.textContent = formatCurrency(interestSaved > 0 ? interestSaved : 0);
+
+      if (monthsSaved > 12) {
+        const years = Math.floor(monthsSaved / 12);
+        const remainMonths = monthsSaved % 12;
+        document.getElementById('timeSaved')!.textContent = years + (years === 1 ? ' year' : ' years') + (remainMonths > 0 ? ', ' + remainMonths + (remainMonths === 1 ? ' month' : ' months') : '');
+      } else {
+        document.getElementById('timeSaved')!.textContent = monthsSaved + (monthsSaved === 1 ? ' month' : ' months');
+      }
+    } else if (fixed.months !== -1) {
+      document.getElementById('interestSavings')!.textContent = 'Significant';
+      document.getElementById('timeSaved')!.textContent = 'Decades';
+    } else {
+      document.getElementById('interestSavings')!.textContent = '$0';
+      document.getElementById('timeSaved')!.textContent = '0 months';
+    }
+  }
+
+  document.getElementById('calculateBtn')?.addEventListener('click', calculate);
+  // Auto-calculate on load
+  calculate();
+</script>

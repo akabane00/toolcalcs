@@ -1,0 +1,449 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Financial Calculators",
+        "item": "https://toolcalcs.com/financial-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Debt-to-Income Calculator"
+      }
+    ]
+  },
+  {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'What is a good debt-to-income ratio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'A debt-to-income ratio under 36% is generally considered good by most lenders, while a DTI under 20% is considered excellent. The lower your DTI, the more financially flexible you are and the more likely you are to qualify for favorable loan terms and interest rates.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What DTI do I need for a mortgage?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Most conventional mortgage lenders require a back-end DTI ratio below 43%, though many prefer borrowers to be below 36%. FHA loans may allow DTI ratios up to 50% with compensating factors, while VA loans generally look for 41% or lower. The lower your DTI, the better your chances of approval and more favorable interest rates.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How do I lower my DTI ratio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'You can lower your debt-to-income ratio by paying off existing debts such as credit cards and car loans, increasing your income through raises, side jobs, or additional employment, avoiding taking on new debt, and refinancing existing loans to lower monthly payments. Even small reductions in monthly debt payments can meaningfully improve your DTI.',
+      },
+    },
+  ],
+},
+];
+---
+
+<BaseLayout
+  title="Debt-to-Income Ratio Calculator - Check Your DTI"
+  description="Free DTI calculator. Calculate your debt-to-income ratio to see where you stand for mortgage and loan approvals. Understand what lenders look for."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/financial-calculators/">Financial Calculators</a> &rsaquo;
+    <span>Debt-to-Income Calculator</span>
+  </nav>
+
+  <h1>Debt-to-Income Ratio Calculator</h1>
+  <p class="page-desc">Calculate your debt-to-income ratio to see where you stand for mortgage and loan approvals.</p>
+
+  <!-- Calculator Tool -->
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <h3 class="inputs-section-title">Monthly Income</h3>
+      <div class="input-group">
+        <label for="grossIncome">Gross Monthly Income ($)</label>
+        <input type="number" id="grossIncome" value="6000" min="0" step="100" />
+      </div>
+      <div class="input-group">
+        <label for="otherIncome">Other Monthly Income ($)</label>
+        <input type="number" id="otherIncome" value="0" min="0" step="100" />
+      </div>
+
+      <h3 class="inputs-section-title">Monthly Debt Payments</h3>
+      <div class="input-group">
+        <label for="mortgageRent">Mortgage/Rent ($)</label>
+        <input type="number" id="mortgageRent" value="1200" min="0" step="50" />
+      </div>
+      <div class="input-group">
+        <label for="carPayment">Car Payment ($)</label>
+        <input type="number" id="carPayment" value="400" min="0" step="50" />
+      </div>
+      <div class="input-group">
+        <label for="studentLoans">Student Loans ($)</label>
+        <input type="number" id="studentLoans" value="300" min="0" step="50" />
+      </div>
+      <div class="input-group">
+        <label for="creditCards">Credit Card Minimum Payments ($)</label>
+        <input type="number" id="creditCards" value="100" min="0" step="25" />
+      </div>
+      <div class="input-group">
+        <label for="otherDebts">Other Monthly Debts ($)</label>
+        <input type="number" id="otherDebts" value="0" min="0" step="50" />
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Front-End DTI Ratio</span>
+          <span class="result-value" id="frontEndDTI">0%</span>
+        </div>
+        <div class="result-card primary">
+          <span class="result-label">Back-End DTI Ratio</span>
+          <span class="result-value" id="backEndDTI">0%</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Monthly Debt</span>
+          <span class="result-value" id="totalDebt">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Monthly Income</span>
+          <span class="result-value" id="totalIncome">$0</span>
+        </div>
+        <div class="result-card" id="statusCard">
+          <span class="result-label">DTI Status</span>
+          <span class="result-value" id="dtiStatus">--</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Max Recommended Housing</span>
+          <span class="result-value" id="maxHousing">$0</span>
+        </div>
+      </div>
+
+      <!-- DTI Rating Bar -->
+      <div class="dti-bar-container">
+        <div class="dti-bar-labels">
+          <span>0%</span>
+          <span>20%</span>
+          <span>36%</span>
+          <span>43%</span>
+          <span>60%+</span>
+        </div>
+        <div class="dti-bar-track">
+          <div class="dti-bar-segment dti-excellent" style="width:33.3%"></div>
+          <div class="dti-bar-segment dti-good" style="width:26.7%"></div>
+          <div class="dti-bar-segment dti-fair" style="width:11.7%"></div>
+          <div class="dti-bar-segment dti-poor" style="width:28.3%"></div>
+          <div class="dti-bar-marker" id="dtiMarker"></div>
+        </div>
+        <div class="dti-bar-legend">
+          <span class="legend-item"><span class="legend-dot dti-excellent"></span> Excellent (&lt;20%)</span>
+          <span class="legend-item"><span class="legend-dot dti-good"></span> Good (20-35%)</span>
+          <span class="legend-item"><span class="legend-dot dti-fair"></span> Fair (36-43%)</span>
+          <span class="legend-item"><span class="legend-dot dti-poor"></span> Needs Improvement (&gt;43%)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>What Is Debt-to-Income Ratio?</h2>
+    <p>The debt-to-income ratio, commonly referred to as DTI, is a personal finance metric that compares your total monthly debt payments to your gross monthly income. It is expressed as a percentage and is one of the most important numbers lenders use to evaluate your ability to manage monthly payments and repay borrowed money.</p>
+    <p>For example, if your total monthly debt payments are $2,000 and your gross monthly income is $6,000, your DTI ratio is 33.3%. This means that one-third of your pre-tax income goes toward paying debts each month. The remaining two-thirds is available for living expenses, savings, and discretionary spending.</p>
+    <p>DTI is a critical factor in virtually every lending decision. Mortgage lenders, auto loan providers, credit card companies, and personal loan issuers all consider your DTI when deciding whether to approve your application and what interest rate to offer you. A lower DTI signals to lenders that you have a healthy balance between debt and income and are more likely to make payments on time.</p>
+    <p>Unlike your credit score, which is based on your credit history and payment behavior, your DTI ratio is a snapshot of your current financial obligations relative to your income. You can have an excellent credit score but still be denied a loan if your DTI is too high, because a high DTI suggests you may be overextended financially, even if you have never missed a payment in the past.</p>
+
+    <h2>Front-End vs. Back-End DTI</h2>
+    <p>There are two types of debt-to-income ratios that lenders evaluate, and it is important to understand the difference between them because each serves a distinct purpose in the lending decision.</p>
+    <p>The <strong>front-end DTI ratio</strong>, also called the housing ratio, measures only your housing-related expenses as a percentage of your gross monthly income. This includes your mortgage payment (or rent), property taxes, homeowners insurance, and any homeowners association (HOA) fees. For example, if your mortgage payment is $1,200 per month and your gross income is $6,000, your front-end DTI is 20%.</p>
+    <p>The <strong>back-end DTI ratio</strong>, also called the total DTI, includes all of your monthly debt obligations divided by your gross monthly income. In addition to housing costs, the back-end DTI includes car payments, student loan payments, credit card minimum payments, personal loans, child support, alimony, and any other recurring debt obligations. If your total monthly debts are $2,000 and your gross income is $6,000, your back-end DTI is 33.3%.</p>
+    <p>Lenders pay close attention to both ratios, but the back-end DTI is generally considered more important because it provides a complete picture of your debt burden. A borrower might have a reasonable front-end DTI of 25% but a concerning back-end DTI of 48% due to large car payments, student loans, and credit card balances. In this case, the lender would likely consider the borrower a higher risk despite the manageable housing payment.</p>
+    <p>The traditional lending guideline is the 28/36 rule: your front-end DTI should not exceed 28%, and your back-end DTI should not exceed 36%. While many lenders have loosened these thresholds in recent years, the 28/36 rule remains a solid benchmark for what most financial advisors consider a healthy debt load.</p>
+
+    <h2>Why DTI Matters for Loans and Mortgages</h2>
+    <p>Your debt-to-income ratio is one of the first things lenders look at when you apply for any type of credit, and it can make or break your application. Lenders use DTI as a risk assessment tool because it directly measures your capacity to take on additional debt and still meet your financial obligations.</p>
+    <p>When you apply for a mortgage, your DTI ratio helps the lender determine the maximum loan amount you can qualify for. Even if you have excellent credit, a high DTI may limit the size of the mortgage you can obtain or result in a higher interest rate. Conversely, a low DTI combined with good credit can help you qualify for the most competitive rates and larger loan amounts.</p>
+    <p>DTI is equally important for other types of loans. Auto lenders, personal loan providers, and credit card companies all evaluate your DTI to assess whether you can comfortably handle another monthly payment. A high DTI signals that a significant portion of your income is already committed to existing debts, leaving less margin for unexpected expenses or additional obligations.</p>
+    <p>Beyond loan approvals, your DTI ratio is a valuable personal finance metric even if you are not applying for credit. Tracking your DTI over time helps you understand your financial health and make informed decisions about taking on new debt. If your DTI is creeping upward, it may be a sign that you need to slow down on borrowing or focus on paying off existing obligations before they become unmanageable.</p>
+    <p>Financial advisors often recommend keeping your total DTI below 36% as a general rule of thumb. At this level, you have enough income left over after debt payments to cover living expenses, build an emergency fund, and save for long-term goals like retirement. Once your DTI exceeds 43%, many lenders become reluctant to extend credit, and your financial flexibility is significantly reduced.</p>
+
+    <h2>DTI Requirements by Loan Type</h2>
+    <p>Different loan programs have different maximum DTI requirements. Understanding these thresholds can help you determine which loan products you are likely to qualify for and what steps you may need to take to improve your DTI before applying.</p>
+    <ul>
+      <li><strong>Conventional loans:</strong> Most conventional mortgage lenders cap the back-end DTI at 43%, though some will go up to 45% or 50% with strong compensating factors such as a high credit score, substantial cash reserves, or a large down payment. The preferred front-end DTI is 28% or lower, and the preferred back-end DTI is 36% or lower.</li>
+      <li><strong>FHA loans:</strong> The Federal Housing Administration is more lenient with DTI requirements. FHA loans generally allow a back-end DTI of up to 43%, but borrowers with compensating factors such as significant cash reserves or a history of making similar-sized housing payments can qualify with a DTI as high as 50%. The front-end DTI limit is typically 31%.</li>
+      <li><strong>VA loans:</strong> The Department of Veterans Affairs does not set a hard maximum DTI for VA loans, but lenders typically use 41% as a guideline. Borrowers with DTI ratios above 41% may still qualify if they have sufficient residual income, which is the money left over after all major expenses are paid. VA loans are available to eligible veterans, active-duty service members, and surviving spouses.</li>
+      <li><strong>USDA loans:</strong> The U.S. Department of Agriculture's rural development loan program generally requires a front-end DTI of 29% or less and a back-end DTI of 41% or less. These loans are designed for moderate-income borrowers purchasing homes in eligible rural areas.</li>
+      <li><strong>Auto loans:</strong> Auto lenders typically prefer a total DTI (including the proposed car payment) below 40% to 45%. Some subprime auto lenders will approve borrowers with higher DTI ratios, but at significantly higher interest rates.</li>
+      <li><strong>Personal loans:</strong> Personal loan DTI requirements vary widely by lender, but most prefer a DTI below 40%. Online lenders may be more flexible than traditional banks, but a lower DTI almost always results in better loan terms.</li>
+    </ul>
+    <p>Keep in mind that meeting the DTI threshold does not guarantee approval. Lenders consider multiple factors including credit score, employment history, down payment or collateral, and overall financial stability. However, exceeding the DTI limit for a particular loan program will typically result in an automatic denial, regardless of how strong your other qualifications are.</p>
+
+    <h2>How to Calculate Your DTI</h2>
+    <p>Calculating your debt-to-income ratio is straightforward and requires only two pieces of information: your total monthly debt payments and your gross monthly income. Here is a step-by-step example to illustrate the process.</p>
+    <p><strong>Step 1: Add up all monthly debt payments.</strong> Include your mortgage or rent payment, car loans, student loans, credit card minimum payments, personal loans, child support, alimony, and any other recurring debt obligations. Do not include utility bills, groceries, transportation costs, or other living expenses that are not debt payments.</p>
+    <p>For example:</p>
+    <ul>
+      <li>Mortgage: $1,200</li>
+      <li>Car payment: $400</li>
+      <li>Student loans: $300</li>
+      <li>Credit card minimums: $100</li>
+      <li>Total monthly debts: $2,000</li>
+    </ul>
+    <p><strong>Step 2: Determine your gross monthly income.</strong> This is your total income before taxes and other deductions. Include your salary, wages, bonuses, commissions, tips, rental income, alimony received, and any other regular income sources. If your income varies, use an average of the past two years.</p>
+    <p>For example:</p>
+    <ul>
+      <li>Gross monthly salary: $6,000</li>
+      <li>Total gross monthly income: $6,000</li>
+    </ul>
+    <p><strong>Step 3: Divide total debts by gross income and multiply by 100.</strong></p>
+    <div class="formula-box">
+      <code>DTI = (Total Monthly Debts / Gross Monthly Income) &times; 100</code>
+    </div>
+    <p>In this example: DTI = ($2,000 / $6,000) &times; 100 = 33.3%. This means 33.3% of the borrower's gross income goes toward debt payments each month. According to most lending guidelines, this falls within the "Good" range but is approaching the "Fair" threshold of 36%.</p>
+    <p>To calculate the front-end DTI separately, use only the housing payment: Front-end DTI = ($1,200 / $6,000) &times; 100 = 20%. This is right at the upper end of the "Excellent" range for front-end DTI and well within the 28% guideline most lenders follow.</p>
+
+    <h2>Strategies to Improve Your DTI Ratio</h2>
+    <p>If your DTI ratio is higher than you would like, there are practical steps you can take to bring it down. Since DTI is a ratio of debt to income, you can improve it by either reducing your debts, increasing your income, or ideally doing both simultaneously.</p>
+    <ol>
+      <li><strong>Pay off high-payment debts first.</strong> Focus on debts with the largest monthly payments, even if they have lower balances. Eliminating a $400 car payment has a bigger impact on your DTI than paying off a $50 monthly credit card minimum. This is different from the debt avalanche method (which targets the highest interest rate), because the goal here is specifically to reduce your monthly obligations.</li>
+      <li><strong>Avoid taking on new debt.</strong> Every new loan or credit card balance increases your DTI. If you are planning to apply for a mortgage or major loan in the near future, avoid financing a new car, opening new credit cards, or taking out personal loans in the months leading up to your application.</li>
+      <li><strong>Pay more than the minimums on credit cards.</strong> By paying down your credit card balances, you reduce the minimum payment amounts that factor into your DTI calculation. Even if you cannot pay off the full balance, reducing it will lower the minimum payment and improve your ratio.</li>
+      <li><strong>Increase your income.</strong> Because DTI is a ratio, increasing the denominator (income) is just as effective as decreasing the numerator (debt). Consider asking for a raise, taking on overtime, starting a side business, freelancing, or finding a higher-paying job. Even a modest income increase can meaningfully improve your DTI.</li>
+      <li><strong>Refinance existing loans for lower payments.</strong> If interest rates have dropped since you took out your car loan or student loans, refinancing to a lower rate can reduce your monthly payments. Extending the loan term can also lower monthly payments, though this increases total interest paid over the life of the loan.</li>
+      <li><strong>Consider debt consolidation.</strong> If you have multiple high-interest debts, consolidating them into a single loan with a lower interest rate and longer term can reduce your total monthly payment. Personal loans and balance transfer credit cards are common consolidation tools, but make sure the new payment is actually lower than the sum of the payments you are replacing.</li>
+      <li><strong>Add a co-borrower.</strong> If you are applying for a mortgage with a spouse or partner, their income is added to yours when calculating DTI. This can significantly lower the ratio, provided the co-borrower does not bring substantial additional debt into the equation.</li>
+    </ol>
+    <p>Improving your DTI ratio does not happen overnight, but even incremental progress can make a meaningful difference in your ability to qualify for loans and secure better interest rates. Start by tracking your DTI monthly and setting a target that aligns with your financial goals.</p>
+
+    <h2>What Lenders Really Look At Beyond DTI</h2>
+    <p>While DTI is a critical factor in lending decisions, it is not the only thing lenders evaluate. Understanding the full picture can help you strengthen your overall application and increase your chances of approval at favorable terms.</p>
+    <p><strong>Credit score</strong> is arguably the most important factor alongside DTI. Your credit score reflects your history of managing credit and making payments. Lenders use it to assess the likelihood that you will repay the loan as agreed. A high credit score can sometimes compensate for a slightly elevated DTI, and vice versa.</p>
+    <p><strong>Employment history and income stability</strong> matter because lenders want to know that your income is reliable and likely to continue. Borrowers with steady employment at the same company for several years are viewed more favorably than those with frequent job changes or gaps in employment. Self-employed borrowers typically need to provide two years of tax returns to document their income.</p>
+    <p><strong>Cash reserves and assets</strong> provide a safety net. Lenders like to see that you have savings beyond your down payment to cover several months of mortgage payments in case of an emergency. Having three to six months of reserves demonstrates financial responsibility and reduces the lender's risk.</p>
+    <p><strong>Down payment size</strong> affects both your loan-to-value ratio and your DTI. A larger down payment means a smaller loan, which results in lower monthly payments and a lower DTI. It also gives the lender more protection if property values decline.</p>
+    <p><strong>Type and stability of debt</strong> also matters. Lenders view installment debt like mortgages and car loans more favorably than revolving debt like credit cards, because installment debt has a fixed payoff schedule. High revolving balances relative to credit limits can signal financial stress, even if the minimum payments are manageable.</p>
+    <p>In summary, while achieving a low DTI ratio is important, it is most powerful when combined with a strong credit score, stable employment, adequate savings, and a reasonable down payment. Strengthening multiple aspects of your financial profile gives you the best chance of loan approval at competitive rates.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>What debts are included in the DTI calculation?</h3>
+    <p>DTI includes all recurring monthly debt obligations: mortgage or rent payments, car loans, student loans, credit card minimum payments, personal loans, child support, alimony, and any other debt that shows up on your credit report. It does not include utility bills, groceries, gas, insurance premiums (unless they are part of your mortgage payment), cell phone bills, or other living expenses that are not debt repayments.</p>
+
+    <h3>Does rent count as debt for DTI purposes?</h3>
+    <p>Yes, your monthly rent payment is included in the front-end DTI calculation as a housing expense. When you apply for a mortgage, lenders will replace your rent payment with the proposed mortgage payment (including taxes and insurance) to calculate what your DTI would be with the new loan. If you are applying for a non-mortgage loan, some lenders include rent in the DTI calculation while others do not.</p>
+
+    <h3>Can I get a mortgage with a DTI over 43%?</h3>
+    <p>It is possible but more difficult. FHA loans may allow DTI ratios up to 50% with compensating factors such as strong cash reserves, a long history of making similar-sized housing payments, or significant additional income not reflected in the standard calculation. Some conventional lenders may also go above 43% for borrowers with excellent credit scores (740+) and substantial down payments (20%+). However, a DTI over 43% will limit your options and likely result in higher interest rates.</p>
+
+    <h3>How often should I check my DTI ratio?</h3>
+    <p>It is a good practice to calculate your DTI ratio at least once per quarter, or whenever your financial situation changes significantly. Major events like paying off a loan, taking on new debt, receiving a raise, or losing a source of income can all affect your DTI. Regular monitoring helps you stay on track with your financial goals and ensures you are prepared when you need to apply for credit.</p>
+
+    <h3>Is DTI the same as my debt ratio?</h3>
+    <p>The term "debt ratio" can refer to several different financial metrics. In personal finance, debt ratio is often used interchangeably with DTI and refers to monthly debts divided by monthly income. In corporate finance, debt ratio refers to total liabilities divided by total assets. When discussing loan qualifications, lenders are always referring to the debt-to-income ratio, which compares monthly debt payments to gross monthly income.</p>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/financial-calculators/mortgage-calculator/">Mortgage Calculator</a> - Estimate monthly home payments with taxes and insurance.</li>
+      <li><a href="/financial-calculators/take-home-pay-calculator/">Take-Home Pay Calculator</a> - Calculate your net paycheck after taxes.</li>
+      <li><a href="/financial-calculators/savings-goal-calculator/">Savings Goal Calculator</a> - Plan monthly savings to reach your financial goals.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .inputs-section-title {
+    grid-column: 1 / -1;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 8px 0 0;
+    padding: 0;
+  }
+  .inputs-section-title:first-child {
+    margin-top: 0;
+  }
+
+  /* DTI Rating Bar */
+  .dti-bar-container {
+    margin-top: 20px;
+    padding: 16px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+  }
+  .dti-bar-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin-bottom: 4px;
+    padding: 0 2px;
+  }
+  .dti-bar-track {
+    position: relative;
+    display: flex;
+    height: 24px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .dti-bar-segment {
+    height: 100%;
+  }
+  .dti-bar-segment.dti-excellent {
+    background: #22c55e;
+  }
+  .dti-bar-segment.dti-good {
+    background: #3b82f6;
+  }
+  .dti-bar-segment.dti-fair {
+    background: #f59e0b;
+  }
+  .dti-bar-segment.dti-poor {
+    background: #ef4444;
+  }
+  .dti-bar-marker {
+    position: absolute;
+    top: -4px;
+    width: 4px;
+    height: 32px;
+    background: var(--color-text);
+    border-radius: 2px;
+    transform: translateX(-50%);
+    transition: left 0.3s ease;
+    box-shadow: 0 0 0 2px var(--color-bg);
+  }
+  .dti-bar-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .legend-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+  .legend-dot.dti-excellent { background: #22c55e; }
+  .legend-dot.dti-good { background: #3b82f6; }
+  .legend-dot.dti-fair { background: #f59e0b; }
+  .legend-dot.dti-poor { background: #ef4444; }
+
+  /* Status card color variants */
+  .result-card.status-excellent { background: #f0fdf4; }
+  .result-card.status-excellent .result-value { color: #22c55e; }
+  .result-card.status-good { background: #eff6ff; }
+  .result-card.status-good .result-value { color: #3b82f6; }
+  .result-card.status-fair { background: #fffbeb; }
+  .result-card.status-fair .result-value { color: #f59e0b; }
+  .result-card.status-poor { background: #fef2f2; }
+  .result-card.status-poor .result-value { color: #ef4444; }
+
+  @media (max-width: 640px) {
+    .calc-inputs { grid-template-columns: 1fr; }
+    .result-cards { grid-template-columns: 1fr; }
+    .dti-bar-legend { flex-direction: column; gap: 6px; }
+  }
+</style>
+
+<script>
+  function formatCurrency(n: number): string {
+    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+
+  function formatPercent(n: number): string {
+    return n.toFixed(1) + '%';
+  }
+
+  function calculate(): void {
+    const grossIncome = parseFloat((document.getElementById('grossIncome') as HTMLInputElement).value) || 0;
+    const otherIncome = parseFloat((document.getElementById('otherIncome') as HTMLInputElement).value) || 0;
+    const mortgageRent = parseFloat((document.getElementById('mortgageRent') as HTMLInputElement).value) || 0;
+    const carPayment = parseFloat((document.getElementById('carPayment') as HTMLInputElement).value) || 0;
+    const studentLoans = parseFloat((document.getElementById('studentLoans') as HTMLInputElement).value) || 0;
+    const creditCards = parseFloat((document.getElementById('creditCards') as HTMLInputElement).value) || 0;
+    const otherDebts = parseFloat((document.getElementById('otherDebts') as HTMLInputElement).value) || 0;
+
+    const totalIncome = grossIncome + otherIncome;
+    const totalDebt = mortgageRent + carPayment + studentLoans + creditCards + otherDebts;
+
+    // Front-end DTI: housing only / total income
+    const frontEndDTI = totalIncome > 0 ? (mortgageRent / totalIncome) * 100 : 0;
+
+    // Back-end DTI: all debts / total income
+    const backEndDTI = totalIncome > 0 ? (totalDebt / totalIncome) * 100 : 0;
+
+    // Maximum recommended housing payment (28% of gross income)
+    const maxHousing = totalIncome * 0.28;
+
+    // Determine DTI status based on back-end DTI
+    let statusText: string;
+    let statusClass: string;
+    if (backEndDTI < 20) {
+      statusText = 'Excellent';
+      statusClass = 'status-excellent';
+    } else if (backEndDTI <= 35) {
+      statusText = 'Good';
+      statusClass = 'status-good';
+    } else if (backEndDTI <= 43) {
+      statusText = 'Fair';
+      statusClass = 'status-fair';
+    } else {
+      statusText = 'Needs Improvement';
+      statusClass = 'status-poor';
+    }
+
+    // Update result cards
+    document.getElementById('frontEndDTI')!.textContent = formatPercent(frontEndDTI);
+    document.getElementById('backEndDTI')!.textContent = formatPercent(backEndDTI);
+    document.getElementById('totalDebt')!.textContent = formatCurrency(totalDebt);
+    document.getElementById('totalIncome')!.textContent = formatCurrency(totalIncome);
+    document.getElementById('dtiStatus')!.textContent = statusText;
+    document.getElementById('maxHousing')!.textContent = formatCurrency(maxHousing);
+
+    // Update status card color
+    const statusCard = document.getElementById('statusCard')!;
+    statusCard.className = 'result-card ' + statusClass;
+
+    // Update DTI bar marker position
+    // Map back-end DTI to a percentage position on the bar (0-60% maps to 0-100% of bar width)
+    const markerPosition = Math.min(backEndDTI / 60 * 100, 100);
+    const marker = document.getElementById('dtiMarker')!;
+    marker.style.left = markerPosition + '%';
+  }
+
+  document.getElementById('calculateBtn')?.addEventListener('click', calculate);
+  // Auto-calculate on load
+  calculate();
+</script>

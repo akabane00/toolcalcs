@@ -1,0 +1,375 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Financial Calculators",
+        "item": "https://toolcalcs.com/financial-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Tax Calculator"
+      }
+    ]
+  },
+  {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'What is the standard deduction for 2025?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'For the 2025 tax year, the standard deduction is $15,000 for single filers and married individuals filing separately, $30,000 for married couples filing jointly, and $22,500 for head of household filers. Most taxpayers benefit from taking the standard deduction rather than itemizing.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is the difference between marginal and effective tax rate?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Your marginal tax rate is the rate applied to the last dollar of your taxable income, which corresponds to your highest tax bracket. Your effective tax rate is the average rate you actually pay across all your income, calculated by dividing your total federal tax by your gross income. The effective rate is always lower than the marginal rate because the U.S. uses a progressive tax system where only income within each bracket is taxed at that bracket\'s rate.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How do I choose the right filing status?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Your filing status depends on your marital status and family situation as of December 31 of the tax year. Single applies to unmarried individuals. Married Filing Jointly is for married couples who combine their income on one return, which usually results in the lowest tax. Married Filing Separately is for married couples who choose to file individual returns, which may benefit couples where one spouse has significant deductions. Head of Household is for unmarried individuals who pay more than half the cost of maintaining a home for a qualifying dependent.',
+      },
+    },
+  ],
+},
+];
+---
+
+<BaseLayout
+  title="Federal Income Tax Calculator 2025 - Estimate Your Tax"
+  description="Free federal income tax calculator for 2025. Estimate your tax liability, effective tax rate, and marginal bracket based on income and filing status."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/financial-calculators/">Financial Calculators</a> &rsaquo;
+    <span>Tax Calculator</span>
+  </nav>
+
+  <h1>Federal Income Tax Calculator 2025</h1>
+  <p class="page-desc">Estimate your federal income tax liability, effective tax rate, and marginal bracket for the 2025 tax year.</p>
+
+  <!-- Calculator Tool -->
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="grossIncome">Annual Gross Income ($)</label>
+        <input type="number" id="grossIncome" value="75000" min="0" step="1000" />
+      </div>
+      <div class="input-group">
+        <label for="filingStatus">Filing Status</label>
+        <select id="filingStatus">
+          <option value="single" selected>Single</option>
+          <option value="mfj">Married Filing Jointly</option>
+          <option value="mfs">Married Filing Separately</option>
+          <option value="hoh">Head of Household</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="deductionType">Deduction Type</label>
+        <select id="deductionType">
+          <option value="standard" selected>Standard Deduction</option>
+          <option value="itemized">Itemized</option>
+        </select>
+      </div>
+      <div class="input-group" id="itemizedGroup" style="display:none;">
+        <label for="itemizedAmount">Itemized Deduction Amount ($)</label>
+        <input type="number" id="itemizedAmount" value="0" min="0" step="500" />
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Federal Tax</span>
+          <span class="result-value" id="federalTax">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Effective Tax Rate</span>
+          <span class="result-value" id="effectiveRate">0%</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Marginal Tax Rate</span>
+          <span class="result-value" id="marginalRate">0%</span>
+        </div>
+        <div class="result-card success">
+          <span class="result-label">After-Tax Income</span>
+          <span class="result-value" id="afterTaxIncome">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Standard Deduction Used</span>
+          <span class="result-value" id="deductionUsed">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Taxable Income</span>
+          <span class="result-value" id="taxableIncome">$0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>What Is Federal Income Tax?</h2>
+    <p>Federal income tax is a tax levied by the Internal Revenue Service (IRS) on the annual earnings of individuals, businesses, trusts, and other legal entities. It is the largest source of revenue for the United States federal government, funding everything from national defense and infrastructure to Social Security, Medicare, and other public programs. Every person who earns income above a certain threshold is required by law to file a federal income tax return and pay any taxes owed.</p>
+    <p>The federal income tax system in the United States is progressive, meaning that people who earn more money generally pay a higher percentage of their income in taxes. However, this does not mean that all of a high earner's income is taxed at the highest rate. Instead, income is divided into segments called tax brackets, and each segment is taxed at its own rate. This progressive structure is designed to distribute the tax burden more equitably across different income levels.</p>
+    <p>Your federal income tax liability is determined by several factors, including your total gross income, your filing status, the deductions and credits you claim, and the tax brackets in effect for that year. The IRS adjusts tax brackets and standard deduction amounts annually to account for inflation, which is why the numbers change slightly from year to year. For the 2025 tax year, the brackets have been adjusted upward compared to 2024, providing a small amount of relief for taxpayers across all income levels.</p>
+    <p>Understanding how federal income tax works is essential for financial planning. When you know your tax liability, you can make better decisions about retirement contributions, investment strategies, and overall budgeting. This calculator helps you estimate your 2025 federal income tax so you can plan ahead and avoid surprises when tax season arrives.</p>
+
+    <h2>How Tax Brackets Work: The Marginal Tax System</h2>
+    <p>One of the most commonly misunderstood aspects of the U.S. tax system is how tax brackets actually work. Many people believe that if they earn enough to move into a higher tax bracket, all of their income will be taxed at that higher rate. This is incorrect. The United States uses a marginal tax system, where only the income that falls within each bracket is taxed at that bracket's rate.</p>
+    <p>For the 2025 tax year, there are seven federal income tax brackets: 10%, 12%, 22%, 24%, 32%, 35%, and 37%. Each bracket applies to a specific range of taxable income, and the ranges vary depending on your filing status.</p>
+    <p>To illustrate how this works, consider a single filer with $75,000 in gross income for 2025. After subtracting the standard deduction of $15,000, their taxable income is $60,000. Here is how the tax is calculated:</p>
+    <ul>
+      <li><strong>10% bracket:</strong> The first $11,925 of taxable income is taxed at 10%, resulting in $1,192.50 in tax.</li>
+      <li><strong>12% bracket:</strong> Income from $11,925 to $48,475 ($36,550) is taxed at 12%, resulting in $4,386.00 in tax.</li>
+      <li><strong>22% bracket:</strong> Income from $48,475 to $60,000 ($11,525) is taxed at 22%, resulting in $2,535.50 in tax.</li>
+    </ul>
+    <p>The total federal tax in this example is $8,114, which represents an effective tax rate of approximately 10.8% on the full $75,000 gross income. Notice that even though this taxpayer falls in the 22% marginal bracket, their effective rate is much lower because the first portions of their income were taxed at 10% and 12%.</p>
+    <p>This distinction between marginal and effective tax rates is crucial. Your marginal rate tells you how much tax you will pay on your next dollar of income, which is important for decisions like whether to take on additional work or sell an investment. Your effective rate tells you what percentage of your total income you actually paid in federal taxes, which is more useful for overall financial planning and budgeting.</p>
+    <p>The progressive nature of the tax system means you should never turn down a raise or bonus out of fear that it will push all your income into a higher bracket. Only the additional income above each bracket threshold is taxed at the higher rate, so earning more always results in higher after-tax income.</p>
+
+    <h2>2025 Federal Tax Brackets</h2>
+    <p>The IRS adjusts tax brackets annually for inflation. Below are the 2025 federal income tax brackets for each filing status. These brackets apply to taxable income, which is your gross income minus your deduction (standard or itemized).</p>
+    <h3>Single and Married Filing Separately</h3>
+    <ul>
+      <li><strong>10%:</strong> $0 to $11,925</li>
+      <li><strong>12%:</strong> $11,925 to $48,475</li>
+      <li><strong>22%:</strong> $48,475 to $103,350</li>
+      <li><strong>24%:</strong> $103,350 to $197,300</li>
+      <li><strong>32%:</strong> $197,300 to $250,525</li>
+      <li><strong>35%:</strong> $250,525 to $626,350</li>
+      <li><strong>37%:</strong> Over $626,350</li>
+    </ul>
+    <h3>Married Filing Jointly</h3>
+    <ul>
+      <li><strong>10%:</strong> $0 to $23,850</li>
+      <li><strong>12%:</strong> $23,850 to $96,950</li>
+      <li><strong>22%:</strong> $96,950 to $206,700</li>
+      <li><strong>24%:</strong> $206,700 to $394,600</li>
+      <li><strong>32%:</strong> $394,600 to $501,050</li>
+      <li><strong>35%:</strong> $501,050 to $751,600</li>
+      <li><strong>37%:</strong> Over $751,600</li>
+    </ul>
+    <h3>Head of Household</h3>
+    <ul>
+      <li><strong>10%:</strong> $0 to $17,000</li>
+      <li><strong>12%:</strong> $17,000 to $64,850</li>
+      <li><strong>22%:</strong> $64,850 to $103,350</li>
+      <li><strong>24%:</strong> $103,350 to $197,300</li>
+      <li><strong>32%:</strong> $197,300 to $250,500</li>
+      <li><strong>35%:</strong> $250,500 to $626,350</li>
+      <li><strong>37%:</strong> Over $626,350</li>
+    </ul>
+
+    <h2>Standard Deduction vs. Itemized Deduction</h2>
+    <p>Before your income is subject to tax brackets, you are allowed to reduce it by claiming either the standard deduction or itemized deductions. This reduction lowers your taxable income, which directly reduces the amount of federal tax you owe. Most taxpayers choose the standard deduction because it is simpler and, for most people, provides a larger deduction than itemizing.</p>
+    <p>The <strong>standard deduction</strong> is a fixed dollar amount set by the IRS each year. For the 2025 tax year, the standard deduction amounts are:</p>
+    <ul>
+      <li><strong>Single:</strong> $15,000</li>
+      <li><strong>Married Filing Jointly:</strong> $30,000</li>
+      <li><strong>Married Filing Separately:</strong> $15,000</li>
+      <li><strong>Head of Household:</strong> $22,500</li>
+    </ul>
+    <p>These amounts have increased from 2024 due to inflation adjustments. The standard deduction is available to all taxpayers and requires no additional documentation or recordkeeping. You simply subtract it from your gross income to arrive at your taxable income.</p>
+    <p><strong>Itemized deductions</strong> allow you to deduct specific expenses you incurred during the year, such as mortgage interest, state and local taxes (SALT), charitable contributions, and certain medical expenses. To itemize, you must keep records and receipts of all qualifying expenses and report them on Schedule A of your tax return.</p>
+    <p>You should itemize only if your total qualifying expenses exceed the standard deduction for your filing status. For example, a single filer would need more than $15,000 in itemized deductions to benefit from itemizing. Common situations where itemizing makes sense include homeowners with large mortgage interest payments, taxpayers who make substantial charitable donations, or individuals with significant unreimbursed medical expenses exceeding 7.5% of their adjusted gross income.</p>
+    <p>Since the Tax Cuts and Jobs Act of 2017 nearly doubled the standard deduction, the percentage of taxpayers who itemize has dropped significantly. According to IRS data, approximately 87% of tax returns now use the standard deduction. However, it is still worth calculating both options each year to ensure you are taking the larger deduction.</p>
+
+    <h2>Filing Status Guide</h2>
+    <p>Your filing status is one of the most important factors in determining your federal income tax because it affects your standard deduction amount, the income thresholds for each tax bracket, and your eligibility for certain credits and deductions. Choosing the correct filing status can save you hundreds or even thousands of dollars in taxes.</p>
+    <p><strong>Single</strong> applies to taxpayers who are unmarried, divorced, or legally separated as of December 31 of the tax year. If you are unmarried and do not qualify for head of household status, you file as single. Single filers receive the smallest standard deduction and have the narrowest tax brackets.</p>
+    <p><strong>Married Filing Jointly (MFJ)</strong> is available to couples who are legally married as of December 31 of the tax year. Both spouses report their combined income and deductions on a single return. This status typically results in the lowest total tax for married couples because the tax brackets are approximately double those of single filers, and the standard deduction is doubled as well. Most married couples benefit from filing jointly, especially when there is a significant difference in income between the two spouses.</p>
+    <p><strong>Married Filing Separately (MFS)</strong> allows married couples to file individual returns. Each spouse reports only their own income and claims their own deductions. This status is less common and usually results in a higher combined tax bill than filing jointly. However, it can be advantageous in certain situations, such as when one spouse has significant medical expenses, student loan repayment under an income-driven plan, or when spouses want to keep their tax liabilities separate. Note that married filing separately uses the same bracket thresholds as single filers.</p>
+    <p><strong>Head of Household (HoH)</strong> is for unmarried taxpayers who pay more than half the cost of maintaining a home for a qualifying dependent, such as a child or elderly parent. Head of household filers receive a larger standard deduction than single filers ($22,500 vs. $15,000 for 2025) and benefit from wider tax brackets, resulting in a lower tax bill. To qualify, you must be unmarried (or considered unmarried) on the last day of the tax year, have paid more than half the household expenses, and have a qualifying person living with you for more than half the year.</p>
+    <p>Choosing the wrong filing status can lead to paying more tax than necessary or, worse, penalties from the IRS. If you are unsure which status applies to you, consider consulting a tax professional, especially if your situation involves recent marriage, divorce, or dependent care arrangements.</p>
+
+    <h2>Tips for Reducing Your Federal Income Tax</h2>
+    <p>While everyone is required to pay their fair share of taxes, there are many legal strategies you can use to minimize your federal income tax liability. Taking advantage of these strategies requires planning, but the savings can be substantial over time.</p>
+    <ol>
+      <li><strong>Maximize retirement contributions.</strong> Contributions to traditional 401(k), 403(b), and traditional IRA accounts are made with pre-tax dollars, which reduces your taxable income. For 2025, you can contribute up to $23,500 to a 401(k) or 403(b), or up to $31,000 if you are age 50 or older. Traditional IRA contributions are deductible up to $7,000 ($8,000 if age 50 or older), subject to income limits if you are covered by a workplace plan.</li>
+      <li><strong>Contribute to a Health Savings Account (HSA).</strong> If you have a qualifying high-deductible health plan, HSA contributions reduce your taxable income and grow tax-free. For 2025, the contribution limits are $4,300 for individual coverage and $8,550 for family coverage. HSA funds can be withdrawn tax-free for qualified medical expenses at any time.</li>
+      <li><strong>Claim all eligible tax credits.</strong> Tax credits are more valuable than deductions because they reduce your tax dollar for dollar rather than just reducing taxable income. Common credits include the Child Tax Credit (up to $2,000 per qualifying child), the Earned Income Tax Credit for lower-income workers, the American Opportunity Credit for college expenses, and the Saver's Credit for retirement contributions.</li>
+      <li><strong>Consider tax-loss harvesting.</strong> If you have investments that have declined in value, selling them to realize the loss can offset capital gains and up to $3,000 of ordinary income per year. This strategy is particularly useful toward the end of the year when you can assess your overall tax situation.</li>
+      <li><strong>Bunch deductions in alternating years.</strong> If your itemized deductions are close to the standard deduction amount, consider bunching deductible expenses like charitable contributions into a single year so that you exceed the standard deduction threshold. In the other year, take the standard deduction. This strategy can maximize your total deductions over a two-year period.</li>
+      <li><strong>Take advantage of employer benefits.</strong> Pre-tax benefits such as flexible spending accounts (FSAs), dependent care accounts, and commuter benefits all reduce your taxable income. Review your employer's benefit offerings during open enrollment to ensure you are taking advantage of every available tax-saving opportunity.</li>
+      <li><strong>Time your income and deductions.</strong> If you expect to be in a lower tax bracket next year, consider deferring income (such as a year-end bonus) into the following year. Conversely, if you expect higher income next year, accelerating deductions into the current year can reduce your tax bill now.</li>
+    </ol>
+    <p>Implementing even a few of these strategies can reduce your federal income tax by hundreds or thousands of dollars each year. The key is to plan ahead rather than waiting until tax filing season to look for savings.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>What is the standard deduction for 2025?</h3>
+    <p>The standard deduction for the 2025 tax year is $15,000 for single filers and married individuals filing separately, $30,000 for married couples filing jointly, and $22,500 for head of household filers. These amounts are slightly higher than 2024 due to annual inflation adjustments by the IRS. The standard deduction reduces your gross income before tax brackets are applied, and approximately 87% of taxpayers use the standard deduction rather than itemizing.</p>
+
+    <h3>What is the difference between marginal and effective tax rate?</h3>
+    <p>Your marginal tax rate is the percentage of tax applied to the last dollar of your taxable income. It represents the highest bracket your income reaches. Your effective tax rate is the overall average rate you pay on all of your income, calculated by dividing your total federal tax by your total gross income. Because the U.S. uses a progressive bracket system where lower portions of income are taxed at lower rates, your effective rate is always lower than your marginal rate. For example, a single filer earning $75,000 may have a marginal rate of 22% but an effective rate of around 10.8%.</p>
+
+    <h3>How do I choose the right filing status?</h3>
+    <p>Your filing status is determined by your marital and family situation on December 31 of the tax year. If you are unmarried with no dependents, you file as Single. If you are married, you typically file as Married Filing Jointly for the best tax outcome, though Married Filing Separately may be better in specific circumstances such as income-driven student loan repayments or when one spouse has large medical deductions. If you are unmarried and pay more than half the cost of maintaining a home for a qualifying dependent, you may qualify for Head of Household, which provides a larger standard deduction and more favorable brackets than Single status.</p>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/financial-calculators/paycheck-calculator/">Paycheck Calculator</a> - Estimate your net take-home pay after taxes and deductions.</li>
+      <li><a href="/financial-calculators/take-home-pay-calculator/">Take-Home Pay Calculator</a> - Calculate your annual and per-period net pay by state.</li>
+      <li><a href="/financial-calculators/compound-interest-calculator/">Compound Interest Calculator</a> - See how your savings and investments grow over time.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function formatCurrency(n: number): string {
+    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+
+  // 2025 Federal Tax Brackets
+  const federalBrackets: Record<string, { min: number; max: number; rate: number }[]> = {
+    single: [
+      { min: 0, max: 11925, rate: 0.10 },
+      { min: 11925, max: 48475, rate: 0.12 },
+      { min: 48475, max: 103350, rate: 0.22 },
+      { min: 103350, max: 197300, rate: 0.24 },
+      { min: 197300, max: 250525, rate: 0.32 },
+      { min: 250525, max: 626350, rate: 0.35 },
+      { min: 626350, max: Infinity, rate: 0.37 },
+    ],
+    mfj: [
+      { min: 0, max: 23850, rate: 0.10 },
+      { min: 23850, max: 96950, rate: 0.12 },
+      { min: 96950, max: 206700, rate: 0.22 },
+      { min: 206700, max: 394600, rate: 0.24 },
+      { min: 394600, max: 501050, rate: 0.32 },
+      { min: 501050, max: 751600, rate: 0.35 },
+      { min: 751600, max: Infinity, rate: 0.37 },
+    ],
+    mfs: [
+      { min: 0, max: 11925, rate: 0.10 },
+      { min: 11925, max: 48475, rate: 0.12 },
+      { min: 48475, max: 103350, rate: 0.22 },
+      { min: 103350, max: 197300, rate: 0.24 },
+      { min: 197300, max: 250525, rate: 0.32 },
+      { min: 250525, max: 626350, rate: 0.35 },
+      { min: 626350, max: Infinity, rate: 0.37 },
+    ],
+    hoh: [
+      { min: 0, max: 17000, rate: 0.10 },
+      { min: 17000, max: 64850, rate: 0.12 },
+      { min: 64850, max: 103350, rate: 0.22 },
+      { min: 103350, max: 197300, rate: 0.24 },
+      { min: 197300, max: 250500, rate: 0.32 },
+      { min: 250500, max: 626350, rate: 0.35 },
+      { min: 626350, max: Infinity, rate: 0.37 },
+    ],
+  };
+
+  const standardDeductions: Record<string, number> = {
+    single: 15000,
+    mfj: 30000,
+    mfs: 15000,
+    hoh: 22500,
+  };
+
+  function calculateFederalTax(taxableIncome: number, brackets: { min: number; max: number; rate: number }[]): number {
+    let tax = 0;
+    for (const bracket of brackets) {
+      if (taxableIncome <= bracket.min) break;
+      const taxableInBracket = Math.min(taxableIncome, bracket.max) - bracket.min;
+      tax += taxableInBracket * bracket.rate;
+    }
+    return tax;
+  }
+
+  function getMarginalRate(taxableIncome: number, brackets: { min: number; max: number; rate: number }[]): number {
+    let rate = 0;
+    for (const bracket of brackets) {
+      if (taxableIncome > bracket.min) {
+        rate = bracket.rate;
+      } else {
+        break;
+      }
+    }
+    return rate;
+  }
+
+  function calculate(): void {
+    const grossIncome = parseFloat((document.getElementById('grossIncome') as HTMLInputElement).value) || 0;
+    const filingStatus = (document.getElementById('filingStatus') as HTMLSelectElement).value;
+    const deductionType = (document.getElementById('deductionType') as HTMLSelectElement).value;
+    const itemizedAmount = parseFloat((document.getElementById('itemizedAmount') as HTMLInputElement).value) || 0;
+
+    // Determine deduction amount
+    const stdDeduction = standardDeductions[filingStatus] || 15000;
+    const deduction = deductionType === 'itemized' ? itemizedAmount : stdDeduction;
+
+    // Calculate taxable income
+    const taxableIncome = Math.max(0, grossIncome - deduction);
+
+    // Get brackets for this filing status
+    const brackets = federalBrackets[filingStatus] || federalBrackets.single;
+
+    // Calculate federal tax
+    const federalTax = calculateFederalTax(taxableIncome, brackets);
+
+    // Calculate rates
+    const effectiveRate = grossIncome > 0 ? (federalTax / grossIncome) * 100 : 0;
+    const marginalRate = taxableIncome > 0 ? getMarginalRate(taxableIncome, brackets) * 100 : 0;
+
+    // After-tax income
+    const afterTaxIncome = grossIncome - federalTax;
+
+    // Update results
+    document.getElementById('federalTax')!.textContent = formatCurrency(federalTax);
+    document.getElementById('effectiveRate')!.textContent = effectiveRate.toFixed(1) + '%';
+    document.getElementById('marginalRate')!.textContent = marginalRate.toFixed(0) + '%';
+    document.getElementById('afterTaxIncome')!.textContent = formatCurrency(afterTaxIncome);
+    document.getElementById('deductionUsed')!.textContent = formatCurrency(deduction);
+    document.getElementById('taxableIncome')!.textContent = formatCurrency(taxableIncome);
+  }
+
+  // Toggle itemized deduction input visibility
+  document.getElementById('deductionType')?.addEventListener('change', () => {
+    const deductionType = (document.getElementById('deductionType') as HTMLSelectElement).value;
+    const itemizedGroup = document.getElementById('itemizedGroup') as HTMLElement;
+    itemizedGroup.style.display = deductionType === 'itemized' ? '' : 'none';
+    calculate();
+  });
+
+  // Recalculate on all input changes
+  document.getElementById('calculateBtn')?.addEventListener('click', calculate);
+  document.getElementById('grossIncome')?.addEventListener('input', calculate);
+  document.getElementById('filingStatus')?.addEventListener('change', calculate);
+  document.getElementById('itemizedAmount')?.addEventListener('input', calculate);
+
+  // Auto-calculate on load
+  calculate();
+</script>
