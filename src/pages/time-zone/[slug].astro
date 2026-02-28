@@ -1,0 +1,401 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import { getAllTimeZonePages, ZONES, type TimeZonePage } from '../../data/time-zones';
+
+export function getStaticPaths() {
+  return getAllTimeZonePages().map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: TimeZonePage };
+const { from, to, diffHours, diffLabel, examplePairs } = page;
+
+const fromUtcLabel = from.utcOffset >= 0 ? `UTC+${from.utcOffset}` : `UTC${from.utcOffset}`;
+const toUtcLabel = to.utcOffset >= 0 ? `UTC+${to.utcOffset}` : `UTC${to.utcOffset}`;
+
+// Related conversions from same source zone
+const allPages = getAllTimeZonePages();
+const relatedPages = allPages
+  .filter((p) => p.from.abbr === from.abbr && p.to.abbr !== to.abbr)
+  .slice(0, 8);
+
+// SEO
+const title = `${from.abbr} to ${to.abbr} Time Zone Converter (${diffLabel}) | ToolCalcs`;
+const description = `Convert ${from.abbr} to ${to.abbr} time instantly. ${from.name} is ${diffLabel} from ${to.name}. Live clock and conversion table.`;
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Time Zone Converter", "item": "https://toolcalcs.com/time-zone/" },
+      { "@type": "ListItem", "position": 3, "name": `${from.abbr} to ${to.abbr}` },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": `What is the time difference between ${from.abbr} and ${to.abbr}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `${from.abbr} (${from.name}) is ${diffLabel} from ${to.abbr} (${to.name}). When it is 12:00 PM in ${from.abbr}, it is ${examplePairs[2].toTime} in ${to.abbr}.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `Does daylight saving time affect ${from.abbr} to ${to.abbr} conversion?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `Yes, daylight saving time (DST) can affect the time difference between ${from.abbr} and ${to.abbr}. When one region observes DST and the other does not, the offset may shift by one hour. Always verify current offsets during DST transition periods in March and November.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `What time is it right now in ${from.abbr} and ${to.abbr}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `Use the live clock on this page to see the current time in both ${from.abbr} and ${to.abbr}. The clocks update every second based on standard UTC offsets.`,
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout title={title} description={description} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/time-zone/">Time Zone Converter</a> &rsaquo;
+    <span>{from.abbr} to {to.abbr}</span>
+  </nav>
+
+  <h1>{from.abbr} to {to.abbr} - Time Zone Converter</h1>
+  <p class="page-desc">Convert between {from.name} and {to.name} with a live clock, conversion table, and interactive tool.</p>
+
+  <!-- Quick Fact -->
+  <div class="quick-fact">
+    <span class="quick-fact-label">Quick Fact:</span>
+    <strong>{from.abbr} ({from.name}) is {diffLabel} from {to.abbr} ({to.name}).</strong>
+  </div>
+
+  <!-- Result Cards -->
+  <div class="result-cards">
+    <div class="result-card primary">
+      <span class="result-label">Time Difference</span>
+      <span class="result-value">{diffLabel}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">{from.abbr} UTC Offset</span>
+      <span class="result-value">{fromUtcLabel}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">{to.abbr} UTC Offset</span>
+      <span class="result-value">{toUtcLabel}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Current Time</span>
+      <span class="result-value" id="liveClock">--:--:-- --</span>
+    </div>
+  </div>
+
+  <!-- Live Clocks -->
+  <div class="calculator-box">
+    <h2 class="calc-section-title">Live Clock</h2>
+    <div class="clock-row">
+      <div class="clock-card">
+        <span class="clock-label">{from.abbr} - {from.name}</span>
+        <span class="clock-time" id="clockFrom">--:--:-- --</span>
+      </div>
+      <div class="clock-arrow">&rarr;</div>
+      <div class="clock-card">
+        <span class="clock-label">{to.abbr} - {to.name}</span>
+        <span class="clock-time" id="clockTo">--:--:-- --</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Converter -->
+  <h2 class="section-heading">Convert a Specific Time</h2>
+  <div class="calculator-box">
+    <div class="converter-inputs">
+      <div class="input-group">
+        <label for="inputHour">Hour (1-12)</label>
+        <input type="number" id="inputHour" value="12" min="1" max="12" />
+      </div>
+      <div class="input-group">
+        <label for="inputMinute">Minute</label>
+        <input type="number" id="inputMinute" value="0" min="0" max="59" />
+      </div>
+      <div class="input-group">
+        <label for="inputAmPm">AM / PM</label>
+        <select id="inputAmPm">
+          <option value="AM">AM</option>
+          <option value="PM" selected>PM</option>
+        </select>
+      </div>
+    </div>
+    <div class="conversion-result" id="conversionResult"></div>
+  </div>
+
+  <!-- Conversion Table -->
+  <h2 class="section-heading">{from.abbr} to {to.abbr} Conversion Table</h2>
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>{from.abbr} ({from.name})</th>
+          <th>{to.abbr} ({to.name})</th>
+        </tr>
+      </thead>
+      <tbody>
+        {examplePairs.map((pair) => (
+          <tr>
+            <td>{pair.fromTime}</td>
+            <td>{pair.toTime}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <AdUnit slot="timezone-mid" format="rectangle" />
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>Understanding Time Zones</h2>
+    <p>
+      Time zones are regions of the globe that observe a uniform standard time for legal, commercial, and social purposes. The world is divided into 24 primary time zones, each roughly 15 degrees of longitude wide, corresponding to one hour of time difference from its neighbors. {from.abbr} ({from.name}) operates at {fromUtcLabel}, while {to.abbr} ({to.name}) operates at {toUtcLabel}. This means there is a {diffLabel} difference between these two zones.
+    </p>
+    <p>
+      Time zones were formalized in the late 19th century as railroads and telegraphs made standardized timekeeping a practical necessity. Before time zones, each city set its own local time based on the position of the sun, which created enormous confusion for train schedules and communication. Today, Coordinated Universal Time (UTC) serves as the global reference from which all time zones are calculated as positive or negative offsets. Understanding UTC offsets is the foundation of accurate time zone conversion.
+    </p>
+
+    <h2>How Time Zone Conversion Works</h2>
+    <p>
+      Converting between {from.abbr} and {to.abbr} is straightforward once you know the offset. Since {from.abbr} is at {fromUtcLabel} and {to.abbr} is at {toUtcLabel}, the difference is {diffLabel}. To convert a time from {from.abbr} to {to.abbr}, simply add {diffHours} hours to the {from.abbr} time. If the result goes past 12:00 AM (midnight), adjust the date forward by one day. If it goes below 12:00 AM, adjust the date backward by one day.
+    </p>
+    <p>
+      For example, when it is {examplePairs[0].fromTime} {from.abbr}, it is {examplePairs[0].toTime} {to.abbr}. Similarly, {examplePairs[2].fromTime} {from.abbr} corresponds to {examplePairs[2].toTime} {to.abbr}. The conversion table above lists six common reference times so you can quickly look up the corresponding time without any calculation. For precise conversions involving minutes, use the interactive converter tool on this page.
+    </p>
+
+    <h2>Daylight Saving Time Considerations</h2>
+    <p>
+      Daylight saving time (DST) can temporarily alter the standard offset between {from.abbr} and {to.abbr}. During DST, clocks are typically set forward by one hour in spring and back by one hour in autumn. If one region observes DST while the other does not, the effective time difference changes. For instance, regions observing {from.abbr} may switch to a daylight variant (such as EDT instead of EST) during summer months, shifting the offset by one hour.
+    </p>
+    <p>
+      Not all countries or regions observe daylight saving time. Most of Asia, Africa, and South America do not use DST, while North America and Europe generally do. When scheduling international meetings or travel between {from.abbr} and {to.abbr} zones, always confirm whether DST is currently in effect for either region. The standard offsets shown on this page ({fromUtcLabel} and {toUtcLabel}) represent the non-DST baseline. During DST transitions, typically in March and November for Northern Hemisphere locations, verify the current offset to avoid scheduling errors.
+    </p>
+    <p>
+      The interactive converter and live clock on this page use standard UTC offsets. For DST-adjusted times, consider checking your device's world clock application, which automatically accounts for seasonal time changes in each region.
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is the time difference between {from.abbr} and {to.abbr}?</h3>
+    <p>
+      {from.abbr} ({from.name}) is {diffLabel} from {to.abbr} ({to.name}). This means when it is 12:00 PM (noon) in {from.abbr}, it is {examplePairs[2].toTime} in {to.abbr}. The difference is based on the standard UTC offsets of {fromUtcLabel} for {from.abbr} and {toUtcLabel} for {to.abbr}.
+    </p>
+
+    <h3>Does daylight saving time affect {from.abbr} to {to.abbr} conversion?</h3>
+    <p>
+      Yes, DST can change the effective time difference by one hour if one zone observes DST and the other does not. During DST periods (typically March through November in the Northern Hemisphere), you should verify the current offsets. The standard difference of {diffLabel} applies outside of DST transitions.
+    </p>
+
+    <h3>What time is it right now in {from.abbr} and {to.abbr}?</h3>
+    <p>
+      Use the live clocks at the top of this page to see the current time in both {from.abbr} and {to.abbr}. The clocks update every second based on standard UTC offsets. For DST-adjusted times, check your device's world clock application.
+    </p>
+
+    <h2>Related Time Zone Conversions</h2>
+    <ul>
+      {relatedPages.map((p) => (
+        <li>
+          <a href={`/time-zone/${p.slug}/`}>{p.from.abbr} to {p.to.abbr} ({p.diffLabel})</a>
+        </li>
+      ))}
+    </ul>
+
+    <p><a href="/time-zone/">&larr; View All Time Zone Conversions</a> | <a href="/date-time-calculators/time-zone-converter/">Full Time Zone Converter</a></p>
+  </article>
+
+  <AdUnit slot="timezone-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .quick-fact {
+    background: #eff6ff;
+    border-radius: var(--radius);
+    padding: 16px 24px;
+    margin-bottom: 24px;
+    font-size: 1.1rem;
+  }
+  .quick-fact-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .quick-fact strong {
+    color: var(--color-primary);
+    font-size: 1.3rem;
+  }
+
+  .calc-section-title {
+    font-size: 1.15rem;
+    margin: 0 0 16px;
+    border: none;
+    padding: 0;
+  }
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+
+  .clock-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .clock-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 20px 28px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    min-width: 200px;
+  }
+  .clock-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+  .clock-time {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--color-primary);
+    font-variant-numeric: tabular-nums;
+  }
+  .clock-arrow {
+    font-size: 1.5rem;
+    color: var(--color-text-muted);
+    font-weight: 700;
+  }
+
+  .converter-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .conversion-result {
+    padding: 14px 16px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 1.05rem;
+    text-align: center;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @media (max-width: 640px) {
+    .clock-row {
+      flex-direction: column;
+      gap: 12px;
+    }
+    .clock-arrow {
+      transform: rotate(90deg);
+    }
+    .converter-inputs {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script define:vars={{ fromOffset: from.utcOffset, toOffset: to.utcOffset, diffH: diffHours, fromAbbr: from.abbr, toAbbr: to.abbr }}>
+  function formatTime12(date) {
+    var h = date.getUTCHours();
+    var m = date.getUTCMinutes();
+    var s = date.getUTCSeconds();
+    var ampm = h >= 12 ? 'PM' : 'AM';
+    var h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+    return h12 + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0') + ' ' + ampm;
+  }
+
+  function getTimeInZone(utcOffset) {
+    var now = new Date();
+    var utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
+    return new Date(utcMs + utcOffset * 3600000);
+  }
+
+  function updateClocks() {
+    var fromDate = getTimeInZone(fromOffset);
+    var toDate = getTimeInZone(toOffset);
+    var clockFromEl = document.getElementById('clockFrom');
+    var clockToEl = document.getElementById('clockTo');
+    var liveClockEl = document.getElementById('liveClock');
+    if (clockFromEl) clockFromEl.textContent = formatTime12(fromDate);
+    if (clockToEl) clockToEl.textContent = formatTime12(toDate);
+    if (liveClockEl) liveClockEl.textContent = formatTime12(fromDate);
+  }
+
+  updateClocks();
+  setInterval(updateClocks, 1000);
+
+  // Interactive converter
+  var hourInput = document.getElementById('inputHour');
+  var minuteInput = document.getElementById('inputMinute');
+  var ampmSelect = document.getElementById('inputAmPm');
+  var resultEl = document.getElementById('conversionResult');
+
+  function convertTime() {
+    var h = parseInt(hourInput.value, 10);
+    var m = parseInt(minuteInput.value, 10);
+    var ampm = ampmSelect.value;
+
+    if (isNaN(h) || h < 1 || h > 12 || isNaN(m) || m < 0 || m > 59) {
+      resultEl.textContent = 'Enter a valid time.';
+      return;
+    }
+
+    var hour24 = h;
+    if (ampm === 'AM' && h === 12) hour24 = 0;
+    else if (ampm === 'PM' && h !== 12) hour24 = h + 12;
+
+    var converted = hour24 + diffH;
+    var dayShift = '';
+    if (converted >= 24) {
+      converted -= 24;
+      dayShift = ' (next day)';
+    } else if (converted < 0) {
+      converted += 24;
+      dayShift = ' (previous day)';
+    }
+
+    var cAmPm = converted >= 12 ? 'PM' : 'AM';
+    var c12 = converted === 0 ? 12 : converted > 12 ? converted - 12 : converted;
+    var result = c12 + ':' + String(m).padStart(2, '0') + ' ' + cAmPm + dayShift;
+
+    resultEl.textContent = h + ':' + String(m).padStart(2, '0') + ' ' + ampm + ' ' + fromAbbr + ' = ' + result + ' ' + toAbbr;
+  }
+
+  hourInput.addEventListener('input', convertTime);
+  minuteInput.addEventListener('input', convertTime);
+  ampmSelect.addEventListener('change', convertTime);
+
+  convertTime();
+</script>

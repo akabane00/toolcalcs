@@ -1,0 +1,88 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getAllTipPages } from '../../data/tip-calculations';
+import '../../styles/category.css';
+
+const allPages = getAllTipPages();
+
+// Group by tip percentage
+const percentGroups = new Map<number, typeof allPages>();
+for (const page of allPages) {
+  if (!percentGroups.has(page.tipPercent)) percentGroups.set(page.tipPercent, []);
+  percentGroups.get(page.tipPercent)!.push(page);
+}
+
+// Sort groups by percentage
+const sortedGroups = [...percentGroups.entries()].sort((a, b) => a[0] - b[0]);
+
+function fmt(n: number): string {
+  return n.toFixed(2);
+}
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Everyday Calculators", "item": "https://toolcalcs.com/everyday-calculators/" },
+    { "@type": "ListItem", "position": 3, "name": "Tip Calculator" },
+  ],
+};
+---
+
+<BaseLayout
+  title="Tip Calculator - Calculate Tips for Any Bill Amount | ToolCalcs"
+  description={`Calculate tips for any bill amount at 10%, 15%, 18%, 20%, and 25%. Browse ${allPages.length} pre-calculated tip amounts with bill splitting.`}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/everyday-calculators/">Everyday Calculators</a> &rsaquo; <span>Tip Calculator</span>
+  </nav>
+
+  <h1>Tip Calculator</h1>
+  <p class="page-desc">Browse {allPages.length} pre-calculated tip amounts grouped by percentage. Select a bill amount to see the tip, total, and per-person breakdown.</p>
+
+  <AdUnit slot="tip-idx-top" format="horizontal" />
+
+  {sortedGroups.map(([percent, pages]) => (
+    <section class="percent-section">
+      <h2 class="percent-heading">{percent}% Tips</h2>
+      <div class="tip-grid">
+        {pages.map((p) => (
+          <a href={`/tip/${p.slug}/`} class="calc-card">
+            <h2>{percent}% on ${fmt(p.billAmount)}</h2>
+            <p>Tip: ${fmt(p.tipAmount)} &middot; Total: ${fmt(p.totalAmount)}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  ))}
+
+  <AdUnit slot="tip-idx-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .percent-section {
+    margin-bottom: 32px;
+  }
+  .percent-heading {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--color-border);
+    color: var(--color-text);
+  }
+  .tip-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+  }
+
+  @media (max-width: 640px) {
+    .tip-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

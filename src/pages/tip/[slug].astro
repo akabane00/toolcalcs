@@ -1,0 +1,364 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import { getAllTipPages, type TipPage } from '../../data/tip-calculations';
+
+export function getStaticPaths() {
+  return getAllTipPages().map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: TipPage };
+const { tipPercent, billAmount, tipAmount, totalAmount, perPerson } = page;
+
+function fmt(n: number): string {
+  return n.toFixed(2);
+}
+
+// Per-person for display cards (2, 3, 4, 5)
+const perPerson2 = perPerson.find(p => p.people === 2);
+const perPerson3 = perPerson.find(p => p.people === 3);
+const perPerson4 = perPerson.find(p => p.people === 4);
+const perPerson5 = perPerson.find(p => p.people === 5);
+
+// Comparison: same bill at different percentages
+const allPages = getAllTipPages();
+const comparisonPercents = [10, 15, 18, 20, 25];
+const comparisonRows = comparisonPercents.map(pct => {
+  const match = allPages.find(p => p.billAmount === billAmount && p.tipPercent === pct);
+  return match ? { percent: pct, tip: match.tipAmount, total: match.totalAmount, current: pct === tipPercent } : null;
+}).filter(Boolean) as { percent: number; tip: number; total: number; current: boolean }[];
+
+// Related pages: same percentage at nearby amounts (±$5, ±$10, ±$15)
+const nearbyAmounts = allPages
+  .filter(p => p.tipPercent === tipPercent && p.billAmount !== billAmount)
+  .sort((a, b) => Math.abs(a.billAmount - billAmount) - Math.abs(b.billAmount - billAmount))
+  .slice(0, 6);
+
+// Related pages: same amount at different percentages
+const otherPercents = allPages
+  .filter(p => p.billAmount === billAmount && p.tipPercent !== tipPercent)
+  .sort((a, b) => a.tipPercent - b.tipPercent)
+  .slice(0, 6);
+
+// SEO
+const title = `${tipPercent}% Tip on $${fmt(billAmount)} is $${fmt(tipAmount)} | Tip Calculator | ToolCalcs`;
+const description = `A ${tipPercent}% tip on $${fmt(billAmount)} equals $${fmt(tipAmount)}, bringing your total to $${fmt(totalAmount)}. Quick tip calculator with bill splitting.`;
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tip Calculator", "item": "https://toolcalcs.com/tip/" },
+      { "@type": "ListItem", "position": 3, "name": `${tipPercent}% on $${fmt(billAmount)}` },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": `How much is a ${tipPercent}% tip on $${fmt(billAmount)}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `A ${tipPercent}% tip on a $${fmt(billAmount)} bill is $${fmt(tipAmount)}. Your total bill including the tip would be $${fmt(totalAmount)}.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `How do you calculate a ${tipPercent}% tip?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `To calculate a ${tipPercent}% tip, multiply the bill amount by ${tipPercent / 100}. For a $${fmt(billAmount)} bill: $${fmt(billAmount)} × ${tipPercent / 100} = $${fmt(tipAmount)}.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `How much should each person pay if splitting a $${fmt(billAmount)} bill with a ${tipPercent}% tip?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `With a ${tipPercent}% tip on $${fmt(billAmount)}, the total is $${fmt(totalAmount)}. Split 2 ways, each person pays $${fmt(perPerson2?.totalEach ?? 0)}. Split 3 ways, each pays $${fmt(perPerson3?.totalEach ?? 0)}. Split 4 ways, each pays $${fmt(perPerson4?.totalEach ?? 0)}.`,
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout title={title} description={description} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/tip/">Tip Calculator</a> &rsaquo;
+    <span>{tipPercent}% on ${fmt(billAmount)}</span>
+  </nav>
+
+  <h1>{tipPercent}% Tip on ${fmt(billAmount)}</h1>
+  <p class="page-desc">Calculate the tip and total for a ${fmt(billAmount)} bill at {tipPercent}%.</p>
+
+  <!-- Quick Answer -->
+  <div class="quick-fact">
+    <span class="quick-fact-label">Quick Answer:</span>
+    <strong>A {tipPercent}% tip on a ${fmt(billAmount)} bill is ${fmt(tipAmount)}. Your total would be ${fmt(totalAmount)}.</strong>
+  </div>
+
+  <!-- Result Cards -->
+  <div class="calculator-box">
+    <div class="result-cards">
+      <div class="result-card primary">
+        <span class="result-label">Tip Amount</span>
+        <span class="result-value">${fmt(tipAmount)}</span>
+      </div>
+      <div class="result-card primary">
+        <span class="result-label">Total Bill</span>
+        <span class="result-value">${fmt(totalAmount)}</span>
+      </div>
+      <div class="result-card">
+        <span class="result-label">Per Person (2)</span>
+        <span class="result-value">${fmt(perPerson2?.totalEach ?? 0)}</span>
+      </div>
+      <div class="result-card">
+        <span class="result-label">Per Person (3)</span>
+        <span class="result-value">${fmt(perPerson3?.totalEach ?? 0)}</span>
+      </div>
+      <div class="result-card">
+        <span class="result-label">Per Person (4)</span>
+        <span class="result-value">${fmt(perPerson4?.totalEach ?? 0)}</span>
+      </div>
+      <div class="result-card">
+        <span class="result-label">Tip per Person (5)</span>
+        <span class="result-value">${fmt(perPerson5?.tipEach ?? 0)}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Tip Calculator -->
+  <h2 class="section-heading">Tip Calculator</h2>
+  <div class="calculator-box">
+    <p class="calc-desc">Enter a bill amount and tip percentage to calculate the tip, total, and per-person amounts.</p>
+    <div class="tip-calc-row">
+      <div class="input-group">
+        <label for="billInput">Bill Amount ($)</label>
+        <input type="number" id="billInput" value={billAmount} step="0.01" min="0" />
+      </div>
+      <div class="input-group">
+        <label for="tipSelect">Tip Percentage</label>
+        <select id="tipSelect">
+          <option value="10" selected={tipPercent === 10}>10%</option>
+          <option value="15" selected={tipPercent === 15}>15%</option>
+          <option value="18" selected={tipPercent === 18}>18%</option>
+          <option value="20" selected={tipPercent === 20}>20%</option>
+          <option value="25" selected={tipPercent === 25}>25%</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="splitInput">Split Between</label>
+        <input type="number" id="splitInput" value="2" min="1" max="20" />
+      </div>
+    </div>
+    <div class="calc-result" id="tipCalcResult"></div>
+  </div>
+
+  <!-- Comparison Table -->
+  <h2 class="section-heading">Tip Comparison for ${fmt(billAmount)} Bill</h2>
+  <div class="calculator-box">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Tip %</th>
+          <th>Tip Amount</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {comparisonRows.map((row) => (
+          <tr class={row.current ? 'highlight-row' : ''}>
+            <td>{row.current ? <strong>{row.percent}%</strong> : <a href={`/tip/${row.percent}-percent-on-${billAmount}/`}>{row.percent}%</a>}</td>
+            <td>${fmt(row.tip)}</td>
+            <td>${fmt(row.total)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <AdUnit slot="tip-mid" format="rectangle" />
+
+  <!-- Content Section -->
+  <article class="content-section">
+    <h2>How to Calculate a {tipPercent}% Tip on ${fmt(billAmount)}</h2>
+    <p>
+      Calculating a tip is straightforward. To find a {tipPercent}% tip on a ${fmt(billAmount)} bill, multiply the bill amount by the tip percentage expressed as a decimal. The formula is:
+    </p>
+    <div class="formula-box">
+      ${fmt(billAmount)} &times; {tipPercent / 100} = ${fmt(tipAmount)}
+    </div>
+    <p>
+      This means you would leave ${fmt(tipAmount)} as a tip, bringing your total bill to ${fmt(totalAmount)}. If you are splitting the bill with another person, each of you would pay ${fmt(perPerson2?.totalEach ?? 0)}. For a party of three, each person pays ${fmt(perPerson3?.totalEach ?? 0)}, and for a group of four, each person pays ${fmt(perPerson4?.totalEach ?? 0)}.
+    </p>
+    <p>
+      A quick mental math trick for calculating tips: to find 10% of any bill, simply move the decimal point one place to the left. For a ${fmt(billAmount)} bill, 10% is ${fmt(billAmount * 0.1)}. From there, you can easily calculate other percentages. For 20%, double the 10% amount. For 15%, add half of the 10% amount to itself. This method works for any bill size and helps you tip quickly without a calculator.
+    </p>
+
+    <h2>Tipping Etiquette in the United States</h2>
+    <p>
+      In the United States, tipping is a deeply ingrained part of the dining culture. The standard tip for sit-down restaurant service ranges from 15% to 20% of the pre-tax bill. A 15% tip is considered the minimum for adequate service, while 18% to 20% is the norm for good service. For exceptional service, many diners leave 25% or more.
+    </p>
+    <p>
+      Tipping practices extend beyond restaurants. For delivery drivers, 15% to 20% of the order total is standard, with a minimum of $3 to $5 for small orders. Bartenders typically receive $1 to $2 per drink or 15% to 20% of the tab. Rideshare drivers are commonly tipped 15% to 20% of the fare. Hairstylists and barbers usually receive 15% to 20%, and hotel housekeeping staff are typically tipped $2 to $5 per night.
+    </p>
+    <p>
+      It is important to note that tips in the United States often make up a significant portion of a service worker's income. Many tipped employees receive a lower base wage, with the expectation that tips will make up the difference. The federal tipped minimum wage is $2.13 per hour, though many states have enacted higher minimums. When you leave a tip, you are directly contributing to your server's livelihood.
+    </p>
+
+    <h2>When to Tip More or Less</h2>
+    <p>
+      There are situations where tipping more than the standard amount is appropriate. Large parties of six or more often have an automatic gratuity of 18% to 20% added to the bill, but if the service is excellent, adding more on top is a generous gesture. During holidays, inclement weather, or when a delivery driver goes out of their way, increasing your tip is a thoughtful way to show appreciation.
+    </p>
+    <p>
+      Conversely, if you receive poor service, it is generally better to speak with a manager rather than leaving no tip. A reduced tip of 10% signals dissatisfaction while still acknowledging the server's effort. Leaving no tip is considered very poor etiquette in the United States, except in cases of truly egregious service. Keep in mind that kitchen delays, food quality issues, and crowded conditions may not be your server's fault.
+    </p>
+    <p>
+      When dining internationally, tipping customs vary significantly. In many European countries, a service charge is included in the bill, and additional tips are small or optional. In Japan, tipping can actually be considered rude. Always research local customs before traveling to avoid unintentional faux pas.
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>How much is a {tipPercent}% tip on ${fmt(billAmount)}?</h3>
+    <p>
+      A {tipPercent}% tip on a ${fmt(billAmount)} bill is ${fmt(tipAmount)}. Add this to the original bill and your total comes to ${fmt(totalAmount)}. You can calculate this by multiplying ${fmt(billAmount)} by {tipPercent / 100}, or by finding 10% (${fmt(billAmount * 0.1)}) and adjusting from there.
+    </p>
+
+    <h3>How do you calculate a {tipPercent}% tip?</h3>
+    <p>
+      To calculate a {tipPercent}% tip on any bill, multiply the pre-tax bill total by {tipPercent / 100}. For example, on a ${fmt(billAmount)} bill: ${fmt(billAmount)} &times; {tipPercent / 100} = ${fmt(tipAmount)}. You can also find 10% by moving the decimal one place left, then adjust accordingly to reach {tipPercent}%.
+    </p>
+
+    <h3>How do you split a ${fmt(billAmount)} bill with a {tipPercent}% tip?</h3>
+    <p>
+      With a {tipPercent}% tip on ${fmt(billAmount)}, the total bill is ${fmt(totalAmount)}. Divide this total by the number of people in your group. For 2 people, each pays ${fmt(perPerson2?.totalEach ?? 0)}. For 3 people, each pays ${fmt(perPerson3?.totalEach ?? 0)}. For 4 people, each pays ${fmt(perPerson4?.totalEach ?? 0)}. For 5 people, each pays ${fmt(perPerson5?.totalEach ?? 0)}. Use the calculator above for other group sizes.
+    </p>
+
+    <h2>Related Tip Calculations</h2>
+    <ul>
+      {nearbyAmounts.map((p) => (
+        <li>
+          <a href={`/tip/${p.slug}/`}>{p.tipPercent}% Tip on ${fmt(p.billAmount)} = ${fmt(p.tipAmount)}</a>
+        </li>
+      ))}
+      {otherPercents.map((p) => (
+        <li>
+          <a href={`/tip/${p.slug}/`}>{p.tipPercent}% Tip on ${fmt(p.billAmount)} = ${fmt(p.tipAmount)}</a>
+        </li>
+      ))}
+    </ul>
+
+    <p><a href="/tip/">&larr; View All Tip Calculations</a> | <a href="/everyday-calculators/">Everyday Calculators</a></p>
+  </article>
+
+  <AdUnit slot="tip-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .quick-fact {
+    background: #eff6ff;
+    border-radius: var(--radius);
+    padding: 16px 24px;
+    margin-bottom: 24px;
+    font-size: 1.1rem;
+  }
+  .quick-fact-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .quick-fact strong {
+    color: var(--color-primary);
+    font-size: 1.3rem;
+  }
+
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+
+  .calc-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 16px;
+  }
+  .tip-calc-row {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .tip-calc-row .input-group {
+    flex: 1;
+    min-width: 120px;
+  }
+  .calc-result {
+    margin-top: 14px;
+    padding: 12px 16px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 1rem;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+
+  .highlight-row {
+    background: #eff6ff;
+  }
+  :global(.highlight-row td) {
+    font-weight: 600;
+  }
+
+  @media (max-width: 640px) {
+    .tip-calc-row {
+      flex-direction: column;
+    }
+  }
+</style>
+
+<script>
+  var billInput = document.getElementById('billInput');
+  var tipSelect = document.getElementById('tipSelect');
+  var splitInput = document.getElementById('splitInput');
+  var resultEl = document.getElementById('tipCalcResult');
+
+  function fmtMoney(n) {
+    return '$' + n.toFixed(2);
+  }
+
+  function updateTipCalc() {
+    var bill = parseFloat(billInput.value);
+    var pct = parseFloat(tipSelect.value);
+    var split = parseInt(splitInput.value, 10);
+
+    if (isNaN(bill) || bill < 0 || isNaN(pct) || isNaN(split) || split < 1) {
+      resultEl.textContent = '';
+      return;
+    }
+
+    var tip = Math.round(bill * pct) / 100;
+    var total = bill + tip;
+    var perPerson = Math.round(total / split * 100) / 100;
+    var tipPerPerson = Math.round(tip / split * 100) / 100;
+
+    resultEl.textContent = pct + '% tip on ' + fmtMoney(bill) + ' = ' + fmtMoney(tip) + ' | Total: ' + fmtMoney(total) + ' | Per person (' + split + '): ' + fmtMoney(perPerson);
+  }
+
+  billInput.addEventListener('input', updateTipCalc);
+  tipSelect.addEventListener('change', updateTipCalc);
+  splitInput.addEventListener('input', updateTipCalc);
+
+  updateTipCalc();
+</script>

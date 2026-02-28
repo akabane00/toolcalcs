@@ -1,0 +1,84 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getAllFractionPages } from '../../data/fractions';
+import '../../styles/category.css';
+
+const allPages = getAllFractionPages();
+
+// Group by denominator
+const denomGroups = new Map<number, typeof allPages>();
+for (const page of allPages) {
+  if (!denomGroups.has(page.denominator)) denomGroups.set(page.denominator, []);
+  denomGroups.get(page.denominator)!.push(page);
+}
+
+// Sort groups by denominator (ascending)
+const sortedGroups = [...denomGroups.entries()].sort((a, b) => a[0] - b[0]);
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Math Calculators", "item": "https://toolcalcs.com/math-calculators/" },
+    { "@type": "ListItem", "position": 3, "name": "Fraction Calculator" },
+  ],
+};
+---
+
+<BaseLayout
+  title="Fraction to Decimal Converter - Convert Any Fraction | ToolCalcs"
+  description={`Convert fractions to decimals and percentages. Browse ${allPages.length} fraction conversions grouped by denominator, with step-by-step explanations.`}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/math-calculators/">Math Calculators</a> &rsaquo; <span>Fraction Calculator</span>
+  </nav>
+
+  <h1>Fraction to Decimal Converter</h1>
+  <p class="page-desc">Browse {allPages.length} fraction conversions grouped by denominator. Select a fraction to see its decimal, percentage, and step-by-step conversion.</p>
+
+  <AdUnit slot="fraction-idx-top" format="horizontal" />
+
+  {sortedGroups.map(([denom, pages]) => (
+    <section class="denom-section">
+      <h2 class="denom-heading">Fractions with Denominator {denom}</h2>
+      <div class="fraction-grid">
+        {pages.map((p) => (
+          <a href={`/fraction/${p.slug}/`} class="calc-card">
+            <h2>{p.numerator}/{p.denominator}</h2>
+            <p>{p.decimal} &middot; {p.percent}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  ))}
+
+  <AdUnit slot="fraction-idx-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .denom-section {
+    margin-bottom: 32px;
+  }
+  .denom-heading {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--color-border);
+    color: var(--color-text);
+  }
+  .fraction-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+  }
+
+  @media (max-width: 640px) {
+    .fraction-grid {
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+  }
+</style>

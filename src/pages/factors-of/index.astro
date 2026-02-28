@@ -1,0 +1,134 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getAllFactorsPages } from '../../data/factors';
+import '../../styles/category.css';
+
+const allPages = getAllFactorsPages();
+
+// Split into 1-100 and larger numbers
+const smallPages = allPages.filter((p) => p.number <= 100);
+const largePages = allPages.filter((p) => p.number > 100);
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://toolcalcs.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Factors Calculator"
+    }
+  ]
+};
+---
+
+<BaseLayout
+  title="Factors Calculator - Find Factors of Any Number | ToolCalcs"
+  description={`Browse factors of ${allPages.length} numbers including 1 through 100 and selected larger numbers. Find all factors, factor pairs, and prime factorizations.`}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <span>Factors Calculator</span>
+  </nav>
+
+  <h1>Factors Calculator</h1>
+  <p class="page-desc">Browse factors of {allPages.length} numbers. Select a number below to see all its factors, factor pairs, and prime factorization.</p>
+
+  <AdUnit slot="factors-idx-top" format="horizontal" />
+
+  <section class="factors-section">
+    <h2 class="factors-heading">Factors of 1 - 100</h2>
+    <div class="number-grid">
+      {smallPages.map((p) => (
+        <a href={`/factors-of/${p.slug}/`} class="number-card">
+          <span class="number-val">{p.number}</span>
+          <span class="number-count">{p.factorCount} factors</span>
+          <span class="number-type">{p.isPrime ? 'Prime' : p.number === 1 ? '' : 'Composite'}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="factors-section">
+    <h2 class="factors-heading">Selected Larger Numbers</h2>
+    <div class="number-grid">
+      {largePages.map((p) => (
+        <a href={`/factors-of/${p.slug}/`} class="number-card">
+          <span class="number-val">{p.number.toLocaleString('en-US')}</span>
+          <span class="number-count">{p.factorCount} factors</span>
+          <span class="number-type">{p.isPrime ? 'Prime' : 'Composite'}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <AdUnit slot="factors-idx-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .factors-section {
+    margin-bottom: 32px;
+  }
+  .factors-heading {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--color-border);
+    color: var(--color-text);
+  }
+  .number-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+  }
+  .number-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 14px 10px;
+    background: var(--color-bg-alt);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--color-text);
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .number-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+  }
+  .number-val {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--color-primary);
+  }
+  .number-count {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+  .number-type {
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  @media (max-width: 640px) {
+    .number-grid {
+      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    }
+    .number-val {
+      font-size: 1.1rem;
+    }
+  }
+</style>

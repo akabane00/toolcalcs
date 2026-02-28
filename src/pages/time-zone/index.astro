@@ -1,0 +1,98 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getAllTimeZonePages, ZONES } from '../../data/time-zones';
+import '../../styles/category.css';
+
+const allPages = getAllTimeZonePages();
+
+// Group conversions by source zone abbreviation
+const grouped = new Map<string, typeof allPages>();
+for (const page of allPages) {
+  const key = page.from.abbr;
+  if (!grouped.has(key)) grouped.set(key, []);
+  grouped.get(key)!.push(page);
+}
+
+// Order by ZONES array order
+const zoneOrder = ZONES.map((z) => z.abbr);
+const sortedGroups = [...grouped.entries()].sort(
+  (a, b) => zoneOrder.indexOf(a[0]) - zoneOrder.indexOf(b[0])
+);
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://toolcalcs.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Time Zone Converter"
+    }
+  ]
+};
+---
+
+<BaseLayout
+  title="Time Zone Converter - Convert Between World Time Zones | ToolCalcs"
+  description={`Browse ${allPages.length} time zone conversions with live clocks, conversion tables, and instant converters. Convert EST, PST, UTC, GMT, IST, JST, and more.`}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <span>Time Zone Converter</span>
+  </nav>
+
+  <h1>Time Zone Converter</h1>
+  <p class="page-desc">Browse {allPages.length} time zone conversions with live clocks, conversion tables, and instant converters. Select a conversion below to get started.</p>
+
+  <AdUnit slot="tz-idx-top" format="horizontal" />
+
+  {sortedGroups.map(([abbr, pages]) => {
+    const zone = ZONES.find((z) => z.abbr === abbr)!;
+    return (
+      <section class="tz-section">
+        <h2 class="tz-heading">{abbr} - {zone.name} ({zone.region})</h2>
+        <div class="calc-grid">
+          {pages.map((p) => (
+            <a href={`/time-zone/${p.slug}/`} class="calc-card">
+              <h3 class="tz-pair">{p.from.abbr} &rarr; {p.to.abbr}</h3>
+              <p>{p.diffLabel} &middot; {p.to.name}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+    );
+  })}
+
+  <AdUnit slot="tz-idx-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .tz-section {
+    margin-bottom: 32px;
+  }
+  .tz-heading {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--color-border);
+    color: var(--color-text);
+  }
+  .tz-pair {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .calc-card h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+</style>

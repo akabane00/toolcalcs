@@ -1,0 +1,440 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import { getAllFactorsPages, type FactorsPage } from '../../data/factors';
+
+export function getStaticPaths() {
+  return getAllFactorsPages().map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: FactorsPage };
+const { number, factors, factorPairs, primeFactors, primeFactorization, isPrime, isComposite, isEven, factorCount, factorSum, isPerfect } = page;
+
+const factorsList = factors.join(', ');
+
+// Format prime factorization with <sup> tags for HTML display
+function formatPrimeHtml(pf: string): string {
+  return pf.replace(/\^(\d+)/g, '<sup>$1</sup>');
+}
+const primeHtml = formatPrimeHtml(primeFactorization);
+
+// Related: nearby numbers +/-1, +/-2, +/-5
+const allPages = getAllFactorsPages();
+const nearbyOffsets = [-5, -2, -1, 1, 2, 5];
+const relatedPages = nearbyOffsets
+  .map((offset) => allPages.find((p) => p.number === number + offset))
+  .filter((p): p is FactorsPage => !!p);
+
+// Divisibility rules
+const divisibilityRules = [
+  { divisor: 2, rule: 'A number is divisible by 2 if its last digit is even (0, 2, 4, 6, or 8).', applies: number % 2 === 0 },
+  { divisor: 3, rule: 'A number is divisible by 3 if the sum of its digits is divisible by 3.', applies: number % 3 === 0 },
+  { divisor: 5, rule: 'A number is divisible by 5 if its last digit is 0 or 5.', applies: number % 5 === 0 },
+  { divisor: 9, rule: 'A number is divisible by 9 if the sum of its digits is divisible by 9.', applies: number % 9 === 0 },
+  { divisor: 10, rule: 'A number is divisible by 10 if its last digit is 0.', applies: number % 10 === 0 },
+];
+
+// SEO
+const title = `Factors of ${number} - ${factorsList} | ToolCalcs`;
+const description = `The factors of ${number} are ${factorsList}. Find all ${factorCount} factors, factor pairs, prime factorization (${primeFactorization}), and more.`;
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Factors Calculator", "item": "https://toolcalcs.com/factors-of/" },
+      { "@type": "ListItem", "position": 3, "name": `Factors of ${number}` },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": `What are the factors of ${number}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `The factors of ${number} are: ${factorsList}. It has ${factorCount} total factors.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `Is ${number} a prime number?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": isPrime
+            ? `Yes, ${number} is a prime number. Its only factors are 1 and ${number}.`
+            : `No, ${number} is ${number === 1 ? 'neither prime nor composite' : 'a composite number'}. It has ${factorCount} factors: ${factorsList}.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `What is the prime factorization of ${number}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": number === 1
+            ? `The number 1 has no prime factorization because it is neither prime nor composite.`
+            : `The prime factorization of ${number} is ${primeFactorization}.`,
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout title={title} description={description} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/factors-of/">Factors Calculator</a> &rsaquo;
+    <span>Factors of {number}</span>
+  </nav>
+
+  <h1>Factors of {number}</h1>
+  <p class="page-desc">Find all factors, factor pairs, and prime factorization of {number}.</p>
+
+  <!-- Quick Fact -->
+  <div class="quick-fact">
+    <span class="quick-fact-label">Quick Fact:</span>
+    <strong>The factors of {number} are: {factorsList}. It has {factorCount} factors.</strong>
+  </div>
+
+  <!-- Result Cards -->
+  <div class="result-cards">
+    <div class="result-card primary">
+      <span class="result-label">Factor Count</span>
+      <span class="result-value">{factorCount}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Factor Sum</span>
+      <span class="result-value">{factorSum.toLocaleString('en-US')}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Prime / Composite</span>
+      <span class="result-value">{isPrime ? 'Prime' : number === 1 ? 'Neither' : 'Composite'}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Even / Odd</span>
+      <span class="result-value">{isEven ? 'Even' : 'Odd'}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Prime Factorization</span>
+      <span class="result-value" set:html={primeHtml} />
+    </div>
+    <div class="result-card">
+      <span class="result-label">Perfect Number</span>
+      <span class="result-value">{isPerfect ? 'Yes' : 'No'}</span>
+    </div>
+  </div>
+
+  <!-- Factor Badges -->
+  <div class="calculator-box">
+    <h2 class="calc-section-title">All Factors of {number}</h2>
+    <div class="factor-badges">
+      {factors.map((f) => (
+        <span class="factor-badge">{f}</span>
+      ))}
+    </div>
+  </div>
+
+  <!-- Factor Pairs Table -->
+  <h2 class="section-heading">Factor Pairs of {number}</h2>
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Factor A</th>
+          <th>Factor B</th>
+          <th>Product</th>
+        </tr>
+      </thead>
+      <tbody>
+        {factorPairs.map((pair) => (
+          <tr>
+            <td>{pair[0]}</td>
+            <td>{pair[1]}</td>
+            <td>{pair[0]} &times; {pair[1]} = {number}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Interactive Factor Finder -->
+  <h2 class="section-heading">Factor Finder</h2>
+  <div class="calculator-box">
+    <p class="calc-desc">Enter any number to find its factors, factor pairs, and prime factorization.</p>
+    <div class="finder-row">
+      <div class="input-group">
+        <label for="finderInput">Number</label>
+        <input type="number" id="finderInput" value={number} min="1" max="1000000" />
+      </div>
+      <button class="calc-btn" id="findBtn">Find Factors</button>
+    </div>
+    <div id="finderResult" class="finder-result"></div>
+  </div>
+
+  <!-- Divisibility Rules -->
+  <h2 class="section-heading">Divisibility Rules for {number}</h2>
+  <div class="calculator-box">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Divisor</th>
+          <th>Rule</th>
+          <th>Applies to {number}?</th>
+        </tr>
+      </thead>
+      <tbody>
+        {divisibilityRules.map((rule) => (
+          <tr>
+            <td>{rule.divisor}</td>
+            <td>{rule.rule}</td>
+            <td>{rule.applies ? 'Yes' : 'No'}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <AdUnit slot="factors-mid" format="rectangle" />
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>What Are Factors?</h2>
+    <p>
+      Factors of a number are the integers that divide evenly into that number with no remainder. For example, the factors of {number} are {factorsList}. Each of these numbers divides into {number} exactly, producing a whole number quotient. Factors always come in pairs: if you divide {number} by one factor, the quotient is another factor. Understanding factors is fundamental in arithmetic, algebra, and number theory, and has practical applications in areas like simplifying fractions, finding greatest common divisors (GCD), and solving equations.
+    </p>
+    <p>
+      Every positive integer has at least two factors: 1 and itself. Numbers with exactly two factors are called prime numbers, while numbers with more than two factors are called composite numbers. The number 1 is a special case that is classified as neither prime nor composite. The number {number} has {factorCount} factor{factorCount !== 1 ? 's' : ''}, making it {isPrime ? 'a prime number' : number === 1 ? 'neither prime nor composite' : 'a composite number'}.
+    </p>
+
+    <h2>How to Find Factors</h2>
+    <p>
+      To find the factors of {number}, systematically test each integer starting from 1 up to the square root of {number} (approximately {Math.floor(Math.sqrt(number))}). For each integer that divides {number} evenly, both the divisor and the quotient are factors. This method works because factors come in pairs: if a divides {number} to give b, then both a and b are factors.
+    </p>
+    <p>
+      Start with 1: since {number} divided by 1 equals {number}, both 1 and {number} are factors. Continue testing 2, 3, 4, and so on. For {number}, the complete set of factor pairs is: {factorPairs.map((p) => `${p[0]} x ${p[1]}`).join(', ')}. You only need to check up to the square root because any factor larger than the square root would have already appeared as a quotient of a smaller factor. This makes the process efficient even for larger numbers.
+    </p>
+
+    <h2>Prime Factorization Explained</h2>
+    <p>
+      Prime factorization is the process of expressing a number as a product of its prime factors. Every composite number can be uniquely expressed as a product of prime numbers, a principle known as the Fundamental Theorem of Arithmetic. {number === 1 ? 'The number 1 has no prime factorization because it is neither prime nor composite.' : `The prime factorization of ${number} is `}{number > 1 ? <Fragment><span set:html={primeHtml} />.</Fragment> : null}
+    </p>
+    <p>
+      To find the prime factorization, divide the number by the smallest prime (2) as many times as possible, then move to the next prime (3), and continue until the quotient is 1. {number > 1 && !isPrime ? `For ${number}, the prime factors are ${[...new Set(primeFactors)].join(', ')}. When multiplied together (${primeFactorization}), they give ${number}.` : ''} Prime factorization is essential for computing the greatest common divisor (GCD) and least common multiple (LCM), simplifying fractions, and solving problems in cryptography.
+    </p>
+
+    <h2>Factor Pairs</h2>
+    <p>
+      Factor pairs of {number} are sets of two numbers whose product equals {number}. There are {factorPairs.length} factor pair{factorPairs.length !== 1 ? 's' : ''} for {number}: {factorPairs.map((p) => `(${p[0]}, ${p[1]})`).join(', ')}. Each pair represents a way to express {number} as a product of two positive integers. Factor pairs are useful in area problems (finding dimensions of rectangles with a specific area), divisibility analysis, and algebraic factoring.
+    </p>
+    <p>
+      If we include negative factors, each positive pair has a corresponding negative pair. For instance, since {factorPairs[0][0]} x {factorPairs[0][1]} = {number}, we also have (-{factorPairs[0][0]}) x (-{factorPairs[0][1]}) = {number}. However, in most practical contexts, only positive factor pairs are considered. The total number of positive factor pairs is {factorPairs.length}, which is half the factor count rounded up (since the square root of a perfect square counts as a single pair).
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What are the factors of {number}?</h3>
+    <p>
+      The factors of {number} are: {factorsList}. These are all the positive integers that divide evenly into {number} with no remainder. The number {number} has {factorCount} total factors.
+    </p>
+
+    <h3>Is {number} a prime number?</h3>
+    <p>
+      {isPrime
+        ? `Yes, ${number} is a prime number. It has exactly two factors: 1 and ${number}. A prime number is only divisible by 1 and itself.`
+        : number === 1
+          ? `No, 1 is neither prime nor composite. By definition, a prime number must be greater than 1.`
+          : `No, ${number} is a composite number. It has ${factorCount} factors (${factorsList}), which is more than the two factors that prime numbers have.`
+      }
+    </p>
+
+    <h3>What is the prime factorization of {number}?</h3>
+    <p>
+      {number === 1
+        ? 'The number 1 has no prime factorization because it is neither prime nor composite. The Fundamental Theorem of Arithmetic applies only to integers greater than 1.'
+        : <Fragment>The prime factorization of {number} is <span set:html={primeHtml} />. This means {number} can be expressed as the product of these prime numbers. Prime factorization is useful for finding GCD, LCM, and simplifying fractions.</Fragment>
+      }
+    </p>
+
+    <h2>Factors of Nearby Numbers</h2>
+    <ul>
+      {relatedPages.map((p) => (
+        <li>
+          <a href={`/factors-of/${p.slug}/`}>Factors of {p.number} - {p.factors.join(', ')}</a>
+        </li>
+      ))}
+    </ul>
+
+    <p><a href="/factors-of/">&larr; View All Factor Pages</a> | <a href="/math-calculators/">Math Calculators</a></p>
+  </article>
+
+  <AdUnit slot="factors-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .quick-fact {
+    background: #eff6ff;
+    border-radius: var(--radius);
+    padding: 16px 24px;
+    margin-bottom: 24px;
+    font-size: 1.1rem;
+  }
+  .quick-fact-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .quick-fact strong {
+    color: var(--color-primary);
+    font-size: 1.15rem;
+  }
+
+  .calc-section-title {
+    font-size: 1.15rem;
+    margin: 0 0 16px;
+    border: none;
+    padding: 0;
+  }
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+
+  .factor-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .factor-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    padding: 8px 14px;
+    background: #eff6ff;
+    border-radius: var(--radius);
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--color-primary);
+  }
+
+  .calc-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 16px;
+  }
+  .finder-row {
+    display: flex;
+    gap: 16px;
+    align-items: end;
+    flex-wrap: wrap;
+  }
+  .finder-row .input-group {
+    flex: 1;
+    min-width: 160px;
+  }
+  .finder-result {
+    margin-top: 16px;
+    padding: 14px 16px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    min-height: 44px;
+  }
+
+  @media (max-width: 640px) {
+    .finder-row {
+      flex-direction: column;
+    }
+    .factor-badge {
+      min-width: 34px;
+      padding: 6px 10px;
+      font-size: 0.9rem;
+    }
+  }
+</style>
+
+<script>
+  var finderInput = document.getElementById('finderInput') as HTMLInputElement;
+  var findBtn = document.getElementById('findBtn') as HTMLButtonElement;
+  var resultDiv = document.getElementById('finderResult') as HTMLDivElement;
+
+  function getFactors(n: number): number[] {
+    var facts: number[] = [];
+    for (var i = 1; i <= Math.sqrt(n); i++) {
+      if (n % i === 0) {
+        facts.push(i);
+        if (i !== n / i) facts.push(n / i);
+      }
+    }
+    return facts.sort(function(a, b) { return a - b; });
+  }
+
+  function getFactorPairs(n: number): [number, number][] {
+    var pairs: [number, number][] = [];
+    for (var i = 1; i <= Math.sqrt(n); i++) {
+      if (n % i === 0) pairs.push([i, n / i]);
+    }
+    return pairs;
+  }
+
+  function getPrimeFactorization(n: number): string {
+    if (n <= 1) return String(n);
+    var counts = new Map<number, number>();
+    var d = 2;
+    var val = n;
+    while (d * d <= val) {
+      while (val % d === 0) {
+        counts.set(d, (counts.get(d) || 0) + 1);
+        val = val / d;
+      }
+      d++;
+    }
+    if (val > 1) counts.set(val, (counts.get(val) || 0) + 1);
+
+    var parts: string[] = [];
+    counts.forEach(function(exp, base) {
+      if (exp === 1) parts.push(String(base));
+      else parts.push(base + '<sup>' + exp + '</sup>');
+    });
+    return parts.join(' \u00D7 ');
+  }
+
+  function findFactors() {
+    var n = parseInt(finderInput.value, 10);
+    if (isNaN(n) || n < 1 || n > 1000000) {
+      resultDiv.textContent = 'Please enter a number between 1 and 1,000,000.';
+      return;
+    }
+
+    var facts = getFactors(n);
+    var pairs = getFactorPairs(n);
+    var primeHtml = getPrimeFactorization(n);
+    var isPrime = n > 1 && facts.length === 2;
+
+    var html = '<strong>Factors of ' + n.toLocaleString('en-US') + ':</strong> ' + facts.join(', ');
+    html += '<br><strong>Factor Count:</strong> ' + facts.length;
+    html += '<br><strong>Factor Pairs:</strong> ' + pairs.map(function(p) { return '(' + p[0] + ', ' + p[1] + ')'; }).join(', ');
+    html += '<br><strong>Prime Factorization:</strong> ' + primeHtml;
+    html += '<br><strong>Type:</strong> ' + (isPrime ? 'Prime' : n === 1 ? 'Neither prime nor composite' : 'Composite');
+
+    resultDiv.innerHTML = html;
+  }
+
+  findBtn.addEventListener('click', findFactors);
+  finderInput.addEventListener('keydown', function(e) {
+    if ((e as KeyboardEvent).key === 'Enter') findFactors();
+  });
+
+  findFactors();
+</script>
