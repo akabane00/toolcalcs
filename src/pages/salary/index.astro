@@ -1,0 +1,102 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getAllSalaryPages } from '../../data/salary-conversions';
+import '../../styles/calculator.css';
+
+const allPages = getAllSalaryPages();
+const hourlyPages = allPages.filter((p) => p.direction === 'hourly').sort((a, b) => a.hourlyRate - b.hourlyRate);
+const annualPages = allPages.filter((p) => p.direction === 'annual').sort((a, b) => a.annualSalary - b.annualSalary);
+
+function fmtCurrency(n: number): string {
+  if (Number.isInteger(n)) return '$' + n.toLocaleString('en-US');
+  return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Financial Calculators", "item": "https://toolcalcs.com/financial-calculators/" },
+    { "@type": "ListItem", "position": 3, "name": "Salary Conversions" },
+  ],
+};
+---
+
+<BaseLayout
+  title="Hourly to Annual Salary Converter - Wage Calculator | ToolCalcs"
+  description={`Convert hourly wages to annual salaries and vice versa. Browse ${allPages.length} salary conversions with before-tax and after-tax breakdowns.`}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/financial-calculators/">Financial Calculators</a> &rsaquo; <span>Salary Conversions</span>
+  </nav>
+
+  <h1>Salary Conversions</h1>
+  <p class="page-desc">Convert hourly wages to annual salaries and annual salaries to hourly rates. Browse {allPages.length} conversions with complete pay breakdowns.</p>
+
+  <AdUnit slot="salary-idx-top" format="horizontal" />
+
+  <h2 class="section-heading">Hourly Rate to Annual Salary</h2>
+  <div class="calculator-box">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Hourly Rate</th>
+          <th>Annual Salary</th>
+          <th>Monthly</th>
+          <th>Biweekly</th>
+        </tr>
+      </thead>
+      <tbody>
+        {hourlyPages.map((p) => (
+          <tr>
+            <td><a href={`/salary/${p.slug}/`}>{fmtCurrency(p.hourlyRate)}/hr</a></td>
+            <td>{fmtCurrency(p.annualSalary)}</td>
+            <td>{fmtCurrency(p.monthlySalary)}</td>
+            <td>{fmtCurrency(p.biweeklySalary)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <AdUnit slot="salary-idx-mid" format="rectangle" />
+
+  <h2 class="section-heading">Annual Salary to Hourly Rate</h2>
+  <div class="calculator-box">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Annual Salary</th>
+          <th>Hourly Rate</th>
+          <th>Monthly</th>
+          <th>Biweekly</th>
+        </tr>
+      </thead>
+      <tbody>
+        {annualPages.map((p) => (
+          <tr>
+            <td><a href={`/salary/${p.slug}/`}>{fmtCurrency(p.annualSalary)}/yr</a></td>
+            <td>{fmtCurrency(p.hourlyRate)}/hr</td>
+            <td>{fmtCurrency(p.monthlySalary)}</td>
+            <td>{fmtCurrency(p.biweeklySalary)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <AdUnit slot="salary-idx-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+  .section-heading:first-of-type {
+    margin-top: 0;
+  }
+</style>

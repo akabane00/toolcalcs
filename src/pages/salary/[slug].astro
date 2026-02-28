@@ -1,0 +1,503 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import { getAllSalaryPages, hourlyRates, annualSalaries, type SalaryPage } from '../../data/salary-conversions';
+
+export function getStaticPaths() {
+  return getAllSalaryPages().map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: SalaryPage };
+const {
+  direction, hourlyRate, annualSalary, monthlySalary, biweeklySalary,
+  weeklySalary, dailySalary, overtimeRate,
+  afterTaxAnnual, afterTaxMonthly, afterTaxBiweekly,
+} = page;
+
+function fmt(n: number): string {
+  if (Number.isInteger(n)) return n.toLocaleString('en-US');
+  return n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+}
+
+function fmtCurrency(n: number): string {
+  return '$' + fmt(n);
+}
+
+function fmtRate(n: number): string {
+  if (Number.isInteger(n)) return '$' + n.toLocaleString('en-US');
+  return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+const isHourly = direction === 'hourly';
+const allPages = getAllSalaryPages();
+
+// Related pages: nearby hourly rates
+const nearbyHourly = allPages
+  .filter((p) => p.direction === 'hourly' && p.hourlyRate !== hourlyRate)
+  .sort((a, b) => Math.abs(a.hourlyRate - hourlyRate) - Math.abs(b.hourlyRate - hourlyRate))
+  .slice(0, 6);
+
+// Find the corresponding reverse page
+const reverseSlug = isHourly
+  ? allPages.find((p) => p.direction === 'annual' && p.annualSalary === annualSalary)?.slug
+  : allPages.find((p) => p.direction === 'hourly' && p.hourlyRate === hourlyRate)?.slug;
+
+// Comparison table: 5 nearby hourly rates
+const comparisonRates = allPages
+  .filter((p) => p.direction === 'hourly' && p.hourlyRate !== hourlyRate)
+  .sort((a, b) => Math.abs(a.hourlyRate - hourlyRate) - Math.abs(b.hourlyRate - hourlyRate))
+  .slice(0, 8);
+
+// SEO
+const h1 = isHourly
+  ? `${fmtRate(hourlyRate)} an Hour is How Much a Year?`
+  : `${fmtCurrency(annualSalary)} a Year is How Much an Hour?`;
+
+const quickAnswer = isHourly
+  ? `${fmtRate(hourlyRate)}/hour = ${fmtCurrency(annualSalary)}/year (before taxes)`
+  : `${fmtCurrency(annualSalary)}/year = ${fmtRate(hourlyRate)}/hour`;
+
+const title = isHourly
+  ? `${fmtRate(hourlyRate)} an Hour is How Much a Year? (${fmtCurrency(annualSalary)}) | ToolCalcs`
+  : `${fmtCurrency(annualSalary)} a Year is How Much an Hour? (${fmtRate(hourlyRate)}) | ToolCalcs`;
+
+const description = isHourly
+  ? `${fmtRate(hourlyRate)} an hour is ${fmtCurrency(annualSalary)} a year before taxes. See monthly (${fmtCurrency(monthlySalary)}), biweekly (${fmtCurrency(biweeklySalary)}), and weekly (${fmtCurrency(weeklySalary)}) pay, plus estimated take-home after taxes.`
+  : `${fmtCurrency(annualSalary)} a year is ${fmtRate(hourlyRate)} an hour. See your monthly (${fmtCurrency(monthlySalary)}), biweekly (${fmtCurrency(biweeklySalary)}), and weekly (${fmtCurrency(weeklySalary)}) salary breakdown, plus estimated take-home pay.`;
+
+const breadcrumbLabel = isHourly ? `${fmtRate(hourlyRate)}/hr Salary` : `${fmtCurrency(annualSalary)}/yr Salary`;
+
+// Context paragraph
+function getSalaryContext(annual: number): string {
+  if (annual < 30000) return `An annual salary of ${fmtCurrency(annual)} is below the median individual income in the United States. At this income level, budgeting carefully and minimizing fixed expenses is especially important. Many workers at this pay level supplement their income with overtime, side jobs, or seek positions with benefits like health insurance and retirement contributions.`;
+  if (annual < 50000) return `An annual salary of ${fmtCurrency(annual)} is near or slightly below the U.S. median individual income. At this level, most workers can cover essential living expenses in many areas of the country, though high-cost cities may present challenges. Contributing to employer-matched retirement plans and building an emergency fund are smart financial priorities at this income.`;
+  if (annual < 80000) return `An annual salary of ${fmtCurrency(annual)} is above the U.S. median individual income. At this income level, most workers can comfortably cover living expenses in the majority of U.S. cities. This is a good income range for building savings, investing, and making progress toward long-term financial goals like homeownership and retirement.`;
+  if (annual < 120000) return `An annual salary of ${fmtCurrency(annual)} places you well above the median income. This income level provides financial flexibility in most parts of the country. Workers earning at this level typically have the capacity to save aggressively, invest in diversified portfolios, and pursue major financial milestones ahead of schedule.`;
+  return `An annual salary of ${fmtCurrency(annual)} is a high income that places you in the upper percentiles of U.S. earners. At this level, tax planning becomes increasingly important, as you may be subject to higher marginal rates. Consider maximizing tax-advantaged accounts, diversifying investments, and consulting a financial advisor to optimize your overall financial strategy.`;
+}
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Financial Calculators", "item": "https://toolcalcs.com/financial-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": breadcrumbLabel },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": isHourly ? `${fmtRate(hourlyRate)} an hour is how much a year?` : `${fmtCurrency(annualSalary)} a year is how much an hour?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": isHourly
+            ? `${fmtRate(hourlyRate)} an hour is ${fmtCurrency(annualSalary)} a year before taxes, based on working 40 hours per week for 52 weeks (2,080 hours total).`
+            : `${fmtCurrency(annualSalary)} a year is ${fmtRate(hourlyRate)} an hour, based on 2,080 working hours per year (40 hours per week × 52 weeks).`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `What is ${fmtRate(hourlyRate)} an hour after taxes?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `At ${fmtRate(hourlyRate)}/hour (${fmtCurrency(annualSalary)}/year), your estimated take-home pay after federal taxes and FICA is approximately ${fmtCurrency(afterTaxAnnual)} per year or ${fmtCurrency(afterTaxMonthly)} per month. Actual take-home depends on your state, filing status, and deductions.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `How much is ${fmtRate(hourlyRate)} an hour biweekly?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `${fmtRate(hourlyRate)} an hour is ${fmtCurrency(biweeklySalary)} per biweekly paycheck before taxes (80 hours × ${fmtRate(hourlyRate)}).`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": isHourly ? `Is ${fmtRate(hourlyRate)} an hour a good salary?` : `Is ${fmtCurrency(annualSalary)} a year a good salary?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `${fmtRate(hourlyRate)} an hour (${fmtCurrency(annualSalary)}/year) is ${annualSalary >= 60000 ? 'above' : annualSalary >= 40000 ? 'near' : 'below'} the U.S. median individual income. Whether it is sufficient depends on your location, household size, and cost of living.`,
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout title={title} description={description} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/financial-calculators/">Financial Calculators</a> &rsaquo;
+    <span>{breadcrumbLabel}</span>
+  </nav>
+
+  <h1>{h1}</h1>
+  <p class="page-desc">Complete salary breakdown with before-tax and after-tax estimates.</p>
+
+  <!-- Quick Answer -->
+  <div class="quick-fact">
+    <span class="quick-fact-label">Quick Answer:</span>
+    <strong>{quickAnswer}</strong>
+  </div>
+
+  <!-- Salary Cards -->
+  <div class="calculator-box">
+    <h2 class="calc-section-title">Before-Tax Salary Breakdown</h2>
+    <div class="salary-grid">
+      <div class="salary-card primary">
+        <span class="salary-number">{isHourly ? fmtCurrency(annualSalary) : fmtRate(hourlyRate)}</span>
+        <span class="salary-label">{isHourly ? 'Annual Salary' : 'Hourly Rate'}</span>
+      </div>
+      <div class="salary-card">
+        <span class="salary-number">{fmtCurrency(monthlySalary)}</span>
+        <span class="salary-label">Monthly</span>
+      </div>
+      <div class="salary-card">
+        <span class="salary-number">{fmtCurrency(biweeklySalary)}</span>
+        <span class="salary-label">Biweekly</span>
+      </div>
+      <div class="salary-card">
+        <span class="salary-number">{fmtCurrency(weeklySalary)}</span>
+        <span class="salary-label">Weekly</span>
+      </div>
+      <div class="salary-card">
+        <span class="salary-number">{fmtCurrency(dailySalary)}</span>
+        <span class="salary-label">Daily (8hr)</span>
+      </div>
+      <div class="salary-card">
+        <span class="salary-number">{fmtRate(overtimeRate)}</span>
+        <span class="salary-label">Overtime (1.5×)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- After-Tax Estimate -->
+  <div class="calculator-box">
+    <h2 class="calc-section-title">Estimated Take-Home Pay</h2>
+    <div class="disclaimer-banner">
+      Estimates are approximate, based on 2026 single-filer federal tax brackets, standard deduction ($15,000), and FICA (7.65%). State taxes, deductions, and credits are not included.
+    </div>
+    <div class="salary-grid compact">
+      <div class="salary-card">
+        <span class="salary-number">{fmtCurrency(afterTaxAnnual)}</span>
+        <span class="salary-label">Annual (After Tax)</span>
+      </div>
+      <div class="salary-card">
+        <span class="salary-number">{fmtCurrency(afterTaxMonthly)}</span>
+        <span class="salary-label">Monthly (After Tax)</span>
+      </div>
+      <div class="salary-card">
+        <span class="salary-number">{fmtCurrency(afterTaxBiweekly)}</span>
+        <span class="salary-label">Biweekly (After Tax)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Calculator -->
+  <h2 class="section-heading">Salary Calculator</h2>
+  <div class="calculator-box">
+    <div class="salary-calc-row">
+      <div class="input-group">
+        <label for="hourlyInput">Hourly Rate ($)</label>
+        <input type="number" id="hourlyInput" value={hourlyRate} step="0.01" min="0" />
+      </div>
+      <div class="input-group">
+        <label for="hoursWeek">Hours / Week</label>
+        <input type="number" id="hoursWeek" value="40" min="1" max="80" />
+      </div>
+      <div class="input-group">
+        <label for="weeksYear">Weeks / Year</label>
+        <input type="number" id="weeksYear" value="52" min="1" max="52" />
+      </div>
+    </div>
+    <div class="calc-summary" id="calcSummary"></div>
+  </div>
+
+  <!-- Comparison Table -->
+  {comparisonRates.length > 0 && (
+    <h2 class="section-heading">Salary Comparison</h2>
+    <div class="calculator-box">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Hourly</th>
+            <th>Weekly</th>
+            <th>Biweekly</th>
+            <th>Monthly</th>
+            <th>Annual</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td><strong>{fmtRate(hourlyRate)}</strong></td>
+            <td>{fmtCurrency(weeklySalary)}</td>
+            <td>{fmtCurrency(biweeklySalary)}</td>
+            <td>{fmtCurrency(monthlySalary)}</td>
+            <td>{fmtCurrency(annualSalary)}</td>
+          </tr>
+          {comparisonRates.map((p) => (
+            <tr>
+              <td><a href={`/salary/${p.slug}/`}>{fmtRate(p.hourlyRate)}</a></td>
+              <td>{fmtCurrency(p.weeklySalary)}</td>
+              <td>{fmtCurrency(p.biweeklySalary)}</td>
+              <td>{fmtCurrency(p.monthlySalary)}</td>
+              <td>{fmtCurrency(p.annualSalary)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+
+  <AdUnit slot="salary-mid" format="rectangle" />
+
+  <!-- Content Section -->
+  <article class="content-section">
+    <h2>{isHourly ? `${fmtRate(hourlyRate)} an Hour Annual Salary Breakdown` : `${fmtCurrency(annualSalary)} a Year Salary Breakdown`}</h2>
+    <p>
+      {isHourly
+        ? `If you earn ${fmtRate(hourlyRate)} per hour and work a standard 40-hour week for 52 weeks, your annual salary is ${fmtCurrency(annualSalary)} before taxes. This is calculated by multiplying ${fmtRate(hourlyRate)} × 40 hours × 52 weeks = ${fmtCurrency(annualSalary)}.`
+        : `An annual salary of ${fmtCurrency(annualSalary)} breaks down to ${fmtRate(hourlyRate)} per hour based on a standard 2,080-hour work year (40 hours × 52 weeks). This means your monthly gross pay is ${fmtCurrency(monthlySalary)} and your biweekly paycheck is ${fmtCurrency(biweeklySalary)} before taxes.`
+      }
+    </p>
+    <p>
+      Your biweekly paycheck (every two weeks) would be {fmtCurrency(biweeklySalary)} before any deductions. Most employers in the United States pay on a biweekly schedule, resulting in 26 paychecks per year. Your monthly gross income works out to {fmtCurrency(monthlySalary)}, and your daily rate for an 8-hour day is {fmtCurrency(dailySalary)}.
+    </p>
+
+    <h2>How We Calculate Annual Salary from Hourly Rate</h2>
+    <p>
+      The standard formula for converting an hourly wage to an annual salary is: <strong>Hourly Rate × Hours per Week × Weeks per Year = Annual Salary</strong>. Using the standard full-time schedule of 40 hours per week and 52 weeks per year gives 2,080 working hours annually. For {fmtRate(hourlyRate)} per hour: {fmtRate(hourlyRate)} × 2,080 = {fmtCurrency(annualSalary)}.
+    </p>
+    <p>
+      If you work fewer than 52 weeks due to unpaid vacation or time off, your actual annual income will be lower. For example, at {fmtRate(hourlyRate)} per hour working 50 weeks, you would earn {fmtCurrency(hourlyRate * 40 * 50)}. The calculator above lets you adjust both hours per week and weeks per year for a customized calculation.
+    </p>
+
+    <h2>Take-Home Pay Estimate</h2>
+    <p>
+      At {fmtCurrency(annualSalary)} per year, your estimated take-home pay after federal income tax and FICA (Social Security and Medicare) is approximately {fmtCurrency(afterTaxAnnual)} annually, or {fmtCurrency(afterTaxMonthly)} per month. This estimate assumes single-filer status with the standard deduction and does not include state or local taxes, which vary significantly by location.
+    </p>
+    <p>
+      FICA taxes account for 7.65% of your gross pay (6.2% for Social Security up to the wage base limit, plus 1.45% for Medicare). Your effective federal income tax rate depends on which tax brackets your income falls into. Workers with dependents, itemized deductions, or tax credits will have a different take-home amount.
+    </p>
+
+    <h2>How Does This Salary Compare?</h2>
+    <p>
+      {getSalaryContext(annualSalary)}
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>{isHourly ? `${fmtRate(hourlyRate)} an hour is how much a year?` : `${fmtCurrency(annualSalary)} a year is how much an hour?`}</h3>
+    <p>
+      {isHourly
+        ? `${fmtRate(hourlyRate)} an hour is ${fmtCurrency(annualSalary)} a year before taxes, based on working 40 hours per week for 52 weeks (2,080 total hours). After estimated federal taxes and FICA, your take-home pay is approximately ${fmtCurrency(afterTaxAnnual)} per year.`
+        : `${fmtCurrency(annualSalary)} a year is ${fmtRate(hourlyRate)} an hour, based on 2,080 working hours per year. After estimated federal taxes and FICA, your take-home pay is approximately ${fmtCurrency(afterTaxAnnual)} per year.`
+      }
+    </p>
+
+    <h3>What is {fmtRate(hourlyRate)} an hour after taxes?</h3>
+    <p>
+      At {fmtRate(hourlyRate)}/hour ({fmtCurrency(annualSalary)}/year), your estimated take-home pay is approximately {fmtCurrency(afterTaxAnnual)} per year, {fmtCurrency(afterTaxMonthly)} per month, or {fmtCurrency(afterTaxBiweekly)} per biweekly paycheck. These estimates use 2026 federal tax brackets for a single filer with the standard deduction. Your actual take-home will vary based on state taxes, deductions, and filing status.
+    </p>
+
+    <h3>How much is {fmtRate(hourlyRate)} an hour biweekly?</h3>
+    <p>
+      At {fmtRate(hourlyRate)} per hour, your biweekly gross paycheck (before taxes) is {fmtCurrency(biweeklySalary)}, based on 80 hours per pay period. After estimated taxes, your biweekly take-home is approximately {fmtCurrency(afterTaxBiweekly)}.
+    </p>
+
+    <h3>Is {fmtRate(hourlyRate)} an hour a good salary?</h3>
+    <p>
+      {fmtRate(hourlyRate)} an hour ({fmtCurrency(annualSalary)}/year) is {annualSalary >= 60000 ? 'above' : annualSalary >= 40000 ? 'near' : 'below'} the U.S. median individual income of approximately $40,000–$45,000. Whether this is a good salary depends on your location, family size, and cost of living. In lower-cost areas, this income {annualSalary >= 50000 ? 'provides comfortable living' : 'covers basic expenses'}, while in major metropolitan areas, housing costs may require {annualSalary >= 80000 ? 'moderate' : 'careful'} budgeting.
+    </p>
+
+    <h2>Related Salary Calculations</h2>
+    <ul>
+      {nearbyHourly.map((p) => (
+        <li>
+          <a href={`/salary/${p.slug}/`}>{fmtRate(p.hourlyRate)} an Hour = {fmtCurrency(p.annualSalary)}/year</a>
+        </li>
+      ))}
+      {reverseSlug && (
+        <li>
+          <a href={`/salary/${reverseSlug}/`}>
+            {isHourly ? `${fmtCurrency(annualSalary)} a Year` : `${fmtRate(hourlyRate)} an Hour`} (reverse)
+          </a>
+        </li>
+      )}
+    </ul>
+
+    <p><a href="/salary/">&larr; View All Salary Conversions</a> | <a href="/financial-calculators/">Financial Calculators</a></p>
+  </article>
+
+  <AdUnit slot="salary-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .quick-fact {
+    background: #eff6ff;
+    border-radius: var(--radius);
+    padding: 16px 24px;
+    margin-bottom: 24px;
+    font-size: 1.1rem;
+  }
+  .quick-fact-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .quick-fact strong {
+    color: var(--color-primary);
+    font-size: 1.3rem;
+  }
+
+  .calc-section-title {
+    font-size: 1.15rem;
+    margin: 0 0 16px;
+    border: none;
+    padding: 0;
+  }
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+
+  .salary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .salary-grid.compact {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .salary-card {
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    padding: 18px 14px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .salary-card.primary {
+    background: #eff6ff;
+    grid-column: 1 / -1;
+  }
+  .salary-number {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--color-text);
+    line-height: 1.2;
+  }
+  .salary-card.primary .salary-number {
+    font-size: 2.8rem;
+    color: var(--color-primary);
+  }
+  .salary-label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .disclaimer-banner {
+    background: #fffbeb;
+    border: 1px solid #f59e0b;
+    border-radius: var(--radius);
+    padding: 10px 16px;
+    font-size: 0.82rem;
+    color: #92400e;
+    margin-bottom: 16px;
+    line-height: 1.4;
+  }
+
+  .salary-calc-row {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .salary-calc-row .input-group {
+    flex: 1;
+    min-width: 120px;
+  }
+  .calc-summary {
+    margin-top: 14px;
+    padding: 12px 16px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 1rem;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+
+  .highlight-row {
+    background: #eff6ff;
+  }
+  :global(.highlight-row td) {
+    font-weight: 600;
+  }
+
+  @media (max-width: 640px) {
+    .salary-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .salary-grid.compact {
+      grid-template-columns: 1fr;
+    }
+    .salary-card.primary .salary-number {
+      font-size: 2.2rem;
+    }
+    .salary-number {
+      font-size: 1.2rem;
+    }
+    .salary-calc-row {
+      flex-direction: column;
+    }
+  }
+</style>
+
+<script define:vars={{ defaultRate: hourlyRate }}>
+  var hourlyInput = document.getElementById('hourlyInput');
+  var hoursWeek = document.getElementById('hoursWeek');
+  var weeksYear = document.getElementById('weeksYear');
+  var summaryEl = document.getElementById('calcSummary');
+
+  function fmtNum(n) {
+    if (Number.isInteger(n)) return '$' + n.toLocaleString('en-US');
+    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function updateCalc() {
+    var rate = parseFloat(hourlyInput.value);
+    var hrs = parseFloat(hoursWeek.value);
+    var wks = parseFloat(weeksYear.value);
+    if (isNaN(rate) || isNaN(hrs) || isNaN(wks) || rate < 0) {
+      summaryEl.textContent = '';
+      return;
+    }
+    var annual = rate * hrs * wks;
+    var monthly = Math.round(annual / 12);
+    var biweekly = Math.round(rate * hrs * 2);
+    var weekly = rate * hrs;
+    summaryEl.textContent = fmtNum(rate) + '/hr × ' + hrs + ' hrs × ' + wks + ' wks = ' + fmtNum(annual) + '/year (' + fmtNum(monthly) + '/month)';
+  }
+
+  hourlyInput.addEventListener('input', updateCalc);
+  hoursWeek.addEventListener('input', updateCalc);
+  weeksYear.addEventListener('input', updateCalc);
+
+  updateCalc();
+</script>

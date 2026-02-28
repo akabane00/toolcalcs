@@ -1,0 +1,93 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getAllNumberWordsPages } from '../../data/number-to-words';
+import '../../styles/calculator.css';
+
+const allPages = getAllNumberWordsPages();
+const numbersUpTo100 = allPages.filter((p) => p.number <= 100);
+const numbersAbove100 = allPages.filter((p) => p.number > 100);
+
+const fmt = (n: number) => n.toLocaleString('en-US');
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Math Calculators", "item": "https://toolcalcs.com/math-calculators/" },
+    { "@type": "ListItem", "position": 3, "name": "Numbers in Words" },
+  ],
+};
+---
+
+<BaseLayout
+  title="Numbers in Words - How to Write Numbers in English | ToolCalcs"
+  description={`How to write numbers in English words. Browse ${allPages.length} numbers with their word form, ordinal, and place value breakdown.`}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/math-calculators/">Math Calculators</a> &rsaquo; <span>Numbers in Words</span>
+  </nav>
+
+  <h1>Numbers in Words</h1>
+  <p class="page-desc">How to write numbers from 1 to 1 billion in English. Click any number for detailed word form, ordinal, and place value information.</p>
+
+  <AdUnit slot="numwords-idx-top" format="horizontal" />
+
+  <h2 class="section-heading">Numbers 1–100 in Words</h2>
+  <div class="calculator-box">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Number</th>
+          <th>In Words</th>
+          <th>Ordinal</th>
+        </tr>
+      </thead>
+      <tbody>
+        {numbersUpTo100.map((p) => (
+          <tr>
+            <td><a href={`/number-to-words/${p.slug}/`}>{fmt(p.number)}</a></td>
+            <td>{p.words}</td>
+            <td>{p.ordinalSuffix}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <AdUnit slot="numwords-idx-mid" format="rectangle" />
+
+  <h2 class="section-heading">Larger Numbers in Words</h2>
+  <div class="calculator-box">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Number</th>
+          <th>In Words</th>
+        </tr>
+      </thead>
+      <tbody>
+        {numbersAbove100.map((p) => (
+          <tr>
+            <td><a href={`/number-to-words/${p.slug}/`}>{fmt(p.number)}</a></td>
+            <td>{p.words}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <AdUnit slot="numwords-idx-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+  .section-heading:first-of-type {
+    margin-top: 0;
+  }
+</style>

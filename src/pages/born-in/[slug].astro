@@ -1,0 +1,425 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import { getAllBornInPages, type BornInPage } from '../../data/born-in-years';
+
+export function getStaticPaths() {
+  return getAllBornInPages().map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: BornInPage };
+const { year, turningAge, generation, generationYears, chineseZodiac } = page;
+
+const buildYear = new Date().getFullYear();
+const lowerAge = turningAge - 1;
+const approxMonths = turningAge * 12;
+const approxWeeks = Math.round(turningAge * 52.1775);
+const approxDays = Math.round(turningAge * 365.25);
+
+// Life milestones
+const milestones = [
+  { label: 'Turned / Turns 18', year: year + 18 },
+  { label: 'Turned / Turns 21', year: year + 21 },
+  { label: 'Turned / Turns 30', year: year + 30 },
+  { label: 'Turned / Turns 40', year: year + 40 },
+  { label: 'Turned / Turns 50', year: year + 50 },
+  { label: 'Turned / Turns 65', year: year + 65 },
+].filter((m) => m.year >= 1920);
+
+// Related years
+const allPages = getAllBornInPages();
+const relatedYears = allPages
+  .filter((p) => Math.abs(p.year - year) > 0 && Math.abs(p.year - year) <= 5)
+  .sort((a, b) => a.year - b.year);
+
+// Generation context
+function getGenerationDesc(gen: string): string {
+  switch (gen) {
+    case 'Greatest Generation':
+      return 'The Greatest Generation, also known as the G.I. Generation, lived through the Great Depression and fought in World War II. This generation is characterized by a strong sense of duty, sacrifice, and civic responsibility. They built the post-war economic boom and laid the foundations of modern America.';
+    case 'Silent Generation':
+      return 'The Silent Generation grew up during the Great Depression and World War II. Known for their conformity and hard work, they came of age in a time of economic recovery and played key roles in the civil rights movement. They valued stability, loyalty, and traditional institutions.';
+    case 'Baby Boomer':
+      return 'Baby Boomers were born during the post-World War II population surge. This generation witnessed the civil rights movement, the Vietnam War, and the moon landing. They drove major cultural shifts in the 1960s and 1970s, and they remain one of the largest and most influential generations in American history.';
+    case 'Generation X':
+      return 'Generation X grew up as latchkey kids during a time of rising divorce rates and dual-income families. They witnessed the end of the Cold War, the rise of MTV, and the dawn of the personal computer era. Gen Xers are known for their independence, skepticism, and adaptability.';
+    case 'Millennial':
+      return 'Millennials, also known as Generation Y, came of age during the rise of the internet and social media. They experienced 9/11 as children or teenagers, entered the workforce during the Great Recession, and have reshaped workplace culture, technology adoption, and consumer expectations.';
+    case 'Generation Z':
+      return 'Generation Z are true digital natives who have never known a world without smartphones and social media. They are the most diverse generation in history and are known for their pragmatism, social awareness, and comfort with technology. Gen Z values authenticity, inclusivity, and mental health awareness.';
+    case 'Generation Alpha':
+      return 'Generation Alpha is the youngest generation, born entirely in the 21st century. They are growing up in a world shaped by artificial intelligence, climate change, and global connectivity. As children and toddlers, their full generational identity is still being formed.';
+    default:
+      return '';
+  }
+}
+
+// SEO
+const title = `Born in ${year}? You Are ${lowerAge} or ${turningAge} Years Old | ToolCalcs`;
+const description = `If you were born in ${year}, you are ${lowerAge} or ${turningAge} years old in ${buildYear}. Find your exact age, generation (${generation}), Chinese zodiac (${chineseZodiac}), and life milestones.`;
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Age Calculator", "item": "https://toolcalcs.com/date-time-calculators/age-calculator/" },
+      { "@type": "ListItem", "position": 3, "name": `Born in ${year}` },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": `How old am I if I was born in ${year}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `If you were born in ${year}, you are ${lowerAge} or ${turningAge} years old in ${buildYear}, depending on whether your birthday has passed this year.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `What generation is someone born in ${year}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `Someone born in ${year} belongs to the ${generation} (${generationYears}).`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `What Chinese zodiac sign is ${year}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `${year} is the Year of the ${chineseZodiac} in the Chinese zodiac.`,
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout title={title} description={description} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/date-time-calculators/age-calculator/">Age Calculator</a> &rsaquo;
+    <span>Born in {year}</span>
+  </nav>
+
+  <h1>Born in {year} — How Old Am I?</h1>
+  <p class="page-desc">Find out your exact age if you were born in {year}.</p>
+
+  <!-- Quick Answer -->
+  <div class="quick-fact">
+    <span class="quick-fact-label">Quick Answer:</span>
+    <strong id="quickAnswer">If you were born in {year}, you are turning {turningAge} years old in {buildYear}.</strong>
+  </div>
+
+  <!-- Age Cards -->
+  <div class="calculator-box">
+    <div class="age-grid" id="ageGrid">
+      <div class="age-card primary">
+        <span class="age-number" id="ageTurning">{turningAge}</span>
+        <span class="age-label">Turning This Year</span>
+      </div>
+      <div class="age-card">
+        <span class="age-number" id="ageCurrent">{lowerAge} or {turningAge}</span>
+        <span class="age-label">Current Age</span>
+      </div>
+      <div class="age-card">
+        <span class="age-number" id="ageMonths">~{approxMonths.toLocaleString('en-US')}</span>
+        <span class="age-label">Months</span>
+      </div>
+      <div class="age-card">
+        <span class="age-number" id="ageWeeks">~{approxWeeks.toLocaleString('en-US')}</span>
+        <span class="age-label">Weeks</span>
+      </div>
+      <div class="age-card">
+        <span class="age-number" id="ageDays">~{approxDays.toLocaleString('en-US')}</span>
+        <span class="age-label">Days</span>
+      </div>
+      <div class="age-card">
+        <span class="age-number">{generation}</span>
+        <span class="age-label">{generationYears}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Exact Age Calculator -->
+  <h2 class="section-heading">Calculate Your Exact Age</h2>
+  <div class="calculator-box">
+    <p class="calc-desc">Select your birth month and day for a precise calculation.</p>
+    <div class="exact-age-row">
+      <div class="input-group">
+        <label for="birthMonth">Birth Month</label>
+        <select id="birthMonth">
+          <option value="0">January</option>
+          <option value="1">February</option>
+          <option value="2">March</option>
+          <option value="3">April</option>
+          <option value="4">May</option>
+          <option value="5">June</option>
+          <option value="6">July</option>
+          <option value="7">August</option>
+          <option value="8">September</option>
+          <option value="9">October</option>
+          <option value="10">November</option>
+          <option value="11">December</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="birthDay">Birth Day</label>
+        <input type="number" id="birthDay" value="1" min="1" max="31" />
+      </div>
+    </div>
+    <div class="exact-result" id="exactResult"></div>
+  </div>
+
+  <!-- Life Milestones -->
+  <h2 class="section-heading">Life Milestones</h2>
+  <div class="calculator-box">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Milestone</th>
+          <th>Year</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {milestones.map((m) => (
+          <tr>
+            <td>{m.label}</td>
+            <td>{m.year}</td>
+            <td>{m.year <= buildYear ? 'Reached' : 'Upcoming'}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <AdUnit slot="bornin-mid" format="rectangle" />
+
+  <!-- Content Section -->
+  <article class="content-section">
+    <h2>How Old Am I If I Was Born in {year}?</h2>
+    <p>
+      If you were born in {year}, you are turning {turningAge} years old in {buildYear}. Your exact current age depends on whether your birthday has already occurred this year. Before your birthday, you are {lowerAge} years old. On or after your birthday, you are {turningAge} years old.
+    </p>
+    <p>
+      To calculate your exact age, subtract your birth year from the current year. If your birthday has not yet passed this calendar year, subtract one additional year. For someone born in {year}, the calculation is {buildYear} − {year} = {turningAge}. Use the calculator above with your exact birth month and day for a precise age in years, months, and days.
+    </p>
+    <p>
+      In approximate terms, someone born in {year} has lived about {approxMonths.toLocaleString('en-US')} months, {approxWeeks.toLocaleString('en-US')} weeks, or {approxDays.toLocaleString('en-US')} days. These figures are approximations based on the midpoint of the year and average month lengths.
+    </p>
+
+    <h2>About the {generation}</h2>
+    <p>{getGenerationDesc(generation)}</p>
+    <p>
+      Someone born in {year} falls within the {generation} cohort ({generationYears}). This generational classification is based on shared historical experiences, cultural touchstones, and demographic patterns that shape attitudes and behaviors throughout life.
+    </p>
+
+    <h2>Chinese Zodiac: Year of the {chineseZodiac}</h2>
+    <p>
+      In the Chinese zodiac, {year} is the Year of the {chineseZodiac}. The Chinese zodiac follows a 12-year cycle, with each year associated with an animal sign. People born in the Year of the {chineseZodiac} are traditionally believed to share certain personality traits associated with this animal.
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>How old am I if I was born in {year}?</h3>
+    <p>
+      If you were born in {year}, you are {lowerAge} or {turningAge} years old in {buildYear}, depending on whether your birthday has already occurred this year. Use the exact age calculator above to find your precise age in years, months, and days.
+    </p>
+
+    <h3>What generation is someone born in {year}?</h3>
+    <p>
+      Someone born in {year} is part of the {generation} ({generationYears}). Generational boundaries are approximate and vary slightly by source, but this classification is widely accepted among demographers and researchers.
+    </p>
+
+    <h3>What Chinese zodiac sign is {year}?</h3>
+    <p>
+      {year} is the Year of the {chineseZodiac} in the Chinese zodiac. The Chinese zodiac operates on a 12-year cycle, and the {chineseZodiac} is one of the twelve animal signs.
+    </p>
+
+    <h2>Born in Other Years</h2>
+    <ul>
+      {relatedYears.map((p) => (
+        <li>
+          <a href={`/born-in/${p.slug}/`}>Born in {p.year} — Age {p.turningAge - 1} or {p.turningAge}</a>
+        </li>
+      ))}
+    </ul>
+
+    <p><a href="/born-in/">&larr; View All Birth Years</a> | <a href="/date-time-calculators/age-calculator/">Full Age Calculator</a></p>
+  </article>
+
+  <AdUnit slot="bornin-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .quick-fact {
+    background: #eff6ff;
+    border-radius: var(--radius);
+    padding: 16px 24px;
+    margin-bottom: 24px;
+    font-size: 1.1rem;
+  }
+  .quick-fact-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .quick-fact strong {
+    color: var(--color-primary);
+    font-size: 1.3rem;
+  }
+
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+
+  .age-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .age-card {
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    padding: 20px 16px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .age-card.primary {
+    background: #eff6ff;
+    grid-column: 1 / -1;
+  }
+  .age-number {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--color-text);
+    line-height: 1.2;
+  }
+  .age-card.primary .age-number {
+    font-size: 3rem;
+    color: var(--color-primary);
+  }
+  .age-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .calc-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 16px;
+  }
+  .exact-age-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .exact-age-row .input-group {
+    flex: 1;
+    min-width: 140px;
+  }
+  .exact-result {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 1.05rem;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+
+  @media (max-width: 640px) {
+    .age-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .age-card.primary .age-number {
+      font-size: 2.5rem;
+    }
+    .age-number {
+      font-size: 1.3rem;
+    }
+    .exact-age-row {
+      flex-direction: column;
+    }
+  }
+</style>
+
+<script define:vars={{ birthYear: year }}>
+  var monthEl = document.getElementById('birthMonth');
+  var dayEl = document.getElementById('birthDay');
+  var resultEl = document.getElementById('exactResult');
+
+  function calcExactAge() {
+    var now = new Date();
+    var month = parseInt(monthEl.value, 10);
+    var day = parseInt(dayEl.value, 10);
+
+    if (isNaN(day) || day < 1 || day > 31) {
+      resultEl.textContent = '';
+      return;
+    }
+
+    var birthDate = new Date(birthYear, month, day);
+    if (birthDate.getMonth() !== month) {
+      resultEl.textContent = 'Invalid date.';
+      return;
+    }
+
+    var years = now.getFullYear() - birthDate.getFullYear();
+    var months = now.getMonth() - birthDate.getMonth();
+    var days = now.getDate() - birthDate.getDate();
+
+    if (days < 0) {
+      months--;
+      var prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+      days += prevMonth.getDate();
+    }
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+
+    resultEl.textContent = 'You are ' + years + ' years, ' + months + ' months, and ' + days + ' days old.';
+  }
+
+  // Update age cards with live date
+  function updateCards() {
+    var now = new Date();
+    var currentYear = now.getFullYear();
+    var turningAge = currentYear - birthYear;
+    var lowerAge = turningAge - 1;
+
+    var turningEl = document.getElementById('ageTurning');
+    var currentEl = document.getElementById('ageCurrent');
+
+    if (turningEl) turningEl.textContent = String(turningAge);
+    if (currentEl) currentEl.textContent = lowerAge + ' or ' + turningAge;
+  }
+
+  monthEl.addEventListener('change', calcExactAge);
+  dayEl.addEventListener('input', calcExactAge);
+
+  updateCards();
+  calcExactAge();
+</script>
