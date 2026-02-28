@@ -2,11 +2,11 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import AdUnit from '../../components/AdUnit.astro';
 import { getAllNumberWordsPages } from '../../data/number-to-words';
-import '../../styles/calculator.css';
+import '../../styles/category.css';
 
 const allPages = getAllNumberWordsPages();
-const numbersUpTo100 = allPages.filter((p) => p.number <= 100);
-const numbersAbove100 = allPages.filter((p) => p.number > 100);
+const smallPages = allPages.filter(p => p.number <= 100);
+const largePages = allPages.filter(p => p.number > 100);
 
 const fmt = (n: number) => n.toLocaleString('en-US');
 
@@ -22,72 +22,103 @@ const structuredData = {
 ---
 
 <BaseLayout
-  title="Numbers in Words - How to Write Numbers in English | ToolCalcs"
-  description={`How to write numbers in English words. Browse ${allPages.length} numbers with their word form, ordinal, and place value breakdown.`}
+  title="Numbers in Words - Number to English Word Converter | ToolCalcs"
+  description={`Convert any number to English words. Browse our complete guide from 1 to 1 billion with words, ordinals, and number facts.`}
   structuredData={structuredData}
 >
   <nav class="breadcrumb">
-    <a href="/">Home</a> &rsaquo; <a href="/math-calculators/">Math Calculators</a> &rsaquo; <span>Numbers in Words</span>
+    <a href="/">Home</a> &rsaquo;
+    <a href="/math-calculators/">Math Calculators</a> &rsaquo;
+    <span>Numbers in Words</span>
   </nav>
 
   <h1>Numbers in Words</h1>
-  <p class="page-desc">How to write numbers from 1 to 1 billion in English. Click any number for detailed word form, ordinal, and place value information.</p>
+  <p class="page-desc">Convert any number to English words. Browse our complete guide from 1 to 1 billion with words, ordinals, and number facts.</p>
 
-  <AdUnit slot="numwords-idx-top" format="horizontal" />
+  <AdUnit slot="words-idx-top" format="horizontal" />
 
-  <h2 class="section-heading">Numbers 1–100 in Words</h2>
-  <div class="calculator-box">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Number</th>
-          <th>In Words</th>
-          <th>Ordinal</th>
-        </tr>
-      </thead>
-      <tbody>
-        {numbersUpTo100.map((p) => (
-          <tr>
-            <td><a href={`/number-to-words/${p.slug}/`}>{fmt(p.number)}</a></td>
-            <td>{p.words}</td>
-            <td>{p.ordinalSuffix}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
+  <section class="words-section">
+    <h2 class="words-heading">Numbers 1-100</h2>
+    <div class="category-grid">
+      {smallPages.map((p) => (
+        <a href={`/number-to-words/${p.slug}/`} class="category-card">
+          <span class="card-number">{fmt(p.number)}</span>
+          <span class="card-words">{p.words}</span>
+        </a>
+      ))}
+    </div>
+  </section>
 
-  <AdUnit slot="numwords-idx-mid" format="rectangle" />
+  <AdUnit slot="words-idx-mid" format="rectangle" />
 
-  <h2 class="section-heading">Larger Numbers in Words</h2>
-  <div class="calculator-box">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Number</th>
-          <th>In Words</th>
-        </tr>
-      </thead>
-      <tbody>
-        {numbersAbove100.map((p) => (
-          <tr>
-            <td><a href={`/number-to-words/${p.slug}/`}>{fmt(p.number)}</a></td>
-            <td>{p.words}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
+  <section class="words-section">
+    <h2 class="words-heading">Larger Numbers</h2>
+    <div class="category-grid">
+      {largePages.map((p) => (
+        <a href={`/number-to-words/${p.slug}/`} class="category-card">
+          <span class="card-number">{fmt(p.number)}</span>
+          <span class="card-words">{p.words}</span>
+        </a>
+      ))}
+    </div>
+  </section>
 
-  <AdUnit slot="numwords-idx-bottom" format="horizontal" />
+  <AdUnit slot="words-idx-bottom" format="horizontal" />
 </BaseLayout>
 
 <style>
-  .section-heading {
-    font-size: 1.2rem;
-    margin: 32px 0 12px;
+  .words-section {
+    margin-bottom: 32px;
   }
-  .section-heading:first-of-type {
-    margin-top: 0;
+  .words-heading {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--color-border);
+    color: var(--color-text);
+  }
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+  }
+  .category-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 14px 10px;
+    background: var(--color-bg-alt, var(--color-surface));
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--color-text);
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .category-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+    text-decoration: none;
+  }
+  .card-number {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--color-primary);
+  }
+  .card-words {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  @media (max-width: 640px) {
+    .category-grid {
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    }
+    .card-number {
+      font-size: 1.1rem;
+    }
   }
 </style>

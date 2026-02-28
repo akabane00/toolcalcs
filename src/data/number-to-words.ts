@@ -1,15 +1,15 @@
 // ==========================================================================
 //  Number to Words Data for Programmatic SEO Pages
-//  Generates ~120 pages at /number-to-words/{number}/
+//  Generates ~136 pages at /number-to-words/{number}/
 // ==========================================================================
 
 export interface NumberWordsPage {
   number: number;
-  slug: string;
-  words: string;
-  capitalizedWords: string;
-  ordinal: string;
-  ordinalSuffix: string;
+  slug: string;              // "100"
+  words: string;             // "one hundred"
+  capitalizedWords: string;  // "One hundred"
+  ordinal: string;           // "one hundredth"
+  ordinalSuffix: string;     // "100th"
   digitCount: number;
   isEven: boolean;
   isPrime: boolean;
@@ -85,7 +85,7 @@ const ordinalTens: Record<string, string> = {
   'eighty': 'eightieth', 'ninety': 'ninetieth',
 };
 
-export function numberToOrdinalWords(n: number): string {
+export function numberToOrdinal(n: number): string {
   if (n === 0) return 'zeroth';
   const words = numberToWords(n);
 
@@ -126,7 +126,7 @@ export function numberToOrdinalWords(n: number): string {
 
 // --- Ordinal Suffix ---
 
-export function ordinalSuffix(n: number): string {
+export function getOrdinalSuffix(n: number): string {
   const j = n % 10;
   const k = n % 100;
   if (j === 1 && k !== 11) return n.toLocaleString('en-US') + 'st';
@@ -137,7 +137,7 @@ export function ordinalSuffix(n: number): string {
 
 // --- Primality ---
 
-function isPrime(n: number): boolean {
+export function isPrime(n: number): boolean {
   if (n < 2) return false;
   if (n < 4) return true;
   if (n % 2 === 0 || n % 3 === 0) return false;
@@ -160,9 +160,9 @@ const targetNumbers: number[] = [
   ...Array.from({ length: 100 }, (_, i) => i + 1),
   // Notable numbers above 100
   101, 111, 150, 200, 300, 400, 500, 600, 700, 800, 900,
-  1000, 1001, 1100, 1500, 2000, 3000, 4000, 5000,
-  6000, 7000, 8000, 9000, 10000,
-  50000, 100000, 500000,
+  1000, 1001, 1100, 1500, 2000, 2500, 3000, 4000, 5000,
+  6000, 7000, 8000, 9000, 10000, 15000, 20000, 25000,
+  50000, 100000, 250000, 500000,
   1000000, 10000000, 100000000,
   1000000000,
 ];
@@ -177,11 +177,15 @@ export function getAllNumberWordsPages(): NumberWordsPage[] {
       slug: String(n),
       words,
       capitalizedWords: capitalize(words),
-      ordinal: numberToOrdinalWords(n),
-      ordinalSuffix: ordinalSuffix(n),
+      ordinal: numberToOrdinal(n),
+      ordinalSuffix: getOrdinalSuffix(n),
       digitCount: String(n).length,
       isEven: n % 2 === 0,
       isPrime: isPrime(n),
     };
   });
+}
+
+export function getNumberWordsBySlug(slug: string): NumberWordsPage | undefined {
+  return getAllNumberWordsPages().find(p => p.slug === slug);
 }

@@ -2,7 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import AdUnit from '../../components/AdUnit.astro';
 import '../../styles/calculator.css';
-import { getAllRomanNumeralPages, romanSymbols, intToRoman, type RomanNumeralPage } from '../../data/roman-numerals';
+import { getAllRomanNumeralPages, intToRoman, romanToInt, type RomanNumeralPage } from '../../data/roman-numerals';
 
 export function getStaticPaths() {
   return getAllRomanNumeralPages().map((page) => ({
@@ -15,27 +15,38 @@ const { page } = Astro.props as { page: RomanNumeralPage };
 const { number, roman, breakdown } = page;
 
 const allPages = getAllRomanNumeralPages();
-
-// Nearby numbers for table
-const nearbyRange = number <= 100
-  ? allPages.filter((p) => Math.abs(p.number - number) <= 5 && p.number !== number)
-  : allPages.filter((p) => Math.abs(p.number - number) <= 3 && p.number !== number);
-
-// Related links
-const relatedPages = allPages
-  .filter((p) => p.number !== number && Math.abs(p.number - number) > 0 && Math.abs(p.number - number) <= 10)
-  .slice(0, 8);
-
-// Build the breakdown string: "1000 + 1000 + 10 + 10 + 4 = M + M + X + X + IV"
-const valueStr = breakdown.map((b) => b.value.toLocaleString('en-US')).join(' + ');
-const symbolStr = breakdown.map((b) => b.symbol).join(' + ');
-
-const isYear = number >= 1900;
 const fmt = (n: number) => n.toLocaleString('en-US');
 
+// Nearby numbers +/-5 range
+const nearbyPages = allPages
+  .filter((p) => p.number !== number && Math.abs(p.number - number) <= 5)
+  .sort((a, b) => a.number - b.number);
+
+// Related links +/-5
+const relatedPages = allPages
+  .filter((p) => p.number !== number && Math.abs(p.number - number) <= 5)
+  .sort((a, b) => a.number - b.number);
+
+// Category label
+function getCategory(n: number): string {
+  if (n >= 1 && n <= 10) return '1-10';
+  if (n >= 11 && n <= 100) return '11-100';
+  return 'Year';
+}
+
+// Subtractive notation reference
+const subtractiveNotations = [
+  { symbol: 'IV', value: 4 },
+  { symbol: 'IX', value: 9 },
+  { symbol: 'XL', value: 40 },
+  { symbol: 'XC', value: 90 },
+  { symbol: 'CD', value: 400 },
+  { symbol: 'CM', value: 900 },
+];
+
 // SEO
-const title = `${fmt(number)} in Roman Numerals - ${roman} | ToolCalcs`;
-const description = `${fmt(number)} in Roman numerals is ${roman}. See the step-by-step breakdown, learn how Roman numerals work, and convert any number with our free tool.`;
+const title = `${number} in Roman Numerals - ${roman} | ToolCalcs`;
+const description = `${number} in Roman numerals is ${roman}. Learn the step-by-step conversion, rules, and practice with our interactive Roman numeral converter.`;
 
 const structuredData = [
   {
@@ -44,7 +55,7 @@ const structuredData = [
     "itemListElement": [
       { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
       { "@type": "ListItem", "position": 2, "name": "Math Calculators", "item": "https://toolcalcs.com/math-calculators/" },
-      { "@type": "ListItem", "position": 3, "name": `${fmt(number)} in Roman Numerals` },
+      { "@type": "ListItem", "position": 3, "name": `${number} in Roman Numerals` },
     ],
   },
   {
@@ -53,10 +64,10 @@ const structuredData = [
     "mainEntity": [
       {
         "@type": "Question",
-        "name": `What is ${fmt(number)} in Roman numerals?`,
+        "name": `What is ${number} in Roman numerals?`,
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": `${fmt(number)} in Roman numerals is ${roman}.`,
+          "text": `${number} in Roman numerals is ${roman}.`,
         },
       },
       {
@@ -64,15 +75,15 @@ const structuredData = [
         "name": `How do you write ${roman} in numbers?`,
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": `${roman} in numbers is ${fmt(number)}. Breakdown: ${symbolStr} = ${valueStr} = ${fmt(number)}.`,
+          "text": `The Roman numeral ${roman} represents the number ${number}.`,
         },
       },
       {
         "@type": "Question",
-        "name": `How do you break down ${fmt(number)} into Roman numerals?`,
+        "name": `How to convert numbers to Roman numerals?`,
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": `${fmt(number)} = ${valueStr} = ${symbolStr} = ${roman}.`,
+          "text": `To convert a number to Roman numerals, use the greedy algorithm: starting from the largest Roman numeral value (M=1000), repeatedly subtract the largest possible value and append the corresponding symbol. Continue with CM=900, D=500, CD=400, C=100, XC=90, L=50, XL=40, X=10, IX=9, V=5, IV=4, I=1 until the number reaches zero.`,
         },
       },
     ],
@@ -84,65 +95,62 @@ const structuredData = [
   <nav class="breadcrumb">
     <a href="/">Home</a> &rsaquo;
     <a href="/math-calculators/">Math Calculators</a> &rsaquo;
-    <span>{fmt(number)} in Roman Numerals</span>
+    <span>{number} in Roman Numerals</span>
   </nav>
 
-  <h1>{fmt(number)} in Roman Numerals</h1>
-  <p class="page-desc">Learn how to write {fmt(number)} as a Roman numeral with step-by-step breakdown.</p>
+  <h1>{number} in Roman Numerals</h1>
+  <p class="page-desc">Learn how to convert {number} to Roman numerals step by step.</p>
 
-  <!-- Quick Answer -->
+  <!-- Quick Fact -->
   <div class="quick-fact">
-    <span class="quick-fact-label">Answer:</span>
-    <strong>{fmt(number)} = {roman}</strong>
+    <span class="quick-fact-label">Quick Fact:</span>
+    <strong>{number} in Roman numerals is {roman}</strong>
+  </div>
+
+  <!-- Result Cards -->
+  <div class="result-cards">
+    <div class="result-card primary">
+      <span class="result-label">Roman Numeral</span>
+      <span class="result-value roman-large">{roman}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Arabic Number</span>
+      <span class="result-value">{fmt(number)}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Number of Symbols</span>
+      <span class="result-value">{roman.length}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Category</span>
+      <span class="result-value">{getCategory(number)}</span>
+    </div>
   </div>
 
   <!-- Step-by-Step Breakdown -->
   <div class="calculator-box">
-    <h2 class="calc-section-title">Step-by-Step Breakdown</h2>
+    <h2 class="calc-section-title">Step-by-Step Conversion</h2>
     <div class="step-list">
-      <div class="step">
-        <span class="step-num">1</span>
-        <div class="step-content">
-          <p class="step-label">Break down into place values</p>
-          <div class="formula-box"><code>{fmt(number)} = {valueStr}</code></div>
+      {breakdown.map((b, i) => (
+        <div class="step">
+          <span class="step-num">{i + 1}</span>
+          <div class="step-content">
+            <p class="step-label">{fmt(b.value)} = {b.symbol}</p>
+          </div>
         </div>
-      </div>
+      ))}
       <div class="step">
-        <span class="step-num">2</span>
+        <span class="step-num result-step">&rarr;</span>
         <div class="step-content">
-          <p class="step-label">Convert each component to Roman numerals</p>
-          <div class="formula-box"><code>{valueStr} = {symbolStr}</code></div>
-        </div>
-      </div>
-      <div class="step">
-        <span class="step-num">3</span>
-        <div class="step-content">
-          <p class="step-label">Combine to get the final result</p>
-          <div class="formula-box"><code>{symbolStr} = {roman}</code></div>
+          <p class="step-label step-result">Result: <strong>{roman}</strong></p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Interactive Converter -->
-  <h2 class="section-heading">Roman Numeral Converter</h2>
-  <div class="calculator-box">
-    <div class="converter-row">
-      <div class="input-group">
-        <label for="numInput">Number (1–3999)</label>
-        <input type="number" id="numInput" value={number} min="1" max="3999" />
-      </div>
-      <span class="converter-eq">=</span>
-      <div class="input-group">
-        <label for="romanOutput">Roman Numeral</label>
-        <input type="text" id="romanOutput" value={roman} readonly />
-      </div>
-    </div>
-  </div>
-
-  <!-- Symbol Reference Table -->
-  <h2 class="section-heading">Roman Numeral Symbols</h2>
-  <div class="calculator-box">
+  <!-- Roman Numeral Reference Table -->
+  <h2 class="section-heading">Roman Numeral Reference Table</h2>
+  <div class="table-container">
     <table class="data-table">
       <thead>
         <tr>
@@ -151,20 +159,64 @@ const structuredData = [
         </tr>
       </thead>
       <tbody>
-        {romanSymbols.map((s) => (
-          <tr class={breakdown.some((b) => b.symbol === s.symbol) ? 'highlight-row' : ''}>
+        <tr><td><strong>I</strong></td><td>1</td></tr>
+        <tr><td><strong>V</strong></td><td>5</td></tr>
+        <tr><td><strong>X</strong></td><td>10</td></tr>
+        <tr><td><strong>L</strong></td><td>50</td></tr>
+        <tr><td><strong>C</strong></td><td>100</td></tr>
+        <tr><td><strong>D</strong></td><td>500</td></tr>
+        <tr><td><strong>M</strong></td><td>1,000</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 class="section-heading">Subtractive Notation</h2>
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Symbol</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        {subtractiveNotations.map((s) => (
+          <tr>
             <td><strong>{s.symbol}</strong></td>
-            <td>{s.value.toLocaleString('en-US')}</td>
+            <td>{fmt(s.value)}</td>
           </tr>
         ))}
       </tbody>
     </table>
   </div>
 
-  <!-- Nearby Numbers -->
-  {nearbyRange.length > 0 && (
+  <!-- Interactive Converter -->
+  <h2 class="section-heading">Interactive Converter</h2>
+  <div class="calculator-box">
+    <div class="converter-row">
+      <div class="converter-col">
+        <div class="input-group">
+          <label for="numInput">Number (1-3999)</label>
+          <input type="number" id="numInput" value={number} min="1" max="3999" />
+        </div>
+        <button class="calc-btn" id="numToRomanBtn">Convert to Roman</button>
+        <div id="numToRomanResult" class="converter-result"></div>
+      </div>
+      <div class="converter-col">
+        <div class="input-group">
+          <label for="romanInput">Roman Numeral</label>
+          <input type="text" id="romanInput" value={roman} pattern="[MmDdCcLlXxVvIi]+" />
+        </div>
+        <button class="calc-btn" id="romanToNumBtn">Convert to Number</button>
+        <div id="romanToNumResult" class="converter-result"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nearby Numbers Table -->
+  {nearbyPages.length > 0 && (
     <h2 class="section-heading">Nearby Numbers</h2>
-    <div class="calculator-box">
+    <div class="table-container">
       <table class="data-table">
         <thead>
           <tr>
@@ -173,8 +225,8 @@ const structuredData = [
           </tr>
         </thead>
         <tbody>
-          {nearbyRange.map((p) => (
-            <tr class={p.number === number ? 'highlight-row' : ''}>
+          {nearbyPages.map((p) => (
+            <tr>
               <td><a href={`/roman-numerals/${p.slug}/`}>{fmt(p.number)}</a></td>
               <td>{p.roman}</td>
             </tr>
@@ -186,55 +238,59 @@ const structuredData = [
 
   <AdUnit slot="roman-mid" format="rectangle" />
 
-  <!-- Content Section -->
+  <!-- SEO Content -->
   <article class="content-section">
-    <h2>How to Convert {fmt(number)} to Roman Numerals</h2>
+    <h2>How to Convert {number} to Roman Numerals</h2>
     <p>
-      To convert {fmt(number)} to Roman numerals, we break the number into its component values and replace each with the corresponding Roman numeral symbol. Starting from the largest possible value, we repeatedly subtract and write the matching symbol until we reach zero.
+      Converting {number} to Roman numerals involves breaking the number down into components that correspond to standard Roman numeral values, starting from the largest value possible. The process uses a greedy algorithm: at each step, subtract the largest Roman numeral value that fits and write down the corresponding symbol.
     </p>
     <p>
-      For {fmt(number)}, the breakdown is: {valueStr}. Each value maps to a Roman numeral symbol: {breakdown.map((b) => `${b.value.toLocaleString('en-US')} = ${b.symbol}`).join(', ')}. Combining these gives us <strong>{roman}</strong>.
+      For {number}, the breakdown is: {breakdown.map((b) => `${fmt(b.value)} (${b.symbol})`).join(' + ')}. Combining these symbols in order gives us <strong>{roman}</strong>. This method works for any number from 1 to 3,999.
     </p>
 
     <h2>Roman Numeral Rules</h2>
     <p>
-      Roman numerals use seven basic symbols: I (1), V (5), X (10), L (50), C (100), D (500), and M (1,000). Numbers are generally written from largest to smallest, left to right, and the values are added together. For example, XII = 10 + 1 + 1 = 12.
+      Roman numerals are built from seven base symbols: I (1), V (5), X (10), L (50), C (100), D (500), and M (1,000). The core rules are:
     </p>
+    <ul>
+      <li><strong>Addition principle:</strong> When a smaller or equal symbol appears after a larger one, add its value. For example, VII = 5 + 1 + 1 = 7.</li>
+      <li><strong>Subtraction principle:</strong> When a smaller symbol appears before a larger one, subtract the smaller value. For example, IV = 5 - 1 = 4, and IX = 10 - 1 = 9.</li>
+      <li><strong>Maximum three repetitions:</strong> A symbol can be repeated up to three consecutive times (e.g., III = 3), but never four. Instead, use subtractive notation (IV for 4, not IIII).</li>
+    </ul>
     <p>
-      The subtractive notation is used to avoid four repeating symbols. Instead of writing IIII for 4, we write IV (5 − 1). This rule applies to six combinations: IV (4), IX (9), XL (40), XC (90), CD (400), and CM (900). A smaller symbol before a larger one means subtraction, not addition.
-    </p>
-    <p>
-      Roman numerals can represent numbers from 1 to 3,999 using the standard symbols. Numbers beyond 3,999 historically used a vinculum (overline) to multiply a symbol by 1,000, but this is rarely used in modern contexts.
+      The six subtractive combinations are: IV (4), IX (9), XL (40), XC (90), CD (400), and CM (900). Only I, X, and C can be used subtractively, and only before the next two higher values.
     </p>
 
-    <h2>Where Roman Numerals Are Used Today</h2>
+    <h2>Modern Uses of Roman Numerals</h2>
     <p>
-      Despite being thousands of years old, Roman numerals remain widely used in modern life. They appear on clock and watch faces, in movie and television copyright notices (e.g., MMXXIV for 2024), for Super Bowl numbering (e.g., Super Bowl LVIII), in book chapter and outline numbering, on building cornerstones, and for monarchs and popes (e.g., Queen Elizabeth II, Pope Francis I).
+      Roman numerals are still used extensively in modern contexts despite being thousands of years old:
     </p>
-    {isYear && (
-      <p>
-        The year {fmt(number)} is written as {roman} in Roman numerals. This is particularly relevant for film credits, tattoo designs, and formal inscriptions where the year is traditionally expressed in Roman numeral form.
-      </p>
-    )}
+    <ul>
+      <li><strong>Clocks and watches:</strong> Traditional clock faces use Roman numerals (I through XII) to mark the hours.</li>
+      <li><strong>Movie and TV titles:</strong> Film sequels and copyright dates in credits often appear in Roman numerals (e.g., MMXXVI for 2026).</li>
+      <li><strong>Super Bowl numbering:</strong> The NFL uses Roman numerals to designate each Super Bowl (e.g., Super Bowl LX).</li>
+      <li><strong>Outlines and numbering:</strong> Academic papers, legal documents, and book chapters frequently use Roman numerals for hierarchical numbering.</li>
+      <li><strong>Monarchs and popes:</strong> Royal and papal names use Roman numerals to distinguish rulers with the same name (e.g., Henry VIII, Pope John XXIII).</li>
+    </ul>
 
     <h2>Frequently Asked Questions</h2>
 
-    <h3>What is {fmt(number)} in Roman numerals?</h3>
+    <h3>What is {number} in Roman numerals?</h3>
     <p>
-      {fmt(number)} in Roman numerals is <strong>{roman}</strong>. This is derived by breaking {fmt(number)} into {valueStr} and converting each part to the corresponding Roman numeral symbols.
+      {number} in Roman numerals is <strong>{roman}</strong>. This is obtained by breaking {number} into its component values ({breakdown.map((b) => fmt(b.value)).join(' + ')}) and converting each to the corresponding Roman numeral symbol ({breakdown.map((b) => b.symbol).join(' + ')}).
     </p>
 
     <h3>How do you write {roman} in numbers?</h3>
     <p>
-      {roman} in standard numbers (Arabic numerals) is {fmt(number)}. To convert, read the Roman numeral from left to right: {symbolStr} = {valueStr} = {fmt(number)}.
+      The Roman numeral {roman} represents the number <strong>{fmt(number)}</strong>. To convert Roman numerals to a number, read the symbols from left to right. If a smaller value precedes a larger one, subtract it; otherwise, add it. Adding up all values in {roman} gives {fmt(number)}.
     </p>
 
-    <h3>How do you break down {fmt(number)} into Roman numerals?</h3>
+    <h3>How to convert numbers to Roman numerals?</h3>
     <p>
-      Break {fmt(number)} into components that match Roman numeral values: {fmt(number)} = {valueStr}. Then replace each value with its symbol: {symbolStr}. Written together: <strong>{roman}</strong>.
+      Use the greedy algorithm: start with the largest Roman numeral value (M = 1,000) and check if it fits into the remaining number. If it does, write the symbol and subtract the value. Continue with the next largest value (CM = 900, D = 500, CD = 400, etc.) until the remaining number reaches zero. This approach produces the correct Roman numeral representation for any number from 1 to 3,999.
     </p>
 
-    <h2>Related Roman Numerals</h2>
+    <h2>Related Numbers</h2>
     <ul>
       {relatedPages.map((p) => (
         <li>
@@ -265,8 +321,12 @@ const structuredData = [
   }
   .quick-fact strong {
     color: var(--color-primary);
-    font-size: 1.5rem;
-    letter-spacing: 0.02em;
+    font-size: 1.15rem;
+  }
+
+  .roman-large {
+    font-size: 1.8rem;
+    letter-spacing: 0.04em;
   }
 
   .calc-section-title {
@@ -283,11 +343,11 @@ const structuredData = [
   .step-list {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
   }
   .step {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 12px;
   }
   .step-num {
@@ -302,83 +362,119 @@ const structuredData = [
     font-weight: 700;
     font-size: 0.9rem;
     flex-shrink: 0;
-    margin-top: 2px;
+  }
+  .step-num.result-step {
+    background: var(--color-success, #16a34a);
   }
   .step-content {
     flex: 1;
   }
   .step-label {
-    font-weight: 600;
-    margin-bottom: 6px;
+    font-weight: 500;
     font-size: 0.95rem;
-  }
-  .step .formula-box {
     margin: 0;
-    padding: 10px 16px;
-    font-size: 1.05rem;
-    text-align: left;
+  }
+  .step-result {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-primary);
   }
 
   .converter-row {
     display: flex;
-    align-items: end;
-    gap: 14px;
+    gap: 24px;
     flex-wrap: wrap;
   }
-  .converter-row .input-group {
+  .converter-col {
     flex: 1;
-    min-width: 120px;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
-  .converter-eq {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: var(--color-text-muted);
-    padding-bottom: 10px;
-    flex-shrink: 0;
-  }
-
-  .highlight-row {
-    background: #eff6ff;
+  .converter-result {
+    padding: 10px 14px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-weight: 600;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
   }
 
   @media (max-width: 640px) {
     .converter-row {
       flex-direction: column;
-      align-items: stretch;
     }
-    .converter-eq {
-      text-align: center;
-      padding-bottom: 0;
+    .roman-large {
+      font-size: 1.5rem;
     }
   }
 </style>
 
 <script>
-  var numInput = document.getElementById('numInput') as HTMLInputElement;
-  var romanOutput = document.getElementById('romanOutput') as HTMLInputElement;
-
-  var vals = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1];
-  var syms = ['M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I'];
-
-  function toRoman(n: number): string {
+  function intToRoman(num) {
+    var vals = [1000,900,500,400,100,90,50,40,10,9,5,4,1];
+    var syms = ['M','CM','D','CD','C','XC','L','XL','X','IX','V','IV','I'];
     var result = '';
     for (var i = 0; i < vals.length; i++) {
-      while (n >= vals[i]) {
-        result += syms[i];
-        n -= vals[i];
-      }
+      while (num >= vals[i]) { result += syms[i]; num -= vals[i]; }
     }
     return result;
   }
 
-  function updateConverter() {
-    var num = parseInt(numInput.value, 10);
-    if (isNaN(num) || num < 1 || num > 3999) {
-      romanOutput.value = num < 1 ? '' : 'Max 3999';
-      return;
+  function romanToInt(s) {
+    var map = {I:1,V:5,X:10,L:50,C:100,D:500,M:1000};
+    var result = 0;
+    for (var i = 0; i < s.length; i++) {
+      var cur = map[s[i].toUpperCase()] || 0;
+      var next = map[s[i+1]?.toUpperCase()] || 0;
+      result += (cur < next) ? -cur : cur;
     }
-    romanOutput.value = toRoman(num);
+    return result;
   }
 
-  numInput.addEventListener('input', updateConverter);
+  var numInput = document.getElementById('numInput');
+  var numToRomanBtn = document.getElementById('numToRomanBtn');
+  var numToRomanResult = document.getElementById('numToRomanResult');
+  var romanInput = document.getElementById('romanInput');
+  var romanToNumBtn = document.getElementById('romanToNumBtn');
+  var romanToNumResult = document.getElementById('romanToNumResult');
+
+  function convertNumToRoman() {
+    var num = parseInt(numInput.value, 10);
+    if (isNaN(num) || num < 1 || num > 3999) {
+      numToRomanResult.textContent = 'Enter a number between 1 and 3,999.';
+      return;
+    }
+    numToRomanResult.textContent = intToRoman(num);
+  }
+
+  function convertRomanToNum() {
+    var val = romanInput.value.trim().toUpperCase();
+    if (!val || !/^[MDCLXVI]+$/.test(val)) {
+      romanToNumResult.textContent = 'Enter valid Roman numeral characters (I, V, X, L, C, D, M).';
+      return;
+    }
+    var num = romanToInt(val);
+    if (num < 1 || num > 3999) {
+      romanToNumResult.textContent = 'Result out of range (1-3,999).';
+      return;
+    }
+    romanToNumResult.textContent = num.toLocaleString('en-US');
+  }
+
+  numToRomanBtn.addEventListener('click', convertNumToRoman);
+  numInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') convertNumToRoman();
+  });
+
+  romanToNumBtn.addEventListener('click', convertRomanToNum);
+  romanInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') convertRomanToNum();
+  });
+
+  convertNumToRoman();
+  convertRomanToNum();
 </script>

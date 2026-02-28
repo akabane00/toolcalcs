@@ -2,15 +2,19 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import AdUnit from '../../components/AdUnit.astro';
 import { getAllSalaryPages } from '../../data/salary-conversions';
-import '../../styles/calculator.css';
+import '../../styles/category.css';
 
 const allPages = getAllSalaryPages();
 const hourlyPages = allPages.filter((p) => p.direction === 'hourly').sort((a, b) => a.hourlyRate - b.hourlyRate);
 const annualPages = allPages.filter((p) => p.direction === 'annual').sort((a, b) => a.annualSalary - b.annualSalary);
 
-function fmtCurrency(n: number): string {
-  if (Number.isInteger(n)) return '$' + n.toLocaleString('en-US');
+function fmt(n: number): string {
   return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function fmtShort(n: number): string {
+  if (n >= 1000) return '$' + (n / 1000).toLocaleString('en-US', { maximumFractionDigits: 0 }) + 'K';
+  return '$' + n.toLocaleString('en-US');
 }
 
 const structuredData = {
@@ -19,84 +23,107 @@ const structuredData = {
   "itemListElement": [
     { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
     { "@type": "ListItem", "position": 2, "name": "Financial Calculators", "item": "https://toolcalcs.com/financial-calculators/" },
-    { "@type": "ListItem", "position": 3, "name": "Salary Conversions" },
+    { "@type": "ListItem", "position": 3, "name": "Salary Calculator" },
   ],
 };
 ---
 
 <BaseLayout
-  title="Hourly to Annual Salary Converter - Wage Calculator | ToolCalcs"
-  description={`Convert hourly wages to annual salaries and vice versa. Browse ${allPages.length} salary conversions with before-tax and after-tax breakdowns.`}
+  title="Salary Calculator - Hourly to Annual Pay Converter | ToolCalcs"
+  description={`Convert hourly wages to annual salary and vice versa. Browse common rates from $7/hr to $100/hr and salaries from $20K to $500K.`}
   structuredData={structuredData}
 >
   <nav class="breadcrumb">
-    <a href="/">Home</a> &rsaquo; <a href="/financial-calculators/">Financial Calculators</a> &rsaquo; <span>Salary Conversions</span>
+    <a href="/">Home</a> &rsaquo;
+    <a href="/financial-calculators/">Financial Calculators</a> &rsaquo;
+    <span>Salary Calculator</span>
   </nav>
 
-  <h1>Salary Conversions</h1>
+  <h1>Salary &amp; Hourly Rate Calculator</h1>
   <p class="page-desc">Convert hourly wages to annual salaries and annual salaries to hourly rates. Browse {allPages.length} conversions with complete pay breakdowns.</p>
 
   <AdUnit slot="salary-idx-top" format="horizontal" />
 
-  <h2 class="section-heading">Hourly Rate to Annual Salary</h2>
-  <div class="calculator-box">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Hourly Rate</th>
-          <th>Annual Salary</th>
-          <th>Monthly</th>
-          <th>Biweekly</th>
-        </tr>
-      </thead>
-      <tbody>
-        {hourlyPages.map((p) => (
-          <tr>
-            <td><a href={`/salary/${p.slug}/`}>{fmtCurrency(p.hourlyRate)}/hr</a></td>
-            <td>{fmtCurrency(p.annualSalary)}</td>
-            <td>{fmtCurrency(p.monthlySalary)}</td>
-            <td>{fmtCurrency(p.biweeklySalary)}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
+  <section class="category-section">
+    <h2 class="category-heading">Hourly Rate Conversions</h2>
+    <div class="category-grid">
+      {hourlyPages.map((p) => (
+        <a href={`/salary/${p.slug}/`} class="category-card">
+          <span class="category-val">${p.hourlyRate}/hr</span>
+          <span class="category-detail">{fmt(p.annualSalary)}/year</span>
+        </a>
+      ))}
+    </div>
+  </section>
 
   <AdUnit slot="salary-idx-mid" format="rectangle" />
 
-  <h2 class="section-heading">Annual Salary to Hourly Rate</h2>
-  <div class="calculator-box">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Annual Salary</th>
-          <th>Hourly Rate</th>
-          <th>Monthly</th>
-          <th>Biweekly</th>
-        </tr>
-      </thead>
-      <tbody>
-        {annualPages.map((p) => (
-          <tr>
-            <td><a href={`/salary/${p.slug}/`}>{fmtCurrency(p.annualSalary)}/yr</a></td>
-            <td>{fmtCurrency(p.hourlyRate)}/hr</td>
-            <td>{fmtCurrency(p.monthlySalary)}</td>
-            <td>{fmtCurrency(p.biweeklySalary)}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
+  <section class="category-section">
+    <h2 class="category-heading">Annual Salary Conversions</h2>
+    <div class="category-grid">
+      {annualPages.map((p) => (
+        <a href={`/salary/${p.slug}/`} class="category-card">
+          <span class="category-val">{fmtShort(p.annualSalary)}/yr</span>
+          <span class="category-detail">{fmt(p.hourlyRate)}/hour</span>
+        </a>
+      ))}
+    </div>
+  </section>
 
   <AdUnit slot="salary-idx-bottom" format="horizontal" />
 </BaseLayout>
 
 <style>
-  .section-heading {
-    font-size: 1.2rem;
-    margin: 32px 0 12px;
+  .category-section {
+    margin-bottom: 32px;
   }
-  .section-heading:first-of-type {
-    margin-top: 0;
+  .category-heading {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--color-border);
+    color: var(--color-text);
+  }
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+  }
+  .category-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 14px 10px;
+    background: var(--color-bg-alt);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--color-text);
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .category-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+  }
+  .category-val {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--color-primary);
+  }
+  .category-detail {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+  }
+
+  @media (max-width: 640px) {
+    .category-grid {
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+    .category-val {
+      font-size: 1rem;
+    }
   }
 </style>

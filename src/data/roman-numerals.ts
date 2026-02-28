@@ -73,6 +73,10 @@ export function getAllRomanNumeralPages(): RomanNumeralPage[] {
   }));
 }
 
+export function getRomanNumeralBySlug(slug: string): RomanNumeralPage | undefined {
+  return getAllRomanNumeralPages().find(p => p.slug === slug);
+}
+
 // Symbol reference table for use in pages
 export const romanSymbols = [
   { symbol: 'I', value: 1 },

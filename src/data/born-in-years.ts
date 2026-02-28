@@ -5,12 +5,14 @@
 
 export interface BornInPage {
   year: number;
-  slug: string;
-  turningAge: number;
-  generation: string;
-  generationYears: string;
-  chineseZodiac: string;
+  slug: string;              // "1990"
+  turningAge: number;        // 2026 - year (hardcode build year as 2026)
+  generation: string;        // "Millennial"
+  generationYears: string;   // "1981-1996"
+  chineseZodiac: string;     // "Horse"
 }
+
+const BUILD_YEAR = 2026;
 
 const generationRanges: { name: string; start: number; end: number }[] = [
   { name: 'Greatest Generation', start: 1901, end: 1927 },
@@ -29,15 +31,16 @@ const chineseZodiacAnimals = [
 
 function getGeneration(year: number): { name: string; years: string } {
   const gen = generationRanges.find((g) => year >= g.start && year <= g.end);
-  return gen ? { name: gen.name, years: `${gen.start}–${gen.end}` } : { name: 'Unknown', years: '' };
+  return gen
+    ? { name: gen.name, years: `${gen.start}-${gen.end}` }
+    : { name: 'Unknown', years: '' };
 }
 
 function getChineseZodiac(year: number): string {
   return chineseZodiacAnimals[year % 12];
 }
 
-export function getAllBornInPages(): BornInPage[] {
-  const buildYear = new Date().getFullYear();
+function buildAllPages(): BornInPage[] {
   const pages: BornInPage[] = [];
 
   for (let year = 1920; year <= 2025; year++) {
@@ -45,7 +48,7 @@ export function getAllBornInPages(): BornInPage[] {
     pages.push({
       year,
       slug: String(year),
-      turningAge: buildYear - year,
+      turningAge: BUILD_YEAR - year,
       generation: gen.name,
       generationYears: gen.years,
       chineseZodiac: getChineseZodiac(year),
@@ -53,4 +56,14 @@ export function getAllBornInPages(): BornInPage[] {
   }
 
   return pages;
+}
+
+export const BORN_IN_PAGES: BornInPage[] = buildAllPages();
+
+export function getAllBornInPages(): BornInPage[] {
+  return BORN_IN_PAGES;
+}
+
+export function getBornInBySlug(slug: string): BornInPage | undefined {
+  return BORN_IN_PAGES.find((p) => p.slug === slug);
 }

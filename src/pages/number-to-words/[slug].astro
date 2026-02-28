@@ -2,7 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import AdUnit from '../../components/AdUnit.astro';
 import '../../styles/calculator.css';
-import { getAllNumberWordsPages, type NumberWordsPage } from '../../data/number-to-words';
+import { getAllNumberWordsPages, numberToWords, numberToOrdinal, type NumberWordsPage } from '../../data/number-to-words';
 
 export function getStaticPaths() {
   return getAllNumberWordsPages().map((page) => ({
@@ -12,45 +12,45 @@ export function getStaticPaths() {
 }
 
 const { page } = Astro.props as { page: NumberWordsPage };
-const { number, words, capitalizedWords, ordinal, ordinalSuffix, digitCount, isEven, isPrime } = page;
+const { number, words, ordinal, ordinalSuffix, digitCount, isEven, isPrime } = page;
+const capitalizedWords = words.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+const capitalizedOrdinal = ordinal.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
 const fmt = (n: number) => n.toLocaleString('en-US');
 const allPages = getAllNumberWordsPages();
 
-// Find nearby pages
-const currentIdx = allPages.findIndex((p) => p.number === number);
-const nearbyPages: NumberWordsPage[] = [];
-if (currentIdx > 0) nearbyPages.push(allPages[currentIdx - 1]);
-if (currentIdx > 1) nearbyPages.push(allPages[currentIdx - 2]);
-if (currentIdx < allPages.length - 1) nearbyPages.push(allPages[currentIdx + 1]);
-if (currentIdx < allPages.length - 2) nearbyPages.push(allPages[currentIdx + 2]);
-nearbyPages.sort((a, b) => a.number - b.number);
-
-// Related pages: same magnitude
-const magnitude = Math.pow(10, Math.floor(Math.log10(number)));
-const relatedPages = allPages
-  .filter((p) => p.number !== number && p.number >= magnitude && p.number < magnitude * 10)
-  .slice(0, 6);
-
-// Place value breakdown
-function getPlaceValues(n: number): { place: string; digit: number; value: number }[] {
-  const placeNames = ['ones', 'tens', 'hundreds', 'thousands', 'ten-thousands', 'hundred-thousands', 'millions', 'ten-millions', 'hundred-millions', 'billions'];
-  const digits = String(n).split('').reverse();
-  return digits.map((d, i) => ({
-    place: placeNames[i] || `10^${i}`,
-    digit: parseInt(d, 10),
-    value: parseInt(d, 10) * Math.pow(10, i),
-  })).reverse().filter((pv) => pv.value > 0 || digits.length === 1);
+// Nearby pages: +/- 5
+const nearbyNumbers: NumberWordsPage[] = [];
+for (let i = -5; i <= 5; i++) {
+  if (i === 0) continue;
+  const p = allPages.find((pg) => pg.number === number + i);
+  if (p) nearbyNumbers.push(p);
 }
 
-const placeValues = getPlaceValues(number);
+// Related pages: +/- 5 for links section
+const relatedPages = nearbyNumbers.slice();
+
+// Place value breakdown
+const placeNames = ['Ones', 'Tens', 'Hundreds', 'Thousands', 'Ten-Thousands', 'Hundred-Thousands', 'Millions', 'Ten-Millions', 'Hundred-Millions', 'Billions'];
+
+function getPlaceValues(n: number): { position: string; digit: number; placeName: string; value: number }[] {
+  if (n === 0) return [{ position: 'Ones', digit: 0, placeName: 'Ones', value: 0 }];
+  const digits = String(n).split('').reverse();
+  return digits.map((d, i) => ({
+    position: placeNames[i] || `10^${i}`,
+    digit: parseInt(d, 10),
+    placeName: placeNames[i] || `10^${i}`,
+    value: parseInt(d, 10) * Math.pow(10, i),
+  })).reverse();
+}
+
+const placeValues = number > 0 ? getPlaceValues(number) : [];
 
 // SEO
 const title = `${fmt(number)} in Words - ${capitalizedWords} | ToolCalcs`;
-const description = `${fmt(number)} in words is "${words}." Learn how to write ${fmt(number)} in English, its ordinal form (${ordinal}), place value, and number facts.`;
+const description = `${fmt(number)} in words is "${words}". The ordinal form is "${ordinal}" (${ordinalSuffix}). Learn to write numbers in English words with our converter.`;
 
 const parityWord = isEven ? 'even' : 'odd';
-const primeWord = isPrime ? 'a prime number' : 'a composite number';
 
 const structuredData = [
   {
@@ -79,15 +79,15 @@ const structuredData = [
         "name": `What is the ordinal form of ${fmt(number)}?`,
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": `The ordinal form of ${fmt(number)} is "${ordinal}" or "${ordinalSuffix}."`,
+          "text": `The ordinal form of ${fmt(number)} is "${ordinal}" (${ordinalSuffix}).`,
         },
       },
       {
         "@type": "Question",
-        "name": `Is ${fmt(number)} an even or odd number?`,
+        "name": `Is ${fmt(number)} even or odd?`,
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": `${fmt(number)} is an ${parityWord} number${number > 1 ? ` and ${primeWord}` : ''}.`,
+          "text": `${fmt(number)} is an ${parityWord} number because it ${isEven ? 'is' : 'is not'} divisible by 2.`,
         },
       },
     ],
@@ -103,75 +103,61 @@ const structuredData = [
   </nav>
 
   <h1>{fmt(number)} in Words</h1>
-  <p class="page-desc">How to write {fmt(number)} in English words, ordinal form, and place value.</p>
+  <p class="page-desc">Learn how to write {fmt(number)} in English words.</p>
 
-  <!-- Quick Answer -->
+  <!-- Quick Fact -->
   <div class="quick-fact">
-    <span class="quick-fact-label">In Words:</span>
-    <strong>"{words}"</strong>
+    <span class="quick-fact-label">Quick Fact:</span>
+    <strong>{fmt(number)} in words is "{words}"</strong>
   </div>
 
-  <!-- Number Facts Cards -->
-  <div class="calculator-box">
-    <div class="facts-grid">
-      <div class="fact-card primary">
-        <span class="fact-value">"{words}"</span>
-        <span class="fact-label">In Words</span>
-      </div>
-      <div class="fact-card">
-        <span class="fact-value">"{ordinal}"</span>
-        <span class="fact-label">Ordinal Words</span>
-      </div>
-      <div class="fact-card">
-        <span class="fact-value">{ordinalSuffix}</span>
-        <span class="fact-label">Ordinal Number</span>
-      </div>
-      <div class="fact-card">
-        <span class="fact-value">{digitCount}</span>
-        <span class="fact-label">{digitCount === 1 ? 'Digit' : 'Digits'}</span>
-      </div>
-      <div class="fact-card">
-        <span class="fact-value">{isEven ? 'Even' : 'Odd'}</span>
-        <span class="fact-label">Parity</span>
-      </div>
-      {number > 1 && (
-        <div class="fact-card">
-          <span class="fact-value">{isPrime ? 'Prime' : 'Composite'}</span>
-          <span class="fact-label">Primality</span>
-        </div>
-      )}
+  <!-- Result Cards -->
+  <div class="result-cards">
+    <div class="result-card primary">
+      <span class="result-label">In Words</span>
+      <span class="result-value">{capitalizedWords}</span>
     </div>
-  </div>
-
-  <!-- Interactive Converter -->
-  <h2 class="section-heading">Number to Words Converter</h2>
-  <div class="calculator-box">
-    <div class="converter-row">
-      <div class="input-group">
-        <label for="numInput">Enter a Number</label>
-        <input type="number" id="numInput" value={number} min="0" max="999999999999" />
-      </div>
+    <div class="result-card">
+      <span class="result-label">Ordinal</span>
+      <span class="result-value">{capitalizedOrdinal}</span>
     </div>
-    <div class="converter-result" id="wordsResult">{words}</div>
+    <div class="result-card">
+      <span class="result-label">Ordinal Number</span>
+      <span class="result-value">{ordinalSuffix}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Digits</span>
+      <span class="result-value">{digitCount}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Even/Odd</span>
+      <span class="result-value">{isEven ? 'Even' : 'Odd'}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Prime/Composite</span>
+      <span class="result-value">{isPrime ? 'Prime' : number === 1 ? 'Neither' : 'Composite'}</span>
+    </div>
   </div>
 
   <!-- Place Value Breakdown -->
-  {placeValues.length > 1 && (
+  {number > 0 && placeValues.length > 1 && (
     <h2 class="section-heading">Place Value Breakdown</h2>
     <div class="calculator-box">
       <table class="data-table">
         <thead>
           <tr>
-            <th>Place</th>
+            <th>Position</th>
             <th>Digit</th>
+            <th>Place Value</th>
             <th>Value</th>
           </tr>
         </thead>
         <tbody>
           {placeValues.map((pv) => (
             <tr>
-              <td>{pv.place}</td>
+              <td>{pv.position}</td>
               <td>{pv.digit}</td>
+              <td>{pv.placeName}</td>
               <td>{fmt(pv.value)}</td>
             </tr>
           ))}
@@ -180,24 +166,36 @@ const structuredData = [
     </div>
   )}
 
-  <!-- Nearby Numbers -->
-  {nearbyPages.length > 0 && (
-    <h2 class="section-heading">Nearby Numbers</h2>
-    <div class="calculator-box">
+  <!-- Interactive Converter -->
+  <h2 class="section-heading">Number to Words Converter</h2>
+  <div class="calculator-box">
+    <p class="calc-desc">Enter any number (up to billions) to convert it to English words.</p>
+    <div class="finder-row">
+      <div class="input-group">
+        <label for="convertInput">Number</label>
+        <input type="number" id="convertInput" value={number} min="0" max="999999999999" />
+      </div>
+      <button class="calc-btn" id="convertBtn">Convert to Words</button>
+    </div>
+    <div id="convertResult" class="finder-result"></div>
+  </div>
+
+  <!-- Nearby Numbers Table -->
+  {nearbyNumbers.length > 0 && (
+    <h2 class="section-heading">Nearby Numbers in Words</h2>
+    <div class="table-container">
       <table class="data-table">
         <thead>
           <tr>
             <th>Number</th>
             <th>In Words</th>
-            <th>Ordinal</th>
           </tr>
         </thead>
         <tbody>
-          {nearbyPages.map((p) => (
+          {nearbyNumbers.map((p) => (
             <tr>
               <td><a href={`/number-to-words/${p.slug}/`}>{fmt(p.number)}</a></td>
               <td>{p.words}</td>
-              <td>{p.ordinalSuffix}</td>
             </tr>
           ))}
         </tbody>
@@ -205,56 +203,49 @@ const structuredData = [
     </div>
   )}
 
-  <AdUnit slot="numwords-mid" format="rectangle" />
+  <AdUnit slot="words-mid" format="rectangle" />
 
-  <!-- Content Section -->
+  <!-- SEO Content -->
   <article class="content-section">
     <h2>How to Write {fmt(number)} in Words</h2>
     <p>
-      The number {fmt(number)} is written in English as "{words}." This is the standard way to spell out {fmt(number)} on checks, legal documents, formal writing, and any context where numbers must be expressed as text rather than digits.
+      The number {fmt(number)} is written in English as "{words}." To write this number, break it down by place value from left to right. {digitCount > 3 ? `Since ${fmt(number)} is a ${digitCount}-digit number, separate each group of three digits and name them according to their place value (ones, thousands, millions, billions).` : `Since ${fmt(number)} is a ${digitCount}-digit number, identify each digit's place value and combine them using standard English number naming conventions.`}
     </p>
     <p>
-      The ordinal form of {fmt(number)} is "{ordinal}," written in numeric shorthand as "{ordinalSuffix}." Ordinal numbers indicate position or order in a sequence, such as first place, second chapter, or {ordinalSuffix} anniversary.
+      The ordinal form of {fmt(number)} is "{ordinal}," written in numeric shorthand as "{ordinalSuffix}." Ordinal numbers indicate position or rank in a sequence and are commonly used for dates, rankings, and floor numbers.
     </p>
 
-    <h2>Number Facts About {fmt(number)}</h2>
+    <h2>Writing Numbers in English</h2>
     <p>
-      {fmt(number)} is a {digitCount}-digit {parityWord} number. {isEven ? `It is even because it is divisible by 2 (${fmt(number)} ÷ 2 = ${fmt(number / 2)}).` : `It is odd because it is not evenly divisible by 2.`}
-      {number > 1 ? ` It is ${primeWord}${isPrime ? ', meaning its only factors are 1 and itself' : ', meaning it has factors other than 1 and itself'}.` : ''}
+      English has specific rules for writing numbers as words. Compound numbers from twenty-one through ninety-nine are always hyphenated (e.g., "twenty-one," "forty-five," "ninety-nine"). In American English, the word "and" is not used between the hundreds and tens places (e.g., "one hundred one," not "one hundred and one"), though British English commonly includes "and."
+    </p>
+    <p>
+      For large numbers, use commas to separate groups of three digits when writing numerals (e.g., 1,000,000) and name each group according to its place value when writing words. The groups from smallest to largest are: ones, thousands, millions, billions, and trillions. Each group follows the same pattern of hundreds, tens, and ones within it.
     </p>
 
-    <h2>When to Write Numbers as Words</h2>
+    <h2>When to Spell Out Numbers</h2>
     <p>
-      There are several situations where writing numbers as words is required or preferred. On checks and financial documents, the amount must be spelled out to prevent alteration. In formal and legal writing, numbers are often written as words for clarity and precision. Many style guides recommend spelling out numbers from one through nine (or one through ninety-nine) and using numerals for larger numbers.
+      There are several important situations where numbers should be written as words rather than digits. On checks and other financial documents, the amount must be spelled out to prevent tampering or misreading. In legal documents, numbers are typically written in both words and digits to avoid ambiguity. Formal writing, including invitations and ceremonial documents, traditionally uses words for numbers.
     </p>
     <p>
-      In academic writing, the APA style recommends spelling out numbers below ten, while the Chicago Manual of Style suggests spelling out numbers below one hundred. Technical and scientific writing generally prefers numerals for precision. When beginning a sentence with a number, always spell it out regardless of size.
+      Most style guides recommend spelling out small numbers (one through nine or one through ninety-nine, depending on the guide) and using numerals for larger numbers. Numbers at the beginning of a sentence should always be spelled out, regardless of their size. In technical and scientific writing, numerals are generally preferred for precision and readability.
     </p>
-
-    <h2>Rules for Writing Numbers in English</h2>
-    <ul>
-      <li>Use a hyphen for compound numbers from twenty-one through ninety-nine.</li>
-      <li>Do not use "and" between hundreds and tens in American English (e.g., "one hundred one," not "one hundred and one").</li>
-      <li>Use commas in numerals to separate groups of three digits (e.g., 1,000,000).</li>
-      <li>Spell out numbers at the beginning of a sentence.</li>
-      <li>Be consistent within a document — if spelling out one number, spell out similar numbers nearby.</li>
-    </ul>
 
     <h2>Frequently Asked Questions</h2>
 
     <h3>How do you write {fmt(number)} in words?</h3>
     <p>
-      {fmt(number)} in words is written as "{words}." This follows standard English number naming conventions where place values are named from largest to smallest.
+      {fmt(number)} in words is written as "{words}." This follows standard English number naming conventions where each group of digits is named by its place value.
     </p>
 
     <h3>What is the ordinal form of {fmt(number)}?</h3>
     <p>
-      The ordinal form of {fmt(number)} is "{ordinal}" (written as {ordinalSuffix}). Ordinal numbers are used to indicate position in a sequence, such as rankings, dates, and addresses.
+      The ordinal form of {fmt(number)} is "{ordinal}" ({ordinalSuffix}). Ordinal numbers indicate position in a sequence, such as rankings, dates, anniversaries, and addresses.
     </p>
 
-    <h3>Is {fmt(number)} {isEven ? 'even' : 'odd'}?</h3>
+    <h3>Is {fmt(number)} even or odd?</h3>
     <p>
-      Yes, {fmt(number)} is an {parityWord} number. {isEven ? `An even number is any integer that is divisible by 2 with no remainder. ${fmt(number)} ÷ 2 = ${fmt(number / 2)}.` : `An odd number is any integer that is not evenly divisible by 2. ${fmt(number)} ÷ 2 = ${(number / 2).toLocaleString('en-US', { maximumFractionDigits: 1 })}.`}
+      {fmt(number)} is an {parityWord} number. {isEven ? `An even number is any integer that is exactly divisible by 2 with no remainder. Since ${fmt(number)} divided by 2 equals ${fmt(number / 2)}, it is even.` : `An odd number is any integer that is not evenly divisible by 2. Since ${fmt(number)} divided by 2 equals ${(number / 2).toLocaleString('en-US', { maximumFractionDigits: 1 })}, it is odd.`}
     </p>
 
     <h2>Related Numbers</h2>
@@ -269,7 +260,7 @@ const structuredData = [
     <p><a href="/number-to-words/">&larr; View All Numbers in Words</a> | <a href="/math-calculators/">Math Calculators</a></p>
   </article>
 
-  <AdUnit slot="numwords-bottom" format="horizontal" />
+  <AdUnit slot="words-bottom" format="horizontal" />
 </BaseLayout>
 
 <style>
@@ -288,7 +279,7 @@ const structuredData = [
   }
   .quick-fact strong {
     color: var(--color-primary);
-    font-size: 1.3rem;
+    font-size: 1.15rem;
   }
 
   .section-heading {
@@ -296,133 +287,126 @@ const structuredData = [
     margin: 32px 0 12px;
   }
 
-  .facts-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-  }
-  .fact-card {
-    background: var(--color-bg);
-    border-radius: var(--radius);
-    padding: 16px 12px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-  }
-  .fact-card.primary {
-    background: #eff6ff;
-    grid-column: 1 / -1;
-  }
-  .fact-value {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--color-text);
-    line-height: 1.3;
-    word-break: break-word;
-  }
-  .fact-card.primary .fact-value {
-    font-size: 1.5rem;
-    color: var(--color-primary);
-  }
-  .fact-label {
-    font-size: 0.78rem;
-    font-weight: 500;
+  .calc-desc {
+    font-size: 0.9rem;
     color: var(--color-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    margin-bottom: 16px;
   }
-
-  .converter-row {
+  .finder-row {
     display: flex;
-    gap: 14px;
+    gap: 16px;
+    align-items: end;
+    flex-wrap: wrap;
   }
-  .converter-row .input-group {
+  .finder-row .input-group {
     flex: 1;
+    min-width: 160px;
   }
-  .converter-result {
-    margin-top: 14px;
-    padding: 14px 18px;
+  .finder-result {
+    margin-top: 16px;
+    padding: 14px 16px;
     background: var(--color-bg);
     border-radius: var(--radius);
-    font-weight: 600;
-    font-size: 1.1rem;
-    min-height: 48px;
-    display: flex;
-    align-items: center;
-    word-break: break-word;
-    line-height: 1.4;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    min-height: 44px;
   }
 
   @media (max-width: 640px) {
-    .facts-grid {
-      grid-template-columns: 1fr 1fr;
-    }
-    .fact-card.primary .fact-value {
-      font-size: 1.2rem;
-    }
-    .fact-value {
-      font-size: 1rem;
+    .finder-row {
+      flex-direction: column;
     }
   }
 </style>
 
 <script>
-  var numInput = document.getElementById('numInput') as HTMLInputElement;
-  var resultEl = document.getElementById('wordsResult') as HTMLDivElement;
+  var convertInput = document.getElementById('convertInput') as HTMLInputElement;
+  var convertBtn = document.getElementById('convertBtn') as HTMLButtonElement;
+  var resultDiv = document.getElementById('convertResult') as HTMLDivElement;
 
-  var onesArr = [
-    '', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine',
-    'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen',
-    'seventeen', 'eighteen', 'nineteen',
-  ];
-  var tensArr = [
-    '', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety',
-  ];
-
-  function toWords(n: number): string {
+  function numberToWords(n: number): string {
     if (n === 0) return 'zero';
-    if (n < 0) return 'negative ' + toWords(-n);
-    var result = '';
-    if (n >= 1000000000) {
-      result += toWords(Math.floor(n / 1000000000)) + ' billion';
-      n %= 1000000000;
-      if (n > 0) result += ' ';
+    var onesArr = ['','one','two','three','four','five','six','seven','eight','nine',
+      'ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];
+    var tensArr = ['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+
+    function convert(num: number): string {
+      if (num < 20) return onesArr[num];
+      if (num < 100) return tensArr[Math.floor(num/10)] + (num%10 ? '-' + onesArr[num%10] : '');
+      if (num < 1000) return onesArr[Math.floor(num/100)] + ' hundred' + (num%100 ? ' ' + convert(num%100) : '');
+      if (num < 1000000) return convert(Math.floor(num/1000)) + ' thousand' + (num%1000 ? ' ' + convert(num%1000) : '');
+      if (num < 1000000000) return convert(Math.floor(num/1000000)) + ' million' + (num%1000000 ? ' ' + convert(num%1000000) : '');
+      return convert(Math.floor(num/1000000000)) + ' billion' + (num%1000000000 ? ' ' + convert(num%1000000000) : '');
     }
-    if (n >= 1000000) {
-      result += toWords(Math.floor(n / 1000000)) + ' million';
-      n %= 1000000;
-      if (n > 0) result += ' ';
-    }
-    if (n >= 1000) {
-      result += toWords(Math.floor(n / 1000)) + ' thousand';
-      n %= 1000;
-      if (n > 0) result += ' ';
-    }
-    if (n >= 100) {
-      result += onesArr[Math.floor(n / 100)] + ' hundred';
-      n %= 100;
-      if (n > 0) result += ' ';
-    }
-    if (n >= 20) {
-      result += tensArr[Math.floor(n / 10)];
-      n %= 10;
-      if (n > 0) result += '-' + onesArr[n];
-    } else if (n > 0) {
-      result += onesArr[n];
-    }
-    return result;
+
+    return n < 0 ? 'negative ' + convert(-n) : convert(n);
   }
 
-  function updateWords() {
-    var num = parseInt(numInput.value, 10);
-    if (isNaN(num) || num < 0 || num > 999999999999) {
-      resultEl.textContent = num < 0 ? 'Enter a positive number' : 'Max: 999,999,999,999';
+  function numberToOrdinalWords(n: number): string {
+    if (n === 0) return 'zeroth';
+    var w = numberToWords(n);
+    var ordOnes: Record<string, string> = {
+      'one': 'first', 'two': 'second', 'three': 'third', 'four': 'fourth',
+      'five': 'fifth', 'six': 'sixth', 'seven': 'seventh', 'eight': 'eighth',
+      'nine': 'ninth', 'ten': 'tenth', 'eleven': 'eleventh', 'twelve': 'twelfth',
+      'thirteen': 'thirteenth', 'fourteen': 'fourteenth', 'fifteen': 'fifteenth',
+      'sixteen': 'sixteenth', 'seventeen': 'seventeenth', 'eighteen': 'eighteenth',
+      'nineteen': 'nineteenth'
+    };
+    var ordTens: Record<string, string> = {
+      'twenty': 'twentieth', 'thirty': 'thirtieth', 'forty': 'fortieth',
+      'fifty': 'fiftieth', 'sixty': 'sixtieth', 'seventy': 'seventieth',
+      'eighty': 'eightieth', 'ninety': 'ninetieth'
+    };
+    var parts = w.split(' ');
+    var lastPart = parts[parts.length - 1];
+    if (lastPart.includes('-')) {
+      var hp = lastPart.split('-');
+      var lw = hp[hp.length - 1];
+      if (ordOnes[lw]) {
+        hp[hp.length - 1] = ordOnes[lw];
+        parts[parts.length - 1] = hp.join('-');
+        return parts.join(' ');
+      }
+    }
+    if (ordOnes[lastPart]) { parts[parts.length - 1] = ordOnes[lastPart]; return parts.join(' '); }
+    if (ordTens[lastPart]) { parts[parts.length - 1] = ordTens[lastPart]; return parts.join(' '); }
+    if (lastPart === 'hundred' || lastPart === 'thousand' || lastPart === 'million' || lastPart === 'billion') {
+      parts[parts.length - 1] = lastPart + 'th';
+      return parts.join(' ');
+    }
+    return w + 'th';
+  }
+
+  function getOrdinalSuffix(n: number): string {
+    var j = n % 10;
+    var k = n % 100;
+    if (j === 1 && k !== 11) return n.toLocaleString('en-US') + 'st';
+    if (j === 2 && k !== 12) return n.toLocaleString('en-US') + 'nd';
+    if (j === 3 && k !== 13) return n.toLocaleString('en-US') + 'rd';
+    return n.toLocaleString('en-US') + 'th';
+  }
+
+  function doConvert() {
+    var n = parseInt(convertInput.value, 10);
+    if (isNaN(n) || n < 0 || n > 999999999999) {
+      resultDiv.textContent = 'Please enter a number between 0 and 999,999,999,999.';
       return;
     }
-    resultEl.textContent = toWords(num);
+    var w = numberToWords(n);
+    var ord = numberToOrdinalWords(n);
+    var ordSuf = getOrdinalSuffix(n);
+
+    var html = '<strong>In Words:</strong> ' + w;
+    html += '<br><strong>Ordinal:</strong> ' + ord;
+    html += '<br><strong>Ordinal Number:</strong> ' + ordSuf;
+    resultDiv.innerHTML = html;
   }
 
-  numInput.addEventListener('input', updateWords);
+  convertBtn.addEventListener('click', doConvert);
+  convertInput.addEventListener('keydown', function(e) {
+    if ((e as KeyboardEvent).key === 'Enter') doConvert();
+  });
+
+  doConvert();
 </script>
