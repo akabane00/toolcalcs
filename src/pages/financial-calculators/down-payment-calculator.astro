@@ -1,0 +1,306 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Financial Calculators", "item": "https://toolcalcs.com/financial-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Down Payment Calculator" },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How much should I put down on a house?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The ideal down payment depends on your financial situation and loan type. Conventional loans typically require 5-20%, with 20% being the threshold to avoid PMI. FHA loans allow as little as 3.5% down. While a larger down payment reduces your monthly payment and total interest, it is important to maintain an emergency fund and not deplete all your savings.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "What is PMI and how can I avoid it?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "PMI (Private Mortgage Insurance) is required by lenders when your down payment is less than 20% of the home price. It typically costs 0.5% to 1.5% of the loan amount annually. You can avoid PMI by putting 20% or more down, using a VA loan (no PMI required), or requesting PMI removal once you reach 20% equity in your home.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "Can I get a mortgage with no down payment?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, certain loan programs offer zero or very low down payment options. VA loans (for veterans and active military) require no down payment. USDA loans for rural properties also offer zero down. FHA loans require just 3.5%, and some conventional programs allow 3% down for first-time buyers. However, lower down payments mean higher monthly payments and more interest over the life of the loan.",
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Down Payment Calculator - Home Savings Planner | ToolCalcs"
+  description="Calculate your home down payment, see if PMI applies, and find out how long it will take to save. Plan your path to homeownership with our free calculator."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/financial-calculators/">Financial Calculators</a> &rsaquo;
+    <span>Down Payment Calculator</span>
+  </nav>
+
+  <h1>Down Payment Calculator</h1>
+  <p class="page-desc">Calculate your down payment amount, check PMI requirements, and see how long it will take to save for your home.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="homePrice">Home Price ($)</label>
+        <input type="number" id="homePrice" value="350000" min="0" step="5000" />
+      </div>
+      <div class="input-group">
+        <label for="downPct">Down Payment (%)</label>
+        <input type="number" id="downPct" value="20" min="0" max="100" step="0.5" />
+      </div>
+      <div class="input-group">
+        <label for="currentSavings">Current Savings ($)</label>
+        <input type="number" id="currentSavings" value="20000" min="0" step="500" />
+      </div>
+      <div class="input-group">
+        <label for="monthlySavings">Monthly Savings ($)</label>
+        <input type="number" id="monthlySavings" value="1500" min="0" step="100" />
+      </div>
+      <div class="input-group">
+        <label for="savingsRate">Annual Return on Savings (%)</label>
+        <input type="number" id="savingsRate" value="4" min="0" max="20" step="0.1" />
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Down Payment Amount</span>
+          <span class="result-value" id="downAmount">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Remaining to Save</span>
+          <span class="result-value" id="remaining">$0</span>
+        </div>
+        <div class="result-card success">
+          <span class="result-label">Months to Goal</span>
+          <span class="result-value" id="monthsToGoal">0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">PMI Required</span>
+          <span class="result-value" id="pmiRequired">No</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Estimated PMI</span>
+          <span class="result-value" id="pmiEstimate">$0/mo</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Loan Amount</span>
+          <span class="result-value" id="loanAmount">$0</span>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="data-table" id="savingsTable">
+          <thead>
+            <tr>
+              <th>Month</th>
+              <th>Savings Added</th>
+              <th>Interest Earned</th>
+              <th>Total Balance</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="downpayment-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>Why Your Down Payment Matters</h2>
+    <p>The down payment is one of the most significant financial decisions you will make when purchasing a home. It directly affects your monthly mortgage payment, the total interest you pay over the life of the loan, and whether you will be required to carry private mortgage insurance (PMI). A larger down payment means borrowing less, which reduces both your monthly obligation and the total cost of homeownership.</p>
+    <p>Beyond the financial math, your down payment also signals creditworthiness to lenders. Borrowers who put more money down are generally seen as lower risk, which can lead to better interest rates and more favorable loan terms. The size of your down payment may also determine which loan products are available to you.</p>
+    <p>Consider a $350,000 home with a 30-year fixed mortgage at 6.5% interest. With 20% down ($70,000), your monthly principal and interest payment would be approximately $1,769 on a $280,000 loan. With just 5% down ($17,500), your payment on a $332,500 loan jumps to $2,102 per month, and you would also pay roughly $208 per month in PMI. Over the life of the loan, the smaller down payment costs an additional $119,880 in extra payments and PMI, which illustrates the significant long-term impact of your down payment decision.</p>
+
+    <h2>PMI Explained: What It Is and What It Costs</h2>
+    <p>Private Mortgage Insurance (PMI) is a type of insurance that protects the lender (not the borrower) if you default on your loan. It is required on conventional loans when the down payment is less than 20% of the home price.</p>
+    <p>PMI typically costs between <strong>0.5% and 1.5%</strong> of the original loan amount per year, paid monthly. On a $300,000 loan, that translates to roughly <strong>$125 to $375 per month</strong>. This calculator estimates PMI at 0.75% of the loan amount annually, which is a reasonable mid-range estimate.</p>
+    <p>The good news is that PMI is not permanent. You can request removal once your loan balance reaches 80% of the original home value, and lenders are required to automatically cancel it at 78%. Some borrowers choose to make extra payments early in the loan to reach this threshold faster.</p>
+
+    <h2>Down Payment Assistance Programs</h2>
+    <p>If saving for a 20% down payment feels out of reach, numerous assistance programs can help:</p>
+    <ul>
+      <li><strong>FHA Loans:</strong> Backed by the Federal Housing Administration, these loans require as little as 3.5% down with a credit score of 580 or higher. They carry their own mortgage insurance premium (MIP) that works similarly to PMI.</li>
+      <li><strong>VA Loans:</strong> Available to veterans, active-duty service members, and eligible spouses with no down payment and no PMI requirement.</li>
+      <li><strong>USDA Loans:</strong> For eligible rural and suburban homebuyers, these loans offer zero down payment with income-based eligibility.</li>
+      <li><strong>State and Local Programs:</strong> Many states offer grants, forgivable loans, or matched savings programs for first-time homebuyers. Check your state housing finance agency for available options.</li>
+      <li><strong>Employer Programs:</strong> Some employers offer down payment assistance or homebuyer education benefits as part of their compensation packages.</li>
+    </ul>
+
+    <h2>How Much Should You Put Down? 3.5% vs 10% vs 20%</h2>
+    <p>The right down payment percentage depends on your financial situation, goals, and the current housing market. Here is how different levels compare on a $350,000 home:</p>
+    <ul>
+      <li><strong>3.5% ($12,250):</strong> Lowest barrier to entry via FHA. Monthly payment is higher, and you will pay mortgage insurance for the life of the loan (unless you refinance). Best for buyers who want to enter the market quickly with limited savings.</li>
+      <li><strong>10% ($35,000):</strong> A middle-ground approach. You still pay PMI, but your monthly payment and total interest are noticeably lower than the 3.5% option. PMI can be removed once you reach 20% equity.</li>
+      <li><strong>20% ($70,000):</strong> The traditional benchmark. No PMI required, lowest monthly payment, and best interest rates. However, it takes longer to save and ties up more cash that could be invested elsewhere.</li>
+    </ul>
+    <p>There is no universally "right" answer. Some financial advisors argue that putting less down and investing the difference in the stock market can yield higher returns over time, while others emphasize the guaranteed savings from avoiding PMI and paying less interest.</p>
+
+    <h2>Closing Costs: The Hidden Expense Beyond the Down Payment</h2>
+    <p>When planning your home purchase savings, the down payment is only part of the equation. Closing costs typically add <strong>2% to 5%</strong> of the home price on top of the down payment. On a $350,000 home, that means an additional $7,000 to $17,500 in expenses due at closing.</p>
+    <p>Common closing costs include:</p>
+    <ul>
+      <li><strong>Loan origination fees:</strong> 0.5% to 1% of the loan amount, charged by the lender for processing your mortgage</li>
+      <li><strong>Appraisal fee:</strong> $300 to $600 for a professional home valuation</li>
+      <li><strong>Title insurance:</strong> $500 to $3,500 to protect against ownership disputes</li>
+      <li><strong>Home inspection:</strong> $300 to $500 for a thorough property assessment</li>
+      <li><strong>Property taxes and insurance:</strong> Often 2-6 months of prepaid taxes and homeowner's insurance are required at closing</li>
+      <li><strong>Attorney fees:</strong> $500 to $2,000 in states that require an attorney for real estate transactions</li>
+    </ul>
+    <p>Factor these costs into your savings goal. A good rule of thumb is to save your target down payment plus an additional 3% of the home price for closing costs and moving expenses.</p>
+
+    <h2>Strategies to Save for a Down Payment Faster</h2>
+    <p>Building a down payment fund requires discipline and often creative strategies. Here are proven approaches that can accelerate your timeline:</p>
+    <ol>
+      <li><strong>Automate your savings.</strong> Set up automatic transfers from your checking account to a dedicated savings account on each payday. Treating savings like a bill ensures consistency.</li>
+      <li><strong>Use a high-yield savings account.</strong> Park your down payment fund in a high-yield savings account earning 4-5% APY rather than a standard account earning 0.01%. On a $50,000 balance, the difference is over $2,000 per year.</li>
+      <li><strong>Cut major expenses temporarily.</strong> Consider downsizing your rental, reducing car payments, or pausing subscription services. Even temporary sacrifices can add hundreds per month to your savings.</li>
+      <li><strong>Direct windfalls to savings.</strong> Tax refunds, work bonuses, gifts, and side income can significantly boost your down payment fund when directed straight to savings rather than spending.</li>
+      <li><strong>Consider a down payment savings match program.</strong> Some banks and nonprofits offer matched savings programs for first-time homebuyers where your contributions are matched dollar-for-dollar up to a certain amount.</li>
+    </ol>
+
+    <h2>Where to Keep Your Down Payment Savings</h2>
+    <p>Choosing the right account for your down payment fund is important because you need both safety and reasonable growth. Since your timeline is typically 1-5 years, your savings should be in low-risk, liquid accounts:</p>
+    <ul>
+      <li><strong>High-yield savings accounts:</strong> Currently offering 4-5% APY with FDIC insurance and easy access. This is the most popular choice for down payment savings.</li>
+      <li><strong>Certificates of deposit (CDs):</strong> Slightly higher rates than savings accounts, but your money is locked for a fixed term (3 months to 5 years). Consider a CD ladder to maintain some liquidity.</li>
+      <li><strong>Money market accounts:</strong> Similar to high-yield savings with check-writing privileges. Rates are competitive and funds remain easily accessible.</li>
+      <li><strong>Treasury bills:</strong> Government-backed securities with 4-week to 52-week terms. Interest is exempt from state income tax, which can provide a slight edge over savings accounts.</li>
+    </ul>
+    <p>Avoid investing your down payment fund in stocks or other volatile assets. A market downturn at the wrong time could delay your home purchase by years. The priority for these funds is preservation of capital, not maximum growth.</p>
+
+    <h2>When Renting May Be Better Than Buying</h2>
+    <p>While homeownership is a common financial goal, it is not always the best decision. Renting may be preferable when you plan to stay in an area for less than 3-5 years (since closing costs and transaction fees eat into short-term gains), when the local price-to-rent ratio exceeds 20 (suggesting homes are overpriced relative to rents), or when you need flexibility for career changes or relocations. Use a rent-vs-buy calculator to compare the true long-term costs in your specific market before committing to a home purchase.</p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>How much should I put down on a house?</h3>
+    <p>The ideal down payment depends on your financial situation and loan type. Conventional loans typically require 5-20%, with 20% being the threshold to avoid PMI. FHA loans allow as little as 3.5% down. While a larger down payment reduces your monthly payment and total interest, it is important to maintain an emergency fund and avoid depleting all your savings for the down payment alone.</p>
+
+    <h3>What is PMI and how can I avoid it?</h3>
+    <p>PMI (Private Mortgage Insurance) is required when your down payment is less than 20% of the home price. It typically costs 0.5% to 1.5% of the loan amount per year. You can avoid PMI by putting 20% or more down, using a VA loan, or requesting PMI removal once you reach 20% equity in your home.</p>
+
+    <h3>Can I get a mortgage with no down payment?</h3>
+    <p>Yes. VA loans for veterans and active military require no down payment and no PMI. USDA loans for eligible rural properties also offer zero down. FHA loans require just 3.5%, and some conventional programs allow 3% for first-time buyers. Keep in mind that lower down payments result in higher monthly payments and more total interest paid.</p>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/financial-calculators/mortgage-calculator/">Mortgage Calculator</a> - Calculate your monthly mortgage payment and amortization schedule.</li>
+      <li><a href="/financial-calculators/home-affordability-calculator/">Home Affordability Calculator</a> - Find out how much house you can afford.</li>
+      <li><a href="/financial-calculators/savings-goal-calculator/">Savings Goal Calculator</a> - Plan how much to save each month to reach any financial goal.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="downpayment-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function formatCurrency(n: number): string {
+    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function calculate() {
+    const homePrice = parseFloat((document.getElementById('homePrice') as HTMLInputElement).value) || 0;
+    const downPct = parseFloat((document.getElementById('downPct') as HTMLInputElement).value) || 0;
+    const currentSavings = parseFloat((document.getElementById('currentSavings') as HTMLInputElement).value) || 0;
+    const monthlySavings = parseFloat((document.getElementById('monthlySavings') as HTMLInputElement).value) || 0;
+    const annualRate = (parseFloat((document.getElementById('savingsRate') as HTMLInputElement).value) || 0) / 100;
+
+    const downAmount = homePrice * (downPct / 100);
+    const loanAmount = homePrice - downAmount;
+    const remaining = Math.max(0, downAmount - currentSavings);
+    const pmiRequired = downPct < 20;
+    const pmiAnnual = pmiRequired ? loanAmount * 0.0075 : 0;
+    const pmiMonthly = pmiAnnual / 12;
+
+    document.getElementById('downAmount')!.textContent = formatCurrency(downAmount);
+    document.getElementById('remaining')!.textContent = formatCurrency(remaining);
+    document.getElementById('loanAmount')!.textContent = formatCurrency(loanAmount);
+    document.getElementById('pmiRequired')!.textContent = pmiRequired ? 'Yes' : 'No';
+    document.getElementById('pmiEstimate')!.textContent = pmiRequired
+      ? formatCurrency(pmiMonthly) + '/mo'
+      : 'N/A';
+
+    // Calculate months to goal with compound interest on savings
+    const monthlyRate = annualRate / 12;
+    let balance = currentSavings;
+    let months = 0;
+    const maxMonths = 600; // 50 years cap
+    const tableRows: { month: number; added: number; interest: number; total: number }[] = [];
+
+    if (remaining <= 0) {
+      months = 0;
+    } else if (monthlySavings <= 0 && monthlyRate <= 0) {
+      months = -1; // Cannot reach goal
+    } else {
+      while (balance < downAmount && months < maxMonths) {
+        months++;
+        const interest = balance * monthlyRate;
+        balance += interest + monthlySavings;
+        tableRows.push({
+          month: months,
+          added: monthlySavings,
+          interest: interest,
+          total: balance,
+        });
+      }
+      if (months >= maxMonths) {
+        months = -1;
+      }
+    }
+
+    document.getElementById('monthsToGoal')!.textContent =
+      remaining <= 0 ? 'Already saved!' : months === -1 ? 'N/A' : months.toString();
+
+    // Render savings timeline table (show first 24 months, then every 6 months)
+    const tbody = document.querySelector('#savingsTable tbody')!;
+    const displayRows = tableRows.filter((row) => {
+      if (row.month <= 24) return true;
+      if (row.month % 6 === 0) return true;
+      if (row.month === tableRows.length) return true;
+      return false;
+    });
+
+    tbody.innerHTML = displayRows.length > 0
+      ? displayRows.map(d => `
+          <tr>
+            <td>${d.month}</td>
+            <td>${formatCurrency(d.added)}</td>
+            <td>${formatCurrency(d.interest)}</td>
+            <td>${formatCurrency(d.total)}</td>
+          </tr>
+        `).join('')
+      : remaining <= 0
+        ? '<tr><td colspan="4" style="text-align:center;">You already have enough saved for the down payment.</td></tr>'
+        : '';
+  }
+
+  document.getElementById('calculateBtn')?.addEventListener('click', calculate);
+  calculate();
+</script>

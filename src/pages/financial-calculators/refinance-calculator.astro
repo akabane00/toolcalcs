@@ -1,0 +1,300 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Financial Calculators",
+        "item": "https://toolcalcs.com/financial-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Refinance Calculator"
+      }
+    ]
+  },
+  {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'When does it make sense to refinance a mortgage?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Refinancing generally makes sense when you can lower your interest rate by at least 0.5% to 1%, plan to stay in the home long enough to recoup closing costs (past the break-even point), or need to switch from an adjustable-rate to a fixed-rate mortgage. The break-even point is calculated by dividing total closing costs by monthly savings. If you plan to stay in your home beyond that point, refinancing is likely worthwhile.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What are typical closing costs for a mortgage refinance?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Closing costs for a mortgage refinance typically range from 2% to 5% of the loan amount. For a $250,000 loan, this means $5,000 to $12,500. Common fees include application fees, appraisal fees ($300-$500), title search and insurance ($700-$900), origination fees (0.5-1% of loan), and recording fees. Some lenders offer no-closing-cost refinances, but these usually come with a higher interest rate.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Should I refinance to a shorter loan term?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Refinancing to a shorter term (e.g., 30-year to 15-year) typically comes with a lower interest rate and dramatically reduces total interest paid, but increases monthly payments. This strategy works well if you can comfortably afford the higher payment. For example, refinancing $250,000 from a 30-year at 7% to a 15-year at 6% increases the monthly payment by about $400 but saves over $150,000 in total interest.',
+      },
+    },
+  ],
+},
+];
+---
+
+<BaseLayout
+  title="Mortgage Refinance Calculator - Compare Old vs New Loan"
+  description="Free mortgage refinance calculator. See your new payment, monthly savings, break-even point, and total interest savings when refinancing."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/financial-calculators/">Financial Calculators</a> &rsaquo;
+    <span>Refinance Calculator</span>
+  </nav>
+
+  <h1>Mortgage Refinance Calculator</h1>
+  <p class="page-desc">Compare your current mortgage to a new loan and see how much you could save by refinancing.</p>
+
+  <!-- Calculator Tool -->
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="currentBalance">Current Loan Balance ($)</label>
+        <input type="number" id="currentBalance" value="250000" min="0" step="1000" />
+      </div>
+      <div class="input-group">
+        <label for="currentPayment">Current Monthly Payment ($)</label>
+        <input type="number" id="currentPayment" value="1663" min="0" step="10" />
+      </div>
+      <div class="input-group">
+        <label for="currentRate">Current Interest Rate (%)</label>
+        <input type="number" id="currentRate" value="7" min="0" max="30" step="0.125" />
+      </div>
+      <div class="input-group">
+        <label for="remainingTerm">Remaining Term (Years)</label>
+        <input type="number" id="remainingTerm" value="25" min="1" max="30" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="newRate">New Interest Rate (%)</label>
+        <input type="number" id="newRate" value="6" min="0" max="30" step="0.125" />
+      </div>
+      <div class="input-group">
+        <label for="newTerm">New Loan Term (Years)</label>
+        <select id="newTerm">
+          <option value="10">10 Years</option>
+          <option value="15">15 Years</option>
+          <option value="20">20 Years</option>
+          <option value="25">25 Years</option>
+          <option value="30" selected>30 Years</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="closingCosts">Closing Costs ($)</label>
+        <input type="number" id="closingCosts" value="3000" min="0" step="500" />
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">New Monthly Payment</span>
+          <span class="result-value" id="newPayment">$0</span>
+        </div>
+        <div class="result-card success">
+          <span class="result-label">Monthly Savings</span>
+          <span class="result-value" id="monthlySavings">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Interest (Old Loan)</span>
+          <span class="result-value" id="oldTotalInterest">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Interest (New Loan)</span>
+          <span class="result-value" id="newTotalInterest">$0</span>
+        </div>
+        <div class="result-card success">
+          <span class="result-label">Net Savings</span>
+          <span class="result-value" id="netSavings">$0</span>
+        </div>
+        <div class="result-card primary">
+          <span class="result-label">Break-Even Point</span>
+          <span class="result-value" id="breakEven">-- months</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>When to Refinance Your Mortgage</h2>
+    <p>Refinancing replaces your existing mortgage with a new loan, ideally at better terms. It can lower your monthly payment, reduce total interest, or let you tap into home equity. However, refinancing is not always the right move -- the decision depends on several factors.</p>
+    <p>The most common reason to refinance is a <strong>lower interest rate</strong>. As a general guideline, if you can reduce your rate by at least 0.5% to 1%, refinancing may be worth exploring. But the most important metric is the <strong>break-even point</strong>: the number of months it takes for your monthly savings to cover the closing costs. If you plan to stay in your home past the break-even point, refinancing is likely a smart financial decision.</p>
+    <div class="formula-box">
+      <code>Break-Even = Closing Costs / Monthly Savings</code>
+    </div>
+    <p>For example, if refinancing saves you $200 per month and costs $4,000 in closing costs, the break-even point is 20 months. If you plan to stay in your home for at least 2 more years, the refinance pays for itself.</p>
+
+    <h2>Types of Refinancing</h2>
+    <h3>Rate-and-Term Refinance</h3>
+    <p>The most straightforward type. You replace your existing mortgage with a new one that has a lower interest rate, a different term, or both. The loan amount stays roughly the same (plus closing costs if rolled in). This is ideal when market rates have dropped since you took out your original mortgage.</p>
+    <h3>Cash-Out Refinance</h3>
+    <p>A cash-out refinance lets you borrow more than your remaining balance and receive the difference in cash. For example, if your home is worth $400,000 and you owe $200,000, you might refinance for $250,000 and receive $50,000 in cash. This can fund home improvements, debt consolidation, or other large expenses. However, it increases your loan balance and may come with a slightly higher interest rate.</p>
+    <h3>Cash-In Refinance</h3>
+    <p>The opposite of cash-out: you bring money to closing to pay down the principal. This can help you eliminate private mortgage insurance (PMI) by reaching 20% equity, qualify for a better interest rate by lowering your loan-to-value ratio, or reduce your monthly payment more significantly.</p>
+    <h3>Streamline Refinance</h3>
+    <p>Available for FHA, VA, and USDA loans, streamline refinances have simplified documentation requirements and may not require an appraisal. They are typically faster and cheaper than conventional refinances, but they only allow rate-and-term changes (no cash-out).</p>
+
+    <h2>Closing Costs Explained</h2>
+    <p>Refinancing is not free. Closing costs typically range from <strong>2% to 5%</strong> of the loan amount and may include:</p>
+    <ul>
+      <li><strong>Application fee:</strong> $75-$300 charged by the lender to process your application.</li>
+      <li><strong>Appraisal fee:</strong> $300-$500 to determine your home's current market value.</li>
+      <li><strong>Title search and insurance:</strong> $700-$900 to verify ownership and protect against title defects.</li>
+      <li><strong>Origination fee:</strong> 0.5-1% of the loan amount for the lender to underwrite the new mortgage.</li>
+      <li><strong>Recording fees:</strong> $50-$250 paid to local government to record the new mortgage.</li>
+      <li><strong>Prepaid interest:</strong> Interest charged from the closing date to the end of that month.</li>
+    </ul>
+    <p>Some lenders offer <strong>"no-closing-cost" refinances</strong>, but this typically means the costs are rolled into the loan balance or offset by a higher interest rate. Always compare the total cost over the life of the loan, not just the upfront fees.</p>
+
+    <h2>Refinance vs. Extra Payments</h2>
+    <p>If your goal is to pay less interest, refinancing is not the only option. Making extra payments on your current mortgage achieves a similar result without closing costs. Here is how to decide:</p>
+    <ul>
+      <li><strong>Choose refinancing</strong> when you can get a meaningfully lower rate (1%+), plan to stay in the home long-term, and want a guaranteed lower monthly payment.</li>
+      <li><strong>Choose extra payments</strong> when the rate difference is small, you want flexibility (extra payments are optional), or you want to avoid closing costs and paperwork.</li>
+      <li><strong>Combine both</strong> for maximum impact: refinance to a lower rate and then make extra payments on the new, lower-rate loan.</li>
+    </ul>
+    <p>For many homeowners, refinancing when rates are favorable and then consistently paying a little extra each month is the most effective strategy for building equity and reducing total interest.</p>
+
+    <h2>How Refinancing Affects Your Credit</h2>
+    <p>Refinancing involves a hard credit inquiry, which may temporarily lower your credit score by a few points. However, if you shop around and submit all applications within a 14-45 day window, credit bureaus typically count them as a single inquiry. Over the long term, refinancing can improve your credit profile by lowering your debt-to-income ratio if you reduce your monthly payment.</p>
+    <p>Be aware that refinancing resets your loan term. If you have been paying your mortgage for 10 years and refinance into a new 30-year mortgage, you are extending your total repayment period. This is why many financial planners recommend refinancing to a shorter term when possible, or at least continuing to make payments at the original higher amount.</p>
+
+    <h2>Steps in the Refinance Process</h2>
+    <ol>
+      <li><strong>Check your credit score and equity.</strong> Most lenders require a credit score of 620 or higher and at least 20% equity for the best rates.</li>
+      <li><strong>Compare lenders.</strong> Get quotes from at least 3-4 lenders to ensure you get the best rate. Compare the APR (which includes fees), not just the interest rate.</li>
+      <li><strong>Gather documentation.</strong> You will need pay stubs, tax returns, bank statements, and your current mortgage statement.</li>
+      <li><strong>Lock your rate.</strong> Once you find a favorable rate, lock it to protect against rate increases during the processing period (typically 30-60 days).</li>
+      <li><strong>Close on the new loan.</strong> Review the closing disclosure carefully, sign the documents, and pay any closing costs due at signing.</li>
+    </ol>
+    <p>The entire refinance process typically takes 30 to 45 days from application to closing, though it can be faster with streamline refinance programs.</p>
+
+    <h2>Refinancing an Adjustable-Rate Mortgage (ARM)</h2>
+    <p>If you have an adjustable-rate mortgage, refinancing into a fixed-rate loan can provide payment stability and protection against future rate increases. This is especially important if your ARM's initial fixed period is ending and rates have risen since you took out the loan.</p>
+    <p>Even if your current ARM rate is lower than available fixed rates, the certainty of knowing your payment will never change may be worth the slight premium. Run the numbers using the calculator above -- enter your current ARM payment and compare it to what a fixed-rate refinance would cost. Factor in the worst-case scenario of your ARM adjusting to its rate cap to understand your risk exposure.</p>
+    <p>Conversely, if you plan to sell your home within a few years, switching from a fixed rate to an ARM with a lower initial rate can reduce your payments during the time you remain in the home. A 5/1 ARM or 7/1 ARM provides a fixed rate for the initial 5 or 7 years, which may be sufficient for your timeline.</p>
+
+    <h2>Key Factors Lenders Evaluate</h2>
+    <p>When you apply to refinance, lenders assess several factors to determine your eligibility and rate:</p>
+    <ul>
+      <li><strong>Credit score:</strong> A score of 740 or above typically qualifies for the best rates. Scores between 620 and 739 can still refinance but at higher rates.</li>
+      <li><strong>Loan-to-value ratio (LTV):</strong> The lower your LTV (ideally under 80%), the better your rate. LTV is calculated as your loan balance divided by your home's appraised value.</li>
+      <li><strong>Debt-to-income ratio (DTI):</strong> Most lenders prefer a DTI below 43%. This includes your new mortgage payment plus all other monthly debt payments divided by your gross monthly income.</li>
+      <li><strong>Employment and income stability:</strong> Lenders look for at least two years of steady employment and sufficient income to cover the new payment.</li>
+    </ul>
+    <p>Before applying, check your credit report for errors, pay down high-interest debt to improve your DTI, and gather documentation such as recent pay stubs, W-2s, tax returns, and bank statements. Getting pre-qualified with multiple lenders takes only a few minutes and helps you understand what rates and terms you can expect.</p>
+    <p>Keep in mind that your home will likely need a new appraisal. If home values in your area have declined since your original purchase, your LTV may be higher than expected, which could affect your rate or even your eligibility to refinance. In such cases, a cash-in refinance or waiting for values to recover may be necessary.</p>
+    <p>Finally, consider the tax implications. Mortgage interest is deductible for taxpayers who itemize, but refinancing to a lower rate means less interest to deduct. For most homeowners, the savings from a lower rate far outweigh any reduction in the tax deduction, but it is worth factoring into your overall comparison.</p>
+    <p>Shopping around is essential. According to research from Freddie Mac, borrowers who obtained at least five rate quotes saved an average of $3,000 over the life of the loan compared to those who only received a single quote.</p>
+    <p>Even small rate differences of 0.125% can add up to thousands of dollars over a 15 or 30-year term. Use the calculator above to compare different scenarios side by side.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>When does it make sense to refinance a mortgage?</h3>
+    <p>Refinancing generally makes sense when you can lower your interest rate by at least 0.5% to 1%, plan to stay in the home long enough to recoup closing costs (past the break-even point), or need to switch from an adjustable-rate to a fixed-rate mortgage. The break-even point is calculated by dividing total closing costs by monthly savings.</p>
+
+    <h3>What are typical closing costs for a mortgage refinance?</h3>
+    <p>Closing costs for a mortgage refinance typically range from 2% to 5% of the loan amount. For a $250,000 loan, this means $5,000 to $12,500. Common fees include application fees, appraisal fees ($300-$500), title search and insurance ($700-$900), origination fees (0.5-1% of loan), and recording fees. Some lenders offer no-closing-cost refinances, but these usually come with a higher interest rate.</p>
+
+    <h3>Should I refinance to a shorter loan term?</h3>
+    <p>Refinancing to a shorter term (e.g., 30-year to 15-year) typically comes with a lower interest rate and dramatically reduces total interest paid, but increases monthly payments. This strategy works well if you can comfortably afford the higher payment. For example, refinancing $250,000 from a 30-year at 7% to a 15-year at 6% increases the monthly payment by about $400 but saves over $150,000 in total interest.</p>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/financial-calculators/mortgage-calculator/">Mortgage Calculator</a> - Calculate monthly mortgage payments with taxes and insurance.</li>
+      <li><a href="/financial-calculators/home-affordability-calculator/">Home Affordability Calculator</a> - Find out how much house you can afford.</li>
+      <li><a href="/financial-calculators/loan-amortization-calculator/">Loan Amortization Calculator</a> - See a detailed amortization schedule for any loan.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function formatCurrency(n: number): string {
+    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function calculateMonthlyPayment(principal: number, monthlyRate: number, totalPayments: number): number {
+    if (monthlyRate === 0) return principal / totalPayments;
+    return principal * (monthlyRate * Math.pow(1 + monthlyRate, totalPayments)) / (Math.pow(1 + monthlyRate, totalPayments) - 1);
+  }
+
+  function calculate() {
+    const currentBalance = parseFloat((document.getElementById('currentBalance') as HTMLInputElement).value) || 0;
+    const currentPayment = parseFloat((document.getElementById('currentPayment') as HTMLInputElement).value) || 0;
+    const currentRate = (parseFloat((document.getElementById('currentRate') as HTMLInputElement).value) || 0) / 100;
+    const remainingTerm = parseInt((document.getElementById('remainingTerm') as HTMLInputElement).value) || 25;
+    const newRate = (parseFloat((document.getElementById('newRate') as HTMLInputElement).value) || 0) / 100;
+    const newTermYears = parseInt((document.getElementById('newTerm') as HTMLSelectElement).value) || 30;
+    const closingCosts = parseFloat((document.getElementById('closingCosts') as HTMLInputElement).value) || 0;
+
+    const currentMonthlyRate = currentRate / 12;
+    const remainingPayments = remainingTerm * 12;
+
+    // Total cost of remaining old loan
+    const oldTotalPaid = currentPayment * remainingPayments;
+    const oldTotalInterest = oldTotalPaid - currentBalance;
+
+    // New loan calculations
+    const newMonthlyRate = newRate / 12;
+    const newTotalPayments = newTermYears * 12;
+    const newMonthlyPayment = calculateMonthlyPayment(currentBalance, newMonthlyRate, newTotalPayments);
+
+    const newTotalPaid = newMonthlyPayment * newTotalPayments;
+    const newTotalInterest = newTotalPaid - currentBalance;
+
+    // Savings calculations
+    const monthlySavings = currentPayment - newMonthlyPayment;
+    const grossSavings = oldTotalInterest - newTotalInterest;
+    const netSavings = grossSavings - closingCosts;
+
+    // Break-even point (months)
+    let breakEvenMonths = 0;
+    if (monthlySavings > 0) {
+      breakEvenMonths = Math.ceil(closingCosts / monthlySavings);
+    }
+
+    document.getElementById('newPayment')!.textContent = formatCurrency(newMonthlyPayment);
+    document.getElementById('monthlySavings')!.textContent = monthlySavings > 0 ? formatCurrency(monthlySavings) : formatCurrency(0);
+    document.getElementById('oldTotalInterest')!.textContent = formatCurrency(Math.max(oldTotalInterest, 0));
+    document.getElementById('newTotalInterest')!.textContent = formatCurrency(Math.max(newTotalInterest, 0));
+    document.getElementById('netSavings')!.textContent = netSavings > 0 ? formatCurrency(netSavings) : formatCurrency(0);
+    document.getElementById('breakEven')!.textContent = monthlySavings > 0 ? breakEvenMonths + ' months' : 'N/A';
+  }
+
+  document.getElementById('calculateBtn')?.addEventListener('click', calculate);
+  calculate();
+</script>

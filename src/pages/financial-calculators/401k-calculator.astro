@@ -1,0 +1,300 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Financial Calculators",
+        "item": "https://toolcalcs.com/financial-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "401(k) Calculator"
+      }
+    ]
+  },
+  {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'How much should I contribute to my 401(k)?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Financial advisors generally recommend contributing at least enough to get the full employer match, as that is essentially free money. Ideally, aim to save 10-15% of your gross salary for retirement. The IRS sets annual contribution limits, which are $23,500 for those under 50 and $31,000 for those 50 and older in 2025.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How does employer matching work in a 401(k)?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Employer matching means your company contributes additional money to your 401(k) based on your own contributions. A common match is 50% of your contributions up to 6% of your salary. For example, if you earn $60,000 and contribute 6% ($3,600), your employer adds 50% of that ($1,800). Not taking advantage of the full match is leaving free money on the table.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is the 4% rule for retirement withdrawals?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'The 4% rule is a guideline suggesting you can withdraw 4% of your retirement portfolio in the first year, then adjust for inflation each subsequent year, with a high probability your savings will last at least 30 years. For example, a $1,000,000 portfolio would provide $40,000 per year or about $3,333 per month in retirement income.',
+      },
+    },
+  ],
+},
+];
+---
+
+<BaseLayout
+  title="401(k) Calculator - Estimate Your Retirement Balance"
+  description="Free 401(k) retirement calculator. Estimate your balance at retirement with employer match, salary growth, and investment returns."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/financial-calculators/">Financial Calculators</a> &rsaquo;
+    <span>401(k) Calculator</span>
+  </nav>
+
+  <h1>401(k) Retirement Calculator</h1>
+  <p class="page-desc">Estimate how much your 401(k) will be worth at retirement, including employer match and salary growth.</p>
+
+  <!-- Calculator Tool -->
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="currentAge">Current Age</label>
+        <input type="number" id="currentAge" value="30" min="18" max="80" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="retirementAge">Retirement Age</label>
+        <input type="number" id="retirementAge" value="65" min="30" max="80" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="currentBalance">Current 401(k) Balance ($)</label>
+        <input type="number" id="currentBalance" value="25000" min="0" step="1000" />
+      </div>
+      <div class="input-group">
+        <label for="annualContribution">Annual Contribution ($)</label>
+        <input type="number" id="annualContribution" value="6000" min="0" step="500" />
+      </div>
+      <div class="input-group">
+        <label for="employerMatch">Employer Match (%)</label>
+        <input type="number" id="employerMatch" value="50" min="0" max="100" step="5" />
+      </div>
+      <div class="input-group">
+        <label for="matchLimit">Match Limit (% of Salary)</label>
+        <input type="number" id="matchLimit" value="6" min="0" max="100" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="annualSalary">Annual Salary ($)</label>
+        <input type="number" id="annualSalary" value="60000" min="0" step="1000" />
+      </div>
+      <div class="input-group">
+        <label for="annualReturn">Expected Annual Return (%)</label>
+        <input type="number" id="annualReturn" value="7" min="0" max="30" step="0.5" />
+      </div>
+      <div class="input-group">
+        <label for="salaryIncrease">Expected Salary Increase (%)</label>
+        <input type="number" id="salaryIncrease" value="3" min="0" max="20" step="0.5" />
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Balance at Retirement</span>
+          <span class="result-value" id="balanceAtRetirement">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Contributions (Yours)</span>
+          <span class="result-value" id="totalContributions">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Employer Match</span>
+          <span class="result-value" id="totalMatch">$0</span>
+        </div>
+        <div class="result-card success">
+          <span class="result-label">Total Investment Gains</span>
+          <span class="result-value" id="totalGains">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Years to Retirement</span>
+          <span class="result-value" id="yearsToRetirement">0</span>
+        </div>
+        <div class="result-card primary">
+          <span class="result-label">Monthly Income (4% Rule)</span>
+          <span class="result-value" id="monthlyIncome">$0</span>
+        </div>
+      </div>
+      <div class="table-container">
+        <table class="data-table" id="growthTable">
+          <thead>
+            <tr>
+              <th>Age</th>
+              <th>Your Contribution</th>
+              <th>Employer Match</th>
+              <th>Balance</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>What Is a 401(k)?</h2>
+    <p>A 401(k) is a tax-advantaged retirement savings plan offered by employers in the United States. Named after section 401(k) of the Internal Revenue Code, it allows employees to contribute a portion of their pre-tax salary to an investment account. The money grows tax-deferred, meaning you do not pay taxes on contributions or investment gains until you withdraw the funds in retirement.</p>
+    <p>There are two main types of 401(k) plans. A <strong>traditional 401(k)</strong> uses pre-tax dollars, reducing your taxable income today. A <strong>Roth 401(k)</strong> uses after-tax dollars, but qualified withdrawals in retirement are completely tax-free. Many employers offer both options, and choosing between them depends on whether you expect to be in a higher or lower tax bracket in retirement.</p>
+
+    <h2>How Employer Matching Works</h2>
+    <p>Employer matching is one of the most valuable benefits of a 401(k). Your employer contributes additional money to your account based on how much you contribute. A common formula is a 50% match on contributions up to 6% of your salary.</p>
+    <p>For example, if you earn $60,000 and contribute 6% ($3,600 per year), your employer would add 50% of that amount ($1,800), giving you a total annual contribution of $5,400. Failing to contribute enough to receive the full match is equivalent to declining a pay raise.</p>
+    <p>Match formulas vary by employer. Some offer dollar-for-dollar matching (100%) up to a certain percentage, while others may match at lower rates but on a larger portion of your salary. Be sure to understand your specific plan's vesting schedule, which determines when the employer's contributions fully belong to you.</p>
+
+    <h2>401(k) Contribution Limits</h2>
+    <p>The IRS sets annual limits on how much you can contribute to a 401(k). For 2025, the employee contribution limit is <strong>$23,500</strong> for those under 50. If you are 50 or older, you can make an additional catch-up contribution of <strong>$7,500</strong>, bringing your total to $31,000.</p>
+    <p>Employer contributions are not counted toward your employee limit, but the total of all contributions (employee plus employer) cannot exceed <strong>$70,000</strong> in 2025 (or $77,500 with catch-up contributions). These limits are adjusted for inflation periodically.</p>
+    <div class="formula-box">
+      <code>Future Value = Balance x (1 + r)<sup>n</sup> + Annual x [(1 + r)<sup>n</sup> - 1] / r</code>
+    </div>
+
+    <h2>Investment Strategy for Your 401(k)</h2>
+    <p>How you invest your 401(k) matters just as much as how much you contribute. Most plans offer a menu of mutual funds, including stock funds, bond funds, and target-date funds. Your investment choices determine whether your account grows at 5%, 7%, or 10% per year, and over decades that difference is enormous.</p>
+    <h3>Asset Allocation by Age</h3>
+    <p>A common rule of thumb is to subtract your age from 110 to determine the percentage of your portfolio that should be in stocks, with the remainder in bonds. A 30-year-old might hold 80% stocks and 20% bonds, while a 55-year-old might shift to 55% stocks and 45% bonds. Younger investors can afford more stock exposure because they have decades to recover from market downturns.</p>
+    <h3>Target-Date Funds</h3>
+    <p>Target-date funds (TDFs) automatically adjust your asset allocation as you approach retirement. If you plan to retire around 2060, you would select a 2060 target-date fund. These are a convenient option for investors who prefer a hands-off approach. Most TDFs shift from aggressive stock-heavy allocations in the early years to more conservative bond-heavy allocations near the target retirement date.</p>
+    <h3>Index Funds vs. Actively Managed Funds</h3>
+    <p>Many 401(k) plans offer both index funds (which track a market benchmark like the S&P 500) and actively managed funds (where a manager picks individual stocks). Research consistently shows that low-cost index funds outperform most actively managed funds over the long term, largely because of lower expense ratios. Look for funds with expense ratios below 0.20% to maximize your returns.</p>
+    <h3>Rebalancing</h3>
+    <p>Over time, market performance can cause your portfolio to drift from its target allocation. For example, a strong stock market year might push your 80/20 stock-to-bond ratio to 90/10, exposing you to more risk than intended. Reviewing and rebalancing your investments at least once a year ensures you maintain your desired level of risk. Many 401(k) plans offer automatic rebalancing features.</p>
+
+    <h2>Traditional vs. Roth 401(k)</h2>
+    <p>If your employer offers both options, choosing between a traditional and Roth 401(k) is an important decision. With a <strong>traditional 401(k)</strong>, contributions are made pre-tax, lowering your taxable income today. You pay income tax on withdrawals in retirement. With a <strong>Roth 401(k)</strong>, contributions are made after-tax, so there is no immediate tax benefit, but qualified withdrawals in retirement are completely tax-free.</p>
+    <p>In general, if you expect your tax rate to be higher in retirement than it is today (perhaps because your income will grow significantly), the Roth option may save you more over time. If you expect your tax rate to be lower in retirement, the traditional option provides more benefit. Many financial planners recommend splitting contributions between both types to diversify your tax exposure.</p>
+
+    <h2>Common 401(k) Mistakes to Avoid</h2>
+    <ol>
+      <li><strong>Not contributing enough to get the full match.</strong> This is the most expensive mistake. An employer match is a guaranteed 50-100% return on your contribution.</li>
+      <li><strong>Cashing out when changing jobs.</strong> Early withdrawals before age 59.5 incur a 10% penalty plus income tax. Roll your old 401(k) into your new employer's plan or an IRA instead.</li>
+      <li><strong>Being too conservative too early.</strong> Young investors who hold only bonds or stable value funds miss out on decades of stock market growth. Time in the market is your greatest asset.</li>
+      <li><strong>Ignoring fees.</strong> High fund expense ratios compound against you over time. A 1% fee difference on a $500,000 portfolio costs $5,000 per year.</li>
+      <li><strong>Not increasing contributions with raises.</strong> When your salary goes up, increase your 401(k) contribution percentage to accelerate your savings without feeling the pinch.</li>
+    </ol>
+
+    <h2>401(k) Withdrawal Rules</h2>
+    <p>You can begin withdrawing from a traditional 401(k) without penalty at age 59 and a half. Withdrawals before that age incur a <strong>10% early withdrawal penalty</strong> plus ordinary income tax on the amount withdrawn. There are a few exceptions, including disability, certain medical expenses, and the "Rule of 55," which allows penalty-free withdrawals if you leave your employer at age 55 or older.</p>
+    <p>Required Minimum Distributions (RMDs) begin at age 73 for most account holders. If you do not withdraw the required amount, the IRS imposes a 25% excise tax on the shortfall. Roth 401(k) accounts are also subject to RMDs unless you roll the balance into a Roth IRA before reaching the RMD age.</p>
+    <p>When you leave a job, you have several options for your 401(k): leave it with your former employer (if the balance exceeds $7,000), roll it into your new employer's plan, roll it into a traditional or Roth IRA, or cash it out (not recommended due to taxes and penalties). A direct rollover to an IRA is often the best choice because it gives you the widest selection of investment options and avoids any tax consequences.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>How much should I contribute to my 401(k)?</h3>
+    <p>Financial advisors generally recommend contributing at least enough to get the full employer match, as that is essentially free money. Ideally, aim to save 10-15% of your gross salary for retirement. The IRS sets annual contribution limits, which are $23,500 for those under 50 and $31,000 for those 50 and older in 2025.</p>
+
+    <h3>How does employer matching work in a 401(k)?</h3>
+    <p>Employer matching means your company contributes additional money to your 401(k) based on your own contributions. A common match is 50% of your contributions up to 6% of your salary. For example, if you earn $60,000 and contribute 6% ($3,600), your employer adds 50% of that ($1,800). Not taking advantage of the full match is leaving free money on the table.</p>
+
+    <h3>What is the 4% rule for retirement withdrawals?</h3>
+    <p>The 4% rule is a guideline suggesting you can withdraw 4% of your retirement portfolio in the first year, then adjust for inflation each subsequent year, with a high probability your savings will last at least 30 years. For example, a $1,000,000 portfolio would provide $40,000 per year or about $3,333 per month in retirement income.</p>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/financial-calculators/retirement-savings-calculator/">Retirement Savings Calculator</a> - Project your retirement nest egg growth.</li>
+      <li><a href="/financial-calculators/compound-interest-calculator/">Compound Interest Calculator</a> - See how compounding accelerates your savings.</li>
+      <li><a href="/financial-calculators/investment-calculator/">Investment Calculator</a> - Estimate returns on general investments.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function formatCurrency(n: number): string {
+    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function calculate() {
+    const currentAge = parseInt((document.getElementById('currentAge') as HTMLInputElement).value) || 30;
+    const retirementAge = parseInt((document.getElementById('retirementAge') as HTMLInputElement).value) || 65;
+    const currentBalance = parseFloat((document.getElementById('currentBalance') as HTMLInputElement).value) || 0;
+    const annualContribution = parseFloat((document.getElementById('annualContribution') as HTMLInputElement).value) || 0;
+    const employerMatchPct = (parseFloat((document.getElementById('employerMatch') as HTMLInputElement).value) || 0) / 100;
+    const matchLimitPct = (parseFloat((document.getElementById('matchLimit') as HTMLInputElement).value) || 0) / 100;
+    let annualSalary = parseFloat((document.getElementById('annualSalary') as HTMLInputElement).value) || 0;
+    const annualReturn = (parseFloat((document.getElementById('annualReturn') as HTMLInputElement).value) || 0) / 100;
+    const salaryIncrease = (parseFloat((document.getElementById('salaryIncrease') as HTMLInputElement).value) || 0) / 100;
+
+    const years = Math.max(retirementAge - currentAge, 0);
+    let balance = currentBalance;
+    let totalContributions = 0;
+    let totalMatchContributions = 0;
+
+    const tableData: { age: number; contribution: number; match: number; balance: number }[] = [];
+
+    for (let y = 0; y < years; y++) {
+      const salary = annualSalary * Math.pow(1 + salaryIncrease, y);
+      const contribution = annualContribution;
+      const matchableAmount = salary * matchLimitPct;
+      const employerContribution = Math.min(contribution, matchableAmount) * employerMatchPct;
+
+      balance += contribution + employerContribution;
+      balance *= (1 + annualReturn);
+
+      totalContributions += contribution;
+      totalMatchContributions += employerContribution;
+
+      tableData.push({
+        age: currentAge + y + 1,
+        contribution: contribution,
+        match: employerContribution,
+        balance: balance,
+      });
+    }
+
+    const totalGains = balance - currentBalance - totalContributions - totalMatchContributions;
+    const monthlyIncome = (balance * 0.04) / 12;
+
+    document.getElementById('balanceAtRetirement')!.textContent = formatCurrency(balance);
+    document.getElementById('totalContributions')!.textContent = formatCurrency(totalContributions);
+    document.getElementById('totalMatch')!.textContent = formatCurrency(totalMatchContributions);
+    document.getElementById('totalGains')!.textContent = formatCurrency(totalGains);
+    document.getElementById('yearsToRetirement')!.textContent = years.toString();
+    document.getElementById('monthlyIncome')!.textContent = formatCurrency(monthlyIncome);
+
+    // Render table
+    const tbody = document.querySelector('#growthTable tbody')!;
+    tbody.innerHTML = tableData.map(d => `
+      <tr>
+        <td>${d.age}</td>
+        <td>${formatCurrency(d.contribution)}</td>
+        <td>${formatCurrency(d.match)}</td>
+        <td>${formatCurrency(d.balance)}</td>
+      </tr>
+    `).join('');
+  }
+
+  document.getElementById('calculateBtn')?.addEventListener('click', calculate);
+  calculate();
+</script>
