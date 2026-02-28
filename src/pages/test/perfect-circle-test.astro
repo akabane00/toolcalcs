@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import AdUnit from '../../components/AdUnit.astro';
 import { getGameBySlug, getRating } from '../../data/games';
 import '../../styles/game.css';
+import GameShare from '../../components/GameShare.astro';
 
 const game = getGameBySlug('perfect-circle-test')!;
 
@@ -81,6 +82,8 @@ const structuredData = [
     <div class="game-controls" id="circleControls" style="display:none;">
       <button class="game-btn primary" id="tryAgainBtn">Try Again</button>
     </div>
+
+    <GameShare />
 
     <div class="attempt-history" id="attemptHistory" style="display:none;">
       <h3>Attempt History</h3>
@@ -187,6 +190,10 @@ const structuredData = [
     }
   }
 </style>
+
+<script define:vars={{ gameName: game.title, gameSlug: game.slug, gameIcon: game.icon, metricLabel: game.metricLabel, metricUnit: game.metricUnit }}>
+  window.__gameShareVars = { gameName, gameSlug, gameIcon, metricLabel, metricUnit };
+</script>
 
 <script>
   interface HistoryEntry {
@@ -451,6 +458,20 @@ const structuredData = [
     // Save to history
     saveToHistory(score, rating.label, rating.color);
     renderHistory();
+
+    if ((window as any).GameShare) {
+      const gsv = (window as any).__gameShareVars;
+      (window as any).GameShare.show({
+        gameName: gsv.gameName,
+        gameSlug: gsv.gameSlug,
+        gameIcon: gsv.gameIcon,
+        score: score,
+        unit: gsv.metricUnit,
+        metricLabel: gsv.metricLabel,
+        ratingLabel: rating.label,
+        ratingColor: rating.color
+      });
+    }
   }
 
   // --- Try Again ---

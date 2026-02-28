@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import AdUnit from '../../components/AdUnit.astro';
 import { getGameBySlug } from '../../data/games';
 import '../../styles/game.css';
+import GameShare from '../../components/GameShare.astro';
 
 const game = getGameBySlug('chimp-test')!;
 
@@ -77,6 +78,8 @@ const structuredData = [
         <button class="game-btn primary" id="tryAgainBtn" type="button" style="margin-top:16px;">Try Again</button>
       </div>
     </div>
+
+    <GameShare />
 
     <div class="attempt-history" id="attemptHistory" hidden>
       <h3>Attempt History</h3>
@@ -233,7 +236,7 @@ const structuredData = [
   }
 </style>
 
-<script>
+<script define:vars={{ gameName: game.title, gameSlug: game.slug, gameIcon: game.icon, metricLabel: game.metricLabel, metricUnit: game.metricUnit }}>
   (function () {
     'use strict';
 
@@ -427,6 +430,19 @@ const structuredData = [
       ratingBadge.style.background = rating.color;
       addToHistory(score);
       renderHistory();
+
+      if (window.GameShare) {
+        window.GameShare.show({
+          gameName: gameName,
+          gameSlug: gameSlug,
+          gameIcon: gameIcon,
+          score: score,
+          unit: metricUnit,
+          metricLabel: metricLabel,
+          ratingLabel: rating.label,
+          ratingColor: rating.color
+        });
+      }
     }
 
     function renderHistory() {

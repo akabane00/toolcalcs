@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import AdUnit from '../../components/AdUnit.astro';
 import { getGameBySlug, getRating } from '../../data/games';
 import '../../styles/game.css';
+import GameShare from '../../components/GameShare.astro';
 
 const game = getGameBySlug('aim-trainer')!;
 
@@ -83,6 +84,8 @@ const structuredData = [
       <button class="game-btn primary" id="btn-start" type="button">Start</button>
       <button class="game-btn primary" id="btn-retry" type="button" style="display:none;">Try Again</button>
     </div>
+
+    <GameShare />
 
     <div class="attempt-history" id="attempt-history" style="display:none;">
       <h3>Attempt History</h3>
@@ -232,6 +235,10 @@ const structuredData = [
     .aim-message { font-size: 1.2rem; padding: 24px; }
   }
 </style>
+
+<script define:vars={{ gameName: game.title, gameSlug: game.slug, gameIcon: game.icon, metricLabel: game.metricLabel, metricUnit: game.metricUnit }}>
+  window.__gameShareVars = { gameName, gameSlug, gameIcon, metricLabel, metricUnit };
+</script>
 
 <script>
   (function() {
@@ -417,6 +424,20 @@ const structuredData = [
 
       // Save to history
       saveHistory(avg, rating);
+
+      if ((window as any).GameShare) {
+        const gsv = (window as any).__gameShareVars;
+        (window as any).GameShare.show({
+          gameName: gsv.gameName,
+          gameSlug: gsv.gameSlug,
+          gameIcon: gsv.gameIcon,
+          score: avg,
+          unit: gsv.metricUnit,
+          metricLabel: gsv.metricLabel,
+          ratingLabel: rating.label,
+          ratingColor: rating.color
+        });
+      }
 
       // Hide HUD, show results
       aimHud.classList.remove('visible');

@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import AdUnit from '../../components/AdUnit.astro';
 import { getGameBySlug, getRating } from '../../data/games';
 import '../../styles/game.css';
+import GameShare from '../../components/GameShare.astro';
 
 const game = getGameBySlug('reaction-time-test')!;
 
@@ -89,6 +90,8 @@ const structuredData = [
       <button class="game-btn primary" id="btn-start" type="button">Start Test</button>
       <button class="game-btn primary" id="btn-retry" type="button" style="display:none;">Try Again</button>
     </div>
+
+    <GameShare />
 
     <div class="attempt-history" id="attempt-history" style="display:none;">
       <h3>Attempt History</h3>
@@ -197,7 +200,7 @@ const structuredData = [
   }
 </style>
 
-<script define:vars={{ ratingScale: game.ratingScale, lowerIsBetter: game.lowerIsBetter, metricUnit: game.metricUnit }}>
+<script define:vars={{ ratingScale: game.ratingScale, lowerIsBetter: game.lowerIsBetter, metricUnit: game.metricUnit, gameName: game.title, gameSlug: game.slug, gameIcon: game.icon, metricLabel: game.metricLabel }}>
   (function () {
     'use strict';
 
@@ -371,6 +374,19 @@ const structuredData = [
       // Save to history
       saveAttempt(reactionTime, rating);
       renderHistory();
+
+      if (window.GameShare) {
+        window.GameShare.show({
+          gameName: gameName,
+          gameSlug: gameSlug,
+          gameIcon: gameIcon,
+          score: reactionTime,
+          unit: metricUnit,
+          metricLabel: metricLabel,
+          ratingLabel: rating.label,
+          ratingColor: rating.color
+        });
+      }
     }
 
     // --- History ---

@@ -1,0 +1,238 @@
+---
+// GameShare.astro — Reusable viral sharing component for game/test result pages.
+// Usage:
+//   1. Add <GameShare /> inside .game-box (after .game-controls, before .attempt-history)
+//   2. Add gameName/gameSlug/gameIcon/metricLabel to define:vars
+//   3. Call window.GameShare.show({...}) in showResult()
+---
+
+<div class="share-bar" id="shareBar" style="display:none;">
+  <div class="share-card" id="shareCard">
+    <div class="share-card-top">
+      <span class="share-card-icon" id="shareCardIcon"></span>
+      <span class="share-card-name" id="shareCardName"></span>
+    </div>
+    <div class="share-card-score" id="shareCardScore"></div>
+    <div class="share-card-label" id="shareCardLabel"></div>
+    <span class="share-card-badge" id="shareCardBadge"></span>
+  </div>
+  <div class="share-actions">
+    <button class="share-btn share-native" id="btnShareNative" type="button" style="display:none;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      Share Result
+    </button>
+    <button class="share-btn" id="btnShareX" type="button" title="Share on X / Twitter">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      Twitter
+    </button>
+    <button class="share-btn" id="btnShareFB" type="button" title="Share on Facebook">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+      Facebook
+    </button>
+    <button class="share-btn" id="btnShareCopy" type="button" title="Copy share link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      Copy Link
+    </button>
+    <button class="share-btn" id="btnShareImg" type="button" title="Download result image">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Save Image
+    </button>
+  </div>
+</div>
+<canvas id="shareCanvas" width="600" height="315" style="display:none;position:absolute;left:-9999px;"></canvas>
+
+<script>
+  // GameShare — global API for game pages to trigger share UI
+  (function initGameShare() {
+    const shareBar = document.getElementById('shareBar');
+    const canvas = document.getElementById('shareCanvas') as HTMLCanvasElement;
+    const cardIcon = document.getElementById('shareCardIcon');
+    const cardName = document.getElementById('shareCardName');
+    const cardScore = document.getElementById('shareCardScore');
+    const cardLabel = document.getElementById('shareCardLabel');
+    const cardBadge = document.getElementById('shareCardBadge');
+    const btnNative = document.getElementById('btnShareNative');
+    const btnX = document.getElementById('btnShareX');
+    const btnFB = document.getElementById('btnShareFB');
+    const btnCopy = document.getElementById('btnShareCopy');
+    const btnImg = document.getElementById('btnShareImg');
+
+    if (!shareBar || !canvas) return;
+
+    let current: any = null;
+
+    // --- Canvas helpers ---
+    function rrect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.arcTo(x + w, y, x + w, y + r, r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+      ctx.lineTo(x + r, y + h);
+      ctx.arcTo(x, y + h, x, y + h - r, r);
+      ctx.lineTo(x, y + r);
+      ctx.arcTo(x, y, x + r, y, r);
+      ctx.closePath();
+    }
+
+    function drawShareImage(d: any) {
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      const W = 600, H = 315;
+
+      // Background
+      const bg = ctx.createLinearGradient(0, 0, W, H);
+      bg.addColorStop(0, '#1e293b');
+      bg.addColorStop(1, '#0f172a');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, W, H);
+
+      // Top accent bar
+      ctx.fillStyle = d.ratingColor || '#2563eb';
+      ctx.fillRect(0, 0, W, 5);
+
+      // Site name
+      ctx.fillStyle = '#64748b';
+      ctx.font = '500 13px system-ui, -apple-system, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('ToolCalcs.com', 28, 36);
+
+      // Game name
+      ctx.fillStyle = '#cbd5e1';
+      ctx.font = '600 19px system-ui, -apple-system, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(d.gameName, W / 2, 80);
+
+      // Score (large)
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '800 58px system-ui, -apple-system, sans-serif';
+      ctx.fillText(String(d.score), W / 2, 155);
+
+      // Unit / metric label
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '400 15px system-ui, -apple-system, sans-serif';
+      ctx.fillText(d.unit, W / 2, 180);
+
+      // Rating pill
+      const pillText = d.ratingLabel;
+      ctx.font = '600 15px system-ui, -apple-system, sans-serif';
+      const pw = ctx.measureText(pillText).width + 30;
+      ctx.fillStyle = d.ratingColor || '#2563eb';
+      rrect(ctx, (W - pw) / 2, 200, pw, 30, 15);
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(pillText, W / 2, 215);
+      ctx.textBaseline = 'alphabetic';
+
+      // Footer URL
+      ctx.fillStyle = '#475569';
+      ctx.font = '400 12px system-ui, -apple-system, sans-serif';
+      ctx.fillText('toolcalcs.com/test/' + d.gameSlug + '/', W / 2, 288);
+    }
+
+    // --- URL & text helpers ---
+    function shareUrl(d: any): string {
+      return 'https://toolcalcs.com/test/' + d.gameSlug + '/';
+    }
+
+    function shareText(d: any): string {
+      return 'I scored ' + d.score + ' ' + d.unit + ' (' + d.ratingLabel + ') on the ' + d.gameName + '! Can you beat me?';
+    }
+
+    // --- Show native share if available ---
+    if (navigator.share) {
+      btnNative!.style.display = '';
+    }
+
+    // --- Button handlers ---
+    btnNative?.addEventListener('click', function () {
+      if (!current) return;
+      canvas.toBlob(function (blob) {
+        const files = blob ? [new File([blob], current.gameSlug + '-result.png', { type: 'image/png' })] : undefined;
+        const shareData: ShareData = {
+          title: current.gameName + ' Result',
+          text: shareText(current),
+          url: shareUrl(current),
+        };
+        // Try sharing with file first, fall back to text-only
+        if (files && navigator.canShare && navigator.canShare({ files })) {
+          shareData.files = files;
+        }
+        navigator.share(shareData).catch(function () { /* user cancelled */ });
+      }, 'image/png');
+    });
+
+    btnX?.addEventListener('click', function () {
+      if (!current) return;
+      const t = encodeURIComponent(shareText(current));
+      const u = encodeURIComponent(shareUrl(current));
+      window.open('https://twitter.com/intent/tweet?text=' + t + '&url=' + u, '_blank', 'width=550,height=420');
+    });
+
+    btnFB?.addEventListener('click', function () {
+      if (!current) return;
+      const u = encodeURIComponent(shareUrl(current));
+      window.open('https://www.facebook.com/sharer/sharer.php?u=' + u, '_blank', 'width=550,height=420');
+    });
+
+    btnCopy?.addEventListener('click', function () {
+      if (!current) return;
+      navigator.clipboard.writeText(shareUrl(current)).then(function () {
+        const span = btnCopy!.querySelector('svg + *') || btnCopy!.lastChild;
+        if (span && span.nodeType === Node.TEXT_NODE) {
+          span.textContent = ' Copied!';
+          btnCopy!.classList.add('copied');
+          setTimeout(function () {
+            span.textContent = ' Copy Link';
+            btnCopy!.classList.remove('copied');
+          }, 2000);
+        }
+      });
+    });
+
+    btnImg?.addEventListener('click', function () {
+      if (!current) return;
+      const a = document.createElement('a');
+      a.download = current.gameSlug + '-result.png';
+      a.href = canvas.toDataURL('image/png');
+      a.click();
+    });
+
+    // --- Public API ---
+    (window as any).GameShare = {
+      show: function (d: {
+        gameName: string;
+        gameSlug: string;
+        gameIcon: string;
+        score: number | string;
+        unit: string;
+        metricLabel: string;
+        ratingLabel: string;
+        ratingColor: string;
+      }) {
+        current = d;
+
+        // Update preview card
+        if (cardIcon) cardIcon.textContent = d.gameIcon;
+        if (cardName) cardName.textContent = d.gameName;
+        if (cardScore) cardScore.textContent = d.score + ' ' + d.unit;
+        if (cardLabel) cardLabel.textContent = d.metricLabel;
+        if (cardBadge) {
+          cardBadge.textContent = d.ratingLabel;
+          cardBadge.style.background = d.ratingColor;
+        }
+
+        // Generate downloadable image
+        drawShareImage(d);
+
+        // Reveal
+        shareBar!.style.display = '';
+      },
+      hide: function () {
+        shareBar!.style.display = 'none';
+      },
+    };
+  })();
+</script>

@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import AdUnit from '../../components/AdUnit.astro';
 import { getGameBySlug, getRating } from '../../data/games';
 import '../../styles/game.css';
+import GameShare from '../../components/GameShare.astro';
 
 const game = getGameBySlug('number-memory-test')!;
 
@@ -115,6 +116,8 @@ const structuredData = [
         <button class="game-btn primary" id="tryAgainBtn" type="button" style="margin-top:16px;">Try Again</button>
       </div>
     </div>
+
+    <GameShare />
 
     <div class="attempt-history" id="attemptHistory" hidden>
       <h3>Attempt History</h3>
@@ -358,7 +361,7 @@ const structuredData = [
   }
 </style>
 
-<script>
+<script define:vars={{ gameName: game.title, gameSlug: game.slug, gameIcon: game.icon, metricLabel: game.metricLabel, metricUnit: game.metricUnit }}>
   (function () {
     // --- Rating scale (min-based, as specified) ---
     const RATING_SCALE = [
@@ -608,6 +611,19 @@ const structuredData = [
       // Save to history
       addToHistory(score);
       renderHistory();
+
+      if (window.GameShare) {
+        window.GameShare.show({
+          gameName: gameName,
+          gameSlug: gameSlug,
+          gameIcon: gameIcon,
+          score: score,
+          unit: metricUnit,
+          metricLabel: metricLabel,
+          ratingLabel: rating.label,
+          ratingColor: rating.color
+        });
+      }
     }
 
     function escapeHtml(text: string): string {

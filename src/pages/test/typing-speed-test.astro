@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import AdUnit from '../../components/AdUnit.astro';
 import { getGameBySlug, getRating } from '../../data/games';
 import '../../styles/game.css';
+import GameShare from '../../components/GameShare.astro';
 
 const game = getGameBySlug('typing-speed-test')!;
 
@@ -104,6 +105,8 @@ const structuredData = [
       <button id="btn-start" class="game-btn primary" type="button">Start Test</button>
       <button id="btn-retry" class="game-btn primary" type="button" hidden>Try Again</button>
     </div>
+
+    <GameShare />
 
     <!-- Attempt history -->
     <div id="history-section" class="attempt-history" hidden>
@@ -312,6 +315,10 @@ const structuredData = [
   }
 </style>
 
+<script define:vars={{ gameName: game.title, gameSlug: game.slug, gameIcon: game.icon, metricLabel: game.metricLabel, metricUnit: game.metricUnit }}>
+  window.__gameShareVars = { gameName, gameSlug, gameIcon, metricLabel, metricUnit };
+</script>
+
 <script>
   (function () {
     // --- Passages ---
@@ -508,6 +515,20 @@ const structuredData = [
       // Save to history
       saveAttempt(wpm, accuracy);
       renderHistory();
+
+      if ((window as any).GameShare) {
+        const gsv = (window as any).__gameShareVars;
+        (window as any).GameShare.show({
+          gameName: gsv.gameName,
+          gameSlug: gsv.gameSlug,
+          gameIcon: gsv.gameIcon,
+          score: wpm,
+          unit: gsv.metricUnit,
+          metricLabel: gsv.metricLabel,
+          ratingLabel: rating.label,
+          ratingColor: rating.color
+        });
+      }
     }
 
     function saveAttempt(wpm: number, accuracy: number): void {

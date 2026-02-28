@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import AdUnit from '../../components/AdUnit.astro';
 import { getGameBySlug, getRating } from '../../data/games';
 import '../../styles/game.css';
+import GameShare from '../../components/GameShare.astro';
 
 const game = getGameBySlug('cps-test')!;
 
@@ -97,6 +98,8 @@ const structuredData = [
     <div class="game-controls" id="cpsControls" style="display:none;">
       <button class="game-btn primary" id="cpsTryAgain" type="button">Try Again</button>
     </div>
+
+    <GameShare />
 
     <!-- Attempt History -->
     <div class="attempt-history" id="cpsHistory" hidden>
@@ -308,6 +311,10 @@ const structuredData = [
   }
 </style>
 
+<script define:vars={{ gameName: game.title, gameSlug: game.slug, gameIcon: game.icon, metricLabel: game.metricLabel, metricUnit: game.metricUnit }}>
+  window.__gameShareVars = { gameName, gameSlug, gameIcon, metricLabel, metricUnit };
+</script>
+
 <script>
   (function () {
     // --- Game configuration & DOM references ---
@@ -445,6 +452,20 @@ const structuredData = [
       // Save to history
       saveAttempt(cps, rating.label);
       renderHistory();
+
+      if (window.GameShare) {
+        const gsv = (window as any).__gameShareVars;
+        window.GameShare.show({
+          gameName: gsv.gameName,
+          gameSlug: gsv.gameSlug,
+          gameIcon: gsv.gameIcon,
+          score: cps,
+          unit: gsv.metricUnit,
+          metricLabel: gsv.metricLabel,
+          ratingLabel: rating.label,
+          ratingColor: rating.color
+        });
+      }
     }
 
     // --- Click handler on game area ---
