@@ -1,0 +1,403 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getToolBySlug } from '../../data/tools';
+import '../../styles/tool.css';
+
+const tool = getToolBySlug('regex-tester')!;
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Web Tools", "item": "https://toolcalcs.com/tools/" },
+      { "@type": "ListItem", "position": 3, "name": "Regex Tester" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is a regular expression?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A regular expression (regex) is a sequence of characters that defines a search pattern. It is used for pattern matching within strings — finding, replacing, or validating text. Regular expressions are supported in virtually every programming language including JavaScript, Python, Java, and more."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What do the regex flags mean?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Common regex flags include: g (global) finds all matches instead of just the first; i (case-insensitive) ignores uppercase/lowercase differences; m (multiline) makes ^ and $ match line boundaries; s (dotAll) makes . match newline characters; u (unicode) enables full Unicode support."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Regex Tester - Test Regular Expressions Online | ToolCalcs"
+  description="Test and debug regular expressions in real time. See matches highlighted in your test string with capture group details. Free online regex tester."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/tools/">Web Tools</a> &rsaquo;
+    <span>Regex Tester</span>
+  </nav>
+
+  <h1>Regex Tester</h1>
+  <p class="page-desc">Test regular expressions against your text in real time. See matches highlighted with capture group details.</p>
+
+  <div class="tool-box">
+    <div class="regex-input-row">
+      <span class="regex-slash">/</span>
+      <input type="text" id="regexPattern" class="regex-pattern-input" placeholder="Enter regex pattern..." value="\b\w+@\w+\.\w+\b" />
+      <span class="regex-slash">/</span>
+      <input type="text" id="regexFlags" class="regex-flags-input" placeholder="flags" value="gi" maxlength="6" />
+    </div>
+    <div class="tool-error" id="regexError" style="display:none;"></div>
+
+    <div class="flag-toggles">
+      <label class="flag-chip"><input type="checkbox" id="flagG" checked /> <span>g</span> global</label>
+      <label class="flag-chip"><input type="checkbox" id="flagI" checked /> <span>i</span> case-insensitive</label>
+      <label class="flag-chip"><input type="checkbox" id="flagM" /> <span>m</span> multiline</label>
+      <label class="flag-chip"><input type="checkbox" id="flagS" /> <span>s</span> dotAll</label>
+      <label class="flag-chip"><input type="checkbox" id="flagU" /> <span>u</span> unicode</label>
+    </div>
+
+    <div class="tool-input-area" style="margin-top:12px;">
+      <span class="tool-label">Test String</span>
+      <textarea class="tool-textarea" id="testString" rows="6" placeholder="Enter text to test against...">Contact us at support@example.com or sales@toolcalcs.com for help.</textarea>
+    </div>
+
+    <div class="match-output" id="matchOutput" style="margin-top:12px;">
+      <span class="tool-label">Highlighted Matches</span>
+      <div class="highlight-area" id="highlightArea"></div>
+    </div>
+
+    <div class="match-details" id="matchDetails" style="margin-top:12px;">
+      <span class="tool-label" id="matchCount">0 matches</span>
+      <div class="match-list" id="matchList"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="regex-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>What Is a Regular Expression?</h2>
+    <p>A regular expression (regex or regexp) is a sequence of characters that defines a search pattern. Originally developed in the 1950s by mathematician Stephen Kleene, regular expressions are used in virtually every programming language for pattern matching within strings — finding, replacing, validating, and extracting text that matches specific patterns.</p>
+    <p>Regular expressions are indispensable tools for developers, data analysts, system administrators, and anyone who works with text processing. They can match simple literal text or complex patterns including character classes, quantifiers, grouping, lookahead/lookbehind assertions, and backreferences.</p>
+
+    <h2>How to Use This Tool</h2>
+    <p>Enter your regex pattern in the pattern field between the forward slashes. Toggle the flags using the checkboxes or type them directly in the flags field. Type or paste your test string in the text area. Matches are highlighted in real time as you type, and match details including capture groups are displayed below.</p>
+
+    <h2>Regex Flags Explained</h2>
+    <ul>
+      <li><strong>g (global):</strong> Find all matches in the string, not just the first one.</li>
+      <li><strong>i (case-insensitive):</strong> Ignore case differences when matching. "hello" matches "Hello", "HELLO", etc.</li>
+      <li><strong>m (multiline):</strong> Makes <code>^</code> and <code>$</code> match the start/end of each line, not just the entire string.</li>
+      <li><strong>s (dotAll):</strong> Makes the dot <code>.</code> match newline characters (<code>\n</code>), which it normally does not.</li>
+      <li><strong>u (unicode):</strong> Enables full Unicode matching, treating surrogate pairs as single characters and enabling Unicode property escapes.</li>
+    </ul>
+
+    <h2>Common Regex Patterns</h2>
+    <ul>
+      <li><strong>Email:</strong> <code>{`\\b[\\w.-]+@[\\w.-]+\\.\\w{2,}\\b`}</code></li>
+      <li><strong>URL:</strong> <code>{'https?://[^\\s/$.?#].[^\\s]*'}</code></li>
+      <li><strong>Phone (US):</strong> <code>{`\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\\s]?\\d{4}`}</code></li>
+      <li><strong>IP Address:</strong> <code>{`\\b\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\b`}</code></li>
+      <li><strong>Date (YYYY-MM-DD):</strong> <code>{`\\d{4}-\\d{2}-\\d{2}`}</code></li>
+      <li><strong>HTML Tag:</strong> <code>&lt;[^&gt;]+&gt;</code></li>
+      <li><strong>Hex Color:</strong> <code>{`#([0-9a-fA-F]{3}){1,2}\\b`}</code></li>
+    </ul>
+
+    <h2>Regex Syntax Quick Reference</h2>
+    <ul>
+      <li><code>.</code> — Any character (except newline without s flag)</li>
+      <li><code>\d</code> — Digit (0-9), <code>\D</code> — Non-digit</li>
+      <li><code>\w</code> — Word character (letter, digit, underscore), <code>\W</code> — Non-word</li>
+      <li><code>\s</code> — Whitespace, <code>\S</code> — Non-whitespace</li>
+      <li><code>^</code> — Start of string/line, <code>$</code> — End of string/line</li>
+      <li><code>[abc]</code> — Character class, <code>[^abc]</code> — Negated class</li>
+      <li><code>*</code> — 0 or more, <code>+</code> — 1 or more, <code>?</code> — 0 or 1</li>
+      <li><code>{'{n}'}</code> — Exactly n, <code>{'{n,m}'}</code> — Between n and m</li>
+      <li><code>(abc)</code> — Capture group, <code>(?:abc)</code> — Non-capture group</li>
+      <li><code>a|b</code> — Alternation (a or b)</li>
+      <li><code>(?=abc)</code> — Positive lookahead, <code>(?!abc)</code> — Negative lookahead</li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is a regular expression?</h3>
+    <p>A regular expression is a pattern that describes a set of strings. It is used for searching, matching, and manipulating text in programming. Virtually every language supports regex — JavaScript, Python, Java, PHP, Go, Ruby, and more.</p>
+
+    <h3>What do the regex flags mean?</h3>
+    <p>Flags modify how the regex engine processes the pattern. The most common are: <strong>g</strong> (global — find all matches), <strong>i</strong> (case-insensitive), <strong>m</strong> (multiline — ^ and $ match per line), <strong>s</strong> (dotAll — . matches newlines), and <strong>u</strong> (Unicode support).</p>
+
+    <h2>Related Tools</h2>
+    <ul>
+      <li><a href="/tools/text-case-converter/">Text Case Converter</a> — Convert text between different cases.</li>
+      <li><a href="/tools/json-formatter/">JSON Formatter</a> — Format and validate JSON data.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="regex-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .regex-input-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 8px 12px;
+  }
+  .regex-slash { font-size: 1.2rem; color: var(--color-text-muted); font-weight: 300; }
+  .regex-pattern-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 1rem;
+    color: var(--color-text);
+    outline: none;
+    min-width: 0;
+  }
+  .regex-flags-input {
+    width: 60px;
+    border: none;
+    background: transparent;
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 1rem;
+    color: var(--color-primary);
+    outline: none;
+    font-weight: 600;
+  }
+
+  .flag-toggles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .flag-chip {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+    transition: border-color 0.15s;
+  }
+  :global(.flag-chip.active) {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  .flag-chip input { width: 14px; height: 14px; margin: 0; accent-color: var(--color-primary); }
+  .flag-chip span { font-weight: 700; font-family: 'Courier New', monospace; }
+
+  .highlight-area {
+    padding: 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-bg);
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    min-height: 60px;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  :global(.regex-match) {
+    background: #bfdbfe;
+    border-radius: 2px;
+    padding: 1px 0;
+  }
+  :global(.regex-match:nth-of-type(even)) { background: #c7d2fe; }
+
+  .match-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  :global(.match-item) {
+    padding: 6px 10px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    font-size: 0.8rem;
+    font-family: 'Courier New', monospace;
+    display: flex;
+    gap: 12px;
+    align-items: baseline;
+  }
+  :global(.match-idx) { color: var(--color-text-muted); font-weight: 600; min-width: 30px; }
+  :global(.match-val) { color: var(--color-text); word-break: break-all; }
+  :global(.match-groups) { color: var(--color-primary); font-size: 0.75rem; }
+
+  @media (max-width: 640px) {
+    .regex-pattern-input { font-size: 0.9rem; }
+    .flag-toggles { gap: 6px; }
+    .flag-chip { font-size: 0.75rem; padding: 3px 6px; }
+  }
+</style>
+
+<script>
+  (function () {
+    'use strict';
+
+    const patternEl = document.getElementById('regexPattern') as HTMLInputElement;
+    const flagsEl = document.getElementById('regexFlags') as HTMLInputElement;
+    const testStringEl = document.getElementById('testString') as HTMLTextAreaElement;
+    const highlightArea = document.getElementById('highlightArea')!;
+    const matchCount = document.getElementById('matchCount')!;
+    const matchList = document.getElementById('matchList')!;
+    const errorEl = document.getElementById('regexError')!;
+
+    const flagCheckboxes: Record<string, HTMLInputElement> = {
+      g: document.getElementById('flagG') as HTMLInputElement,
+      i: document.getElementById('flagI') as HTMLInputElement,
+      m: document.getElementById('flagM') as HTMLInputElement,
+      s: document.getElementById('flagS') as HTMLInputElement,
+      u: document.getElementById('flagU') as HTMLInputElement,
+    };
+
+    function updateChipStyles() {
+      for (const [, cb] of Object.entries(flagCheckboxes)) {
+        const chip = cb.closest('.flag-chip') as HTMLElement;
+        if (chip) chip.classList.toggle('active', cb.checked);
+      }
+    }
+
+    // Sync flags between text input and checkboxes
+    function syncFlagsFromCheckboxes() {
+      let flags = '';
+      for (const [f, cb] of Object.entries(flagCheckboxes)) {
+        if (cb.checked) flags += f;
+      }
+      flagsEl.value = flags;
+      updateChipStyles();
+      runTest();
+    }
+
+    function syncCheckboxesFromFlags() {
+      const flags = flagsEl.value;
+      for (const [f, cb] of Object.entries(flagCheckboxes)) {
+        cb.checked = flags.includes(f);
+      }
+      updateChipStyles();
+      runTest();
+    }
+
+    function escapeHtml(s: string): string {
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function runTest() {
+      const pattern = patternEl.value;
+      const flags = flagsEl.value;
+      const text = testStringEl.value;
+
+      // Clear previous results
+      errorEl.style.display = 'none';
+
+      if (!pattern) {
+        highlightArea.textContent = text;
+        matchCount.textContent = '0 matches';
+        matchList.innerHTML = '';
+        return;
+      }
+
+      let regex: RegExp;
+      try {
+        regex = new RegExp(pattern, flags);
+      } catch (e: any) {
+        errorEl.textContent = e.message || 'Invalid regular expression';
+        errorEl.style.display = '';
+        highlightArea.textContent = text;
+        matchCount.textContent = '0 matches';
+        matchList.innerHTML = '';
+        return;
+      }
+
+      // Find all matches
+      const matches: { index: number; match: string; groups: string[] }[] = [];
+      if (flags.includes('g')) {
+        let m: RegExpExecArray | null;
+        let safety = 0;
+        while ((m = regex.exec(text)) !== null && safety++ < 10000) {
+          matches.push({
+            index: m.index,
+            match: m[0],
+            groups: m.slice(1),
+          });
+          if (m[0].length === 0) regex.lastIndex++;
+        }
+      } else {
+        const m = regex.exec(text);
+        if (m) {
+          matches.push({
+            index: m.index,
+            match: m[0],
+            groups: m.slice(1),
+          });
+        }
+      }
+
+      // Build highlighted text
+      let html = '';
+      let lastIndex = 0;
+      for (const m of matches) {
+        if (m.index > lastIndex) {
+          html += escapeHtml(text.slice(lastIndex, m.index));
+        }
+        html += `<span class="regex-match">${escapeHtml(m.match)}</span>`;
+        lastIndex = m.index + m.match.length;
+      }
+      if (lastIndex < text.length) {
+        html += escapeHtml(text.slice(lastIndex));
+      }
+      highlightArea.innerHTML = html || escapeHtml(text);
+
+      // Match count
+      matchCount.textContent = `${matches.length} match${matches.length !== 1 ? 'es' : ''}`;
+
+      // Match details
+      matchList.innerHTML = matches.slice(0, 100).map((m, i) => {
+        let groupsHtml = '';
+        if (m.groups.length > 0) {
+          const parts = m.groups.map((g, j) => '$' + (j + 1) + ': "' + escapeHtml(g != null ? g : '') + '"');
+          groupsHtml = ' <span class="match-groups">[' + parts.join(', ') + ']</span>';
+        }
+        return `<div class="match-item">
+          <span class="match-idx">#${i + 1}</span>
+          <span class="match-val">"${escapeHtml(m.match)}" at index ${m.index}${groupsHtml}</span>
+        </div>`;
+      }).join('');
+    }
+
+    // Events
+    patternEl.addEventListener('input', runTest);
+    flagsEl.addEventListener('input', syncCheckboxesFromFlags);
+    testStringEl.addEventListener('input', runTest);
+    Object.values(flagCheckboxes).forEach(cb => cb.addEventListener('change', syncFlagsFromCheckboxes));
+
+    updateChipStyles();
+    runTest();
+  })();
+</script>

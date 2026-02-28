@@ -1,0 +1,410 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getToolBySlug } from '../../data/tools';
+import '../../styles/tool.css';
+
+const tool = getToolBySlug('image-compressor')!;
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Web Tools", "item": "https://toolcalcs.com/tools/" },
+      { "@type": "ListItem", "position": 3, "name": "Image Compressor" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How does image compression work?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Image compression reduces file size by removing redundant data. Lossy compression (JPEG) discards visual information the human eye is less sensitive to, achieving high compression ratios. Lossless compression (PNG) preserves all data using pattern detection. This browser-based tool uses the Canvas API to re-encode images at your chosen quality level."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is my image uploaded to a server?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. This tool processes images entirely in your browser using the HTML5 Canvas API. Your images never leave your device. All compression and resizing happens locally on your computer."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What image formats are supported?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "This tool accepts JPEG, PNG, WebP, GIF, and BMP input images. Output is available in JPEG (best for photos) or WebP (best compression with good quality) format. PNG output maintains the original quality for lossless needs."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Image Compressor - Compress Images Online Free | ToolCalcs"
+  description="Compress and resize images in your browser. Reduce file size while maintaining quality. No upload to server — 100% private. Supports JPEG, PNG, WebP."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/tools/">Web Tools</a> &rsaquo;
+    <span>Image Compressor</span>
+  </nav>
+
+  <h1>Image Compressor</h1>
+  <p class="page-desc">Compress and resize images entirely in your browser. Your files never leave your device.</p>
+
+  <div class="tool-box">
+    <div class="upload-area" id="uploadArea" role="button" tabindex="0" aria-label="Click or drop image to compress">
+      <div class="upload-icon" aria-hidden="true">🖼️</div>
+      <p class="upload-text">Click or drag & drop an image here</p>
+      <p class="upload-hint">Supports JPEG, PNG, WebP, GIF, BMP</p>
+      <input type="file" id="fileInput" accept="image/*" hidden />
+    </div>
+
+    <div class="compress-options" id="compressOptions" style="display:none;">
+      <div class="tool-options">
+        <div class="tool-option">
+          <label for="quality">Quality</label>
+          <div class="slider-row">
+            <input type="range" id="quality" min="10" max="100" value="80" step="1" />
+            <span class="slider-val" id="qualityVal">80%</span>
+          </div>
+        </div>
+        <div class="tool-option">
+          <label for="maxWidth">Max Width (px)</label>
+          <input type="number" id="maxWidth" value="1920" min="100" max="10000" step="1" />
+        </div>
+        <div class="tool-option">
+          <label for="outputFormat">Format</label>
+          <select id="outputFormat">
+            <option value="image/jpeg" selected>JPEG</option>
+            <option value="image/webp">WebP</option>
+            <option value="image/png">PNG (lossless)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="preview-row">
+        <div class="preview-card">
+          <span class="preview-label">Original</span>
+          <canvas id="originalPreview" class="preview-canvas"></canvas>
+          <div class="preview-stats" id="originalStats">—</div>
+        </div>
+        <div class="preview-arrow" aria-hidden="true">→</div>
+        <div class="preview-card">
+          <span class="preview-label">Compressed</span>
+          <canvas id="compressedPreview" class="preview-canvas"></canvas>
+          <div class="preview-stats" id="compressedStats">—</div>
+        </div>
+      </div>
+
+      <div class="savings-badge" id="savingsBadge" style="display:none;">
+        <span id="savingsText">—</span>
+      </div>
+
+      <div class="tool-controls">
+        <button class="tool-btn primary" id="downloadBtn" type="button">Download Compressed Image</button>
+        <button class="tool-btn secondary" id="resetBtn" type="button">Choose Another Image</button>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="image-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>How Image Compression Works</h2>
+    <p>Image compression reduces file size by removing or simplifying data that the human visual system is less sensitive to. There are two fundamental approaches:</p>
+    <ul>
+      <li><strong>Lossy compression (JPEG, WebP):</strong> Permanently discards some visual information to achieve much smaller file sizes. The compression ratio is controlled by a quality parameter — lower quality means smaller files but more visible artifacts. JPEG uses Discrete Cosine Transform (DCT) to remove high-frequency detail that humans barely perceive.</li>
+      <li><strong>Lossless compression (PNG):</strong> Preserves all original image data using pattern detection and efficient encoding. File sizes are larger than lossy formats but the image quality is identical to the original. PNG uses DEFLATE compression combined with predictive filtering.</li>
+    </ul>
+    <p>This tool uses your browser's built-in Canvas API to re-encode images. When you select JPEG or WebP output, the quality slider controls the lossy compression level. When you select PNG, the output is lossless regardless of the quality setting.</p>
+
+    <h2>Privacy: Your Images Stay Private</h2>
+    <p>Unlike many online image compression services, this tool processes everything entirely in your web browser using the HTML5 Canvas API. Your images are never uploaded to any server. The compression, resizing, and format conversion all happen locally on your device. This makes it ideal for compressing sensitive or personal images.</p>
+
+    <h2>When to Use Each Format</h2>
+    <ul>
+      <li><strong>JPEG:</strong> Best for photographs and complex images with many colors. Offers excellent compression ratios. Not suitable for text, logos, or images requiring transparency.</li>
+      <li><strong>WebP:</strong> Modern format by Google that provides 25-35% better compression than JPEG at equivalent quality. Supported by all major browsers. Excellent for web use.</li>
+      <li><strong>PNG:</strong> Best for graphics, logos, screenshots, and images requiring transparency. Produces larger files than JPEG/WebP for photographs but preserves every pixel perfectly.</li>
+    </ul>
+
+    <h2>Tips for Optimal Compression</h2>
+    <ul>
+      <li><strong>Quality 70-85%:</strong> For most photos, a quality of 70-85% provides excellent compression with minimal visible quality loss.</li>
+      <li><strong>Resize to actual display size:</strong> If an image will be displayed at 800px wide on a website, there's no need to keep it at 4000px. Resizing before compression dramatically reduces file size.</li>
+      <li><strong>Use WebP for web:</strong> If your target audience uses modern browsers, WebP provides significantly better compression than JPEG.</li>
+      <li><strong>Keep originals:</strong> Always keep your original high-resolution images. Compression is lossy and cannot be undone.</li>
+      <li><strong>Avoid re-compressing:</strong> Each round of lossy compression degrades quality further. Compress from the original source whenever possible.</li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>How does image compression work?</h3>
+    <p>Image compression reduces file size by removing redundant or less-important visual data. Lossy compression (JPEG, WebP) discards information the eye is less sensitive to. Lossless compression (PNG) uses efficient encoding to represent the same data in fewer bytes.</p>
+
+    <h3>Is my image uploaded to a server?</h3>
+    <p>No. This tool processes images entirely in your browser using the HTML5 Canvas API. Your images never leave your device.</p>
+
+    <h3>What image formats are supported?</h3>
+    <p>Input: JPEG, PNG, WebP, GIF, and BMP. Output: JPEG (best for photos), WebP (best compression), or PNG (lossless).</p>
+
+    <h2>Related Tools</h2>
+    <ul>
+      <li><a href="/tools/base64-encoder-decoder/">Base64 Encoder/Decoder</a> — Encode images to Base64 for embedding in HTML/CSS.</li>
+      <li><a href="/tools/color-converter/">Color Converter</a> — Convert between HEX, RGB, and HSL color formats.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="image-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .upload-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+    border: 2px dashed var(--color-border);
+    border-radius: var(--radius);
+    padding: 32px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    background: var(--color-bg);
+  }
+  .upload-area:hover, .upload-area.dragover {
+    border-color: var(--color-primary);
+    background: rgba(37, 99, 235, 0.04);
+  }
+  .upload-icon { font-size: 2.5rem; margin-bottom: 8px; }
+  .upload-text { font-weight: 600; margin-bottom: 4px; }
+  .upload-hint { font-size: 0.8rem; color: var(--color-text-muted); }
+
+  .slider-row { display: flex; align-items: center; gap: 8px; }
+  .slider-row input[type="range"] { flex: 1; accent-color: var(--color-primary); }
+  .slider-val { font-weight: 600; font-size: 0.9rem; min-width: 40px; }
+
+  .preview-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 16px 0;
+    overflow-x: auto;
+  }
+  .preview-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+  .preview-label { font-size: 0.85rem; font-weight: 600; color: var(--color-text-muted); }
+  .preview-canvas {
+    max-width: 100%;
+    max-height: 200px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: #f1f5f9;
+    object-fit: contain;
+  }
+  .preview-stats { font-size: 0.8rem; color: var(--color-text-muted); text-align: center; }
+  .preview-arrow { font-size: 1.5rem; color: var(--color-text-muted); flex-shrink: 0; }
+
+  .savings-badge {
+    text-align: center;
+    padding: 8px 16px;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+  }
+
+  @media (max-width: 640px) {
+    .preview-row { flex-direction: column; }
+    .preview-arrow { transform: rotate(90deg); }
+  }
+</style>
+
+<script>
+  (function () {
+    'use strict';
+
+    const uploadArea = document.getElementById('uploadArea')!;
+    const fileInput = document.getElementById('fileInput') as HTMLInputElement;
+    const compressOptions = document.getElementById('compressOptions')!;
+    const qualitySlider = document.getElementById('quality') as HTMLInputElement;
+    const qualityVal = document.getElementById('qualityVal')!;
+    const maxWidthInput = document.getElementById('maxWidth') as HTMLInputElement;
+    const formatSelect = document.getElementById('outputFormat') as HTMLSelectElement;
+    const originalPreview = document.getElementById('originalPreview') as HTMLCanvasElement;
+    const compressedPreview = document.getElementById('compressedPreview') as HTMLCanvasElement;
+    const originalStats = document.getElementById('originalStats')!;
+    const compressedStats = document.getElementById('compressedStats')!;
+    const savingsBadge = document.getElementById('savingsBadge')!;
+    const savingsText = document.getElementById('savingsText')!;
+    const downloadBtn = document.getElementById('downloadBtn')!;
+    const resetBtn = document.getElementById('resetBtn')!;
+
+    let originalImage: HTMLImageElement | null = null;
+    let originalFileSize = 0;
+    let compressedBlob: Blob | null = null;
+
+    function formatBytes(bytes: number): string {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / 1024 / 1024).toFixed(2) + ' MB';
+    }
+
+    function drawPreview(canvas: HTMLCanvasElement, img: HTMLImageElement, maxW: number) {
+      const scale = Math.min(1, maxW / img.naturalWidth);
+      const w = Math.round(img.naturalWidth * scale);
+      const h = Math.round(img.naturalHeight * scale);
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d')!;
+      ctx.drawImage(img, 0, 0, w, h);
+    }
+
+    async function compress() {
+      if (!originalImage) return;
+
+      const quality = parseInt(qualitySlider.value) / 100;
+      const maxWidth = parseInt(maxWidthInput.value) || 1920;
+      const format = formatSelect.value;
+
+      // Draw original preview (full size)
+      const origW = originalImage.naturalWidth;
+      const origH = originalImage.naturalHeight;
+
+      // Preview at small size
+      const previewMax = 300;
+      drawPreview(originalPreview, originalImage, previewMax);
+      originalStats.textContent = `${origW} × ${origH} — ${formatBytes(originalFileSize)}`;
+
+      // Compress: resize if needed, then re-encode
+      const scale = Math.min(1, maxWidth / origW);
+      const newW = Math.round(origW * scale);
+      const newH = Math.round(origH * scale);
+
+      const offscreen = document.createElement('canvas');
+      offscreen.width = newW;
+      offscreen.height = newH;
+      const ctx = offscreen.getContext('2d')!;
+      ctx.drawImage(originalImage, 0, 0, newW, newH);
+
+      // Get compressed blob
+      compressedBlob = await new Promise<Blob | null>(resolve => {
+        if (format === 'image/png') {
+          offscreen.toBlob(resolve, 'image/png');
+        } else {
+          offscreen.toBlob(resolve, format, quality);
+        }
+      });
+
+      if (!compressedBlob) return;
+
+      // Show compressed preview
+      const compressedUrl = URL.createObjectURL(compressedBlob);
+      const compImg = new Image();
+      compImg.onload = () => {
+        drawPreview(compressedPreview, compImg, previewMax);
+        URL.revokeObjectURL(compressedUrl);
+      };
+      compImg.src = compressedUrl;
+
+      const compSize = compressedBlob.size;
+      compressedStats.textContent = `${newW} × ${newH} — ${formatBytes(compSize)}`;
+
+      // Show savings
+      const saved = originalFileSize - compSize;
+      const pct = Math.round((saved / originalFileSize) * 100);
+      savingsBadge.style.display = '';
+      if (saved > 0) {
+        savingsBadge.style.background = '#dcfce7';
+        savingsBadge.style.color = '#166534';
+        savingsText.textContent = `Saved ${formatBytes(saved)} (${pct}% smaller)`;
+      } else {
+        savingsBadge.style.background = '#fef2f2';
+        savingsBadge.style.color = '#991b1b';
+        savingsText.textContent = `Output is ${formatBytes(Math.abs(saved))} larger. Try JPEG or lower quality.`;
+      }
+    }
+
+    function loadFile(file: File) {
+      if (!file.type.startsWith('image/')) return;
+      originalFileSize = file.size;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          originalImage = img;
+          uploadArea.style.display = 'none';
+          compressOptions.style.display = '';
+          compress();
+        };
+        img.src = e.target!.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Upload events
+    uploadArea.addEventListener('click', () => fileInput.click());
+    uploadArea.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') fileInput.click(); });
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files && fileInput.files[0]) loadFile(fileInput.files[0]);
+    });
+
+    // Drag and drop
+    uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+    uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      if (e.dataTransfer?.files[0]) loadFile(e.dataTransfer.files[0]);
+    });
+
+    // Options change
+    qualitySlider.addEventListener('input', () => {
+      qualityVal.textContent = qualitySlider.value + '%';
+      compress();
+    });
+    maxWidthInput.addEventListener('change', compress);
+    formatSelect.addEventListener('change', compress);
+
+    // Download
+    downloadBtn.addEventListener('click', () => {
+      if (!compressedBlob) return;
+      const ext = formatSelect.value === 'image/png' ? 'png' : formatSelect.value === 'image/webp' ? 'webp' : 'jpg';
+      const link = document.createElement('a');
+      link.download = `compressed.${ext}`;
+      link.href = URL.createObjectURL(compressedBlob);
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+    });
+
+    // Reset
+    resetBtn.addEventListener('click', () => {
+      originalImage = null;
+      compressedBlob = null;
+      fileInput.value = '';
+      uploadArea.style.display = '';
+      compressOptions.style.display = 'none';
+      savingsBadge.style.display = 'none';
+    });
+  })();
+</script>
