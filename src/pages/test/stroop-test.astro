@@ -1,0 +1,457 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getGameBySlug } from '../../data/games';
+import '../../styles/game.css';
+
+const game = getGameBySlug('stroop-test')!;
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Tests & Games", "item": "https://toolcalcs.com/test/" },
+    { "@type": "ListItem", "position": 3, "name": "Stroop Effect Test" }
+  ]
+};
+---
+
+<BaseLayout
+  title="Stroop Effect Test - Test Your Cognitive Speed Online | ToolCalcs"
+  description="Test your cognitive speed with the Stroop Effect. Color words are displayed in conflicting ink colors — identify the ink color, not the word. Free online Stroop test."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/test/">Tests & Games</a> &rsaquo;
+    <span>Stroop Effect Test</span>
+  </nav>
+
+  <h1>Stroop Effect Test</h1>
+  <p class="page-desc">A word will appear in a colored ink. Identify the INK COLOR, not the word itself. How fast can you override your reading instinct?</p>
+
+  <div class="game-box">
+    <div class="game-area" id="gameArea" role="region" aria-label="Stroop test area" aria-live="polite">
+      <div class="game-instructions" id="instructionsView">
+        <h2>Stroop Effect</h2>
+        <p>You'll see color words displayed in different ink colors. Click the button that matches the <strong>INK COLOR</strong> of the word, not the word itself. 20 rounds total.</p>
+        <div class="stroop-example">
+          <span style="color:#ef4444;font-size:1.8rem;font-weight:800;">BLUE</span>
+          <span class="example-hint">Answer: RED (the ink color)</span>
+        </div>
+        <button class="game-btn primary" id="startBtn" type="button" style="margin-top:16px;">Start Test</button>
+      </div>
+
+      <div class="play-view" id="playView" style="display:none;">
+        <div class="status-bar">
+          <span class="level-info" id="roundInfo">1 / 20</span>
+          <span class="level-info" id="correctInfo">0 correct</span>
+        </div>
+        <div class="stroop-word-container">
+          <span class="stroop-word" id="stroopWord">RED</span>
+        </div>
+        <p class="stroop-prompt">What is the INK COLOR?</p>
+        <div class="stroop-buttons" id="stroopButtons"></div>
+      </div>
+
+      <div class="result-view" id="resultView" style="display:none;">
+        <div class="result-icon" aria-hidden="true">🧪</div>
+        <div class="result-label">Test Complete</div>
+        <div class="score-display">
+          <span class="score-value" id="finalScore">0</span>
+          <span class="score-unit">ms average</span>
+        </div>
+        <div class="rating-badge" id="ratingBadge">—</div>
+        <div class="stroop-stats" id="stroopStats"></div>
+        <button class="game-btn primary" id="tryAgainBtn" type="button" style="margin-top:16px;">Try Again</button>
+      </div>
+    </div>
+
+    <div class="attempt-history" id="attemptHistory" hidden>
+      <h3>Attempt History</h3>
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is the Stroop Effect?</h2>
+    <p>The Stroop Effect is one of the most famous phenomena in cognitive psychology. First described by John Ridley Stroop in 1935, it demonstrates the interference that occurs when the brain processes conflicting information. When the word "RED" is printed in blue ink, your brain must suppress the automatic reading response to correctly identify the ink color.</p>
+    <p>This interference occurs because reading is a highly automated skill for literate adults. You cannot simply "not read" a word — your brain processes the word meaning automatically and involuntarily. When that meaning conflicts with the visual color information, your brain must engage executive control to resolve the conflict, which takes extra time and mental effort.</p>
+
+    <h2>How This Test Works</h2>
+    <p>The test presents 20 rounds. Each round displays a color word (RED, BLUE, GREEN, or YELLOW) in a randomly assigned ink color that may or may not match the word. Your task is to click the button that matches the ink color of the word as quickly as possible.</p>
+    <ul>
+      <li><strong>Congruent trials:</strong> The word matches the ink color (e.g., "RED" in red ink). These are easier and faster to respond to.</li>
+      <li><strong>Incongruent trials:</strong> The word conflicts with the ink color (e.g., "RED" in blue ink). These create the Stroop interference effect and are slower.</li>
+    </ul>
+    <p>Your score is the average response time for correct answers. Faster times indicate stronger cognitive control and processing speed.</p>
+
+    <h2>The Science Behind the Stroop Effect</h2>
+    <p>The Stroop Effect reveals several important principles about how the brain processes information:</p>
+    <h3>Automaticity</h3>
+    <p>Reading is an overlearned, automatic process. Once you've learned to read, you cannot look at a word without processing its meaning. This automaticity is useful in everyday life but creates interference in the Stroop task when the automatic response (reading the word) conflicts with the required response (naming the ink color).</p>
+    <h3>Processing Speed</h3>
+    <p>We process word meaning faster than we process color information. This speed difference means the word meaning arrives in conscious awareness before the color information, creating a bottleneck that must be resolved by executive control.</p>
+    <h3>Executive Function</h3>
+    <p>The anterior cingulate cortex (ACC) and dorsolateral prefrontal cortex (DLPFC) are the brain regions most active during Stroop interference. These areas are responsible for conflict monitoring, error detection, and response inhibition — collectively known as executive function.</p>
+
+    <h2>What Your Score Means</h2>
+    <ul>
+      <li><strong>Under 700ms:</strong> Exceptional cognitive control and processing speed. You can rapidly override automatic responses.</li>
+      <li><strong>700-1000ms:</strong> Fast response time indicating strong executive function and attentional control.</li>
+      <li><strong>1000-1500ms:</strong> Good performance. Most adults fall in this range, especially when first taking the test.</li>
+      <li><strong>1500-2000ms:</strong> Average. The interference effect is noticeably slowing your responses.</li>
+      <li><strong>Over 2000ms:</strong> The Stroop interference is having a strong effect. Practice and focus can help improve your time.</li>
+    </ul>
+
+    <h2>Factors That Affect Stroop Performance</h2>
+    <ul>
+      <li><strong>Practice:</strong> Repeated exposure reduces the interference effect as your brain becomes more efficient at suppressing the automatic reading response.</li>
+      <li><strong>Age:</strong> Children and older adults typically show larger Stroop effects than young adults.</li>
+      <li><strong>Fatigue and stress:</strong> Mental fatigue and acute stress impair executive function, leading to slower Stroop performance.</li>
+      <li><strong>Bilingualism:</strong> Research suggests that bilingual individuals may show smaller Stroop effects due to their practice at inhibiting one language while using another.</li>
+      <li><strong>Attention disorders:</strong> Individuals with ADHD often show larger Stroop interference effects, as the task requires sustained attention and impulse control.</li>
+    </ul>
+
+    <h2>Clinical Applications</h2>
+    <p>The Stroop test is used clinically to assess executive function in various conditions, including ADHD, traumatic brain injury, depression, schizophrenia, and age-related cognitive decline. It is part of many standard neuropsychological test batteries and is valued for its sensitivity to frontal lobe dysfunction.</p>
+    <p>In research settings, the Stroop task has been adapted in many ways — emotional Stroop (using emotion words), numerical Stroop (using number values and physical sizes), and spatial Stroop (using directional words and positions) — each revealing different aspects of cognitive control and attentional processing.</p>
+  </article>
+
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .game-area { cursor: default; user-select: auto; -webkit-user-select: auto; }
+
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+  }
+  .level-info { font-weight: 700; font-size: 1rem; color: var(--color-text); }
+
+  .stroop-example {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+  }
+  .example-hint {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+  }
+
+  .stroop-word-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 120px;
+    padding: 16px;
+  }
+  .stroop-word {
+    font-size: 3.5rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    user-select: none;
+  }
+  .stroop-prompt {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+
+  .stroop-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 0 16px 16px;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  :global(.stroop-color-btn) {
+    flex: 1 1 calc(50% - 10px);
+    min-width: 120px;
+    padding: 14px 20px;
+    border: 2px solid transparent;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: transform 0.1s, opacity 0.1s;
+  }
+  :global(.stroop-color-btn:hover) { transform: scale(0.97); opacity: 0.9; }
+  :global(.stroop-color-btn:active) { transform: scale(0.94); }
+  :global(.stroop-color-btn.flash-correct) {
+    box-shadow: 0 0 0 3px #16a34a;
+    animation: correctPulse 0.3s ease;
+  }
+  :global(.stroop-color-btn.flash-wrong) {
+    opacity: 0.5;
+    animation: wrongShake 0.3s ease;
+  }
+  @keyframes correctPulse {
+    50% { transform: scale(1.05); }
+  }
+  @keyframes wrongShake {
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
+  }
+
+  .play-view {
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .result-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 280px;
+    padding: 24px;
+  }
+  .result-icon { font-size: 3rem; margin-bottom: 8px; }
+  .result-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+
+  .stroop-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 12px;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    text-align: center;
+  }
+
+  @media (max-width: 640px) {
+    .stroop-word { font-size: 2.5rem; }
+    :global(.stroop-color-btn) { min-width: 100px; padding: 12px 16px; font-size: 0.9rem; }
+  }
+</style>
+
+<script>
+  (function () {
+    'use strict';
+
+    const COLORS = [
+      { name: 'RED', hex: '#ef4444' },
+      { name: 'BLUE', hex: '#3b82f6' },
+      { name: 'GREEN', hex: '#22c55e' },
+      { name: 'YELLOW', hex: '#eab308' },
+    ];
+    const TOTAL_ROUNDS = 20;
+
+    const RATING_SCALE = [
+      { min: 0, max: 700, label: 'Incredible!', color: '#16a34a' },
+      { min: 0, max: 1000, label: 'Fast!', color: '#22c55e' },
+      { min: 0, max: 1500, label: 'Good', color: '#2563eb' },
+      { min: 0, max: 2000, label: 'Average', color: '#f59e0b' },
+      { min: 0, max: Infinity, label: 'Slow', color: '#ef4444' },
+    ];
+
+    function getLocalRating(score: number) {
+      for (const level of RATING_SCALE) {
+        if (score <= level.max) return { label: level.label, color: level.color };
+      }
+      return { label: 'Slow', color: '#ef4444' };
+    }
+
+    const STORAGE_KEY = 'toolcalcs_stroop-test_history';
+    const MAX_HISTORY = 20;
+
+    function loadHistory(): Array<{ score: number; date: string; rating: string }> {
+      try { const r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch {}
+      return [];
+    }
+    function saveHistory(h: Array<{ score: number; date: string; rating: string }>) {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch {}
+    }
+    function addToHistory(score: number) {
+      const h = loadHistory();
+      h.unshift({ score, date: new Date().toISOString(), rating: getLocalRating(score).label });
+      saveHistory(h);
+    }
+
+    // DOM
+    const instructionsView = document.getElementById('instructionsView')!;
+    const playView = document.getElementById('playView')!;
+    const resultView = document.getElementById('resultView')!;
+    const startBtn = document.getElementById('startBtn')!;
+    const tryAgainBtn = document.getElementById('tryAgainBtn')!;
+    const roundInfo = document.getElementById('roundInfo')!;
+    const correctInfo = document.getElementById('correctInfo')!;
+    const stroopWord = document.getElementById('stroopWord')!;
+    const stroopButtons = document.getElementById('stroopButtons')!;
+    const finalScore = document.getElementById('finalScore')!;
+    const ratingBadge = document.getElementById('ratingBadge')!;
+    const stroopStats = document.getElementById('stroopStats')!;
+    const attemptHistorySection = document.getElementById('attemptHistory')!;
+    const historyList = document.getElementById('historyList')!;
+
+    let currentRound = 0;
+    let correctCount = 0;
+    let responseTimes: number[] = [];
+    let roundStartTime = 0;
+    let currentInkColor = '';
+    let canClick = false;
+
+    function showView(view: HTMLElement) {
+      [instructionsView, playView, resultView].forEach(v => v.style.display = 'none');
+      view.style.display = '';
+    }
+
+    function pickRandom<T>(arr: T[]): T {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function renderButtons() {
+      stroopButtons.innerHTML = '';
+      COLORS.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = 'stroop-color-btn';
+        btn.style.background = c.hex;
+        btn.textContent = c.name;
+        btn.dataset.colorName = c.name;
+        stroopButtons.appendChild(btn);
+      });
+    }
+
+    function startRound() {
+      currentRound++;
+      if (currentRound > TOTAL_ROUNDS) {
+        endGame();
+        return;
+      }
+
+      roundInfo.textContent = `${currentRound} / ${TOTAL_ROUNDS}`;
+      correctInfo.textContent = `${correctCount} correct`;
+
+      // Pick word and ink color (ensure at least 60% incongruent)
+      const wordColor = pickRandom(COLORS);
+      let inkColor: typeof COLORS[0];
+      if (Math.random() < 0.7) {
+        // Incongruent: pick different color
+        const others = COLORS.filter(c => c.name !== wordColor.name);
+        inkColor = pickRandom(others);
+      } else {
+        inkColor = wordColor;
+      }
+
+      currentInkColor = inkColor.name;
+      stroopWord.textContent = wordColor.name;
+      stroopWord.style.color = inkColor.hex;
+
+      // Reset button states
+      stroopButtons.querySelectorAll('.stroop-color-btn').forEach(btn => {
+        btn.classList.remove('flash-correct', 'flash-wrong');
+      });
+
+      roundStartTime = performance.now();
+      canClick = true;
+    }
+
+    function handleButtonClick(e: Event) {
+      if (!canClick) return;
+      const target = (e.target as HTMLElement).closest('.stroop-color-btn') as HTMLElement | null;
+      if (!target) return;
+
+      canClick = false;
+      const responseTime = performance.now() - roundStartTime;
+      const clicked = target.dataset.colorName || '';
+
+      if (clicked === currentInkColor) {
+        // Correct
+        correctCount++;
+        responseTimes.push(responseTime);
+        target.classList.add('flash-correct');
+      } else {
+        // Wrong
+        target.classList.add('flash-wrong');
+        // Highlight correct button
+        stroopButtons.querySelectorAll('.stroop-color-btn').forEach(btn => {
+          if ((btn as HTMLElement).dataset.colorName === currentInkColor) {
+            btn.classList.add('flash-correct');
+          }
+        });
+      }
+
+      setTimeout(() => startRound(), 400);
+    }
+
+    function startGame() {
+      currentRound = 0;
+      correctCount = 0;
+      responseTimes = [];
+      showView(playView);
+      renderButtons();
+      startRound();
+    }
+
+    function endGame() {
+      const avgTime = responseTimes.length > 0
+        ? Math.round(responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length)
+        : 9999;
+
+      showView(resultView);
+      finalScore.textContent = String(avgTime);
+      const rating = getLocalRating(avgTime);
+      ratingBadge.textContent = rating.label;
+      ratingBadge.style.background = rating.color;
+
+      const accuracy = Math.round((correctCount / TOTAL_ROUNDS) * 100);
+      stroopStats.innerHTML = `
+        <span>Accuracy: ${correctCount}/${TOTAL_ROUNDS} (${accuracy}%)</span>
+        <span>Fastest: ${responseTimes.length > 0 ? Math.round(Math.min(...responseTimes)) : '—'}ms</span>
+        <span>Slowest: ${responseTimes.length > 0 ? Math.round(Math.max(...responseTimes)) : '—'}ms</span>
+      `;
+
+      addToHistory(avgTime);
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const history = loadHistory();
+      if (history.length === 0) { attemptHistorySection.hidden = true; return; }
+      attemptHistorySection.hidden = false;
+      historyList.innerHTML = history.map(e => {
+        const r = getLocalRating(e.score);
+        return `<div class="history-item">
+          <span class="history-score">${e.score}ms</span>
+          <span class="history-rating" style="background:${r.color}">${r.label}</span>
+          <span class="history-time">${formatDate(e.date)}</span>
+        </div>`;
+      }).join('');
+    }
+
+    function formatDate(iso: string): string {
+      try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+      catch { return ''; }
+    }
+
+    stroopButtons.addEventListener('click', handleButtonClick);
+    startBtn.addEventListener('click', startGame);
+    tryAgainBtn.addEventListener('click', startGame);
+    renderHistory();
+  })();
+</script>
