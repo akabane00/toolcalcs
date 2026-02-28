@@ -1,0 +1,291 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Financial Calculators", "item": "https://toolcalcs.com/financial-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Rent vs Buy Calculator" },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is it cheaper to rent or buy a home?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "It depends on your location, how long you plan to stay, mortgage rates, home appreciation, and your investment alternatives. Generally, buying becomes more favorable after 5-7 years due to equity building and tax benefits, but renting can be cheaper in high-cost markets or for short stays.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "How long do I need to stay to make buying worth it?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The breakeven point typically falls between 3 and 7 years, depending on closing costs, home appreciation, and mortgage rates. If you plan to move within 2-3 years, renting is usually more cost-effective due to transaction costs of buying and selling.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "What costs are included in homeownership besides the mortgage?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Homeownership costs include property taxes (1-2% of home value), homeowner's insurance, maintenance and repairs (1-2% of home value per year), HOA fees if applicable, private mortgage insurance (PMI) if down payment is under 20%, and potential special assessments.",
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Rent vs Buy Calculator - Should I Rent or Buy? | ToolCalcs"
+  description="Compare the total cost of renting versus buying a home over time. See which option builds more wealth based on your situation."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/financial-calculators/">Financial Calculators</a> &rsaquo;
+    <span>Rent vs Buy Calculator</span>
+  </nav>
+
+  <h1>Rent vs Buy Calculator</h1>
+  <p class="page-desc">Compare the true cost of renting versus buying a home over your desired time horizon.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="homePrice">Home Price ($)</label>
+        <input type="number" id="homePrice" value="350000" min="0" step="5000" />
+      </div>
+      <div class="input-group">
+        <label for="downPct">Down Payment (%)</label>
+        <input type="number" id="downPct" value="20" min="0" max="100" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="mortgageRate">Mortgage Rate (%)</label>
+        <input type="number" id="mortgageRate" value="6.5" min="0" max="15" step="0.125" />
+      </div>
+      <div class="input-group">
+        <label for="stayYears">Years You'll Stay</label>
+        <input type="number" id="stayYears" value="7" min="1" max="30" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="monthlyRent">Monthly Rent ($)</label>
+        <input type="number" id="monthlyRent" value="1800" min="0" step="50" />
+      </div>
+      <div class="input-group">
+        <label for="rentIncrease">Annual Rent Increase (%)</label>
+        <input type="number" id="rentIncrease" value="3" min="0" max="10" step="0.5" />
+      </div>
+      <div class="input-group">
+        <label for="appreciation">Home Appreciation (%/yr)</label>
+        <input type="number" id="appreciation" value="3" min="-5" max="10" step="0.5" />
+      </div>
+      <div class="input-group">
+        <label for="investReturn">Investment Return (%/yr)</label>
+        <input type="number" id="investReturn" value="7" min="0" max="15" step="0.5" />
+      </div>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Recommendation</span>
+          <span class="result-value" id="recommendation">—</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Cost of Buying</span>
+          <span class="result-value" id="buyCost">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Cost of Renting</span>
+          <span class="result-value" id="rentCost">$0</span>
+        </div>
+        <div class="result-card success">
+          <span class="result-label">Net Savings</span>
+          <span class="result-value" id="savings">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Home Equity Built</span>
+          <span class="result-value" id="equity">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Renter's Investment</span>
+          <span class="result-value" id="renterInvest">$0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="rentvsbuy-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>Should I Rent or Buy?</h2>
+    <p>
+      The rent-versus-buy decision is one of the biggest financial choices most people face. There is no universal answer — the best option depends on your income, savings, local housing market, how long you plan to stay, and your tolerance for the responsibilities of homeownership. This calculator helps you compare the total financial cost of each option over your intended time horizon.
+    </p>
+    <p>
+      When you buy a home, you build equity over time as you pay down the mortgage and as the property appreciates. However, you also incur significant costs: closing costs, maintenance, property taxes, insurance, and potential PMI. When you rent, your monthly payment may be lower, and the difference can be invested in the stock market or other assets.
+    </p>
+
+    <h2>How This Calculator Works</h2>
+    <p>
+      This calculator compares the <strong>total net cost</strong> of buying versus renting over your specified time period. For buying, it accounts for the mortgage principal and interest, property taxes (estimated at 1.2% of home value), homeowner's insurance, maintenance (estimated at 1% of home value), and home appreciation. For renting, it accounts for monthly rent with annual increases and the potential investment returns from the money you would have spent on a down payment and the monthly savings difference.
+    </p>
+    <p>
+      The "total cost" for each option represents the net money spent after accounting for equity built (buying) or investment gains (renting). The option with the lower net cost is the recommended choice for your situation.
+    </p>
+
+    <h2>When Buying Makes More Sense</h2>
+    <ul>
+      <li>You plan to stay for 5 or more years, giving equity time to build and covering transaction costs.</li>
+      <li>Local rents are high relative to home prices (low price-to-rent ratio).</li>
+      <li>Mortgage interest rates are low, making monthly payments competitive with rent.</li>
+      <li>You value the stability and customization freedom of owning your home.</li>
+      <li>Home prices in your area have historically appreciated at a reasonable rate.</li>
+    </ul>
+
+    <h2>When Renting Makes More Sense</h2>
+    <ul>
+      <li>You plan to move within 2-3 years, making transaction costs prohibitive.</li>
+      <li>Home prices in your area are very high relative to rents (high price-to-rent ratio).</li>
+      <li>You prefer flexibility and mobility for career or lifestyle reasons.</li>
+      <li>You can invest the difference and earn strong returns in the stock market.</li>
+      <li>You do not want the responsibilities and risks of homeownership (maintenance, repairs, market downturns).</li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>Is it cheaper to rent or buy a home?</h3>
+    <p>
+      It depends on your location, how long you plan to stay, mortgage rates, home appreciation, and your investment alternatives. Generally, buying becomes more favorable after 5-7 years due to equity building, but renting can be cheaper in expensive markets or for short-term stays.
+    </p>
+
+    <h3>How long do I need to stay to make buying worth it?</h3>
+    <p>
+      The breakeven point typically falls between 3 and 7 years, depending on closing costs (usually 2-5% of home price), home appreciation, and mortgage rates. If you plan to move within 2-3 years, renting is usually more cost-effective.
+    </p>
+
+    <h3>What costs are included in homeownership besides the mortgage?</h3>
+    <p>
+      Homeownership costs include property taxes (1-2% of home value), homeowner's insurance, maintenance and repairs (1-2% of home value per year), HOA fees if applicable, private mortgage insurance (PMI) if your down payment is under 20%, and closing costs when buying and selling.
+    </p>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/financial-calculators/home-affordability-calculator/">Home Affordability Calculator</a> — Find out how much house you can afford.</li>
+      <li><a href="/financial-calculators/mortgage-calculator/">Mortgage Calculator</a> — Calculate monthly mortgage payments.</li>
+      <li><a href="/financial-calculators/investment-calculator/">Investment Calculator</a> — Project investment growth over time.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="rentvsbuy-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function fmtCurrency(n: number): string {
+    return '$' + Math.round(n).toLocaleString('en-US');
+  }
+
+  function calculate() {
+    const homePrice = parseFloat((document.getElementById('homePrice') as HTMLInputElement).value) || 0;
+    const downPct = parseFloat((document.getElementById('downPct') as HTMLInputElement).value) || 0;
+    const mortgageRate = parseFloat((document.getElementById('mortgageRate') as HTMLInputElement).value) || 0;
+    const stayYears = parseInt((document.getElementById('stayYears') as HTMLInputElement).value) || 1;
+    const monthlyRent = parseFloat((document.getElementById('monthlyRent') as HTMLInputElement).value) || 0;
+    const rentIncrease = parseFloat((document.getElementById('rentIncrease') as HTMLInputElement).value) || 0;
+    const appreciation = parseFloat((document.getElementById('appreciation') as HTMLInputElement).value) || 0;
+    const investReturn = parseFloat((document.getElementById('investReturn') as HTMLInputElement).value) || 0;
+
+    const downPayment = homePrice * downPct / 100;
+    const loanAmount = homePrice - downPayment;
+    const monthlyRate = mortgageRate / 100 / 12;
+    const nPayments = 30 * 12;
+
+    // Monthly mortgage P&I
+    let monthlyPI = 0;
+    if (monthlyRate > 0) {
+      monthlyPI = loanAmount * monthlyRate * Math.pow(1 + monthlyRate, nPayments) / (Math.pow(1 + monthlyRate, nPayments) - 1);
+    } else if (nPayments > 0) {
+      monthlyPI = loanAmount / nPayments;
+    }
+
+    // Calculate buying costs over stay period
+    let totalBuyCost = 0;
+    let closingCostBuy = homePrice * 0.03; // 3% closing costs
+    let closingCostSell = homePrice * Math.pow(1 + appreciation / 100, stayYears) * 0.06; // 6% selling costs
+    totalBuyCost += closingCostBuy;
+
+    let remainingLoan = loanAmount;
+    let totalMortgagePaid = 0;
+    let totalTaxInsuranceMaint = 0;
+
+    for (let year = 0; year < stayYears; year++) {
+      const currentHomeValue = homePrice * Math.pow(1 + appreciation / 100, year);
+      const yearlyTax = currentHomeValue * 0.012;
+      const yearlyInsurance = 1500;
+      const yearlyMaint = currentHomeValue * 0.01;
+      totalTaxInsuranceMaint += yearlyTax + yearlyInsurance + yearlyMaint;
+
+      for (let m = 0; m < 12; m++) {
+        const interestPayment = remainingLoan * monthlyRate;
+        const principalPayment = monthlyPI - interestPayment;
+        remainingLoan -= principalPayment;
+        totalMortgagePaid += monthlyPI;
+      }
+    }
+
+    const futureHomeValue = homePrice * Math.pow(1 + appreciation / 100, stayYears);
+    const equityBuilt = futureHomeValue - Math.max(0, remainingLoan);
+    const netBuyCost = downPayment + totalMortgagePaid + totalTaxInsuranceMaint + closingCostBuy + closingCostSell - equityBuilt;
+
+    // Calculate renting costs over stay period
+    let totalRentPaid = 0;
+    let currentRent = monthlyRent;
+    for (let year = 0; year < stayYears; year++) {
+      totalRentPaid += currentRent * 12;
+      currentRent *= (1 + rentIncrease / 100);
+    }
+
+    // Renter invests the down payment + monthly savings difference
+    const monthlyBuyTotal = monthlyPI + homePrice * 0.012 / 12 + 1500 / 12 + homePrice * 0.01 / 12;
+    let renterInvestment = downPayment;
+    const monthlyInvestRate = investReturn / 100 / 12;
+
+    for (let month = 0; month < stayYears * 12; month++) {
+      renterInvestment *= (1 + monthlyInvestRate);
+      const yearIdx = Math.floor(month / 12);
+      const currentMonthlyRent = monthlyRent * Math.pow(1 + rentIncrease / 100, yearIdx);
+      const monthlySavings = Math.max(0, monthlyBuyTotal - currentMonthlyRent);
+      renterInvestment += monthlySavings;
+    }
+
+    const netRentCost = totalRentPaid - (renterInvestment - downPayment);
+
+    const savings = Math.abs(netBuyCost - netRentCost);
+    const buyIsBetter = netBuyCost < netRentCost;
+
+    document.getElementById('recommendation')!.textContent = buyIsBetter ? 'Buy' : 'Rent';
+    document.getElementById('buyCost')!.textContent = fmtCurrency(netBuyCost);
+    document.getElementById('rentCost')!.textContent = fmtCurrency(netRentCost);
+    document.getElementById('savings')!.textContent = fmtCurrency(savings) + ' ' + (buyIsBetter ? '(buying)' : '(renting)');
+    document.getElementById('equity')!.textContent = fmtCurrency(equityBuilt);
+    document.getElementById('renterInvest')!.textContent = fmtCurrency(renterInvestment);
+  }
+
+  document.querySelectorAll('#homePrice, #downPct, #mortgageRate, #stayYears, #monthlyRent, #rentIncrease, #appreciation, #investReturn').forEach(el => {
+    el.addEventListener('input', calculate);
+  });
+
+  calculate();
+</script>

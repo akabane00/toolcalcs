@@ -167,6 +167,38 @@ export const calculators: Calculator[] = [
     categorySlug: 'financial-calculators',
     icon: '🏆',
   },
+  {
+    title: 'Home Affordability Calculator',
+    slug: 'home-affordability-calculator',
+    description: 'Find out how much house you can afford based on income, debts, down payment, and interest rate.',
+    category: 'Financial Calculators',
+    categorySlug: 'financial-calculators',
+    icon: '🏡',
+  },
+  {
+    title: 'Rent vs Buy Calculator',
+    slug: 'rent-vs-buy-calculator',
+    description: 'Compare the true cost of renting versus buying a home over time. See which option builds more wealth.',
+    category: 'Financial Calculators',
+    categorySlug: 'financial-calculators',
+    icon: '🔑',
+  },
+  {
+    title: 'Margin Calculator',
+    slug: 'margin-calculator',
+    description: 'Calculate profit margin, markup, and revenue from cost and selling price. Supports gross and net margin.',
+    category: 'Financial Calculators',
+    categorySlug: 'financial-calculators',
+    icon: '💲',
+  },
+  {
+    title: 'Crypto Profit Calculator',
+    slug: 'crypto-profit-calculator',
+    description: 'Calculate cryptocurrency investment profit or loss. Enter buy and sell prices to see your returns and ROI.',
+    category: 'Financial Calculators',
+    categorySlug: 'financial-calculators',
+    icon: '₿',
+  },
   // Health
   {
     title: 'BMI Calculator',
@@ -239,6 +271,22 @@ export const calculators: Calculator[] = [
     category: 'Health Calculators',
     categorySlug: 'health-calculators',
     icon: '😴',
+  },
+  {
+    title: 'Macro Calculator',
+    slug: 'macro-calculator',
+    description: 'Calculate your daily protein, carbs, and fat targets based on calories and diet goals. Customize macro splits.',
+    category: 'Health Calculators',
+    categorySlug: 'health-calculators',
+    icon: '🥩',
+  },
+  {
+    title: 'Water Intake Calculator',
+    slug: 'water-intake-calculator',
+    description: 'Find out how much water you should drink daily based on weight, activity level, and climate.',
+    category: 'Health Calculators',
+    categorySlug: 'health-calculators',
+    icon: '💧',
   },
   // Math
   {

@@ -1,0 +1,267 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Health Calculators", "item": "https://toolcalcs.com/health-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Macro Calculator" },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How do I calculate my macros?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "First, determine your daily calorie target. Then split those calories among protein (4 cal/g), carbohydrates (4 cal/g), and fat (9 cal/g) based on your goals. A balanced split is 30% protein, 40% carbs, 30% fat. For muscle building, increase protein to 35-40%. For keto, increase fat to 70-75%.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "What is the best macro ratio for weight loss?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A common macro ratio for weight loss is 40% protein, 30% carbs, 30% fat. Higher protein helps preserve muscle mass during a calorie deficit. However, the best ratio depends on your preferences and adherence — the most effective diet is the one you can sustain.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "How much protein do I need per day?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The general recommendation is 0.7-1.0 grams of protein per pound of body weight for active individuals. Sedentary adults need about 0.36g per pound. For muscle building, aim for 1.0-1.2g per pound. The RDA minimum is 0.36g per pound of body weight.",
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Macro Calculator - Calculate Protein, Carbs & Fat | ToolCalcs"
+  description="Calculate your daily macronutrient targets for protein, carbs, and fat. Customize macro splits for weight loss, muscle gain, or maintenance."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/health-calculators/">Health Calculators</a> &rsaquo;
+    <span>Macro Calculator</span>
+  </nav>
+
+  <h1>Macro Calculator</h1>
+  <p class="page-desc">Calculate your daily protein, carbs, and fat targets based on your calorie goal.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="calories">Daily Calories</label>
+        <input type="number" id="calories" value="2000" min="500" max="10000" step="50" />
+      </div>
+      <div class="input-group">
+        <label for="dietGoal">Diet Goal</label>
+        <select id="dietGoal">
+          <option value="balanced">Balanced (30/40/30)</option>
+          <option value="weightloss">Weight Loss (40/30/30)</option>
+          <option value="muscle">Muscle Building (35/40/25)</option>
+          <option value="lowcarb">Low Carb (40/20/40)</option>
+          <option value="keto">Keto (25/5/70)</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="proteinPct">Protein (%)</label>
+        <input type="number" id="proteinPct" value="30" min="0" max="100" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="carbsPct">Carbs (%)</label>
+        <input type="number" id="carbsPct" value="40" min="0" max="100" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="fatPct">Fat (%)</label>
+        <input type="number" id="fatPct" value="30" min="0" max="100" step="1" />
+      </div>
+    </div>
+
+    <div class="pct-warning hidden" id="pctWarning">Percentages must total 100%</div>
+
+    <div class="calc-results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Daily Calories</span>
+          <span class="result-value" id="totalCals">2,000</span>
+        </div>
+        <div class="result-card protein-card">
+          <span class="result-label">Protein</span>
+          <span class="result-value" id="proteinG">0g</span>
+          <span class="result-sub" id="proteinCal">0 cal</span>
+        </div>
+        <div class="result-card carbs-card">
+          <span class="result-label">Carbs</span>
+          <span class="result-value" id="carbsG">0g</span>
+          <span class="result-sub" id="carbsCal">0 cal</span>
+        </div>
+        <div class="result-card fat-card">
+          <span class="result-label">Fat</span>
+          <span class="result-value" id="fatG">0g</span>
+          <span class="result-sub" id="fatCal">0 cal</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="macro-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>What Are Macronutrients?</h2>
+    <p>
+      Macronutrients — commonly called "macros" — are the three main categories of nutrients that provide energy (calories) to your body: protein, carbohydrates, and fat. Each macronutrient plays a distinct role in body function, and the balance among them significantly affects body composition, energy levels, and overall health.
+    </p>
+    <ul>
+      <li><strong>Protein (4 calories per gram):</strong> Essential for building and repairing muscle tissue, producing enzymes and hormones, and supporting immune function. Good sources include meat, fish, eggs, dairy, legumes, and tofu.</li>
+      <li><strong>Carbohydrates (4 calories per gram):</strong> The body's preferred energy source, especially for the brain and during high-intensity exercise. Found in grains, fruits, vegetables, legumes, and sugar.</li>
+      <li><strong>Fat (9 calories per gram):</strong> Critical for hormone production, nutrient absorption (vitamins A, D, E, K), cell membrane integrity, and energy storage. Found in oils, nuts, seeds, avocado, and fatty fish.</li>
+    </ul>
+
+    <h2>How to Calculate Your Macros</h2>
+    <p>
+      Start by determining your daily calorie target using a <a href="/health-calculators/calorie-calculator/">calorie calculator</a> or <a href="/health-calculators/tdee-calculator/">TDEE calculator</a>. Once you know your calorie goal, divide those calories among the three macronutrients based on your fitness goal.
+    </p>
+    <div class="formula-box">
+      <code>Protein (g) = Total Calories × Protein% / 4</code>
+    </div>
+    <div class="formula-box">
+      <code>Carbs (g) = Total Calories × Carbs% / 4</code>
+    </div>
+    <div class="formula-box">
+      <code>Fat (g) = Total Calories × Fat% / 9</code>
+    </div>
+    <p>
+      For example, on a 2,000-calorie diet with a 30/40/30 split: Protein = 2000 × 0.30 / 4 = 150g, Carbs = 2000 × 0.40 / 4 = 200g, Fat = 2000 × 0.30 / 9 = 67g.
+    </p>
+
+    <h2>Popular Macro Splits by Goal</h2>
+    <ul>
+      <li><strong>Balanced (30/40/30):</strong> A well-rounded split suitable for general health and moderate activity.</li>
+      <li><strong>Weight Loss (40/30/30):</strong> Higher protein to preserve muscle during a calorie deficit, moderate carbs and fat.</li>
+      <li><strong>Muscle Building (35/40/25):</strong> High protein and carbs to fuel workouts and recovery, moderate fat.</li>
+      <li><strong>Low Carb (40/20/40):</strong> Reduced carbohydrates with higher protein and fat for those who respond well to lower carb intake.</li>
+      <li><strong>Keto (25/5/70):</strong> Very low carb, high fat to induce ketosis. Typically limits carbs to 20-50g per day.</li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>How do I calculate my macros?</h3>
+    <p>
+      Determine your daily calorie target, then split calories among protein (4 cal/g), carbs (4 cal/g), and fat (9 cal/g) based on your goals. Use the presets above or enter custom percentages that total 100%.
+    </p>
+
+    <h3>What is the best macro ratio for weight loss?</h3>
+    <p>
+      A 40% protein, 30% carbs, 30% fat split is commonly recommended for weight loss. Higher protein helps preserve muscle mass during a calorie deficit and increases satiety. However, the best ratio is one you can consistently follow.
+    </p>
+
+    <h3>How much protein do I need per day?</h3>
+    <p>
+      Active individuals should aim for 0.7-1.0 grams per pound of body weight. For muscle building, 1.0-1.2g per pound is ideal. The RDA minimum of 0.36g per pound is considered insufficient for athletes and active people.
+    </p>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/health-calculators/calorie-calculator/">Calorie Calculator</a> — Calculate your daily calorie needs.</li>
+      <li><a href="/health-calculators/tdee-calculator/">TDEE Calculator</a> — Find your Total Daily Energy Expenditure.</li>
+      <li><a href="/health-calculators/bmi-calculator/">BMI Calculator</a> — Check your Body Mass Index.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="macro-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .protein-card { border-left: 3px solid #ef4444; }
+  .carbs-card { border-left: 3px solid #f59e0b; }
+  .fat-card { border-left: 3px solid #3b82f6; }
+  .result-sub {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+  }
+  .pct-warning {
+    background: #fef2f2;
+    color: #991b1b;
+    padding: 8px 16px;
+    border-radius: var(--radius);
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin: 12px 0;
+    text-align: center;
+  }
+  .pct-warning.hidden { display: none; }
+</style>
+
+<script>
+  const presets: Record<string, [number, number, number]> = {
+    balanced: [30, 40, 30],
+    weightloss: [40, 30, 30],
+    muscle: [35, 40, 25],
+    lowcarb: [40, 20, 40],
+    keto: [25, 5, 70],
+  };
+
+  const caloriesEl = document.getElementById('calories') as HTMLInputElement;
+  const goalEl = document.getElementById('dietGoal') as HTMLSelectElement;
+  const proteinPctEl = document.getElementById('proteinPct') as HTMLInputElement;
+  const carbsPctEl = document.getElementById('carbsPct') as HTMLInputElement;
+  const fatPctEl = document.getElementById('fatPct') as HTMLInputElement;
+  const warningEl = document.getElementById('pctWarning') as HTMLDivElement;
+
+  function calculate() {
+    const calories = parseFloat(caloriesEl.value) || 0;
+    const pPct = parseFloat(proteinPctEl.value) || 0;
+    const cPct = parseFloat(carbsPctEl.value) || 0;
+    const fPct = parseFloat(fatPctEl.value) || 0;
+    const total = pPct + cPct + fPct;
+
+    warningEl.classList.toggle('hidden', Math.abs(total - 100) < 0.1);
+
+    const proteinCal = calories * pPct / 100;
+    const carbsCal = calories * cPct / 100;
+    const fatCal = calories * fPct / 100;
+
+    document.getElementById('totalCals')!.textContent = Math.round(calories).toLocaleString('en-US');
+    document.getElementById('proteinG')!.textContent = Math.round(proteinCal / 4) + 'g';
+    document.getElementById('proteinCal')!.textContent = Math.round(proteinCal) + ' cal (' + pPct + '%)';
+    document.getElementById('carbsG')!.textContent = Math.round(carbsCal / 4) + 'g';
+    document.getElementById('carbsCal')!.textContent = Math.round(carbsCal) + ' cal (' + cPct + '%)';
+    document.getElementById('fatG')!.textContent = Math.round(fatCal / 9) + 'g';
+    document.getElementById('fatCal')!.textContent = Math.round(fatCal) + ' cal (' + fPct + '%)';
+  }
+
+  goalEl.addEventListener('change', () => {
+    const preset = presets[goalEl.value];
+    if (preset) {
+      proteinPctEl.value = String(preset[0]);
+      carbsPctEl.value = String(preset[1]);
+      fatPctEl.value = String(preset[2]);
+    }
+    calculate();
+  });
+
+  [caloriesEl, proteinPctEl, carbsPctEl, fatPctEl].forEach(el => {
+    el.addEventListener('input', () => {
+      goalEl.value = 'custom';
+      calculate();
+    });
+  });
+
+  calculate();
+</script>

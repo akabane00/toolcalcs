@@ -1,0 +1,297 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Financial Calculators", "item": "https://toolcalcs.com/financial-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Home Affordability Calculator" },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How much house can I afford?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A general rule is that your total monthly housing costs should not exceed 28% of your gross monthly income (the front-end ratio). With debts included, your total debt payments should stay below 36% of gross income (the back-end ratio). Lenders may allow up to 43% for qualified mortgages.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "What is the 28/36 rule for home buying?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The 28/36 rule states that you should spend no more than 28% of your gross monthly income on housing costs (mortgage, taxes, insurance) and no more than 36% on total debt payments (housing plus car loans, student loans, credit cards). This is a guideline used by many lenders.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "How much down payment do I need for a house?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Conventional loans typically require 5-20% down. FHA loans allow as little as 3.5% down. VA and USDA loans may require no down payment. A 20% down payment avoids private mortgage insurance (PMI), which saves money monthly.",
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Home Affordability Calculator - How Much House Can I Afford? | ToolCalcs"
+  description="Calculate how much house you can afford based on your income, debts, down payment, and interest rate. Uses the 28/36 rule for accurate estimates."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/financial-calculators/">Financial Calculators</a> &rsaquo;
+    <span>Home Affordability Calculator</span>
+  </nav>
+
+  <h1>Home Affordability Calculator</h1>
+  <p class="page-desc">Find out how much house you can afford based on your income, debts, and down payment.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="annualIncome">Annual Gross Income ($)</label>
+        <input type="number" id="annualIncome" value="75000" min="0" step="1000" />
+      </div>
+      <div class="input-group">
+        <label for="monthlyDebts">Monthly Debt Payments ($)</label>
+        <input type="number" id="monthlyDebts" value="500" min="0" step="50" />
+      </div>
+      <div class="input-group">
+        <label for="downPayment">Down Payment ($)</label>
+        <input type="number" id="downPayment" value="40000" min="0" step="1000" />
+      </div>
+      <div class="input-group">
+        <label for="interestRate">Interest Rate (%)</label>
+        <input type="number" id="interestRate" value="6.5" min="0" max="15" step="0.125" />
+      </div>
+      <div class="input-group">
+        <label for="loanTerm">Loan Term (Years)</label>
+        <select id="loanTerm">
+          <option value="30" selected>30 years</option>
+          <option value="20">20 years</option>
+          <option value="15">15 years</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="propertyTax">Property Tax Rate (%/year)</label>
+        <input type="number" id="propertyTax" value="1.2" min="0" max="5" step="0.1" />
+      </div>
+      <div class="input-group">
+        <label for="homeInsurance">Home Insurance ($/year)</label>
+        <input type="number" id="homeInsurance" value="1500" min="0" step="100" />
+      </div>
+      <div class="input-group">
+        <label for="dtiRatio">Max DTI Ratio (%)</label>
+        <select id="dtiRatio">
+          <option value="28">Conservative (28%)</option>
+          <option value="31">Moderate (31%)</option>
+          <option value="36" selected>Standard (36%)</option>
+          <option value="43">Aggressive (43%)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Home You Can Afford</span>
+          <span class="result-value" id="maxHome">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Max Loan Amount</span>
+          <span class="result-value" id="maxLoan">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Monthly Payment</span>
+          <span class="result-value" id="monthlyPayment">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Max Housing Budget</span>
+          <span class="result-value" id="maxHousing">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Down Payment</span>
+          <span class="result-value" id="downPct">0%</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Front-End Ratio</span>
+          <span class="result-value" id="frontEnd">0%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="afford-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>How Much House Can I Afford?</h2>
+    <p>
+      Determining how much house you can afford is one of the most important financial decisions you will make. The answer depends on several factors: your gross income, existing monthly debts, available down payment, current mortgage interest rates, and the property tax and insurance costs in your area.
+    </p>
+    <p>
+      Lenders use two key ratios to assess your borrowing capacity. The <strong>front-end ratio</strong> (also called the housing ratio) measures what percentage of your gross monthly income goes toward housing costs — mortgage principal and interest, property taxes, and homeowner's insurance (often abbreviated PITI). Most lenders prefer this ratio to stay at or below 28%.
+    </p>
+    <p>
+      The <strong>back-end ratio</strong> (or debt-to-income ratio) includes all your monthly debt obligations — housing costs plus car payments, student loans, credit card minimums, and other recurring debts. The standard guideline is to keep this ratio below 36%, although some loan programs allow up to 43% or even higher with compensating factors like excellent credit or substantial reserves.
+    </p>
+
+    <h2>The 28/36 Rule Explained</h2>
+    <p>
+      The 28/36 rule is a widely used guideline in mortgage lending. It states that a household should spend no more than 28% of its gross monthly income on total housing expenses and no more than 36% of its gross monthly income on total debt service, including housing and other debts like auto loans, student loans, and credit card payments.
+    </p>
+    <div class="formula-box">
+      <code>Max Housing Payment = Gross Monthly Income × 0.28</code>
+    </div>
+    <div class="formula-box">
+      <code>Max Total Debt = Gross Monthly Income × 0.36</code>
+    </div>
+    <p>
+      For example, if your annual income is $75,000 (or $6,250 per month), the 28% front-end limit gives you a maximum housing budget of $1,750 per month. If you have $500 in existing monthly debt payments, the 36% back-end limit allows $2,250 total, meaning only $1,750 remains for housing — the same result in this case.
+    </p>
+
+    <h2>Factors That Affect Home Affordability</h2>
+    <ul>
+      <li><strong>Interest rate:</strong> Even a 0.5% difference in your mortgage rate can change your buying power by tens of thousands of dollars.</li>
+      <li><strong>Down payment:</strong> A larger down payment reduces your loan amount and monthly payment, potentially eliminating the need for PMI.</li>
+      <li><strong>Loan term:</strong> A 15-year mortgage has higher monthly payments but lower total interest compared to a 30-year mortgage.</li>
+      <li><strong>Property taxes:</strong> These vary significantly by state and county, from under 0.5% to over 2% of home value annually.</li>
+      <li><strong>Credit score:</strong> Higher scores qualify for lower interest rates, increasing your purchasing power.</li>
+      <li><strong>Existing debts:</strong> Car loans, student loans, and credit card debt reduce the amount available for housing.</li>
+    </ul>
+
+    <h2>Down Payment Considerations</h2>
+    <p>
+      A 20% down payment is the traditional benchmark because it eliminates the requirement for private mortgage insurance (PMI), which typically costs 0.5% to 1% of the loan amount annually. However, many buyers purchase homes with much less down. FHA loans require as little as 3.5%, conventional loans may accept 3-5%, and VA loans for eligible veterans may require no down payment at all.
+    </p>
+    <p>
+      While a smaller down payment gets you into a home sooner, it means a larger loan, higher monthly payments, and potentially PMI costs that add hundreds of dollars per month. Use this calculator to see how different down payment amounts affect your maximum affordable home price.
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>How much house can I afford?</h3>
+    <p>
+      A general rule is that your total monthly housing costs should not exceed 28% of your gross monthly income (the front-end ratio). With debts included, your total debt payments should stay below 36% of gross income (the back-end ratio). This calculator uses both ratios to determine the lower (more conservative) limit for your situation.
+    </p>
+
+    <h3>What is the 28/36 rule for home buying?</h3>
+    <p>
+      The 28/36 rule states that you should spend no more than 28% of your gross monthly income on housing costs (mortgage, taxes, insurance) and no more than 36% on total debt payments (housing plus car loans, student loans, credit cards). This guideline helps ensure you can comfortably afford your home without becoming house-poor.
+    </p>
+
+    <h3>How much down payment do I need for a house?</h3>
+    <p>
+      Conventional loans typically require 5-20% down. FHA loans allow as little as 3.5% down. VA and USDA loans may require no down payment. A 20% down payment avoids private mortgage insurance (PMI), saving you money each month, but it is not mandatory.
+    </p>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/financial-calculators/mortgage-calculator/">Mortgage Calculator</a> — Calculate monthly mortgage payments for a specific home price.</li>
+      <li><a href="/financial-calculators/debt-to-income-calculator/">Debt-to-Income Calculator</a> — Check your DTI ratio for mortgage qualification.</li>
+      <li><a href="/financial-calculators/rent-vs-buy-calculator/">Rent vs Buy Calculator</a> — Compare renting and buying over time.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="afford-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function fmtCurrency(n: number): string {
+    return '$' + Math.round(n).toLocaleString('en-US');
+  }
+
+  function calculate() {
+    const annualIncome = parseFloat((document.getElementById('annualIncome') as HTMLInputElement).value) || 0;
+    const monthlyDebts = parseFloat((document.getElementById('monthlyDebts') as HTMLInputElement).value) || 0;
+    const downPayment = parseFloat((document.getElementById('downPayment') as HTMLInputElement).value) || 0;
+    const rate = parseFloat((document.getElementById('interestRate') as HTMLInputElement).value) || 0;
+    const years = parseInt((document.getElementById('loanTerm') as HTMLSelectElement).value) || 30;
+    const taxRate = parseFloat((document.getElementById('propertyTax') as HTMLInputElement).value) || 0;
+    const insurance = parseFloat((document.getElementById('homeInsurance') as HTMLInputElement).value) || 0;
+    const dtiPct = parseInt((document.getElementById('dtiRatio') as HTMLSelectElement).value) || 36;
+
+    const monthlyIncome = annualIncome / 12;
+
+    // Max total debt allowed
+    const maxTotalDebt = monthlyIncome * (dtiPct / 100);
+    // Max housing = max total debt - existing debts
+    const maxHousingBudget = Math.max(0, maxTotalDebt - monthlyDebts);
+
+    // Also check front-end (28% of income for housing alone)
+    const frontEndMax = monthlyIncome * 0.28;
+    const effectiveHousing = Math.min(maxHousingBudget, frontEndMax);
+
+    // Subtract monthly property tax and insurance to get max P&I
+    // Property tax and insurance depend on home price, which we're solving for
+    // Iterative approach: estimate home price, then refine
+    let homePrice = 0;
+    const monthlyRate = rate / 100 / 12;
+    const nPayments = years * 12;
+
+    if (monthlyRate > 0) {
+      // Mortgage payment factor
+      const factor = monthlyRate * Math.pow(1 + monthlyRate, nPayments) / (Math.pow(1 + monthlyRate, nPayments) - 1);
+
+      // home price = down payment + loan
+      // monthly PITI = loan * factor + homePrice * taxRate/100/12 + insurance/12
+      // effectiveHousing = (homePrice - downPayment) * factor + homePrice * taxRate/100/12 + insurance/12
+      // Solve for homePrice:
+      // effectiveHousing - insurance/12 = homePrice * (factor + taxRate/100/12) - downPayment * factor
+      // homePrice = (effectiveHousing - insurance/12 + downPayment * factor) / (factor + taxRate/100/12)
+
+      const monthlyInsurance = insurance / 12;
+      const monthlyTaxFactor = taxRate / 100 / 12;
+
+      homePrice = (effectiveHousing - monthlyInsurance + downPayment * factor) / (factor + monthlyTaxFactor);
+      if (homePrice < downPayment) homePrice = downPayment;
+    } else {
+      // 0% rate: payment = principal / nPayments
+      const monthlyInsurance = insurance / 12;
+      const monthlyTaxFactor = taxRate / 100 / 12;
+      homePrice = (effectiveHousing - monthlyInsurance + downPayment / nPayments) / (1 / nPayments + monthlyTaxFactor);
+      if (homePrice < downPayment) homePrice = downPayment;
+    }
+
+    const loanAmount = Math.max(0, homePrice - downPayment);
+    let monthlyPI = 0;
+    if (monthlyRate > 0) {
+      monthlyPI = loanAmount * monthlyRate * Math.pow(1 + monthlyRate, nPayments) / (Math.pow(1 + monthlyRate, nPayments) - 1);
+    } else {
+      monthlyPI = loanAmount / nPayments;
+    }
+    const monthlyTax = homePrice * taxRate / 100 / 12;
+    const monthlyIns = insurance / 12;
+    const totalMonthly = monthlyPI + monthlyTax + monthlyIns;
+    const downPct = homePrice > 0 ? (downPayment / homePrice * 100) : 0;
+    const frontEndRatio = monthlyIncome > 0 ? (totalMonthly / monthlyIncome * 100) : 0;
+
+    document.getElementById('maxHome')!.textContent = fmtCurrency(homePrice);
+    document.getElementById('maxLoan')!.textContent = fmtCurrency(loanAmount);
+    document.getElementById('monthlyPayment')!.textContent = fmtCurrency(totalMonthly);
+    document.getElementById('maxHousing')!.textContent = fmtCurrency(effectiveHousing) + '/mo';
+    document.getElementById('downPct')!.textContent = downPct.toFixed(1) + '%';
+    document.getElementById('frontEnd')!.textContent = frontEndRatio.toFixed(1) + '%';
+  }
+
+  document.querySelectorAll('#annualIncome, #monthlyDebts, #downPayment, #interestRate, #loanTerm, #propertyTax, #homeInsurance, #dtiRatio').forEach(el => {
+    el.addEventListener('input', calculate);
+    el.addEventListener('change', calculate);
+  });
+
+  calculate();
+</script>
