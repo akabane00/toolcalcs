@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import AdUnit from '../../components/AdUnit.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
 import '../../styles/calculator.css';
 import { getAllNumberWordsPages, numberToWords, numberToOrdinal, type NumberWordsPage } from '../../data/number-to-words';
 
@@ -18,6 +19,15 @@ const capitalizedOrdinal = ordinal.split(' ').map(w => w.charAt(0).toUpperCase()
 
 const fmt = (n: number) => n.toLocaleString('en-US');
 const allPages = getAllNumberWordsPages();
+
+// Cross-links to other routes
+const crossLinks: { href: string; label: string; icon: string }[] = [];
+if ((number >= 1 && number <= 100) || (number >= 1900 && number <= 2030)) {
+  crossLinks.push({ href: `/roman-numerals/${number}/`, label: `${fmt(number)} in Roman Numerals`, icon: '🏛️' });
+}
+if (number >= 1 && number <= 100) {
+  crossLinks.push({ href: `/factors-of/${number}/`, label: `Factors of ${fmt(number)}`, icon: '🧮' });
+}
 
 // Nearby pages: +/- 5
 const nearbyNumbers: NumberWordsPage[] = [];
@@ -258,6 +268,8 @@ const structuredData = [
     </ul>
 
     <p><a href="/number-to-words/">&larr; View All Numbers in Words</a> | <a href="/math-calculators/">Math Calculators</a></p>
+
+    <CrossLinks links={crossLinks} />
   </article>
 
   <AdUnit slot="words-bottom" format="horizontal" />

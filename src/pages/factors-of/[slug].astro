@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import AdUnit from '../../components/AdUnit.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
 import '../../styles/calculator.css';
 import { getAllFactorsPages, type FactorsPage } from '../../data/factors';
 
@@ -21,6 +22,15 @@ function formatPrimeHtml(pf: string): string {
   return pf.replace(/\^(\d+)/g, '<sup>$1</sup>');
 }
 const primeHtml = formatPrimeHtml(primeFactorization);
+
+// Cross-links to other routes
+const crossLinks: { href: string; label: string; icon: string }[] = [];
+if ((number >= 1 && number <= 100) || (number >= 1900 && number <= 2030)) {
+  crossLinks.push({ href: `/roman-numerals/${number}/`, label: `${number} in Roman Numerals`, icon: '🏛️' });
+}
+if (number >= 1 && number <= 100) {
+  crossLinks.push({ href: `/number-to-words/${number}/`, label: `${number} in Words`, icon: '🔤' });
+}
 
 // Related: nearby numbers +/-1, +/-2, +/-5
 const allPages = getAllFactorsPages();
@@ -274,6 +284,8 @@ const structuredData = [
     </ul>
 
     <p><a href="/factors-of/">&larr; View All Factor Pages</a> | <a href="/math-calculators/">Math Calculators</a></p>
+
+    <CrossLinks links={crossLinks} />
   </article>
 
   <AdUnit slot="factors-bottom" format="horizontal" />

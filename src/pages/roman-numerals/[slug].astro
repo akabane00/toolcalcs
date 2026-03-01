@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import AdUnit from '../../components/AdUnit.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
 import '../../styles/calculator.css';
 import { getAllRomanNumeralPages, intToRoman, romanToInt, type RomanNumeralPage } from '../../data/roman-numerals';
 
@@ -16,6 +17,16 @@ const { number, roman, breakdown } = page;
 
 const allPages = getAllRomanNumeralPages();
 const fmt = (n: number) => n.toLocaleString('en-US');
+
+// Cross-links to other routes
+const crossLinks: { href: string; label: string; icon: string }[] = [];
+if (number >= 1 && number <= 100) {
+  crossLinks.push({ href: `/number-to-words/${number}/`, label: `${number} in Words`, icon: '🔤' });
+  crossLinks.push({ href: `/factors-of/${number}/`, label: `Factors of ${number}`, icon: '🧮' });
+}
+if (number >= 1920 && number <= 2025) {
+  crossLinks.push({ href: `/born-in/${number}/`, label: `Born in ${number} — How Old?`, icon: '🎂' });
+}
 
 // Nearby numbers +/-5 range
 const nearbyPages = allPages
@@ -300,6 +311,8 @@ const structuredData = [
     </ul>
 
     <p><a href="/roman-numerals/">&larr; View All Roman Numerals</a> | <a href="/math-calculators/">Math Calculators</a></p>
+
+    <CrossLinks links={crossLinks} />
   </article>
 
   <AdUnit slot="roman-bottom" format="horizontal" />
