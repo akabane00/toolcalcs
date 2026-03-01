@@ -252,6 +252,45 @@ export const worksheets: Worksheet[] = [
       { name: 'maxSide', label: 'Max Side Length', type: 'select', default: '12', options: [{ value: '10', label: 'Up to 10' }, { value: '12', label: 'Up to 12' }, { value: '20', label: 'Up to 20' }] },
     ],
   },
+  {
+    title: 'Decimals Worksheets',
+    slug: 'decimals-worksheets',
+    description: 'Free printable decimals worksheets. Practice adding, subtracting, multiplying, and dividing decimal numbers with configurable decimal places.',
+    icon: '🔢',
+    gradeRange: '4-6',
+    mathTopic: 'Decimals',
+    configOptions: [
+      { name: 'problems', label: 'Number of Problems', type: 'number', default: 15, min: 5, max: 30 },
+      { name: 'type', label: 'Problem Type', type: 'select', default: 'addSub', options: [{ value: 'addSub', label: 'Add & Subtract' }, { value: 'multiply', label: 'Multiply' }, { value: 'divide', label: 'Divide' }, { value: 'placeValue', label: 'Place Value' }, { value: 'compare', label: 'Compare Decimals' }] },
+      { name: 'maxDecimalPlaces', label: 'Decimal Places', type: 'select', default: '2', options: [{ value: '1', label: '1 Place (0.1)' }, { value: '2', label: '2 Places (0.01)' }, { value: '3', label: '3 Places (0.001)' }] },
+    ],
+  },
+  {
+    title: 'Percentages Worksheets',
+    slug: 'percentages-worksheets',
+    description: 'Free printable percentages worksheets. Practice finding percent of a number, percent change, discounts, and converting between fractions, decimals, and percents.',
+    icon: '%',
+    gradeRange: '5-7',
+    mathTopic: 'Percentages',
+    configOptions: [
+      { name: 'problems', label: 'Number of Problems', type: 'number', default: 15, min: 5, max: 30 },
+      { name: 'type', label: 'Problem Type', type: 'select', default: 'percentOf', options: [{ value: 'findPercent', label: 'Find the Percent' }, { value: 'percentOf', label: 'Percent of a Number' }, { value: 'percentChange', label: 'Percent Change' }, { value: 'discount', label: 'Discounts & Sale Price' }] },
+      { name: 'difficulty', label: 'Difficulty', type: 'select', default: 'easy', options: [{ value: 'easy', label: 'Easy (nice percentages)' }, { value: 'medium', label: 'Medium' }, { value: 'hard', label: 'Hard (multi-step)' }] },
+    ],
+  },
+  {
+    title: 'Fact Families Worksheets',
+    slug: 'fact-families-worksheets',
+    description: 'Free printable fact family worksheets. Practice addition/subtraction and multiplication/division fact families with visual triangle models.',
+    icon: '🏠',
+    gradeRange: 'K-2',
+    mathTopic: 'Fact Families',
+    configOptions: [
+      { name: 'problems', label: 'Number of Problems', type: 'number', default: 10, min: 5, max: 20 },
+      { name: 'operation', label: 'Operation', type: 'select', default: 'addSub', options: [{ value: 'addSub', label: 'Addition & Subtraction' }, { value: 'mulDiv', label: 'Multiplication & Division' }] },
+      { name: 'maxNumber', label: 'Max Number', type: 'select', default: '10', options: [{ value: '10', label: 'Up to 10' }, { value: '12', label: 'Up to 12' }, { value: '20', label: 'Up to 20' }] },
+    ],
+  },
 ];
 
 export function getWorksheetBySlug(slug: string): Worksheet | undefined {
