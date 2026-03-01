@@ -22,20 +22,21 @@ export interface GcfLcmPage {
   relationship: string;      // "12 × 18 = 216 = 6 × 36"
 }
 
-// All pairs from [2..20]
+// All pairs from [2..30]
 function smallPairs(): [number, number][] {
   const pairs: [number, number][] = [];
-  for (let a = 2; a <= 20; a++) {
-    for (let b = a + 1; b <= 20; b++) {
+  for (let a = 2; a <= 30; a++) {
+    for (let b = a + 1; b <= 30; b++) {
       pairs.push([a, b]);
     }
   }
   return pairs;
 }
 
-// Selected pairs from [21..50] — multiples of 5 and commonly searched
+// Selected pairs from [31..100] — commonly searched
 function mediumPairs(): [number, number][] {
-  const meds = [21, 24, 25, 27, 28, 30, 32, 35, 36, 40, 42, 45, 48, 50];
+  const meds = [32, 33, 35, 36, 40, 42, 44, 45, 48, 50, 54, 55, 56, 60,
+    63, 64, 66, 70, 72, 75, 80, 81, 84, 90, 96, 100];
   const pairs: [number, number][] = [];
   const seen = new Set<string>();
   for (let i = 0; i < meds.length; i++) {
@@ -48,8 +49,8 @@ function mediumPairs(): [number, number][] {
       }
     }
   }
-  // Also pair small numbers with medium numbers (selected)
-  const smalls = [2, 3, 4, 5, 6, 8, 9, 10, 12, 15, 16, 18, 20];
+  // Also pair small numbers with medium numbers
+  const smalls = [2, 3, 4, 5, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20, 21, 24, 25, 27, 28, 30];
   for (const s of smalls) {
     for (const m of meds) {
       if (s < m) {
@@ -68,6 +69,10 @@ function mediumPairs(): [number, number][] {
 const EXTRA_PAIRS: [number, number][] = [
   [48, 60], [54, 72], [56, 84], [60, 90], [72, 96],
   [80, 120], [84, 108], [90, 120], [100, 150], [120, 180],
+  [24, 36], [36, 48], [48, 72], [60, 84], [72, 108],
+  [90, 150], [100, 120], [108, 144], [120, 160], [144, 180],
+  [150, 200], [180, 240], [200, 300], [240, 360], [300, 400],
+  [360, 480], [400, 500], [500, 600], [600, 720], [720, 840],
 ];
 
 function buildAllPages(): GcfLcmPage[] {

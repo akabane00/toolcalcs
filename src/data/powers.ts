@@ -19,7 +19,7 @@ export interface PowerPage {
 
 export function getAllSquaredPages(): PowerPage[] {
   const pages: PowerPage[] = [];
-  for (let n = 1; n <= 60; n++) {
+  for (let n = 1; n <= 100; n++) {
     const result = n * n;
     const cbrt = Math.round(Math.cbrt(result));
     pages.push({
@@ -39,7 +39,7 @@ export function getAllSquaredPages(): PowerPage[] {
 
 export function getAllCubedPages(): PowerPage[] {
   const pages: PowerPage[] = [];
-  for (let n = 1; n <= 25; n++) {
+  for (let n = 1; n <= 50; n++) {
     const result = n * n * n;
     const sqrt = Math.round(Math.sqrt(result));
     pages.push({
@@ -57,10 +57,35 @@ export function getAllCubedPages(): PowerPage[] {
   return pages;
 }
 
+export function getAllFourthPowerPages(): PowerPage[] {
+  const pages: PowerPage[] = [];
+  for (let n = 1; n <= 25; n++) {
+    const result = n * n * n * n;
+    const sqrt = Math.round(Math.sqrt(result));
+    const cbrt = Math.round(Math.cbrt(result));
+    pages.push({
+      slug: String(n),
+      base: n,
+      exponent: 4,
+      result,
+      resultFormatted: result.toLocaleString('en-US'),
+      isPerfectSquare: sqrt * sqrt === result,
+      isPerfectCube: cbrt * cbrt * cbrt === result,
+      squareRoot: sqrt * sqrt === result ? sqrt : null,
+      cubeRoot: cbrt * cbrt * cbrt === result ? cbrt : null,
+    });
+  }
+  return pages;
+}
+
 export function getSquaredBySlug(slug: string): PowerPage | undefined {
   return getAllSquaredPages().find((p) => p.slug === slug);
 }
 
 export function getCubedBySlug(slug: string): PowerPage | undefined {
   return getAllCubedPages().find((p) => p.slug === slug);
+}
+
+export function getFourthPowerBySlug(slug: string): PowerPage | undefined {
+  return getAllFourthPowerPages().find((p) => p.slug === slug);
 }

@@ -1,0 +1,298 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import '../../styles/calculator.css';
+import { getAllFourthPowerPages, type PowerPage } from '../../data/powers';
+
+export function getStaticPaths() {
+  return getAllFourthPowerPages().map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: PowerPage };
+const { base, result, resultFormatted, isPerfectSquare, squareRoot } = page;
+
+const allPages = getAllFourthPowerPages();
+const nearbyOffsets = [-3, -2, -1, 1, 2, 3];
+const relatedPages = nearbyOffsets
+  .map((offset) => allPages.find((p) => p.base === base + offset))
+  .filter((p): p is PowerPage => !!p);
+
+const crossLinks: { href: string; label: string; icon: string }[] = [
+  { href: `/math/${base}-squared/`, label: `${base} Squared`, icon: '²' },
+  { href: `/math/${base}-cubed/`, label: `${base} Cubed`, icon: '³' },
+];
+if (base <= 200) {
+  crossLinks.push({ href: `/math/is-${base}-prime/`, label: `Is ${base} Prime?`, icon: '🔍' });
+}
+if (result <= 500) {
+  crossLinks.push({ href: `/math/square-root-of-${result}/`, label: `Square Root of ${resultFormatted}`, icon: '√' });
+}
+
+const squared = base * base;
+const cubed = base * base * base;
+
+const title = `${base} to the Fourth Power - ${base}⁴ = ${resultFormatted} | ToolCalcs`;
+const description = `${base} to the fourth power (${base}⁴) equals ${resultFormatted}. See step-by-step calculation, related powers, and an interactive power calculator.`;
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Math Reference", "item": "https://toolcalcs.com/math/" },
+      { "@type": "ListItem", "position": 3, "name": `${base} to the Fourth Power` },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": `What is ${base} to the fourth power?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `${base} to the fourth power (${base}⁴) equals ${resultFormatted}. This is calculated by multiplying ${base} by itself four times: ${base} × ${base} × ${base} × ${base} = ${resultFormatted}.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `How do you calculate ${base}⁴?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `To calculate ${base}⁴, multiply ${base} by itself four times: ${base} × ${base} = ${squared.toLocaleString('en-US')}, then ${squared.toLocaleString('en-US')} × ${base} = ${cubed.toLocaleString('en-US')}, then ${cubed.toLocaleString('en-US')} × ${base} = ${resultFormatted}. Alternatively, ${base}⁴ = (${base}²)² = ${squared.toLocaleString('en-US')}² = ${resultFormatted}.`,
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout title={title} description={description} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/math/">Math Reference</a> &rsaquo;
+    <span>{base} to the Fourth Power</span>
+  </nav>
+
+  <h1>{base} to the Fourth Power</h1>
+  <p class="page-desc">Calculate {base}⁴ with step-by-step explanation and related powers.</p>
+
+  <div class="quick-fact">
+    <span class="quick-fact-label">Quick Answer:</span>
+    <strong>{base}⁴ = {base} × {base} × {base} × {base} = {resultFormatted}</strong>
+  </div>
+
+  <div class="result-cards">
+    <div class="result-card primary">
+      <span class="result-label">{base}⁴</span>
+      <span class="result-value">{resultFormatted}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Base</span>
+      <span class="result-value">{base}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Exponent</span>
+      <span class="result-value">4</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">{base}²</span>
+      <span class="result-value">{squared.toLocaleString('en-US')}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">{base}³</span>
+      <span class="result-value">{cubed.toLocaleString('en-US')}</span>
+    </div>
+    {isPerfectSquare && squareRoot !== null && (
+      <div class="result-card">
+        <span class="result-label">√{resultFormatted}</span>
+        <span class="result-value">{squareRoot.toLocaleString('en-US')}</span>
+      </div>
+    )}
+  </div>
+
+  <h2 class="section-heading">Step-by-Step Calculation</h2>
+  <div class="calculator-box">
+    <div class="steps-list">
+      <div class="step-row">
+        <span class="step-num">Step 1:</span>
+        <span>Write the expression: {base}⁴</span>
+      </div>
+      <div class="step-row">
+        <span class="step-num">Step 2:</span>
+        <span>Multiply {base} × {base} = {squared.toLocaleString('en-US')}</span>
+      </div>
+      <div class="step-row">
+        <span class="step-num">Step 3:</span>
+        <span>Multiply {squared.toLocaleString('en-US')} × {base} = {cubed.toLocaleString('en-US')}</span>
+      </div>
+      <div class="step-row">
+        <span class="step-num">Step 4:</span>
+        <span>Multiply {cubed.toLocaleString('en-US')} × {base} = {resultFormatted}</span>
+      </div>
+      <div class="step-row result">
+        <span class="step-num">Result:</span>
+        <span>{base}⁴ = <strong>{resultFormatted}</strong></span>
+      </div>
+    </div>
+    <p style="margin-top: 12px; font-size: 0.9rem; color: var(--color-text-muted);">
+      Shortcut: {base}⁴ = ({base}²)² = {squared.toLocaleString('en-US')}² = {resultFormatted}
+    </p>
+  </div>
+
+  <h2 class="section-heading">Power Calculator</h2>
+  <div class="calculator-box">
+    <p class="calc-desc">Enter a base and exponent to calculate any power.</p>
+    <div class="finder-row">
+      <div class="input-group">
+        <label for="baseInput">Base</label>
+        <input type="number" id="baseInput" value={base} min="-10000" max="10000" />
+      </div>
+      <div class="input-group">
+        <label for="expInput">Exponent</label>
+        <input type="number" id="expInput" value="4" min="0" max="20" />
+      </div>
+      <button class="calc-btn" id="powerBtn">Calculate</button>
+    </div>
+    <div id="powerResult" class="finder-result"></div>
+  </div>
+
+  <h2 class="section-heading">Fourth Powers of 1 to 25</h2>
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr><th>n</th><th>n⁴</th><th>n</th><th>n⁴</th></tr>
+      </thead>
+      <tbody>
+        {Array.from({ length: 13 }, (_, i) => {
+          const n1 = i + 1;
+          const n2 = i + 14;
+          return (
+            <tr>
+              <td class={n1 === base ? 'highlight' : ''}>{n1}</td>
+              <td class={n1 === base ? 'highlight' : ''}>{(n1 ** 4).toLocaleString('en-US')}</td>
+              {n2 <= 25 ? (
+                <>
+                  <td class={n2 === base ? 'highlight' : ''}>{n2}</td>
+                  <td class={n2 === base ? 'highlight' : ''}>{(n2 ** 4).toLocaleString('en-US')}</td>
+                </>
+              ) : (
+                <>
+                  <td></td>
+                  <td></td>
+                </>
+              )}
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  </div>
+
+  <AdUnit slot="fourth-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>What Does "To the Fourth Power" Mean?</h2>
+    <p>
+      Raising a number to the fourth power means multiplying it by itself four times. The expression {base}⁴ is read as "{base} to the fourth power" or "{base} to the fourth." In mathematical notation, the small "4" is the exponent, and {base} is the base. The result, {resultFormatted}, is the fourth power of {base}. Fourth powers appear in physics (especially in radiation equations like the Stefan-Boltzmann law), geometry (hypervolume of a tesseract), and engineering calculations.
+    </p>
+
+    <h2>Calculating {base}⁴</h2>
+    <p>
+      There are two common methods to calculate {base}⁴. The direct method multiplies {base} by itself four times: {base} &times; {base} &times; {base} &times; {base} = {resultFormatted}. The shortcut method uses the square: first calculate {base}² = {squared.toLocaleString('en-US')}, then square that result: {squared.toLocaleString('en-US')}² = {resultFormatted}. The shortcut is often faster for mental math because squaring a number twice is simpler than multiplying four times.
+    </p>
+
+    <h2>Relationship Between Powers</h2>
+    <p>
+      The fourth power of {base} connects to its other powers. {base}¹ = {base}. {base}² = {squared.toLocaleString('en-US')}. {base}³ = {cubed.toLocaleString('en-US')}. {base}⁴ = {resultFormatted}. Each successive power multiplies the previous result by {base}. Notice that {base}⁴ = {base}² &times; {base}² = {squared.toLocaleString('en-US')} &times; {squared.toLocaleString('en-US')} = {resultFormatted}. This is a consequence of the exponent multiplication rule: a<sup>m</sup> &times; a<sup>n</sup> = a<sup>m+n</sup>.
+    </p>
+
+    {isPerfectSquare && squareRoot !== null && (
+      <>
+        <h2>Perfect Square Property</h2>
+        <p>
+          Because {base}⁴ = ({base}²)², every fourth power is automatically a perfect square. In this case, {resultFormatted} is a perfect square with square root {squareRoot.toLocaleString('en-US')} (which equals {base}²). This means √{resultFormatted} = {squareRoot.toLocaleString('en-US')}.
+        </p>
+      </>
+    )}
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>What is {base} to the fourth power?</h3>
+    <p>
+      {base} to the fourth power ({base}⁴) equals {resultFormatted}. This is calculated by multiplying {base} by itself four times: {base} &times; {base} &times; {base} &times; {base} = {resultFormatted}.
+    </p>
+
+    <h3>How do you calculate {base}⁴?</h3>
+    <p>
+      You can calculate {base}⁴ by multiplying {base} four times ({base} &times; {base} &times; {base} &times; {base}), or by squaring {base} twice: first {base}² = {squared.toLocaleString('en-US')}, then {squared.toLocaleString('en-US')}² = {resultFormatted}.
+    </p>
+
+    <h2>Nearby Fourth Powers</h2>
+    <ul>
+      {relatedPages.map((p) => (
+        <li>
+          <a href={`/math/${p.slug}-to-the-fourth/`}>{p.base}⁴ = {p.resultFormatted}</a>
+        </li>
+      ))}
+    </ul>
+
+    <p><a href="/math/">&larr; Math Reference</a> | <a href="/math-calculators/">Math Calculators</a></p>
+
+    <CrossLinks links={crossLinks} />
+  </article>
+
+  <AdUnit slot="fourth-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .quick-fact { background: #eff6ff; border-radius: var(--radius); padding: 16px 24px; margin-bottom: 24px; font-size: 1.1rem; }
+  .quick-fact-label { font-size: 0.85rem; color: var(--color-text-muted); display: block; margin-bottom: 4px; }
+  .quick-fact strong { color: var(--color-primary); font-size: 1.15rem; }
+  .section-heading { font-size: 1.2rem; margin: 32px 0 12px; }
+  .calc-desc { font-size: 0.9rem; color: var(--color-text-muted); margin-bottom: 16px; }
+  .finder-row { display: flex; gap: 16px; align-items: end; flex-wrap: wrap; }
+  .finder-row .input-group { flex: 1; min-width: 100px; }
+  .finder-result { margin-top: 16px; padding: 14px 16px; background: var(--color-bg); border-radius: var(--radius); font-size: 0.95rem; line-height: 1.7; min-height: 44px; }
+  .steps-list { display: flex; flex-direction: column; gap: 8px; }
+  .step-row { display: flex; gap: 10px; align-items: baseline; padding: 6px 0; }
+  .step-row.result { margin-top: 8px; padding-top: 12px; border-top: 2px solid var(--color-primary); color: var(--color-primary); font-weight: 600; }
+  .step-num { font-weight: 700; min-width: 60px; color: var(--color-text-muted); font-size: 0.85rem; }
+  .highlight { background: #dbeafe; font-weight: 700; color: var(--color-primary); }
+  @media (max-width: 640px) { .finder-row { flex-direction: column; } }
+</style>
+
+<script>
+  var baseInput = document.getElementById('baseInput') as HTMLInputElement;
+  var expInput = document.getElementById('expInput') as HTMLInputElement;
+  var powerBtn = document.getElementById('powerBtn') as HTMLButtonElement;
+  var resultDiv = document.getElementById('powerResult') as HTMLDivElement;
+
+  function calculate() {
+    var b = parseFloat(baseInput.value);
+    var e = parseInt(expInput.value, 10);
+    if (isNaN(b) || isNaN(e) || e < 0 || e > 20 || Math.abs(b) > 10000) {
+      resultDiv.textContent = 'Please enter a valid base (-10000 to 10000) and exponent (0 to 20).';
+      return;
+    }
+    var result = Math.pow(b, e);
+    var html = '<strong>' + b + '<sup>' + e + '</sup> = ' + result.toLocaleString('en-US') + '</strong>';
+    if (e === 2) {
+      html += '<br><strong>Square Root of ' + result.toLocaleString('en-US') + ':</strong> ' + b;
+    }
+    if (e === 3) {
+      html += '<br><strong>Cube Root of ' + result.toLocaleString('en-US') + ':</strong> ' + b;
+    }
+    resultDiv.innerHTML = html;
+  }
+
+  powerBtn.addEventListener('click', calculate);
+  baseInput.addEventListener('keydown', function(e) { if ((e as KeyboardEvent).key === 'Enter') calculate(); });
+  expInput.addEventListener('keydown', function(e) { if ((e as KeyboardEvent).key === 'Enter') calculate(); });
+  calculate();
+</script>

@@ -21,9 +21,8 @@ export interface SquareRootPage {
 }
 
 const TARGET_NUMBERS = [
-  ...Array.from({ length: 200 }, (_, i) => i + 1),
-  225, 256, 289, 324, 400, 500, 625, 729, 900, 1000,
-  1024, 1296, 1600, 2000, 2025, 2500, 10000,
+  ...Array.from({ length: 500 }, (_, i) => i + 1),
+  625, 729, 900, 1000, 1024, 1296, 1600, 2000, 2025, 2500, 10000,
 ];
 
 function nearestPerfect(n: number, dir: 'below' | 'above'): number {

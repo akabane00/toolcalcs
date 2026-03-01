@@ -56,13 +56,14 @@ function formatPrimeFactorization(factors: number[]): string {
     .join(' × ');
 }
 
-// Target numbers: 1-100, plus selected larger numbers
+// Target numbers: 1-200 continuous, plus selected larger composites
 const TARGET_NUMBERS = [
-  ...Array.from({ length: 100 }, (_, i) => i + 1),
-  102, 108, 110, 112, 120, 125, 128, 132, 140, 144, 150,
-  160, 175, 180, 192, 196, 200, 210, 225, 240, 250,
-  256, 270, 288, 300, 360, 400, 432, 480, 500, 512,
-  600, 625, 720, 750, 800, 900, 1000, 1024, 1440, 2000,
+  ...Array.from({ length: 200 }, (_, i) => i + 1),
+  210, 216, 225, 240, 250, 252, 256, 270, 280, 288, 300, 315, 320,
+  336, 343, 350, 360, 375, 378, 384, 392, 400, 420, 432, 441, 450,
+  480, 500, 504, 512, 525, 540, 560, 576, 600, 625, 630, 648, 660,
+  672, 700, 720, 729, 750, 768, 784, 800, 840, 864, 900, 960, 1000,
+  1024, 1200, 1440, 1500, 2000, 2500, 3000, 5000, 10000,
 ];
 
 export function getAllFactorsPages(): FactorsPage[] {

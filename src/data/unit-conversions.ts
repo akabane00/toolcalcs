@@ -7,7 +7,7 @@ export interface Unit {
   name: string;
   slug: string;
   abbrev: string;
-  category: 'length' | 'weight' | 'temperature' | 'volume';
+  category: 'length' | 'weight' | 'temperature' | 'volume' | 'area' | 'speed' | 'data' | 'energy' | 'pressure';
   toBase: number; // multiply by this to get base unit (meters, kg, liters)
 }
 
@@ -43,6 +43,48 @@ export const units: Unit[] = [
   { name: 'Pints', slug: 'pints', abbrev: 'pt', category: 'volume', toBase: 0.473176 },
   { name: 'Cups', slug: 'cups', abbrev: 'cup', category: 'volume', toBase: 0.236588 },
   { name: 'Fluid Ounces', slug: 'fluid-ounces', abbrev: 'fl oz', category: 'volume', toBase: 0.0295735 },
+
+  // Area (base: square meters)
+  { name: 'Square Inches', slug: 'square-inches', abbrev: 'in²', category: 'area', toBase: 0.00064516 },
+  { name: 'Square Feet', slug: 'square-feet', abbrev: 'ft²', category: 'area', toBase: 0.092903 },
+  { name: 'Square Yards', slug: 'square-yards', abbrev: 'yd²', category: 'area', toBase: 0.836127 },
+  { name: 'Square Meters', slug: 'square-meters', abbrev: 'm²', category: 'area', toBase: 1 },
+  { name: 'Square Centimeters', slug: 'square-centimeters', abbrev: 'cm²', category: 'area', toBase: 0.0001 },
+  { name: 'Acres', slug: 'acres', abbrev: 'ac', category: 'area', toBase: 4046.86 },
+  { name: 'Hectares', slug: 'hectares', abbrev: 'ha', category: 'area', toBase: 10000 },
+  { name: 'Square Kilometers', slug: 'square-kilometers', abbrev: 'km²', category: 'area', toBase: 1000000 },
+  { name: 'Square Miles', slug: 'square-miles', abbrev: 'mi²', category: 'area', toBase: 2589988.11 },
+
+  // Speed (base: meters per second)
+  { name: 'Miles per Hour', slug: 'mph', abbrev: 'mph', category: 'speed', toBase: 0.44704 },
+  { name: 'Kilometers per Hour', slug: 'kmh', abbrev: 'km/h', category: 'speed', toBase: 0.277778 },
+  { name: 'Meters per Second', slug: 'meters-per-second', abbrev: 'm/s', category: 'speed', toBase: 1 },
+  { name: 'Feet per Second', slug: 'feet-per-second', abbrev: 'ft/s', category: 'speed', toBase: 0.3048 },
+  { name: 'Knots', slug: 'knots', abbrev: 'kn', category: 'speed', toBase: 0.514444 },
+
+  // Data Storage (base: bytes)
+  { name: 'Bytes', slug: 'bytes', abbrev: 'B', category: 'data', toBase: 1 },
+  { name: 'Kilobytes', slug: 'kilobytes', abbrev: 'KB', category: 'data', toBase: 1024 },
+  { name: 'Megabytes', slug: 'megabytes', abbrev: 'MB', category: 'data', toBase: 1048576 },
+  { name: 'Gigabytes', slug: 'gigabytes', abbrev: 'GB', category: 'data', toBase: 1073741824 },
+  { name: 'Terabytes', slug: 'terabytes', abbrev: 'TB', category: 'data', toBase: 1099511627776 },
+
+  // Energy (base: joules)
+  { name: 'Joules', slug: 'joules', abbrev: 'J', category: 'energy', toBase: 1 },
+  { name: 'Kilojoules', slug: 'kilojoules', abbrev: 'kJ', category: 'energy', toBase: 1000 },
+  { name: 'Calories', slug: 'calories', abbrev: 'cal', category: 'energy', toBase: 4.184 },
+  { name: 'Kilocalories', slug: 'kilocalories', abbrev: 'kcal', category: 'energy', toBase: 4184 },
+  { name: 'BTU', slug: 'btu', abbrev: 'BTU', category: 'energy', toBase: 1055.06 },
+  { name: 'Kilowatt-Hours', slug: 'kilowatt-hours', abbrev: 'kWh', category: 'energy', toBase: 3600000 },
+  { name: 'Watt-Hours', slug: 'watt-hours', abbrev: 'Wh', category: 'energy', toBase: 3600 },
+
+  // Pressure (base: pascals)
+  { name: 'Pascals', slug: 'pascals', abbrev: 'Pa', category: 'pressure', toBase: 1 },
+  { name: 'Kilopascals', slug: 'kilopascals', abbrev: 'kPa', category: 'pressure', toBase: 1000 },
+  { name: 'PSI', slug: 'psi', abbrev: 'psi', category: 'pressure', toBase: 6894.76 },
+  { name: 'Bar', slug: 'bar', abbrev: 'bar', category: 'pressure', toBase: 100000 },
+  { name: 'Atmospheres', slug: 'atmospheres', abbrev: 'atm', category: 'pressure', toBase: 101325 },
+  { name: 'mmHg', slug: 'mmhg', abbrev: 'mmHg', category: 'pressure', toBase: 133.322 },
 ];
 
 const unitMap = new Map(units.map(u => [u.slug, u]));
@@ -128,6 +170,74 @@ const bidirectionalPairs: [string, string][] = [
   ['quarts', 'cups'],
   ['pints', 'fluid-ounces'],
   ['quarts', 'pints'],
+
+  // Area
+  ['square-feet', 'square-meters'],
+  ['square-feet', 'square-inches'],
+  ['square-feet', 'square-yards'],
+  ['square-feet', 'acres'],
+  ['square-meters', 'square-centimeters'],
+  ['square-meters', 'square-kilometers'],
+  ['square-meters', 'hectares'],
+  ['square-yards', 'square-meters'],
+  ['square-yards', 'acres'],
+  ['acres', 'hectares'],
+  ['acres', 'square-kilometers'],
+  ['acres', 'square-miles'],
+  ['hectares', 'square-kilometers'],
+  ['square-miles', 'square-kilometers'],
+  ['square-inches', 'square-centimeters'],
+
+  // Speed
+  ['mph', 'kmh'],
+  ['mph', 'meters-per-second'],
+  ['mph', 'knots'],
+  ['mph', 'feet-per-second'],
+  ['kmh', 'meters-per-second'],
+  ['kmh', 'knots'],
+  ['knots', 'meters-per-second'],
+  ['feet-per-second', 'meters-per-second'],
+
+  // Data Storage
+  ['bytes', 'kilobytes'],
+  ['kilobytes', 'megabytes'],
+  ['megabytes', 'gigabytes'],
+  ['gigabytes', 'terabytes'],
+  ['kilobytes', 'bytes'],
+  ['megabytes', 'kilobytes'],
+  ['gigabytes', 'megabytes'],
+  ['terabytes', 'gigabytes'],
+  ['megabytes', 'bytes'],
+  ['gigabytes', 'bytes'],
+
+  // Energy
+  ['joules', 'calories'],
+  ['joules', 'kilojoules'],
+  ['calories', 'kilocalories'],
+  ['calories', 'joules'],
+  ['kilocalories', 'joules'],
+  ['kilocalories', 'kilojoules'],
+  ['btu', 'joules'],
+  ['btu', 'kilocalories'],
+  ['btu', 'kilowatt-hours'],
+  ['kilowatt-hours', 'joules'],
+  ['kilowatt-hours', 'kilocalories'],
+  ['watt-hours', 'joules'],
+
+  // Pressure
+  ['psi', 'bar'],
+  ['psi', 'atmospheres'],
+  ['psi', 'kilopascals'],
+  ['psi', 'pascals'],
+  ['psi', 'mmhg'],
+  ['bar', 'atmospheres'],
+  ['bar', 'pascals'],
+  ['bar', 'kilopascals'],
+  ['atmospheres', 'pascals'],
+  ['atmospheres', 'kilopascals'],
+  ['mmhg', 'pascals'],
+  ['mmhg', 'atmospheres'],
+  ['kilopascals', 'pascals'],
 ];
 
 // Expand to both directions
@@ -169,4 +279,9 @@ export const categoryNames: Record<string, string> = {
   weight: 'Weight',
   temperature: 'Temperature',
   volume: 'Volume',
+  area: 'Area',
+  speed: 'Speed',
+  data: 'Data Storage',
+  energy: 'Energy',
+  pressure: 'Pressure',
 };

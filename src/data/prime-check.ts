@@ -20,15 +20,9 @@ export interface PrimeCheckPage {
   digitSum: number;
 }
 
-// 1-200 + commonly confused composites + round numbers
+// 1-1000 continuous range for comprehensive coverage
 const TARGET_NUMBERS = [
-  ...Array.from({ length: 200 }, (_, i) => i + 1),
-  // Commonly thought to be prime (but aren't)
-  201, 207, 209, 213, 217, 219, 221, 247, 253, 259,
-  261, 267, 289, 291, 299, 301, 309, 319, 321, 323,
-  329, 333, 341, 351, 361, 371, 377, 381, 391, 399,
-  // Round numbers
-  250, 300, 400, 500, 750, 1000,
+  ...Array.from({ length: 1000 }, (_, i) => i + 1),
 ];
 
 function getDigitSum(n: number): number {
