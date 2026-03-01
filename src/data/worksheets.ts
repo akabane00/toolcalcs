@@ -225,6 +225,33 @@ export const worksheets: Worksheet[] = [
       { name: 'difficulty', label: 'Difficulty', type: 'select', default: 'easy', options: [{ value: 'easy', label: 'Easy (numbers < 50)' }, { value: 'medium', label: 'Medium (numbers < 200)' }, { value: 'hard', label: 'Hard (numbers < 1,000)' }] },
     ],
   },
+  {
+    title: 'Number Line Worksheets',
+    slug: 'number-line-worksheets',
+    description: 'Free printable number line worksheets. Practice identifying numbers, placing values, and visualizing addition and subtraction on a number line.',
+    icon: '📏',
+    gradeRange: '1-3',
+    mathTopic: 'Number Line',
+    configOptions: [
+      { name: 'problems', label: 'Number of Problems', type: 'number', default: 8, min: 4, max: 15 },
+      { name: 'type', label: 'Problem Type', type: 'select', default: 'identify', options: [{ value: 'identify', label: 'Identify the Number' }, { value: 'place', label: 'Place the Number' }, { value: 'addition', label: 'Addition on Number Line' }, { value: 'subtraction', label: 'Subtraction on Number Line' }] },
+      { name: 'range', label: 'Number Range', type: 'select', default: '20', options: [{ value: '10', label: '0 to 10' }, { value: '20', label: '0 to 20' }, { value: '50', label: '0 to 50' }, { value: '100', label: '0 to 100' }] },
+    ],
+  },
+  {
+    title: 'Area & Perimeter Worksheets',
+    slug: 'area-and-perimeter-worksheets',
+    description: 'Free printable area and perimeter worksheets. Practice calculating area and perimeter of rectangles, squares, and triangles with visual diagrams.',
+    icon: '📐',
+    gradeRange: '3-5',
+    mathTopic: 'Area & Perimeter',
+    configOptions: [
+      { name: 'problems', label: 'Number of Problems', type: 'number', default: 10, min: 5, max: 20 },
+      { name: 'type', label: 'Find', type: 'select', default: 'both', options: [{ value: 'area', label: 'Area Only' }, { value: 'perimeter', label: 'Perimeter Only' }, { value: 'both', label: 'Area and Perimeter' }] },
+      { name: 'shapes', label: 'Shapes', type: 'select', default: 'rectangles', options: [{ value: 'rectangles', label: 'Rectangles & Squares' }, { value: 'triangles', label: 'Triangles' }, { value: 'mixed', label: 'Mixed' }] },
+      { name: 'maxSide', label: 'Max Side Length', type: 'select', default: '12', options: [{ value: '10', label: 'Up to 10' }, { value: '12', label: 'Up to 12' }, { value: '20', label: 'Up to 20' }] },
+    ],
+  },
 ];
 
 export function getWorksheetBySlug(slug: string): Worksheet | undefined {
