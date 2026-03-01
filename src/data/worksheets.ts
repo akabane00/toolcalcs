@@ -291,6 +291,45 @@ export const worksheets: Worksheet[] = [
       { name: 'maxNumber', label: 'Max Number', type: 'select', default: '10', options: [{ value: '10', label: 'Up to 10' }, { value: '12', label: 'Up to 12' }, { value: '20', label: 'Up to 20' }] },
     ],
   },
+  {
+    title: 'Measurement Worksheets',
+    slug: 'measurement-worksheets',
+    description: 'Free printable measurement worksheets. Practice converting between customary and metric units, comparing measurements, and solving measurement word problems.',
+    icon: '📏',
+    gradeRange: '2-4',
+    mathTopic: 'Measurement',
+    configOptions: [
+      { name: 'problems', label: 'Number of Problems', type: 'number', default: 15, min: 5, max: 30 },
+      { name: 'type', label: 'Problem Type', type: 'select', default: 'convert', options: [{ value: 'convert', label: 'Unit Conversions' }, { value: 'compare', label: 'Compare Measurements' }, { value: 'wordProblem', label: 'Word Problems' }] },
+      { name: 'system', label: 'Measurement System', type: 'select', default: 'customary', options: [{ value: 'customary', label: 'Customary (US)' }, { value: 'metric', label: 'Metric' }, { value: 'both', label: 'Both' }] },
+    ],
+  },
+  {
+    title: 'Word Problems Worksheets',
+    slug: 'word-problems-worksheets',
+    description: 'Free printable math word problems worksheets. Practice solving addition, subtraction, multiplication, and division word problems for grades 1-6.',
+    icon: '📝',
+    gradeRange: '1-6',
+    mathTopic: 'Word Problems',
+    configOptions: [
+      { name: 'problems', label: 'Number of Problems', type: 'number', default: 8, min: 5, max: 15 },
+      { name: 'operation', label: 'Operation', type: 'select', default: 'mixed', options: [{ value: 'addition', label: 'Addition' }, { value: 'subtraction', label: 'Subtraction' }, { value: 'multiplication', label: 'Multiplication' }, { value: 'division', label: 'Division' }, { value: 'mixed', label: 'Mixed Operations' }] },
+      { name: 'gradeLevel', label: 'Grade Level', type: 'select', default: '3-4', options: [{ value: '1-2', label: 'Grades 1-2 (numbers < 20)' }, { value: '3-4', label: 'Grades 3-4 (numbers < 100)' }, { value: '5-6', label: 'Grades 5-6 (larger numbers)' }] },
+    ],
+  },
+  {
+    title: 'Geometry Worksheets',
+    slug: 'geometry-worksheets',
+    description: 'Free printable geometry worksheets. Practice identifying shapes, classifying angles, finding lines of symmetry, and classifying triangles with visual diagrams.',
+    icon: '📐',
+    gradeRange: '2-5',
+    mathTopic: 'Geometry',
+    configOptions: [
+      { name: 'problems', label: 'Number of Problems', type: 'number', default: 10, min: 5, max: 20 },
+      { name: 'type', label: 'Problem Type', type: 'select', default: 'identifyShapes', options: [{ value: 'identifyShapes', label: 'Identify Shapes' }, { value: 'angles', label: 'Classify Angles' }, { value: 'symmetry', label: 'Lines of Symmetry' }, { value: 'classify', label: 'Classify Triangles' }] },
+      { name: 'difficulty', label: 'Difficulty', type: 'select', default: 'easy', options: [{ value: 'easy', label: 'Easy' }, { value: 'medium', label: 'Medium' }, { value: 'hard', label: 'Hard' }] },
+    ],
+  },
 ];
 
 export function getWorksheetBySlug(slug: string): Worksheet | undefined {
