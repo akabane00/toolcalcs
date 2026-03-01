@@ -121,6 +121,58 @@ export const worksheets: Worksheet[] = [
       { name: 'maxTotal', label: 'Max Total', type: 'select', default: '1.00', options: [{ value: '0.50', label: 'Up to 50¢' }, { value: '1.00', label: 'Up to $1.00' }, { value: '5.00', label: 'Up to $5.00' }, { value: '20.00', label: 'Up to $20.00' }] },
     ],
   },
+  {
+    title: 'Place Value Worksheets',
+    slug: 'place-value-worksheets',
+    description: 'Free printable place value worksheets. Practice identifying digit values, expanded form, and standard form for numbers up to 5 digits.',
+    icon: '🔟',
+    gradeRange: '1-4',
+    mathTopic: 'Place Value',
+    configOptions: [
+      { name: 'problems', label: 'Number of Problems', type: 'number', default: 15, min: 5, max: 30 },
+      { name: 'type', label: 'Problem Type', type: 'select', default: 'identify', options: [{ value: 'identify', label: 'Identify Digit Value' }, { value: 'expanded', label: 'Expanded Form' }, { value: 'standard', label: 'Standard Form' }, { value: 'compose', label: 'Write the Number' }] },
+      { name: 'maxDigits', label: 'Max Digits', type: 'select', default: '3', options: [{ value: '2', label: '2 Digits (10-99)' }, { value: '3', label: '3 Digits (100-999)' }, { value: '4', label: '4 Digits (1,000-9,999)' }, { value: '5', label: '5 Digits (10,000-99,999)' }] },
+    ],
+  },
+  {
+    title: 'Rounding Worksheets',
+    slug: 'rounding-worksheets',
+    description: 'Free printable rounding worksheets. Practice rounding numbers to the nearest 10, 100, and 1,000 with unlimited problems.',
+    icon: '🔄',
+    gradeRange: '3-5',
+    mathTopic: 'Rounding',
+    configOptions: [
+      { name: 'problems', label: 'Number of Problems', type: 'number', default: 20, min: 5, max: 40 },
+      { name: 'roundTo', label: 'Round To', type: 'select', default: '10', options: [{ value: '10', label: 'Nearest 10' }, { value: '100', label: 'Nearest 100' }, { value: '1000', label: 'Nearest 1,000' }] },
+      { name: 'maxNumber', label: 'Max Number', type: 'select', default: '999', options: [{ value: '99', label: 'Up to 99' }, { value: '999', label: 'Up to 999' }, { value: '9999', label: 'Up to 9,999' }, { value: '99999', label: 'Up to 99,999' }] },
+    ],
+  },
+  {
+    title: 'Comparing Numbers Worksheets',
+    slug: 'comparing-numbers-worksheets',
+    description: 'Free printable greater than less than worksheets. Practice comparing numbers using >, <, and = symbols.',
+    icon: '⚖️',
+    gradeRange: 'K-3',
+    mathTopic: 'Comparing Numbers',
+    configOptions: [
+      { name: 'problems', label: 'Number of Problems', type: 'number', default: 20, min: 5, max: 40 },
+      { name: 'maxDigits', label: 'Max Digits', type: 'select', default: '2', options: [{ value: '1', label: '1 Digit (0-9)' }, { value: '2', label: '2 Digits (10-99)' }, { value: '3', label: '3 Digits (100-999)' }, { value: '4', label: '4 Digits (1,000-9,999)' }] },
+      { name: 'includeEquals', label: 'Include Equals', type: 'select', default: 'yes', options: [{ value: 'yes', label: 'Yes (>, <, =)' }, { value: 'no', label: 'No (>, < only)' }] },
+    ],
+  },
+  {
+    title: 'Even & Odd Worksheets',
+    slug: 'even-and-odd-worksheets',
+    description: 'Free printable even and odd number worksheets. Practice identifying, sorting, and classifying numbers as even or odd.',
+    icon: '🎯',
+    gradeRange: 'K-2',
+    mathTopic: 'Even & Odd Numbers',
+    configOptions: [
+      { name: 'problems', label: 'Number of Problems', type: 'number', default: 20, min: 10, max: 40 },
+      { name: 'type', label: 'Problem Type', type: 'select', default: 'classify', options: [{ value: 'classify', label: 'Classify (Even or Odd?)' }, { value: 'color', label: 'Color Even Numbers' }, { value: 'fill', label: 'Fill Missing Even/Odd' }] },
+      { name: 'maxNumber', label: 'Max Number', type: 'select', default: '20', options: [{ value: '10', label: 'Up to 10' }, { value: '20', label: 'Up to 20' }, { value: '50', label: 'Up to 50' }, { value: '100', label: 'Up to 100' }] },
+    ],
+  },
 ];
 
 export function getWorksheetBySlug(slug: string): Worksheet | undefined {
