@@ -2,9 +2,12 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
+import cloudflare from '@astrojs/cloudflare';
+
 // https://astro.build/config
 export default defineConfig({
   site: 'https://toolcalcs.com',
+
   integrations: [sitemap({
     serialize(item) {
       const url = item.url;
@@ -42,7 +45,10 @@ export default defineConfig({
       return item;
     },
   })],
+
   build: {
     format: 'directory',
   },
+
+  adapter: cloudflare(),
 });
