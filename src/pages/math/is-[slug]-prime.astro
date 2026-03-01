@@ -1,0 +1,363 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import '../../styles/calculator.css';
+import { getAllPrimeCheckPages, type PrimeCheckPage } from '../../data/prime-check';
+
+export function getStaticPaths() {
+  return getAllPrimeCheckPages().map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: PrimeCheckPage };
+const { number, isPrime: numIsPrime, factors, factorCount, nextPrimeNum, prevPrimeNum, primeFactorization, nthPrime, nearbyPrimes, isEven, digitSum } = page;
+
+function formatPrimeHtml(pf: string): string {
+  return pf.replace(/\^(\d+)/g, '<sup>$1</sup>');
+}
+const primeHtml = formatPrimeHtml(primeFactorization);
+
+// Cross-links
+const crossLinks: { href: string; label: string; icon: string }[] = [];
+if (number <= 141) {
+  crossLinks.push({ href: `/factors-of/${number}/`, label: `Factors of ${number}`, icon: '🔢' });
+}
+if (number <= 217) {
+  crossLinks.push({ href: `/math/square-root-of-${number}/`, label: `Square Root of ${number}`, icon: '√' });
+}
+if (number <= 60) {
+  crossLinks.push({ href: `/math/${number}-squared/`, label: `${number} Squared`, icon: '²' });
+}
+
+// Related prime check pages
+const allPages = getAllPrimeCheckPages();
+const nearbyOffsets = [-3, -2, -1, 1, 2, 3];
+const relatedPages = nearbyOffsets
+  .map((offset) => allPages.find((p) => p.number === number + offset))
+  .filter((p): p is PrimeCheckPage => !!p);
+
+// Divisibility tests
+const divTests = [
+  { divisor: 2, test: isEven, reason: `${number} is ${isEven ? 'even' : 'odd'}` },
+  { divisor: 3, test: digitSum % 3 === 0, reason: `digit sum ${digitSum} is ${digitSum % 3 === 0 ? '' : 'not '}divisible by 3` },
+  { divisor: 5, test: number % 5 === 0, reason: `${number} ${number % 5 === 0 ? 'ends in 0 or 5' : 'does not end in 0 or 5'}` },
+];
+
+const answerText = numIsPrime
+  ? `Yes, ${number} is a prime number.`
+  : number === 1
+    ? `No, 1 is neither prime nor composite.`
+    : `No, ${number} is NOT a prime number. It is composite.`;
+
+// SEO
+const title = `Is ${number} a Prime Number? ${numIsPrime ? 'Yes' : 'No'} | ToolCalcs`;
+const description = numIsPrime
+  ? `Yes, ${number} is a prime number. It is the ${nthPrime}${nthPrime === 1 ? 'st' : nthPrime === 2 ? 'nd' : nthPrime === 3 ? 'rd' : 'th'} prime. Its only factors are 1 and ${number}.`
+  : `No, ${number} is not a prime number. It has ${factorCount} factors: ${factors.join(', ')}. Prime factorization: ${primeFactorization}.`;
+
+const ordinalSuffix = (n: number) => {
+  const s = ['th', 'st', 'nd', 'rd'];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+};
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Math Reference", "item": "https://toolcalcs.com/math/" },
+      { "@type": "ListItem", "position": 3, "name": `Is ${number} Prime?` },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": `Is ${number} a prime number?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": numIsPrime
+            ? `Yes, ${number} is a prime number. It is the ${ordinalSuffix(nthPrime)} prime number. Its only factors are 1 and ${number}.`
+            : number === 1
+              ? `No, 1 is neither prime nor composite by mathematical convention.`
+              : `No, ${number} is not a prime number. It is a composite number with ${factorCount} factors: ${factors.join(', ')}.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `What are the factors of ${number}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `The factors of ${number} are: ${factors.join(', ')}. It has ${factorCount} total factors.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `What is the next prime number after ${number}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `The next prime number after ${number} is ${nextPrimeNum}.${prevPrimeNum > 0 ? ` The previous prime before ${number} is ${prevPrimeNum}.` : ''}`,
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout title={title} description={description} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/math/">Math Reference</a> &rsaquo;
+    <span>Is {number} Prime?</span>
+  </nav>
+
+  <h1>Is {number} a Prime Number?</h1>
+  <p class="page-desc">Check whether {number} is prime or composite, with its factors, prime factorization, and detailed explanation.</p>
+
+  <div class={`quick-fact ${numIsPrime ? 'prime-yes' : 'prime-no'}`}>
+    <span class="quick-fact-label">Answer:</span>
+    <strong>{answerText}</strong>
+  </div>
+
+  <!-- Result Cards -->
+  <div class="result-cards">
+    <div class={`result-card ${numIsPrime ? 'primary' : 'not-prime'}`}>
+      <span class="result-label">Prime?</span>
+      <span class="result-value">{numIsPrime ? 'Yes' : number === 1 ? 'Neither' : 'No'}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Factor Count</span>
+      <span class="result-value">{factorCount}</span>
+    </div>
+    {numIsPrime && nthPrime > 0 && (
+      <div class="result-card">
+        <span class="result-label">Ordinal</span>
+        <span class="result-value">{ordinalSuffix(nthPrime)} prime</span>
+      </div>
+    )}
+    <div class="result-card">
+      <span class="result-label">Previous Prime</span>
+      <span class="result-value">{prevPrimeNum > 0 ? prevPrimeNum : 'N/A'}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Next Prime</span>
+      <span class="result-value">{nextPrimeNum}</span>
+    </div>
+    {!numIsPrime && number > 1 && (
+      <div class="result-card">
+        <span class="result-label">Prime Factorization</span>
+        <span class="result-value" set:html={primeHtml} />
+      </div>
+    )}
+  </div>
+
+  <!-- Factors Display -->
+  {!numIsPrime && number > 1 && (
+    <div class="calculator-box">
+      <h2 class="calc-section-title">All Factors of {number}</h2>
+      <div class="factor-badges">
+        {factors.map((f) => (
+          <span class="factor-badge">{f}</span>
+        ))}
+      </div>
+    </div>
+  )}
+
+  <!-- Divisibility Test -->
+  <h2 class="section-heading">Quick Divisibility Tests for {number}</h2>
+  <div class="calculator-box">
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr><th>Divisor</th><th>Divisible?</th><th>Reason</th></tr>
+        </thead>
+        <tbody>
+          {divTests.map((t) => (
+            <tr>
+              <td>{t.divisor}</td>
+              <td class={t.test ? 'yes-cell' : 'no-cell'}>{t.test ? 'Yes' : 'No'}</td>
+              <td>{t.reason}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Nearby Primes -->
+  <h2 class="section-heading">Nearby Prime Numbers</h2>
+  <div class="calculator-box">
+    <div class="factor-badges">
+      {nearbyPrimes.map((p) => (
+        <a href={`/math/is-${p}-prime/`} class={`factor-badge ${p === number ? 'current' : ''}`}>{p}</a>
+      ))}
+    </div>
+  </div>
+
+  <!-- Interactive Prime Checker -->
+  <h2 class="section-heading">Prime Number Checker</h2>
+  <div class="calculator-box">
+    <p class="calc-desc">Enter any number to check if it is prime.</p>
+    <div class="finder-row">
+      <div class="input-group">
+        <label for="primeInput">Number</label>
+        <input type="number" id="primeInput" value={number} min="1" max="10000000" />
+      </div>
+      <button class="calc-btn" id="primeBtn">Check</button>
+    </div>
+    <div id="primeResult" class="finder-result"></div>
+  </div>
+
+  <AdUnit slot="prime-mid" format="rectangle" />
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>Is {number} Prime or Composite?</h2>
+    <p>
+      {numIsPrime
+        ? `The number ${number} is a prime number. A prime number is a natural number greater than 1 that has no positive divisors other than 1 and itself. The only factors of ${number} are 1 and ${number}. It is the ${ordinalSuffix(nthPrime)} prime number in the sequence of all primes. The prime before it is ${prevPrimeNum > 0 ? prevPrimeNum : 'N/A'}, and the next prime after it is ${nextPrimeNum}.`
+        : number === 1
+          ? `The number 1 is neither prime nor composite. By mathematical convention, a prime number must be greater than 1. The number 1 has only one factor (itself), while prime numbers must have exactly two distinct factors (1 and themselves). This definition exists because including 1 as a prime would break the Fundamental Theorem of Arithmetic, which states that every integer greater than 1 has a unique prime factorization.`
+          : `The number ${number} is NOT a prime number — it is a composite number. A composite number has more than two factors. The factors of ${number} are ${factors.join(', ')}, giving it ${factorCount} total factors. Its prime factorization is ${primeFactorization}. The smallest factor (other than 1) that proves ${number} is not prime is ${factors[1]}, since ${number} ÷ ${factors[1]} = ${number / factors[1]}.`
+      }
+    </p>
+
+    <h2>How to Determine if {number} Is Prime</h2>
+    <p>
+      To check whether ${number} is prime, test if any integer from 2 up to √{number} ≈ {Math.floor(Math.sqrt(number))} divides it evenly. If none do, the number is prime. If any do, the number is composite. {numIsPrime ? `For ${number}, no integer from 2 to ${Math.floor(Math.sqrt(number))} divides it evenly, confirming it is prime.` : number > 1 ? `For ${number}, we find that ${factors[1]} divides it evenly (${number} ÷ ${factors[1]} = ${number / factors[1]}), so ${number} is composite.` : ''}
+    </p>
+    <p>
+      Quick divisibility rules can speed up this process. A number is divisible by 2 if it ends in an even digit, by 3 if its digit sum is divisible by 3, by 5 if it ends in 0 or 5. For ${number}: it is {isEven ? 'even' : 'odd'}, its digit sum is {digitSum} ({digitSum % 3 === 0 ? 'divisible' : 'not divisible'} by 3), and it {number % 5 === 0 ? 'ends in 0 or 5' : 'does not end in 0 or 5'}. These quick checks can immediately identify many composite numbers without further testing.
+    </p>
+
+    <h2>What Is a Prime Number?</h2>
+    <p>
+      A prime number is a natural number greater than 1 that cannot be formed by multiplying two smaller natural numbers. In other words, a prime has exactly two distinct positive divisors: 1 and itself. The first 25 prime numbers are: 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, and 97. The number 2 is the only even prime; all other primes are odd.
+    </p>
+    <p>
+      Prime numbers are the "building blocks" of all natural numbers. The Fundamental Theorem of Arithmetic states that every integer greater than 1 can be uniquely expressed as a product of prime numbers (up to the order of the factors). This makes primes essential in number theory, cryptography (RSA encryption relies on the difficulty of factoring large semiprimes), and computer science.
+    </p>
+
+    <h2>The Sieve of Eratosthenes</h2>
+    <p>
+      The Sieve of Eratosthenes is an ancient algorithm for finding all prime numbers up to a given limit. Start by listing all numbers from 2 to the limit. Then, starting from 2, mark all multiples of 2 as composite. Move to the next unmarked number (3) and mark all its multiples. Continue until you have processed all numbers up to the square root of the limit. The remaining unmarked numbers are prime. To check if {number} is prime using this method, you would generate primes up to {number} and see if {number} appears in the list.
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>Is {number} a prime number?</h3>
+    <p>
+      {numIsPrime
+        ? `Yes, ${number} is a prime number. Its only factors are 1 and ${number}. It is the ${ordinalSuffix(nthPrime)} prime number.`
+        : number === 1
+          ? `No, 1 is neither prime nor composite by definition.`
+          : `No, ${number} is not prime. It is composite with ${factorCount} factors: ${factors.join(', ')}.`
+      }
+    </p>
+
+    <h3>What are the factors of {number}?</h3>
+    <p>
+      The factors of {number} are: {factors.join(', ')}. It has {factorCount} total factors. {numIsPrime ? 'Since it is prime, it has only two factors.' : ''}
+    </p>
+
+    <h3>What is the next prime after {number}?</h3>
+    <p>
+      The next prime number after {number} is {nextPrimeNum}. {prevPrimeNum > 0 ? `The previous prime before ${number} is ${prevPrimeNum}.` : ''}
+    </p>
+
+    <h2>Is Nearby Number Prime?</h2>
+    <ul>
+      {relatedPages.map((p) => (
+        <li>
+          <a href={`/math/is-${p.slug}-prime/`}>
+            Is {p.number} Prime? {p.isPrime ? 'Yes' : 'No'}
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <p><a href="/math/">&larr; Math Reference</a> | <a href="/math-calculators/">Math Calculators</a></p>
+
+    <CrossLinks links={crossLinks} />
+  </article>
+
+  <AdUnit slot="prime-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .quick-fact { background: #eff6ff; border-radius: var(--radius); padding: 16px 24px; margin-bottom: 24px; font-size: 1.1rem; }
+  .quick-fact.prime-yes { background: #f0fdf4; }
+  .quick-fact.prime-no { background: #fef2f2; }
+  .quick-fact-label { font-size: 0.85rem; color: var(--color-text-muted); display: block; margin-bottom: 4px; }
+  .quick-fact.prime-yes strong { color: #16a34a; font-size: 1.15rem; }
+  .quick-fact.prime-no strong { color: #dc2626; font-size: 1.15rem; }
+  .calc-section-title { font-size: 1.15rem; margin: 0 0 16px; border: none; padding: 0; }
+  .section-heading { font-size: 1.2rem; margin: 32px 0 12px; }
+  .calc-desc { font-size: 0.9rem; color: var(--color-text-muted); margin-bottom: 16px; }
+  .finder-row { display: flex; gap: 16px; align-items: end; flex-wrap: wrap; }
+  .finder-row .input-group { flex: 1; min-width: 160px; }
+  .finder-result { margin-top: 16px; padding: 14px 16px; background: var(--color-bg); border-radius: var(--radius); font-size: 0.95rem; line-height: 1.7; min-height: 44px; }
+  .factor-badges { display: flex; flex-wrap: wrap; gap: 8px; }
+  .factor-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 40px; padding: 8px 14px; background: #eff6ff; border-radius: var(--radius); font-weight: 700; font-size: 1rem; color: var(--color-primary); text-decoration: none; }
+  .factor-badge.current { background: var(--color-primary); color: white; }
+  .not-prime { border-color: #fecaca; }
+  .not-prime .result-value { color: #dc2626; }
+  .yes-cell { color: #16a34a; font-weight: 700; }
+  .no-cell { color: #dc2626; font-weight: 700; }
+  @media (max-width: 640px) { .finder-row { flex-direction: column; } .factor-badge { min-width: 34px; padding: 6px 10px; font-size: 0.9rem; } }
+</style>
+
+<script>
+  var primeInput = document.getElementById('primeInput') as HTMLInputElement;
+  var primeBtn = document.getElementById('primeBtn') as HTMLButtonElement;
+  var resultDiv = document.getElementById('primeResult') as HTMLDivElement;
+
+  function checkPrime(n: number): boolean {
+    if (n < 2) return false;
+    if (n < 4) return true;
+    if (n % 2 === 0 || n % 3 === 0) return false;
+    for (var i = 5; i * i <= n; i += 6) {
+      if (n % i === 0 || n % (i + 2) === 0) return false;
+    }
+    return true;
+  }
+
+  function getFactors(n: number): number[] {
+    var f: number[] = [];
+    for (var i = 1; i <= Math.sqrt(n); i++) {
+      if (n % i === 0) { f.push(i); if (i !== n / i) f.push(n / i); }
+    }
+    return f.sort(function(a, b) { return a - b; });
+  }
+
+  function calculate() {
+    var n = parseInt(primeInput.value, 10);
+    if (isNaN(n) || n < 1 || n > 10000000) {
+      resultDiv.textContent = 'Please enter a number between 1 and 10,000,000.';
+      return;
+    }
+    var prime = checkPrime(n);
+    var factors = getFactors(n);
+    var html = '<strong>Is ' + n.toLocaleString('en-US') + ' prime? ';
+    html += prime ? '<span style="color:#16a34a">Yes!</span>' : '<span style="color:#dc2626">No</span>';
+    html += '</strong>';
+    html += '<br><strong>Factors:</strong> ' + factors.join(', ');
+    html += '<br><strong>Factor Count:</strong> ' + factors.length;
+    // Find next prime
+    var np = n + 1;
+    while (!checkPrime(np)) np++;
+    html += '<br><strong>Next Prime:</strong> ' + np;
+    resultDiv.innerHTML = html;
+  }
+
+  primeBtn.addEventListener('click', calculate);
+  primeInput.addEventListener('keydown', function(e) { if ((e as KeyboardEvent).key === 'Enter') calculate(); });
+  calculate();
+</script>

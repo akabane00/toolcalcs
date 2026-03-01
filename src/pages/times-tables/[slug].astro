@@ -1,0 +1,354 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import '../../styles/calculator.css';
+import { getAllTimesPages, getAllTimesTablePages, getAllTimesFactPages, type TimesPage, type TimesTablePage, type TimesFactPage } from '../../data/times-tables';
+
+export function getStaticPaths() {
+  return getAllTimesPages().map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: TimesPage };
+const isTable = page.type === 'table';
+const tablePage = isTable ? page as TimesTablePage : null;
+const factPage = !isTable ? page as TimesFactPage : null;
+
+// Cross-links
+const crossLinks: { href: string; label: string; icon: string }[] = [
+  { href: '/worksheets/multiplication-worksheets/', label: 'Multiplication Worksheets', icon: '📝' },
+];
+
+// SEO for table pages
+const tableTitle = tablePage ? `${tablePage.multiplier} Times Table - Multiplication Chart | ToolCalcs` : '';
+const tableDesc = tablePage ? `Learn the ${tablePage.multiplier} times table: ${tablePage.products.map(p => `${tablePage.multiplier} × ${p.factor} = ${p.result}`).slice(0, 5).join(', ')} and more. Practice with interactive quiz.` : '';
+
+// SEO for fact pages
+const factTitle = factPage ? `${factPage.factorA} Times ${factPage.factorB} = ${factPage.product} | Multiplication Facts | ToolCalcs` : '';
+const factDesc = factPage ? `${factPage.factorA} × ${factPage.factorB} = ${factPage.product}. Learn this multiplication fact with division facts, related facts, and memory tips.` : '';
+
+const title = isTable ? tableTitle : factTitle;
+const description = isTable ? tableDesc : factDesc;
+
+const breadcrumbName = isTable
+  ? `${tablePage!.multiplier} Times Table`
+  : `${factPage!.factorA} × ${factPage!.factorB}`;
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Times Tables", "item": "https://toolcalcs.com/times-tables/" },
+      { "@type": "ListItem", "position": 3, "name": breadcrumbName },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": isTable ? [
+      {
+        "@type": "Question",
+        "name": `What is the ${tablePage!.multiplier} times table?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `The ${tablePage!.multiplier} times table is: ${tablePage!.products.map(p => `${tablePage!.multiplier} × ${p.factor} = ${p.result}`).join(', ')}.`,
+        },
+      },
+    ] : [
+      {
+        "@type": "Question",
+        "name": `What is ${factPage!.factorA} times ${factPage!.factorB}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `${factPage!.factorA} times ${factPage!.factorB} equals ${factPage!.product}. (${factPage!.factorA} × ${factPage!.factorB} = ${factPage!.product})`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `What is ${factPage!.product} divided by ${factPage!.factorA}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `${factPage!.product} divided by ${factPage!.factorA} equals ${factPage!.factorB}. This is the inverse of ${factPage!.factorA} × ${factPage!.factorB} = ${factPage!.product}.`,
+        },
+      },
+    ],
+  },
+];
+
+// Full 12x12 grid for table pages
+const fullGrid = Array.from({ length: 12 }, (_, r) =>
+  Array.from({ length: 12 }, (_, c) => (r + 1) * (c + 1))
+);
+---
+
+<BaseLayout title={title} description={description} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/times-tables/">Times Tables</a> &rsaquo;
+    <span>{breadcrumbName}</span>
+  </nav>
+
+  {isTable && tablePage && (
+    <>
+      <h1>{tablePage.multiplier} Times Table</h1>
+      <p class="page-desc">Learn and practice the {tablePage.multiplier} times table with a complete multiplication chart, interactive quiz, and tips.</p>
+
+      <div class="quick-fact">
+        <span class="quick-fact-label">Quick Reference:</span>
+        <strong>{tablePage.products.map(p => `${tablePage.multiplier} × ${p.factor} = ${p.result}`).join(' | ')}</strong>
+      </div>
+
+      <!-- Multiplication Table -->
+      <div class="calculator-box">
+        <h2 class="calc-section-title">{tablePage.multiplier} Times Table Chart</h2>
+        <div class="table-container">
+          <table class="data-table times-table">
+            <thead>
+              <tr><th>Multiplication</th><th>Result</th></tr>
+            </thead>
+            <tbody>
+              {tablePage.products.map((p) => (
+                <tr>
+                  <td><a href={`/times-tables/${tablePage.multiplier}-times-${p.factor}/`}>{tablePage.multiplier} × {p.factor}</a></td>
+                  <td class="result-cell">{p.result}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Quick Practice Quiz -->
+      <h2 class="section-heading">Practice Quiz</h2>
+      <div class="calculator-box">
+        <p class="calc-desc">Test your {tablePage.multiplier} times table knowledge!</p>
+        <div class="quiz-area">
+          <div class="quiz-question" id="quizQuestion"></div>
+          <div class="finder-row">
+            <div class="input-group">
+              <label for="quizAnswer">Your Answer</label>
+              <input type="number" id="quizAnswer" min="0" />
+            </div>
+            <button class="calc-btn" id="quizCheck">Check</button>
+            <button class="calc-btn secondary" id="quizNext">Next</button>
+          </div>
+          <div id="quizFeedback" class="finder-result"></div>
+          <div class="quiz-score">Score: <span id="quizScore">0</span> / <span id="quizTotal">0</span></div>
+        </div>
+      </div>
+
+      <!-- Other Tables Links -->
+      <h2 class="section-heading">All Times Tables</h2>
+      <div class="table-grid">
+        {Array.from({ length: 12 }, (_, i) => i + 1).map((n) => (
+          <a href={`/times-tables/${n}/`} class={`table-link ${n === tablePage.multiplier ? 'active' : ''}`}>
+            {n}× Table
+          </a>
+        ))}
+      </div>
+    </>
+  )}
+
+  {!isTable && factPage && (
+    <>
+      <h1>{factPage.factorA} Times {factPage.factorB}</h1>
+      <p class="page-desc">Learn the multiplication fact {factPage.factorA} × {factPage.factorB} with related facts and division inverses.</p>
+
+      <div class="quick-fact">
+        <span class="quick-fact-label">Quick Answer:</span>
+        <strong>{factPage.factorA} × {factPage.factorB} = {factPage.product}</strong>
+      </div>
+
+      <!-- Result Cards -->
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Product</span>
+          <span class="result-value">{factPage.product}</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Commutative</span>
+          <span class="result-value">{factPage.factorB} × {factPage.factorA} = {factPage.product}</span>
+        </div>
+        {factPage.divisionFacts.map((df) => (
+          <div class="result-card">
+            <span class="result-label">Division Fact</span>
+            <span class="result-value">{df}</span>
+          </div>
+        ))}
+      </div>
+
+      <!-- Fact Family -->
+      <div class="calculator-box">
+        <h2 class="calc-section-title">Fact Family for {factPage.factorA}, {factPage.factorB}, and {factPage.product}</h2>
+        <div class="fact-family">
+          <span class="fact-item">{factPage.factorA} × {factPage.factorB} = {factPage.product}</span>
+          {factPage.isCommutative && <span class="fact-item">{factPage.factorB} × {factPage.factorA} = {factPage.product}</span>}
+          <span class="fact-item">{factPage.product} ÷ {factPage.factorA} = {factPage.factorB}</span>
+          {factPage.isCommutative && <span class="fact-item">{factPage.product} ÷ {factPage.factorB} = {factPage.factorA}</span>}
+        </div>
+      </div>
+
+      <!-- Related Facts -->
+      <h2 class="section-heading">Related Multiplication Facts</h2>
+      <div class="table-grid">
+        {factPage.relatedFacts.map((rf) => (
+          <a href={`/times-tables/${rf.slug}/`} class="table-link">{rf.label}</a>
+        ))}
+      </div>
+
+      <!-- Table Links -->
+      <h2 class="section-heading">Full Tables</h2>
+      <div class="table-grid">
+        <a href={`/times-tables/${factPage.factorA}/`} class="table-link">{factPage.factorA}× Table</a>
+        {factPage.isCommutative && <a href={`/times-tables/${factPage.factorB}/`} class="table-link">{factPage.factorB}× Table</a>}
+      </div>
+    </>
+  )}
+
+  <AdUnit slot="times-mid" format="rectangle" />
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    {isTable && tablePage && (
+      <>
+        <h2>Learning the {tablePage.multiplier} Times Table</h2>
+        <p>
+          The {tablePage.multiplier} times table is one of the essential multiplication tables that students learn in elementary school. Mastering the {tablePage.multiplier} times table means knowing that {tablePage.multiplier} × 1 = {tablePage.multiplier}, {tablePage.multiplier} × 2 = {tablePage.multiplier * 2}, all the way up to {tablePage.multiplier} × 12 = {tablePage.multiplier * 12}. These multiplication facts are the building blocks for more advanced math including long multiplication, division, fractions, and algebra.
+        </p>
+        <p>
+          One effective strategy for learning the {tablePage.multiplier} times table is to identify patterns in the products. {tablePage.multiplier % 2 === 0 ? `Since ${tablePage.multiplier} is even, all products in this table are even numbers.` : `Since ${tablePage.multiplier} is odd, the products alternate between odd and even.`} {tablePage.multiplier === 5 ? 'All products end in either 0 or 5, making this one of the easiest tables to memorize.' : tablePage.multiplier === 9 ? 'The digits of each product always sum to 9 (or a multiple of 9), and the tens digit increases by 1 while the ones digit decreases by 1.' : tablePage.multiplier === 10 ? 'Simply add a zero to the end of any number to multiply by 10.' : `Look for patterns: the products increase by ${tablePage.multiplier} each time you move to the next factor.`}
+        </p>
+
+        <h2>Tips for Memorizing</h2>
+        <p>
+          Repetition is key to memorizing multiplication tables. Write out the {tablePage.multiplier} times table several times, recite it aloud, and use flashcards. Start by learning the easier facts (multiplying by 1, 2, 5, and 10) and then fill in the gaps. The commutative property means that if you know {tablePage.multiplier} × 7, you also know 7 × {tablePage.multiplier}, effectively halving the number of facts to memorize.
+        </p>
+        <p>
+          Practice regularly with timed drills and quizzes. Use the interactive quiz above to test yourself. Try to answer each fact within 3 seconds — this indicates true fluency. If you can recall all 12 facts in the {tablePage.multiplier} times table instantly, you have mastered this table and can move on to more challenging ones.
+        </p>
+
+        <h2>Real-World Applications</h2>
+        <p>
+          Multiplication by {tablePage.multiplier} appears frequently in everyday life. {tablePage.multiplier === 7 ? 'There are 7 days in a week, so the 7 times table helps calculate weeks and days.' : tablePage.multiplier === 12 ? 'There are 12 months in a year and 12 inches in a foot, making the 12 times table especially practical.' : tablePage.multiplier === 4 ? 'With 4 quarters in a dollar and 4 weeks in a month (approximately), the 4 times table is useful for money and time calculations.' : `The ${tablePage.multiplier} times table is used in measuring, cooking, shopping, and many other daily activities.`} Understanding multiplication tables builds the mental math skills needed for estimation, budgeting, and problem-solving throughout life.
+        </p>
+
+        <h2>Frequently Asked Questions</h2>
+        <h3>What is the {tablePage.multiplier} times table?</h3>
+        <p>
+          The {tablePage.multiplier} times table lists the products of {tablePage.multiplier} multiplied by the numbers 1 through 12: {tablePage.products.map(p => `${tablePage.multiplier} × ${p.factor} = ${p.result}`).join(', ')}. These are fundamental multiplication facts used throughout mathematics.
+        </p>
+      </>
+    )}
+
+    {!isTable && factPage && (
+      <>
+        <h2>Understanding {factPage.factorA} × {factPage.factorB} = {factPage.product}</h2>
+        <p>
+          The multiplication fact {factPage.factorA} × {factPage.factorB} = {factPage.product} means that {factPage.factorA} groups of {factPage.factorB} items total {factPage.product} items. This can also be visualized as a rectangle with {factPage.factorA} rows and {factPage.factorB} columns, containing {factPage.product} squares in total. Multiplication is one of the four basic arithmetic operations and is essentially repeated addition: {factPage.factorA} × {factPage.factorB} = {Array(factPage.factorA).fill(factPage.factorB).join(' + ')} = {factPage.product}.
+        </p>
+
+        <h2>The Commutative Property</h2>
+        <p>
+          {factPage.isCommutative
+            ? `Because multiplication is commutative, ${factPage.factorA} × ${factPage.factorB} equals ${factPage.factorB} × ${factPage.factorA}. Both give ${factPage.product}. This property means that the order of the factors does not change the product. Visually, you can rotate the ${factPage.factorA}-by-${factPage.factorB} rectangle to get a ${factPage.factorB}-by-${factPage.factorA} rectangle — it still contains ${factPage.product} squares.`
+            : `Since both factors are ${factPage.factorA}, this is a square number: ${factPage.factorA}² = ${factPage.product}. The commutative property (a × b = b × a) is trivially satisfied when both factors are equal.`
+          }
+        </p>
+
+        <h2>Related Division Facts</h2>
+        <p>
+          Every multiplication fact has corresponding division facts. Since {factPage.factorA} × {factPage.factorB} = {factPage.product}, we know that {factPage.divisionFacts.join(' and ')}. These four related facts ({factPage.factorA} × {factPage.factorB} = {factPage.product}, {factPage.factorB} × {factPage.factorA} = {factPage.product}, {factPage.divisionFacts.join(', ')}) form a fact family — a set of related equations using the same three numbers.
+        </p>
+
+        <h2>Frequently Asked Questions</h2>
+        <h3>What is {factPage.factorA} times {factPage.factorB}?</h3>
+        <p>
+          {factPage.factorA} times {factPage.factorB} equals {factPage.product}. In mathematical notation: {factPage.factorA} × {factPage.factorB} = {factPage.product}. This multiplication fact is part of both the {factPage.factorA} times table and the {factPage.factorB} times table.
+        </p>
+
+        <h3>What is {factPage.product} divided by {factPage.factorA}?</h3>
+        <p>
+          {factPage.product} divided by {factPage.factorA} equals {factPage.factorB}. Division is the inverse operation of multiplication, so since {factPage.factorA} × {factPage.factorB} = {factPage.product}, it follows that {factPage.product} ÷ {factPage.factorA} = {factPage.factorB}.
+        </p>
+      </>
+    )}
+
+    <p><a href="/times-tables/">&larr; All Times Tables</a> | <a href="/math/">Math Reference</a></p>
+
+    <CrossLinks links={crossLinks} />
+  </article>
+
+  <AdUnit slot="times-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .quick-fact { background: #eff6ff; border-radius: var(--radius); padding: 16px 24px; margin-bottom: 24px; font-size: 1.1rem; }
+  .quick-fact-label { font-size: 0.85rem; color: var(--color-text-muted); display: block; margin-bottom: 4px; }
+  .quick-fact strong { color: var(--color-primary); font-size: 1.05rem; }
+  .calc-section-title { font-size: 1.15rem; margin: 0 0 16px; border: none; padding: 0; }
+  .section-heading { font-size: 1.2rem; margin: 32px 0 12px; }
+  .calc-desc { font-size: 0.9rem; color: var(--color-text-muted); margin-bottom: 16px; }
+  .finder-row { display: flex; gap: 16px; align-items: end; flex-wrap: wrap; }
+  .finder-row .input-group { flex: 1; min-width: 120px; }
+  .finder-result { margin-top: 16px; padding: 14px 16px; background: var(--color-bg); border-radius: var(--radius); font-size: 0.95rem; line-height: 1.7; min-height: 44px; }
+  .times-table td a { color: var(--color-primary); text-decoration: none; font-weight: 600; }
+  .times-table td a:hover { text-decoration: underline; }
+  .result-cell { font-weight: 700; color: var(--color-primary); font-size: 1.1rem; }
+  .table-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .table-link { padding: 10px 16px; background: var(--color-bg-alt); border: 1px solid var(--color-border); border-radius: var(--radius); text-decoration: none; color: var(--color-text); font-weight: 600; font-size: 0.9rem; transition: border-color 0.15s; }
+  .table-link:hover, .table-link.active { border-color: var(--color-primary); color: var(--color-primary); background: #eff6ff; }
+  .fact-family { display: flex; flex-wrap: wrap; gap: 10px; }
+  .fact-item { padding: 10px 18px; background: #eff6ff; border-radius: var(--radius); font-weight: 700; font-size: 1rem; color: var(--color-primary); }
+  .quiz-question { font-size: 1.5rem; font-weight: 800; color: var(--color-primary); margin-bottom: 16px; text-align: center; }
+  .quiz-score { margin-top: 12px; font-weight: 600; font-size: 0.95rem; color: var(--color-text-muted); }
+  .calc-btn.secondary { background: var(--color-text-muted); }
+  @media (max-width: 640px) { .finder-row { flex-direction: column; } .quiz-question { font-size: 1.2rem; } }
+</style>
+
+<script define:vars={{ multiplier: isTable ? (page as TimesTablePage).multiplier : 0, isTablePage: isTable }}>
+  if (isTablePage && multiplier > 0) {
+    var questionEl = document.getElementById('quizQuestion');
+    var answerEl = document.getElementById('quizAnswer');
+    var checkBtn = document.getElementById('quizCheck');
+    var nextBtn = document.getElementById('quizNext');
+    var feedbackEl = document.getElementById('quizFeedback');
+    var scoreEl = document.getElementById('quizScore');
+    var totalEl = document.getElementById('quizTotal');
+
+    var currentFactor = 0;
+    var score = 0;
+    var total = 0;
+
+    function newQuestion() {
+      currentFactor = Math.floor(Math.random() * 12) + 1;
+      if (questionEl) questionEl.textContent = multiplier + ' × ' + currentFactor + ' = ?';
+      if (answerEl) { answerEl.value = ''; answerEl.focus(); }
+      if (feedbackEl) feedbackEl.textContent = '';
+    }
+
+    function checkAnswer() {
+      if (!answerEl || !feedbackEl || !scoreEl || !totalEl) return;
+      var userAns = parseInt(answerEl.value, 10);
+      var correct = multiplier * currentFactor;
+      total++;
+      if (userAns === correct) {
+        score++;
+        feedbackEl.innerHTML = '<span style="color: #16a34a; font-weight: 700;">Correct! ' + multiplier + ' × ' + currentFactor + ' = ' + correct + '</span>';
+      } else {
+        feedbackEl.innerHTML = '<span style="color: #dc2626; font-weight: 700;">Incorrect. ' + multiplier + ' × ' + currentFactor + ' = ' + correct + '</span>';
+      }
+      scoreEl.textContent = String(score);
+      totalEl.textContent = String(total);
+    }
+
+    if (checkBtn) checkBtn.addEventListener('click', checkAnswer);
+    if (nextBtn) nextBtn.addEventListener('click', newQuestion);
+    if (answerEl) answerEl.addEventListener('keydown', function(e) { if (e.key === 'Enter') checkAnswer(); });
+    newQuestion();
+  }
+</script>

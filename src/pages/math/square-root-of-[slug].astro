@@ -1,0 +1,357 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import '../../styles/calculator.css';
+import { getAllSquareRootPages, type SquareRootPage } from '../../data/square-roots';
+
+export function getStaticPaths() {
+  return getAllSquareRootPages().map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: SquareRootPage };
+const { number, squareRoot, squareRootDecimal, isPerfectSquare, simplifiedForm, coefficient, radicand, nearestPerfectBelow, nearestPerfectAbove, squareOfNumber, isPrime: numIsPrime } = page;
+
+// Perfect squares list for reference (1-20)
+const perfectSquares = Array.from({ length: 20 }, (_, i) => ({ base: i + 1, square: (i + 1) * (i + 1) }));
+
+// Cross-links
+const crossLinks: { href: string; label: string; icon: string }[] = [];
+if (number <= 141) {
+  crossLinks.push({ href: `/factors-of/${number}/`, label: `Factors of ${number}`, icon: '🔢' });
+}
+if (number <= 60) {
+  crossLinks.push({ href: `/math/${number}-squared/`, label: `${number} Squared`, icon: '²' });
+}
+if (number <= 200) {
+  crossLinks.push({ href: `/math/is-${number}-prime/`, label: `Is ${number} Prime?`, icon: '🔍' });
+}
+
+// Related pages (nearby numbers)
+const allPages = getAllSquareRootPages();
+const nearbyOffsets = [-5, -2, -1, 1, 2, 5];
+const relatedPages = nearbyOffsets
+  .map((offset) => allPages.find((p) => p.number === number + offset))
+  .filter((p): p is SquareRootPage => !!p);
+
+// SEO
+const title = `Square Root of ${number} - ${isPerfectSquare ? squareRoot : `√${number} ≈ ${squareRoot}`} | ToolCalcs`;
+const description = `The square root of ${number} is ${isPerfectSquare ? squareRoot : `approximately ${squareRoot}`}. ${isPerfectSquare ? `${number} is a perfect square.` : `Simplified radical form: ${simplifiedForm}.`} Step-by-step calculation and explanation.`;
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Math Reference", "item": "https://toolcalcs.com/math/" },
+      { "@type": "ListItem", "position": 3, "name": `Square Root of ${number}` },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": `What is the square root of ${number}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": isPerfectSquare
+            ? `The square root of ${number} is exactly ${squareRoot}. Since ${squareRoot} × ${squareRoot} = ${number}, ${number} is a perfect square.`
+            : `The square root of ${number} is approximately ${squareRoot}. In simplified radical form, √${number} = ${simplifiedForm}.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `Is ${number} a perfect square?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": isPerfectSquare
+            ? `Yes, ${number} is a perfect square. It equals ${squareRoot} × ${squareRoot}.`
+            : `No, ${number} is not a perfect square. The nearest perfect squares are ${nearestPerfectBelow} (√${nearestPerfectBelow} = ${Math.round(Math.sqrt(nearestPerfectBelow))}) and ${nearestPerfectAbove} (√${nearestPerfectAbove} = ${Math.round(Math.sqrt(nearestPerfectAbove))}).`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `What is ${number} squared?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `${number} squared (${number}²) equals ${squareOfNumber.toLocaleString('en-US')}. This is ${number} multiplied by itself.`,
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout title={title} description={description} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/math/">Math Reference</a> &rsaquo;
+    <span>Square Root of {number}</span>
+  </nav>
+
+  <h1>Square Root of {number}</h1>
+  <p class="page-desc">Calculate the square root of {number} with step-by-step explanation, simplified radical form, and nearby perfect squares.</p>
+
+  <div class="quick-fact">
+    <span class="quick-fact-label">Quick Answer:</span>
+    <strong>
+      {isPerfectSquare
+        ? `√${number} = ${squareRoot} (exact — ${number} is a perfect square)`
+        : `√${number} ≈ ${squareRoot} — Simplified: ${simplifiedForm}`
+      }
+    </strong>
+  </div>
+
+  <!-- Result Cards -->
+  <div class="result-cards">
+    <div class="result-card primary">
+      <span class="result-label">Square Root</span>
+      <span class="result-value">{isPerfectSquare ? squareRoot : `≈ ${squareRoot}`}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Decimal Value</span>
+      <span class="result-value">{squareRootDecimal}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Perfect Square?</span>
+      <span class="result-value">{isPerfectSquare ? 'Yes' : 'No'}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Simplified Radical</span>
+      <span class="result-value">{simplifiedForm}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Nearest Perfect Squares</span>
+      <span class="result-value">{nearestPerfectBelow}, {nearestPerfectAbove}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">{number} Squared</span>
+      <span class="result-value">{squareOfNumber.toLocaleString('en-US')}</span>
+    </div>
+  </div>
+
+  <!-- Step-by-step -->
+  <h2 class="section-heading">How to Calculate √{number}</h2>
+  <div class="calculator-box">
+    {isPerfectSquare ? (
+      <div class="steps-list">
+        <div class="step-row">
+          <span class="step-num">Step 1:</span>
+          <span>Ask: what number times itself equals {number}?</span>
+        </div>
+        <div class="step-row">
+          <span class="step-num">Step 2:</span>
+          <span>{squareRoot} × {squareRoot} = {number} ✓</span>
+        </div>
+        <div class="step-row result">
+          <span class="step-num">Answer:</span>
+          <span>√{number} = <strong>{squareRoot}</strong> (exact)</span>
+        </div>
+      </div>
+    ) : (
+      <div class="steps-list">
+        <div class="step-row">
+          <span class="step-num">Step 1:</span>
+          <span>Find nearest perfect squares: {nearestPerfectBelow} &lt; {number} &lt; {nearestPerfectAbove}</span>
+        </div>
+        <div class="step-row">
+          <span class="step-num">Step 2:</span>
+          <span>So √{number} is between {Math.round(Math.sqrt(nearestPerfectBelow))} and {Math.round(Math.sqrt(nearestPerfectAbove))}</span>
+        </div>
+        <div class="step-row">
+          <span class="step-num">Step 3:</span>
+          <span>Simplify the radical: {coefficient > 1 ? `√${number} = √(${coefficient * coefficient} × ${radicand}) = ${coefficient}√${radicand}` : `√${number} cannot be simplified further`}</span>
+        </div>
+        <div class="step-row result">
+          <span class="step-num">Answer:</span>
+          <span>√{number} = <strong>{simplifiedForm}</strong> ≈ {squareRoot}</span>
+        </div>
+      </div>
+    )}
+  </div>
+
+  <!-- Interactive Calculator -->
+  <h2 class="section-heading">Square Root Calculator</h2>
+  <div class="calculator-box">
+    <p class="calc-desc">Enter any number to find its square root and simplified radical form.</p>
+    <div class="finder-row">
+      <div class="input-group">
+        <label for="sqrtInput">Number</label>
+        <input type="number" id="sqrtInput" value={number} min="0" max="1000000000" step="any" />
+      </div>
+      <button class="calc-btn" id="sqrtBtn">Calculate</button>
+    </div>
+    <div id="sqrtResult" class="finder-result"></div>
+  </div>
+
+  <!-- Perfect Squares Reference -->
+  <h2 class="section-heading">Perfect Squares Reference (1-20)</h2>
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr><th>n</th><th>n²</th><th>√(n²)</th></tr>
+      </thead>
+      <tbody>
+        {perfectSquares.map((ps) => (
+          <tr class={ps.square === number ? 'highlight-row' : ''}>
+            <td>{ps.base}</td>
+            <td>{ps.square}</td>
+            <td>{ps.base}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <AdUnit slot="sqrt-mid" format="rectangle" />
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>Understanding Square Roots</h2>
+    <p>
+      A square root of a number is a value that, when multiplied by itself, gives the original number. The square root of {number} is written as √{number} and equals {isPerfectSquare ? `exactly ${squareRoot}` : `approximately ${squareRoot}`}. The symbol √ is called the radical sign, and the number inside it ({number}) is called the radicand. Square roots are one of the most fundamental operations in mathematics, appearing in geometry, physics, engineering, and statistics.
+    </p>
+    <p>
+      Every positive number has two square roots: a positive root and a negative root. When we write √{number}, we typically mean the principal (positive) square root. So √{number} = {isPerfectSquare ? squareRoot : `≈ ${squareRoot}`}, and −√{number} = {isPerfectSquare ? `-${squareRoot}` : `≈ -${squareRoot}`}. Both values, when squared, produce {number}. The number zero has one square root: 0. Negative numbers do not have real square roots, though they have complex square roots involving the imaginary unit i.
+    </p>
+
+    <h2>{isPerfectSquare ? `Why ${number} Is a Perfect Square` : `Why ${number} Is Not a Perfect Square`}</h2>
+    <p>
+      {isPerfectSquare
+        ? `A perfect square is a number that can be expressed as the product of an integer with itself. Since ${squareRoot} × ${squareRoot} = ${number}, the number ${number} is indeed a perfect square. Perfect squares have exact integer square roots, making calculations with them straightforward. The first 20 perfect squares are: 1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144, 169, 196, 225, 256, 289, 324, 361, and 400.`
+        : `The number ${number} is not a perfect square because no integer multiplied by itself equals ${number}. The nearest perfect squares to ${number} are ${nearestPerfectBelow} (${Math.round(Math.sqrt(nearestPerfectBelow))}²) and ${nearestPerfectAbove} (${Math.round(Math.sqrt(nearestPerfectAbove))}²). Since ${number} falls between these two perfect squares, its square root is an irrational number that cannot be expressed as a simple fraction. In decimal form, √${number} = ${squareRootDecimal}... and the digits continue without repeating.`
+      }
+    </p>
+
+    <h2>Simplified Radical Form</h2>
+    <p>
+      {isPerfectSquare
+        ? `Since ${number} is a perfect square, √${number} simplifies to the integer ${squareRoot}. There is no radical needed in the simplified form.`
+        : coefficient > 1
+          ? `To simplify √${number}, find the largest perfect square factor of ${number}. Since ${number} = ${coefficient * coefficient} × ${radicand}, and ${coefficient * coefficient} is a perfect square (${coefficient}² = ${coefficient * coefficient}), we can write: √${number} = √(${coefficient * coefficient} × ${radicand}) = √${coefficient * coefficient} × √${radicand} = ${coefficient}√${radicand}. This is the simplified radical form. The radicand ${radicand} has no perfect square factors other than 1, confirming the expression is fully simplified.`
+          : `The square root of ${number} is already in its simplest radical form: √${number}. This is because ${number} has no perfect square factors other than 1. In other words, you cannot extract any integer from under the radical sign. The decimal approximation is ${squareRoot}.`
+      }
+    </p>
+
+    <h2>Methods for Calculating Square Roots</h2>
+    <h3>Estimation Method</h3>
+    <p>
+      To estimate √{number}, find the two consecutive perfect squares it lies between. Since {nearestPerfectBelow} &lt; {number} &lt; {nearestPerfectAbove}, we know √{number} is between {Math.round(Math.sqrt(nearestPerfectBelow))} and {Math.round(Math.sqrt(nearestPerfectAbove))}. You can then refine the estimate by testing values between these integers. This method provides a quick approximation without a calculator.
+    </p>
+
+    <h3>Newton's Method (Babylonian Method)</h3>
+    <p>
+      Newton's method iteratively improves an estimate of the square root. Start with an initial guess (say x₀ = {Math.round(Math.sqrt(number))}), then apply the formula: x₁ = (x₀ + {number}/x₀) / 2. Each iteration approximately doubles the number of correct digits. This ancient algorithm, dating back to Babylonian mathematics around 1500 BCE, converges very quickly and is the basis for many computer implementations of the square root function.
+    </p>
+
+    <h3>Prime Factorization Method</h3>
+    <p>
+      {isPerfectSquare
+        ? `For perfect squares, you can find the square root through prime factorization. Factor ${number} into primes, then take half the exponent of each prime factor. The product of these results gives the exact square root of ${squareRoot}.`
+        : `To simplify a radical using prime factorization, factor the radicand into primes. Group the prime factors into pairs. Each pair contributes one factor outside the radical sign. Any unpaired primes remain under the radical. This method guarantees you find the fully simplified form: ${simplifiedForm}.`
+      }
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is the square root of {number}?</h3>
+    <p>
+      {isPerfectSquare
+        ? `The square root of ${number} is exactly ${squareRoot}. This is because ${squareRoot} × ${squareRoot} = ${number}. Since the result is a whole number, ${number} is a perfect square.`
+        : `The square root of ${number} is approximately ${squareRoot}. In simplified radical form, √${number} = ${simplifiedForm}. The exact value is irrational and cannot be expressed as a fraction.`
+      }
+    </p>
+
+    <h3>Is {number} a perfect square?</h3>
+    <p>
+      {isPerfectSquare
+        ? `Yes, ${number} is a perfect square. It equals ${squareRoot}². A perfect square is any number that results from multiplying an integer by itself.`
+        : `No, ${number} is not a perfect square. The nearest perfect squares are ${nearestPerfectBelow} and ${nearestPerfectAbove}. A perfect square must be the product of an integer multiplied by itself.`
+      }
+    </p>
+
+    <h3>What is {number} squared?</h3>
+    <p>
+      {number} squared ({number}²) equals {squareOfNumber.toLocaleString('en-US')}. This is the result of multiplying {number} by itself: {number} × {number} = {squareOfNumber.toLocaleString('en-US')}. Note that squaring and taking the square root are inverse operations.
+    </p>
+
+    <h2>Square Roots of Nearby Numbers</h2>
+    <ul>
+      {relatedPages.map((p) => (
+        <li>
+          <a href={`/math/square-root-of-${p.slug}/`}>
+            Square Root of {p.number} = {p.isPerfectSquare ? p.squareRoot : `≈ ${p.squareRoot}`}
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <p><a href="/math/">&larr; Math Reference</a> | <a href="/math-calculators/">Math Calculators</a></p>
+
+    <CrossLinks links={crossLinks} />
+  </article>
+
+  <AdUnit slot="sqrt-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .quick-fact { background: #eff6ff; border-radius: var(--radius); padding: 16px 24px; margin-bottom: 24px; font-size: 1.1rem; }
+  .quick-fact-label { font-size: 0.85rem; color: var(--color-text-muted); display: block; margin-bottom: 4px; }
+  .quick-fact strong { color: var(--color-primary); font-size: 1.15rem; }
+  .calc-section-title { font-size: 1.15rem; margin: 0 0 16px; border: none; padding: 0; }
+  .section-heading { font-size: 1.2rem; margin: 32px 0 12px; }
+  .calc-desc { font-size: 0.9rem; color: var(--color-text-muted); margin-bottom: 16px; }
+  .finder-row { display: flex; gap: 16px; align-items: end; flex-wrap: wrap; }
+  .finder-row .input-group { flex: 1; min-width: 160px; }
+  .finder-result { margin-top: 16px; padding: 14px 16px; background: var(--color-bg); border-radius: var(--radius); font-size: 0.95rem; line-height: 1.7; min-height: 44px; }
+  .steps-list { display: flex; flex-direction: column; gap: 8px; }
+  .step-row { display: flex; gap: 10px; align-items: baseline; padding: 6px 0; }
+  .step-row.result { margin-top: 8px; padding-top: 12px; border-top: 2px solid var(--color-primary); color: var(--color-primary); font-weight: 600; }
+  .step-num { font-weight: 700; min-width: 60px; color: var(--color-text-muted); font-size: 0.85rem; }
+  .highlight-row { background: #dbeafe; font-weight: 700; }
+  @media (max-width: 640px) { .finder-row { flex-direction: column; } }
+</style>
+
+<script>
+  var sqrtInput = document.getElementById('sqrtInput') as HTMLInputElement;
+  var sqrtBtn = document.getElementById('sqrtBtn') as HTMLButtonElement;
+  var resultDiv = document.getElementById('sqrtResult') as HTMLDivElement;
+
+  function simplifyRad(n: number): { coeff: number; rad: number } {
+    if (n <= 0) return { coeff: 0, rad: 0 };
+    var c = 1, r = n;
+    for (var i = 2; i * i <= r; i++) {
+      while (r % (i * i) === 0) { c *= i; r /= i * i; }
+    }
+    return { coeff: c, rad: r };
+  }
+
+  function calculate() {
+    var n = parseFloat(sqrtInput.value);
+    if (isNaN(n) || n < 0 || n > 1000000000) {
+      resultDiv.textContent = 'Please enter a number between 0 and 1,000,000,000.';
+      return;
+    }
+    var root = Math.sqrt(n);
+    var perfect = Number.isInteger(n) && Number.isInteger(root);
+    var html = '<strong>√' + n + ' = ' + (perfect ? root : root.toFixed(10).replace(/0+$/, '')) + '</strong>';
+    html += '<br><strong>Perfect Square:</strong> ' + (perfect ? 'Yes' : 'No');
+    if (Number.isInteger(n) && !perfect && n > 0) {
+      var s = simplifyRad(n);
+      var form = s.rad === 1 ? String(s.coeff) : (s.coeff > 1 ? s.coeff + '√' + s.rad : '√' + s.rad);
+      html += '<br><strong>Simplified:</strong> ' + form;
+    }
+    html += '<br><strong>' + n + ' Squared:</strong> ' + (n * n).toLocaleString('en-US');
+    resultDiv.innerHTML = html;
+  }
+
+  sqrtBtn.addEventListener('click', calculate);
+  sqrtInput.addEventListener('keydown', function(e) { if ((e as KeyboardEvent).key === 'Enter') calculate(); });
+  calculate();
+</script>

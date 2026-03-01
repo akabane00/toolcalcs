@@ -1,0 +1,104 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/category.css';
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Times Tables" },
+  ],
+};
+
+// Full 12x12 grid
+const grid = Array.from({ length: 12 }, (_, r) =>
+  Array.from({ length: 12 }, (_, c) => (r + 1) * (c + 1))
+);
+---
+
+<BaseLayout
+  title="Times Tables 1-12 - Multiplication Charts & Practice | ToolCalcs"
+  description="Complete times tables from 1 to 12 with interactive multiplication charts, practice quizzes, and printable reference. Master multiplication facts with 156 detailed pages."
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <span>Times Tables</span>
+  </nav>
+
+  <h1>Times Tables 1 - 12</h1>
+  <p class="page-desc">Master multiplication with complete times tables, interactive quizzes, and 144 individual fact pages. Select a table below to start learning.</p>
+
+  <AdUnit slot="times-idx-top" format="horizontal" />
+
+  <!-- Table Selection -->
+  <section class="factors-section">
+    <h2 class="factors-heading">Select a Times Table</h2>
+    <div class="number-grid">
+      {Array.from({ length: 12 }, (_, i) => i + 1).map((n) => (
+        <a href={`/times-tables/${n}/`} class="number-card">
+          <span class="number-val">{n}×</span>
+          <span class="number-count">Times Table</span>
+          <span class="number-type">{n} to {n * 12}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Full 12x12 Chart -->
+  <section class="factors-section">
+    <h2 class="factors-heading">Complete 12 × 12 Multiplication Chart</h2>
+    <div class="table-container">
+      <table class="data-table chart-table">
+        <thead>
+          <tr>
+            <th>×</th>
+            {Array.from({ length: 12 }, (_, i) => (
+              <th>{i + 1}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {grid.map((row, r) => (
+            <tr>
+              <th>{r + 1}</th>
+              {row.map((val, c) => (
+                <td>
+                  <a href={`/times-tables/${r + 1}-times-${c + 1}/`}>{val}</a>
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <AdUnit slot="times-idx-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .factors-section { margin-bottom: 32px; }
+  .factors-heading { font-size: 1.2rem; font-weight: 700; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--color-border); }
+  .number-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+  .number-card { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px 10px; background: var(--color-bg-alt); border: 1px solid var(--color-border); border-radius: var(--radius); text-decoration: none; color: var(--color-text); transition: border-color 0.15s, box-shadow 0.15s; }
+  .number-card:hover { border-color: var(--color-primary); box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1); }
+  .number-val { font-size: 1.3rem; font-weight: 800; color: var(--color-primary); }
+  .number-count { font-size: 0.8rem; font-weight: 600; }
+  .number-type { font-size: 0.7rem; color: var(--color-text-muted); }
+
+  .chart-table { font-size: 0.85rem; }
+  .chart-table th { background: var(--color-primary); color: white; padding: 8px 6px; font-weight: 700; text-align: center; min-width: 36px; }
+  .chart-table tbody th { background: var(--color-primary); color: white; }
+  .chart-table td { text-align: center; padding: 6px 4px; }
+  .chart-table td a { color: var(--color-text); text-decoration: none; font-weight: 500; }
+  .chart-table td a:hover { color: var(--color-primary); font-weight: 700; }
+  .chart-table tr:hover td { background: #eff6ff; }
+
+  @media (max-width: 640px) {
+    .number-grid { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); }
+    .chart-table { font-size: 0.7rem; }
+    .chart-table th, .chart-table td { padding: 4px 2px; min-width: 28px; }
+  }
+</style>

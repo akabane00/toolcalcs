@@ -1,0 +1,297 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import '../../styles/calculator.css';
+import { getAllSquaredPages, type PowerPage } from '../../data/powers';
+
+export function getStaticPaths() {
+  return getAllSquaredPages().map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: PowerPage };
+const { base, result, resultFormatted, isPerfectCube, cubeRoot } = page;
+
+// Related squared pages
+const allPages = getAllSquaredPages();
+const nearbyOffsets = [-3, -2, -1, 1, 2, 3];
+const relatedPages = nearbyOffsets
+  .map((offset) => allPages.find((p) => p.base === base + offset))
+  .filter((p): p is PowerPage => !!p);
+
+// Perfect squares reference
+const perfectSquares = Array.from({ length: 20 }, (_, i) => ({ base: i + 1, square: (i + 1) * (i + 1) }));
+
+// Cross-links
+const crossLinks: { href: string; label: string; icon: string }[] = [
+  { href: `/math/square-root-of-${result}/`, label: `Square Root of ${resultFormatted}`, icon: '√' },
+];
+if (result <= 141) {
+  crossLinks.push({ href: `/factors-of/${result}/`, label: `Factors of ${resultFormatted}`, icon: '🔢' });
+}
+if (base <= 25) {
+  crossLinks.push({ href: `/math/${base}-cubed/`, label: `${base} Cubed`, icon: '³' });
+}
+if (base <= 200) {
+  crossLinks.push({ href: `/math/is-${base}-prime/`, label: `Is ${base} Prime?`, icon: '🔍' });
+}
+
+// SEO
+const title = `${base} Squared - ${base}² = ${resultFormatted} | ToolCalcs`;
+const description = `${base} squared (${base}²) equals ${resultFormatted}. Learn what ${base} squared means, see the calculation, and explore related powers and square roots.`;
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Math Reference", "item": "https://toolcalcs.com/math/" },
+      { "@type": "ListItem", "position": 3, "name": `${base} Squared` },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": `What is ${base} squared?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `${base} squared (${base}²) equals ${resultFormatted}. This is calculated by multiplying ${base} by itself: ${base} × ${base} = ${resultFormatted}.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `What is the square root of ${resultFormatted}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `The square root of ${resultFormatted} is ${base}. Since ${base} × ${base} = ${resultFormatted}, we know that √${resultFormatted} = ${base}.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `Is ${resultFormatted} a perfect square?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `Yes, ${resultFormatted} is a perfect square because it equals ${base}². Every number of the form n² (where n is an integer) is a perfect square.`,
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout title={title} description={description} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/math/">Math Reference</a> &rsaquo;
+    <span>{base} Squared</span>
+  </nav>
+
+  <h1>{base} Squared</h1>
+  <p class="page-desc">Calculate {base} squared ({base}²) with step-by-step explanation, geometric interpretation, and related powers.</p>
+
+  <div class="quick-fact">
+    <span class="quick-fact-label">Quick Answer:</span>
+    <strong>{base}² = {base} × {base} = {resultFormatted}</strong>
+  </div>
+
+  <!-- Result Cards -->
+  <div class="result-cards">
+    <div class="result-card primary">
+      <span class="result-label">{base}²</span>
+      <span class="result-value">{resultFormatted}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Base</span>
+      <span class="result-value">{base}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Exponent</span>
+      <span class="result-value">2</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Square Root of {resultFormatted}</span>
+      <span class="result-value">{base}</span>
+    </div>
+    {isPerfectCube && cubeRoot !== null && (
+      <div class="result-card">
+        <span class="result-label">Cube Root of {resultFormatted}</span>
+        <span class="result-value">{cubeRoot}</span>
+      </div>
+    )}
+    <div class="result-card">
+      <span class="result-label">{base}³</span>
+      <span class="result-value">{(base * base * base).toLocaleString('en-US')}</span>
+    </div>
+  </div>
+
+  <!-- Calculation Steps -->
+  <h2 class="section-heading">Step-by-Step Calculation</h2>
+  <div class="calculator-box">
+    <div class="steps-list">
+      <div class="step-row">
+        <span class="step-num">Step 1:</span>
+        <span>Write the expression: {base}²</span>
+      </div>
+      <div class="step-row">
+        <span class="step-num">Step 2:</span>
+        <span>"Squared" means multiply by itself: {base} × {base}</span>
+      </div>
+      <div class="step-row result">
+        <span class="step-num">Result:</span>
+        <span>{base} × {base} = <strong>{resultFormatted}</strong></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Power Calculator -->
+  <h2 class="section-heading">Power Calculator</h2>
+  <div class="calculator-box">
+    <p class="calc-desc">Enter a base and exponent to calculate any power.</p>
+    <div class="finder-row">
+      <div class="input-group">
+        <label for="baseInput">Base</label>
+        <input type="number" id="baseInput" value={base} min="-10000" max="10000" />
+      </div>
+      <div class="input-group">
+        <label for="expInput">Exponent</label>
+        <input type="number" id="expInput" value="2" min="0" max="20" />
+      </div>
+      <button class="calc-btn" id="powerBtn">Calculate</button>
+    </div>
+    <div id="powerResult" class="finder-result"></div>
+  </div>
+
+  <!-- Perfect Squares Reference -->
+  <h2 class="section-heading">Perfect Squares 1² to 20²</h2>
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr><th>n</th><th>n²</th><th>n</th><th>n²</th></tr>
+      </thead>
+      <tbody>
+        {Array.from({ length: 10 }, (_, i) => (
+          <tr>
+            <td class={perfectSquares[i].base === base ? 'highlight' : ''}>{perfectSquares[i].base}</td>
+            <td class={perfectSquares[i].base === base ? 'highlight' : ''}>{perfectSquares[i].square}</td>
+            <td class={perfectSquares[i + 10].base === base ? 'highlight' : ''}>{perfectSquares[i + 10].base}</td>
+            <td class={perfectSquares[i + 10].base === base ? 'highlight' : ''}>{perfectSquares[i + 10].square.toLocaleString('en-US')}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <AdUnit slot="squared-mid" format="rectangle" />
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>What Does "Squared" Mean?</h2>
+    <p>
+      When we say a number is "squared," we mean it is multiplied by itself. The term comes from geometry: a square with side length {base} has an area of {base} × {base} = {resultFormatted} square units. In mathematical notation, {base} squared is written as {base}², where the small "2" is called an exponent or power. The expression {base}² is read as "{base} to the second power" or simply "{base} squared."
+    </p>
+    <p>
+      Squaring is one of the most common exponent operations in mathematics. It appears in the Pythagorean theorem (a² + b² = c²), in area calculations, in the quadratic formula, in physics equations for kinetic energy (KE = ½mv²), and in statistics (variance and standard deviation). Understanding squares and square roots is essential for success in algebra and beyond.
+    </p>
+
+    <h2>Calculating {base} Squared</h2>
+    <p>
+      To calculate {base}², multiply {base} by itself: {base} × {base} = {resultFormatted}. This can be verified by repeated addition: {base} added to itself {base} times equals {resultFormatted}. {base < 20 ? `For mental math, you can use the pattern that (n+1)² = n² + 2n + 1. Since ${base - 1}² = ${(base - 1) * (base - 1)}, we get ${base}² = ${(base - 1) * (base - 1)} + ${2 * (base - 1)} + 1 = ${resultFormatted}.` : `For larger numbers, breaking them into parts can help: ${base} = ${Math.floor(base / 10) * 10} + ${base % 10}, so ${base}² = (${Math.floor(base / 10) * 10} + ${base % 10})² = ${Math.floor(base / 10) * 10}² + 2 × ${Math.floor(base / 10) * 10} × ${base % 10} + ${base % 10}² = ${(Math.floor(base / 10) * 10) ** 2} + ${2 * Math.floor(base / 10) * 10 * (base % 10)} + ${(base % 10) ** 2} = ${resultFormatted}.`}
+    </p>
+
+    <h2>Square Root Connection</h2>
+    <p>
+      Squaring and taking the square root are inverse operations. Since {base}² = {resultFormatted}, the square root of {resultFormatted} is {base}: √{resultFormatted} = {base}. This relationship is fundamental: if you know a number's square, you can find the number by taking the square root, and vice versa. The number {resultFormatted} is a perfect square because its square root is the integer {base}.
+    </p>
+
+    <h2>Geometric Interpretation</h2>
+    <p>
+      Visually, {base}² represents the area of a square with side length {base}. If you draw a square grid with {base} rows and {base} columns, it contains exactly {resultFormatted} small squares. This geometric connection is why the operation is called "squaring" and why the result is called a "perfect square." Area calculations in real life — flooring, painting walls, gardening plots — often involve squaring measurements.
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>What is {base} squared?</h3>
+    <p>
+      {base} squared ({base}²) equals {resultFormatted}. This is the result of multiplying {base} by itself: {base} × {base} = {resultFormatted}.
+    </p>
+
+    <h3>What is the square root of {resultFormatted}?</h3>
+    <p>
+      The square root of {resultFormatted} is {base}. Since {base} × {base} = {resultFormatted}, we know that √{resultFormatted} = {base}. The number {resultFormatted} is a perfect square.
+    </p>
+
+    <h3>Is {resultFormatted} a perfect square?</h3>
+    <p>
+      Yes, {resultFormatted} is a perfect square because it equals {base}². A perfect square is any number that can be expressed as an integer multiplied by itself.
+    </p>
+
+    <h2>Nearby Squares</h2>
+    <ul>
+      {relatedPages.map((p) => (
+        <li>
+          <a href={`/math/${p.slug}-squared/`}>{p.base} Squared = {p.resultFormatted}</a>
+        </li>
+      ))}
+    </ul>
+
+    <p><a href="/math/">&larr; Math Reference</a> | <a href="/math-calculators/">Math Calculators</a></p>
+
+    <CrossLinks links={crossLinks} />
+  </article>
+
+  <AdUnit slot="squared-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .quick-fact { background: #eff6ff; border-radius: var(--radius); padding: 16px 24px; margin-bottom: 24px; font-size: 1.1rem; }
+  .quick-fact-label { font-size: 0.85rem; color: var(--color-text-muted); display: block; margin-bottom: 4px; }
+  .quick-fact strong { color: var(--color-primary); font-size: 1.15rem; }
+  .calc-section-title { font-size: 1.15rem; margin: 0 0 16px; border: none; padding: 0; }
+  .section-heading { font-size: 1.2rem; margin: 32px 0 12px; }
+  .calc-desc { font-size: 0.9rem; color: var(--color-text-muted); margin-bottom: 16px; }
+  .finder-row { display: flex; gap: 16px; align-items: end; flex-wrap: wrap; }
+  .finder-row .input-group { flex: 1; min-width: 100px; }
+  .finder-result { margin-top: 16px; padding: 14px 16px; background: var(--color-bg); border-radius: var(--radius); font-size: 0.95rem; line-height: 1.7; min-height: 44px; }
+  .steps-list { display: flex; flex-direction: column; gap: 8px; }
+  .step-row { display: flex; gap: 10px; align-items: baseline; padding: 6px 0; }
+  .step-row.result { margin-top: 8px; padding-top: 12px; border-top: 2px solid var(--color-primary); color: var(--color-primary); font-weight: 600; }
+  .step-num { font-weight: 700; min-width: 60px; color: var(--color-text-muted); font-size: 0.85rem; }
+  .highlight { background: #dbeafe; font-weight: 700; color: var(--color-primary); }
+  @media (max-width: 640px) { .finder-row { flex-direction: column; } }
+</style>
+
+<script>
+  var baseInput = document.getElementById('baseInput') as HTMLInputElement;
+  var expInput = document.getElementById('expInput') as HTMLInputElement;
+  var powerBtn = document.getElementById('powerBtn') as HTMLButtonElement;
+  var resultDiv = document.getElementById('powerResult') as HTMLDivElement;
+
+  function calculate() {
+    var b = parseFloat(baseInput.value);
+    var e = parseInt(expInput.value, 10);
+    if (isNaN(b) || isNaN(e) || e < 0 || e > 20 || Math.abs(b) > 10000) {
+      resultDiv.textContent = 'Please enter a valid base (-10000 to 10000) and exponent (0 to 20).';
+      return;
+    }
+    var result = Math.pow(b, e);
+    var html = '<strong>' + b + '<sup>' + e + '</sup> = ' + result.toLocaleString('en-US') + '</strong>';
+    if (e === 2) {
+      html += '<br><strong>Square Root of ' + result.toLocaleString('en-US') + ':</strong> ' + b;
+    }
+    if (e === 3) {
+      html += '<br><strong>Cube Root of ' + result.toLocaleString('en-US') + ':</strong> ' + b;
+    }
+    resultDiv.innerHTML = html;
+  }
+
+  powerBtn.addEventListener('click', calculate);
+  baseInput.addEventListener('keydown', function(e) { if ((e as KeyboardEvent).key === 'Enter') calculate(); });
+  expInput.addEventListener('keydown', function(e) { if ((e as KeyboardEvent).key === 'Enter') calculate(); });
+  calculate();
+</script>

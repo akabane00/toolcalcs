@@ -1,0 +1,461 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import '../../styles/calculator.css';
+import { getAllGcfLcmPages, type GcfLcmPage } from '../../data/gcf-lcm';
+
+export function getStaticPaths() {
+  return getAllGcfLcmPages().map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: GcfLcmPage };
+const { numA, numB, gcf, lcm: lcmVal, factorsA, factorsB, commonFactors, primeFactorizationA, primeFactorizationB, product, relationship } = page;
+
+function formatPrimeHtml(pf: string): string {
+  return pf.replace(/\^(\d+)/g, '<sup>$1</sup>');
+}
+const primeHtmlA = formatPrimeHtml(primeFactorizationA);
+const primeHtmlB = formatPrimeHtml(primeFactorizationB);
+
+// Cross-links
+const crossLinks: { href: string; label: string; icon: string }[] = [
+  { href: `/factors-of/${numA}/`, label: `Factors of ${numA}`, icon: '🔢' },
+  { href: `/factors-of/${numB}/`, label: `Factors of ${numB}`, icon: '🔢' },
+];
+
+// Related GCF pages (nearby pairs)
+const allPages = getAllGcfLcmPages();
+const relatedPages = allPages
+  .filter((p) => p.slug !== page.slug && (p.numA === numA || p.numB === numB || p.numA === numB || p.numB === numA))
+  .slice(0, 8);
+
+// Euclidean algorithm steps
+function euclideanSteps(a: number, b: number): { a: number; b: number; q: number; r: number }[] {
+  const steps: { a: number; b: number; q: number; r: number }[] = [];
+  let x = Math.max(a, b), y = Math.min(a, b);
+  while (y > 0) {
+    const q = Math.floor(x / y);
+    const r = x % y;
+    steps.push({ a: x, b: y, q, r });
+    x = y;
+    y = r;
+  }
+  return steps;
+}
+const steps = euclideanSteps(numA, numB);
+
+// SEO
+const title = `GCF of ${numA} and ${numB} - Greatest Common Factor is ${gcf} | ToolCalcs`;
+const description = `The GCF (Greatest Common Factor) of ${numA} and ${numB} is ${gcf}. The LCM (Least Common Multiple) is ${lcmVal}. Find common factors, prime factorizations, and step-by-step solutions.`;
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Math Reference", "item": "https://toolcalcs.com/math/" },
+      { "@type": "ListItem", "position": 3, "name": `GCF of ${numA} and ${numB}` },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": `What is the GCF of ${numA} and ${numB}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `The Greatest Common Factor (GCF) of ${numA} and ${numB} is ${gcf}. This is the largest number that divides both ${numA} and ${numB} without a remainder.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `What is the LCM of ${numA} and ${numB}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `The Least Common Multiple (LCM) of ${numA} and ${numB} is ${lcmVal}. This is the smallest number that is a multiple of both ${numA} and ${numB}.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `What are the common factors of ${numA} and ${numB}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `The common factors of ${numA} and ${numB} are: ${commonFactors.join(', ')}. The greatest of these is ${gcf}.`,
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout title={title} description={description} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/math/">Math Reference</a> &rsaquo;
+    <span>GCF of {numA} and {numB}</span>
+  </nav>
+
+  <h1>GCF of {numA} and {numB}</h1>
+  <p class="page-desc">Find the Greatest Common Factor and Least Common Multiple of {numA} and {numB}, with step-by-step methods.</p>
+
+  <div class="quick-fact">
+    <span class="quick-fact-label">Quick Answer:</span>
+    <strong>The GCF of {numA} and {numB} is {gcf}. The LCM is {lcmVal.toLocaleString('en-US')}.</strong>
+  </div>
+
+  <!-- Result Cards -->
+  <div class="result-cards">
+    <div class="result-card primary">
+      <span class="result-label">GCF</span>
+      <span class="result-value">{gcf}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">LCM</span>
+      <span class="result-value">{lcmVal.toLocaleString('en-US')}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Common Factors</span>
+      <span class="result-value">{commonFactors.length}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Product</span>
+      <span class="result-value">{product.toLocaleString('en-US')}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">{numA} Factorization</span>
+      <span class="result-value" set:html={primeHtmlA} />
+    </div>
+    <div class="result-card">
+      <span class="result-label">{numB} Factorization</span>
+      <span class="result-value" set:html={primeHtmlB} />
+    </div>
+  </div>
+
+  <!-- Common Factors -->
+  <div class="calculator-box">
+    <h2 class="calc-section-title">Common Factors of {numA} and {numB}</h2>
+    <div class="factor-badges">
+      {commonFactors.map((f) => (
+        <span class="factor-badge">{f}</span>
+      ))}
+    </div>
+  </div>
+
+  <!-- Factors Comparison Table -->
+  <h2 class="section-heading">Factors Comparison</h2>
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Factors of {numA}</th>
+          <th>Factors of {numB}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {Array.from({ length: Math.max(factorsA.length, factorsB.length) }).map((_, i) => (
+          <tr>
+            <td class={factorsA[i] && commonFactors.includes(factorsA[i]) ? 'highlight' : ''}>
+              {factorsA[i] ?? ''}
+            </td>
+            <td class={factorsB[i] && commonFactors.includes(factorsB[i]) ? 'highlight' : ''}>
+              {factorsB[i] ?? ''}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    <p class="table-note">Highlighted values are common factors.</p>
+  </div>
+
+  <!-- Euclidean Algorithm Steps -->
+  <h2 class="section-heading">Euclidean Algorithm Steps</h2>
+  <div class="calculator-box">
+    <p class="calc-desc">Find GCF using the Euclidean algorithm (repeated division):</p>
+    <div class="steps-list">
+      {steps.map((s, i) => (
+        <div class="step-row">
+          <span class="step-num">Step {i + 1}:</span>
+          <span>{s.a} ÷ {s.b} = {s.q} remainder <strong>{s.r}</strong></span>
+        </div>
+      ))}
+      <div class="step-row result">
+        <span class="step-num">Result:</span>
+        <span>The last non-zero remainder is <strong>{gcf}</strong>, so GCF({numA}, {numB}) = {gcf}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Relationship -->
+  <div class="calculator-box">
+    <h2 class="calc-section-title">GCF × LCM = Product</h2>
+    <p class="relationship-formula">{relationship}</p>
+    <p class="calc-desc">This identity always holds: the product of two numbers equals the product of their GCF and LCM.</p>
+  </div>
+
+  <!-- Interactive GCF/LCM Finder -->
+  <h2 class="section-heading">GCF & LCM Calculator</h2>
+  <div class="calculator-box">
+    <p class="calc-desc">Enter any two numbers to find their GCF and LCM.</p>
+    <div class="finder-row">
+      <div class="input-group">
+        <label for="inputA">Number A</label>
+        <input type="number" id="inputA" value={numA} min="1" max="1000000" />
+      </div>
+      <div class="input-group">
+        <label for="inputB">Number B</label>
+        <input type="number" id="inputB" value={numB} min="1" max="1000000" />
+      </div>
+      <button class="calc-btn" id="calcBtn">Calculate</button>
+    </div>
+    <div id="calcResult" class="finder-result"></div>
+  </div>
+
+  <AdUnit slot="gcf-mid" format="rectangle" />
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>What Is the GCF (Greatest Common Factor)?</h2>
+    <p>
+      The Greatest Common Factor (GCF) of two numbers is the largest positive integer that divides both numbers without leaving a remainder. The GCF is also known as the Greatest Common Divisor (GCD) or Highest Common Factor (HCF). For {numA} and {numB}, the GCF is {gcf}, meaning {gcf} is the largest number that divides evenly into both {numA} and {numB}.
+    </p>
+    <p>
+      Finding the GCF is a fundamental operation in mathematics with applications in simplifying fractions, solving equations, and working with ratios. For example, the fraction {numA}/{numB} can be simplified by dividing both the numerator and denominator by their GCF of {gcf}, resulting in {numA / gcf}/{numB / gcf}. This is the simplest form of the fraction because {numA / gcf} and {numB / gcf} share no common factor other than 1.
+    </p>
+
+    <h2>How to Find the GCF of {numA} and {numB}</h2>
+    <h3>Method 1: Listing Factors</h3>
+    <p>
+      List all factors of each number, then identify the largest factor they share. The factors of {numA} are {factorsA.join(', ')}. The factors of {numB} are {factorsB.join(', ')}. The common factors are {commonFactors.join(', ')}, and the greatest among them is {gcf}.
+    </p>
+
+    <h3>Method 2: Prime Factorization</h3>
+    <p>
+      Write each number as a product of prime factors: {numA} = {primeFactorizationA} and {numB} = {primeFactorizationB}. The GCF is the product of the shared prime factors, each taken to the lowest power it appears in either factorization. Using this method, GCF({numA}, {numB}) = {gcf}.
+    </p>
+
+    <h3>Method 3: Euclidean Algorithm</h3>
+    <p>
+      The Euclidean algorithm finds the GCF through repeated division. Divide the larger number by the smaller, then replace the larger number with the smaller and the smaller with the remainder. Repeat until the remainder is zero. The last non-zero remainder is the GCF. For {numA} and {numB}: {steps.map((s) => `${s.a} ÷ ${s.b} = ${s.q} R ${s.r}`).join('; ')}. The GCF is {gcf}.
+    </p>
+
+    <h2>What Is the LCM (Least Common Multiple)?</h2>
+    <p>
+      The Least Common Multiple (LCM) of two numbers is the smallest positive integer that is divisible by both numbers. For {numA} and {numB}, the LCM is {lcmVal.toLocaleString('en-US')}. You can find the LCM using the formula: LCM(a, b) = (a × b) ÷ GCF(a, b). So LCM({numA}, {numB}) = ({numA} × {numB}) ÷ {gcf} = {product.toLocaleString('en-US')} ÷ {gcf} = {lcmVal.toLocaleString('en-US')}.
+    </p>
+    <p>
+      The LCM is essential for adding and subtracting fractions with different denominators. To add {`1/${numA}`} and {`1/${numB}`}, you need a common denominator, which is the LCM = {lcmVal.toLocaleString('en-US')}. The LCM is also used in scheduling problems, gear ratios, and finding common periods of repeating events.
+    </p>
+
+    <h2>The GCF-LCM Relationship</h2>
+    <p>
+      There is a fundamental relationship between the GCF and LCM of two numbers: the product of the two numbers always equals the product of their GCF and LCM. In formula form: a × b = GCF(a, b) × LCM(a, b). For {numA} and {numB}: {numA} × {numB} = {product.toLocaleString('en-US')} and {gcf} × {lcmVal.toLocaleString('en-US')} = {(gcf * lcmVal).toLocaleString('en-US')}. Both products are equal, confirming the relationship.
+    </p>
+    <p>
+      This identity is useful because it allows you to find the LCM if you know the GCF (or vice versa) without having to compute it independently. Since the Euclidean algorithm efficiently finds the GCF, you can then derive the LCM with a single multiplication and division. This approach is faster than listing multiples, especially for large numbers.
+    </p>
+
+    <h2>Practical Applications</h2>
+    <p>
+      The GCF and LCM have many real-world applications. The GCF is used to simplify fractions, distribute items evenly, and tile rectangular areas with the largest possible square tiles. For example, if you have a {numA}-by-{numB} grid, the largest square tile that fits evenly is {gcf}-by-{gcf}. The LCM is used to synchronize repeating events: if one event repeats every {numA} days and another every {numB} days, they coincide every {lcmVal} days.
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is the GCF of {numA} and {numB}?</h3>
+    <p>
+      The GCF (Greatest Common Factor) of {numA} and {numB} is {gcf}. This means {gcf} is the largest number that divides both {numA} and {numB} evenly. The common factors are {commonFactors.join(', ')}.
+    </p>
+
+    <h3>What is the LCM of {numA} and {numB}?</h3>
+    <p>
+      The LCM (Least Common Multiple) of {numA} and {numB} is {lcmVal.toLocaleString('en-US')}. This is the smallest positive number that is divisible by both {numA} and {numB}. You can calculate it as ({numA} × {numB}) ÷ GCF = {product.toLocaleString('en-US')} ÷ {gcf} = {lcmVal.toLocaleString('en-US')}.
+    </p>
+
+    <h3>What are the common factors of {numA} and {numB}?</h3>
+    <p>
+      The common factors of {numA} and {numB} are: {commonFactors.join(', ')}. These are all the positive integers that divide both {numA} and {numB} without a remainder. The greatest of these common factors is {gcf}.
+    </p>
+
+    <h2>Related GCF Calculations</h2>
+    <ul>
+      {relatedPages.map((p) => (
+        <li>
+          <a href={`/math/gcf-of-${p.slug}/`}>GCF of {p.numA} and {p.numB} = {p.gcf}</a>
+        </li>
+      ))}
+    </ul>
+
+    <p><a href="/math/">&larr; Math Reference</a> | <a href="/math-calculators/">Math Calculators</a></p>
+
+    <CrossLinks links={crossLinks} />
+  </article>
+
+  <AdUnit slot="gcf-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .quick-fact {
+    background: #eff6ff;
+    border-radius: var(--radius);
+    padding: 16px 24px;
+    margin-bottom: 24px;
+    font-size: 1.1rem;
+  }
+  .quick-fact-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .quick-fact strong {
+    color: var(--color-primary);
+    font-size: 1.15rem;
+  }
+
+  .calc-section-title {
+    font-size: 1.15rem;
+    margin: 0 0 16px;
+    border: none;
+    padding: 0;
+  }
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+
+  .factor-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .factor-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    padding: 8px 14px;
+    background: #eff6ff;
+    border-radius: var(--radius);
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--color-primary);
+  }
+
+  .highlight {
+    background: #dbeafe;
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+  .table-note {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-top: 8px;
+    font-style: italic;
+  }
+
+  .steps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .step-row {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    padding: 6px 0;
+  }
+  .step-row.result {
+    margin-top: 8px;
+    padding-top: 12px;
+    border-top: 2px solid var(--color-primary);
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+  .step-num {
+    font-weight: 700;
+    min-width: 60px;
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+  }
+
+  .relationship-formula {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    text-align: center;
+    margin: 12px 0;
+    font-family: 'Courier New', monospace;
+  }
+
+  .calc-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 16px;
+  }
+  .finder-row {
+    display: flex;
+    gap: 16px;
+    align-items: end;
+    flex-wrap: wrap;
+  }
+  .finder-row .input-group {
+    flex: 1;
+    min-width: 120px;
+  }
+  .finder-result {
+    margin-top: 16px;
+    padding: 14px 16px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    min-height: 44px;
+  }
+
+  @media (max-width: 640px) {
+    .finder-row { flex-direction: column; }
+    .factor-badge { min-width: 34px; padding: 6px 10px; font-size: 0.9rem; }
+  }
+</style>
+
+<script>
+  var inputA = document.getElementById('inputA') as HTMLInputElement;
+  var inputB = document.getElementById('inputB') as HTMLInputElement;
+  var calcBtn = document.getElementById('calcBtn') as HTMLButtonElement;
+  var resultDiv = document.getElementById('calcResult') as HTMLDivElement;
+
+  function computeGcd(a: number, b: number): number {
+    a = Math.abs(a); b = Math.abs(b);
+    while (b) { var t = b; b = a % b; a = t; }
+    return a;
+  }
+
+  function calculate() {
+    var a = parseInt(inputA.value, 10);
+    var b = parseInt(inputB.value, 10);
+    if (isNaN(a) || isNaN(b) || a < 1 || b < 1 || a > 1000000 || b > 1000000) {
+      resultDiv.textContent = 'Please enter two numbers between 1 and 1,000,000.';
+      return;
+    }
+    var g = computeGcd(a, b);
+    var l = (a * b) / g;
+
+    var html = '<strong>GCF(' + a + ', ' + b + ') = ' + g + '</strong>';
+    html += '<br><strong>LCM(' + a + ', ' + b + ') = ' + l.toLocaleString('en-US') + '</strong>';
+    html += '<br><strong>Product:</strong> ' + a + ' × ' + b + ' = ' + (a * b).toLocaleString('en-US');
+    html += '<br><strong>Verification:</strong> GCF × LCM = ' + g + ' × ' + l.toLocaleString('en-US') + ' = ' + (g * l).toLocaleString('en-US');
+    resultDiv.innerHTML = html;
+  }
+
+  calcBtn.addEventListener('click', calculate);
+  inputA.addEventListener('keydown', function(e) { if ((e as KeyboardEvent).key === 'Enter') calculate(); });
+  inputB.addEventListener('keydown', function(e) { if ((e as KeyboardEvent).key === 'Enter') calculate(); });
+  calculate();
+</script>
