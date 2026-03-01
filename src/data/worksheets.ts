@@ -173,6 +173,32 @@ export const worksheets: Worksheet[] = [
       { name: 'maxNumber', label: 'Max Number', type: 'select', default: '20', options: [{ value: '10', label: 'Up to 10' }, { value: '20', label: 'Up to 20' }, { value: '50', label: 'Up to 50' }, { value: '100', label: 'Up to 100' }] },
     ],
   },
+  {
+    title: 'Fractions Worksheets',
+    slug: 'fractions-worksheets',
+    description: 'Free printable fractions worksheets. Practice identifying, comparing, and adding fractions with visual models and step-by-step problems.',
+    icon: '½',
+    gradeRange: '3-5',
+    mathTopic: 'Fractions',
+    configOptions: [
+      { name: 'problems', label: 'Number of Problems', type: 'number', default: 16, min: 5, max: 30 },
+      { name: 'type', label: 'Problem Type', type: 'select', default: 'identify', options: [{ value: 'identify', label: 'Identify Fractions (Visual)' }, { value: 'equivalent', label: 'Equivalent Fractions' }, { value: 'compare', label: 'Compare Fractions' }, { value: 'addSame', label: 'Add (Same Denominator)' }, { value: 'subSame', label: 'Subtract (Same Denominator)' }, { value: 'addDiff', label: 'Add (Different Denom.)' }, { value: 'subDiff', label: 'Subtract (Different Denom.)' }] },
+      { name: 'maxDenom', label: 'Max Denominator', type: 'select', default: '8', options: [{ value: '4', label: 'Up to 4' }, { value: '8', label: 'Up to 8' }, { value: '12', label: 'Up to 12' }] },
+    ],
+  },
+  {
+    title: 'Order of Operations Worksheets',
+    slug: 'order-of-operations-worksheets',
+    description: 'Free printable order of operations (PEMDAS) worksheets. Practice evaluating expressions with parentheses, exponents, and mixed operations.',
+    icon: '📐',
+    gradeRange: '4-6',
+    mathTopic: 'Order of Operations',
+    configOptions: [
+      { name: 'problems', label: 'Number of Problems', type: 'number', default: 15, min: 5, max: 30 },
+      { name: 'difficulty', label: 'Difficulty', type: 'select', default: 'basic', options: [{ value: 'basic', label: 'Basic (2 operations, no parentheses)' }, { value: 'medium', label: 'Medium (2-3 operations, parentheses)' }, { value: 'advanced', label: 'Advanced (3-4 operations, exponents)' }] },
+      { name: 'maxNumber', label: 'Max Number', type: 'select', default: '9', options: [{ value: '9', label: 'Up to 9' }, { value: '12', label: 'Up to 12' }, { value: '20', label: 'Up to 20' }] },
+    ],
+  },
 ];
 
 export function getWorksheetBySlug(slug: string): Worksheet | undefined {
