@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import AdUnit from '../../components/AdUnit.astro';
-import { worksheets } from '../../data/worksheets';
+import { worksheets, type Worksheet } from '../../data/worksheets';
 import '../../styles/category.css';
 
 const structuredData = {
@@ -12,11 +12,38 @@ const structuredData = {
     { "@type": "ListItem", "position": 2, "name": "Worksheets" }
   ]
 };
+
+function getBySlug(slug: string): Worksheet | undefined {
+  return worksheets.find(w => w.slug === slug);
+}
+
+const categories = [
+  {
+    title: 'Basic Operations',
+    description: 'Build a strong foundation with addition, subtraction, multiplication, and division practice.',
+    slugs: ['addition-worksheets', 'subtraction-worksheets', 'multiplication-worksheets', 'division-worksheets', 'long-division-worksheets', 'fact-families-worksheets'],
+  },
+  {
+    title: 'Number Sense',
+    description: 'Develop number understanding with place value, counting, comparing, decimals, and percentages.',
+    slugs: ['number-tracing', 'skip-counting', 'place-value-worksheets', 'rounding-worksheets', 'comparing-numbers-worksheets', 'even-and-odd-worksheets', 'number-patterns-worksheets', 'decimals-worksheets', 'percentages-worksheets'],
+  },
+  {
+    title: 'Visual & Applied Math',
+    description: 'Apply math to the real world with time, money, fractions, geometry, and measurement.',
+    slugs: ['telling-time-worksheets', 'counting-money-worksheets', 'number-line-worksheets', 'fractions-worksheets', 'area-and-perimeter-worksheets', 'geometry-worksheets', 'measurement-worksheets'],
+  },
+  {
+    title: 'Problem Solving',
+    description: 'Challenge students with multi-step operations and real-world word problems.',
+    slugs: ['order-of-operations-worksheets', 'word-problems-worksheets'],
+  },
+];
 ---
 
 <BaseLayout
-  title="Free Printable Math Worksheets - Addition, Subtraction & More | ToolCalcs"
-  description="Free printable math worksheets for K-5: addition, subtraction, multiplication, division, number tracing, skip counting, telling time, and counting money."
+  title="Free Printable Math Worksheets - K-7 Math Practice | ToolCalcs"
+  description="Free printable math worksheets for Pre-K through 7th grade. 24 worksheet types covering addition, subtraction, multiplication, division, fractions, geometry, and more."
   structuredData={structuredData}
 >
   <nav class="breadcrumb">
@@ -24,23 +51,108 @@ const structuredData = {
   </nav>
 
   <h1>Printable Math Worksheets</h1>
-  <p class="page-desc">Free, unlimited practice worksheets for Pre-K through 5th grade. Generate new problems every time, print, and practice.</p>
+  <p class="page-desc">Free, unlimited practice worksheets for Pre-K through 7th grade. Choose a category, generate new problems every time, print, and practice.</p>
+
+  <div class="grade-filter" id="gradeFilter">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="0,0">Pre-K</button>
+    <button class="filter-btn" data-filter="0,2">K-2</button>
+    <button class="filter-btn" data-filter="1,3">1-3</button>
+    <button class="filter-btn" data-filter="2,4">2-4</button>
+    <button class="filter-btn" data-filter="3,5">3-5</button>
+    <button class="filter-btn" data-filter="4,6">4-6</button>
+    <button class="filter-btn" data-filter="5,7">5-7</button>
+  </div>
 
   <AdUnit slot="cat-top" format="horizontal" />
 
-  <div class="calc-grid">
-    {worksheets.map(ws => (
-      <a href={`/worksheets/${ws.slug}/`} class="calc-card">
-        <span class="calc-icon">{ws.icon}</span>
-        <h2>{ws.title}</h2>
-        <p>{ws.description}</p>
-        <span class="grade-badge">Grades {ws.gradeRange}</span>
-      </a>
-    ))}
-  </div>
+  {categories.map(cat => (
+    <section class="ws-category" data-category>
+      <h2>{cat.title}</h2>
+      <p class="cat-desc">{cat.description}</p>
+      <div class="calc-grid">
+        {cat.slugs.map(slug => {
+          const ws = getBySlug(slug);
+          if (!ws) return null;
+          return (
+            <a href={`/worksheets/${ws.slug}/`} class="calc-card" data-grades={ws.gradeRange}>
+              <span class="calc-icon">{ws.icon}</span>
+              <h3>{ws.title}</h3>
+              <p>{ws.description}</p>
+              <span class="grade-badge">Grades {ws.gradeRange}</span>
+            </a>
+          );
+        })}
+      </div>
+    </section>
+  ))}
 
   <AdUnit slot="cat-bottom" format="horizontal" />
 </BaseLayout>
+
+<script is:inline>
+  (function () {
+    var gradeMap = {
+      'Pre-K': [0, 0],
+      'K-2': [0, 2],
+      'K-3': [0, 3],
+      '1-3': [1, 3],
+      '1-4': [1, 4],
+      '1-6': [1, 6],
+      '2-4': [2, 4],
+      '2-5': [2, 5],
+      '3-5': [3, 5],
+      '4-6': [4, 6],
+      '5-7': [5, 7]
+    };
+
+    var filterBtns = document.querySelectorAll('.filter-btn');
+    var cards = document.querySelectorAll('.calc-card[data-grades]');
+    var catSections = document.querySelectorAll('.ws-category');
+
+    function filterCards(filterValue) {
+      filterBtns.forEach(function (btn) {
+        btn.classList.toggle('active', btn.dataset.filter === filterValue);
+      });
+
+      if (filterValue === 'all') {
+        cards.forEach(function (card) { card.style.display = ''; });
+        catSections.forEach(function (sec) { sec.style.display = ''; });
+        return;
+      }
+
+      var parts = filterValue.split(',');
+      var fMin = parseInt(parts[0], 10);
+      var fMax = parseInt(parts[1], 10);
+
+      cards.forEach(function (card) {
+        var range = gradeMap[card.dataset.grades];
+        if (!range) { card.style.display = 'none'; return; }
+        var visible = range[0] <= fMax && range[1] >= fMin;
+        card.style.display = visible ? '' : 'none';
+      });
+
+      catSections.forEach(function (sec) {
+        var visibleCards = sec.querySelectorAll('.calc-card:not([style*="display: none"])');
+        sec.style.display = visibleCards.length > 0 ? '' : 'none';
+      });
+    }
+
+    filterBtns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var filter = btn.dataset.filter;
+        filterCards(filter);
+        history.replaceState(null, '', '#grade-' + (filter === 'all' ? 'all' : filter.replace(',', '-')));
+      });
+    });
+
+    var hash = location.hash.replace('#grade-', '');
+    if (hash && hash !== '' && hash !== 'all') {
+      var filterVal = hash.replace('-', ',');
+      filterCards(filterVal);
+    }
+  })();
+</script>
 
 <style>
   .grade-badge {
@@ -52,5 +164,51 @@ const structuredData = {
     background: #eff6ff;
     color: var(--color-primary);
     border-radius: 12px;
+  }
+
+  .grade-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+  .filter-btn {
+    padding: 6px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    background: var(--color-bg);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .filter-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  .filter-btn.active {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+  }
+
+  .ws-category {
+    margin-bottom: 32px;
+  }
+  .ws-category h2 {
+    font-size: 1.3rem;
+    margin-bottom: 4px;
+  }
+  .cat-desc {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+  }
+
+  .calc-card h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 6px;
   }
 </style>
