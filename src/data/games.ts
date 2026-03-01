@@ -177,6 +177,38 @@ export const games: Game[] = [
       { max: Infinity, label: 'Chimpanzee Level!', color: '#16a34a' },
     ],
   },
+  {
+    title: 'Math Flashcards',
+    slug: 'math-flashcards',
+    description: 'Practice arithmetic with timed flashcards. Answer as many math problems as you can before time runs out.',
+    icon: '🔢',
+    metricUnit: 'correct',
+    metricLabel: 'Correct Answers',
+    lowerIsBetter: false,
+    ratingScale: [
+      { max: 5, label: 'Keep Practicing', color: '#ef4444' },
+      { max: 10, label: 'Getting There', color: '#f59e0b' },
+      { max: 20, label: 'Good', color: '#2563eb' },
+      { max: 30, label: 'Great!', color: '#22c55e' },
+      { max: Infinity, label: 'Math Whiz!', color: '#16a34a' },
+    ],
+  },
+  {
+    title: 'Timed Math Drills',
+    slug: 'timed-math-drills',
+    description: 'Race against the clock to solve as many math problems as possible. Build speed and accuracy with mental math.',
+    icon: '⏱️',
+    metricUnit: 'problems',
+    metricLabel: 'Problems Solved',
+    lowerIsBetter: false,
+    ratingScale: [
+      { max: 10, label: 'Warming Up', color: '#ef4444' },
+      { max: 20, label: 'Average', color: '#f59e0b' },
+      { max: 35, label: 'Good', color: '#2563eb' },
+      { max: 50, label: 'Fast!', color: '#22c55e' },
+      { max: Infinity, label: 'Speed Demon!', color: '#16a34a' },
+    ],
+  },
 ];
 
 export function getGameBySlug(slug: string): Game | undefined {
