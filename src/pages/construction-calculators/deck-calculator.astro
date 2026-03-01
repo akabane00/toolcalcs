@@ -1,0 +1,323 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Construction Calculators",
+        "item": "https://toolcalcs.com/construction-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Deck Calculator"
+      }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How many deck boards do I need for a 12x16 deck?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Using standard 5.5-inch (2x6) boards with 1/8-inch gaps, you need about 26 rows. With 16-foot boards, that is 26 boards. With 8-foot boards, you need 52 boards.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How far apart should deck joists be?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Standard spacing is 16 inches on center for most wood decking. Some composite requires 12-inch spacing. Never exceed 24-inch spacing.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How much does it cost to build a deck per square foot?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Pressure-treated wood costs $15 to $25 per sq ft for materials and labor. Composite runs $25 to $45 per sq ft. A 192 sq ft (12x16) pressure-treated deck costs $3,000 to $5,000.',
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Deck Calculator - Estimate Decking, Joists & Materials | ToolCalcs"
+  description="Free deck calculator. Estimate decking boards, joists, posts, railing balusters, and total cost for your deck project. Calculate materials for any deck size instantly."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/construction-calculators/">Construction Calculators</a> &rsaquo;
+    <span>Deck Calculator</span>
+  </nav>
+
+  <h1>Deck Calculator</h1>
+  <p class="page-desc">Estimate decking boards, joists, posts, railing materials, and total cost for your deck project.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="deckLength">Deck Length (ft)</label>
+        <input type="number" id="deckLength" value="16" min="1" step="0.5" />
+      </div>
+      <div class="input-group">
+        <label for="deckWidth">Deck Width (ft)</label>
+        <input type="number" id="deckWidth" value="12" min="1" step="0.5" />
+      </div>
+      <div class="input-group">
+        <label for="boardWidth">Board Width</label>
+        <select id="boardWidth">
+          <option value="3.5">3.5" (2&times;4)</option>
+          <option value="5.5" selected>5.5" (2&times;6)</option>
+          <option value="7.25">7.25" (2&times;8)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="joistSpacing">Joist Spacing</label>
+        <select id="joistSpacing">
+          <option value="12">12" on center</option>
+          <option value="16" selected>16" on center</option>
+          <option value="24">24" on center</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="deckHeight">Deck Height (ft)</label>
+        <input type="number" id="deckHeight" value="3" min="0.5" step="0.5" />
+      </div>
+      <div class="input-group">
+        <label for="railingLength">Railing Length (ft, 0 if none)</label>
+        <input type="number" id="railingLength" value="40" min="0" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="pricePerLinFt">Price per Linear Foot ($)</label>
+        <input type="number" id="pricePerLinFt" value="1.50" min="0" step="0.10" />
+      </div>
+    </div>
+
+    <div class="calc-results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Deck Area</span>
+          <span class="result-value" id="deckArea">192 sq ft</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Decking Boards</span>
+          <span class="result-value" id="deckingBoards">0</span>
+          <span class="result-sub" id="deckingLinFt"></span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Joists</span>
+          <span class="result-value" id="joistCount">0</span>
+          <span class="result-sub" id="joistLinFt"></span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Support Posts (4&times;4)</span>
+          <span class="result-value" id="supportPosts">0</span>
+        </div>
+        <div class="result-card" id="railingPostsCard">
+          <span class="result-label">Railing Posts</span>
+          <span class="result-value" id="railingPosts">0</span>
+        </div>
+        <div class="result-card" id="balustersCard">
+          <span class="result-label">Balusters</span>
+          <span class="result-value" id="balusters">0</span>
+        </div>
+        <div class="result-card success">
+          <span class="result-label">Estimated Cost</span>
+          <span class="result-value" id="estimatedCost">$0.00</span>
+          <span class="result-sub" id="totalLinFtLabel"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>How to Calculate Decking Materials</h2>
+    <p>Building a deck is one of the most rewarding home improvement projects, adding usable outdoor living space and increasing your property value. Accurate material estimation is the foundation of a successful deck build, whether you are a seasoned contractor or a first-time DIY builder. Ordering the right quantities of lumber prevents costly mid-project delays, while avoiding excessive overage keeps your budget in check.</p>
+    <p>The first step in calculating deck materials is determining the deck dimensions. Measure the planned length and width of the deck in feet. The length is typically the dimension parallel to the house, while the width extends outward from the house. These two measurements give you the total deck area in square feet, which serves as the basis for all subsequent material calculations. A 16-foot by 12-foot deck, for example, has a total area of 192 square feet.</p>
+    <div class="formula-box">
+      <code>Deck Area = Length &times; Width</code><br />
+      <code>Board Count = Deck Width (in.) &divide; (Board Width + 0.125" gap)</code><br />
+      <code>Total Decking (lin ft) = Board Count &times; Deck Length</code>
+    </div>
+    <p>Decking boards run perpendicular to the joists, spanning the width of the deck. To calculate how many boards you need, convert the deck width to inches and divide by the width of one board plus a 1/8-inch gap (0.125 inches) for drainage and expansion. Using standard 2-by-6 decking that is 5.5 inches wide, a 12-foot (144-inch) wide deck requires 144 divided by 5.625, which equals approximately 25.6 boards. Round up to 26 boards. Each board runs the full length of the deck, so with a 16-foot deck, you need 26 boards that are each 16 feet long, totaling 416 linear feet of decking.</p>
+    <p>Joists are the structural members that support the decking boards. They run perpendicular to the decking, spanning the width of the deck. The number of joists depends on the joist spacing, which is typically 16 inches on center for standard wood decking. To calculate joists, convert the deck length to inches, divide by the joist spacing, and add one for the end joist. For a 16-foot (192-inch) deck with 16-inch spacing, the calculation is 192 divided by 16, plus 1, equals 13 joists. Each joist spans the width of the deck, so 13 joists at 12 feet each equals 156 linear feet of joist material.</p>
+    <p>Support posts hold the deck structure above the ground. The number of posts depends on the deck size and the span capability of the beams. A common configuration uses two rows of posts spaced approximately 6 feet apart along the length of the deck. For a 16-foot deck, each row needs approximately 4 posts (16 divided by 6, rounded up, plus 1), and two rows gives 8 total support posts. Each post extends from the footing to the underside of the beam, with the length determined by the deck height plus the depth needed for the footing.</p>
+    <p>Always add 10% to 15% to your material estimates for waste, cutting errors, and boards that may have defects. Lumber is a natural product, and warped, cracked, or knotty boards should be rejected and replaced. Having extra material on hand ensures you can finish the project without a return trip to the lumber yard.</p>
+
+    <h2>Choosing Deck Board Sizes</h2>
+    <p>The size of your decking boards affects the appearance, structural performance, and cost of your deck. The three most common board sizes for residential decking are 2-by-4 (actual 3.5 inches wide), 2-by-6 (actual 5.5 inches wide), and 2-by-8 (actual 7.25 inches wide). Each has specific advantages and ideal use cases.</p>
+    <p><strong>2-by-6 boards (5.5 inches wide)</strong> are the most popular choice for residential decking and the industry standard. They provide an excellent balance of structural strength, visual proportion, and cost efficiency. The 5.5-inch width creates a classic deck appearance with visible board lines that are neither too narrow nor too wide. Two-by-six boards are strong enough to span 16 inches between joists without excessive deflection, making them compatible with standard framing practices. They are widely available in pressure-treated pine, cedar, redwood, and various composite formulations, giving you the most options in terms of material and price.</p>
+    <p><strong>2-by-4 boards (3.5 inches wide)</strong> create a more refined, detailed look with more visible board lines per square foot of deck surface. They are lighter and easier to handle than wider boards, making them a good choice for DIY builders working alone. However, the narrower width means you need more boards to cover the same area, which increases the number of fasteners and installation time. Two-by-four boards are slightly more flexible than wider boards and may require 12-inch joist spacing instead of 16-inch to prevent excessive springiness underfoot. They are commonly used for accent borders, bench tops, and decorative elements rather than full deck surfaces.</p>
+    <p><strong>2-by-8 boards (7.25 inches wide)</strong> cover more area per board, reducing the number of boards needed and speeding up installation. A 12-foot wide deck requires only about 20 boards instead of 26 with 2-by-6 lumber. However, wider boards are more prone to cupping, twisting, and warping because of the greater width-to-thickness ratio. They also create a less traditional look with fewer, wider lines. Two-by-eight decking is less common in retail lumber yards, which can make sourcing more difficult and expensive. This size works best for rustic or cabin-style decks where the wider boards complement the architectural style.</p>
+    <p>Regardless of the board width you choose, always use boards that are at least 1 inch thick (nominal 2-inch, actual 1.5-inch) for walking surfaces. Thinner boards like 1-by-6 or 5/4-by-6 are available and are popular for composite and some premium wood decking, but they require tighter joist spacing (12 inches on center) and cannot support heavy loads between joists as effectively as full 2-inch nominal thickness boards.</p>
+    <p>Leave a 1/8-inch gap between decking boards for drainage and wood expansion. Pressure-treated lumber should be installed with wider gaps of up to 1/4 inch if it is still wet from the treatment process, as it will shrink as it dries. Kiln-dried lumber and composite boards can be installed with the standard 1/8-inch gap since they have already reached their stable moisture content.</p>
+
+    <h2>Joist Spacing and Span Tables</h2>
+    <p>Joist spacing is one of the most important structural decisions in deck design. The spacing affects how much weight the deck can support, how much the decking boards deflect underfoot, and whether the deck meets building code requirements. Incorrect joist spacing can lead to a bouncy, unsafe deck that fails inspection and may eventually collapse under heavy loads.</p>
+    <p>The three standard joist spacings are 12 inches, 16 inches, and 24 inches on center. The term "on center" means the measurement is taken from the center of one joist to the center of the next, not from edge to edge. Since a standard 2-by-8 or 2-by-10 joist is 1.5 inches thick, 16-inch on-center spacing leaves approximately 14.5 inches of clear span between joists.</p>
+    <p><strong>16-inch on-center spacing</strong> is the default standard for most residential decks using 2-by-6 or 5/4-by-6 wood decking. This spacing provides adequate support for normal residential use, including foot traffic, patio furniture, grills, and small gatherings of people. Building codes in most jurisdictions accept 16-inch spacing for decks with a live load rating of 40 pounds per square foot, which is the standard residential requirement. Most contractors use 16-inch spacing unless the project specifications call for something different.</p>
+    <p><strong>12-inch on-center spacing</strong> is required for some composite decking products, diagonal decking installations, and decks that will support above-average loads such as hot tubs, heavy planters, or large outdoor kitchens. The tighter spacing provides approximately 33% more support than 16-inch spacing, making the deck surface noticeably more rigid underfoot. The trade-off is a 33% increase in the number of joists and corresponding fasteners, which adds to both material cost and installation time. Always check the composite manufacturer's installation guide for their recommended joist spacing, as using wider spacing may void the warranty.</p>
+    <p><strong>24-inch on-center spacing</strong> is the maximum allowable for most decking materials and is only appropriate for thick, structural-grade lumber such as 2-by-6 or thicker decking boards installed perpendicular to the joists. This wider spacing reduces material and labor costs but creates a noticeably springier deck surface. Many building codes do not allow 24-inch spacing for residential decks, and most composite decking manufacturers specifically prohibit it. Use 24-inch spacing only on utility decks, platforms, or structures where the decking boards are unusually thick and building codes permit it.</p>
+    <p>The maximum span of a joist, which is the distance it can bridge between beams or support points, depends on the joist size, wood species, and spacing. A 2-by-8 pressure-treated southern pine joist at 16-inch spacing can span up to approximately 10 feet 6 inches. A 2-by-10 of the same species and spacing can span up to 13 feet 3 inches. For decks wider than these spans, you will need an intermediate beam supported by additional posts and footings to prevent the joists from sagging or bouncing.</p>
+
+    <h2>Post and Beam Requirements</h2>
+    <p>The substructure of a deck consists of footings, posts, beams, and joists that work together to transfer the weight of the deck, its furnishings, and its occupants safely to the ground. Properly sizing and spacing these components is essential for a safe, code-compliant deck that will last for decades.</p>
+    <p><strong>Footings</strong> are the concrete foundations that anchor each post to the ground. Most building codes require footings to extend below the frost line, which ranges from 12 inches in the deep South to 48 inches or more in northern states. Footings can be poured concrete piers, precast concrete blocks, or helical screw piles. Poured concrete footings are the most common and typically measure 12 to 24 inches in diameter depending on the load they must support. A standard residential deck footing is 12 inches in diameter and uses approximately two 80-pound bags of concrete.</p>
+    <p><strong>Posts</strong> are the vertical members that transfer loads from the beams to the footings. Standard residential decks use 4-by-4 (3.5 by 3.5 inches actual) or 6-by-6 (5.5 by 5.5 inches actual) pressure-treated posts. Four-by-four posts are adequate for decks up to 6 feet in height, while 6-by-6 posts should be used for taller decks or decks with heavy loads. Posts are typically spaced 6 to 8 feet apart along each beam line. For a 16-foot-long deck, two rows of posts (one along the outer edge and one at approximately mid-span) with posts spaced 6 feet apart provide robust support.</p>
+    <p><strong>Beams</strong> run horizontally and sit on top of the posts, spanning between them to support the joists. Beams can be solid lumber (4-by-6, 4-by-8, etc.) or built-up beams made by laminating two or three pieces of 2-by lumber together. A common beam for a residential deck is a doubled 2-by-10 or 2-by-12, which is made by bolting two boards together with structural bolts or through-bolts spaced 16 inches apart in a staggered pattern. The size of the beam depends on the span between posts and the tributary load area it supports.</p>
+    <p>The ledger board is a special beam that attaches the deck to the house. It is typically a 2-by-10 or 2-by-12 that is lag-bolted through the house's exterior sheathing into the rim joist or wall framing. Proper ledger attachment is critical because failure of the ledger connection is the most common cause of deck collapses. Use 1/2-inch lag screws or through-bolts spaced 16 inches apart in a staggered pattern, and install flashing above the ledger to prevent water from entering the wall cavity behind it.</p>
+
+    <h2>Railing and Baluster Calculations</h2>
+    <p>Deck railings are required by building codes on any deck surface that is 30 inches or more above grade. Beyond the code requirement, railings provide safety, define the perimeter of the deck, and contribute significantly to the overall appearance. Calculating railing materials accurately ensures a consistent, professional-looking installation.</p>
+    <p>Railing posts are the vertical supports for the railing system. Building codes require railing posts to be spaced no more than 6 feet apart, and they must be able to withstand a 200-pound lateral force at the top without failing. Railing posts are typically 4-by-4 lumber that extends from below the deck surface (bolted to the joist or rim board) to 36 to 42 inches above the deck surface, depending on local code requirements. To calculate the number of railing posts, divide the total railing length by 6 and add 1. For 40 feet of railing, you need 8 posts (40 divided by 6 equals 6.67, rounded up to 7, plus 1 equals 8).</p>
+    <p>Balusters are the vertical infill pieces between railing posts. Building codes require that the space between balusters be no more than 4 inches, which prevents small children from squeezing through. Standard balusters are 2-by-2 (1.5 inches actual) pressure-treated or cedar spindles. To calculate the number of balusters, convert the total railing length to inches and divide by 4.75 inches (the width of one baluster at 1.5 inches plus the maximum gap of 3.25 inches, which ensures the spaces do not exceed 4 inches). For 40 feet (480 inches) of railing, you need approximately 101 balusters.</p>
+    <p>The top rail and bottom rail run horizontally between the railing posts, with the balusters attached between them. The top rail should be 36 inches above the deck surface for residential decks under 30 inches high, and 42 inches for decks 30 inches or more above grade. Some jurisdictions require 42 inches for all deck railings. The bottom rail sits 2 to 4 inches above the deck surface to allow water and debris to drain off.</p>
+    <p>Alternative railing infill options include horizontal cable railing, tempered glass panels, horizontal wood or composite boards, and decorative metal panels. Each has different material requirements and cost implications. Cable railing, for example, uses stainless steel cables spaced no more than 3 inches apart instead of vertical balusters. While cable railing creates a modern, open look, the cables, tensioners, and hardware are significantly more expensive than wood balusters.</p>
+
+    <h2>Pressure Treated vs Composite</h2>
+    <p>The choice between pressure-treated wood and composite decking is one of the most significant decisions in deck planning, affecting upfront cost, long-term maintenance, appearance, and lifespan. Each material has distinct advantages and trade-offs that make it better suited for different situations and budgets.</p>
+    <p><strong>Pressure-treated wood</strong> is the most widely used decking material in the United States, accounting for roughly 75% of all residential decks. Pressure-treated southern pine or fir is infused with chemical preservatives that protect against rot, decay, fungal growth, and termite damage. The treatment process forces preservatives deep into the wood grain under high pressure, creating protection that lasts 15 to 25 years or more. Pressure-treated lumber is widely available at every home improvement store and lumber yard, comes in all standard dimensions, and costs $1.00 to $2.50 per linear foot for decking boards.</p>
+    <p>The primary disadvantage of pressure-treated wood is ongoing maintenance. New pressure-treated decking should be allowed to dry for 3 to 6 months after installation, then sealed or stained with a water-repellent finish. This coating needs to be reapplied every 2 to 3 years to maintain the wood's appearance and prevent cracking, splitting, warping, and graying. Without regular maintenance, pressure-treated decking degrades relatively quickly, losing its color within the first year and developing surface checks and splinters within 3 to 5 years. Over a 20-year lifespan, the cumulative cost of staining and sealing a pressure-treated deck can exceed the original material cost.</p>
+    <p><strong>Composite decking</strong> is made from a blend of wood fibers, plastic polymers, and binding agents that are extruded into boards resembling natural wood. Leading composite brands like Trex, TimberTech, Fiberon, and Azek offer products that closely mimic the grain patterns and colors of natural hardwoods without the maintenance requirements. Composite boards are highly resistant to rot, insects, splintering, and fading. Most manufacturers offer warranties of 25 to 50 years, and some offer limited lifetime warranties against structural defects.</p>
+    <p>The trade-off with composite is cost. Composite decking boards range from $3 to $8 per linear foot, two to four times the cost of pressure-treated wood. The hidden fastener systems recommended for composite installation add further expense. However, because composite requires virtually no maintenance beyond occasional cleaning with soap and water, the total cost of ownership over 25 years can be comparable to or even less than pressure-treated wood when staining and sealing costs are factored in. Composite also does not splinter, making it more comfortable for barefoot use around pools and in family areas with young children.</p>
+    <p>From a structural standpoint, composite decking is not a direct substitute for pressure-treated lumber. Composite boards are used only for the walking surface and sometimes the fascia and railings. The substructure, including joists, beams, posts, and ledger boards, must still be built from pressure-treated lumber or structural steel. Some composite boards require tighter joist spacing (12 inches on center instead of 16), so always check the manufacturer's installation guidelines before ordering framing materials.</p>
+
+    <h2>Deck Building Cost Breakdown</h2>
+    <p>The cost of building a deck depends on the size, material, design complexity, and whether you hire a contractor or do the work yourself. Understanding the cost components helps you set a realistic budget and make informed trade-off decisions between features and expenses.</p>
+    <p><strong>Materials</strong> typically account for 40% to 50% of the total cost for a contractor-built deck. For a basic 12-by-16-foot (192 square foot) deck using pressure-treated wood, material costs break down approximately as follows: decking boards ($400 to $600), joists and rim boards ($200 to $350), beams ($100 to $200), posts ($80 to $150), hardware and fasteners ($150 to $300), concrete for footings ($80 to $150), and railing materials ($300 to $600). The total material cost ranges from $1,300 to $2,350, or roughly $7 to $12 per square foot.</p>
+    <p><strong>Labor</strong> accounts for 50% to 60% of the total cost when hiring a contractor. Professional deck builders typically charge $15 to $35 per square foot for labor on a standard deck. Complex designs with multiple levels, built-in seating, custom railings, or curved elements cost more. For the 192-square-foot deck example, labor costs range from $2,880 to $6,720. Combined with materials, the total installed cost is $4,200 to $9,000, or roughly $22 to $47 per square foot.</p>
+    <p><strong>Permits and inspections</strong> are required in most jurisdictions for any deck attached to a house or elevated more than 30 inches above grade. Permit fees range from $100 to $500 depending on your location and the size of the deck. Some municipalities also require engineered drawings for larger or more complex decks, which can add $200 to $1,000 to the project cost. Always pull the required permits before starting construction, as unpermitted work can create problems when selling the home and may not be covered by insurance if it fails.</p>
+    <p><strong>Composite upgrades</strong> add significant cost to the project. Replacing pressure-treated decking with composite adds $2 to $6 per square foot for materials, bringing the decking material cost for a 192-square-foot deck from about $500 to $1,500 or more. Composite railing systems add another $30 to $80 per linear foot compared to $10 to $25 for wood railings. For the full 192-square-foot deck with 40 feet of railing, upgrading to composite adds $1,500 to $3,500 to the total material cost.</p>
+    <p>DIY builders can save 50% or more by eliminating labor costs. A handy homeowner with basic carpentry skills and the right tools can build a standard rectangular deck in two to three weekends. The essential tools include a circular saw, drill/driver, post hole digger or auger, speed square, tape measure, chalk line, and level. Renting a post hole auger ($40 to $80 per day) saves hours of backbreaking manual digging and is highly recommended for any deck with more than four footings.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>How many deck boards do I need for a 12x16 deck?</h3>
+    <p>For a 12-by-16-foot deck using standard 5.5-inch (2-by-6) boards with 1/8-inch gaps, you need approximately 26 rows of boards. Each board runs the full 16-foot length of the deck. If you can purchase 16-foot boards, you need 26 boards. If you can only find 8-foot boards, you need 52 boards (26 rows times 2 boards per row), with each pair of boards butting together over a joist for support. Always add 10% for waste and defective boards, so order 29 boards in 16-foot lengths or 57 boards in 8-foot lengths. The total linear footage of decking is 416 feet (26 boards times 16 feet each). Using wider 7.25-inch (2-by-8) boards reduces the count to about 20 rows, while narrower 3.5-inch (2-by-4) boards increases it to approximately 41 rows.</p>
+
+    <h3>How far apart should deck joists be?</h3>
+    <p>Standard joist spacing for most wood decking is 16 inches on center, which provides a good balance of structural support, material efficiency, and code compliance. Some composite decking products require 12-inch on-center spacing due to the material's different rigidity characteristics, so always check the manufacturer's installation guide before framing. Twelve-inch spacing is also recommended for diagonal decking installations and decks that will support heavy loads like hot tubs. Twenty-four-inch spacing is the maximum allowed by most building codes and is generally only acceptable for thick, structural-grade wood decking boards in low-traffic utility applications. For a standard 16-foot deck with 16-inch joist spacing, you need 13 joists. Reducing to 12-inch spacing increases that to 17 joists, while 24-inch spacing requires only 9 joists.</p>
+
+    <h3>How much does it cost to build a deck per square foot?</h3>
+    <p>The cost to build a deck varies significantly based on the material, design complexity, and whether you hire a contractor or do it yourself. Pressure-treated wood decks cost $15 to $25 per square foot for materials and professional labor, making them the most affordable option. Cedar and redwood decks run $20 to $35 per square foot. Composite decking costs $25 to $45 per square foot installed, while premium PVC decking can reach $30 to $60 per square foot. For a typical 192-square-foot (12-by-16) pressure-treated deck, expect to spend $3,000 to $5,000 with professional installation or $1,300 to $2,500 for materials only if you build it yourself. Multi-level decks, built-in features, and complex designs add 20% to 50% to the base cost. Railing adds $20 to $60 per linear foot depending on the material and style.</p>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/everyday-calculators/square-footage-calculator/">Square Footage Calculator</a> - Calculate the area of your deck or outdoor space.</li>
+      <li><a href="/construction-calculators/concrete-calculator/">Concrete Calculator</a> - Estimate concrete for deck footings and piers.</li>
+      <li><a href="/construction-calculators/fence-calculator/">Fence Calculator</a> - Plan fencing materials to complement your new deck.</li>
+      <li><a href="/construction-calculators/flooring-calculator/">Flooring Calculator</a> - Calculate flooring materials for indoor projects.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .result-card.primary {
+    border-color: var(--color-primary);
+    background: #eff6ff;
+  }
+  .result-card.success {
+    border-color: #16a34a;
+    background: #f0fdf4;
+  }
+  .result-card.success .result-value {
+    color: #16a34a;
+  }
+  .result-sub {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+  }
+</style>
+
+<script is:inline>
+  function calculate() {
+    var deckLength = parseFloat(document.getElementById('deckLength').value) || 0;
+    var deckWidth = parseFloat(document.getElementById('deckWidth').value) || 0;
+    var boardWidth = parseFloat(document.getElementById('boardWidth').value) || 5.5;
+    var joistSpacing = parseFloat(document.getElementById('joistSpacing').value) || 16;
+    var deckHeight = parseFloat(document.getElementById('deckHeight').value) || 3;
+    var railingLength = parseFloat(document.getElementById('railingLength').value) || 0;
+    var pricePerLinFt = parseFloat(document.getElementById('pricePerLinFt').value) || 0;
+
+    // Deck area
+    var area = deckLength * deckWidth;
+
+    // Decking boards: width in inches / (board width + 1/8" gap)
+    var boardCount = Math.ceil((deckWidth * 12) / (boardWidth + 0.125));
+    var totalDeckingLinFt = boardCount * deckLength;
+
+    // Joists: length in inches / spacing + 1
+    var joistCount = Math.ceil((deckLength * 12) / joistSpacing) + 1;
+    var totalJoistLinFt = joistCount * deckWidth;
+
+    // Support posts: ~6ft beam spacing, 2 rows
+    var postsPerRow = Math.ceil(deckLength / 6) + 1;
+    var supportPosts = postsPerRow * 2;
+
+    // Railing posts: every 6 ft + 1
+    var railingPosts = 0;
+    var balusterCount = 0;
+    var railingPostsCard = document.getElementById('railingPostsCard');
+    var balustersCard = document.getElementById('balustersCard');
+
+    if (railingLength > 0) {
+      railingPosts = Math.ceil(railingLength / 6) + 1;
+      balusterCount = Math.ceil((railingLength * 12) / 4.75);
+      railingPostsCard.style.display = 'block';
+      balustersCard.style.display = 'block';
+    } else {
+      railingPostsCard.style.display = 'none';
+      balustersCard.style.display = 'none';
+    }
+
+    // Cost: decking + joist linear feet * price
+    var totalLinFt = totalDeckingLinFt + totalJoistLinFt;
+    var cost = totalLinFt * pricePerLinFt;
+
+    // Update results
+    document.getElementById('deckArea').textContent = area.toFixed(0).toLocaleString() + ' sq ft';
+    document.getElementById('deckingBoards').textContent = boardCount.toLocaleString();
+    document.getElementById('deckingLinFt').textContent = totalDeckingLinFt.toLocaleString() + ' linear ft';
+    document.getElementById('joistCount').textContent = joistCount.toLocaleString();
+    document.getElementById('joistLinFt').textContent = totalJoistLinFt.toLocaleString() + ' linear ft';
+    document.getElementById('supportPosts').textContent = supportPosts.toLocaleString();
+    document.getElementById('railingPosts').textContent = railingPosts.toLocaleString();
+    document.getElementById('balusters').textContent = balusterCount.toLocaleString();
+    document.getElementById('estimatedCost').textContent = '$' + Math.round(cost).toLocaleString();
+    document.getElementById('totalLinFtLabel').textContent = totalLinFt.toLocaleString() + ' total linear ft';
+  }
+
+  document.querySelectorAll('.calc-inputs input, .calc-inputs select').forEach(function(el) {
+    el.addEventListener('input', calculate);
+    el.addEventListener('change', calculate);
+  });
+
+  calculate();
+</script>

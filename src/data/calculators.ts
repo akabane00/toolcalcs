@@ -51,6 +51,12 @@ export const categories: Category[] = [
     description: 'Tip, discount, square footage, gas cost, electricity, word counter, and practical tools for daily life.',
     icon: '🧮',
   },
+  {
+    name: 'Construction Calculators',
+    slug: 'construction-calculators',
+    description: 'Concrete, roofing, paint, flooring, mulch, fence, drywall, and deck calculators for home improvement projects.',
+    icon: '🔨',
+  },
 ];
 
 export const calculators: Calculator[] = [
@@ -499,6 +505,71 @@ export const calculators: Calculator[] = [
     category: 'Everyday Calculators',
     categorySlug: 'everyday-calculators',
     icon: '📝',
+  },
+  // Construction
+  {
+    title: 'Concrete Calculator',
+    slug: 'concrete-calculator',
+    description: 'Calculate cubic yards of concrete needed for slabs, footings, columns, and stairs. Estimate bags and cost.',
+    category: 'Construction Calculators',
+    categorySlug: 'construction-calculators',
+    icon: '🧱',
+  },
+  {
+    title: 'Paint Calculator',
+    slug: 'paint-calculator',
+    description: 'Estimate gallons of paint needed for any room. Subtract doors and windows for accurate coverage.',
+    category: 'Construction Calculators',
+    categorySlug: 'construction-calculators',
+    icon: '🎨',
+  },
+  {
+    title: 'Roofing Calculator',
+    slug: 'roofing-calculator',
+    description: 'Estimate roofing materials including shingles, underlayment, and nails from roof dimensions and pitch.',
+    category: 'Construction Calculators',
+    categorySlug: 'construction-calculators',
+    icon: '🏠',
+  },
+  {
+    title: 'Flooring Calculator',
+    slug: 'flooring-calculator',
+    description: 'Calculate materials needed for hardwood, laminate, tile, vinyl, or carpet with waste factor built in.',
+    category: 'Construction Calculators',
+    categorySlug: 'construction-calculators',
+    icon: '🪵',
+  },
+  {
+    title: 'Mulch Calculator',
+    slug: 'mulch-calculator',
+    description: 'Calculate cubic yards of mulch, gravel, or topsoil for landscaping. Includes weight and bag estimates.',
+    category: 'Construction Calculators',
+    categorySlug: 'construction-calculators',
+    icon: '🌿',
+  },
+  {
+    title: 'Fence Calculator',
+    slug: 'fence-calculator',
+    description: 'Estimate posts, rails, and pickets needed for any fence. Supports privacy, picket, and ranch styles.',
+    category: 'Construction Calculators',
+    categorySlug: 'construction-calculators',
+    icon: '🏡',
+  },
+  {
+    title: 'Drywall Calculator',
+    slug: 'drywall-calculator',
+    description: 'Calculate drywall sheets, joint compound, and tape for rooms. Accounts for doors and window cutouts.',
+    category: 'Construction Calculators',
+    categorySlug: 'construction-calculators',
+    icon: '🪟',
+  },
+  {
+    title: 'Deck Calculator',
+    slug: 'deck-calculator',
+    description: 'Estimate decking boards, joists, posts, and hardware for your deck project with cost estimates.',
+    category: 'Construction Calculators',
+    categorySlug: 'construction-calculators',
+    icon: '🪜',
   },
 ];
 

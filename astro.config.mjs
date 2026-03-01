@@ -11,14 +11,14 @@ export default defineConfig({
 
       // High-priority: homepage, category indexes, interactive tools/games
       if (url === 'https://toolcalcs.com/' ||
-          url.match(/toolcalcs\.com\/(financial|health|math|date-time|conversion|everyday)-calculators\/$/) ||
+          url.match(/toolcalcs\.com\/(financial|health|math|date-time|conversion|everyday|construction)-calculators\/$/) ||
           url.match(/toolcalcs\.com\/test\/$/) ||
           url.match(/toolcalcs\.com\/tools\/$/)) {
         item.priority = 1.0;
         item.changefreq = 'weekly';
       }
       // Medium-high: individual calculators, games, tools, worksheets
-      else if (url.match(/toolcalcs\.com\/(financial|health|math|date-time|conversion|everyday)-calculators\/[^/]+\/$/) ||
+      else if (url.match(/toolcalcs\.com\/(financial|health|math|date-time|conversion|everyday|construction)-calculators\/[^/]+\/$/) ||
                url.match(/toolcalcs\.com\/test\/[^/]+\/$/) ||
                url.match(/toolcalcs\.com\/tools\/[^/]+\/$/) ||
                url.match(/toolcalcs\.com\/worksheets\/[^/]+\/$/)) {

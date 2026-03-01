@@ -1,0 +1,293 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Construction Calculators",
+        "item": "https://toolcalcs.com/construction-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Drywall Calculator"
+      }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How many sheets of drywall do I need for a 12x12 room?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'A 12×12 room with 8-foot ceilings needs about 18 standard 4×8 sheets: 12 sheets for walls (384 sq ft / 32 sq ft per sheet) plus 5-6 for the ceiling (144 sq ft / 32 = 4.5, rounded up). Add 10% for waste.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How much does drywall cost per sheet?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Standard 1/2-inch 4×8 drywall sheets cost $10 to $20 each at most home improvement stores. Moisture-resistant (green board) costs $13 to $25, and fire-rated (Type X) costs $12 to $22 per sheet.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What size drywall should I use?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Use 4×8 sheets for most residential walls. Use 4×12 sheets for rooms with 9-foot or higher ceilings to reduce horizontal seams. Use 1/2-inch thickness for walls and 5/8-inch for ceilings.',
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Drywall Calculator - Estimate Sheets, Tape & Joint Compound | ToolCalcs"
+  description="Free drywall calculator. Estimate how many drywall sheets, joint compound, and tape you need for any room. Calculate costs for walls and ceilings with door and window deductions."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/construction-calculators/">Construction Calculators</a> &rsaquo;
+    <span>Drywall Calculator</span>
+  </nav>
+
+  <h1>Drywall Calculator</h1>
+  <p class="page-desc">Calculate how many drywall sheets, joint compound, and tape you need for your room. Accounts for doors, windows, ceilings, and waste.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="roomLength">Room Length (ft)</label>
+        <input type="number" id="roomLength" value="14" min="0" step="0.1" />
+      </div>
+      <div class="input-group">
+        <label for="roomWidth">Room Width (ft)</label>
+        <input type="number" id="roomWidth" value="12" min="0" step="0.1" />
+      </div>
+      <div class="input-group">
+        <label for="ceilingHeight">Ceiling Height (ft)</label>
+        <input type="number" id="ceilingHeight" value="8" min="0" step="0.1" />
+      </div>
+      <div class="input-group">
+        <label for="numDoors">Number of Doors</label>
+        <input type="number" id="numDoors" value="2" min="0" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="numWindows">Number of Windows</label>
+        <input type="number" id="numWindows" value="2" min="0" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="includeCeiling">Include Ceiling</label>
+        <select id="includeCeiling">
+          <option value="yes" selected>Yes</option>
+          <option value="no">No</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="sheetSize">Sheet Size</label>
+        <select id="sheetSize">
+          <option value="4x8" selected>4×8 (32 sq ft)</option>
+          <option value="4x10">4×10 (40 sq ft)</option>
+          <option value="4x12">4×12 (48 sq ft)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="pricePerSheet">Price per Sheet ($)</label>
+        <input type="number" id="pricePerSheet" value="15" min="0" step="0.01" />
+      </div>
+    </div>
+
+    <div class="calc-results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Total Area (sq ft)</span>
+          <span class="result-value" id="resultTotalArea">0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Sheets Needed</span>
+          <span class="result-value" id="resultSheets">0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Joint Compound (gallons)</span>
+          <span class="result-value" id="resultCompound">0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Joint Tape (ft)</span>
+          <span class="result-value" id="resultTape">0</span>
+        </div>
+        <div class="result-card success">
+          <span class="result-label">Estimated Cost</span>
+          <span class="result-value" id="resultCost">$0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>How to Calculate Drywall for a Room</h2>
+    <p>Calculating drywall for a room is one of the most common tasks homeowners and contractors face before starting an interior renovation. Getting the estimate right saves money and prevents frustrating trips back to the store mid-project. The process involves measuring the total surface area that needs to be covered, subtracting openings for doors and windows, selecting the right sheet size, and adding a waste factor to account for cuts and mistakes.</p>
+    <p>The fundamental approach is straightforward. First, calculate the total wall area by adding up the length of all four walls and multiplying by the ceiling height. For a rectangular room, the perimeter is twice the length plus twice the width. Multiply this perimeter by the ceiling height to get the gross wall area in square feet.</p>
+    <div class="formula-box">
+      <code>Wall Area = 2 &times; (Length + Width) &times; Ceiling Height</code><br />
+      <code>Door Deduction = Number of Doors &times; 21 sq ft</code><br />
+      <code>Window Deduction = Number of Windows &times; 15 sq ft</code><br />
+      <code>Net Area = Wall Area + Ceiling Area &minus; Doors &minus; Windows</code>
+    </div>
+    <p>Next, subtract the area of all door and window openings. A standard interior door opening measures approximately 3 feet wide by 7 feet tall, or 21 square feet. A standard window opening is about 3 feet wide by 5 feet tall, or 15 square feet. If your doors or windows are non-standard sizes, measure them individually and use the actual dimensions. After subtracting these openings, you have the net wall area that requires drywall.</p>
+    <p>If you are also drywalling the ceiling, add the ceiling area to your total. The ceiling area is simply the room length multiplied by the room width. For a 14-by-12-foot room, the ceiling adds 168 square feet to the project. Finally, divide the total area by the square footage of your chosen sheet size and add 10 percent for waste. This waste factor accounts for the unusable pieces left over from cutting around corners, outlets, and other obstacles.</p>
+    <p>For example, consider a 14-by-12-foot room with 8-foot ceilings, 2 doors, and 2 windows. The wall area is 2 times (14 plus 12) times 8, which equals 416 square feet. Subtracting 2 doors (42 sq ft) and 2 windows (30 sq ft) leaves 344 square feet of wall area. Adding the ceiling (168 sq ft) brings the total to 512 square feet. Dividing by 32 square feet per 4-by-8 sheet gives 16 sheets, and adding 10 percent waste rounds up to 18 sheets.</p>
+
+    <h2>Choosing the Right Drywall Sheet Size</h2>
+    <p>Drywall sheets come in three common sizes: 4-by-8 feet, 4-by-10 feet, and 4-by-12 feet. Each size has its advantages depending on the room dimensions and ceiling height. Choosing the right size reduces the number of seams you need to tape and finish, which saves time, effort, and produces a smoother final result.</p>
+    <p>The standard 4-by-8-foot sheet is the most widely available and the easiest to handle. It covers 32 square feet and is the default choice for most residential walls with 8-foot ceilings. When hung horizontally (with the long edge running along the wall), a single 4-by-8 sheet covers the full height of an 8-foot wall, leaving only vertical seams between sheets. This is the preferred method for most wall installations because horizontal hanging creates fewer joints and the tapered long edges produce cleaner, flatter seams.</p>
+    <p>For rooms with 9-foot or 10-foot ceilings, 4-by-10-foot sheets are the better choice. A single 4-by-10 sheet covers the full height of a 9-foot wall when hung horizontally, plus leaves an inch of overhang at top and bottom for trimming. This eliminates the need for horizontal butt joints, which are notoriously difficult to hide with tape and compound. The 4-by-10 sheet covers 40 square feet and weighs approximately 15 percent more than a 4-by-8 sheet, making it somewhat more challenging to handle alone.</p>
+    <p>The 4-by-12-foot sheet is the largest standard size and covers 48 square feet. It is ideal for large rooms with high ceilings or long walls where you want to minimize vertical seams. Professional drywallers often prefer 12-foot sheets for ceilings because they can span wider rooms with fewer joints. However, 4-by-12 sheets are heavy, awkward to transport, and nearly impossible for one person to hang alone. They are best suited for professional crews with drywall lifts and experience handling oversized panels.</p>
+    <p>As a general rule, use the largest sheet that you can comfortably handle and that fits through the doors and hallways leading to the work area. Fewer seams mean less taping, less compound, less sanding, and a better-looking finished wall. But do not overextend yourself with sheets that are too large to manage safely, as dropped or damaged sheets create additional waste and expense.</p>
+
+    <h2>Types of Drywall and When to Use Each</h2>
+    <p>Not all drywall is created equal. Different types are engineered for specific environments and applications. Using the right type of drywall in each area of your home ensures long-term performance and compliance with building codes.</p>
+    <p><strong>Standard drywall (white board)</strong> is the most common type, used for most interior walls and ceilings in dry areas. It consists of a gypsum core sandwiched between two layers of paper facing. Standard drywall comes in 1/4-inch, 3/8-inch, 1/2-inch, and 5/8-inch thicknesses. Half-inch is the standard choice for walls, while 5/8-inch is commonly used for ceilings to resist sagging between joists spaced 24 inches apart.</p>
+    <p><strong>Moisture-resistant drywall (green board)</strong> has a water-resistant paper facing and a moisture-resistant gypsum core. It is designed for use in bathrooms, laundry rooms, kitchens, and other areas where humidity levels are elevated. Green board is not waterproof and should not be used as a tile backer in direct-wet areas like shower enclosures. It costs about 20 to 40 percent more than standard drywall.</p>
+    <p><strong>Fire-rated drywall (Type X)</strong> contains glass fibers and other additives that slow the spread of fire. Building codes require Type X drywall in certain locations, including walls between a garage and living space, walls surrounding furnace rooms, and ceilings in multi-family dwellings. A single layer of 5/8-inch Type X drywall provides a one-hour fire rating. It costs slightly more than standard drywall and is heavier per sheet.</p>
+    <p><strong>Mold-resistant drywall (purple board)</strong> uses fiberglass facing instead of paper, which eliminates the organic food source that mold needs to grow. It is the best choice for basements, bathrooms, and any area prone to moisture problems. Mold-resistant drywall costs more than green board but provides superior protection in consistently damp environments.</p>
+    <p><strong>Soundproof drywall</strong> is a specialty product with a viscoelastic polymer layer sandwiched between two layers of gypsum. It is significantly heavier and more expensive than standard drywall but provides excellent sound dampening for home theaters, bedrooms adjacent to noisy areas, and home offices. A single layer of soundproof drywall can achieve Sound Transmission Class (STC) ratings comparable to multiple layers of standard drywall.</p>
+
+    <h2>Calculating Joint Compound and Tape</h2>
+    <p>Drywall installation does not end when the last sheet is hung. Every seam between sheets must be covered with joint tape and finished with multiple coats of joint compound (commonly called mud) to create a smooth, seamless surface ready for painting. Estimating these materials accurately prevents project delays and waste.</p>
+    <p>Joint compound is sold by the gallon or in pre-mixed buckets. A general rule of thumb is that one gallon of joint compound covers approximately 100 square feet of drywall surface when applied across all three coats (taping coat, filler coat, and finish coat). This includes the compound used for covering seams, corner beads, and fastener heads. For a 500-square-foot project, plan on purchasing about 5 gallons of premixed all-purpose joint compound.</p>
+    <p>Joint tape comes in two varieties: paper tape and fiberglass mesh tape. Paper tape is the traditional choice and provides a stronger bond, especially in inside corners. Fiberglass mesh tape is self-adhesive and easier to apply, making it popular with DIYers. Both types come in rolls of 75 feet, 250 feet, or 500 feet. To estimate the amount of tape needed, calculate the total length of all seams. This includes every horizontal and vertical seam between sheets, all inside and outside corners, and the joints where walls meet the ceiling.</p>
+    <p>For a rough estimate of tape needed, multiply the room perimeter by the number of horizontal rows of sheets (which is the ceiling height divided by 4 feet, rounded up), then multiply by 2 to account for both horizontal and vertical seams. A 14-by-12-foot room with 8-foot ceilings has a 52-foot perimeter with approximately 2 rows of drywall, so the tape estimate is about 52 times 2 times 2, equaling 208 feet. Add extra for the ceiling seams if you are drywalling the ceiling as well.</p>
+    <p>In addition to compound and tape, you will need corner bead for any outside corners, drywall screws (approximately one screw every 8 inches along the framing), and sanding supplies for smoothing the finished joints. Pre-mixed all-purpose compound is the easiest option for most homeowners, as it can be used for all three coats. Professionals sometimes use setting-type compound (which is mixed from powder) for the first coat because it dries harder and faster, then switch to pre-mixed compound for the finish coats.</p>
+
+    <h2>How to Account for Doors and Windows</h2>
+    <p>Doors and windows create openings in the wall that do not need to be covered with drywall, so their area should be subtracted from your total wall area calculation. However, the relationship between these openings and material waste is more nuanced than a simple subtraction might suggest.</p>
+    <p>A standard interior door opening measures approximately 3 feet wide by 7 feet tall (21 square feet), while a standard window opening is about 3 feet wide by 5 feet tall (15 square feet). Exterior doors are typically 3 feet wide by 6 feet 8 inches tall, or about 20 square feet. Sliding glass doors and French doors can be 5 to 8 feet wide, significantly reducing wall area. If your openings are non-standard, measure each one individually for a more accurate estimate.</p>
+    <p>While you do subtract door and window areas from your gross wall calculation, keep in mind that the drywall around these openings still needs to be cut to fit. The pieces cut away from the full sheets may or may not be usable elsewhere in the room. Small cutoff pieces from around doors and windows often become waste because they are too small or oddly shaped to use on other walls. This is one reason the 10 percent waste factor is so important. In rooms with many doors and windows, you might increase the waste factor to 12 or 15 percent to account for the additional cutting.</p>
+    <p>When estimating material for rooms with unusually large openings, such as a living room with a wall of windows or a room with a large archway, be especially careful. The remaining wall area between and around these openings may require narrow strips of drywall that are inefficient to cut from full sheets. In these cases, it can be helpful to sketch the wall layout on graph paper and plan your sheet placement to visualize how many full and partial sheets you actually need.</p>
+
+    <h2>Drywall Cost per Sheet and per Room</h2>
+    <p>Drywall is one of the most affordable building materials on a per-square-foot basis, which is one reason it became the dominant interior wall finish in residential construction. However, the total cost of a drywall project includes more than just the sheets themselves.</p>
+    <p>Standard 1/2-inch 4-by-8-foot drywall sheets typically cost between $10 and $20 each at major home improvement retailers, depending on the brand and your region. This translates to approximately $0.31 to $0.63 per square foot for the panels alone. Moisture-resistant green board costs $13 to $25 per 4-by-8 sheet, and fire-rated Type X drywall runs $12 to $22 per sheet. Specialty products like mold-resistant and soundproof drywall can cost $25 to $50 or more per sheet.</p>
+    <p>Beyond the drywall sheets, budget for joint compound ($8 to $15 per 4.5-gallon bucket, covering approximately 400 to 500 square feet), joint tape ($3 to $10 per 500-foot roll), drywall screws ($7 to $12 per pound, with one pound covering approximately 300 square feet), and corner bead ($3 to $8 per 8-foot piece). Finishing supplies like sanding screens, mud pans, and drywall knives add another $20 to $50 if you do not already own them.</p>
+    <p>For a typical 12-by-12-foot bedroom with 8-foot ceilings, expect to spend approximately $150 to $300 on drywall materials alone, including sheets, compound, tape, screws, and corner bead. If you hire a professional to hang and finish the drywall, labor costs range from $1.50 to $3.00 per square foot, adding $750 to $1,500 for a room this size. The total professional installation cost for a single room is typically $900 to $1,800, with the labor accounting for about 70 to 80 percent of the total.</p>
+    <p>For a whole-house drywall project in a 1,500-square-foot home, material costs alone typically run $2,500 to $5,000. Professional installation for the entire house can range from $8,000 to $20,000 depending on ceiling heights, the number of rooms, the complexity of the layout, and regional labor rates. Getting multiple quotes from licensed drywall contractors is always advisable for large projects.</p>
+
+    <h2>Drywall Installation Tips for DIYers</h2>
+    <p>Installing drywall yourself can save thousands of dollars on a renovation project, but it requires patience, the right tools, and attention to technique. The hanging phase is physically demanding, while the taping and finishing phase demands precision and practice. Here are key tips to help you achieve professional-looking results.</p>
+    <p><strong>Start with the ceiling.</strong> If you are drywalling both walls and ceiling, always install the ceiling first. The wall sheets will then butt up against the ceiling panels, helping to support them. Use a drywall lift (available for rent at most home improvement stores) to raise ceiling panels into position. Trying to hold a heavy drywall sheet overhead while driving screws is extremely difficult and dangerous without a lift or a helper.</p>
+    <p><strong>Hang sheets horizontally on walls.</strong> Placing 4-by-8 sheets with the long edge running horizontally creates fewer joints and positions the tapered edges where they are easiest to finish. The tapered long edges of drywall sheets are designed to create a shallow channel for tape and compound, producing a flatter finished joint than the non-tapered butt ends.</p>
+    <p><strong>Stagger your seams.</strong> Avoid aligning vertical seams between adjacent rows of drywall. Staggering the seams makes the wall stronger and reduces the visibility of the joints in the finished product. Start every other row with a half sheet to create a brick-like pattern.</p>
+    <p><strong>Use the right number of screws.</strong> Place drywall screws every 8 inches along the edges of each sheet and every 12 inches in the field (interior area). Screws should be placed at least 3/8 inch from the edge to prevent the gypsum from crumbling. Drive screws just slightly below the paper surface without breaking through it. A drywall screw gun with an adjustable depth stop makes this much easier than using a regular drill.</p>
+    <p><strong>Apply three coats of compound.</strong> Professional finishers typically apply a taping coat (embedding the tape in compound), a filler or block coat (building up and feathering the joint), and a finish coat (smoothing and final feathering). Each coat should be wider than the previous one, with the final coat feathered out 10 to 12 inches on each side of the seam. Allow each coat to dry completely (usually 24 hours) before applying the next, and sand lightly between coats.</p>
+    <p><strong>Do not skip the primer.</strong> After all joints are finished and sanded smooth, apply a coat of drywall primer before painting. Primer seals the paper facing and the joint compound uniformly, ensuring that the paint absorbs evenly across the entire surface. Without primer, the areas over joints often look different from the areas over bare drywall, creating visible patches called flashing.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>How many sheets of drywall do I need for a 12x12 room?</h3>
+    <p>A 12-by-12-foot room with 8-foot ceilings needs about 18 standard 4-by-8 drywall sheets when covering both walls and ceiling. The wall area is 2 times (12 plus 12) times 8, which equals 384 square feet. Dividing by 32 square feet per sheet gives 12 sheets for the walls. The ceiling adds 144 square feet, or about 4.5 sheets, rounded up to 5. The subtotal of 17 sheets becomes approximately 18 to 19 sheets after adding 10 percent for waste. If you have doors and windows, the sheet count may drop slightly, but maintaining the 10 percent waste allowance is still recommended because the cutouts around openings generate waste pieces that are often too small to reuse elsewhere.</p>
+
+    <h3>How much does drywall cost per sheet?</h3>
+    <p>Standard 1/2-inch 4-by-8 drywall sheets cost $10 to $20 each at most home improvement stores, depending on brand, region, and current market conditions. Moisture-resistant green board costs $13 to $25 per sheet, and fire-rated Type X drywall runs $12 to $22. Specialty products like mold-resistant purple board cost $15 to $30, and soundproof drywall can cost $40 to $50 or more per sheet. Prices fluctuate with supply chain conditions and raw material costs. Buying in bulk quantities of 50 or more sheets may qualify for a contractor discount at some retailers, typically saving 5 to 15 percent off the per-sheet price.</p>
+
+    <h3>What size drywall should I use?</h3>
+    <p>Use 4-by-8-foot sheets for most residential walls with standard 8-foot ceilings. This is the most common and easiest-to-handle size, covering 32 square feet per sheet. For rooms with 9-foot or higher ceilings, use 4-by-12-foot sheets to eliminate horizontal butt joints, which are difficult to finish smoothly. Use 1/2-inch thickness for standard walls and 5/8-inch thickness for ceilings, which resists sagging between joists. In garages and between the garage and living space, building codes typically require 5/8-inch Type X fire-rated drywall. For curved walls or arches, use flexible 1/4-inch drywall that can bend around gentle radii.</p>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/construction-calculators/paint-calculator/">Paint Calculator</a> - Estimate how much paint you need for walls and ceilings.</li>
+      <li><a href="/everyday-calculators/square-footage-calculator/">Square Footage Calculator</a> - Calculate area in square feet for any space.</li>
+      <li><a href="/construction-calculators/flooring-calculator/">Flooring Calculator</a> - Estimate flooring materials for any room size.</li>
+      <li><a href="/construction-calculators/concrete-calculator/">Concrete Calculator</a> - Calculate concrete volume for slabs, footings, and columns.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  /* No additional page-specific styles needed */
+</style>
+
+<script is:inline>
+  function calculate() {
+    var length = parseFloat(document.getElementById('roomLength').value) || 0;
+    var width = parseFloat(document.getElementById('roomWidth').value) || 0;
+    var height = parseFloat(document.getElementById('ceilingHeight').value) || 0;
+    var doors = parseInt(document.getElementById('numDoors').value) || 0;
+    var windows = parseInt(document.getElementById('numWindows').value) || 0;
+    var includeCeiling = document.getElementById('includeCeiling').value;
+    var sheetSize = document.getElementById('sheetSize').value;
+    var pricePerSheet = parseFloat(document.getElementById('pricePerSheet').value) || 0;
+
+    // Sheet area lookup
+    var sheetAreas = { '4x8': 32, '4x10': 40, '4x12': 48 };
+    var sheetArea = sheetAreas[sheetSize] || 32;
+
+    // Wall area
+    var wallArea = 2 * (length + width) * height;
+
+    // Door and window deductions
+    var doorDeduction = doors * 21;
+    var windowDeduction = windows * 15;
+
+    // Ceiling area
+    var ceilingArea = 0;
+    if (includeCeiling === 'yes') {
+      ceilingArea = length * width;
+    }
+
+    // Total area
+    var totalArea = wallArea + ceilingArea - doorDeduction - windowDeduction;
+    if (totalArea < 0) totalArea = 0;
+
+    // Sheets needed (10% waste)
+    var sheetsNeeded = Math.ceil(totalArea / sheetArea * 1.1);
+
+    // Joint compound (gallons) - 1 gallon per 100 sq ft
+    var compound = Math.ceil(totalArea / 100);
+
+    // Joint tape (ft) - perimeter × rows of sheets × 2
+    var perimeter = 2 * (length + width);
+    var rows = Math.ceil(height / 4);
+    var tape = Math.round(perimeter * rows * 2);
+
+    // Estimated cost
+    var cost = sheetsNeeded * pricePerSheet;
+
+    // Display results
+    document.getElementById('resultTotalArea').textContent = totalArea.toFixed(2);
+    document.getElementById('resultSheets').textContent = sheetsNeeded.toLocaleString();
+    document.getElementById('resultCompound').textContent = compound.toLocaleString();
+    document.getElementById('resultTape').textContent = tape.toLocaleString();
+    document.getElementById('resultCost').textContent = '$' + Math.round(cost).toLocaleString();
+  }
+
+  document.querySelectorAll('.calc-inputs input, .calc-inputs select').forEach(function(el) {
+    el.addEventListener('input', calculate);
+    el.addEventListener('change', calculate);
+  });
+
+  calculate();
+</script>

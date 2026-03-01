@@ -1,0 +1,292 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Construction Calculators",
+        "item": "https://toolcalcs.com/construction-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Paint Calculator"
+      }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How much paint do I need for a 12x12 room?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'A 12x12 room with 8-foot ceilings has approximately 384 square feet of wall area. After subtracting a door and two windows, you need about 1 gallon for one coat or 2 gallons for two coats at standard coverage of 350 sq ft per gallon.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How many square feet does a gallon of paint cover?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'One gallon of interior paint covers 350 to 400 square feet per coat on smooth surfaces. Rough or textured surfaces may cover only 250 to 300 square feet per gallon.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Should I always paint two coats?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Two coats are recommended for most painting jobs. Two coats provide more even coverage, better color saturation, and improved durability. One coat may suffice for touch-ups or when painting over a similar color.',
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Paint Calculator - Estimate Gallons Needed for Any Room | ToolCalcs"
+  description="Free paint calculator. Calculate how many gallons of paint you need for walls and ceilings. Subtract doors and windows for accurate coverage estimates with cost."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/construction-calculators/">Construction Calculators</a> &rsaquo;
+    <span>Paint Calculator</span>
+  </nav>
+
+  <h1>Paint Calculator</h1>
+  <p class="page-desc">Calculate how many gallons of paint you need for any room. Accounts for doors, windows, coats, and ceiling painting.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="roomLength">Room Length (ft)</label>
+        <input type="number" id="roomLength" value="12" min="0" step="0.1" />
+      </div>
+      <div class="input-group">
+        <label for="roomWidth">Room Width (ft)</label>
+        <input type="number" id="roomWidth" value="10" min="0" step="0.1" />
+      </div>
+      <div class="input-group">
+        <label for="ceilingHeight">Ceiling Height (ft)</label>
+        <input type="number" id="ceilingHeight" value="8" min="0" step="0.1" />
+      </div>
+      <div class="input-group">
+        <label for="numDoors">Number of Doors</label>
+        <input type="number" id="numDoors" value="2" min="0" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="numWindows">Number of Windows</label>
+        <input type="number" id="numWindows" value="2" min="0" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="numCoats">Number of Coats</label>
+        <select id="numCoats">
+          <option value="1">1</option>
+          <option value="2" selected>2</option>
+          <option value="3">3</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="coverage">Coverage per Gallon (sq ft)</label>
+        <input type="number" id="coverage" value="350" min="1" step="10" />
+      </div>
+      <div class="input-group">
+        <label for="includeCeiling">Include Ceiling</label>
+        <select id="includeCeiling">
+          <option value="no" selected>No</option>
+          <option value="yes">Yes</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="pricePerGallon">Price per Gallon ($)</label>
+        <input type="number" id="pricePerGallon" value="45" min="0" step="0.01" />
+      </div>
+    </div>
+
+    <div class="calc-results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Wall Area</span>
+          <span class="result-value" id="resultWallArea">280 sq ft</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Paintable Area</span>
+          <span class="result-value" id="resultTotalArea">280 sq ft</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Gallons Needed</span>
+          <span class="result-value" id="resultGallons">2</span>
+        </div>
+        <div class="result-card success">
+          <span class="result-label">Estimated Cost</span>
+          <span class="result-value" id="resultCost">$90.00</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>How to Calculate Paint for a Room</h2>
+    <p>Calculating how much paint you need for a room is a straightforward process that saves you from the frustration of running out of paint mid-project or wasting money on extra gallons you will never use. The key is accurately measuring your wall area, subtracting openings like doors and windows, and accounting for the number of coats you plan to apply.</p>
+    <p>The basic formula for wall area is to calculate the perimeter of the room and multiply it by the ceiling height. The perimeter is the total distance around all four walls. For a rectangular room, the perimeter is two times the length plus two times the width. Once you have the gross wall area, subtract the area of each door and window to get the net paintable surface.</p>
+    <div class="formula-box">
+      <code>Wall Area = 2 &times; (Length + Width) &times; Height &minus; (Doors &times; 21 sq ft) &minus; (Windows &times; 15 sq ft)</code>
+    </div>
+    <p>A standard interior door measures approximately 3 feet wide by 7 feet tall, giving it an area of about 21 square feet. A standard window measures approximately 3 feet wide by 5 feet tall, with an area of about 15 square feet. While your actual doors and windows may differ slightly from these averages, using 21 square feet per door and 15 square feet per window provides a reliable estimate for most homes.</p>
+    <p>After calculating the net wall area, decide how many coats of paint you will apply. Multiply the net area by the number of coats to get the total paintable area. Then divide by the coverage rate listed on your paint can, which is typically 350 to 400 square feet per gallon for smooth walls. Round up to the nearest whole gallon, because paint stores do not sell fractions of gallons for standard sizes. Our calculator handles all of these steps automatically and includes an option to add the ceiling area if you plan to paint it as well.</p>
+    <p>For example, a 12-by-10-foot room with 8-foot ceilings, two doors, and two windows has a perimeter of 44 feet. The gross wall area is 44 &times; 8 = 352 square feet. Subtracting two doors (42 sq ft) and two windows (30 sq ft) leaves 280 square feet of paintable wall. For two coats at 350 sq ft per gallon, you need 280 &times; 2 / 350 = 1.6 gallons, which rounds up to 2 gallons.</p>
+
+    <h2>Understanding Paint Coverage Rates</h2>
+    <p>Paint coverage rate refers to the number of square feet that one gallon of paint will cover in a single coat. This number varies depending on the type of paint, the surface texture, and the application method. Understanding these variations helps you make more accurate estimates and avoid shortfalls.</p>
+    <p><strong>Smooth drywall:</strong> 350 to 400 square feet per gallon. This is the standard coverage rate printed on most interior paint cans and represents ideal conditions with properly primed, smooth surfaces. New drywall that has been primed typically achieves coverage at the higher end of this range because the primer seals the paper surface and provides a uniform base for the topcoat.</p>
+    <p><strong>Textured walls:</strong> 250 to 350 square feet per gallon. Knockdown texture, orange peel texture, and popcorn surfaces have more surface area than smooth walls, which means they absorb more paint per square foot. Heavy texture can reduce coverage by 25% or more compared to smooth walls. If your walls have noticeable texture, use the lower end of the coverage range in your calculations.</p>
+    <p><strong>Bare or unprimed surfaces:</strong> 200 to 300 square feet per gallon. Unprimed drywall, bare wood, and raw plaster are porous and absorb a significant amount of the first coat. Using a dedicated primer before painting is more economical than relying on paint alone to cover these surfaces, because primer is cheaper than paint and provides a better base for adhesion and coverage.</p>
+    <p><strong>Exterior surfaces:</strong> 250 to 350 square feet per gallon. Exterior paints are formulated to be thicker and more durable, but outdoor surfaces like wood siding, stucco, brick, and concrete block tend to be rougher and more porous than interior walls. Wind, temperature, and humidity also affect application and drying, which can influence effective coverage.</p>
+    <p><strong>Dark colors and deep tones:</strong> Coverage can drop significantly when applying dark paint over a lighter base or vice versa. A deep red, navy blue, or charcoal gray may require three or even four coats to achieve full coverage over a white or light-colored base. Using a tinted primer in a shade close to the final color can reduce the number of topcoats needed and save both time and money.</p>
+
+    <h2>How to Measure Walls for Painting</h2>
+    <p>Accurate measurements are the foundation of a good paint estimate. Taking a few extra minutes to measure carefully can prevent the hassle of an extra trip to the paint store or the waste of unused gallons.</p>
+    <p><strong>Measuring wall length:</strong> Use a tape measure to measure the length of each wall at the base. Measure from corner to corner. For the most accurate results, measure each wall individually rather than assuming opposite walls are the same length, because rooms are rarely perfectly square. Record each measurement in feet and inches, then convert inches to decimal feet by dividing by 12 (for example, 10 feet 6 inches = 10.5 feet).</p>
+    <p><strong>Measuring ceiling height:</strong> Measure from the floor to the ceiling in at least two spots in the room. In older homes, ceiling heights can vary from one side of the room to the other. If the height varies, use the taller measurement to ensure you buy enough paint. Standard ceiling heights are 8 feet in most homes, 9 feet in newer construction, and 10 to 12 feet in formal living areas and older homes.</p>
+    <p><strong>Measuring doors and windows:</strong> For a quick estimate, use the standard sizes: 21 square feet per door and 15 square feet per window. For a more precise estimate, measure each opening's width and height and calculate the actual area. French doors, sliding glass doors, and picture windows may be significantly larger than standard sizes and should be measured individually. A sliding glass door, for example, is typically 6 feet wide by 7 feet tall (42 square feet), more than double the standard door size.</p>
+    <p><strong>Measuring irregular features:</strong> If your room has bump-outs, recessed niches, half-walls, or accent walls, measure these features separately. A recessed niche adds wall area (the sides and back of the niche), while a half-wall or pony wall has both sides and a top edge to paint. For rooms with angled or vaulted ceilings, measure the height at the shortest and tallest points and calculate the wall area as a trapezoid.</p>
+
+    <h2>How Many Coats of Paint Do You Need?</h2>
+    <p>The number of coats required depends on several factors including the current wall color, the new color, the paint quality, and the surface condition. Understanding when one coat is sufficient and when three or more are needed helps you estimate both paint quantity and project time accurately.</p>
+    <p><strong>One coat:</strong> A single coat is sufficient only in specific situations. If you are repainting walls the same color or a very similar shade for a simple refresh, one coat may provide adequate coverage. Touch-up work on scuffs and marks also requires only one coat. Some premium "one-coat" paints contain higher concentrations of pigment and binders that provide better hiding power, but even these paints work best when going from one light color to another similar light color.</p>
+    <p><strong>Two coats (recommended standard):</strong> Two coats is the industry standard for most painting projects. The first coat provides base coverage and adhesion, while the second coat ensures uniform color, hides any thin spots from the first coat, and provides maximum durability. Two coats are especially important when changing colors, when the new color is lighter than the old one, or when painting over repairs and patches that were primed.</p>
+    <p><strong>Three or more coats:</strong> Three coats are sometimes necessary when making dramatic color changes, such as going from dark to light or light to a vivid, saturated color like red, yellow, or orange. These colors have inherently lower hiding power because their pigments are more transparent. Using a tinted primer that matches the approximate value (lightness or darkness) of the final color can reduce the need for additional topcoats. For example, when painting walls deep red, apply a gray or pink-tinted primer first, then two coats of red, rather than three or four coats of red over white primer.</p>
+
+    <h2>Interior vs Exterior Paint Differences</h2>
+    <p>Interior and exterior paints are formulated differently to handle the demands of their respective environments. Using the right type of paint in the right location ensures better adhesion, durability, and appearance.</p>
+    <p><strong>Interior paint</strong> is designed for low-odor application in enclosed spaces. It uses resins that resist scuffing, staining, and cleaning. Interior paints are available in a wide range of sheens from flat (matte) to high-gloss, with each sheen offering a different balance of aesthetics and washability. Flat paint hides imperfections well but is harder to clean. Eggshell and satin are the most popular interior sheens because they offer a soft luster and good washability. Semi-gloss and gloss are used for trim, doors, cabinets, and high-moisture areas like bathrooms and kitchens.</p>
+    <p><strong>Exterior paint</strong> is formulated to withstand ultraviolet radiation, temperature extremes, rain, snow, and mildew growth. It contains UV stabilizers to prevent fading, flexible resins that expand and contract with temperature changes without cracking, and mildewcides to resist mold and mildew growth. Exterior paint is typically thicker than interior paint, which contributes to its lower coverage rate per gallon. Most exterior paints come in flat, satin, and semi-gloss sheens. Flat exterior paint is commonly used on siding, while semi-gloss is used for trim and shutters.</p>
+    <p><strong>Coverage differences:</strong> Interior paint generally covers 350 to 400 square feet per gallon on smooth surfaces. Exterior paint covers 250 to 350 square feet per gallon because the surfaces are rougher and the paint is applied more thickly. When using our calculator for exterior projects, reduce the coverage rate to 300 square feet per gallon for wood siding, 250 for stucco, and 200 for rough brick or concrete block.</p>
+
+    <h2>Types of Paint and Their Coverage</h2>
+    <p>Understanding the different types of paint available helps you choose the right product for your project and estimate coverage more accurately.</p>
+
+    <div class="info-table">
+      <h3>Paint Coverage by Type and Surface</h3>
+      <table>
+        <thead>
+          <tr><th>Paint Type</th><th>Surface</th><th>Coverage (sq ft/gal)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Latex (water-based)</td><td>Smooth drywall</td><td>350 - 400</td></tr>
+          <tr><td>Latex (water-based)</td><td>Textured walls</td><td>250 - 350</td></tr>
+          <tr><td>Oil-based (alkyd)</td><td>Smooth surfaces</td><td>350 - 450</td></tr>
+          <tr><td>Primer</td><td>New drywall</td><td>300 - 400</td></tr>
+          <tr><td>Primer</td><td>Bare wood</td><td>250 - 350</td></tr>
+          <tr><td>Exterior latex</td><td>Wood siding</td><td>250 - 350</td></tr>
+          <tr><td>Exterior latex</td><td>Stucco</td><td>150 - 250</td></tr>
+          <tr><td>Ceiling paint</td><td>Smooth ceiling</td><td>350 - 400</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p><strong>Latex (water-based) paint</strong> is the most popular choice for both interior and exterior applications. It dries quickly (usually within 1 to 2 hours between coats), cleans up with soap and water, has low odor, and produces fewer volatile organic compounds (VOCs) than oil-based alternatives. Latex paint has excellent color retention and flexibility, making it resistant to cracking as surfaces expand and contract with temperature changes.</p>
+    <p><strong>Oil-based (alkyd) paint</strong> provides a smoother, harder finish than latex and is preferred for high-wear surfaces like doors, trim, and cabinets. It levels out better than latex, minimizing brush and roller marks. However, oil-based paint has a strong odor, requires mineral spirits for cleanup, takes 8 to 24 hours to dry between coats, and contains higher levels of VOCs. Many jurisdictions have restricted or banned oil-based paints for interior use due to environmental and health concerns.</p>
+    <p><strong>Specialty paints</strong> include ceiling paint (formulated to be thicker and splatter-resistant for overhead application), bathroom and kitchen paint (contains extra mildewcide and moisture resistance), porch and floor paint (extra durable for foot traffic), and cabinet paint (self-leveling for a smooth factory-like finish). Each specialty paint has its own coverage rate, which is listed on the can label.</p>
+
+    <h2>Tips for Reducing Paint Waste</h2>
+    <p>Buying the right amount of paint is important, but how you apply it also affects how far each gallon goes. These practical tips help you maximize coverage and minimize waste.</p>
+    <p><strong>Use the right roller nap.</strong> The nap (or pile) of a paint roller determines how much paint it holds and how it applies to the surface. For smooth drywall, use a 3/8-inch nap roller. For lightly textured walls, use a 1/2-inch nap. For heavily textured surfaces like stucco or brick, use a 3/4-inch to 1-inch nap. Using too thick a nap on smooth walls applies excess paint, wastes material, and can create an orange-peel texture you did not want.</p>
+    <p><strong>Prime when needed.</strong> Applying primer before painting over new drywall, patches, stains, or dramatic color changes reduces the number of topcoats needed and saves money. Primer costs $15 to $25 per gallon compared to $30 to $60 for quality topcoat paint. One coat of primer plus two coats of paint uses less total material than three or four coats of paint alone.</p>
+    <p><strong>Maintain a wet edge.</strong> When rolling paint on a wall, always work from a freshly painted area into the dry area, overlapping the wet edge. This technique prevents lap marks, which are visible lines that form when wet paint is applied next to paint that has already started to dry. Lap marks are more noticeable with darker colors and glossier sheens. Working in sections from ceiling to floor, and completing one wall before moving to the next, helps maintain a consistent wet edge.</p>
+    <p><strong>Avoid overloading brushes and rollers.</strong> Dipping a brush more than a third of its bristle length into the paint or saturating a roller until it drips wastes paint and creates drips and runs on the wall. Load the brush or roller with a moderate amount of paint and apply it in even strokes. You can always add more paint, but removing drips after they dry requires sanding and repainting.</p>
+    <p><strong>Store leftover paint properly.</strong> Seal opened cans tightly by placing plastic wrap over the opening before pressing the lid on. Store paint cans upside down to create an airtight seal. Keep paint in a climate-controlled space where temperatures stay between 50 and 80 degrees Fahrenheit. Properly stored latex paint lasts 2 to 10 years, giving you plenty of time for touch-ups. Label each can with the room it was used in and the date of purchase.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>How much paint do I need for a 12x12 room?</h3>
+    <p>A 12-by-12-foot room with 8-foot ceilings has a perimeter of 48 feet and a gross wall area of 384 square feet. After subtracting one standard door (21 sq ft) and two standard windows (30 sq ft), the net paintable wall area is approximately 333 square feet. At a standard coverage rate of 350 square feet per gallon, you would need just under 1 gallon for a single coat. For the recommended two coats, you need 333 &times; 2 / 350 = 1.9 gallons, which rounds up to 2 gallons. If you are also painting the ceiling (144 sq ft), add another gallon of ceiling paint. These estimates assume smooth drywall in good condition with a previously painted surface. Textured walls or unpainted surfaces will require additional paint.</p>
+
+    <h3>How many square feet does a gallon of paint cover?</h3>
+    <p>One gallon of standard interior latex paint covers 350 to 400 square feet per coat on smooth, previously painted surfaces. This is the coverage rate listed on most paint cans and represents optimal conditions. Real-world coverage depends on the surface texture, porosity, color change, and application method. Textured walls may only get 250 to 300 square feet per gallon. Bare or unprimed surfaces can drop to 200 to 300 square feet per gallon because the porous surface absorbs more paint. Exterior paint typically covers 250 to 350 square feet per gallon because outdoor surfaces are rougher. When estimating for your project, use 350 as the baseline and adjust downward for textured or unpainted surfaces.</p>
+
+    <h3>Should I always paint two coats?</h3>
+    <p>Two coats are recommended for the vast majority of painting projects. The first coat provides base coverage and adhesion to the surface, while the second coat delivers uniform color, fills any thin spots from the first coat, and creates a more durable finish. Two coats are essential when changing wall colors, painting over repairs or patches, or using a color with inherently low hiding power such as red, yellow, or bright orange. The only situations where one coat may be sufficient are minor touch-ups of the same color, refreshing a wall with the same or very similar color, or using a premium "one-coat" paint over a similar shade. Even then, inspect the wall after the first coat dries and apply a second coat to any areas that look thin or uneven.</p>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/everyday-calculators/square-footage-calculator/">Square Footage Calculator</a> - Calculate area in square feet for rooms and projects.</li>
+      <li><a href="/construction-calculators/drywall-calculator/">Drywall Calculator</a> - Estimate drywall sheets, tape, and compound for your room.</li>
+      <li><a href="/construction-calculators/concrete-calculator/">Concrete Calculator</a> - Calculate cubic yards of concrete for slabs, footings, and columns.</li>
+      <li><a href="/construction-calculators/flooring-calculator/">Flooring Calculator</a> - Estimate materials for hardwood, tile, laminate, and carpet.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  /* No page-specific styles needed; all covered by calculator.css */
+</style>
+
+<script is:inline>
+  function calculate() {
+    var roomLength = parseFloat(document.getElementById('roomLength').value) || 0;
+    var roomWidth = parseFloat(document.getElementById('roomWidth').value) || 0;
+    var ceilingHeight = parseFloat(document.getElementById('ceilingHeight').value) || 0;
+    var numDoors = parseInt(document.getElementById('numDoors').value) || 0;
+    var numWindows = parseInt(document.getElementById('numWindows').value) || 0;
+    var numCoats = parseInt(document.getElementById('numCoats').value) || 1;
+    var coverage = parseFloat(document.getElementById('coverage').value) || 350;
+    var includeCeiling = document.getElementById('includeCeiling').value;
+    var pricePerGallon = parseFloat(document.getElementById('pricePerGallon').value) || 0;
+
+    // Wall area = perimeter * height - doors - windows
+    var perimeter = 2 * (roomLength + roomWidth);
+    var grossWallArea = perimeter * ceilingHeight;
+    var doorArea = numDoors * 21;
+    var windowArea = numWindows * 15;
+    var wallArea = grossWallArea - doorArea - windowArea;
+    if (wallArea < 0) wallArea = 0;
+
+    // Ceiling area
+    var ceilingArea = 0;
+    if (includeCeiling === 'yes') {
+      ceilingArea = roomLength * roomWidth;
+    }
+
+    var totalArea = wallArea + ceilingArea;
+    var totalWithCoats = totalArea * numCoats;
+    var gallons = Math.ceil(totalWithCoats / coverage);
+    var cost = gallons * pricePerGallon;
+
+    document.getElementById('resultWallArea').textContent = Math.round(wallArea).toLocaleString() + ' sq ft';
+    document.getElementById('resultTotalArea').textContent = Math.round(totalArea).toLocaleString() + ' sq ft';
+    document.getElementById('resultGallons').textContent = gallons.toLocaleString();
+    document.getElementById('resultCost').textContent = '$' + cost.toFixed(2);
+  }
+
+  // Real-time calculation on input changes
+  document.querySelectorAll('.calc-inputs input, .calc-inputs select').forEach(function (el) {
+    el.addEventListener('input', calculate);
+    el.addEventListener('change', calculate);
+  });
+
+  // Initial calculation
+  calculate();
+</script>

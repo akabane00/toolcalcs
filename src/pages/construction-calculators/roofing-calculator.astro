@@ -1,0 +1,372 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Construction Calculators",
+        "item": "https://toolcalcs.com/construction-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Roofing Calculator"
+      }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How many squares of shingles do I need?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Divide your total roof area in square feet by 100 to get squares. Add 10-15% for waste. A 2,000 sq ft roof needs 20 squares plus 2-3 extra, totaling 22-23 squares or 66-69 bundles.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How do I measure roof pitch?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Roof pitch is the ratio of rise over run. Place a level on the roof, measure 12 inches horizontally, then measure the vertical distance from that point to the roof surface. A 6-inch rise over 12 inches is a 6/12 pitch.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How much does a new roof cost?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'A new asphalt shingle roof costs $5,000 to $15,000 for an average home, or $3.50 to $5.50 per square foot installed. Metal roofing runs $7 to $14 per square foot.',
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Roofing Calculator - Estimate Shingles, Squares & Cost | ToolCalcs"
+  description="Free roofing calculator. Estimate roofing squares, shingle bundles, underlayment, and nails for your roof. Calculate costs by dimensions and pitch or known roof area."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/construction-calculators/">Construction Calculators</a> &rsaquo;
+    <span>Roofing Calculator</span>
+  </nav>
+
+  <h1>Roofing Calculator</h1>
+  <p class="page-desc">Estimate roofing materials including shingle bundles, underlayment rolls, and nails. Calculate by house dimensions and roof pitch, or enter a known roof area.</p>
+
+  <div class="calculator-box">
+    <div class="shape-tabs">
+      <button class="shape-tab active" data-tab="dimensions">By Dimensions</button>
+      <button class="shape-tab" data-tab="knownarea">Known Area</button>
+    </div>
+
+    <div class="shape-panel active" id="panel-dimensions">
+      <div class="calc-inputs">
+        <div class="input-group">
+          <label for="houseLength">House Length (ft)</label>
+          <input type="number" id="houseLength" value="40" min="0" step="0.1" />
+        </div>
+        <div class="input-group">
+          <label for="houseWidth">House Width (ft)</label>
+          <input type="number" id="houseWidth" value="30" min="0" step="0.1" />
+        </div>
+        <div class="input-group">
+          <label for="roofPitch">Roof Pitch</label>
+          <select id="roofPitch">
+            <option value="2">2/12</option>
+            <option value="3">3/12</option>
+            <option value="4">4/12</option>
+            <option value="5">5/12</option>
+            <option value="6" selected>6/12</option>
+            <option value="7">7/12</option>
+            <option value="8">8/12</option>
+            <option value="9">9/12</option>
+            <option value="10">10/12</option>
+            <option value="11">11/12</option>
+            <option value="12">12/12</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="shape-panel" id="panel-knownarea">
+      <div class="calc-inputs">
+        <div class="input-group">
+          <label for="knownRoofArea">Roof Area (sq ft)</label>
+          <input type="number" id="knownRoofArea" value="1500" min="0" step="1" />
+        </div>
+      </div>
+    </div>
+
+    <div class="calc-inputs shared-inputs">
+      <div class="input-group">
+        <label for="wasteFactor">Waste Factor (%)</label>
+        <input type="number" id="wasteFactor" value="10" min="0" max="50" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="pricePerSquare">Price per Square ($)</label>
+        <input type="number" id="pricePerSquare" value="120" min="0" step="1" />
+      </div>
+    </div>
+
+    <div class="calc-results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Roof Area (sq ft)</span>
+          <span class="result-value" id="resultRoofArea">0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Roofing Squares</span>
+          <span class="result-value" id="resultSquares">0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Shingle Bundles</span>
+          <span class="result-value" id="resultBundles">0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Underlayment Rolls</span>
+          <span class="result-value" id="resultUnderlayment">0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Nails (lbs)</span>
+          <span class="result-value" id="resultNails">0</span>
+        </div>
+        <div class="result-card success">
+          <span class="result-label">Estimated Cost</span>
+          <span class="result-value" id="resultCost">$0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>How to Calculate Roofing Materials</h2>
+    <p>Calculating roofing materials accurately is essential for any roof replacement or new construction project. Ordering too little material causes costly delays, while ordering too much wastes money and creates disposal challenges. The process involves determining the total roof area, converting that area into roofing squares, and then calculating the specific quantities of shingles, underlayment, nails, and accessories needed to complete the job.</p>
+    <p>The starting point for any roofing estimate is the roof area, measured in square feet. If you know your roof area from blueprints, a previous inspection, or an aerial measurement service, you can use that number directly. If you do not know the roof area, you can estimate it from the building's footprint dimensions and the roof pitch. The footprint area is the length of the house multiplied by the width, which gives you the area as if the roof were perfectly flat. The actual roof area is larger than the footprint because the roof slopes upward at an angle.</p>
+    <div class="formula-box">
+      <code>Footprint Area = House Length &times; House Width</code><br />
+      <code>Roof Area = Footprint Area &times; Pitch Multiplier</code><br />
+      <code>Total Area with Waste = Roof Area &times; (1 + Waste% / 100)</code><br />
+      <code>Roofing Squares = Total Area / 100</code>
+    </div>
+    <p>To convert the flat footprint into the actual sloped roof area, multiply by a pitch multiplier. The pitch multiplier accounts for the additional surface area created by the slope of the roof. A steeper roof has a higher pitch multiplier and therefore more surface area than a shallow roof covering the same footprint. For example, a house with a 40-by-30-foot footprint has a flat area of 1,200 square feet. With a 6/12 pitch (multiplier of 1.118), the actual roof area is approximately 1,342 square feet. After adding 10 percent for waste, the total becomes about 1,476 square feet.</p>
+    <p>Once you have the total roof area with waste, divide by 100 to convert to roofing squares. A roofing square is the industry-standard unit of measurement, representing 100 square feet of roof coverage. Shingles, underlayment, and many other roofing products are priced and sold by the square, making this conversion essential for ordering materials and getting contractor quotes.</p>
+    <p>For the example above, 1,476 square feet divided by 100 equals 14.76 squares, which you would round up to 15 squares. At 3 bundles per square for standard three-tab or architectural shingles, you would need 45 bundles. The waste factor ensures you have enough material to account for cuts at ridges, valleys, hips, and edges, as well as any damaged shingles that need to be discarded during installation.</p>
+
+    <h2>Understanding Roof Pitch</h2>
+    <p>Roof pitch is a critical factor in roofing calculations because it directly determines the actual surface area of the roof. Pitch is expressed as a ratio of vertical rise to horizontal run, with the run always fixed at 12 inches. A 6/12 pitch means the roof rises 6 inches for every 12 inches of horizontal distance. The higher the first number, the steeper the roof.</p>
+    <p>Roof pitch affects far more than just the area calculation. It influences the type of roofing materials that can be used, the installation difficulty, the drainage performance, and the overall aesthetic of the building. Understanding pitch helps homeowners communicate effectively with contractors and make informed decisions about roofing projects.</p>
+    <p><strong>Low-pitch roofs (2/12 to 4/12)</strong> have a gentle slope that is easy to walk on but may not shed water as effectively as steeper roofs. These pitches are common on ranch-style homes, modern architecture, and commercial buildings. Low-pitch roofs require special installation techniques, including additional underlayment layers and careful sealing of all penetrations and seams. Not all shingle products are rated for use on low-pitch roofs; check the manufacturer's minimum slope requirement before ordering materials.</p>
+    <p><strong>Medium-pitch roofs (5/12 to 8/12)</strong> are the most common in residential construction. They provide a good balance between drainage performance, walkability for maintenance and repairs, and aesthetic appeal. A 6/12 pitch is considered the standard for most homes and works well with virtually all roofing materials, from asphalt shingles to metal panels to clay tiles.</p>
+    <p><strong>Steep-pitch roofs (9/12 to 12/12)</strong> are common on Cape Cod, Tudor, and Victorian-style homes. They shed water and snow very effectively and provide usable attic space, but they are more difficult and dangerous to work on. Steep roofs require special safety equipment, including roof brackets, harnesses, and scaffolding. The increased difficulty of working on a steep roof typically adds 20 to 50 percent to labor costs compared to a standard-pitch roof. A 12/12 pitch creates a 45-degree angle, which is the steepest pitch commonly found in residential construction.</p>
+    <p>To measure your roof pitch from inside the attic, hold a level horizontally against a rafter with one end touching the bottom of the rafter. Measure 12 inches along the level from the contact point, then measure the vertical distance from the end of the level straight up to the bottom of the rafter. That vertical measurement is your rise, and the pitch is expressed as the rise over 12. For example, if the vertical measurement is 8 inches, your roof has an 8/12 pitch.</p>
+    <p>If you cannot access the attic, you can measure pitch from the outside using a similar technique. Place a level against the roof surface, measure 12 inches horizontally, and then measure the vertical drop from the end of the level to the roof surface. Alternatively, many smartphone apps use the device's accelerometer to measure roof pitch by simply placing the phone flat on the roof surface.</p>
+
+    <h2>What Is a Roofing Square?</h2>
+    <p>A roofing square is the standard unit of measurement in the roofing industry. One roofing square equals 100 square feet of roof area. This unit simplifies ordering, pricing, and communication between homeowners, contractors, and suppliers. When a roofer says a roof is "20 squares," they mean it covers 2,000 square feet.</p>
+    <p>Most roofing materials are packaged and priced by the square. A standard bundle of three-tab or architectural asphalt shingles covers approximately one-third of a square, or about 33.3 square feet. Therefore, 3 bundles equal 1 square. Some heavier or premium shingle products require 4 or even 5 bundles per square due to their greater weight and overlap. Always check the coverage specification on the shingle packaging, as it varies by manufacturer and product line.</p>
+    <p>When getting contractor quotes, prices are typically given per square for both materials and labor. This makes it easy to compare bids from different contractors on an apples-to-apples basis. A typical asphalt shingle installation might cost $100 to $200 per square for materials and $150 to $300 per square for labor, depending on the roof complexity, pitch, height, and local market rates. The per-square pricing structure also makes it simple to calculate the impact of upgrading to a higher-quality shingle product: if the upgrade adds $30 per square and your roof is 22 squares, the total upgrade cost is $660.</p>
+
+    <h2>Shingle Types and Coverage</h2>
+    <p>Asphalt shingles are by far the most popular roofing material in the United States, covering approximately 75 to 80 percent of all residential roofs. They are available in several types, each with different performance characteristics, warranties, and price points.</p>
+    <p><strong>Three-tab shingles</strong> are the most basic and affordable option. They have a flat, uniform appearance with three evenly spaced tabs that create a regular, repeating pattern. Three-tab shingles typically weigh 60 to 80 pounds per bundle, come 3 bundles per square, and carry warranties of 20 to 30 years. They cost approximately $70 to $100 per square for materials, making them the budget-friendly choice for homeowners who want reliable protection without premium features.</p>
+    <p><strong>Architectural (dimensional) shingles</strong> are the current industry standard for residential roofing. They have a thicker, layered construction that creates a dimensional, textured appearance resembling wood shakes or slate. Architectural shingles weigh 80 to 120 pounds per bundle, come 3 bundles per square, and carry warranties of 30 to 50 years (sometimes called "lifetime" warranties). They cost $90 to $150 per square for materials and offer better wind resistance, typically rated for winds up to 110 to 130 MPH compared to 60 to 70 MPH for three-tab shingles.</p>
+    <p><strong>Premium or designer shingles</strong> are the top tier of asphalt roofing products. They offer the most realistic imitation of natural materials like slate, cedar shakes, or tile, with enhanced durability and performance. Premium shingles can weigh 100 to 150 pounds per bundle, may require 4 to 5 bundles per square, and carry 50-year to lifetime warranties with enhanced coverage for wind, algae, and impact damage. They cost $150 to $300 per square for materials and are often used on high-end homes where curb appeal is a priority.</p>
+    <p>When choosing shingles, consider not just the upfront cost but the total cost of ownership over the expected life of the roof. A premium architectural shingle with a 50-year warranty may cost 50 percent more than a basic three-tab shingle, but it can last twice as long, potentially saving money over the life of the home. Also consider the local climate, wind exposure, and any homeowner association requirements that may dictate acceptable roofing materials and colors.</p>
+
+    <h2>Underlayment and Accessories</h2>
+    <p>Underlayment is a critical waterproofing layer installed directly on the roof deck beneath the shingles. It serves as a secondary barrier against water infiltration in case shingles are damaged or wind-driven rain penetrates beneath them. Building codes in most jurisdictions require underlayment on all sloped roofs.</p>
+    <p>Traditional felt underlayment (also called tar paper) comes in two weights: 15-pound (No. 15) and 30-pound (No. 30). A standard roll of 15-pound felt covers approximately 400 square feet, while a roll of 30-pound felt covers about 200 square feet. Synthetic underlayment has largely replaced felt in modern construction because it is lighter, stronger, more water-resistant, and easier to install. A roll of synthetic underlayment typically covers 1,000 square feet and costs $50 to $100, compared to $15 to $30 for a roll of felt.</p>
+    <p>In addition to underlayment, a complete roofing installation requires several accessory materials. <strong>Ice and water shield</strong> is a self-adhering rubberized membrane installed along eaves, in valleys, and around penetrations in cold climates to prevent ice dam damage. It is required by code in many northern states and typically covers the first 3 feet of the roof from the eave edge. <strong>Drip edge</strong> is a metal flashing installed along the eaves and rakes (gable edges) to direct water away from the fascia and into the gutters. <strong>Ridge vent</strong> provides continuous ventilation along the roof peak, which is essential for preventing moisture buildup and extending the life of the roof and shingles. <strong>Hip and ridge cap shingles</strong> are specially shaped pieces that cover the peak and hip lines of the roof. They can be cut from standard shingles or purchased as pre-formed cap shingles.</p>
+    <p>Roofing nails are sold by the pound, with approximately 140 standard 1-1/4-inch roofing nails per pound. The number of nails required depends on the shingle type and local wind zone requirements. Standard installation requires 4 nails per shingle, while high-wind areas may require 6 nails per shingle. As a rough guide, plan on approximately 2 to 2.5 pounds of nails per roofing square for standard installations.</p>
+
+    <h2>Roofing Cost by Material Type</h2>
+    <p>The cost of a new roof varies dramatically depending on the material chosen, the size and complexity of the roof, and local labor rates. Understanding the price range for each material type helps homeowners budget appropriately and weigh the tradeoffs between upfront cost, longevity, and aesthetic appeal.</p>
+    <p><strong>Asphalt shingles</strong> remain the most affordable roofing material, with total installed costs ranging from $3.50 to $5.50 per square foot, or $350 to $550 per roofing square. For a typical 2,000-square-foot roof (20 squares), the total installed cost is $7,000 to $11,000 for standard architectural shingles. This price includes tear-off of the old roof, disposal fees, underlayment, flashing, ridge vent, and all accessories. Asphalt shingle roofs last 20 to 40 years depending on the product quality, climate, and maintenance.</p>
+    <p><strong>Metal roofing</strong> costs $7 to $14 per square foot installed, or $700 to $1,400 per square. Standing seam metal roofing is at the higher end, while corrugated metal panels are more affordable. A metal roof on a 2,000-square-foot home typically costs $14,000 to $28,000 fully installed. Metal roofs last 40 to 70 years, are highly resistant to wind and hail, and reflect solar heat to reduce cooling costs. They are an increasingly popular choice despite the higher upfront cost because of their longevity and low maintenance requirements.</p>
+    <p><strong>Wood shakes and shingles</strong> cost $6 to $12 per square foot installed. Cedar is the most common wood species used for roofing. Wood roofs have a distinctive natural appearance that ages to a silver-gray color over time. They last 25 to 40 years with proper maintenance, which includes periodic cleaning, treatment, and replacement of individual damaged shakes. Wood roofing is restricted or prohibited in some areas due to fire concerns.</p>
+    <p><strong>Clay and concrete tiles</strong> cost $8 to $20 per square foot installed. They are extremely durable, lasting 50 to 100 years or more, and are fire-resistant. Tile roofing is common in Mediterranean, Spanish, and Southwestern architectural styles. The primary drawback is weight: tile roofs can weigh 600 to 1,100 pounds per square, requiring the roof structure to be engineered or reinforced to support the load.</p>
+    <p><strong>Slate</strong> is the most premium natural roofing material, costing $15 to $30 per square foot installed. A slate roof can last 75 to 200 years, making it a once-in-a-lifetime investment. Natural slate is extremely heavy and requires specialized installation skills, which limits the number of qualified installers and drives up labor costs. Synthetic slate products offer a similar appearance at roughly half the cost and weight.</p>
+
+    <h2>DIY vs Professional Roofing</h2>
+    <p>Roofing is one of the most debated home improvement projects when it comes to the DIY versus professional decision. While the potential savings from doing it yourself are substantial, the risks and challenges of roofing work are significant and should not be underestimated.</p>
+    <p><strong>Safety is the primary concern.</strong> Roofing involves working at heights on sloped surfaces, often in hot weather. Falls from roofs cause thousands of injuries and dozens of fatalities every year in the United States. Professional roofers use harnesses, roof brackets, scaffolding, and other fall protection equipment, and they have training and experience working safely at elevation. If you have never worked at height or are uncomfortable on ladders, roofing is not the right project to start with.</p>
+    <p><strong>Material savings from DIY are moderate.</strong> Labor typically accounts for 40 to 60 percent of the total cost of a professional roof installation. For a $10,000 roofing job, you might save $4,000 to $6,000 by doing it yourself. However, you will need to rent or purchase equipment (dumpster for tear-off debris, roofing nailer, compressor, safety equipment), which can eat into your savings by $500 to $1,500. You also lose the labor warranty that comes with professional installation.</p>
+    <p><strong>Quality and warranty implications are important.</strong> Most shingle manufacturers require installation by a certified contractor for the full warranty to be valid. A DIY installation may void or limit the manufacturer's material warranty if the shingles were not installed according to the manufacturer's specifications. Professional installers also typically provide a workmanship warranty of 5 to 15 years, covering leaks and defects caused by installation errors. With DIY, you bear full responsibility for any problems.</p>
+    <p><strong>Time investment is substantial.</strong> A professional crew of 3 to 5 workers can typically strip and reroof a standard residential roof in 1 to 3 days. A DIY homeowner working alone or with one helper should expect the same project to take 1 to 3 weeks of full days, depending on experience, the size and complexity of the roof, and weather conditions. During this time, the exposed roof deck is vulnerable to rain damage, which can cause serious problems if the weather does not cooperate with your schedule.</p>
+    <p>If you decide to DIY, start with a small, simple roof structure like a shed or detached garage to build your skills before tackling the main house. Study the shingle manufacturer's installation manual thoroughly, invest in proper safety equipment, and check your local building codes for permit requirements and inspection procedures. Many jurisdictions require a building permit for roof replacement, and the work must pass inspection to ensure compliance with building codes.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>How many squares of shingles do I need?</h3>
+    <p>To determine how many squares of shingles you need, divide your total roof area in square feet by 100. One roofing square equals 100 square feet of coverage. After calculating the base number of squares, add 10 to 15 percent for waste to account for cuts at ridges, valleys, hips, and starter courses. For example, a 2,000-square-foot roof needs 20 squares as a base. Adding 10 percent brings the total to 22 squares, and adding 15 percent brings it to 23 squares. Since standard asphalt shingles come 3 bundles per square, 22 squares equals 66 bundles and 23 squares equals 69 bundles. Complex roofs with many hips, valleys, dormers, and penetrations should use the higher waste percentage, while simple gable roofs can use the lower end.</p>
+
+    <h3>How do I measure roof pitch?</h3>
+    <p>Roof pitch is the ratio of vertical rise to horizontal run, expressed as rise over 12 inches. The most common method to measure pitch is from inside the attic. Hold a level horizontally against the underside of a roof rafter, measure 12 inches along the level from the point where it contacts the rafter, then measure the vertical distance from the end of the level straight up to the bottom of the rafter. That vertical distance in inches is your rise, and the pitch is stated as that number over 12. For example, if the vertical distance measures 6 inches, your roof has a 6/12 pitch. You can also measure from outside by placing a level on the roof surface, measuring 12 inches horizontally, and then measuring the vertical drop to the roof surface. Several smartphone apps can also measure pitch using the phone's built-in accelerometer when the phone is placed flat on the roof.</p>
+
+    <h3>How much does a new roof cost?</h3>
+    <p>A new asphalt shingle roof for an average-sized home (1,500 to 2,500 square feet of roof area) typically costs $5,000 to $15,000 fully installed, or $3.50 to $5.50 per square foot. This price includes tear-off of the existing roof, disposal, new underlayment, flashing, drip edge, ridge vent, and shingles. Metal roofing costs $7 to $14 per square foot installed, bringing the total for the same home to $10,500 to $35,000. The wide price ranges reflect differences in material quality, roof complexity and pitch, geographic location, and contractor pricing. Steep or complex roofs with multiple dormers, valleys, and hips cost more because they require more labor and generate more material waste. Getting at least three quotes from licensed, insured roofing contractors is strongly recommended before committing to a project.</p>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/everyday-calculators/square-footage-calculator/">Square Footage Calculator</a> - Calculate area in square feet for any space.</li>
+      <li><a href="/construction-calculators/concrete-calculator/">Concrete Calculator</a> - Calculate concrete volume for slabs, footings, and columns.</li>
+      <li><a href="/construction-calculators/deck-calculator/">Deck Calculator</a> - Estimate materials for building a deck.</li>
+      <li><a href="/construction-calculators/fence-calculator/">Fence Calculator</a> - Calculate fence materials and costs.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .shape-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--color-border);
+  }
+  .shape-tab {
+    padding: 10px 16px;
+    border: none;
+    background: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+  }
+  .shape-tab:hover {
+    color: var(--color-primary);
+  }
+  .shape-tab.active {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+  }
+  .shape-panel {
+    display: none;
+  }
+  .shape-panel.active {
+    display: block;
+  }
+  .shared-inputs {
+    margin-top: 8px;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border);
+  }
+</style>
+
+<script is:inline>
+  var activeTab = 'dimensions';
+
+  var pitchMultipliers = {
+    2: 1.014,
+    3: 1.031,
+    4: 1.054,
+    5: 1.083,
+    6: 1.118,
+    7: 1.158,
+    8: 1.202,
+    9: 1.250,
+    10: 1.302,
+    11: 1.357,
+    12: 1.414
+  };
+
+  function calculate() {
+    var wasteFactor = parseFloat(document.getElementById('wasteFactor').value) || 0;
+    var pricePerSquare = parseFloat(document.getElementById('pricePerSquare').value) || 0;
+
+    var roofArea = 0;
+
+    if (activeTab === 'dimensions') {
+      var houseLength = parseFloat(document.getElementById('houseLength').value) || 0;
+      var houseWidth = parseFloat(document.getElementById('houseWidth').value) || 0;
+      var pitchValue = parseInt(document.getElementById('roofPitch').value) || 6;
+      var multiplier = pitchMultipliers[pitchValue] || 1.118;
+      var footprint = houseLength * houseWidth;
+      roofArea = footprint * multiplier;
+    } else {
+      roofArea = parseFloat(document.getElementById('knownRoofArea').value) || 0;
+    }
+
+    // Apply waste factor
+    var totalArea = roofArea * (1 + wasteFactor / 100);
+
+    // Roofing squares
+    var squares = totalArea / 100;
+
+    // Shingle bundles (3 per square)
+    var bundles = Math.ceil(squares * 3);
+
+    // Underlayment rolls (1 roll covers ~400 sq ft)
+    var underlaymentRolls = Math.ceil(totalArea / 400);
+
+    // Nails (lbs) - ~2.5 lbs per square
+    var nails = Math.ceil(squares * 2.5);
+
+    // Estimated cost
+    var cost = squares * pricePerSquare;
+
+    // Display results
+    document.getElementById('resultRoofArea').textContent = totalArea.toFixed(2);
+    document.getElementById('resultSquares').textContent = squares.toFixed(2);
+    document.getElementById('resultBundles').textContent = bundles.toLocaleString();
+    document.getElementById('resultUnderlayment').textContent = underlaymentRolls.toLocaleString();
+    document.getElementById('resultNails').textContent = nails.toLocaleString();
+    document.getElementById('resultCost').textContent = '$' + Math.round(cost).toLocaleString();
+  }
+
+  // Tab switching
+  document.querySelectorAll('.shape-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      var tabName = tab.getAttribute('data-tab');
+      activeTab = tabName;
+
+      // Update active tab
+      document.querySelectorAll('.shape-tab').forEach(function(t) {
+        t.classList.remove('active');
+      });
+      tab.classList.add('active');
+
+      // Update active panel
+      document.querySelectorAll('.shape-panel').forEach(function(p) {
+        p.classList.remove('active');
+      });
+      document.getElementById('panel-' + tabName).classList.add('active');
+
+      calculate();
+    });
+  });
+
+  // Listen to all inputs
+  document.querySelectorAll('.calc-inputs input, .calc-inputs select').forEach(function(el) {
+    el.addEventListener('input', calculate);
+    el.addEventListener('change', calculate);
+  });
+
+  calculate();
+</script>

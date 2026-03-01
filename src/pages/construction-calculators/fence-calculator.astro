@@ -1,0 +1,317 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Construction Calculators",
+        "item": "https://toolcalcs.com/construction-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Fence Calculator"
+      }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How many fence posts do I need for 100 feet?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'For 100 linear feet with 8-foot spacing, you need 14 posts (100/8 = 12.5, rounded up to 13 sections, plus 1 = 14). Add 2 extra for each gate. With 6-foot spacing, you need 18 posts.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How far apart should fence posts be?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Standard spacing is 6 to 8 feet on center. 8-foot is most common for privacy fences because rails come in 8-foot lengths. Wind-prone areas should use 6-foot spacing.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How much does it cost to fence a yard?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'A 200-foot wood privacy fence costs $3,000 to $6,000 for materials and $5,000 to $10,000 installed. Vinyl runs $4,000 to $8,000, chain link $1,500 to $3,000.',
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Fence Calculator - Estimate Posts, Boards & Materials | ToolCalcs"
+  description="Free fence calculator. Estimate the number of posts, rails, pickets, concrete, and total cost for privacy, picket, or ranch fences. Plan your fencing project with accurate material lists."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/construction-calculators/">Construction Calculators</a> &rsaquo;
+    <span>Fence Calculator</span>
+  </nav>
+
+  <h1>Fence Calculator</h1>
+  <p class="page-desc">Estimate posts, rails, pickets, concrete, and total cost for your fencing project.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="totalLength">Total Fence Length (ft)</label>
+        <input type="number" id="totalLength" value="100" min="1" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="fenceHeight">Fence Height (ft)</label>
+        <select id="fenceHeight">
+          <option value="4">4 ft</option>
+          <option value="5">5 ft</option>
+          <option value="6" selected>6 ft</option>
+          <option value="8">8 ft</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="fenceStyle">Fence Style</label>
+        <select id="fenceStyle">
+          <option value="privacy" selected>Privacy</option>
+          <option value="picket">Picket</option>
+          <option value="ranch">Ranch</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="postSpacing">Post Spacing (ft)</label>
+        <input type="number" id="postSpacing" value="8" min="4" max="10" step="0.5" />
+      </div>
+      <div class="input-group">
+        <label for="gateCount">Number of Gates</label>
+        <input type="number" id="gateCount" value="1" min="0" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="gateWidth">Gate Width (ft)</label>
+        <input type="number" id="gateWidth" value="4" min="1" step="0.5" />
+      </div>
+      <div class="input-group">
+        <label for="postPrice">Price per Post ($)</label>
+        <input type="number" id="postPrice" value="15" min="0" step="0.50" />
+      </div>
+      <div class="input-group">
+        <label for="picketPrice">Price per Picket/Board ($)</label>
+        <input type="number" id="picketPrice" value="3" min="0" step="0.25" />
+      </div>
+    </div>
+
+    <div class="calc-results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Posts Needed</span>
+          <span class="result-value" id="postsNeeded">0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Rails Needed</span>
+          <span class="result-value" id="railsNeeded">0</span>
+        </div>
+        <div class="result-card" id="picketsCard">
+          <span class="result-label" id="picketsLabel">Boards Needed</span>
+          <span class="result-value" id="picketsNeeded">0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Concrete (80-lb bags)</span>
+          <span class="result-value" id="concreteBags">0</span>
+        </div>
+        <div class="result-card success">
+          <span class="result-label">Estimated Cost</span>
+          <span class="result-value" id="estimatedCost">$0.00</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>How to Calculate Fence Materials</h2>
+    <p>Planning a fence project starts with accurately estimating the materials you will need. Ordering the right amount of posts, rails, pickets, and concrete saves money and prevents frustrating mid-project supply runs. The process is straightforward once you understand the key measurements and how they relate to material quantities.</p>
+    <p>The first step is measuring the total linear footage of the fence line. Walk the perimeter of the area you want to enclose using a tape measure or measuring wheel. Record the total distance in feet. If you are enclosing a rectangular yard, measure each side and add them together. For a yard that is 60 feet wide and 40 feet deep, the perimeter is 200 feet (60 + 40 + 60 + 40). Subtract the width of any driveways, walkways, or areas where you will not install fencing.</p>
+    <div class="formula-box">
+      <code>Fenceable Length = Total Length &minus; (Number of Gates &times; Gate Width)</code><br />
+      <code>Sections = Fenceable Length &divide; Post Spacing (rounded up)</code><br />
+      <code>Posts = Sections + 1 + (Gates &times; 2)</code>
+    </div>
+    <p>Next, determine the number of fence posts. Divide the fenceable length by your post spacing to find the number of sections, then add one for the starting post. Standard post spacing is 8 feet for privacy fences and 6 to 8 feet for picket fences. Each gate requires two additional posts, one on each side. For a 100-foot fence with 8-foot spacing and one 4-foot gate, the fenceable length is 96 feet. That gives 12 sections, plus 1 starting post, plus 2 gate posts, for a total of 15 posts.</p>
+    <p>Rails run horizontally between posts and support the pickets or boards. Privacy fences typically use three horizontal rails per section: a top rail, a middle rail, and a bottom rail. Picket fences generally use two rails per section. Ranch-style fences use three or more rails but no pickets, since the rails themselves are the visible barrier. The total number of rails is the number of sections multiplied by the rails per section.</p>
+    <p>Pickets or boards are the vertical members that attach to the rails. For a privacy fence, boards are installed side by side with no gaps. Standard privacy fence boards are 5.5 inches wide, and you calculate the number per section by dividing the section width in inches by 5.5 and rounding up. For a picket fence with 3.5-inch pickets and 3.5-inch gaps, divide the section width by 7 inches (the combined width of one picket plus one gap) and round up. Ranch fences have no pickets since the horizontal rails provide the barrier.</p>
+    <p>Concrete anchors every post in the ground. The standard recommendation is two 80-pound bags of quick-setting concrete per post. This provides a solid footing in a post hole that is 10 to 12 inches in diameter and 24 to 36 inches deep. In areas with loose or sandy soil, you may need three bags per post. Multiply the total number of posts by 2 (or 3 for difficult soil) to calculate the total concrete needed.</p>
+
+    <h2>Fence Styles and Material Requirements</h2>
+    <p>The style of fence you choose determines not only the appearance but also the quantity and type of materials required. Each style has different structural requirements, labor complexity, and cost implications. Understanding these differences before you buy materials prevents costly mistakes and ensures a professional-looking result.</p>
+    <p><strong>Privacy fences</strong> are the most popular residential fence style. They consist of vertical boards placed tightly together with no gaps between them, creating a solid barrier that blocks visibility, reduces wind, and provides a sound buffer. The boards are typically 1-by-6-inch dog-eared or flat-top cedar or pressure-treated pine planks that are 5.5 inches wide after milling. Privacy fences use three horizontal rails per section to support the tightly packed boards and prevent warping. A standard 6-foot-tall privacy fence with 8-foot sections uses approximately 18 boards per section (96 inches divided by 5.5 inches per board). This makes privacy fences one of the most material-intensive styles, but they offer the highest level of seclusion.</p>
+    <p><strong>Picket fences</strong> are a classic American fence style characterized by evenly spaced vertical pickets with pointed or shaped tops. The gaps between pickets allow visibility and airflow while still defining a boundary and containing pets or small children. Standard pickets are 3.5 inches wide with 3.5-inch spacing between them, creating a balanced open-and-closed pattern. Because of the gaps, picket fences use roughly half the number of vertical boards as privacy fences, making them less expensive per linear foot. Picket fences typically stand 3 to 4 feet tall and use two horizontal rails per section.</p>
+    <p><strong>Ranch or split-rail fences</strong> are the most economical style, consisting of horizontal rails supported by posts with no vertical pickets. Traditional ranch fences use two to four horizontal rails made from split logs or dimensional lumber. They are common on rural properties, farms, and large lots where the goal is to mark a boundary or contain livestock rather than provide privacy. Because they use only rails and posts, ranch fences require the fewest materials of any style. However, they do not block wind, noise, or visibility, and they are not suitable for containing small dogs or cats.</p>
+    <p><strong>Board-on-board fences</strong> are a variation of the privacy fence where alternating boards overlap on opposite sides of the rails. This creates a fence that looks finished from both sides and provides privacy from direct angles while allowing some airflow through the overlapping gaps. Board-on-board fences use approximately 25% more boards than standard privacy fences due to the overlap but are considered more neighbor-friendly since both sides look equally attractive.</p>
+    <p><strong>Shadowbox fences</strong> are similar to board-on-board but with wider gaps between the boards. Alternating boards are placed on each side of the rails with deliberate spacing, creating a semi-private fence that allows some light and air to pass through. The shadow effect created by looking through the fence at an angle gives this style its name. Shadowbox fences are a popular compromise between the privacy of a solid fence and the openness of a picket fence.</p>
+
+    <h2>Post Spacing and Setting Guide</h2>
+    <p>Fence post spacing is one of the most critical decisions in fence construction. The distance between posts affects the structural integrity of the fence, its resistance to wind, the amount of materials needed, and the overall cost. Getting the spacing right from the beginning prevents sagging rails, leaning sections, and premature failure.</p>
+    <p>The most common post spacing for residential fences is 8 feet on center, meaning the distance from the center of one post to the center of the next post is 8 feet. This spacing works well with standard 8-foot lumber, which is the most readily available and affordable length for rails. When you install a top and bottom rail using 8-foot boards, they span perfectly from post to post with minimal cutting and waste.</p>
+    <p>In areas prone to high winds, heavy snow loads, or soft soil conditions, reducing the post spacing to 6 feet provides significantly greater structural strength. Six-foot spacing increases the number of posts by approximately 33% compared to 8-foot spacing, but the added support makes the fence much more resistant to lateral forces. If your property is in a region with frequent storms or sustained winds above 30 miles per hour, 6-foot spacing is a worthwhile investment.</p>
+    <p>Setting fence posts properly is just as important as spacing them correctly. The standard rule is to bury one-third of the total post length below ground. For a 6-foot fence using 8-foot posts, the post hole should be at least 24 inches deep. For an 8-foot fence, use 12-foot posts buried 36 inches deep. In frost-prone areas, post holes should extend below the frost line, which can be 36 to 48 inches deep in northern states, to prevent frost heave from pushing the posts out of the ground over time.</p>
+    <p>Post holes should be 10 to 12 inches in diameter, roughly three times the width of the post. Dig the hole with straight sides and a flat bottom, then add 4 to 6 inches of gravel at the bottom for drainage. Set the post in the hole, check that it is plumb with a level, brace it temporarily, and pour quick-setting concrete around it. Two 80-pound bags of concrete per hole is standard for 4-by-4-inch posts. Mound the concrete slightly above grade and slope it away from the post to prevent water from pooling around the base.</p>
+
+    <h2>Privacy Fence vs Picket Fence</h2>
+    <p>Choosing between a privacy fence and a picket fence depends on your primary goals for the fence, your budget, neighborhood regulations, and personal aesthetic preferences. Each style serves different purposes and excels in different situations.</p>
+    <p>Privacy fences are the ideal choice when your primary goal is screening your yard from neighbors, street traffic, or nearby commercial properties. A solid 6-foot or 8-foot privacy fence blocks virtually all visibility, reduces street noise by 5 to 10 decibels, and acts as a windbreak that can reduce wind speed by up to 50% within a distance of 10 times the fence height. Privacy fences are popular for backyard pools, hot tubs, patios, and outdoor living spaces where you want to enjoy the outdoors without being observed. Many municipalities require a privacy fence or wall around swimming pools for safety and liability purposes.</p>
+    <p>Picket fences, on the other hand, are better suited for front yards, decorative boundaries, and situations where you want to define your property line without creating a visual barrier. A well-built picket fence adds significant curb appeal and can increase property value by 2% to 5% according to real estate professionals. Picket fences are effective at keeping children and dogs within the yard while maintaining an open, welcoming appearance. Because they allow wind to pass through, picket fences experience less wind loading and are less likely to blow over during storms compared to solid privacy fences of the same height.</p>
+    <p>From a cost perspective, picket fences are generally 30% to 40% less expensive than privacy fences per linear foot because they use fewer boards and shorter posts. A 100-foot picket fence might cost $1,200 to $2,500 for materials, while a privacy fence of the same length could run $2,500 to $5,000 depending on the height and wood species. Labor costs for installation are comparable since the post-setting and rail-hanging process is the same for both styles, though attaching pickets is slightly faster than installing privacy boards because of the gaps.</p>
+    <p>Local zoning codes and homeowners association (HOA) rules may dictate which style you can install. Many communities restrict front-yard fences to 4 feet in height, which effectively requires a picket-style design. Backyard fences are typically allowed up to 6 feet, and some jurisdictions permit 8 feet with a variance. Always check your local building codes and HOA covenants before purchasing materials to avoid costly modifications or removal orders after installation.</p>
+
+    <h2>How Deep Should Fence Posts Be?</h2>
+    <p>The depth of your fence post holes is a critical factor in the long-term stability and durability of your fence. Posts that are not buried deeply enough will lean, shift, and eventually fail, especially under wind loads or frost heave. The general rule of thumb is to bury one-third of the total post length below ground, but several factors can require deeper holes.</p>
+    <p>For a standard 6-foot privacy fence, use 4-by-4-inch posts that are at least 8 feet long. This gives you 6 feet of post above ground and 2 feet below ground (24 inches). While 24 inches is adequate in stable soil with a shallow frost line, many professionals recommend a minimum depth of 30 inches for better stability. For an 8-foot fence, use 12-foot posts buried at least 36 inches deep.</p>
+    <p>The frost line in your region is an important consideration. When water in the soil freezes, it expands and pushes objects upward, a process known as frost heave. If your post footings sit above the frost line, the repeated freeze-thaw cycle will gradually push the posts out of the ground, causing the fence to lean and buckle. In the northern United States, frost lines range from 36 inches in the upper Midwest to 48 inches or more in states like Minnesota, Wisconsin, and Maine. Extending your post holes below the frost line prevents this problem entirely.</p>
+    <p>Soil type also affects how deep your posts should be. Sandy or loose soil provides less lateral support than clay or compacted soil, so posts in sandy areas should be buried deeper, typically 30 to 36 inches even for a 6-foot fence. Rocky soil may limit how deep you can dig, but rocks and gravel provide excellent drainage and lateral support, so shallower depths may be acceptable. If you hit bedrock or large boulders, set the post against the rock and fill the hole with concrete to lock it in place.</p>
+    <p>Corner posts and gate posts bear more stress than line posts and should be buried at least 6 inches deeper than the standard line posts. Gate posts carry the weight of the gate plus the dynamic forces of opening and closing, so they benefit from extra depth and additional concrete. Some builders use 6-by-6-inch posts for gates instead of the standard 4-by-4 to handle the extra load.</p>
+
+    <h2>Fence Cost Breakdown</h2>
+    <p>Understanding the cost components of a fence project helps you budget accurately and identify areas where you can save money without sacrificing quality. The total cost of a fence includes materials, labor (if hiring a contractor), permits, and miscellaneous supplies. Materials alone typically account for 40% to 50% of the total installed price, while labor makes up the other 50% to 60%.</p>
+    <p><strong>Posts</strong> are the most important structural component and range from $8 to $25 each depending on the material and size. Pressure-treated 4-by-4 pine posts cost $8 to $15 each in 8-foot lengths. Cedar posts run $12 to $20. For gate posts and corner posts, 6-by-6-inch posts cost $20 to $40 each. You will need one post for every section plus one, plus two additional posts per gate.</p>
+    <p><strong>Rails</strong> are typically 2-by-4 or 2-by-3 lumber in 8-foot lengths. Pressure-treated 2-by-4 rails cost $4 to $8 each. Cedar rails are $6 to $12. Each section needs two to three rails depending on the fence style and height, so a 100-foot fence with 8-foot spacing has 13 sections requiring 26 to 39 rails.</p>
+    <p><strong>Pickets and boards</strong> vary widely in price based on wood species, grade, and dimensions. Standard 1-by-6 by 6-foot dog-eared pressure-treated fence boards cost $2 to $4 each. Cedar boards run $3 to $6 each. Pickets for picket-style fences cost $1.50 to $4 each depending on the profile and wood type. For a privacy fence, you will need approximately 18 boards per 8-foot section, so a 100-foot fence requires around 234 boards.</p>
+    <p><strong>Concrete</strong> for setting posts costs about $5 to $7 per 80-pound bag. With two bags per post and 15 posts, you will need 30 bags costing $150 to $210. Quick-setting concrete is easier to work with and sets in 20 to 40 minutes, allowing you to move to the next post without waiting.</p>
+    <p><strong>Hardware and fasteners</strong> include galvanized or stainless steel screws, nails, brackets, and gate hardware. Budget $100 to $250 for hardware on a 100-foot fence. Gate kits with hinges, a latch, and a handle cost $25 to $75 each depending on quality and style.</p>
+    <p>For a typical 150-foot, 6-foot-tall pressure-treated wood privacy fence with one gate, expect to spend $2,000 to $3,500 on materials if you are doing the work yourself. Professional installation adds $15 to $30 per linear foot for labor, bringing the total to $4,500 to $8,000. The per-foot cost decreases for longer fences because the fixed costs of equipment, delivery, and setup are spread over more footage.</p>
+
+    <h2>Wood vs Vinyl vs Chain Link</h2>
+    <p>The three most popular residential fencing materials are wood, vinyl (PVC), and chain link. Each has distinct advantages and disadvantages in terms of cost, appearance, durability, and maintenance requirements. Your choice should balance your budget, aesthetic preferences, and willingness to perform ongoing maintenance.</p>
+    <p><strong>Wood fences</strong> are the most popular choice for residential properties, accounting for roughly half of all new fences installed in the United States. Wood offers a natural, warm appearance that complements most architectural styles. It can be stained or painted in virtually any color, and it is the easiest material for DIY installation. Pressure-treated pine is the most affordable option at $12 to $20 per linear foot installed, while western red cedar costs $15 to $30 per linear foot. The primary drawback of wood is maintenance. Without regular staining or sealing every 2 to 3 years, wood fences fade, warp, rot, and eventually need replacement. A well-maintained wood fence lasts 15 to 20 years, while a neglected one may fail in 8 to 12 years.</p>
+    <p><strong>Vinyl fences</strong> are made from polyvinyl chloride (PVC) and are marketed as a low-maintenance alternative to wood. Vinyl never needs painting or staining, does not rot or attract termites, and can be cleaned with a garden hose and mild detergent. Vinyl fences come in a variety of styles that mimic the look of painted wood, including privacy, picket, and ranch designs. The upfront cost is significantly higher than wood, typically $20 to $40 per linear foot installed, but the elimination of maintenance costs means the total cost of ownership over 20 to 30 years can be comparable to or even lower than wood. Vinyl fences last 20 to 30 years or more under normal conditions. The main disadvantages of vinyl are its higher initial price, limited color options (primarily white and tan), and susceptibility to cracking in extremely cold temperatures.</p>
+    <p><strong>Chain link fences</strong> are the most affordable fencing option, costing $8 to $18 per linear foot installed. They are made from galvanized steel wire woven into a diamond pattern and are extremely durable, requiring virtually no maintenance. Chain link fences last 20 years or more and resist wind, pests, and moisture. However, chain link provides no privacy and is generally considered the least attractive fencing option. Privacy slats or mesh fabric can be woven through the chain link to add some screening, but these additions increase cost and require periodic replacement. Chain link is commonly used for backyard pet containment, sports facilities, and commercial properties where function matters more than appearance.</p>
+    <p><strong>Composite fences</strong> are a newer option that combines wood fibers with plastic polymers to create a material that looks like wood but requires little maintenance. Composite fencing costs $25 to $50 per linear foot installed, making it the most expensive option, but it offers a wood-like appearance without the painting, staining, or rot issues that plague natural wood. Composite fences come with warranties of 20 to 25 years and are available in colors that mimic various wood species.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>How many fence posts do I need for 100 feet?</h3>
+    <p>For 100 linear feet of fencing with standard 8-foot post spacing, you need 14 posts. The calculation is straightforward: divide 100 by 8 to get 12.5 sections, round up to 13 sections, and add 1 for the starting post to get 14 posts total. If you have gates, add 2 extra posts for each gate opening. With one standard gate, you would need 16 posts (14 line posts plus 2 gate posts). If you prefer 6-foot spacing for added strength in windy areas, divide 100 by 6 to get approximately 17 sections, add 1 for 18 posts, plus 2 per gate. Always buy one or two extra posts in case any are damaged during installation or have defects that make them unusable.</p>
+
+    <h3>How far apart should fence posts be?</h3>
+    <p>Standard fence post spacing is 6 to 8 feet on center, meaning from the center of one post to the center of the next post. Eight-foot spacing is the most common for residential privacy fences because standard lumber comes in 8-foot lengths, making it easy to cut rails without waste. Eight-foot spacing provides adequate support for most fence styles in normal wind conditions. However, if you live in an area prone to high winds, heavy snow, or if you are building a fence taller than 6 feet, reduce the spacing to 6 feet for significantly greater structural strength. Some fence styles, like chain link, can use spacing up to 10 feet because the woven wire mesh distributes loads more evenly across the span. Never exceed 10 feet between posts for any fence type, as the rails will sag under their own weight and the load of attached pickets or boards.</p>
+
+    <h3>How much does it cost to fence a yard?</h3>
+    <p>The cost to fence a yard varies widely based on the perimeter length, fence style, material, and whether you hire a contractor or do it yourself. A 200-foot wood privacy fence using pressure-treated pine costs approximately $3,000 to $6,000 for materials alone. Professional installation adds $3,000 to $6,000 in labor, bringing the total to $5,000 to $10,000. Vinyl privacy fencing for the same perimeter costs $4,000 to $8,000 for materials and installation. Chain link is the most affordable option at $1,500 to $3,000 for a 200-foot run. For a typical quarter-acre lot with a 200- to 300-foot perimeter, most homeowners spend $4,000 to $8,000 for a wood privacy fence installed by a professional contractor. DIY installation can cut the total cost by 40% to 50% since labor is the largest expense component.</p>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/everyday-calculators/square-footage-calculator/">Square Footage Calculator</a> - Calculate the area of your yard or property for fence planning.</li>
+      <li><a href="/construction-calculators/concrete-calculator/">Concrete Calculator</a> - Estimate concrete needed for post footings and other projects.</li>
+      <li><a href="/construction-calculators/deck-calculator/">Deck Calculator</a> - Plan decking materials, joists, and costs for your deck project.</li>
+      <li><a href="/construction-calculators/mulch-calculator/">Mulch Calculator</a> - Calculate mulch volume for landscaping around your new fence line.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .result-card.primary {
+    border-color: var(--color-primary);
+    background: #eff6ff;
+  }
+  .result-card.success {
+    border-color: #16a34a;
+    background: #f0fdf4;
+  }
+  .result-card.success .result-value {
+    color: #16a34a;
+  }
+</style>
+
+<script is:inline>
+  function calculate() {
+    var totalLength = parseFloat(document.getElementById('totalLength').value) || 0;
+    var fenceHeight = parseFloat(document.getElementById('fenceHeight').value) || 6;
+    var fenceStyle = document.getElementById('fenceStyle').value;
+    var postSpacing = parseFloat(document.getElementById('postSpacing').value) || 8;
+    var gateCount = parseInt(document.getElementById('gateCount').value) || 0;
+    var gateWidth = parseFloat(document.getElementById('gateWidth').value) || 4;
+    var postPrice = parseFloat(document.getElementById('postPrice').value) || 0;
+    var picketPrice = parseFloat(document.getElementById('picketPrice').value) || 0;
+
+    // Ensure post spacing within bounds
+    if (postSpacing < 4) postSpacing = 4;
+    if (postSpacing > 10) postSpacing = 10;
+
+    // Calculate fenceable length
+    var fenceableLength = totalLength - (gateCount * gateWidth);
+    if (fenceableLength < 0) fenceableLength = 0;
+
+    // Calculate sections and posts
+    var sections = Math.ceil(fenceableLength / postSpacing);
+    var posts = sections + 1 + (gateCount * 2);
+
+    // Calculate rails per section based on style
+    var railsPerSection = 3;
+    if (fenceStyle === 'picket') railsPerSection = 2;
+    if (fenceStyle === 'ranch') railsPerSection = 3;
+    var rails = sections * railsPerSection;
+
+    // Calculate pickets/boards based on style
+    var pickets = 0;
+    var picketsCard = document.getElementById('picketsCard');
+    var picketsLabel = document.getElementById('picketsLabel');
+
+    if (fenceStyle === 'privacy') {
+      // 5.5" boards with no gap
+      pickets = sections * Math.ceil((postSpacing * 12) / 5.5);
+      picketsLabel.textContent = 'Boards Needed';
+      picketsCard.style.display = 'block';
+    } else if (fenceStyle === 'picket') {
+      // 3.5" picket + 3.5" gap = 7" per picket
+      pickets = sections * Math.ceil((postSpacing * 12) / 7);
+      picketsLabel.textContent = 'Pickets Needed';
+      picketsCard.style.display = 'block';
+    } else {
+      // Ranch - rails only, no pickets
+      pickets = 0;
+      picketsLabel.textContent = 'Rails Only';
+      picketsCard.style.display = 'none';
+    }
+
+    // Concrete: 2 bags per post
+    var concreteBags = posts * 2;
+
+    // Estimated cost
+    var cost = (posts * postPrice) + (pickets * picketPrice) + (rails * 8) + (concreteBags * 6);
+
+    // Update results
+    document.getElementById('postsNeeded').textContent = posts.toLocaleString();
+    document.getElementById('railsNeeded').textContent = rails.toLocaleString();
+    document.getElementById('picketsNeeded').textContent = pickets.toLocaleString();
+    document.getElementById('concreteBags').textContent = concreteBags.toLocaleString();
+    document.getElementById('estimatedCost').textContent = '$' + Math.round(cost).toLocaleString();
+  }
+
+  document.querySelectorAll('.calc-inputs input, .calc-inputs select').forEach(function(el) {
+    el.addEventListener('input', calculate);
+    el.addEventListener('change', calculate);
+  });
+
+  calculate();
+</script>
