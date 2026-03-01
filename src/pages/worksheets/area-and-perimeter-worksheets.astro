@@ -182,29 +182,36 @@ const structuredData = {
     var rightPad = 70;
     var rw = w * scale;
     var rh = h * scale;
-    var svgW = rw + pad + rightPad;
-    var svgH = rh + pad * 2 + 20;
+    var svgW = Math.max(rw + pad + rightPad, 220);
+    var bothMode = findType === 'both';
+    var svgH = rh + pad * 2 + (bothMode && showAnswer ? 36 : 20);
 
     var svg = '<svg viewBox="0 0 ' + svgW + ' ' + svgH + '" class="ap-svg">';
 
-    // Rectangle
-    svg += '<rect x="' + pad + '" y="' + pad + '" width="' + rw + '" height="' + rh + '" fill="rgba(37,99,235,0.08)" stroke="#334155" stroke-width="2"/>';
+    // Rectangle - center horizontally if svgW was expanded
+    var rectX = Math.max(pad, (svgW - rw) / 2 - 10);
+
+    svg += '<rect x="' + rectX + '" y="' + pad + '" width="' + rw + '" height="' + rh + '" fill="rgba(37,99,235,0.08)" stroke="#334155" stroke-width="2"/>';
 
     // Width label (top)
-    svg += '<text x="' + (pad + rw / 2) + '" y="' + (pad - 8) + '" text-anchor="middle" font-size="13" fill="#334155" font-weight="600">' + w + ' cm</text>';
+    svg += '<text x="' + (rectX + rw / 2) + '" y="' + (pad - 8) + '" text-anchor="middle" font-size="13" fill="#334155" font-weight="600">' + w + ' cm</text>';
 
     // Height label (right)
-    svg += '<text x="' + (pad + rw + 14) + '" y="' + (pad + rh / 2) + '" text-anchor="start" font-size="13" fill="#334155" font-weight="600" dominant-baseline="middle">' + h + ' cm</text>';
+    svg += '<text x="' + (rectX + rw + 14) + '" y="' + (pad + rh / 2) + '" text-anchor="start" font-size="13" fill="#334155" font-weight="600" dominant-baseline="middle">' + h + ' cm</text>';
 
     // Answer labels
     if (showAnswer) {
       var area = w * h;
       var perimeter = 2 * (w + h);
-      var label = '';
-      if (findType === 'area') label = 'A = ' + area + ' cm\u00b2';
-      else if (findType === 'perimeter') label = 'P = ' + perimeter + ' cm';
-      else label = 'A = ' + area + ' cm\u00b2, P = ' + perimeter + ' cm';
-      svg += '<text x="' + (pad + rw / 2) + '" y="' + (pad + rh + 20) + '" text-anchor="middle" font-size="11" fill="#2563eb" font-weight="600">' + label + '</text>';
+      var cx = svgW / 2;
+      if (findType === 'area') {
+        svg += '<text x="' + cx + '" y="' + (pad + rh + 20) + '" text-anchor="middle" font-size="11" fill="#2563eb" font-weight="600">A = ' + area + ' cm\u00b2</text>';
+      } else if (findType === 'perimeter') {
+        svg += '<text x="' + cx + '" y="' + (pad + rh + 20) + '" text-anchor="middle" font-size="11" fill="#2563eb" font-weight="600">P = ' + perimeter + ' cm</text>';
+      } else {
+        svg += '<text x="' + cx + '" y="' + (pad + rh + 18) + '" text-anchor="middle" font-size="11" fill="#2563eb" font-weight="600">A = ' + area + ' cm\u00b2</text>';
+        svg += '<text x="' + cx + '" y="' + (pad + rh + 32) + '" text-anchor="middle" font-size="11" fill="#2563eb" font-weight="600">P = ' + perimeter + ' cm</text>';
+      }
     }
 
     svg += '</svg>';
@@ -217,8 +224,9 @@ const structuredData = {
     var rightPad = 60;
     var bw = base * scale;
     var th = height * scale;
-    var svgW = bw + pad + rightPad;
-    var svgH = th + pad * 2 + 20;
+    var svgW = Math.max(bw + pad + rightPad, 220);
+    var bothMode = findType === 'both';
+    var svgH = th + pad * 2 + (bothMode && showAnswer ? 50 : 36);
 
     // Triangle vertices: bottom-left, bottom-right, top-center(ish)
     var x1 = pad, y1 = pad + th;
@@ -235,7 +243,7 @@ const structuredData = {
 
     // Height dashed line
     svg += '<line x1="' + x3 + '" y1="' + y3 + '" x2="' + x3 + '" y2="' + y1 + '" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="4,3"/>';
-    svg += '<text x="' + (x3 - 14) + '" y="' + (pad + th / 2) + '" text-anchor="end" font-size="12" fill="#2563eb" font-weight="600" dominant-baseline="middle">h=' + height + '</text>';
+    svg += '<text x="' + (x3 + 8) + '" y="' + (pad + th / 2) + '" text-anchor="start" font-size="12" fill="#2563eb" font-weight="600" dominant-baseline="middle">h=' + height + '</text>';
 
     // Side labels
     var mx1 = (x1 + x3) / 2, my1 = (y1 + y3) / 2;
@@ -246,11 +254,15 @@ const structuredData = {
     if (showAnswer) {
       var area = (base * height) / 2;
       var perimeter = base + side1 + side2;
-      var label = '';
-      if (findType === 'area') label = 'A = ' + area + ' cm\u00b2';
-      else if (findType === 'perimeter') label = 'P = ' + perimeter + ' cm';
-      else label = 'A = ' + area + ' cm\u00b2, P = ' + perimeter + ' cm';
-      svg += '<text x="' + (pad + bw / 2) + '" y="' + (y1 + 34) + '" text-anchor="middle" font-size="11" fill="#2563eb" font-weight="600">' + label + '</text>';
+      var cx = svgW / 2;
+      if (findType === 'area') {
+        svg += '<text x="' + cx + '" y="' + (y1 + 34) + '" text-anchor="middle" font-size="11" fill="#2563eb" font-weight="600">A = ' + area + ' cm\u00b2</text>';
+      } else if (findType === 'perimeter') {
+        svg += '<text x="' + cx + '" y="' + (y1 + 34) + '" text-anchor="middle" font-size="11" fill="#2563eb" font-weight="600">P = ' + perimeter + ' cm</text>';
+      } else {
+        svg += '<text x="' + cx + '" y="' + (y1 + 32) + '" text-anchor="middle" font-size="11" fill="#2563eb" font-weight="600">A = ' + area + ' cm\u00b2</text>';
+        svg += '<text x="' + cx + '" y="' + (y1 + 46) + '" text-anchor="middle" font-size="11" fill="#2563eb" font-weight="600">P = ' + perimeter + ' cm</text>';
+      }
     }
 
     svg += '</svg>';
