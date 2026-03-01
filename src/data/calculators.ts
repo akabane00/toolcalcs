@@ -571,6 +571,48 @@ export const calculators: Calculator[] = [
     categorySlug: 'construction-calculators',
     icon: '🪜',
   },
+  {
+    title: 'Solar Panel Calculator',
+    slug: 'solar-panel-calculator',
+    description: 'Calculate solar panel system ROI, payback period, and 25-year savings based on system size and local sun hours.',
+    category: 'Construction Calculators',
+    categorySlug: 'construction-calculators',
+    icon: '☀️',
+  },
+
+  // Financial (new)
+  {
+    title: 'Break-Even Calculator',
+    slug: 'breakeven-calculator',
+    description: 'Calculate your business break-even point in units and revenue. Find contribution margin and safety margin.',
+    category: 'Financial Calculators',
+    categorySlug: 'financial-calculators',
+    icon: '📊',
+  },
+  {
+    title: 'Rental Yield Calculator',
+    slug: 'rental-yield-calculator',
+    description: 'Calculate gross and net rental yield, cap rate, and NOI for investment properties.',
+    category: 'Financial Calculators',
+    categorySlug: 'financial-calculators',
+    icon: '🏘️',
+  },
+  {
+    title: 'DCA Calculator',
+    slug: 'dca-calculator',
+    description: 'Calculate dollar-cost averaging returns. See how regular monthly investments grow with compound returns.',
+    category: 'Financial Calculators',
+    categorySlug: 'financial-calculators',
+    icon: '📅',
+  },
+  {
+    title: 'Payroll Tax Calculator',
+    slug: 'payroll-tax-calculator',
+    description: 'Estimate federal income tax, Social Security, Medicare, and state tax from your salary.',
+    category: 'Financial Calculators',
+    categorySlug: 'financial-calculators',
+    icon: '🧾',
+  },
 ];
 
 export function getCalculatorsByCategory(categorySlug: string): Calculator[] {

@@ -1,0 +1,597 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import '../../styles/calculator.css';
+import { getAllDividedByPages, type DividedByPage } from '../../data/divided-by';
+
+export function getStaticPaths() {
+  return getAllDividedByPages().map((page) => ({
+    params: { dividend: String(page.dividend), divisor: String(page.divisor) },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: DividedByPage };
+const { dividend, divisor, quotient, remainder, decimalResult, isDivisible, isRepeating } = page;
+
+function fmt(n: number): string {
+  if (Number.isInteger(n)) return n.toLocaleString('en-US');
+  if (Math.abs(n) >= 100) return n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+  if (Math.abs(n) >= 1) return n.toLocaleString('en-US', { maximumFractionDigits: 4 });
+  if (Math.abs(n) >= 0.001) return n.toLocaleString('en-US', { maximumFractionDigits: 6 });
+  return n.toExponential(4);
+}
+
+// SEO
+const title = `What is ${fmt(dividend)} Divided by ${fmt(divisor)}? Answer: ${decimalResult} | ToolCalcs`;
+const description = `${fmt(dividend)} divided by ${fmt(divisor)} equals ${decimalResult}. See the quotient, remainder, fraction, and step-by-step long division explanation.`;
+
+// Related pages
+const allPages = getAllDividedByPages();
+const sameDividend = allPages
+  .filter((p) => p.dividend === dividend && p.divisor !== divisor)
+  .slice(0, 5);
+const sameDivisor = allPages
+  .filter((p) => p.divisor === divisor && p.dividend !== dividend)
+  .slice(0, 5);
+
+// GCD for simplified fraction
+function gcd(a: number, b: number): number {
+  a = Math.abs(a);
+  b = Math.abs(b);
+  while (b) {
+    var t = b;
+    b = a % b;
+    a = t;
+  }
+  return a;
+}
+
+const g = gcd(dividend, divisor);
+const simplifiedNum = dividend / g;
+const simplifiedDen = divisor / g;
+const isSimplified = g > 1;
+
+// Quick reference: this dividend divided by all divisors
+const dividendReference = allPages.filter((p) => p.dividend === dividend);
+
+// Structured data
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Math Reference", "item": "https://toolcalcs.com/math/" },
+      { "@type": "ListItem", "position": 3, "name": `${fmt(dividend)} \u00f7 ${fmt(divisor)}` },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": `What is ${fmt(dividend)} divided by ${fmt(divisor)}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `${fmt(dividend)} divided by ${fmt(divisor)} equals ${decimalResult}. The quotient is ${fmt(quotient)} with a remainder of ${fmt(remainder)}. As a fraction, it is ${dividend}/${divisor}${isSimplified ? `, which simplifies to ${simplifiedNum}/${simplifiedDen}` : ''}.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `Is ${fmt(dividend)} divisible by ${fmt(divisor)}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": isDivisible
+            ? `Yes, ${fmt(dividend)} is divisible by ${fmt(divisor)}. ${fmt(dividend)} \u00f7 ${fmt(divisor)} = ${decimalResult} with no remainder.`
+            : `No, ${fmt(dividend)} is not evenly divisible by ${fmt(divisor)}. The division gives a quotient of ${fmt(quotient)} with a remainder of ${fmt(remainder)}.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `What is ${fmt(dividend)}/${fmt(divisor)} as a fraction?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": isSimplified
+            ? `${fmt(dividend)}/${fmt(divisor)} as a fraction is ${dividend}/${divisor}, which simplifies to ${simplifiedNum}/${simplifiedDen} by dividing both numerator and denominator by their GCD of ${g}.`
+            : `${fmt(dividend)}/${fmt(divisor)} is already in its simplest form because the GCD of ${fmt(dividend)} and ${fmt(divisor)} is 1.`,
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout title={title} description={description} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/math/">Math Reference</a> &rsaquo;
+    <span>{fmt(dividend)} &divide; {fmt(divisor)}</span>
+  </nav>
+
+  <h1>What is {fmt(dividend)} Divided by {fmt(divisor)}?</h1>
+  <p class="page-desc">Calculate {fmt(dividend)} &divide; {fmt(divisor)} with the quotient, remainder, decimal result, and simplified fraction. Step-by-step division explained.</p>
+
+  <!-- Result Cards -->
+  <div class="result-cards">
+    <div class="result-card primary">
+      <span class="result-label">{fmt(dividend)} &divide; {fmt(divisor)}</span>
+      <span class="result-value">{decimalResult}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Quotient</span>
+      <span class="result-value">{fmt(quotient)}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Remainder</span>
+      <span class="result-value">{fmt(remainder)}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Fraction</span>
+      <span class="result-value">{isSimplified ? `${simplifiedNum}/${simplifiedDen}` : `${dividend}/${divisor}`}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Divisible?</span>
+      <span class="result-value">
+        {isDivisible
+          ? <span class="divisible-badge">Yes</span>
+          : <span class="not-divisible-badge">No</span>
+        }
+      </span>
+    </div>
+  </div>
+
+  <!-- Step-by-Step Division -->
+  <h2 class="section-heading">Step-by-Step Division</h2>
+  <div class="calculator-box">
+    <div class="steps-list">
+      <div class="step">
+        <span class="step-num">Step 1</span>
+        <span class="step-content">
+          <span class="step-label">Set up the division:</span> {fmt(dividend)} &divide; {fmt(divisor)}
+        </span>
+      </div>
+      <div class="step">
+        <span class="step-num">Step 2</span>
+        <span class="step-content">
+          <span class="step-label">Find how many times {fmt(divisor)} goes into {fmt(dividend)}:</span> {fmt(quotient)} times
+        </span>
+      </div>
+      <div class="step">
+        <span class="step-num">Step 3</span>
+        <span class="step-content">
+          <span class="step-label">Multiply:</span> {fmt(quotient)} &times; {fmt(divisor)} = {fmt(quotient * divisor)}
+        </span>
+      </div>
+      <div class="step">
+        <span class="step-num">Step 4</span>
+        <span class="step-content">
+          <span class="step-label">Find remainder:</span> {fmt(dividend)} &minus; {fmt(quotient * divisor)} = {fmt(remainder)}
+        </span>
+      </div>
+      <div class="step result">
+        <span class="step-num">Result</span>
+        <span class="step-content">
+          {fmt(dividend)} &divide; {fmt(divisor)} = <strong>{fmt(quotient)} remainder {fmt(remainder)}</strong> (or <strong>{decimalResult}</strong> as a decimal)
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Division Calculator -->
+  <h2 class="section-heading">Division Calculator</h2>
+  <div class="calculator-box">
+    <p class="calc-desc">Enter any two numbers to calculate their division.</p>
+    <div class="div-calc-row">
+      <div class="input-group">
+        <label for="dividendInput">Dividend</label>
+        <input type="number" id="dividendInput" value={dividend} min="0" max="1000000" />
+      </div>
+      <div class="input-group">
+        <label for="divisorInput">Divisor</label>
+        <input type="number" id="divisorInput" value={divisor} min="1" max="1000000" />
+      </div>
+      <button class="calc-btn" id="divCalcBtn">Calculate</button>
+    </div>
+    <div id="divCalcResult" class="finder-result">
+      <div class="div-calc-row">
+        <div class="input-group">
+          <label>Quotient</label>
+          <span id="quotientOutput" class="calc-output">{fmt(quotient)}</span>
+        </div>
+        <div class="input-group">
+          <label>Remainder</label>
+          <span id="remainderOutput" class="calc-output">{fmt(remainder)}</span>
+        </div>
+        <div class="input-group">
+          <label>Decimal</label>
+          <span id="decimalOutput" class="calc-output">{decimalResult}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="div-mid" format="rectangle" />
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>How to Divide {fmt(dividend)} by {fmt(divisor)}</h2>
+    <p>
+      Division is one of the four fundamental arithmetic operations. When we divide {fmt(dividend)} by {fmt(divisor)}, we are finding out how many times {fmt(divisor)} fits into {fmt(dividend)}, and whether there is anything left over. The number being divided ({fmt(dividend)}) is called the <strong>dividend</strong>, the number we are dividing by ({fmt(divisor)}) is called the <strong>divisor</strong>, and the answer is called the <strong>quotient</strong>.
+    </p>
+    <p>
+      In this case, {fmt(dividend)} &divide; {fmt(divisor)} = {decimalResult}. The whole-number quotient is {fmt(quotient)}, which means {fmt(divisor)} goes into {fmt(dividend)} exactly {fmt(quotient)} complete times. The remainder is {fmt(remainder)}, which is what is left over after subtracting {fmt(quotient)} &times; {fmt(divisor)} = {fmt(quotient * divisor)} from {fmt(dividend)}.
+    </p>
+    <p>
+      There are several ways to express the result of this division. As an integer division, we write {fmt(dividend)} &divide; {fmt(divisor)} = {fmt(quotient)} R {fmt(remainder)} (where R stands for "remainder"). As a decimal, the result is {decimalResult}. As a fraction, we write {dividend}/{divisor}{isSimplified ? `, which simplifies to ${simplifiedNum}/${simplifiedDen} by dividing both the numerator and the denominator by their greatest common divisor (GCD) of ${g}` : ', which is already in its simplest form'}.
+    </p>
+    <p>
+      Understanding how to divide numbers is essential for everyday tasks such as splitting a bill among friends, calculating unit prices at the store, converting measurements, and distributing items evenly. Division is the inverse of multiplication: since {fmt(quotient)} &times; {fmt(divisor)} = {fmt(quotient * divisor)}, we know that {fmt(quotient * divisor)} &divide; {fmt(divisor)} = {fmt(quotient)}. This inverse relationship is a useful way to check your work.
+    </p>
+    <p>
+      To perform long division of {fmt(dividend)} by {fmt(divisor)} by hand, begin by determining how many times {fmt(divisor)} goes into the leading digits of {fmt(dividend)}. Write the partial quotient above the dividend, multiply it by the divisor, subtract the product from the current portion of the dividend, bring down the next digit, and repeat. Continue this process until all digits have been brought down. Any value remaining at the end is the remainder. If you continue the process past the decimal point, you can calculate as many decimal places as needed.
+    </p>
+
+    <h2>Is {fmt(dividend)} Divisible by {fmt(divisor)}?</h2>
+    {isDivisible ? (
+      <p>
+        <span class="divisible-badge">Yes</span> &mdash; {fmt(dividend)} is evenly divisible by {fmt(divisor)}. When you divide {fmt(dividend)} by {fmt(divisor)}, the result is exactly {decimalResult} with no remainder. This means {fmt(divisor)} is a <strong>factor</strong> of {fmt(dividend)}, and {fmt(dividend)} is a <strong>multiple</strong> of {fmt(divisor)}. In other words, you can arrange {fmt(dividend)} objects into {fmt(quotient)} equal groups of {fmt(divisor)}, with nothing left over.
+      </p>
+    ) : (
+      <p>
+        <span class="not-divisible-badge">No</span> &mdash; {fmt(dividend)} is <strong>not</strong> evenly divisible by {fmt(divisor)}. The division produces a quotient of {fmt(quotient)} with a remainder of {fmt(remainder)}. This means that if you tried to split {fmt(dividend)} objects into groups of {fmt(divisor)}, you would get {fmt(quotient)} full groups and have {fmt(remainder)} object{remainder !== 1 ? 's' : ''} left over. Since the remainder is not zero, {fmt(divisor)} is not a factor of {fmt(dividend)}.
+      </p>
+    )}
+
+    {isRepeating && (
+      <>
+        <h2>Repeating Decimals</h2>
+        <p>
+          When you divide {fmt(dividend)} by {fmt(divisor)}, the result is a <strong>repeating decimal</strong>: {decimalResult}. A repeating decimal occurs when the long division process produces a remainder that has appeared before, causing the same sequence of digits to repeat indefinitely. This happens whenever the divisor has prime factors other than 2 and 5 (the prime factors of 10, our number base).
+        </p>
+        <p>
+          In this case, {fmt(divisor)} cannot be expressed as a product of only 2s and 5s, which is why the decimal expansion of {fmt(dividend)}/{fmt(divisor)} repeats. Repeating decimals are perfectly valid numbers and can always be expressed as exact fractions. Here, the fraction {isSimplified ? `${simplifiedNum}/${simplifiedDen}` : `${dividend}/${divisor}`} is the exact value. Repeating decimals are common in everyday calculations &mdash; for example, 1/3 = 0.333... and 1/7 = 0.142857142857... are both repeating decimals that most people encounter frequently.
+        </p>
+      </>
+    )}
+
+    {isDivisible && (
+      <>
+        <h2>Even Division</h2>
+        <p>
+          {fmt(dividend)} &divide; {fmt(divisor)} = {decimalResult} exactly, with no remainder and no repeating decimals. This is called an <strong>even division</strong> or <strong>exact division</strong>. When a division comes out evenly, it tells us that the dividend is a multiple of the divisor. Specifically, {fmt(dividend)} = {fmt(quotient)} &times; {fmt(divisor)}, so {fmt(dividend)} appears in the multiplication table of {fmt(divisor)}.
+        </p>
+        <p>
+          Even divisions are particularly useful in practical situations. For example, if you have {fmt(dividend)} items and need to distribute them equally among {fmt(divisor)} people, each person receives exactly {decimalResult} items with nothing remaining. This also means that {fmt(divisor)} and {fmt(quotient)} are both factors of {fmt(dividend)}.
+        </p>
+      </>
+    )}
+
+    <h2>Quick Reference: {fmt(dividend)} Divided by Other Numbers</h2>
+    <div class="div-table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Division</th>
+            <th>Result</th>
+            <th>Quotient</th>
+            <th>Remainder</th>
+            <th>Divisible?</th>
+          </tr>
+        </thead>
+        <tbody>
+          {dividendReference.map((ref) => (
+            <tr class={ref.divisor === divisor ? 'highlight-row' : ''}>
+              <td>
+                {ref.divisor === divisor
+                  ? <strong>{fmt(ref.dividend)} &divide; {fmt(ref.divisor)}</strong>
+                  : <a href={`/math/${ref.dividend}-divided-by-${ref.divisor}/`}>{fmt(ref.dividend)} &divide; {fmt(ref.divisor)}</a>
+                }
+              </td>
+              <td>{ref.decimalResult}</td>
+              <td>{fmt(ref.quotient)}</td>
+              <td>{fmt(ref.remainder)}</td>
+              <td>
+                {ref.isDivisible
+                  ? <span class="divisible-badge">Yes</span>
+                  : <span class="not-divisible-badge">No</span>
+                }
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Related Divisions</h2>
+    {sameDividend.length > 0 && (
+      <>
+        <h3>{fmt(dividend)} Divided by Other Numbers</h3>
+        <ul>
+          {sameDividend.map((p) => (
+            <li>
+              <a href={`/math/${p.dividend}-divided-by-${p.divisor}/`}>
+                {fmt(p.dividend)} &divide; {fmt(p.divisor)} = {p.decimalResult}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </>
+    )}
+    {sameDivisor.length > 0 && (
+      <>
+        <h3>Other Numbers Divided by {fmt(divisor)}</h3>
+        <ul>
+          {sameDivisor.map((p) => (
+            <li>
+              <a href={`/math/${p.dividend}-divided-by-${p.divisor}/`}>
+                {fmt(p.dividend)} &divide; {fmt(p.divisor)} = {p.decimalResult}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </>
+    )}
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is {fmt(dividend)} divided by {fmt(divisor)}?</h3>
+    <p>
+      {fmt(dividend)} divided by {fmt(divisor)} equals {decimalResult}. The integer quotient is {fmt(quotient)} with a remainder of {fmt(remainder)}. As a fraction, the result is {dividend}/{divisor}{isSimplified ? `, which simplifies to ${simplifiedNum}/${simplifiedDen}` : ''}.
+    </p>
+
+    <h3>Is {fmt(dividend)} divisible by {fmt(divisor)}?</h3>
+    <p>
+      {isDivisible
+        ? `Yes, ${fmt(dividend)} is divisible by ${fmt(divisor)}. The division ${fmt(dividend)} \u00f7 ${fmt(divisor)} = ${decimalResult} produces no remainder, which means ${fmt(divisor)} is a factor of ${fmt(dividend)}.`
+        : `No, ${fmt(dividend)} is not evenly divisible by ${fmt(divisor)}. The division gives a quotient of ${fmt(quotient)} with a remainder of ${fmt(remainder)}.`
+      }
+    </p>
+
+    <h3>What is {fmt(dividend)}/{fmt(divisor)} as a fraction?</h3>
+    <p>
+      {isSimplified
+        ? `The fraction ${dividend}/${divisor} simplifies to ${simplifiedNum}/${simplifiedDen}. You can simplify it by dividing both the numerator (${fmt(dividend)}) and the denominator (${fmt(divisor)}) by their greatest common divisor, which is ${g}.`
+        : `The fraction ${dividend}/${divisor} is already in its simplest form because the greatest common divisor of ${fmt(dividend)} and ${fmt(divisor)} is 1, meaning they share no common factors other than 1.`
+      }
+    </p>
+
+    <p><a href="/math/">&larr; Math Reference</a> | <a href="/math-calculators/">Math Calculators</a></p>
+
+    <CrossLinks links={[
+      { href: '/factors-of/', label: 'Factors', icon: '\u{1F522}' },
+      { href: '/fraction/', label: 'Fractions', icon: '\u00BD' },
+      { href: '/math/', label: 'Math Reference', icon: '\u{1F4D0}' },
+    ]} />
+  </article>
+
+  <AdUnit slot="div-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .quick-fact {
+    background: #eff6ff;
+    border-radius: var(--radius);
+    padding: 16px 24px;
+    margin-bottom: 24px;
+    font-size: 1.1rem;
+  }
+  .quick-fact-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .quick-fact strong {
+    color: var(--color-primary);
+    font-size: 1.15rem;
+  }
+
+  .result-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .result-card {
+    flex: 1;
+    min-width: 140px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-align: center;
+  }
+  .result-card.primary {
+    background: #eff6ff;
+  }
+  .result-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    margin-bottom: 4px;
+  }
+  .result-value {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+  .result-card.primary .result-value {
+    color: var(--color-primary);
+  }
+
+  .calc-section-title {
+    font-size: 1.15rem;
+    margin: 0 0 16px;
+    border: none;
+    padding: 0;
+  }
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+
+  .steps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .step {
+    display: flex;
+    gap: 12px;
+    align-items: baseline;
+    padding: 8px 0;
+  }
+  .step-num {
+    font-weight: 700;
+    min-width: 56px;
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+  .step-content {
+    flex: 1;
+    line-height: 1.6;
+  }
+  .step-label {
+    font-weight: 600;
+  }
+  .step.result {
+    margin-top: 8px;
+    padding-top: 12px;
+    border-top: 2px solid var(--color-primary);
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  .div-calc-row {
+    display: flex;
+    gap: 16px;
+    align-items: end;
+    flex-wrap: wrap;
+  }
+  .div-calc-row .input-group {
+    flex: 1;
+    min-width: 100px;
+  }
+  .calc-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 16px;
+  }
+  .calc-output {
+    display: block;
+    padding: 10px 12px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    text-align: center;
+  }
+  .finder-result {
+    margin-top: 16px;
+    padding: 14px 16px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    min-height: 44px;
+  }
+
+  .div-table-wrap {
+    overflow-x: auto;
+    margin-bottom: 24px;
+  }
+  .div-table-wrap table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  .div-table-wrap th,
+  .div-table-wrap td {
+    padding: 8px 12px;
+    text-align: right;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .div-table-wrap th {
+    font-weight: 600;
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .div-table-wrap th:first-child,
+  .div-table-wrap td:first-child {
+    text-align: left;
+  }
+  .div-table-wrap tr:hover td {
+    background: var(--color-bg);
+  }
+  .highlight-row td {
+    background: #dbeafe;
+    font-weight: 700;
+  }
+
+  .divisible-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    background: #dcfce7;
+    color: #166534;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .not-divisible-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    background: #fee2e2;
+    color: #991b1b;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  @media (max-width: 640px) {
+    .result-cards {
+      flex-direction: column;
+    }
+    .div-calc-row {
+      flex-direction: column;
+    }
+    .result-card {
+      min-width: unset;
+    }
+  }
+</style>
+
+<script define:vars={{ dividend, divisor }}>
+  var dividendInput = document.getElementById('dividendInput');
+  var divisorInput = document.getElementById('divisorInput');
+  var divCalcBtn = document.getElementById('divCalcBtn');
+  var quotientOutput = document.getElementById('quotientOutput');
+  var remainderOutput = document.getElementById('remainderOutput');
+  var decimalOutput = document.getElementById('decimalOutput');
+
+  function calculate() {
+    var a = parseInt(dividendInput.value);
+    var b = parseInt(divisorInput.value);
+    if (isNaN(a) || isNaN(b) || b === 0 || a < 0 || b < 1 || a > 1000000 || b > 1000000) {
+      quotientOutput.textContent = '--';
+      remainderOutput.textContent = '--';
+      decimalOutput.textContent = 'Enter valid numbers';
+      return;
+    }
+    quotientOutput.textContent = Math.floor(a / b);
+    remainderOutput.textContent = a % b;
+    decimalOutput.textContent = (a / b).toLocaleString('en-US', { maximumFractionDigits: 6 });
+  }
+
+  divCalcBtn.addEventListener('click', calculate);
+  dividendInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') calculate(); });
+  divisorInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') calculate(); });
+  calculate();
+</script>

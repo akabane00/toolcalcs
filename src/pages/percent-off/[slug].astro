@@ -1,0 +1,450 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import '../../styles/calculator.css';
+import { getAllPercentOffPages, discountPercents, originalPrices, type PercentOffPage } from '../../data/percent-off';
+
+export function getStaticPaths() {
+  return getAllPercentOffPages().map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: PercentOffPage };
+const { discountPercent, originalPrice, discountAmount, finalPrice, savingsRatio } = page;
+
+// Format numbers for display
+function fmt(n: number): string {
+  if (Number.isInteger(n)) return n.toLocaleString('en-US');
+  if (Math.abs(n) >= 100) return n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+  if (Math.abs(n) >= 1) return n.toLocaleString('en-US', { maximumFractionDigits: 4 });
+  return n.toLocaleString('en-US', { maximumFractionDigits: 6 });
+}
+
+// Format price with $ and 2 decimal places
+function fmtPrice(n: number): string {
+  return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+const originalPriceStr = fmtPrice(originalPrice);
+const finalPriceStr = fmtPrice(finalPrice);
+const discountAmountStr = fmtPrice(discountAmount);
+const discountDecimal = fmt(discountPercent / 100);
+
+// SEO metadata
+const title = `What is ${discountPercent}% Off ${originalPriceStr}? Final Price ${finalPriceStr} | ToolCalcs`;
+const description = `${discountPercent}% off ${originalPriceStr} is ${finalPriceStr}. You save ${discountAmountStr}. Learn how to calculate ${discountPercent} percent off ${originalPriceStr} with step-by-step formula and interactive discount calculator.`;
+
+// Related calculations: same discount, different prices
+const allPages = getAllPercentOffPages();
+const sameDiscount = allPages
+  .filter((p) => p.discountPercent === discountPercent && p.originalPrice !== originalPrice)
+  .slice(0, 5);
+
+// Related calculations: same price, different discounts
+const samePrice = allPages
+  .filter((p) => p.originalPrice === originalPrice && p.discountPercent !== discountPercent)
+  .slice(0, 5);
+
+// All discounts for this price (for the reference table)
+const allDiscountsForPrice = allPages
+  .filter((p) => p.originalPrice === originalPrice);
+
+// Structured data
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Discount Calculator", "item": "https://toolcalcs.com/percent-off/" },
+      { "@type": "ListItem", "position": 3, "name": `${discountPercent}% Off ${originalPriceStr}` },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": `What is ${discountPercent}% off ${originalPriceStr}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `${discountPercent}% off ${originalPriceStr} means you pay ${finalPriceStr}. The discount saves you ${discountAmountStr} off the original price of ${originalPriceStr}.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `How much do you save with a ${discountPercent}% discount on ${originalPriceStr}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `With a ${discountPercent}% discount on ${originalPriceStr}, you save ${discountAmountStr}. The final price after the discount is ${finalPriceStr}. The savings ratio is ${savingsRatio} of the original price.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `How do you calculate ${discountPercent}% off a price?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `To calculate ${discountPercent}% off any price, multiply the original price by ${discountDecimal} to find the discount amount, then subtract it from the original price. For ${originalPriceStr}: ${originalPriceStr} \u00D7 ${discountDecimal} = ${discountAmountStr} discount, so the final price is ${originalPriceStr} - ${discountAmountStr} = ${finalPriceStr}.`,
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout title={title} description={description} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/percent-off/">Discount Calculator</a> &rsaquo;
+    <span>{discountPercent}% Off {originalPriceStr}</span>
+  </nav>
+
+  <h1>What is {discountPercent}% Off {originalPriceStr}?</h1>
+  <p class="page-desc">Calculate {discountPercent} percent off {originalPriceStr} with the formula, step-by-step solution, and interactive discount calculator.</p>
+
+  <!-- Quick Answer -->
+  <div class="quick-fact">
+    <span class="quick-fact-label">Quick Answer:</span>
+    <strong>{discountPercent}% off {originalPriceStr} = {finalPriceStr} (you save {discountAmountStr})</strong>
+  </div>
+
+  <!-- Step-by-Step Calculation -->
+  <div class="calculator-box">
+    <h2 class="calc-section-title">Step-by-Step Calculation</h2>
+    <div class="step-list">
+      <div class="step">
+        <span class="step-num">1</span>
+        <div class="step-content">
+          <p class="step-label">Write the formula</p>
+          <div class="formula-box"><code>Final Price = Original Price &times; (1 - Discount / 100)</code></div>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">2</span>
+        <div class="step-content">
+          <p class="step-label">Substitute the values</p>
+          <div class="formula-box"><code>{originalPriceStr} &times; (1 - {discountPercent} / 100)</code></div>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">3</span>
+        <div class="step-content">
+          <p class="step-label">Calculate the discount amount</p>
+          <div class="formula-box"><code>{originalPriceStr} &times; {discountDecimal} = {discountAmountStr}</code></div>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">4</span>
+        <div class="step-content">
+          <p class="step-label">Subtract to get the final price</p>
+          <div class="formula-box"><code>{originalPriceStr} - {discountAmountStr} = {finalPriceStr}</code></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mini Calculator -->
+  <h2 class="section-heading">Discount Calculator</h2>
+  <div class="calculator-box">
+    <div class="disc-calc-row">
+      <div class="input-group">
+        <label for="discPctInput">Discount (%)</label>
+        <input type="number" id="discPctInput" value={discountPercent} step="any" />
+      </div>
+      <span class="disc-of-label">off</span>
+      <div class="input-group">
+        <label for="origPriceInput">Original Price ($)</label>
+        <input type="number" id="origPriceInput" value={originalPrice} step="any" />
+      </div>
+    </div>
+    <div class="disc-calc-row disc-calc-results">
+      <span class="disc-eq-label">=</span>
+      <div class="input-group">
+        <label for="discountAmtOutput">You Save ($)</label>
+        <input type="text" id="discountAmtOutput" value={discountAmountStr} readonly />
+      </div>
+      <div class="input-group">
+        <label for="finalPriceOutput">Final Price ($)</label>
+        <input type="text" id="finalPriceOutput" value={finalPriceStr} readonly />
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="disc-mid" format="rectangle" />
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>Understanding {discountPercent}% Discounts</h2>
+    <p>
+      When a store offers {discountPercent}% off, it means the price is reduced by {discountPercent} hundredths of the original amount. For an item priced at {originalPriceStr}, this translates to a {discountAmountStr} savings, bringing the price down to {finalPriceStr}. This is equivalent to paying {savingsRatio} less than the full price. Whether you are shopping online, browsing a clearance rack, or comparing coupon offers, understanding how to quickly compute percent-off discounts helps you evaluate deals and budget your spending more effectively.
+    </p>
+
+    <h2>Quick Reference: All Discounts on {originalPriceStr}</h2>
+    <div class="disc-table-wrap">
+      <table class="disc-table">
+        <thead>
+          <tr>
+            <th>Discount</th>
+            <th>You Save</th>
+            <th>Final Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {allDiscountsForPrice.map((p) => (
+            <tr class={p.discountPercent === discountPercent ? 'current-row' : ''}>
+              <td>
+                <a href={`/percent-off/${p.slug}/`}>{p.discountPercent}% off</a>
+              </td>
+              <td>{fmtPrice(p.discountAmount)}</td>
+              <td>{fmtPrice(p.finalPrice)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    {sameDiscount.length > 0 && (
+      <h2>Same Discount, Different Prices</h2>
+      <ul>
+        {sameDiscount.map((p) => (
+          <li>
+            <a href={`/percent-off/${p.slug}/`}>
+              {p.discountPercent}% off {fmtPrice(p.originalPrice)} = {fmtPrice(p.finalPrice)}
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+
+    <h2>How to Calculate Percent Off</h2>
+    <p>
+      Calculating a percentage discount is one of the most common math tasks in everyday shopping. The formula is straightforward: multiply the original price by the discount percentage expressed as a decimal, then subtract that amount from the original price. In mathematical terms, <strong>Final Price = Original Price &times; (1 - Discount% / 100)</strong>. Alternatively, you can calculate the discount amount first&mdash;Original Price &times; (Discount% / 100)&mdash;and then subtract it.
+    </p>
+    <p>
+      For this specific calculation, {discountPercent}% of {originalPriceStr} is {discountAmountStr}. Subtracting that from {originalPriceStr} gives a final price of {finalPriceStr}. The savings ratio is {savingsRatio}, which can be a useful mental shortcut.
+    </p>
+    <p>
+      Mental math shortcuts make discount calculations faster. To find 10% of any price, simply move the decimal point one place to the left. For example, 10% of {originalPriceStr} is {fmtPrice(originalPrice * 0.1)}. From there, you can build other percentages: 5% is half of 10%, 20% is double 10%, and 25% is 10% plus half of the remaining amount after subtracting 10%. For 50%, just halve the price.
+    </p>
+    <p>
+      When shopping, it is also helpful to think about discounts in terms of simple fractions. A 25% discount means you pay 3/4 of the price. A 33% discount means you pay roughly 2/3. A 50% discount means you pay exactly half. These mental models let you quickly approximate the final price without reaching for a calculator, which is especially valuable during time-limited flash sales or when comparing deals across multiple stores.
+    </p>
+    <p>
+      Keep in mind that sales tax is typically calculated on the discounted price, not the original price. So if your local sales tax rate is, say, 8%, you would calculate 8% of {finalPriceStr} rather than 8% of {originalPriceStr}. This means the effective savings from a discount are slightly higher than the sticker amount because you also save on the tax portion. For larger purchases, this difference can add up significantly.
+    </p>
+    <p>
+      Another common scenario is stacking discounts. If a store offers {discountPercent}% off and you also have a coupon for an additional 10% off, the discounts are typically applied sequentially, not added together. That means the second 10% is calculated on the already-reduced price of {finalPriceStr}, resulting in {fmtPrice(finalPrice * 0.9)}&mdash;not on the original {originalPriceStr}. Understanding this distinction helps you accurately predict your out-of-pocket cost.
+    </p>
+    <p>
+      Percent-off calculations appear in many contexts beyond retail shopping. Employers may discuss salary reductions as a percentage. Investment portfolios track losses as percent declines. Restaurants might offer early-bird discounts on menu prices. Real estate agents discuss price reductions on listings. In every case, the underlying math is the same: multiply by the percentage expressed as a decimal, and subtract from the original value. Mastering this single formula equips you to handle a surprisingly wide range of real-world financial calculations.
+    </p>
+
+    <!-- FAQ Section -->
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is {discountPercent}% off {originalPriceStr}?</h3>
+    <p>
+      {discountPercent}% off {originalPriceStr} means the final price is <strong>{finalPriceStr}</strong>. The discount saves you {discountAmountStr} off the original price. This is calculated by multiplying {originalPriceStr} by {discountDecimal} to get the discount amount, then subtracting it from {originalPriceStr}.
+    </p>
+
+    <h3>How much do you save with a {discountPercent}% discount on {originalPriceStr}?</h3>
+    <p>
+      With a {discountPercent}% discount on {originalPriceStr}, you save <strong>{discountAmountStr}</strong>. The savings ratio is {savingsRatio} of the original price. After the discount, you pay {finalPriceStr}. Use the interactive calculator above to try different discount percentages and prices.
+    </p>
+
+    <h3>How do you calculate {discountPercent}% off a price?</h3>
+    <p>
+      To calculate {discountPercent}% off any price, multiply the price by {discountDecimal} to find the discount amount, then subtract it from the original price. For example, {originalPriceStr} &times; {discountDecimal} = {discountAmountStr}, and {originalPriceStr} - {discountAmountStr} = {finalPriceStr}. The formula is: <strong>Final Price = Original Price &times; (1 - {discountPercent}/100)</strong>.
+    </p>
+
+    <h2>Full Discount Calculator</h2>
+    <p>
+      Need to calculate a different discount? Use our <a href="/percent-off/">full Discount Calculator</a> to browse all percent-off calculations or try a custom discount percentage and price.
+    </p>
+
+    <CrossLinks links={[
+      { href: '/percentage/', label: 'Percentage Calculator', icon: '%' },
+      { href: '/tip/', label: 'Tip Calculator', icon: '\uD83D\uDCA1' },
+      { href: '/what-percent/', label: 'What Percent?', icon: '\uD83D\uDD22' },
+    ]} />
+  </article>
+
+  <AdUnit slot="disc-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .quick-fact {
+    background: #eff6ff;
+    border-radius: var(--radius);
+    padding: 16px 24px;
+    margin-bottom: 24px;
+    font-size: 1.1rem;
+  }
+  .quick-fact-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .quick-fact strong {
+    color: var(--color-primary);
+    font-size: 1.3rem;
+  }
+
+  .calc-section-title {
+    font-size: 1.15rem;
+    margin: 0 0 16px;
+    border: none;
+    padding: 0;
+  }
+
+  .step-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .step-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .step-content {
+    flex: 1;
+  }
+  .step-label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-size: 0.95rem;
+  }
+  .step .formula-box {
+    margin: 0;
+    padding: 10px 16px;
+    font-size: 1.05rem;
+    text-align: left;
+  }
+
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+
+  .disc-calc-row {
+    display: flex;
+    align-items: end;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .disc-calc-results {
+    margin-top: 16px;
+  }
+  .disc-calc-row .input-group {
+    flex: 1;
+    min-width: 100px;
+  }
+  .disc-of-label,
+  .disc-eq-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    padding-bottom: 10px;
+    flex-shrink: 0;
+  }
+
+  .disc-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 16px 0 24px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+  .disc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+  .disc-table th,
+  .disc-table td {
+    padding: 8px 16px;
+    text-align: center;
+    border: 1px solid var(--color-border);
+  }
+  .disc-table thead th {
+    background: var(--color-surface);
+    font-weight: 600;
+  }
+  .disc-table td a {
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+  .disc-table td a:hover {
+    text-decoration: underline;
+  }
+  .disc-table tbody tr:hover {
+    background: var(--color-surface);
+  }
+  .disc-table .current-row {
+    background: #eff6ff;
+    font-weight: 600;
+  }
+
+  @media (max-width: 640px) {
+    .disc-calc-row {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .disc-of-label,
+    .disc-eq-label {
+      text-align: center;
+      padding-bottom: 0;
+    }
+  }
+</style>
+
+<script define:vars={{ discountPercent, originalPrice }}>
+  var discPctInput = document.getElementById('discPctInput');
+  var origPriceInput = document.getElementById('origPriceInput');
+  var discountAmtOutput = document.getElementById('discountAmtOutput');
+  var finalPriceOutput = document.getElementById('finalPriceOutput');
+
+  function formatPrice(n) {
+    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function calculate() {
+    var pct = parseFloat(discPctInput.value);
+    var price = parseFloat(origPriceInput.value);
+    if (isNaN(pct) || isNaN(price)) {
+      discountAmtOutput.value = '';
+      finalPriceOutput.value = '';
+      return;
+    }
+    var discAmt = Math.round(price * pct) / 100;
+    var finalP = Math.round((price - price * pct / 100) * 100) / 100;
+    discountAmtOutput.value = formatPrice(discAmt);
+    finalPriceOutput.value = formatPrice(finalP);
+  }
+
+  discPctInput.addEventListener('input', calculate);
+  origPriceInput.addEventListener('input', calculate);
+
+  calculate();
+</script>

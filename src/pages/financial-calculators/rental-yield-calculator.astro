@@ -1,0 +1,269 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Financial Calculators", "item": "https://toolcalcs.com/financial-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Rental Yield Calculator" },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is a good rental yield?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A good gross rental yield is generally between 5% and 8%, though this varies by market and property type. In high-demand urban areas, yields of 3-5% are common, while secondary markets may offer 8-12%. Net rental yield, which accounts for expenses, should ideally be above 4-5% to justify the risks of property investment.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between gross and net rental yield?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Gross rental yield is calculated by dividing annual rental income by the property purchase price, without deducting any expenses. Net rental yield subtracts operating expenses such as property taxes, insurance, maintenance, management fees, and vacancy losses from the rental income before dividing by the property price. Net yield gives a more accurate picture of actual investment returns.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "How do you calculate cap rate?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Cap rate (capitalization rate) is calculated by dividing the net operating income (NOI) by the total acquisition cost of the property. The total acquisition cost includes the purchase price plus closing costs. For example, if a property generates $15,000 in NOI per year and was purchased for $300,000 with $9,000 in closing costs, the cap rate is $15,000 / $309,000 = 4.85%.",
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Rental Yield Calculator - Gross & Net Yield, Cap Rate | ToolCalcs"
+  description="Free rental yield calculator for investment properties. Calculate gross yield, net yield, cap rate, net operating income, and monthly cash flow."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/financial-calculators/">Financial Calculators</a> &rsaquo;
+    <span>Rental Yield Calculator</span>
+  </nav>
+
+  <h1>Rental Yield Calculator</h1>
+  <p class="page-desc">Calculate gross yield, net yield, cap rate, net operating income, and monthly cash flow for any investment property.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="propertyPrice">Property Purchase Price ($)</label>
+        <input type="number" id="propertyPrice" value="300000" min="0" step="1000" />
+      </div>
+      <div class="input-group">
+        <label for="monthlyRent">Monthly Rent ($)</label>
+        <input type="number" id="monthlyRent" value="2000" min="0" step="50" />
+      </div>
+      <div class="input-group">
+        <label for="propertyTax">Annual Property Taxes ($)</label>
+        <input type="number" id="propertyTax" value="3600" min="0" step="100" />
+      </div>
+      <div class="input-group">
+        <label for="insurance">Annual Insurance ($)</label>
+        <input type="number" id="insurance" value="1200" min="0" step="100" />
+      </div>
+      <div class="input-group">
+        <label for="maintenance">Annual Maintenance ($)</label>
+        <input type="number" id="maintenance" value="2400" min="0" step="100" />
+      </div>
+      <div class="input-group">
+        <label for="management">Annual Management Fees ($)</label>
+        <input type="number" id="management" value="0" min="0" step="100" />
+      </div>
+      <div class="input-group">
+        <label for="vacancyRate">Vacancy Rate (%)</label>
+        <input type="number" id="vacancyRate" value="5" min="0" max="100" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="closingCosts">Closing Costs ($)</label>
+        <input type="number" id="closingCosts" value="9000" min="0" step="500" />
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Gross Rental Yield</span>
+          <span class="result-value" id="grossYield">0%</span>
+        </div>
+        <div class="result-card success">
+          <span class="result-label">Net Rental Yield</span>
+          <span class="result-value" id="netYield">0%</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Cap Rate</span>
+          <span class="result-value" id="capRate">0%</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Annual Gross Income</span>
+          <span class="result-value" id="annualGross">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Net Operating Income (NOI)</span>
+          <span class="result-value" id="noi">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Monthly Cash Flow</span>
+          <span class="result-value" id="monthlyCashFlow">$0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="rental-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>Understanding Rental Yield</h2>
+    <p>Rental yield is the most fundamental metric used by real estate investors to evaluate the income-producing potential of an investment property. It expresses the annual rental income as a percentage of the property's purchase price or market value, providing a quick snapshot of how hard your money is working for you. Whether you are comparing two properties in the same neighborhood, evaluating opportunities across different cities, or benchmarking real estate against stocks and bonds, rental yield gives you a standardized way to measure and compare returns.</p>
+    <p>Unlike total return, which includes capital appreciation, rental yield focuses exclusively on the cash income a property generates. This makes it particularly useful for investors who prioritize steady cash flow over speculative price gains. A property can appreciate handsomely over a decade but still be a poor investment if the rental income barely covers its operating costs. Conversely, a modest property in a secondary market may not appreciate rapidly but can deliver strong and consistent cash flow that compounds wealth over time.</p>
+    <p>Understanding the distinction between gross yield, net yield, and cap rate is essential for making informed investment decisions. Each metric tells a different part of the story, and relying on just one can lead to costly miscalculations. This guide walks through every metric this calculator produces, explains how each is calculated, and offers practical guidance on interpreting the results.</p>
+
+    <h2>Gross vs Net Rental Yield</h2>
+    <p>Gross rental yield is the simplest measure of a property's income potential. It takes the total annual rent and divides it by the property's purchase price without accounting for any expenses. It is useful for initial screening and quick comparisons, but it can be misleading because it ignores the very real costs of owning and operating a rental property.</p>
+    <div class="formula-box">
+      <code>Gross Rental Yield = (Monthly Rent &times; 12 / Property Price) &times; 100</code>
+    </div>
+    <p>For example, a property purchased for $300,000 that rents for $2,000 per month produces $24,000 in annual rent. The gross yield is $24,000 / $300,000 = 8.0%. This looks attractive, but it does not tell you how much of that rent you actually keep after paying property taxes, insurance, maintenance, and other costs.</p>
+    <p>Net rental yield provides a far more accurate picture by subtracting operating expenses and vacancy losses from the rental income before dividing by the purchase price. Operating expenses typically include property taxes, insurance, routine maintenance and repairs, and property management fees. Vacancy losses account for the periods when the property sits empty between tenants.</p>
+    <div class="formula-box">
+      <code>Net Rental Yield = Net Operating Income / Property Price &times; 100</code>
+    </div>
+    <p>Using the same example, suppose annual operating expenses total $7,200 (property taxes, insurance, maintenance) and the vacancy rate is 5%. The effective gross income is $24,000 &times; 0.95 = $22,800. Subtracting $7,200 in expenses gives a net operating income of $15,600. The net yield is $15,600 / $300,000 = 5.2%. The difference between 8.0% gross and 5.2% net is significant and demonstrates why experienced investors always look beyond gross yield when evaluating properties.</p>
+
+    <h2>What Is Cap Rate and Why It Matters</h2>
+    <p>The capitalization rate, commonly known as cap rate, is closely related to net rental yield but uses the total acquisition cost rather than just the purchase price as the denominator. Total acquisition cost includes the purchase price plus closing costs such as title fees, appraisal fees, inspection costs, attorney fees, and transfer taxes. This gives an even more conservative and realistic assessment of your return on total capital deployed.</p>
+    <div class="formula-box">
+      <code>Cap Rate = Net Operating Income / (Property Price + Closing Costs) &times; 100</code>
+    </div>
+    <p>Cap rates are widely used in commercial real estate to compare properties and assess market conditions. A higher cap rate implies a higher return relative to the total cost, but it often signals higher risk, less desirable locations, or older properties requiring more maintenance. Lower cap rates are typical in premium locations with strong tenant demand and stable property values. In major metropolitan areas, cap rates of 3-5% are common for residential properties, while secondary and tertiary markets often see cap rates of 6-10% or more.</p>
+    <p>Cap rate is also used to estimate a property's value through the income approach. If you know that comparable properties in an area sell at a 6% cap rate and a property generates $18,000 in NOI, you can estimate its market value at $18,000 / 0.06 = $300,000. This valuation method is standard practice among commercial real estate appraisers and institutional investors.</p>
+
+    <h2>How Vacancy Rate Affects Returns</h2>
+    <p>Vacancy rate is one of the most important variables in rental property analysis, yet many beginning investors overlook it or underestimate its impact. The vacancy rate represents the percentage of time your property is expected to be unoccupied and therefore not generating income. Even in strong rental markets, some vacancy is inevitable due to tenant turnover, lease renewal gaps, and the time needed to find quality tenants.</p>
+    <p>A typical vacancy rate assumption for residential rental properties ranges from 3% to 10%, depending on the market. Well-located properties in high-demand areas with limited supply may experience vacancy rates as low as 2-3%, while properties in softer markets or those targeting a smaller tenant pool might see 8-10% or higher. As a general rule of thumb, a 5% vacancy rate is a reasonable starting assumption for most residential markets, equivalent to about 18 vacant days per year.</p>
+    <p>The financial impact of vacancy compounds because you still pay property taxes, insurance, and potentially utilities and lawn care during vacant periods. A 10% vacancy rate does not just reduce your income by 10%; it effectively increases your per-unit cost of ownership because fixed expenses continue regardless of occupancy. This is why properties with lower vacancy rates in stable markets often command premium prices and lower cap rates, as investors are willing to pay more for reliable income streams.</p>
+    <p>To minimize vacancy, experienced landlords focus on tenant retention through fair pricing, responsive maintenance, and lease renewal incentives. Pricing rent slightly below the top of the market range can dramatically reduce turnover and vacancy, often resulting in higher net income over time compared to maximizing rent and experiencing frequent turnovers.</p>
+
+    <h2>The 1% Rule and 2% Rule for Rental Properties</h2>
+    <p>The 1% rule and 2% rule are quick screening tools that real estate investors use to evaluate potential rental properties before diving into detailed analysis. These rules of thumb help investors rapidly filter out properties that are unlikely to produce adequate cash flow.</p>
+    <p>The 1% rule states that the monthly rent should be at least 1% of the purchase price. For a $300,000 property, the monthly rent should be at least $3,000 to pass this test. Properties that meet the 1% rule are generally considered to have a reasonable chance of producing positive cash flow after accounting for expenses, taxes, and debt service. A property renting for $2,000 per month on a $300,000 purchase price yields a 0.67% ratio, which falls short of the 1% rule and suggests the property may not generate strong cash flow.</p>
+    <p>The 2% rule is a more aggressive version, requiring monthly rent to equal at least 2% of the purchase price. Very few properties in major metropolitan areas meet this threshold today. Properties that do tend to be in lower-cost markets, require significant renovation, or carry higher risk. Meeting the 2% rule typically indicates exceptional cash flow potential but may come with trade-offs in appreciation potential, tenant quality, or property condition.</p>
+    <p>While these rules are useful for initial screening, they should never replace thorough financial analysis. A property that fails the 1% rule might still be an excellent investment if it is located in a rapidly appreciating market or offers value-add renovation opportunities. Conversely, a property meeting the 2% rule in a declining neighborhood with high vacancy and deferred maintenance could be a money pit.</p>
+
+    <h2>Comparing Rental Yield to Other Investments</h2>
+    <p>One of the most common questions investors face is whether to put their money into rental real estate or alternative investments like stocks, bonds, or REITs. Rental yield provides one basis for comparison, but a fair analysis requires looking at total return, risk, liquidity, tax advantages, and time commitment.</p>
+    <p>The S&P 500 has historically returned approximately 10% annually before inflation, including both price appreciation and dividends. However, dividend yield alone (the income component) has averaged only about 1.5-2% in recent years. By comparison, a well-chosen rental property generating a 5-6% net yield already outperforms the stock market's income component, and this is before considering appreciation, leverage benefits, and tax advantages.</p>
+    <p>REITs (Real Estate Investment Trusts) offer a middle ground, providing real estate exposure with stock market liquidity. REITs have historically returned 8-12% annually, with dividend yields typically in the 3-5% range. However, REIT dividends are generally taxed as ordinary income, unlike qualified stock dividends. Rental property investors benefit from depreciation deductions, mortgage interest deductions, and the ability to defer capital gains through 1031 exchanges, which are not available to REIT investors.</p>
+    <p>The key advantage of direct rental property investment is leverage. With a 20-25% down payment, you control an asset worth four to five times your cash investment. If a $300,000 property appreciates 3% in a year, the $9,000 gain represents a 15% return on your $60,000 down payment. Add 5% net yield on the full property value, and total returns can easily reach 20-30% on invested capital in favorable markets. Of course, leverage amplifies losses too, and real estate carries risks that passive stock investing does not, including tenant issues, maintenance surprises, and illiquidity.</p>
+
+    <h2>Hidden Costs That Reduce Rental Yield</h2>
+    <p>Many first-time real estate investors are surprised to discover costs that do not appear in a basic rental yield calculation but can significantly erode actual returns. Being aware of these hidden costs helps you build more realistic financial projections and avoid unpleasant surprises.</p>
+    <p><strong>Repairs and capital expenditures.</strong> Routine maintenance covers day-to-day items like plumbing fixes, appliance repairs, and painting between tenants. Capital expenditures (CapEx) are larger, less frequent items like roof replacement ($8,000-$15,000), HVAC system replacement ($5,000-$10,000), water heater replacement ($1,000-$2,000), and flooring replacement ($3,000-$8,000). Experienced investors set aside 5-10% of gross rent for a CapEx reserve fund to smooth these irregular expenses.</p>
+    <p><strong>Tenant turnover costs.</strong> Each time a tenant moves out, you face costs beyond just the vacancy period. These include cleaning ($200-$500), repainting ($500-$2,000), minor repairs ($200-$1,000), advertising and showing the property ($100-$500), and potential lease-up concessions. A single turnover can easily cost $1,500-$3,000 in direct expenses plus one to two months of lost rent. Minimizing turnover through good tenant relations and competitive pricing is one of the most effective ways to maximize net yield.</p>
+    <p><strong>Legal and accounting fees.</strong> Landlords periodically incur legal costs for lease drafting, eviction proceedings, and disputes with tenants or contractors. Professional tax preparation for rental properties typically costs $200-$500 per year, and some investors hire bookkeepers or use specialized accounting software ($10-$50 per month). While these costs seem modest individually, they add up over the life of an investment.</p>
+    <p><strong>Accounting for all costs.</strong> When evaluating a potential rental property, add 15-20% to your estimated annual expenses to create a buffer for costs you have not anticipated. This more conservative approach may reduce your projected yield, but it produces estimates that more closely match real-world results. Seasoned investors would rather be pleasantly surprised by higher actual returns than face shortfalls they did not plan for.</p>
+
+    <h2>Tax Benefits of Rental Property Investment</h2>
+    <p>Rental property offers several significant tax advantages that can dramatically improve after-tax returns compared to other investment types. Understanding these benefits is essential for accurately comparing rental yield to alternative investments.</p>
+    <p><strong>Depreciation.</strong> The IRS allows residential rental property owners to depreciate the building (not the land) over 27.5 years using straight-line depreciation. For a $300,000 property where the building value is $240,000, this creates an annual depreciation deduction of approximately $8,727. This is a paper expense that reduces your taxable rental income without requiring any actual cash outlay. If your net operating income is $15,000, depreciation could reduce your taxable rental income to just $6,273, or even create a paper loss that offsets other income if you qualify as a real estate professional.</p>
+    <p><strong>Operating expense deductions.</strong> All ordinary and necessary expenses related to managing and maintaining your rental property are tax-deductible. This includes property taxes, insurance premiums, maintenance and repair costs, property management fees, advertising costs, travel expenses to inspect or manage the property, and even a home office deduction if you manage properties from a dedicated workspace. These deductions directly reduce your taxable income and improve your after-tax return.</p>
+    <p><strong>Mortgage interest deduction.</strong> If you finance the property with a mortgage, the interest portion of your payments is fully deductible against rental income. In the early years of a mortgage, the majority of each payment is interest, creating a substantial tax benefit. On a $240,000 loan at 7% interest, first-year interest alone is approximately $16,700, which can create a significant paper loss when combined with depreciation and operating expenses.</p>
+    <p><strong>1031 exchange.</strong> Section 1031 of the Internal Revenue Code allows investors to defer capital gains taxes when selling one investment property and purchasing another of equal or greater value. By continuously exchanging properties throughout your investing career, you can defer capital gains taxes indefinitely. Upon death, your heirs receive a stepped-up cost basis, potentially eliminating the deferred gains entirely. This powerful strategy allows investors to grow their portfolios much faster than they could if paying capital gains taxes on each sale.</p>
+
+    <h2>Common Mistakes When Calculating Rental Yield</h2>
+    <p>Even experienced investors occasionally make errors when evaluating rental property returns. Avoiding these common mistakes will lead to better investment decisions and more accurate financial projections.</p>
+    <p><strong>Using asking rent instead of market rent.</strong> Listing agents and sellers often advertise optimistic rental estimates to make properties appear more attractive. Always verify actual market rents by checking comparable listings on rental platforms, speaking with local property managers, and reviewing recent lease comparables. Overstating rent by even $200 per month inflates gross income by $2,400 annually and can make a mediocre deal appear attractive.</p>
+    <p><strong>Ignoring vacancy entirely.</strong> Assuming 100% occupancy year-round is unrealistic for almost any rental property. Even in the tightest rental markets, plan for at least 3-5% vacancy to account for tenant turnover and the time between tenants. In softer markets, 8-10% or more may be appropriate. Failing to account for vacancy inflates your projected income and yields.</p>
+    <p><strong>Underestimating maintenance costs.</strong> A common rule of thumb is to budget 1% of the property value annually for maintenance and repairs, though older properties may require 1.5-2%. New investors frequently budget too little for maintenance, especially for older properties with aging systems and components. Deferred maintenance does not disappear; it simply creates larger, more expensive problems down the road.</p>
+    <p><strong>Forgetting about property management.</strong> Even if you plan to self-manage, your time has value. Professional property management typically costs 8-12% of gross rent for single-family homes. Even if you do not hire a manager initially, including this cost in your analysis gives you a realistic picture of the property's returns independent of your personal labor. It also ensures the investment still works if your circumstances change and you need to hire management later.</p>
+    <p><strong>Confusing gross and net yield.</strong> Quoting gross yield without context can lead to overconfidence in a property's returns. Always calculate and report net yield alongside gross yield to maintain a realistic perspective. A property with a 10% gross yield and a 3% net yield is not nearly as attractive as those top-line numbers suggest.</p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is a good rental yield?</h3>
+    <p>A good gross rental yield generally falls between 5% and 8%, though this varies significantly by market and property type. In high-demand urban areas like San Francisco or New York, gross yields of 3-5% are common because property prices are high relative to rents. Secondary and tertiary markets often offer gross yields of 8-12% because purchase prices are lower. For net rental yield, a return above 4-5% is generally considered good, as it indicates the property generates meaningful income after all operating expenses are covered. The ideal yield also depends on your investment strategy: cash flow-focused investors seek higher yields, while appreciation-focused investors may accept lower yields in markets with stronger price growth potential.</p>
+
+    <h3>What is the difference between gross and net rental yield?</h3>
+    <p>Gross rental yield is calculated by dividing the annual rental income by the property purchase price, without deducting any expenses. It provides a quick, top-level comparison tool but does not reflect actual profitability. Net rental yield subtracts all operating expenses, including property taxes, insurance, maintenance, property management fees, and vacancy losses, from the rental income before dividing by the property price. Net yield gives investors a much more accurate picture of actual cash returns. The gap between gross and net yield typically ranges from 2 to 4 percentage points, depending on the expense load. A property with an 8% gross yield might deliver only a 4-5% net yield after accounting for all costs of ownership.</p>
+
+    <h3>How do you calculate cap rate?</h3>
+    <p>Cap rate, or capitalization rate, is calculated by dividing the property's net operating income (NOI) by its total acquisition cost. NOI is the annual rental income minus operating expenses (property taxes, insurance, maintenance, management fees) and vacancy losses, but before debt service (mortgage payments). The total acquisition cost includes the purchase price plus all closing costs. For example, if a property generates $15,000 in annual NOI and was acquired for a total of $309,000 (including $9,000 in closing costs), the cap rate is $15,000 / $309,000 = 4.85%. Cap rate differs from net yield because it uses total acquisition cost rather than just the purchase price, making it a slightly more conservative and comprehensive measure of return.</p>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/financial-calculators/roi-calculator/">ROI Calculator</a> - Calculate total return on investment, annualized ROI, and net profit for any investment.</li>
+      <li><a href="/financial-calculators/mortgage-calculator/">Mortgage Calculator</a> - Estimate monthly mortgage payments, total interest, and amortization schedules.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="rental-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function formatCurrency(n) {
+    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function formatPct(n) {
+    return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
+  }
+
+  function calculate() {
+    var propertyPrice = parseFloat(document.getElementById('propertyPrice').value) || 0;
+    var monthlyRent = parseFloat(document.getElementById('monthlyRent').value) || 0;
+    var propertyTax = parseFloat(document.getElementById('propertyTax').value) || 0;
+    var insurance = parseFloat(document.getElementById('insurance').value) || 0;
+    var maintenance = parseFloat(document.getElementById('maintenance').value) || 0;
+    var management = parseFloat(document.getElementById('management').value) || 0;
+    var vacancyRate = parseFloat(document.getElementById('vacancyRate').value) || 0;
+    var closingCosts = parseFloat(document.getElementById('closingCosts').value) || 0;
+
+    var annualGross = monthlyRent * 12;
+    var effectiveGrossIncome = annualGross * (1 - vacancyRate / 100);
+    var totalExpenses = propertyTax + insurance + maintenance + management;
+    var noi = effectiveGrossIncome - totalExpenses;
+    var monthlyCashFlow = noi / 12;
+
+    var grossYield = 0;
+    var netYield = 0;
+    var capRate = 0;
+
+    if (propertyPrice > 0) {
+      grossYield = (annualGross / propertyPrice) * 100;
+      netYield = (noi / propertyPrice) * 100;
+    }
+
+    var totalAcquisition = propertyPrice + closingCosts;
+    if (totalAcquisition > 0) {
+      capRate = (noi / totalAcquisition) * 100;
+    }
+
+    document.getElementById('grossYield').textContent = formatPct(grossYield);
+    document.getElementById('netYield').textContent = formatPct(netYield);
+    document.getElementById('capRate').textContent = formatPct(capRate);
+    document.getElementById('annualGross').textContent = formatCurrency(annualGross);
+    document.getElementById('noi').textContent = formatCurrency(noi);
+    document.getElementById('monthlyCashFlow').textContent = formatCurrency(monthlyCashFlow);
+  }
+
+  document.getElementById('calculateBtn').addEventListener('click', calculate);
+  calculate();
+</script>

@@ -1,0 +1,332 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Construction Calculators",
+        "item": "https://toolcalcs.com/construction-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Solar Panel Calculator"
+      }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How long does it take for solar panels to pay for themselves?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Most residential solar panel systems pay for themselves in 6 to 12 years, depending on system cost, local electricity rates, sunlight availability, and available incentives. After the federal tax credit and state incentives, the average payback period in the U.S. is about 8 years. After payback, the electricity your system generates is essentially free for the remaining 15 to 20 years of the system warranty.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is the federal solar tax credit?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The federal solar Investment Tax Credit (ITC) allows homeowners to deduct 30% of the total cost of a solar panel system from their federal taxes. This 30% rate is available through 2032. It steps down to 26% in 2033 and 22% in 2034, and is scheduled to expire for residential installations after 2034 unless extended by Congress.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How much can solar panels save over 25 years?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'A typical 8 kW residential solar system can save $30,000 to $90,000 over 25 years, depending on local electricity rates and how much those rates increase over time. With average U.S. electricity rates around $0.15/kWh and a 3% annual rate increase, a well-sized system in a sunny location can save over $60,000 after accounting for the net system cost.',
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Solar Panel Calculator - ROI, Savings & Payback Period | ToolCalcs"
+  description="Free solar panel calculator. Estimate system ROI, payback period, 25-year savings, and monthly electricity savings based on your system size and location."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/construction-calculators/">Construction Calculators</a> &rsaquo;
+    <span>Solar Panel Calculator</span>
+  </nav>
+
+  <h1>Solar Panel Calculator</h1>
+  <p class="page-desc">Estimate your solar panel system ROI, payback period, 25-year savings, and monthly electricity savings based on your system size, cost, and location.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="systemCost">System Cost ($)</label>
+        <input type="number" id="systemCost" value="25000" min="0" step="500" />
+      </div>
+      <div class="input-group">
+        <label for="systemSize">System Size (kW)</label>
+        <input type="number" id="systemSize" value="8" min="1" max="50" step="0.5" />
+      </div>
+      <div class="input-group">
+        <label for="taxCredit">Federal Tax Credit (%)</label>
+        <input type="number" id="taxCredit" value="30" min="0" max="100" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="stateIncentive">State/Local Incentives ($)</label>
+        <input type="number" id="stateIncentive" value="0" min="0" step="100" />
+      </div>
+      <div class="input-group">
+        <label for="monthlyBill">Monthly Electric Bill ($)</label>
+        <input type="number" id="monthlyBill" value="150" min="0" step="10" />
+      </div>
+      <div class="input-group">
+        <label for="sunHours">Avg Peak Sun Hours/Day</label>
+        <input type="number" id="sunHours" value="5" min="1" max="10" step="0.5" />
+      </div>
+      <div class="input-group">
+        <label for="elecRate">Electricity Rate ($/kWh)</label>
+        <input type="number" id="elecRate" value="0.15" min="0.01" max="1" step="0.01" />
+      </div>
+      <div class="input-group">
+        <label for="rateIncrease">Annual Rate Increase (%)</label>
+        <input type="number" id="rateIncrease" value="3" min="0" max="10" step="0.5" />
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Net System Cost</span>
+          <span class="result-value" id="resultNetCost">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Payback Period (years)</span>
+          <span class="result-value" id="resultPayback">0</span>
+        </div>
+        <div class="result-card success">
+          <span class="result-label">25-Year Savings</span>
+          <span class="result-value" id="resultTotalSavings">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Monthly Savings</span>
+          <span class="result-value" id="resultMonthlySavings">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total ROI</span>
+          <span class="result-value" id="resultRoi">0%</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">CO2 Offset (tons/25yr)</span>
+          <span class="result-value" id="resultCo2">0</span>
+        </div>
+      </div>
+
+      <div class="info-table" id="savingsTable" style="display:none;">
+        <h3>Year-by-Year Savings Breakdown</h3>
+        <table>
+          <thead>
+            <tr><th>Year</th><th>Electricity Rate</th><th>Annual Savings</th><th>Cumulative Savings</th></tr>
+          </thead>
+          <tbody id="savingsTableBody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="solar-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>How Solar Panel ROI Works</h2>
+    <p>Solar panel return on investment (ROI) measures the financial benefit of installing a solar energy system on your home. Unlike most home improvement projects that may or may not increase property value, a solar panel system generates measurable, ongoing savings by reducing or eliminating your monthly electricity bill. The ROI calculation compares the total financial benefit over the life of the system against the net cost of purchasing and installing the panels.</p>
+    <p>The financial case for residential solar has never been stronger. The combination of dramatically lower panel prices, generous federal and state incentives, rising electricity rates, and improved panel efficiency means that most homeowners in the United States can expect a positive return on their solar investment within 6 to 12 years. After the payback period, every kilowatt-hour your system produces is essentially free electricity for the remaining 15 to 20 years of the panel warranty.</p>
+    <p>To calculate solar ROI accurately, you need to account for several variables: the gross system cost, the federal Investment Tax Credit (ITC), any state or local incentives, your current electricity consumption, your local electricity rate, the expected rate of electricity price increases, and the amount of sunlight your location receives. Our calculator above brings all of these factors together to give you a comprehensive picture of the financial returns you can expect from a solar installation.</p>
+    <p>It is important to understand that solar ROI is not a fixed number. It changes over time as electricity rates rise, making the savings from solar increasingly valuable in later years. A system that saves you $1,500 in year one might save you $2,500 or more in year fifteen due to compounding electricity rate increases. This escalating savings profile is one of the key advantages of solar energy over other investments with fixed returns.</p>
+
+    <h2>Understanding the Federal Solar Tax Credit (ITC)</h2>
+    <p>The federal solar Investment Tax Credit (ITC) is the single most important financial incentive for residential solar installations in the United States. Under the Inflation Reduction Act of 2022, the ITC allows homeowners to deduct 30% of the total cost of a solar energy system from their federal income taxes. This is a direct tax credit, not a deduction, meaning it reduces your tax liability dollar for dollar.</p>
+    <p>The 30% ITC rate is available for solar systems installed through the end of 2032. After that, the credit steps down on the following schedule:</p>
+    <ul>
+      <li><strong>2022 through 2032:</strong> 30% of system cost</li>
+      <li><strong>2033:</strong> 26% of system cost</li>
+      <li><strong>2034:</strong> 22% of system cost</li>
+      <li><strong>2035 and beyond:</strong> The residential credit is scheduled to expire (commercial installations retain a 10% permanent credit)</li>
+    </ul>
+    <p>For a $25,000 solar system, the 30% ITC provides a $7,500 tax credit, effectively reducing the net cost to $17,500. The credit applies to the total system cost including panels, inverters, racking, wiring, labor, permits, and sales tax. Battery storage systems also qualify for the ITC when installed alongside or added to an existing solar system.</p>
+    <p>To claim the ITC, you must own the solar system outright (purchased with cash or financed with a loan). Systems acquired through a lease or power purchase agreement (PPA) do not qualify for the homeowner's ITC because the leasing company owns the system and claims the credit themselves. You must also have sufficient federal tax liability to use the credit. If your tax liability in the year of installation is less than the credit amount, you can carry the unused portion forward to future tax years.</p>
+
+    <h2>Calculating Your Solar Payback Period</h2>
+    <p>The payback period is the number of years it takes for the cumulative electricity savings from your solar system to equal the net cost you paid for it. It is the single most important metric for evaluating whether solar makes financial sense for your specific situation. A shorter payback period means you start enjoying free electricity sooner and accumulate more total savings over the life of the system.</p>
+    <div class="formula-box">
+      <code>Net Cost = System Cost - (System Cost &times; Tax Credit %) - State Incentives</code><br />
+      <code>Year 1 Savings = System Size (kW) &times; Sun Hours &times; 365 &times; Electricity Rate</code><br />
+      <code>Payback Period = Net Cost / Year 1 Savings</code>
+    </div>
+    <p>For example, consider a homeowner who installs an 8 kW system costing $25,000. After the 30% federal ITC ($7,500) and a $2,000 state rebate, the net cost is $15,500. If the system produces about 14,600 kWh per year (8 kW times 5 peak sun hours times 365 days) and the local electricity rate is $0.15 per kWh, the annual savings in year one are approximately $2,190. The simple payback period is $15,500 divided by $2,190, which equals about 7.1 years.</p>
+    <p>However, this simple calculation understates the true payback because it does not account for rising electricity rates. If rates increase by 3% annually, your savings grow each year, and you actually reach payback slightly faster. Our calculator uses the compounding rate increase to give you a more accurate payback estimate that reflects real-world conditions.</p>
+    <p>The average solar payback period in the United States ranges from 6 to 12 years, with significant variation by state. States with high electricity rates and good solar incentives, such as California, Massachusetts, New York, and Hawaii, tend to have shorter payback periods. States with low electricity rates and less sunlight, such as those in the upper Midwest, may have longer payback periods. However, even in less optimal locations, the 25-year savings are typically substantial because electricity rates continue to rise while your solar production costs remain fixed at zero.</p>
+
+    <h2>Factors Affecting Solar Panel ROI</h2>
+    <p>Several variables influence the financial return on a solar panel investment. Understanding these factors helps you make an informed decision and set realistic expectations for your system's performance.</p>
+    <p><strong>Geographic location and sunlight availability.</strong> The amount of electricity your solar system produces depends directly on how much sunlight it receives. Solar resource is measured in peak sun hours per day, which represents the equivalent number of hours at full 1,000 watts per square meter irradiance. The southwestern United States (Arizona, Nevada, New Mexico, Southern California) receives 6 to 7 peak sun hours per day, while the Pacific Northwest and Northeast receive 3 to 4.5 peak sun hours. More sunlight means more electricity production and faster payback.</p>
+    <p><strong>Roof orientation and angle.</strong> In the Northern Hemisphere, south-facing roofs receive the most sunlight throughout the year and produce the most energy. A south-facing roof tilted at an angle equal to your latitude (roughly 25 to 45 degrees for most of the continental U.S.) is ideal. West-facing roofs produce about 10 to 15% less energy than south-facing, while east-facing roofs are similar. North-facing roofs are generally not recommended for solar installations because they receive significantly less direct sunlight.</p>
+    <p><strong>Shading.</strong> Even partial shading from trees, chimneys, neighboring buildings, or other obstructions can significantly reduce solar panel output. Traditional string inverter systems are particularly vulnerable to shading because a single shaded panel can reduce the output of the entire string. Modern systems using microinverters or power optimizers mitigate this problem by allowing each panel to operate independently, but shading still reduces total system production. A professional solar installer will conduct a shade analysis before recommending a system size and layout.</p>
+    <p><strong>Panel efficiency.</strong> Solar panel efficiency refers to the percentage of sunlight that a panel converts into electricity. Standard residential panels have efficiencies between 18% and 22%. Higher-efficiency panels (such as those made by SunPower or REC) produce more electricity per square foot, which is especially valuable if your roof space is limited. However, higher-efficiency panels typically cost more per watt. The efficiency rating is already factored into the panel's wattage rating, so when you compare systems by total kilowatt capacity, the efficiency is already accounted for.</p>
+    <p><strong>Local electricity rates.</strong> Higher electricity rates mean greater savings per kilowatt-hour produced. Homeowners in states with rates above $0.20 per kWh (such as California, Connecticut, Massachusetts, and Hawaii) see faster payback periods and higher total savings than those in states with rates below $0.10 per kWh. The rate of annual electricity price increases also matters significantly over a 25-year analysis period.</p>
+
+    <h2>Solar Panel System Sizing Guide</h2>
+    <p>Properly sizing a solar panel system is critical to maximizing your financial return. A system that is too small will leave you paying for grid electricity unnecessarily, while a system that is too large may produce excess energy that your utility does not fully compensate you for, depending on your local net metering policy.</p>
+    <p>The most straightforward approach to sizing a solar system is to base it on your annual electricity consumption. Start by reviewing your electricity bills for the past 12 months to determine your total annual usage in kilowatt-hours (kWh). Most utility bills show monthly consumption, so add up all 12 months. The average U.S. household uses approximately 10,500 kWh per year, but this varies widely based on home size, climate, heating and cooling systems, and the number of occupants.</p>
+    <p>Once you know your annual consumption, divide it by the expected annual production per kilowatt of solar capacity in your area. Annual production per kW is calculated as peak sun hours per day times 365 days times a system efficiency factor (typically 0.75 to 0.85 to account for inverter losses, wiring losses, temperature effects, and soiling).</p>
+    <div class="formula-box">
+      <code>System Size (kW) = Annual kWh Usage / (Peak Sun Hours &times; 365 &times; 0.80)</code>
+    </div>
+    <p>For a home using 10,500 kWh per year in an area with 5 peak sun hours per day: 10,500 / (5 times 365 times 0.80) = 10,500 / 1,460 = 7.2 kW. Rounding up to account for panel degradation over time, an 8 kW system would be appropriate. This size would offset approximately 100% of the home's electricity usage in year one, with the percentage gradually declining as panels degrade and electricity consumption potentially grows.</p>
+    <p>Many homeowners choose to size their system to offset 80% to 100% of their current usage. Going above 100% may not make financial sense in areas without favorable net metering policies, as the utility may not compensate you at the full retail rate for excess generation. If you plan to add an electric vehicle or heat pump in the future, consider sizing your system larger to accommodate the increased demand.</p>
+
+    <h2>Net Metering and Its Impact on Savings</h2>
+    <p>Net metering is a billing arrangement that allows solar panel owners to send excess electricity back to the grid in exchange for credits on their utility bill. It is one of the most important policy factors affecting solar panel ROI because it determines how you are compensated for the electricity your system produces but you do not use immediately.</p>
+    <p>Under traditional net metering, your electric meter effectively runs backward when your solar panels produce more electricity than your home is consuming. This typically occurs during the middle of the day when solar production peaks but your home may be unoccupied. The excess electricity flows onto the grid, and your utility gives you a credit at the full retail rate for each kilowatt-hour exported. In the evening and at night when your panels are not producing, you draw electricity from the grid as usual. At the end of each billing period, you pay only for your net consumption (total usage minus total credits).</p>
+    <p>Net metering policies vary significantly by state and utility. Some states, like California, have moved to net billing (NEM 3.0) where excess solar exports are credited at a lower rate than the retail price, typically closer to the wholesale electricity rate. This reduces the value of exported electricity and can make solar batteries more attractive, since storing excess energy for your own evening use becomes more valuable than sending it to the grid at a reduced rate.</p>
+    <p>If your utility offers full retail net metering, a solar system that produces 100% of your annual electricity usage will effectively eliminate your electricity bill (though most utilities charge a small fixed monthly connection fee of $10 to $20). If your utility uses net billing at a reduced export rate, you may want to size your system to match your daytime usage more closely or invest in battery storage to maximize self-consumption.</p>
+
+    <h2>Solar Panel Degradation</h2>
+    <p>Solar panels gradually lose a small amount of their electricity-producing capacity over time, a process known as degradation. Understanding degradation is important for setting realistic long-term savings expectations and evaluating manufacturer warranties.</p>
+    <p>The industry-standard degradation rate for modern solar panels is approximately 0.5% per year. This means that a panel rated at 400 watts will produce about 398 watts after one year, 390 watts after five years, and approximately 350 watts after 25 years. Over a 25-year period, a panel degrading at 0.5% per year will still produce approximately 87.5% of its original rated output. Some premium panel manufacturers claim degradation rates as low as 0.25% per year.</p>
+    <p>Most solar panel manufacturers offer two types of warranties. The <strong>product warranty</strong> (also called the equipment or workmanship warranty) covers manufacturing defects and typically lasts 12 to 25 years depending on the manufacturer. The <strong>performance warranty</strong> (also called the power output warranty) guarantees that the panels will still produce a minimum percentage of their rated output after a specified number of years. A typical performance warranty guarantees at least 90% output after 10 years and at least 80% output after 25 years.</p>
+    <p>For the purposes of ROI calculations, most analysts assume a constant output over the analysis period rather than modeling year-by-year degradation. This slightly overstates the savings in later years but simplifies the calculation. If you want a more conservative estimate, reduce your expected annual production by 0.5% per year. The overall impact on 25-year savings is relatively modest, typically reducing total savings by 5% to 8% compared to a no-degradation assumption.</p>
+
+    <h2>Comparing Solar Financing Options</h2>
+    <p>How you pay for your solar system significantly affects your overall return on investment. There are three main financing options for residential solar: cash purchase, solar loan, and lease or power purchase agreement (PPA). Each has distinct advantages and tradeoffs.</p>
+    <p><strong>Cash purchase</strong> provides the highest total ROI because you avoid paying interest on a loan and you own the system outright from day one. You claim the full federal ITC and any state incentives directly. The downside is the large upfront capital requirement, typically $15,000 to $35,000 before incentives. For homeowners who have the available cash and plan to stay in their home for at least 7 to 10 years, a cash purchase almost always delivers the best financial outcome. The effective return on the investment typically ranges from 8% to 15% annualized, which compares favorably to most other investment options at similar risk levels.</p>
+    <p><strong>Solar loans</strong> allow you to finance the system with little or no money down while still owning the system and claiming the tax credit. Solar loans typically have terms of 10 to 25 years with interest rates ranging from 3% to 8% depending on your credit score and the lender. With a solar loan, your monthly loan payment may be similar to or less than your current electricity bill, so you achieve savings from day one. However, the total cost of the system increases due to interest, which reduces the overall ROI compared to a cash purchase. Many homeowners use the federal tax credit refund to make a lump-sum payment on the loan principal, reducing the total interest paid.</p>
+    <p><strong>Solar leases and PPAs</strong> require zero upfront cost. With a lease, you pay a fixed monthly payment for the use of the solar equipment. With a PPA, you pay a per-kilowatt-hour rate for the electricity the system produces, typically 10% to 30% below the utility rate. The solar company owns the system, claims the tax credit, and is responsible for maintenance. The advantage is simplicity and no financial risk, but the savings are much smaller than with ownership, and you do not build equity in the system. Leases and PPAs can also complicate home sales, as the agreement may need to be transferred to the buyer or bought out. For homeowners who cannot claim the tax credit (due to insufficient tax liability) or prefer not to take on debt, a lease or PPA can still provide meaningful savings with no upfront investment.</p>
+
+    <h2>Environmental Impact of Solar Energy</h2>
+    <p>Beyond financial returns, solar panels provide significant environmental benefits by displacing electricity generated from fossil fuels. The environmental impact of your solar system can be quantified in terms of carbon dioxide (CO2) emissions avoided, which is a primary driver of climate change.</p>
+    <p>The average CO2 emissions factor for U.S. electricity generation is approximately 0.417 kilograms (about 0.92 pounds) of CO2 per kilowatt-hour. This means every kilowatt-hour your solar panels produce avoids nearly a pound of CO2 emissions. An 8 kW solar system producing approximately 14,600 kWh per year avoids about 6.1 metric tons of CO2 annually. Over a 25-year system lifetime, that totals approximately 152 metric tons of CO2 avoided.</p>
+    <p>To put this in perspective, the average passenger car in the United States emits about 4.6 metric tons of CO2 per year. An 8 kW solar system offsets the equivalent of driving about 1.3 cars annually, or the equivalent of roughly 33 car-years of driving over 25 years. Another way to visualize the impact: the U.S. Forest Service estimates that one mature tree absorbs about 48 pounds (0.022 metric tons) of CO2 per year. An 8 kW solar system provides the CO2-reduction equivalent of planting approximately 278 trees.</p>
+    <p>Solar panels also reduce emissions of other pollutants associated with fossil fuel combustion, including sulfur dioxide (SO2), nitrogen oxides (NOx), and particulate matter. These pollutants contribute to acid rain, smog, and respiratory health problems. By generating clean electricity, your solar system improves local air quality in addition to reducing greenhouse gas emissions.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>How long does it take for solar panels to pay for themselves?</h3>
+    <p>Most residential solar panel systems pay for themselves in 6 to 12 years, with the average being around 8 years after accounting for the federal tax credit. The payback period depends on your net system cost after incentives, your local electricity rate, and the amount of sunlight your location receives. Higher electricity rates and more sunshine lead to shorter payback periods. After the system has paid for itself, the electricity it generates is essentially free for the remaining life of the system, which is typically 25 to 30 years. With annual electricity rate increases of 3% or more, the savings in later years can be two to three times the savings in year one, making the post-payback period extremely valuable.</p>
+
+    <h3>What is the federal solar tax credit?</h3>
+    <p>The federal solar Investment Tax Credit (ITC) allows homeowners who purchase a solar energy system to deduct 30% of the total system cost from their federal income taxes. This includes the cost of panels, inverters, racking, installation labor, permits, and sales tax. The 30% rate is available for systems installed through the end of 2032, after which it steps down to 26% in 2033 and 22% in 2034. The credit is scheduled to expire for residential installations after 2034 unless Congress extends it. To qualify, you must own the system (not lease it) and have sufficient federal tax liability to use the credit. Any unused credit can be carried forward to subsequent tax years.</p>
+
+    <h3>How much can solar panels save over 25 years?</h3>
+    <p>A typical 8 kW residential solar system can save between $30,000 and $90,000 over 25 years, depending on local electricity rates, the annual rate of increase, and how much sunlight your location receives. At the national average electricity rate of approximately $0.15 per kWh with a 3% annual increase, an 8 kW system in an area with 5 peak sun hours per day can generate over $60,000 in cumulative savings. In states with higher electricity rates like California ($0.25+/kWh) or Massachusetts ($0.22+/kWh), 25-year savings can exceed $80,000 to $90,000. These figures account for the compounding effect of rising electricity prices, which makes solar increasingly valuable over time. The total ROI, measured as the percentage return on your net investment, often exceeds 200% to 400% over the full 25-year period.</p>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/financial-calculators/roi-calculator/">ROI Calculator</a> - Calculate return on investment for any investment or purchase.</li>
+      <li><a href="/everyday-calculators/electricity-cost-calculator/">Electricity Cost Calculator</a> - Estimate electricity usage and costs for any appliance.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="solar-bottom" format="horizontal" />
+</BaseLayout>
+
+<script is:inline>
+  function calculate() {
+    var systemCost = parseFloat(document.getElementById('systemCost').value) || 0;
+    var systemSize = parseFloat(document.getElementById('systemSize').value) || 0;
+    var taxCredit = parseFloat(document.getElementById('taxCredit').value) || 0;
+    var stateIncentive = parseFloat(document.getElementById('stateIncentive').value) || 0;
+    var monthlyBill = parseFloat(document.getElementById('monthlyBill').value) || 0;
+    var sunHours = parseFloat(document.getElementById('sunHours').value) || 0;
+    var elecRate = parseFloat(document.getElementById('elecRate').value) || 0;
+    var rateIncrease = parseFloat(document.getElementById('rateIncrease').value) || 0;
+
+    var netCost = systemCost - (systemCost * taxCredit / 100) - stateIncentive;
+    if (netCost < 0) {
+      netCost = 0;
+    }
+
+    var annualProduction = systemSize * sunHours * 365; // kWh
+    var year1Savings = Math.min(annualProduction * elecRate, monthlyBill * 12);
+
+    var totalSavings = 0;
+    var tableYears = [1, 5, 10, 15, 20, 25];
+    var tableData = [];
+    var cumulative = 0;
+
+    for (var yr = 0; yr < 25; yr++) {
+      var rate = elecRate * Math.pow(1 + rateIncrease / 100, yr);
+      var annualSave = Math.min(annualProduction * rate, monthlyBill * 12 * Math.pow(1 + rateIncrease / 100, yr));
+      totalSavings += annualSave;
+      cumulative += annualSave;
+
+      if (tableYears.indexOf(yr + 1) !== -1) {
+        tableData.push({
+          year: yr + 1,
+          rate: rate,
+          annual: annualSave,
+          cumulative: cumulative
+        });
+      }
+    }
+
+    var paybackYears = year1Savings > 0 ? netCost / year1Savings : 0;
+    var roi = netCost > 0 ? ((totalSavings - netCost) / netCost) * 100 : 0;
+    var monthlySavings = year1Savings / 12;
+    var co2Offset = annualProduction * 0.000417 * 25; // tons
+
+    // Display results
+    document.getElementById('resultNetCost').textContent = '$' + Math.round(netCost).toLocaleString();
+    document.getElementById('resultPayback').textContent = paybackYears > 0 ? paybackYears.toFixed(1) : '0';
+    document.getElementById('resultTotalSavings').textContent = '$' + Math.round(totalSavings).toLocaleString();
+    document.getElementById('resultMonthlySavings').textContent = '$' + Math.round(monthlySavings).toLocaleString();
+    document.getElementById('resultRoi').textContent = roi > 0 ? roi.toFixed(1) + '%' : '0%';
+    document.getElementById('resultCo2').textContent = co2Offset.toFixed(1);
+
+    // Build savings table
+    var tbody = document.getElementById('savingsTableBody');
+    tbody.innerHTML = '';
+    for (var i = 0; i < tableData.length; i++) {
+      var row = document.createElement('tr');
+      row.innerHTML =
+        '<td>' + tableData[i].year + '</td>' +
+        '<td>$' + tableData[i].rate.toFixed(3) + '/kWh</td>' +
+        '<td>$' + Math.round(tableData[i].annual).toLocaleString() + '</td>' +
+        '<td>$' + Math.round(tableData[i].cumulative).toLocaleString() + '</td>';
+      tbody.appendChild(row);
+    }
+    document.getElementById('savingsTable').style.display = 'block';
+  }
+
+  // Button click handler
+  document.getElementById('calculateBtn').addEventListener('click', calculate);
+
+  // Also calculate on Enter key in any input
+  document.querySelectorAll('.calc-inputs input').forEach(function(el) {
+    el.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        calculate();
+      }
+    });
+  });
+
+  // Initial calculation
+  calculate();
+</script>

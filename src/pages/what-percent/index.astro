@@ -1,0 +1,89 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/category.css';
+import { getAllWhatPercentPages } from '../../data/what-percent';
+
+const allPages = getAllWhatPercentPages();
+
+// Group pages by wholeValue
+const wholeGroups = new Map<number, typeof allPages>();
+for (const page of allPages) {
+  if (!wholeGroups.has(page.wholeValue)) wholeGroups.set(page.wholeValue, []);
+  wholeGroups.get(page.wholeValue)!.push(page);
+}
+
+// Sort groups by wholeValue ascending, and pages within each group by partValue ascending
+const sortedGroups = [...wholeGroups.entries()]
+  .sort((a, b) => a[0] - b[0])
+  .map(([whole, pages]) => [whole, pages.sort((a, b) => a.partValue - b.partValue)] as [number, typeof allPages]);
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://toolcalcs.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Percentage Calculator",
+      "item": "https://toolcalcs.com/math-calculators/percentage-calculator/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "What Percent Is X of Y"
+    }
+  ]
+};
+---
+
+<BaseLayout
+  title="What Percentage Is X of Y? - All Calculations | ToolCalcs"
+  description={`Browse ${allPages.length} percentage ratio calculations. Find what percentage one number is of another with step-by-step solutions.`}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/math-calculators/percentage-calculator/">Percentage Calculator</a> &rsaquo; <span>What Percent Is X of Y</span>
+  </nav>
+
+  <h1>What Percentage Is X of Y?</h1>
+  <p class="page-desc">Browse {allPages.length} percentage ratio calculations. Select any pair below to see what percentage one number is of another, with step-by-step solutions, fractions, and decimal equivalents.</p>
+
+  <AdUnit slot="wp-idx-top" format="horizontal" />
+
+  {sortedGroups.map(([whole, pages]) => (
+    <section class="whole-section">
+      <h2 class="whole-heading">Percentages of {whole.toLocaleString('en-US')}</h2>
+      <div class="calc-grid">
+        {pages.map((p) => (
+          <a href={`/what-percent/${p.slug}/`} class="calc-card">
+            <h2>{p.partValue.toLocaleString('en-US')} of {p.wholeValue.toLocaleString('en-US')}</h2>
+            <p>= {p.percentStr}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  ))}
+
+  <AdUnit slot="wp-idx-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .whole-section {
+    margin-bottom: 32px;
+  }
+  .whole-heading {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--color-border);
+    color: var(--color-text);
+  }
+</style>

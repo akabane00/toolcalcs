@@ -1,0 +1,146 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getAllPercentOffPages, discountPercents, originalPrices } from '../../data/percent-off';
+import '../../styles/category.css';
+
+const allPages = getAllPercentOffPages();
+
+// Build a lookup map: `${discountPercent}-${originalPrice}` -> page
+const pageMap = new Map(allPages.map(p => [`${p.discountPercent}-${p.originalPrice}`, p]));
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://toolcalcs.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Discount Calculator",
+      "item": "https://toolcalcs.com/percent-off/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "All Discount Calculations"
+    }
+  ]
+};
+---
+
+<BaseLayout
+  title="Percent Off Calculator - All Discount Calculations | ToolCalcs"
+  description={`Browse ${allPages.length} instant percent-off discount calculations. Find the final price after X% off $Y with step-by-step solutions.`}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <span>Discount Calculator</span>
+  </nav>
+
+  <h1>Percent Off Calculator</h1>
+  <p class="page-desc">Browse {allPages.length} instant discount calculations. Find the final price after X% off $Y with step-by-step solutions.</p>
+
+  <AdUnit slot="cat-top" format="horizontal" />
+
+  <div class="disc-table-wrap">
+    <table class="disc-table">
+      <thead>
+        <tr>
+          <th class="disc-corner">% Off \ Price</th>
+          {originalPrices.map(price => (
+            <th>${price.toLocaleString()}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {discountPercents.map(pct => (
+          <tr>
+            <th class="disc-row-header">{pct}% off</th>
+            {originalPrices.map(price => {
+              const page = pageMap.get(`${pct}-${price}`);
+              return (
+                <td>
+                  {page ? (
+                    <a href={`/percent-off/${page.slug}/`}>
+                      ${page.finalPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </a>
+                  ) : '\u2014'}
+                </td>
+              );
+            })}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <p class="table-hint">Click any value to see the full calculation with step-by-step solution.</p>
+
+  <AdUnit slot="cat-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .disc-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 24px 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+  .disc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+  .disc-table th,
+  .disc-table td {
+    padding: 6px 10px;
+    text-align: center;
+    border: 1px solid var(--color-border);
+  }
+  .disc-table thead th {
+    background: var(--color-surface);
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  .disc-corner {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: var(--color-surface);
+  }
+  .disc-row-header {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--color-surface);
+    font-weight: 600;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .disc-table td a {
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+  .disc-table td a:hover {
+    text-decoration: underline;
+  }
+  .disc-table tbody tr:hover {
+    background: var(--color-surface);
+  }
+  .table-hint {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    text-align: center;
+    margin-top: 8px;
+  }
+</style>

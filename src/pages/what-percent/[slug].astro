@@ -1,0 +1,473 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import '../../styles/calculator.css';
+import { getAllWhatPercentPages, type WhatPercentPage } from '../../data/what-percent';
+
+export function getStaticPaths() {
+  return getAllWhatPercentPages().map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: WhatPercentPage };
+const { partValue, wholeValue, percentage, percentStr, fractionSimplified, decimalForm, isCleanPercent } = page;
+
+// Format numbers for display
+function fmt(n: number): string {
+  if (Number.isInteger(n)) return n.toLocaleString('en-US');
+  if (Math.abs(n) >= 100) return n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+  if (Math.abs(n) >= 1) return n.toLocaleString('en-US', { maximumFractionDigits: 4 });
+  return n.toLocaleString('en-US', { maximumFractionDigits: 6 });
+}
+
+const partStr = fmt(partValue);
+const wholeStr = fmt(wholeValue);
+
+// SEO metadata
+const title = `What Percentage Is ${partStr} of ${wholeStr}? Answer: ${percentStr} | ToolCalcs`;
+const description = `${partStr} is ${percentStr} of ${wholeStr}. Learn how to calculate what percentage ${partStr} is of ${wholeStr} with the step-by-step formula, fraction, and decimal equivalents.`;
+
+// Related calculations: same whole, different parts
+const allPages = getAllWhatPercentPages();
+const sameWhole = allPages
+  .filter((p) => p.wholeValue === wholeValue && p.partValue !== partValue)
+  .slice(0, 5);
+
+// Related calculations: same part, different wholes
+const samePart = allPages
+  .filter((p) => p.partValue === partValue && p.wholeValue !== wholeValue)
+  .slice(0, 5);
+
+// All pages with this whole value (for reference table)
+const allSameWhole = allPages
+  .filter((p) => p.wholeValue === wholeValue)
+  .sort((a, b) => a.partValue - b.partValue);
+
+// Structured data
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Percentage Calculator", "item": "https://toolcalcs.com/math-calculators/percentage-calculator/" },
+      { "@type": "ListItem", "position": 3, "name": `What Percent Is ${partStr} of ${wholeStr}` },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": `What percentage is ${partStr} of ${wholeStr}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `${partStr} is ${percentStr} of ${wholeStr}. You can calculate this by dividing ${partStr} by ${wholeStr} and multiplying by 100: (${partStr} / ${wholeStr}) \u00D7 100 = ${percentStr}.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `How do you find what percent ${partStr} is of ${wholeStr}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `To find what percent ${partStr} is of ${wholeStr}, divide the part (${partStr}) by the whole (${wholeStr}) to get ${decimalForm}, then multiply by 100. The result is ${percentStr}. The formula is: Percentage = (Part / Whole) \u00D7 100.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `What is ${partStr} out of ${wholeStr} as a fraction and decimal?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `${partStr} out of ${wholeStr} as a simplified fraction is ${fractionSimplified}. As a decimal, it is ${decimalForm}. As a percentage, it is ${percentStr}.`,
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout title={title} description={description} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/math-calculators/percentage-calculator/">Percentage Calculator</a> &rsaquo;
+    <span>What Percent Is {partStr} of {wholeStr}</span>
+  </nav>
+
+  <h1>What Percentage Is {partStr} of {wholeStr}?</h1>
+  <p class="page-desc">Calculate what percentage {partStr} is of {wholeStr} with the formula, step-by-step solution, and interactive calculator.</p>
+
+  <!-- Quick Answer -->
+  <div class="quick-fact">
+    <span class="quick-fact-label">Quick Answer:</span>
+    <strong>{partStr} is {percentStr} of {wholeStr}</strong>
+  </div>
+
+  <!-- Result Cards -->
+  <div class="result-cards">
+    <div class="result-card primary">
+      <span class="result-label">Percentage</span>
+      <span class="result-value">{percentStr}</span>
+    </div>
+    <div class="result-card primary">
+      <span class="result-label">Fraction</span>
+      <span class="result-value">{fractionSimplified}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Decimal</span>
+      <span class="result-value">{decimalForm}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Clean Result</span>
+      <span class="result-value">{isCleanPercent ? 'Yes' : 'No'}</span>
+    </div>
+  </div>
+
+  <!-- Step-by-Step Calculation -->
+  <div class="calculator-box">
+    <h2 class="calc-section-title">Step-by-Step Calculation</h2>
+    <div class="step-list">
+      <div class="step">
+        <span class="step-num">1</span>
+        <div class="step-content">
+          <p class="step-label">Write the formula</p>
+          <div class="formula-box"><code>Percentage = (Part / Whole) &times; 100</code></div>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">2</span>
+        <div class="step-content">
+          <p class="step-label">Substitute the values</p>
+          <div class="formula-box"><code>({partStr} / {wholeStr}) &times; 100</code></div>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">3</span>
+        <div class="step-content">
+          <p class="step-label">Divide the part by the whole</p>
+          <div class="formula-box"><code>{partStr} / {wholeStr} = {decimalForm}</code></div>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">4</span>
+        <div class="step-content">
+          <p class="step-label">Multiply by 100</p>
+          <div class="formula-box"><code>{decimalForm} &times; 100 = {percentStr}</code></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mini Calculator -->
+  <h2 class="section-heading">Percentage Calculator</h2>
+  <div class="calculator-box">
+    <div class="pct-calc-row">
+      <div class="input-group">
+        <label for="partInput">Part</label>
+        <input type="number" id="partInput" value={partValue} step="any" />
+      </div>
+      <span class="pct-of-label">of</span>
+      <div class="input-group">
+        <label for="wholeInput">Whole</label>
+        <input type="number" id="wholeInput" value={wholeValue} step="any" />
+      </div>
+      <span class="pct-eq-label">=</span>
+      <div class="input-group">
+        <label for="pctOutput">Percentage</label>
+        <input type="text" id="pctOutput" readonly />
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="wp-mid" format="rectangle" />
+
+  <!-- Content Section -->
+  <article class="content-section">
+    <h2>Understanding This Calculation</h2>
+    <p>
+      When we ask "what percentage is {partStr} of {wholeStr}?", we are determining how {partStr} relates to {wholeStr} as a proportion expressed out of 100. In other words, if {wholeStr} represents the whole (100%), then {partStr} represents {percentStr} of that whole. This is equivalent to the fraction {fractionSimplified}, which as a decimal is {decimalForm}. Understanding this relationship is essential for comparing quantities, interpreting data, and making informed decisions in finance, academics, and everyday life.
+    </p>
+
+    <h2>Quick Reference: Percentages of {wholeStr}</h2>
+    {allSameWhole.length > 0 && (
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Part</th>
+            <th>Percentage</th>
+            <th>Fraction</th>
+            <th>Decimal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {allSameWhole.map((p) => (
+            <tr class={p.partValue === partValue ? 'highlight-row' : ''}>
+              <td>
+                {p.partValue === partValue ? (
+                  <strong>{fmt(p.partValue)} of {fmt(p.wholeValue)}</strong>
+                ) : (
+                  <a href={`/what-percent/${p.slug}/`}>{fmt(p.partValue)} of {fmt(p.wholeValue)}</a>
+                )}
+              </td>
+              <td>{p.percentStr}</td>
+              <td>{p.fractionSimplified}</td>
+              <td>{p.decimalForm}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+
+    {samePart.length > 0 && (
+      <h2>Same Part, Different Wholes</h2>
+      <p>See how {partStr} compares as a percentage of different whole values:</p>
+      <ul>
+        {samePart.map((p) => (
+          <li>
+            <a href={`/what-percent/${p.slug}/`}>
+              What percentage is {fmt(p.partValue)} of {fmt(p.wholeValue)}? = {p.percentStr}
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+
+    {sameWhole.length > 0 && (
+      <h2>Same Whole, Different Parts</h2>
+      <p>See how other values compare as a percentage of {wholeStr}:</p>
+      <ul>
+        {sameWhole.map((p) => (
+          <li>
+            <a href={`/what-percent/${p.slug}/`}>
+              What percentage is {fmt(p.partValue)} of {fmt(p.wholeValue)}? = {p.percentStr}
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+
+    <h2>How to Calculate Percentages</h2>
+    <p>
+      A percentage is a way of expressing a number as a fraction of 100. The word "percent" comes from the Latin <em>per centum</em>, meaning "by the hundred." When we ask what percentage {partStr} is of {wholeStr}, we are asking: out of {wholeStr} equal parts, how many parts does {partStr} represent when scaled to 100?
+    </p>
+    <p>
+      The fundamental formula for calculating what percentage one number is of another is: <strong>Percentage = (Part / Whole) &times; 100</strong>. In this case, dividing {partStr} by {wholeStr} gives us {decimalForm}, and multiplying that decimal by 100 gives us {percentStr}. This formula is the reverse of the more common "what is X% of Y" calculation.
+    </p>
+    <p>
+      This type of calculation appears constantly in daily life. When you receive a test score of {partStr} out of {wholeStr}, you scored {percentStr}. When a store marks an item down from ${wholeStr} to ${wholeStr} minus ${partStr}, the original price fraction is {fractionSimplified}. Financial analysts use percentage-of-whole calculations to determine portfolio allocation, profit margins, and market share.
+    </p>
+    <p>
+      There are several mental math shortcuts for common percentage calculations. If the part is half the whole, the answer is always 50%. If the part equals the whole, it is 100%. To quickly estimate, try rounding both numbers to values that divide evenly. For instance, if you need to find what percent 48 is of 200, you can think of it as roughly 50 out of 200, which is 25%.
+    </p>
+    <p>
+      The relationship between fractions, decimals, and percentages is fundamental to mathematics. Every fraction can be expressed as a decimal by dividing the numerator by the denominator, and every decimal can be converted to a percentage by multiplying by 100. In our example, {partStr}/{wholeStr} simplifies to the fraction {fractionSimplified}, equals the decimal {decimalForm}, and represents {percentStr}. These three forms are interchangeable and each is useful in different contexts.
+    </p>
+    <p>
+      Understanding percentages also helps with percentage increase and decrease problems. If a value goes from {wholeStr} to {wholeStr} plus {partStr}, the percentage increase is {percentStr}. Conversely, if a value decreases by {partStr} from a starting point of {wholeStr}, the percentage decrease is also {percentStr}. These calculations are essential for understanding inflation rates, investment returns, population growth, and sales performance metrics.
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What percentage is {partStr} of {wholeStr}?</h3>
+    <p>
+      {partStr} is <strong>{percentStr}</strong> of {wholeStr}. This is calculated by dividing the part ({partStr}) by the whole ({wholeStr}) to get {decimalForm}, then multiplying by 100. The formula is: ({partStr} / {wholeStr}) &times; 100 = {percentStr}.
+    </p>
+
+    <h3>How do you find what percent {partStr} is of {wholeStr}?</h3>
+    <p>
+      To find what percent {partStr} is of {wholeStr}, use the formula Percentage = (Part / Whole) &times; 100. Divide {partStr} by {wholeStr} to get {decimalForm}, then multiply by 100 to get {percentStr}. You can also use the interactive calculator above to verify this result or try different values.
+    </p>
+
+    <h3>What is {partStr} out of {wholeStr} as a fraction and decimal?</h3>
+    <p>
+      {partStr} out of {wholeStr} as a simplified fraction is <strong>{fractionSimplified}</strong>. As a decimal, it is <strong>{decimalForm}</strong>. As a percentage, it is <strong>{percentStr}</strong>. These three representations are mathematically equivalent ways of expressing the same ratio.
+    </p>
+
+    <h2>Full Percentage Calculator</h2>
+    <p>
+      Need to calculate a different percentage? Use our <a href="/math-calculators/percentage-calculator/">full Percentage Calculator</a> for percentage increase/decrease, percentage difference, and more advanced percentage operations.
+    </p>
+
+    <CrossLinks links={[
+      { href: '/percentage/', label: 'X% of Y', icon: '%' },
+      { href: '/percent-off/', label: 'Percent Off', icon: '\uD83C\uDFF7\uFE0F' },
+      { href: '/fraction/', label: 'Fractions', icon: '\u00BD' },
+    ]} />
+  </article>
+
+  <AdUnit slot="wp-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .quick-fact {
+    background: #eff6ff;
+    border-radius: var(--radius);
+    padding: 16px 24px;
+    margin-bottom: 24px;
+    font-size: 1.1rem;
+  }
+  .quick-fact-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .quick-fact strong {
+    color: var(--color-primary);
+    font-size: 1.3rem;
+  }
+
+  .result-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .result-card {
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-align: center;
+  }
+  .result-card.primary { background: #eff6ff; }
+  .result-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    margin-bottom: 4px;
+  }
+  .result-value {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+  .result-card.primary .result-value { color: var(--color-primary); }
+
+  .calc-section-title {
+    font-size: 1.15rem;
+    margin: 0 0 16px;
+    border: none;
+    padding: 0;
+  }
+
+  .step-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .step-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .step-content {
+    flex: 1;
+  }
+  .step-label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-size: 0.95rem;
+  }
+  .step .formula-box {
+    margin: 0;
+    padding: 10px 16px;
+    font-size: 1.05rem;
+    text-align: left;
+  }
+
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+
+  .pct-calc-row {
+    display: flex;
+    align-items: end;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .pct-calc-row .input-group {
+    flex: 1;
+    min-width: 100px;
+  }
+  .pct-of-label,
+  .pct-eq-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    padding-bottom: 10px;
+    flex-shrink: 0;
+  }
+
+  .highlight-row {
+    background: #eff6ff;
+  }
+  :global(.highlight-row td) {
+    font-weight: 600;
+  }
+
+  @media (max-width: 640px) {
+    .pct-calc-row {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .pct-of-label,
+    .pct-eq-label {
+      text-align: center;
+      padding-bottom: 0;
+    }
+    .result-cards {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script define:vars={{ partValue, wholeValue }}>
+  var partInput = document.getElementById('partInput');
+  var wholeInput = document.getElementById('wholeInput');
+  var pctOutput = document.getElementById('pctOutput');
+
+  function formatNum(n) {
+    if (Number.isInteger(n)) return n.toLocaleString('en-US');
+    if (Math.abs(n) >= 100) return n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+    if (Math.abs(n) >= 1) return n.toLocaleString('en-US', { maximumFractionDigits: 4 });
+    if (Math.abs(n) >= 0.01) return n.toLocaleString('en-US', { maximumFractionDigits: 6 });
+    return n.toExponential(4);
+  }
+
+  function calculate() {
+    var part = parseFloat(partInput.value);
+    var whole = parseFloat(wholeInput.value);
+    if (isNaN(part) || isNaN(whole) || whole === 0) {
+      pctOutput.value = whole === 0 ? 'Cannot divide by zero' : '';
+      return;
+    }
+    var pct = (part / whole) * 100;
+    pctOutput.value = formatNum(pct) + '%';
+  }
+
+  partInput.addEventListener('input', calculate);
+  wholeInput.addEventListener('input', calculate);
+
+  // Initialize with pre-filled values
+  calculate();
+</script>
