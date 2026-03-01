@@ -199,6 +199,32 @@ export const worksheets: Worksheet[] = [
       { name: 'maxNumber', label: 'Max Number', type: 'select', default: '9', options: [{ value: '9', label: 'Up to 9' }, { value: '12', label: 'Up to 12' }, { value: '20', label: 'Up to 20' }] },
     ],
   },
+  {
+    title: 'Long Division Worksheets',
+    slug: 'long-division-worksheets',
+    description: 'Free printable long division worksheets. Practice dividing 2-4 digit numbers with step-by-step long division format.',
+    icon: '➗',
+    gradeRange: '4-6',
+    mathTopic: 'Long Division',
+    configOptions: [
+      { name: 'problems', label: 'Number of Problems', type: 'number', default: 10, min: 4, max: 20 },
+      { name: 'type', label: 'Division Type', type: 'select', default: '2by1', options: [{ value: '2by1', label: '2-digit ÷ 1-digit' }, { value: '3by1', label: '3-digit ÷ 1-digit' }, { value: '3by2', label: '3-digit ÷ 2-digit' }, { value: '4by2', label: '4-digit ÷ 2-digit' }] },
+      { name: 'remainder', label: 'Remainders', type: 'select', default: 'no', options: [{ value: 'no', label: 'No Remainders' }, { value: 'yes', label: 'With Remainders' }] },
+    ],
+  },
+  {
+    title: 'Number Patterns Worksheets',
+    slug: 'number-patterns-worksheets',
+    description: 'Free printable number patterns worksheets. Practice recognizing and extending addition, subtraction, and multiplication patterns.',
+    icon: '🔢',
+    gradeRange: '1-4',
+    mathTopic: 'Number Patterns',
+    configOptions: [
+      { name: 'problems', label: 'Number of Patterns', type: 'number', default: 10, min: 5, max: 20 },
+      { name: 'patternType', label: 'Pattern Type', type: 'select', default: 'adding', options: [{ value: 'adding', label: 'Adding' }, { value: 'subtracting', label: 'Subtracting' }, { value: 'multiplying', label: 'Multiplying' }, { value: 'mixed', label: 'Mixed' }] },
+      { name: 'difficulty', label: 'Difficulty', type: 'select', default: 'easy', options: [{ value: 'easy', label: 'Easy (numbers < 50)' }, { value: 'medium', label: 'Medium (numbers < 200)' }, { value: 'hard', label: 'Hard (numbers < 1,000)' }] },
+    ],
+  },
 ];
 
 export function getWorksheetBySlug(slug: string): Worksheet | undefined {
