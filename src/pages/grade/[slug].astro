@@ -1,0 +1,542 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import '../../styles/calculator.css';
+import { getAllGradeScorePages, GRADE_TOTALS, type GradeScorePage } from '../../data/grade-scores';
+
+export function getStaticPaths() {
+  return getAllGradeScorePages().map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: GradeScorePage };
+const { score, total, percentage, percentStr, letterGrade, gpa, passFail } = page;
+
+// Nearby scores for reference table (same total, +/- 5 range)
+const allPages = getAllGradeScorePages();
+const nearbyScores = allPages
+  .filter((p) => p.total === total && Math.abs(p.score - score) <= 5 && p.score !== score)
+  .sort((a, b) => a.score - b.score);
+
+// Determine the grade bar color class
+function getBarClass(grade: string): string {
+  if (grade.startsWith('A')) return 'grade-a';
+  if (grade.startsWith('B')) return 'grade-b';
+  if (grade.startsWith('C')) return 'grade-c';
+  if (grade.startsWith('D')) return 'grade-d';
+  return 'grade-f';
+}
+const barClass = getBarClass(letterGrade);
+
+// Decimal value for step-by-step
+const decimalValue = (score / total).toFixed(4);
+
+// SEO metadata
+const title = `What Grade Is ${score} out of ${total}? ${percentStr} (${letterGrade}) | ToolCalcs`;
+const description = `${score} out of ${total} is ${percentStr}, which is a ${letterGrade} (GPA: ${gpa}). See the step-by-step calculation, grade scale, and interactive grade calculator.`;
+
+// Grade scale data for table
+const gradeScale = [
+  { min: '97-100%', grade: 'A+', gpa: '4.0' },
+  { min: '93-96%', grade: 'A', gpa: '4.0' },
+  { min: '90-92%', grade: 'A-', gpa: '3.7' },
+  { min: '87-89%', grade: 'B+', gpa: '3.3' },
+  { min: '83-86%', grade: 'B', gpa: '3.0' },
+  { min: '80-82%', grade: 'B-', gpa: '2.7' },
+  { min: '77-79%', grade: 'C+', gpa: '2.3' },
+  { min: '73-76%', grade: 'C', gpa: '2.0' },
+  { min: '70-72%', grade: 'C-', gpa: '1.7' },
+  { min: '67-69%', grade: 'D+', gpa: '1.3' },
+  { min: '63-66%', grade: 'D', gpa: '1.0' },
+  { min: '60-62%', grade: 'D-', gpa: '0.7' },
+  { min: '0-59%', grade: 'F', gpa: '0.0' },
+];
+
+// Related grade links for other totals
+const relatedTotals = GRADE_TOTALS.filter((t) => t !== total).slice(0, 6);
+const relatedLinks = relatedTotals.map((t) => {
+  var relScore = Math.round((percentage / 100) * t);
+  if (relScore < 1) relScore = 1;
+  if (relScore > t) relScore = t;
+  return allPages.find((p) => p.total === t && p.score === relScore);
+}).filter(Boolean) as GradeScorePage[];
+
+// Structured data
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Grade Calculator", "item": "https://toolcalcs.com/grade/" },
+      { "@type": "ListItem", "position": 3, "name": `${score} out of ${total}` },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": `What grade is ${score} out of ${total}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `${score} out of ${total} is ${percentStr}, which is a ${letterGrade} letter grade with a ${gpa} GPA on a 4.0 scale. This is a ${passFail.toLowerCase()}ing grade.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `What is ${score}/${total} as a percentage?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `${score}/${total} as a percentage is ${percentStr}. To calculate this, divide ${score} by ${total} to get ${decimalValue}, then multiply by 100 to get ${percentStr}.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `Is ${score} out of ${total} a passing grade?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `${score} out of ${total} is ${percentStr}, which is a ${passFail.toLowerCase()}ing grade. In most standard grading systems, 60% or higher is considered passing. ${score}/${total} corresponds to a ${letterGrade} letter grade.`,
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout title={title} description={description} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/grade/">Grade Calculator</a> &rsaquo;
+    <span>{score} out of {total}</span>
+  </nav>
+
+  <h1>{score} out of {total} as a Grade</h1>
+  <p class="page-desc">Find out what letter grade, percentage, and GPA a score of {score} out of {total} equals, with a step-by-step breakdown and interactive calculator.</p>
+
+  <!-- Quick Answer -->
+  <div class="quick-fact">
+    <span class="quick-fact-label">Quick Answer:</span>
+    <strong>{score}/{total} = {percentStr} ({letterGrade})</strong>
+  </div>
+
+  <!-- Result Cards -->
+  <div class="result-cards">
+    <div class="result-card primary">
+      <span class="result-label">Percentage</span>
+      <span class="result-value">{percentStr}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Letter Grade</span>
+      <span class="result-value">{letterGrade}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">GPA (4.0 Scale)</span>
+      <span class="result-value">{gpa}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Pass / Fail</span>
+      <span class="result-value">{passFail}</span>
+    </div>
+  </div>
+
+  <!-- Progress Bar -->
+  <div class="grade-bar-container">
+    <div class={`grade-bar ${barClass}`} style={`width: ${Math.min(percentage, 100)}%`}></div>
+  </div>
+
+  <!-- Step-by-Step Calculation -->
+  <div class="calculator-box">
+    <h2 class="calc-section-title">Step-by-Step Calculation</h2>
+    <div class="step-list">
+      <div class="step">
+        <span class="step-num">1</span>
+        <div class="step-content">
+          <p class="step-label">Divide the score by the total</p>
+          <div class="formula-box"><code>{score} &divide; {total} = {decimalValue}</code></div>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">2</span>
+        <div class="step-content">
+          <p class="step-label">Multiply by 100 to get the percentage</p>
+          <div class="formula-box"><code>{decimalValue} &times; 100 = {percentStr}</code></div>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">3</span>
+        <div class="step-content">
+          <p class="step-label">Apply the grade scale to find the letter grade</p>
+          <div class="formula-box"><code>{percentStr} &rarr; {letterGrade}</code></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grade Scale Reference Table -->
+  <h2 class="section-heading">Grade Scale Reference</h2>
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Percentage Range</th>
+          <th>Letter Grade</th>
+          <th>GPA</th>
+        </tr>
+      </thead>
+      <tbody>
+        {gradeScale.map((row) => (
+          <tr class={row.grade === letterGrade ? 'highlight-row' : ''}>
+            <td>{row.min}</td>
+            <td>{row.grade}</td>
+            <td>{row.gpa}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <AdUnit slot="grade-mid" format="rectangle" />
+
+  <!-- Interactive Grade Calculator -->
+  <h2 class="section-heading">Grade Calculator</h2>
+  <div class="calculator-box">
+    <div class="grade-calc-row">
+      <div class="input-group">
+        <label for="gradeScore">Score</label>
+        <input type="number" id="gradeScore" step="any" min="0" />
+      </div>
+      <span class="grade-of-label">out of</span>
+      <div class="input-group">
+        <label for="gradeTotal">Total</label>
+        <input type="number" id="gradeTotal" step="any" min="1" />
+      </div>
+    </div>
+    <div id="gradeResult" class="grade-result"></div>
+  </div>
+
+  <!-- Nearby Scores Table -->
+  {nearbyScores.length > 0 && (
+    <h2 class="section-heading">Nearby Scores out of {total}</h2>
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Score</th>
+            <th>Percentage</th>
+            <th>Letter Grade</th>
+            <th>GPA</th>
+            <th>Pass/Fail</th>
+          </tr>
+        </thead>
+        <tbody>
+          {nearbyScores.map((p) => (
+            <tr>
+              <td>
+                <a href={`/grade/${p.slug}/`}>{p.score}/{p.total}</a>
+              </td>
+              <td>{p.percentStr}</td>
+              <td>{p.letterGrade}</td>
+              <td>{p.gpa}</td>
+              <td>{p.passFail}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+
+  <!-- SEO Content Section -->
+  <article class="content-section">
+    <h2>Understanding the Grading Scale</h2>
+    <p>
+      A score of {score} out of {total} translates to {percentStr}, which places it in the {letterGrade} range on the standard American grading scale. The grading scale divides student performance into five primary categories: A (excellent, 90-100%), B (above average, 80-89%), C (average, 70-79%), D (below average, 60-69%), and F (failing, below 60%). Each of these letter grades can be further refined with plus and minus modifiers. An A+ represents the highest achievement at 97% or above, while a D- at 60-62% is the lowest passing grade in most systems.
+    </p>
+    <p>
+      The grading scale you see on this page follows the most widely used standard in the United States. However, it is important to note that grading scales can vary between institutions. Some schools use a 10-point scale where each grade spans exactly 10 percentage points, while others use different cutoff percentages. Advanced Placement (AP) classes and honors courses may use weighted scales where an A counts as 5.0 instead of 4.0. Always check your specific institution's grading policy for the most accurate grade conversion.
+    </p>
+    <p>
+      With a score of {score} out of {total}, your result of {percentStr} and a letter grade of {letterGrade} means your GPA equivalent on a 4.0 scale is {gpa}. This GPA conversion is particularly important for college applications, scholarship eligibility, and academic standing requirements. Most colleges expect a minimum GPA of 2.0 (C average) for admission, while competitive programs often require 3.5 or higher.
+    </p>
+
+    <h2>How to Calculate Your Grade</h2>
+    <p>
+      Converting a raw score to a percentage is one of the most fundamental calculations in academics. The formula is simple: divide the number of points earned by the total number of points possible, then multiply by 100. For your score of {score} out of {total}, the calculation is ({score} / {total}) &times; 100 = {percentStr}. This percentage can then be mapped to a letter grade using the standard grading scale.
+    </p>
+    <p>
+      When calculating your overall course grade, you may need to account for weighted categories. For example, if homework is worth 20% of your grade, quizzes 30%, and exams 50%, you would calculate the percentage for each category separately and then compute a weighted average. Many teachers also offer extra credit opportunities that can push your score above 100%, though the letter grade is typically capped at A+ regardless of how far above 97% you go.
+    </p>
+    <p>
+      If you scored {score} out of {total} on one assignment but want to know what you need on future assignments to reach a target grade, you can use a simple algebra approach. Add the points you need to the points you have earned so far, then divide by the total possible points across all assignments. For instance, if you need an 80% overall and have {score} out of {total} on the first test, you can calculate exactly what score you need on the next test to meet your goal.
+    </p>
+
+    <h2>GPA Conversion</h2>
+    <p>
+      The Grade Point Average (GPA) is a standardized way of measuring academic achievement across courses and semesters. On the standard 4.0 scale, each letter grade corresponds to a specific number of grade points: A and A+ equal 4.0, A- equals 3.7, B+ equals 3.3, B equals 3.0, B- equals 2.7, and so on down to F at 0.0. Your score of {score}/{total} ({percentStr}) gives you a {letterGrade}, which translates to a {gpa} GPA.
+    </p>
+    <p>
+      To calculate your cumulative GPA across multiple courses, multiply the grade points for each course by the number of credit hours, sum all the products, and divide by the total credit hours. For example, if you earned a {letterGrade} ({gpa}) in a 3-credit course and a B (3.0) in a 4-credit course, your GPA would be ({gpa} &times; 3 + 3.0 &times; 4) / 7. This weighted approach ensures that courses with more credit hours have a proportionally larger impact on your overall GPA.
+    </p>
+    <p>
+      Different GPA scales are used around the world. While the 4.0 scale is standard in the United States and Canada, many European universities use a different system. In Germany, grades range from 1.0 (best) to 5.0 (fail). The UK uses a classification system (First Class Honours, Upper Second, etc.). When applying to international programs, you may need to convert your GPA using institution-specific conversion tables or services like WES (World Education Services).
+    </p>
+
+    <h2>Tips for Improving Your Grade</h2>
+    <p>
+      If your current score of {score} out of {total} ({percentStr}) is not where you want it to be, there are several evidence-based strategies to improve your academic performance. Start by analyzing which types of questions you missed and identify patterns in your errors. Were they conceptual misunderstandings, careless mistakes, or gaps in specific topics? This analysis helps you target your study efforts more effectively.
+    </p>
+    <p>
+      Active recall and spaced repetition are two of the most effective study techniques according to cognitive science research. Instead of passively re-reading notes, quiz yourself on the material at increasing intervals. Use flashcards, practice problems, or teach the concepts to someone else. Studies show that students who use active recall techniques score significantly higher on exams compared to those who rely on passive review methods like highlighting or re-reading textbooks.
+    </p>
+    <p>
+      Time management is equally important. Break your study sessions into focused 25-minute blocks (the Pomodoro Technique), take short breaks between sessions, and avoid cramming the night before. Research consistently shows that distributed practice over multiple days leads to better retention and higher test scores than massed practice in a single session. Additionally, getting adequate sleep before an exam is critical, as sleep consolidation plays a major role in memory formation and recall.
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What grade is {score} out of {total}?</h3>
+    <p>
+      {score} out of {total} is <strong>{percentStr}</strong>, which is a <strong>{letterGrade}</strong> letter grade with a <strong>{gpa}</strong> GPA on a 4.0 scale. This is a {passFail.toLowerCase()}ing grade. The calculation is: ({score} / {total}) &times; 100 = {percentStr}.
+    </p>
+
+    <h3>What is {score}/{total} as a percentage?</h3>
+    <p>
+      {score}/{total} as a percentage is <strong>{percentStr}</strong>. To convert any score to a percentage, divide the score by the total and multiply by 100. In this case, {score} &divide; {total} = {decimalValue}, and {decimalValue} &times; 100 = {percentStr}.
+    </p>
+
+    <h3>Is {score} out of {total} a passing grade?</h3>
+    <p>
+      {score} out of {total} is {percentStr}, which is a <strong>{passFail.toLowerCase()}ing</strong> grade. In most standard grading systems, 60% or higher is considered passing, corresponding to a D- or better letter grade. Your score of {percentStr} gives you a {letterGrade}, which {passFail === 'Pass' ? 'meets' : 'does not meet'} the typical passing threshold.
+    </p>
+
+    {relatedLinks.length > 0 && (
+      <h2>Related Grade Calculations</h2>
+      <p>See how the same percentage ({percentStr}) maps to different score totals:</p>
+      <ul>
+        {relatedLinks.map((p) => (
+          <li>
+            <a href={`/grade/${p.slug}/`}>
+              {p.score} out of {p.total} = {p.percentStr} ({p.letterGrade})
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+
+    <CrossLinks links={[
+      { href: '/percentage/', label: 'X% of Y', icon: '%' },
+      { href: '/what-percent/', label: 'What Percent', icon: '?' },
+      { href: '/fraction/', label: 'Fractions', icon: '\u00BD' },
+    ]} />
+  </article>
+
+  <AdUnit slot="grade-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .quick-fact {
+    background: #eff6ff;
+    border-radius: var(--radius);
+    padding: 16px 24px;
+    margin-bottom: 24px;
+    font-size: 1.1rem;
+  }
+  .quick-fact-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .quick-fact strong {
+    color: var(--color-primary);
+    font-size: 1.3rem;
+  }
+
+  .result-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .result-card {
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-align: center;
+  }
+  .result-card.primary { background: #eff6ff; }
+  .result-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    margin-bottom: 4px;
+  }
+  .result-value {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+  .result-card.primary .result-value { color: var(--color-primary); }
+
+  .grade-bar-container {
+    width: 100%;
+    height: 24px;
+    background: #f1f5f9;
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 16px 0;
+  }
+  .grade-bar {
+    height: 100%;
+    border-radius: 12px;
+    transition: width 0.3s;
+  }
+  .grade-bar.grade-a { background: #22c55e; }
+  .grade-bar.grade-b { background: #3b82f6; }
+  .grade-bar.grade-c { background: #f59e0b; }
+  .grade-bar.grade-d { background: #f97316; }
+  .grade-bar.grade-f { background: #ef4444; }
+
+  .calc-section-title {
+    font-size: 1.15rem;
+    margin: 0 0 16px;
+    border: none;
+    padding: 0;
+  }
+
+  .step-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .step-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .step-content {
+    flex: 1;
+  }
+  .step-label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-size: 0.95rem;
+  }
+  .step .formula-box {
+    margin: 0;
+    padding: 10px 16px;
+    font-size: 1.05rem;
+    text-align: left;
+  }
+
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+
+  .highlight-row {
+    background: #eff6ff;
+  }
+  :global(.highlight-row td) {
+    font-weight: 600;
+  }
+
+  .grade-calc-row {
+    display: flex;
+    align-items: end;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .grade-calc-row .input-group {
+    flex: 1;
+    min-width: 100px;
+  }
+  .grade-of-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    padding-bottom: 10px;
+    flex-shrink: 0;
+  }
+  .grade-result {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: #eff6ff;
+    border-radius: var(--radius);
+    font-size: 1.1rem;
+    min-height: 24px;
+  }
+
+  @media (max-width: 640px) {
+    .grade-calc-row {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .grade-of-label {
+      text-align: center;
+      padding-bottom: 0;
+    }
+    .result-cards {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script define:vars={{ score, total }}>
+  var scoreInput = document.getElementById('gradeScore');
+  var totalInput = document.getElementById('gradeTotal');
+  var resultDiv = document.getElementById('gradeResult');
+
+  function getGrade(pct) {
+    if (pct >= 97) return { grade: 'A+', gpa: '4.0' };
+    if (pct >= 93) return { grade: 'A', gpa: '4.0' };
+    if (pct >= 90) return { grade: 'A-', gpa: '3.7' };
+    if (pct >= 87) return { grade: 'B+', gpa: '3.3' };
+    if (pct >= 83) return { grade: 'B', gpa: '3.0' };
+    if (pct >= 80) return { grade: 'B-', gpa: '2.7' };
+    if (pct >= 77) return { grade: 'C+', gpa: '2.3' };
+    if (pct >= 73) return { grade: 'C', gpa: '2.0' };
+    if (pct >= 70) return { grade: 'C-', gpa: '1.7' };
+    if (pct >= 67) return { grade: 'D+', gpa: '1.3' };
+    if (pct >= 63) return { grade: 'D', gpa: '1.0' };
+    if (pct >= 60) return { grade: 'D-', gpa: '0.7' };
+    return { grade: 'F', gpa: '0.0' };
+  }
+
+  function calculate() {
+    var s = parseFloat(scoreInput.value);
+    var t = parseFloat(totalInput.value);
+    if (isNaN(s) || isNaN(t) || t <= 0) { resultDiv.textContent = 'Enter valid numbers.'; return; }
+    var pct = (s / t) * 100;
+    var rounded = Math.round(pct * 100) / 100;
+    var info = getGrade(rounded);
+    var pass = rounded >= 60 ? 'Pass' : 'Fail';
+    resultDiv.innerHTML = '<strong>' + rounded + '% — ' + info.grade + '</strong> (GPA: ' + info.gpa + ', ' + pass + ')';
+  }
+
+  scoreInput.value = score;
+  totalInput.value = total;
+  scoreInput.addEventListener('input', calculate);
+  totalInput.addEventListener('input', calculate);
+  calculate();
+</script>

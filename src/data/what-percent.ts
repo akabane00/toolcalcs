@@ -64,33 +64,49 @@ const PAIRS: [number, number][] = [
   [150, 100], [200, 100],
 ];
 
+const GRID_WHOLES = [10, 20, 25, 50, 75, 100, 150, 200, 250, 500];
+
+function buildPage(x: number, y: number): WhatPercentPage {
+  const pct = (x / y) * 100;
+  const g = gcd(x, y);
+  const isClean = Math.abs(pct - Math.round(pct)) < 0.0001;
+  return {
+    slug: `${x}-of-${y}`,
+    partValue: x,
+    wholeValue: y,
+    percentage: isClean ? Math.round(pct) : parseFloat(pct.toFixed(4)),
+    percentStr: isClean
+      ? Math.round(pct) + '%'
+      : pct.toFixed(2).replace(/\.?0+$/, '') + '%',
+    fractionSimplified: `${x / g}/${y / g}`,
+    decimalForm: isClean
+      ? (pct / 100).toString()
+      : (x / y).toFixed(6).replace(/0+$/, ''),
+    isCleanPercent: isClean,
+  };
+}
+
 export function getAllWhatPercentPages(): WhatPercentPage[] {
   const pages: WhatPercentPage[] = [];
   const seen = new Set<string>();
 
+  // Curated pairs first
   for (const [x, y] of PAIRS) {
     const slug = `${x}-of-${y}`;
     if (seen.has(slug)) continue;
     seen.add(slug);
+    pages.push(buildPage(x, y));
+  }
 
-    const pct = (x / y) * 100;
-    const g = gcd(x, y);
-    const isClean = Math.abs(pct - Math.round(pct)) < 0.0001;
-
-    pages.push({
-      slug,
-      partValue: x,
-      wholeValue: y,
-      percentage: isClean ? Math.round(pct) : parseFloat(pct.toFixed(4)),
-      percentStr: isClean
-        ? Math.round(pct) + '%'
-        : pct.toFixed(2).replace(/\.?0+$/, '') + '%',
-      fractionSimplified: `${x / g}/${y / g}`,
-      decimalForm: isClean
-        ? (pct / 100).toString()
-        : (x / y).toFixed(6).replace(/0+$/, ''),
-      isCleanPercent: isClean,
-    });
+  // Grid-generated pairs
+  for (const y of GRID_WHOLES) {
+    for (var x = 1; x <= 50; x++) {
+      if (x >= y) continue;
+      const slug = `${x}-of-${y}`;
+      if (seen.has(slug)) continue;
+      seen.add(slug);
+      pages.push(buildPage(x, y));
+    }
   }
 
   return pages;

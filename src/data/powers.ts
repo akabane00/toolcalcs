@@ -39,7 +39,7 @@ export function getAllSquaredPages(): PowerPage[] {
 
 export function getAllCubedPages(): PowerPage[] {
   const pages: PowerPage[] = [];
-  for (let n = 1; n <= 50; n++) {
+  for (let n = 1; n <= 100; n++) {
     const result = n * n * n;
     const sqrt = Math.round(Math.sqrt(result));
     pages.push({
@@ -59,7 +59,7 @@ export function getAllCubedPages(): PowerPage[] {
 
 export function getAllFourthPowerPages(): PowerPage[] {
   const pages: PowerPage[] = [];
-  for (let n = 1; n <= 25; n++) {
+  for (let n = 1; n <= 50; n++) {
     const result = n * n * n * n;
     const sqrt = Math.round(Math.sqrt(result));
     const cbrt = Math.round(Math.cbrt(result));

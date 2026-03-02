@@ -26,7 +26,7 @@ export default defineConfig({
         item.changefreq = 'monthly';
       }
       // Medium: programmatic index pages
-      else if (url.match(/toolcalcs\.com\/(percentage|convert|salary|roman-numerals|number-to-words|born-in|fraction|tip|time-zone|factors-of|days-until|currency|how-many|worksheets|math|times-tables|percent-off|what-percent)\/$/) ) {
+      else if (url.match(/toolcalcs\.com\/(percentage|convert|salary|roman-numerals|number-to-words|born-in|fraction|tip|time-zone|factors-of|days-until|currency|how-many|worksheets|math|times-tables|percent-off|what-percent|grade)\/$/) ) {
         item.priority = 0.7;
         item.changefreq = 'monthly';
       }

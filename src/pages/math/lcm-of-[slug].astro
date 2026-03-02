@@ -1,0 +1,499 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import '../../styles/calculator.css';
+import { getAllGcfLcmPages, type GcfLcmPage } from '../../data/gcf-lcm';
+
+export function getStaticPaths() {
+  return getAllGcfLcmPages().map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: GcfLcmPage };
+const { numA, numB, gcf, lcm: lcmVal, factorsA, factorsB, commonFactors, primeFactorizationA, primeFactorizationB, product, relationship } = page;
+
+function formatPrimeHtml(pf: string): string {
+  return pf.replace(/\^(\d+)/g, '<sup>$1</sup>');
+}
+const primeHtmlA = formatPrimeHtml(primeFactorizationA);
+const primeHtmlB = formatPrimeHtml(primeFactorizationB);
+
+// Cross-links
+const crossLinks: { href: string; label: string; icon: string }[] = [
+  { href: `/factors-of/${numA}/`, label: `Factors of ${numA}`, icon: '🔢' },
+  { href: `/factors-of/${numB}/`, label: `Factors of ${numB}`, icon: '🔢' },
+];
+
+// Related LCM pages (nearby pairs)
+const allPages = getAllGcfLcmPages();
+const relatedPages = allPages
+  .filter((p) => p.slug !== page.slug && (p.numA === numA || p.numB === numB || p.numA === numB || p.numB === numA))
+  .slice(0, 8);
+
+// Generate multiples lists for Method 1
+const multiplesCount = Math.max(10, Math.ceil(lcmVal / Math.min(numA, numB)) + 1);
+const multiplesA: number[] = [];
+for (let i = 1; i <= multiplesCount; i++) {
+  multiplesA.push(numA * i);
+  if (numA * i >= lcmVal) break;
+}
+const multiplesB: number[] = [];
+for (let i = 1; i <= multiplesCount; i++) {
+  multiplesB.push(numB * i);
+  if (numB * i >= lcmVal) break;
+}
+
+// SEO
+const title = `LCM of ${numA} and ${numB} - Least Common Multiple is ${lcmVal} | ToolCalcs`;
+const description = `The LCM (Least Common Multiple) of ${numA} and ${numB} is ${lcmVal}. The GCF (Greatest Common Factor) is ${gcf}. Find step-by-step methods including listing multiples, prime factorization, and the GCF formula.`;
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Math Reference", "item": "https://toolcalcs.com/math/" },
+      { "@type": "ListItem", "position": 3, "name": `LCM of ${numA} and ${numB}` },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": `What is the LCM of ${numA} and ${numB}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `The Least Common Multiple (LCM) of ${numA} and ${numB} is ${lcmVal}. This is the smallest positive number that is divisible by both ${numA} and ${numB}.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `How do you find the LCM of ${numA} and ${numB} using prime factorization?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `To find the LCM using prime factorization, write ${numA} = ${primeFactorizationA} and ${numB} = ${primeFactorizationB}. Take the highest power of each prime factor that appears in either factorization and multiply them together to get LCM = ${lcmVal}.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `What is the relationship between GCF and LCM of ${numA} and ${numB}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `The product of two numbers always equals the product of their GCF and LCM: ${numA} × ${numB} = ${product} and GCF × LCM = ${gcf} × ${lcmVal} = ${product}. You can use this to find the LCM from the GCF: LCM = (${numA} × ${numB}) ÷ ${gcf} = ${lcmVal}.`,
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout title={title} description={description} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/math/">Math Reference</a> &rsaquo;
+    <span>LCM of {numA} and {numB}</span>
+  </nav>
+
+  <h1>LCM of {numA} and {numB}</h1>
+  <p class="page-desc">Find the Least Common Multiple of {numA} and {numB}, with step-by-step methods including listing multiples, prime factorization, and the GCF formula.</p>
+
+  <div class="quick-fact">
+    <span class="quick-fact-label">Quick Answer:</span>
+    <strong>The LCM of {numA} and {numB} is {lcmVal.toLocaleString('en-US')}. The GCF is {gcf}.</strong>
+  </div>
+
+  <!-- Result Cards -->
+  <div class="result-cards">
+    <div class="result-card primary">
+      <span class="result-label">LCM</span>
+      <span class="result-value">{lcmVal.toLocaleString('en-US')}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">GCF</span>
+      <span class="result-value">{gcf}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Product</span>
+      <span class="result-value">{product.toLocaleString('en-US')}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">{numA} Factorization</span>
+      <span class="result-value" set:html={primeHtmlA} />
+    </div>
+    <div class="result-card">
+      <span class="result-label">{numB} Factorization</span>
+      <span class="result-value" set:html={primeHtmlB} />
+    </div>
+    <div class="result-card">
+      <span class="result-label">Common Factors</span>
+      <span class="result-value">{commonFactors.length}</span>
+    </div>
+  </div>
+
+  <AdUnit slot="lcm-mid" format="rectangle" />
+
+  <!-- Method 1: Listing Multiples -->
+  <h2 class="section-heading">Method 1: Listing Multiples</h2>
+  <div class="calculator-box">
+    <p class="calc-desc">List multiples of each number and find the smallest value that appears in both lists.</p>
+    <h3 class="calc-section-title">Multiples of {numA}</h3>
+    <div class="multiples-row">
+      {multiplesA.map((m) => (
+        <span class={`multiple-badge${m === lcmVal ? ' common' : ''}`}>{m.toLocaleString('en-US')}</span>
+      ))}
+    </div>
+    <h3 class="calc-section-title">Multiples of {numB}</h3>
+    <div class="multiples-row">
+      {multiplesB.map((m) => (
+        <span class={`multiple-badge${m === lcmVal ? ' common' : ''}`}>{m.toLocaleString('en-US')}</span>
+      ))}
+    </div>
+    <div class="steps-list">
+      <div class="step-row result">
+        <span class="step-num">Result:</span>
+        <span>The first common multiple is <strong>{lcmVal.toLocaleString('en-US')}</strong>, so LCM({numA}, {numB}) = {lcmVal.toLocaleString('en-US')}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Method 2: Prime Factorization -->
+  <h2 class="section-heading">Method 2: Prime Factorization</h2>
+  <div class="calculator-box">
+    <p class="calc-desc">Write each number as a product of prime factors, then take the highest power of every prime that appears.</p>
+    <div class="steps-list">
+      <div class="step-row">
+        <span class="step-num">Step 1:</span>
+        <span>Prime factorization of {numA} = <strong set:html={primeHtmlA} /></span>
+      </div>
+      <div class="step-row">
+        <span class="step-num">Step 2:</span>
+        <span>Prime factorization of {numB} = <strong set:html={primeHtmlB} /></span>
+      </div>
+      <div class="step-row">
+        <span class="step-num">Step 3:</span>
+        <span>Take the <strong>highest power</strong> of each prime factor from either factorization</span>
+      </div>
+      <div class="step-row result">
+        <span class="step-num">Result:</span>
+        <span>Multiply them together: LCM({numA}, {numB}) = <strong>{lcmVal.toLocaleString('en-US')}</strong></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Method 3: Using GCF Formula -->
+  <h2 class="section-heading">Method 3: Using the GCF Formula</h2>
+  <div class="calculator-box">
+    <p class="calc-desc">Use the identity LCM(a, b) = (a &times; b) &divide; GCF(a, b) to compute the LCM directly from the GCF.</p>
+    <div class="steps-list">
+      <div class="step-row">
+        <span class="step-num">Step 1:</span>
+        <span>Find the GCF of {numA} and {numB}: GCF = <strong>{gcf}</strong></span>
+      </div>
+      <div class="step-row">
+        <span class="step-num">Step 2:</span>
+        <span>Compute the product: {numA} &times; {numB} = <strong>{product.toLocaleString('en-US')}</strong></span>
+      </div>
+      <div class="step-row">
+        <span class="step-num">Step 3:</span>
+        <span>Divide: {product.toLocaleString('en-US')} &divide; {gcf} = <strong>{lcmVal.toLocaleString('en-US')}</strong></span>
+      </div>
+      <div class="step-row result">
+        <span class="step-num">Result:</span>
+        <span>LCM({numA}, {numB}) = ({numA} &times; {numB}) &divide; {gcf} = <strong>{lcmVal.toLocaleString('en-US')}</strong></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- GCF-LCM Relationship -->
+  <div class="calculator-box">
+    <h2 class="calc-section-title">GCF &times; LCM = Product</h2>
+    <p class="relationship-formula">{relationship}</p>
+    <p class="calc-desc">This identity always holds: the product of two numbers equals the product of their GCF and LCM.</p>
+  </div>
+
+  <!-- Interactive LCM/GCF Calculator -->
+  <h2 class="section-heading">LCM & GCF Calculator</h2>
+  <div class="calculator-box">
+    <p class="calc-desc">Enter any two numbers to find their LCM and GCF.</p>
+    <div class="finder-row">
+      <div class="input-group">
+        <label for="inputA">Number A</label>
+        <input type="number" id="inputA" value={numA} min="1" max="1000000" />
+      </div>
+      <div class="input-group">
+        <label for="inputB">Number B</label>
+        <input type="number" id="inputB" value={numB} min="1" max="1000000" />
+      </div>
+      <button class="calc-btn" id="calcBtn">Calculate</button>
+    </div>
+    <div id="calcResult" class="finder-result"></div>
+  </div>
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>What Is the LCM (Least Common Multiple)?</h2>
+    <p>
+      The Least Common Multiple (LCM) of two numbers is the smallest positive integer that is divisible by both numbers. In other words, the LCM is the smallest number that appears in the multiplication tables of both numbers. For {numA} and {numB}, the LCM is {lcmVal.toLocaleString('en-US')}, meaning {lcmVal.toLocaleString('en-US')} is the smallest number that both {numA} and {numB} divide into evenly.
+    </p>
+    <p>
+      The LCM is sometimes called the Lowest Common Multiple or Least Common Denominator (LCD) when working with fractions. It is a fundamental concept in number theory and arithmetic, appearing in problems involving fractions, scheduling, repeating patterns, and divisibility. Unlike the GCF which looks for the largest shared factor, the LCM looks for the smallest shared multiple &mdash; they approach the relationship between two numbers from opposite directions.
+    </p>
+    <p>
+      Formally, the LCM of two integers a and b is the smallest positive integer m such that a divides m and b divides m (i.e., m mod a = 0 and m mod b = 0). For {numA} and {numB}, we can verify: {lcmVal.toLocaleString('en-US')} &divide; {numA} = {lcmVal / numA} and {lcmVal.toLocaleString('en-US')} &divide; {numB} = {lcmVal / numB}, both of which are whole numbers.
+    </p>
+
+    <h2>How to Find the LCM of {numA} and {numB}</h2>
+    <h3>Method 1: Listing Multiples</h3>
+    <p>
+      The most straightforward method is to list the multiples of each number until you find the first common value. The multiples of {numA} are {numA}, {numA * 2}, {numA * 3}, {numA * 4}, and so on. The multiples of {numB} are {numB}, {numB * 2}, {numB * 3}, {numB * 4}, and so on. By comparing these lists, the first multiple that appears in both is {lcmVal.toLocaleString('en-US')}, which is the LCM. This method works well for small numbers but becomes tedious for larger values.
+    </p>
+
+    <h3>Method 2: Prime Factorization</h3>
+    <p>
+      Write each number as a product of prime factors: {numA} = {primeFactorizationA} and {numB} = {primeFactorizationB}. To find the LCM, take the <strong>highest power</strong> of every prime factor that appears in either factorization, then multiply them together. This is the opposite of the GCF method, where you take the lowest powers. The result gives LCM({numA}, {numB}) = {lcmVal.toLocaleString('en-US')}. This method is efficient and systematic for any pair of numbers.
+    </p>
+
+    <h3>Method 3: Using the GCF Formula</h3>
+    <p>
+      The fastest method uses the relationship between GCF and LCM. The formula is: LCM(a, b) = (a &times; b) &divide; GCF(a, b). Since GCF({numA}, {numB}) = {gcf}, we calculate: LCM = ({numA} &times; {numB}) &divide; {gcf} = {product.toLocaleString('en-US')} &divide; {gcf} = {lcmVal.toLocaleString('en-US')}. This method requires knowing the GCF first, which can be found quickly using the Euclidean algorithm.
+    </p>
+
+    <h2>Real-World Applications of the LCM</h2>
+    <p>
+      The LCM has many practical applications in everyday mathematics and real-world problems. One of the most common uses is <strong>adding and subtracting fractions</strong> with different denominators. To add {`1/${numA}`} + {`1/${numB}`}, you need a common denominator, which is the LCM = {lcmVal.toLocaleString('en-US')}. Converting: {`1/${numA}`} = {lcmVal / numA}/{lcmVal.toLocaleString('en-US')} and {`1/${numB}`} = {lcmVal / numB}/{lcmVal.toLocaleString('en-US')}, so the sum is {lcmVal / numA + lcmVal / numB}/{lcmVal.toLocaleString('en-US')}.
+    </p>
+    <p>
+      <strong>Scheduling and synchronization</strong> is another major application. If one event occurs every {numA} days and another every {numB} days, both events will coincide every {lcmVal.toLocaleString('en-US')} days. This applies to shift rotations, maintenance schedules, bus timetables, and astronomical cycles. For example, if two traffic lights have cycles of {numA} seconds and {numB} seconds, they will both turn green simultaneously every {lcmVal.toLocaleString('en-US')} seconds.
+    </p>
+    <p>
+      In engineering, the LCM is used for <strong>gear ratios and mechanical cycles</strong>. When two gears with {numA} and {numB} teeth mesh together, it takes {lcmVal.toLocaleString('en-US')} tooth engagements before the same two teeth meet again. This is important for understanding wear patterns and designing gear systems. The LCM also appears in music theory, signal processing, and computer science when working with periodic patterns that need to be synchronized.
+    </p>
+
+    <h2>LCM vs GCF: Key Differences</h2>
+    <p>
+      The LCM and GCF are complementary concepts that describe the relationship between two numbers from different perspectives. The <strong>GCF (Greatest Common Factor)</strong> is the largest number that divides both {numA} and {numB} evenly &mdash; it measures what the numbers share in terms of factors. The GCF of {numA} and {numB} is {gcf}. The <strong>LCM (Least Common Multiple)</strong> is the smallest number that both {numA} and {numB} divide into evenly &mdash; it measures when the numbers first align as multiples. The LCM of {numA} and {numB} is {lcmVal.toLocaleString('en-US')}.
+    </p>
+    <p>
+      These two values are connected by the fundamental identity: GCF &times; LCM = a &times; b. For {numA} and {numB}: {gcf} &times; {lcmVal.toLocaleString('en-US')} = {(gcf * lcmVal).toLocaleString('en-US')}, and {numA} &times; {numB} = {product.toLocaleString('en-US')}. Both products are equal, confirming the relationship. If two numbers are coprime (their GCF is 1), then their LCM equals their product. If the GCF is large relative to the numbers, the LCM will be smaller than the product.
+    </p>
+    <p>
+      The GCF is useful for simplifying fractions and dividing quantities evenly, while the LCM is useful for finding common denominators and synchronizing periodic events. Together, they provide a complete picture of the divisibility relationship between any two numbers.
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is the LCM of {numA} and {numB}?</h3>
+    <p>
+      The LCM (Least Common Multiple) of {numA} and {numB} is {lcmVal.toLocaleString('en-US')}. This is the smallest positive number that is divisible by both {numA} and {numB}. You can verify: {lcmVal.toLocaleString('en-US')} &divide; {numA} = {lcmVal / numA} and {lcmVal.toLocaleString('en-US')} &divide; {numB} = {lcmVal / numB}, both whole numbers.
+    </p>
+
+    <h3>How do you find the LCM using prime factorization?</h3>
+    <p>
+      To find the LCM of {numA} and {numB} using prime factorization, first write each number as a product of primes: {numA} = {primeFactorizationA} and {numB} = {primeFactorizationB}. Then take the highest power of each prime that appears in either factorization and multiply them together. The result is {lcmVal.toLocaleString('en-US')}.
+    </p>
+
+    <h3>What is the relationship between GCF and LCM?</h3>
+    <p>
+      The GCF and LCM of two numbers are related by the identity: GCF(a, b) &times; LCM(a, b) = a &times; b. For {numA} and {numB}: {gcf} &times; {lcmVal.toLocaleString('en-US')} = {product.toLocaleString('en-US')} and {numA} &times; {numB} = {product.toLocaleString('en-US')}. This means you can find the LCM from the GCF using the formula LCM = (a &times; b) &divide; GCF.
+    </p>
+
+    <h2>Related LCM Calculations</h2>
+    <ul>
+      {relatedPages.map((p) => (
+        <li>
+          <a href={`/math/lcm-of-${p.slug}/`}>LCM of {p.numA} and {p.numB} = {p.lcm}</a>
+        </li>
+      ))}
+    </ul>
+
+    <p><a href="/math/">&larr; Math Reference</a> | <a href="/math-calculators/">Math Calculators</a></p>
+
+    <CrossLinks links={crossLinks} />
+  </article>
+
+  <AdUnit slot="lcm-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .quick-fact {
+    background: #eff6ff;
+    border-radius: var(--radius);
+    padding: 16px 24px;
+    margin-bottom: 24px;
+    font-size: 1.1rem;
+  }
+  .quick-fact-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .quick-fact strong {
+    color: var(--color-primary);
+    font-size: 1.15rem;
+  }
+
+  .calc-section-title {
+    font-size: 1.15rem;
+    margin: 0 0 16px;
+    border: none;
+    padding: 0;
+  }
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+
+  .factor-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .factor-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    padding: 8px 14px;
+    background: #eff6ff;
+    border-radius: var(--radius);
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--color-primary);
+  }
+
+  .highlight {
+    background: #dbeafe;
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+  .table-note {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-top: 8px;
+    font-style: italic;
+  }
+
+  .steps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .step-row {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    padding: 6px 0;
+  }
+  .step-row.result {
+    margin-top: 8px;
+    padding-top: 12px;
+    border-top: 2px solid var(--color-primary);
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+  .step-num {
+    font-weight: 700;
+    min-width: 60px;
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+  }
+
+  .relationship-formula {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    text-align: center;
+    margin: 12px 0;
+    font-family: 'Courier New', monospace;
+  }
+
+  .calc-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 16px;
+  }
+  .finder-row {
+    display: flex;
+    gap: 16px;
+    align-items: end;
+    flex-wrap: wrap;
+  }
+  .finder-row .input-group {
+    flex: 1;
+    min-width: 120px;
+  }
+  .finder-result {
+    margin-top: 16px;
+    padding: 14px 16px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    min-height: 44px;
+  }
+
+  .multiples-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 8px 0;
+  }
+  .multiple-badge {
+    padding: 4px 10px;
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    background: var(--color-bg);
+  }
+  .multiple-badge.common {
+    background: #dbeafe;
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  @media (max-width: 640px) {
+    .finder-row { flex-direction: column; }
+    .factor-badge { min-width: 34px; padding: 6px 10px; font-size: 0.9rem; }
+  }
+</style>
+
+<script>
+  var inputA = document.getElementById('inputA') as HTMLInputElement;
+  var inputB = document.getElementById('inputB') as HTMLInputElement;
+  var calcBtn = document.getElementById('calcBtn') as HTMLButtonElement;
+  var resultDiv = document.getElementById('calcResult') as HTMLDivElement;
+
+  function computeGcd(a, b) {
+    a = Math.abs(a); b = Math.abs(b);
+    while (b) { var t = b; b = a % b; a = t; }
+    return a;
+  }
+
+  function calculate() {
+    var a = parseInt(inputA.value, 10);
+    var b = parseInt(inputB.value, 10);
+    if (isNaN(a) || isNaN(b) || a < 1 || b < 1 || a > 1000000 || b > 1000000) {
+      resultDiv.textContent = 'Please enter two numbers between 1 and 1,000,000.';
+      return;
+    }
+    var g = computeGcd(a, b);
+    var l = (a * b) / g;
+
+    var html = '<strong>LCM(' + a + ', ' + b + ') = ' + l.toLocaleString('en-US') + '</strong>';
+    html += '<br><strong>GCF(' + a + ', ' + b + ') = ' + g + '</strong>';
+    html += '<br><strong>Product:</strong> ' + a + ' × ' + b + ' = ' + (a * b).toLocaleString('en-US');
+    html += '<br><strong>Verification:</strong> GCF × LCM = ' + g + ' × ' + l.toLocaleString('en-US') + ' = ' + (g * l).toLocaleString('en-US');
+    resultDiv.innerHTML = html;
+  }
+
+  calcBtn.addEventListener('click', calculate);
+  inputA.addEventListener('keydown', function(e) { if ((e as KeyboardEvent).key === 'Enter') calculate(); });
+  inputB.addEventListener('keydown', function(e) { if ((e as KeyboardEvent).key === 'Enter') calculate(); });
+  calculate();
+</script>

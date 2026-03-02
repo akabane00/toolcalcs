@@ -1,0 +1,134 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/category.css';
+import { getAllGradeScorePages, GRADE_TOTALS } from '../../data/grade-scores';
+
+const allPages = getAllGradeScorePages();
+const totalPages = allPages.length;
+
+// Group by total
+const byTotal = new Map<number, typeof allPages>();
+for (const p of allPages) {
+  if (!byTotal.has(p.total)) byTotal.set(p.total, []);
+  byTotal.get(p.total)!.push(p);
+}
+
+// Key percentages for sampling large totals
+const samplePcts = [100, 95, 90, 85, 80, 75, 70, 65, 60, 50, 40, 25, 10];
+
+function getSampleScores(total: number, pages: typeof allPages): typeof allPages {
+  if (total <= 30) return pages;
+  var seen = new Set<number>();
+  var samples: typeof allPages = [];
+  for (var i = 0; i < samplePcts.length; i++) {
+    var targetScore = Math.round((samplePcts[i] / 100) * total);
+    if (targetScore < 1) targetScore = 1;
+    if (targetScore > total) targetScore = total;
+    if (seen.has(targetScore)) continue;
+    seen.add(targetScore);
+    var found = pages.find(function(p) { return p.score === targetScore; });
+    if (found) samples.push(found);
+  }
+  return samples;
+}
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Grade Calculator" },
+  ],
+};
+---
+
+<BaseLayout
+  title="Grade Calculator - Convert Scores to Letter Grades & GPA | ToolCalcs"
+  description={`Convert test scores to percentages, letter grades, and GPA. Browse ${totalPages.toLocaleString('en-US')} score lookups organized by total points.`}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <span>Grade Calculator</span>
+  </nav>
+
+  <h1>Grade Calculator</h1>
+  <p class="page-desc">Convert test scores to percentages, letter grades, and GPA. Browse {totalPages.toLocaleString('en-US')} score lookups.</p>
+
+  <AdUnit slot="grade-idx-top" format="horizontal" />
+
+  {GRADE_TOTALS.map((total) => {
+    const pages = byTotal.get(total) || [];
+    const displayPages = getSampleScores(total, pages);
+    return (
+      <section class="factors-section">
+        <h2 class="factors-heading">Scores out of {total} ({pages.length} pages)</h2>
+        <div class="number-grid">
+          {displayPages.map((p) => (
+            <a href={`/grade/${p.slug}/`} class="number-card">
+              <span class="number-val">{p.score}/{p.total}</span>
+              <span class="number-count">{p.percentStr} {p.letterGrade}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    );
+  })}
+
+  <AdUnit slot="grade-idx-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .factors-section {
+    margin-bottom: 32px;
+  }
+  .factors-heading {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--color-border);
+    color: var(--color-text);
+  }
+  .number-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+  }
+  .number-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 14px 10px;
+    background: var(--color-bg-alt);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--color-text);
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .number-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+  }
+  .number-val {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--color-primary);
+  }
+  .number-count {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  @media (max-width: 640px) {
+    .number-grid {
+      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    }
+    .number-val {
+      font-size: 1.1rem;
+    }
+  }
+</style>
