@@ -1,0 +1,177 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import { getAllRandomGenPages } from '../../data/random-generators';
+
+const allPages = getAllRandomGenPages();
+const totalCount = allPages.length;
+
+// Group pages into categories
+const numberPages = allPages.filter((p) => p.type === 'number');
+const diceGamePages = allPages.filter((p) => p.slug === 'dice-roll' || p.slug === 'two-dice-roll' || p.slug === 'coin-flip');
+const funPages = allPages.filter((p) => p.slug === 'yes-or-no' || p.slug === 'random-letter' || p.slug === 'random-color');
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://toolcalcs.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Random Generators"
+    }
+  ]
+};
+---
+
+<BaseLayout
+  title="Random Number Generators - Free Online Tools | ToolCalcs"
+  description={`Free random number generators, dice rollers, coin flippers, and more. ${totalCount} generators for games, decisions, and fun.`}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <span>Random Generators</span>
+  </nav>
+
+  <h1>Random Number Generators</h1>
+  <p class="page-desc">Free random number generators, dice rollers, coin flippers, and more. {totalCount} generators for games, decisions, and fun.</p>
+
+  <AdUnit slot="random-idx-top" format="horizontal" />
+
+  <!-- Dice & Games Section -->
+  <section class="category-section">
+    <h2 class="category-heading">Dice &amp; Games</h2>
+    <div class="gen-grid">
+      {diceGamePages.map((p) => (
+        <a href={`/random/${p.slug}/`} class="gen-card">
+          <span class="gen-icon">
+            {p.slug === 'dice-roll' ? '\u2685' : p.slug === 'two-dice-roll' ? '\u2684\u2682' : '\u{1FA99}'}
+          </span>
+          <span class="gen-title">{p.title}</span>
+          <span class="gen-desc">{p.description}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Fun Generators Section -->
+  <section class="category-section">
+    <h2 class="category-heading">Fun Generators</h2>
+    <div class="gen-grid">
+      {funPages.map((p) => (
+        <a href={`/random/${p.slug}/`} class="gen-card">
+          <span class="gen-icon">
+            {p.slug === 'yes-or-no' ? '\u2753' : p.slug === 'random-letter' ? 'Aa' : '\u{1F3A8}'}
+          </span>
+          <span class="gen-title">{p.title}</span>
+          <span class="gen-desc">{p.description}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Number Ranges Section -->
+  <section class="category-section">
+    <h2 class="category-heading">Number Ranges</h2>
+    <div class="gen-grid">
+      {numberPages.map((p) => (
+        <a href={`/random/${p.slug}/`} class="gen-card">
+          <span class="gen-icon">#</span>
+          <span class="gen-title">{p.title}</span>
+          <span class="gen-desc">{p.description}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <AdUnit slot="random-idx-mid" format="horizontal" />
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>About Our Random Number Generators</h2>
+    <p>
+      ToolCalcs offers a comprehensive collection of {totalCount} free random number generators, dice rollers, coin flippers, and fun decision-making tools. Every generator on this page runs entirely in your browser using JavaScript's <code>Math.random()</code> function, which provides a uniform probability distribution. This means each possible outcome is equally likely, ensuring fair and unbiased results every time you click Generate.
+    </p>
+    <p>
+      Whether you need to generate a random number for a board game, flip a coin to settle a debate, roll virtual dice for a tabletop RPG, or pick a random color for a design project, we have a dedicated tool for your needs. Each generator page includes a large, easy-to-read result display, a history of your last 10 results, and detailed information about the probability distribution.
+    </p>
+
+    <h2>How Random Number Generation Works</h2>
+    <p>
+      Computers generate random numbers using algorithms called pseudo-random number generators (PRNGs). These algorithms take an initial value called a seed, which is usually derived from the system clock or other sources of entropy, and apply mathematical transformations to produce a sequence of numbers that appear random. Modern browsers use high-quality PRNGs like xorshift128+ that pass rigorous statistical tests for randomness.
+    </p>
+    <p>
+      While these numbers are technically deterministic (given the same seed, you would get the same sequence), they are practically indistinguishable from true randomness for everyday applications like games, lotteries, classroom activities, and decision making. For cryptographic applications requiring true randomness, specialized APIs exist, but for all the tools on this page, <code>Math.random()</code> provides excellent, fair results.
+    </p>
+
+    <h2>Common Uses for Random Generators</h2>
+    <p>
+      Random number generators have countless applications in everyday life. Teachers use them to call on students fairly. Game masters use dice rollers for tabletop RPGs. Friends use coin flippers to make quick decisions. Designers use random color generators for inspiration. Raffle organizers use number pickers to select winners. The tools on this page are free, require no installation, and work on any device with a web browser.
+    </p>
+  </article>
+
+  <AdUnit slot="random-idx-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .category-section {
+    margin-bottom: 32px;
+  }
+  .category-heading {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--color-border);
+    color: var(--color-text);
+  }
+  .gen-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+  }
+  .gen-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 18px 20px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--color-text);
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .gen-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+    text-decoration: none;
+  }
+  .gen-icon {
+    font-size: 1.5rem;
+    margin-bottom: 4px;
+  }
+  .gen-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+  .gen-desc {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+  }
+
+  @media (max-width: 640px) {
+    .gen-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

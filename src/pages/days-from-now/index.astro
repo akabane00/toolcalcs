@@ -1,0 +1,152 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import { getAllDaysCalcPages, type DaysCalcPage } from '../../data/days-calculator';
+
+const allPages = getAllDaysCalcPages();
+
+// Group pages by time range
+const group1 = allPages.filter(function (p) { return p.days >= 1 && p.days <= 7; });
+const group2 = allPages.filter(function (p) { return p.days >= 8 && p.days <= 14; });
+const group3 = allPages.filter(function (p) { return p.days >= 15 && p.days <= 30; });
+const group4 = allPages.filter(function (p) { return p.days >= 31 && p.days <= 90; });
+const group5 = allPages.filter(function (p) { return p.days >= 91 && p.days <= 180; });
+const group6 = allPages.filter(function (p) { return p.days >= 181; });
+
+const groups = [
+  { title: '1 to 7 Days', pages: group1 },
+  { title: '1 to 2 Weeks', pages: group2 },
+  { title: '2 to 4 Weeks', pages: group3 },
+  { title: '1 to 3 Months', pages: group4 },
+  { title: '3 to 6 Months', pages: group5 },
+  { title: '6+ Months', pages: group6 },
+];
+
+const title = 'Days From Today Calculator - Find Any Future Date | ToolCalcs';
+const description = 'Find the exact date for any number of days from today. Browse ' + allPages.length + ' date calculations organized by time range. Free online days from now calculator.';
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://toolcalcs.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Days From Today"
+    }
+  ]
+};
+---
+
+<BaseLayout title={title} description={description} structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <span>Days From Today</span>
+  </nav>
+
+  <h1>Days From Today Calculator</h1>
+  <p class="page-desc">Find the exact date for any number of days from today. Browse {allPages.length} date calculations below.</p>
+
+  <AdUnit slot="days-idx-top" format="horizontal" />
+
+  {groups.map(function (group) {
+    return (
+      <section class="days-section">
+        <h2 class="days-heading">{group.title}</h2>
+        <div class="days-grid">
+          {group.pages.map(function (p) {
+            return (
+              <a href={'/days-from-now/' + p.slug + '/'} class="days-card">
+                <span class="days-val">{p.days.toLocaleString('en-US')}</span>
+                <span class="days-label">Days From Today</span>
+              </a>
+            );
+          })}
+        </div>
+      </section>
+    );
+  })}
+
+  <section class="sister-link-section">
+    <p>Looking for past dates? See <a href="/days-ago/">Days Ago Calculator</a></p>
+  </section>
+
+  <AdUnit slot="days-idx-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .days-section {
+    margin-bottom: 32px;
+  }
+  .days-heading {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--color-border);
+    color: var(--color-text);
+  }
+  .days-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+  }
+  .days-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 14px 10px;
+    background: var(--color-bg-alt, var(--color-bg));
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--color-text);
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .days-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+    text-decoration: none;
+  }
+  .days-val {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--color-primary);
+  }
+  .days-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .sister-link-section {
+    margin-top: 24px;
+    padding: 20px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    text-align: center;
+    font-size: 1rem;
+    color: var(--color-text-muted);
+  }
+  .sister-link-section a {
+    font-weight: 600;
+  }
+
+  @media (max-width: 640px) {
+    .days-grid {
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    }
+    .days-val {
+      font-size: 1.1rem;
+    }
+  }
+</style>

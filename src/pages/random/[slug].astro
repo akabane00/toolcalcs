@@ -1,0 +1,397 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import { getAllRandomGenPages, type RandomGenPage } from '../../data/random-generators';
+
+export function getStaticPaths() {
+  return getAllRandomGenPages().map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: RandomGenPage };
+const { min, max, slug, title, type, description, probability, uses } = page;
+
+// Build related pages list: pick 6-8 other generators to link to
+const allPages = getAllRandomGenPages();
+const relatedPages = allPages
+  .filter((p) => p.slug !== slug)
+  .sort(() => 0.5 - Math.random())
+  .slice(0, 8);
+
+// Total possible values
+const totalValues = type === 'special'
+  ? (slug === 'random-color' ? '16,777,216' : slug === 'random-letter' ? '26' : slug === 'two-dice-roll' ? '11 (sums 2-12)' : slug === 'dice-roll' ? '6' : '2')
+  : (max - min + 1).toLocaleString('en-US');
+
+// SEO title and meta description
+const seoTitle = title + ' | Free Online Tool | ToolCalcs';
+const seoDescription = description + ' Click Generate for an instant random result.';
+
+// Structured data
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Random Generators", "item": "https://toolcalcs.com/random/" },
+      { "@type": "ListItem", "position": 3, "name": title },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is this truly random?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, this generator uses JavaScript's Math.random() which provides cryptographically sufficient randomness for most purposes. Each result is independent of previous results, giving you a fair and unbiased outcome every time.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "Can I generate multiple random results?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, click the Generate button as many times as you need. Each click produces a new independent random result. Your last 10 results are saved in the history section below the generator.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "What is the probability of getting any specific result?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": probability,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "Do I need to install anything to use this generator?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No installation is required. This random generator runs entirely in your web browser. It works on desktop, tablet, and mobile devices with no downloads or sign-ups needed.",
+        },
+      },
+    ],
+  },
+];
+
+// Special type content helpers
+function getSpecialIntro(): string {
+  if (slug === 'coin-flip') return 'This virtual coin flipper simulates the classic heads-or-tails coin toss. Whether you need to settle a dispute, make a quick decision, or just have fun, this tool delivers an instant fair coin flip right in your browser. The coin flip is one of the oldest and most universal methods of making a random binary decision, dating back to the Roman Empire where it was known as "navia aut caput" (ship or head).';
+  if (slug === 'yes-or-no') return 'The Random Yes or No Generator gives you a definitive answer when you are stuck between two options. Sometimes the hardest decisions are the simplest ones, and this tool removes the agony of choosing by leaving it to chance. Whether you are deciding what to eat for dinner, whether to go out tonight, or settling a friendly debate, let randomness be your guide.';
+  if (slug === 'random-letter') return 'This random letter generator picks a letter from A to Z with equal probability. It is perfect for word games like Scattergories, creative writing exercises, teaching the alphabet, or any situation where you need a randomly selected letter. Each of the 26 letters has an equal 3.85% chance of being selected.';
+  if (slug === 'random-color') return 'The Random Color Generator creates a color from the full spectrum of 16.7 million possible hex colors. Each click generates a completely new color with its hex code displayed, making it ideal for designers seeking inspiration, artists exploring palettes, web developers choosing accent colors, or anyone who loves discovering new color combinations.';
+  if (slug === 'dice-roll') return 'This online dice roller simulates a standard 6-sided die (d6). It is the perfect tool when you need to roll dice for board games, tabletop RPGs, or classroom activities but do not have physical dice available. Each face has an equal 16.67% probability of appearing, just like a real fair die.';
+  if (slug === 'two-dice-roll') return 'Roll two virtual 6-sided dice and see each die result plus their sum. This two-dice roller is perfect for board games like Monopoly, Settlers of Catan, Backgammon, and Craps. Unlike a single die, two dice produce a bell-curved probability distribution where 7 is the most common sum.';
+  return '';
+}
+
+function getSpecialContent(): string {
+  if (slug === 'coin-flip') return '<h2>History of the Coin Flip</h2><p>The coin flip has been used for decision-making for over two thousand years. Ancient Romans called it "navia aut caput" (ship or head), referring to the images on their coins. In medieval England, the practice was called "cross and pile" after the cross stamped on one side of coins. Today, coin flips are used in sports to determine first possession, in everyday life for quick decisions, and in mathematics to teach basic probability theory.</p><p>The beauty of the coin flip lies in its simplicity. With exactly two equally likely outcomes, it represents the most fundamental form of random selection. A fair coin gives each side a 50% probability, making it the perfect tool for unbiased binary decisions. Interestingly, research by Persi Diaconis at Stanford University found that real coins show a very slight bias toward landing on the same side they started, but for practical purposes, the bias is negligible.</p><h2>Probability Theory and Coin Flips</h2><p>Coin flips are the foundation of probability theory. The expected outcome over many flips follows the law of large numbers. If you flip a coin 1,000 times, you will get close to 500 heads and 500 tails, though the exact split will vary. This concept is central to statistics, gaming theory, and even quantum mechanics.</p><p>A common misconception is the gambler is fallacy, which is the belief that after several heads in a row, tails becomes more likely. In reality, each flip is independent. The coin has no memory of previous results. Whether you have flipped 10 heads in a row or alternated perfectly, the next flip is always 50/50.</p>';
+  if (slug === 'dice-roll') return '<h2>History of Dice</h2><p>Dice are among the oldest known gaming implements. Archaeological evidence shows dice being used in ancient Mesopotamia as far back as 3000 BCE. Early dice were made from bones, which is why dice are sometimes called "bones." The cubical six-sided die that we know today became the standard in ancient Rome and Greece. Throughout history, dice have been used for gambling, divination, board games, and generating random numbers.</p><p>Modern dice are manufactured to exacting standards to ensure fairness. Casino-grade dice are transparent and have flush pips (dots) to prevent any bias. The numbers on opposite faces of a standard Western die always add up to 7: 1 is opposite 6, 2 is opposite 5, and 3 is opposite 4.</p><h2>Dice Probability Distribution</h2><p>A single fair die produces a uniform distribution, meaning each face (1 through 6) has an equal probability of 1/6, or approximately 16.67%. This uniform distribution makes a single die roll ideal for generating fair random numbers in the 1-6 range. When used in tabletop role-playing games, the d6 is one of several polyhedral dice used, alongside d4, d8, d10, d12, and d20.</p><p>The expected value (average) of a single die roll is 3.5. This means if you roll a die many times and average the results, it will converge toward 3.5. This mathematical property is important in game design and probability calculations.</p>';
+  if (slug === 'two-dice-roll') return '<h2>Two-Dice Probability Distribution</h2><p>When rolling two dice, the possible sums range from 2 to 12, but not all sums are equally likely. The probability distribution forms a triangle shape, with 7 being the most probable sum. There are six ways to roll a 7 (1+6, 2+5, 3+4, 4+3, 5+2, 6+1) but only one way to roll a 2 (1+1) or a 12 (6+6). This non-uniform distribution is fundamental to many board games and gambling games.</p><p>Here is the probability for each sum: 2 has a 2.78% chance, 3 has 5.56%, 4 has 8.33%, 5 has 11.11%, 6 has 13.89%, 7 has 16.67%, 8 has 13.89%, 9 has 11.11%, 10 has 8.33%, 11 has 5.56%, and 12 has 2.78%. This bell-curve distribution makes games of chance both interesting and mathematically rich.</p><h2>Dice in Board Games</h2><p>Two-dice rolling is central to many popular board games. In Monopoly, players roll two dice to move around the board, and rolling doubles grants an extra turn (but three consecutive doubles sends you to jail). In Settlers of Catan, the dice roll determines which resource tiles produce, making the probability distribution directly affect strategy. In the casino game of Craps, the entire game revolves around the probabilities of two-dice sums, with 7 and 11 being winning numbers on the come-out roll.</p>';
+  if (slug === 'random-color') return '<h2>Understanding Hex Color Codes</h2><p>Hex color codes represent colors using a six-digit hexadecimal number preceded by a hash symbol (#). The six digits are split into three pairs: the first two represent red, the middle two represent green, and the last two represent blue. Each pair ranges from 00 (no intensity) to FF (full intensity), giving 256 possible values per channel. With three channels, there are 256 x 256 x 256 = 16,777,216 possible colors.</p><p>For example, #FF0000 is pure red, #00FF00 is pure green, #0000FF is pure blue, #000000 is black, and #FFFFFF is white. Understanding hex codes is essential for web design, graphic design, and digital art. This generator picks from the entire spectrum of 16.7 million colors, ensuring truly diverse and often surprising results.</p><h2>Color Theory and Design</h2><p>Random color generation can be a powerful creative tool. Designers often use random colors as starting points for color palettes, then adjust for harmony. You can use a generated color and find its complementary, analogous, or triadic colors to build a complete palette. Random colors can also break you out of creative ruts by forcing you to work with unexpected combinations.</p>';
+  if (slug === 'random-letter') return '<h2>Letter Frequency in English</h2><p>While this generator gives each letter an equal probability of selection, letters in natural English text appear with very different frequencies. The most common letter is E (appearing about 12.7% of the time), followed by T (9.1%), A (8.2%), O (7.5%), and I (7.0%). The least common letters are Q (0.1%), Z (0.07%), and X (0.15%). These frequency patterns are what make cryptography and word games like Scrabble so interesting.</p><p>In Scrabble, tile distribution roughly mirrors letter frequency, with more common letters having lower point values. The random letter generator treats all letters equally, which makes it ideal for games like Scattergories where you need an unbiased starting letter, or for creative writing exercises where you want to challenge yourself with less common letters.</p><h2>Using Random Letters for Games</h2><p>Random letter selection is the foundation of many popular games and activities. In Scattergories, players must name items in categories starting with a randomly selected letter. In creative writing workshops, a random letter can serve as a prompt for alliterative poetry or stream-of-consciousness exercises. Teachers use random letters for spelling bees, alphabet games, and phonics practice.</p>';
+  if (slug === 'yes-or-no') return '<h2>The Psychology of Decision Making</h2><p>Research in behavioral psychology shows that humans are surprisingly bad at making random choices. We tend to overthink decisions, especially when both options seem equally good or equally bad. This phenomenon, known as analysis paralysis or the paradox of choice, can lead to stress and delayed action. A random Yes or No generator can cut through this mental fog and provide a clear answer.</p><p>Interestingly, many people report that when they see the random answer, they immediately know whether they agree with it. This suggests that the random generator does not actually make the decision for you. Instead, it reveals your true preference by giving you something to react to. If you feel relief at seeing "Yes," you probably wanted Yes all along. If you feel disappointed, you know your real answer is No.</p><h2>When to Use a Random Decision Maker</h2><p>Random decision makers work best for low-stakes choices where both options are acceptable. Should you order pizza or sushi? Watch a movie or read a book? Take the highway or the scenic route? For these everyday decisions, a random Yes or No can save you time and mental energy. However, for important life decisions like career changes or major purchases, it is better to use structured decision-making frameworks.</p>';
+  return '';
+}
+---
+
+<BaseLayout title={seoTitle} description={seoDescription} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/random/">Random Generators</a> &rsaquo;
+    <span>{title}</span>
+  </nav>
+
+  <h1>{title}</h1>
+  <p class="page-desc">{description}</p>
+
+  <!-- Main Generator Card -->
+  <div class="calculator-box generator-card">
+    <div id="result" class="big-result">?</div>
+
+    {slug === 'random-color' && (
+      <div id="colorPreview" class="color-preview"></div>
+    )}
+
+    <button id="generateBtn" class="generate-btn">Generate</button>
+  </div>
+
+  <!-- History Section -->
+  <div id="history" class="history-section">
+    <h3>History</h3>
+    <div id="historyList" class="history-grid"></div>
+  </div>
+
+  <!-- Quick Stats Card -->
+  <div class="result-cards">
+    <div class="result-card primary">
+      <span class="result-label">Range</span>
+      <span class="result-value">
+        {type === 'special'
+          ? (slug === 'coin-flip' ? 'Heads / Tails'
+            : slug === 'yes-or-no' ? 'Yes / No'
+            : slug === 'random-letter' ? 'A - Z'
+            : slug === 'random-color' ? '#000000 - #FFFFFF'
+            : slug === 'dice-roll' ? '1 - 6'
+            : slug === 'two-dice-roll' ? '2 - 12 (sum)'
+            : min + ' - ' + max)
+          : min.toLocaleString('en-US') + ' - ' + max.toLocaleString('en-US')}
+      </span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Total Possible Values</span>
+      <span class="result-value">{totalValues}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Probability Per Value</span>
+      <span class="result-value">{probability}</span>
+    </div>
+  </div>
+
+  <AdUnit slot="random-mid" format="horizontal" />
+
+  <!-- SEO Content Section -->
+  <article class="content-section">
+    <h2>About {title}</h2>
+    <p>
+      {description} This free online tool generates results instantly with a single click. Every result is completely independent, meaning previous outcomes have no influence on future ones. The generator uses a uniform probability distribution, ensuring that each possible outcome has an equal chance of being selected.
+    </p>
+    {type === 'special' ? (
+      <p set:html={getSpecialIntro()} />
+    ) : (
+      <p>
+        Generating a random number between {min.toLocaleString('en-US')} and {max.toLocaleString('en-US')} is one of the most common random number generation tasks. With {totalValues} possible values, each number has a {probability} chance of being selected on any given click. This range is widely used in games, education, statistics, and everyday decision making. Whether you need a quick pick for a lottery, a random student number for a classroom activity, or a fair selection for a raffle, this generator has you covered.
+      </p>
+    )}
+
+    <h2>Common Uses</h2>
+    <ul>
+      {uses.map((use) => (
+        <li><strong>{use}</strong> &mdash; Use this generator to quickly produce a random result for {use.toLowerCase()}. The unbiased selection ensures fairness in any application.</li>
+      ))}
+    </ul>
+    <p>
+      These are just a few of the many applications for this random generator. Anywhere you need an unbiased, instant random result, this tool can help. Bookmark this page for quick access whenever you need it.
+    </p>
+
+    <h2>How Random Number Generation Works</h2>
+    <p>
+      This generator uses JavaScript's built-in <code>Math.random()</code> function, which produces pseudo-random numbers using an algorithm seeded by your system's clock. While technically pseudo-random rather than truly random, the output is more than sufficient for games, decisions, and everyday use. The algorithm produces numbers with a uniform distribution, meaning every possible value within the range is equally likely to appear.
+    </p>
+    <p>
+      Pseudo-random number generators (PRNGs) work by applying a mathematical formula to a seed value to produce a sequence of numbers that appear random. Modern browsers use high-quality PRNGs such as xorshift128+ or similar algorithms that pass rigorous statistical tests for randomness. For cryptographic applications like encryption keys or security tokens, specialized APIs like <code>crypto.getRandomValues()</code> are recommended, but for general-purpose random generation, <code>Math.random()</code> provides excellent results.
+    </p>
+    <p>
+      The uniform distribution used by this generator means that over a large number of trials, each possible outcome will appear approximately the same number of times. This is different from a normal (bell curve) distribution, where values cluster around the center. For a range of {min.toLocaleString('en-US')} to {max.toLocaleString('en-US')}, uniform distribution ensures complete fairness. No number is more or less likely than any other.
+    </p>
+
+    {type === 'special' && (
+      <Fragment set:html={getSpecialContent()} />
+    )}
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>Is this truly random?</h3>
+    <p>
+      Yes, this generator uses JavaScript's <code>Math.random()</code> which provides cryptographically sufficient randomness for most purposes. Each result is independent of previous results, giving you a fair and unbiased outcome every time. The algorithm used by modern browsers passes stringent statistical randomness tests.
+    </p>
+
+    <h3>Can I generate multiple random results?</h3>
+    <p>
+      Yes, click the Generate button as many times as you need. Each click produces a new independent random result. Your last 10 results are displayed in the history section below the generator, making it easy to track your recent outcomes.
+    </p>
+
+    <h3>What is the probability of getting any specific result?</h3>
+    <p>
+      The probability is {probability}. This generator uses a uniform distribution, meaning every possible outcome is equally likely. Over many generations, you will see each result appear approximately the same number of times.
+    </p>
+
+    <h3>Do I need to install anything?</h3>
+    <p>
+      No installation is required. This random generator runs entirely in your web browser. It works on desktop, tablet, and mobile devices with no downloads, sign-ups, or special software needed. Simply click Generate and get your result instantly.
+    </p>
+
+    <h2>Related Random Generators</h2>
+    <ul>
+      {relatedPages.map((p) => (
+        <li><a href={`/random/${p.slug}/`}>{p.title}</a> &mdash; {p.description}</li>
+      ))}
+    </ul>
+    <p><a href="/random/">&larr; View All Random Generators</a></p>
+  </article>
+
+  <AdUnit slot="random-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .generator-card {
+    text-align: center;
+    padding: 32px 24px;
+    margin-bottom: 24px;
+  }
+
+  .big-result {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: var(--color-primary);
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    line-height: 1.2;
+    word-break: break-word;
+    transition: transform 0.2s ease;
+  }
+
+  .big-result.pop {
+    transform: scale(1.1);
+  }
+
+  .generate-btn {
+    display: inline-block;
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    padding: 16px 48px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .generate-btn:hover {
+    background: var(--color-primary-dark);
+    transform: translateY(-1px);
+  }
+  .generate-btn:active {
+    transform: translateY(0);
+  }
+
+  .color-preview {
+    width: 100%;
+    height: 100px;
+    border-radius: var(--radius);
+    border: 1px solid var(--color-border);
+    margin-bottom: 24px;
+    transition: background-color 0.3s ease;
+  }
+
+  .history-section {
+    margin-bottom: 24px;
+  }
+  .history-section h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--color-text-muted);
+  }
+  .history-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 32px;
+  }
+  .history-item {
+    display: inline-block;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-text);
+  }
+
+  @media (max-width: 640px) {
+    .big-result {
+      font-size: 2.5rem;
+      min-height: 60px;
+    }
+    .generate-btn {
+      padding: 14px 36px;
+      font-size: 1.1rem;
+      width: 100%;
+    }
+  }
+</style>
+
+<script define:vars={{ min, max, slug }}>
+  var resultEl = document.getElementById('result');
+  var generateBtn = document.getElementById('generateBtn');
+  var historyList = document.getElementById('historyList');
+  var colorPreview = document.getElementById('colorPreview');
+  var history = [];
+  var MAX_HISTORY = 10;
+
+  function generate() {
+    var value;
+    var display;
+
+    if (slug === 'coin-flip') {
+      value = Math.random() < 0.5 ? 0 : 1;
+      display = value === 0 ? 'Heads' : 'Tails';
+    } else if (slug === 'yes-or-no') {
+      value = Math.random() < 0.5 ? 0 : 1;
+      display = value === 0 ? 'Yes' : 'No';
+    } else if (slug === 'random-letter') {
+      value = Math.floor(Math.random() * 26);
+      display = String.fromCharCode(65 + value);
+    } else if (slug === 'random-color') {
+      value = Math.floor(Math.random() * 16777216);
+      var hex = '#' + ('000000' + value.toString(16)).slice(-6);
+      display = hex.toUpperCase();
+      if (colorPreview) {
+        colorPreview.style.backgroundColor = hex;
+      }
+    } else if (slug === 'dice-roll') {
+      value = Math.floor(Math.random() * 6) + 1;
+      var diceChars = ['\u2680', '\u2681', '\u2682', '\u2683', '\u2684', '\u2685'];
+      display = diceChars[value - 1] + ' ' + value;
+    } else if (slug === 'two-dice-roll') {
+      var d1 = Math.floor(Math.random() * 6) + 1;
+      var d2 = Math.floor(Math.random() * 6) + 1;
+      var diceSymbols = ['\u2680', '\u2681', '\u2682', '\u2683', '\u2684', '\u2685'];
+      value = d1 + d2;
+      display = diceSymbols[d1 - 1] + ' + ' + diceSymbols[d2 - 1] + ' = ' + value;
+    } else {
+      value = Math.floor(Math.random() * (max - min + 1)) + min;
+      display = value.toLocaleString('en-US');
+    }
+
+    if (resultEl) {
+      resultEl.textContent = display;
+      resultEl.classList.add('pop');
+      setTimeout(function() { resultEl.classList.remove('pop'); }, 200);
+    }
+
+    history.unshift(display);
+    if (history.length > MAX_HISTORY) history.pop();
+    renderHistory();
+  }
+
+  function renderHistory() {
+    if (!historyList) return;
+    historyList.innerHTML = '';
+    for (var i = 0; i < history.length; i++) {
+      var span = document.createElement('span');
+      span.className = 'history-item';
+      span.textContent = history[i];
+      historyList.appendChild(span);
+    }
+  }
+
+  if (generateBtn) {
+    generateBtn.addEventListener('click', generate);
+  }
+
+  generate();
+</script>

@@ -1,0 +1,395 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import { getAllDaysCalcPages, type DaysCalcPage } from '../../data/days-calculator';
+
+export function getStaticPaths() {
+  return getAllDaysCalcPages().map((page) => ({
+    params: { days: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: DaysCalcPage };
+const { days, weeks, remainderDays, approxMonths, businessDays } = page;
+
+// Navigation links
+const allPages = getAllDaysCalcPages();
+const currentIndex = allPages.findIndex(function (p) { return p.days === days; });
+const prevPage = currentIndex > 0 ? allPages[currentIndex - 1] : null;
+const nextPage = currentIndex < allPages.length - 1 ? allPages[currentIndex + 1] : null;
+
+// Related day slugs based on day count
+function getRelatedDays(d: number): number[] {
+  var related: number[] = [];
+  var candidates = [7, 14, 30, 45, 60, 90, 120, 150, 180, 200, 240, 270, 300, 365, 500, 730, 1000];
+  for (var i = 0; i < candidates.length; i++) {
+    if (candidates[i] !== d) {
+      related.push(candidates[i]);
+    }
+    if (related.length >= 6) break;
+  }
+  return related;
+}
+const relatedDays = getRelatedDays(days);
+const relatedPages = relatedDays
+  .map(function (d) { return allPages.find(function (p) { return p.days === d; }); })
+  .filter(function (p): p is DaysCalcPage { return !!p; });
+
+// SEO
+const title = days + ' Days Ago - What Date Was ' + days + ' Days Ago From Today? | ToolCalcs';
+const description = 'Find out what date was ' + days + ' days ago from today. ' + days + ' days ago is approximately ' + weeks + ' weeks and ' + remainderDays + ' days, or about ' + approxMonths + ' months in the past. Free date calculator.';
+
+// Structured data
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Days Ago", "item": "https://toolcalcs.com/days-ago/" },
+      { "@type": "ListItem", "position": 3, "name": days + " Days" },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What date was " + days + " days ago?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": days + " days ago is calculated by subtracting " + days + " calendar days from the current date. The exact date depends on today's date. Use our calculator above to see the precise result.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "How many weeks ago was " + days + " days?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": days + " days ago is equal to " + weeks + " weeks and " + remainderDays + " days in the past, which is approximately " + approxMonths + " months ago.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "How many business days is " + days + " days ago?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": days + " calendar days ago is approximately " + businessDays + " business days in the past (weekdays only, excluding Saturday and Sunday). This estimate does not account for public holidays.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "How do you calculate " + days + " days ago from today?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "To calculate " + days + " days ago, start with today's date and subtract " + days + " calendar days. The calculation accounts for months with different numbers of days (28, 29, 30, or 31) and leap years.",
+        },
+      },
+    ],
+  },
+];
+
+// Context-aware content generation for "days ago"
+function getCommonUsesAgo(d: number): string {
+  if (d <= 7) return 'Looking back ' + d + ' days is common when reviewing recent purchases for return eligibility, checking when a short-term medication was started, recalling recent conversations or meetings, verifying recent bank transactions, and confirming delivery dates for recent orders. A ' + d + '-day lookback is also relevant for tracking symptom onset for medical purposes and verifying recent attendance records.';
+  if (d <= 14) return 'A ' + d + '-day lookback is frequently relevant for verifying biweekly paycheck dates, checking the start date of a two-week trial period, reviewing recent medical appointments, confirming when a two-week notice was submitted, and tracking the origin date of a recent purchase within a return window. Insurance claim filing often requires knowing exact dates within this timeframe.';
+  if (d <= 30) return 'Looking back ' + d + ' days is important for monthly billing cycle reviews, credit card statement period verification, warranty start date confirmation, rent payment history, subscription renewal tracking, and 30-day return policy deadlines. Many dispute resolution processes require you to identify the exact date an event occurred within the past month.';
+  if (d <= 60) return 'A ' + d + '-day lookback is common for extended warranty claim verification, verifying when a 60-day trial period began, reviewing billing disputes that require documentation from the past two months, checking the start date of a fitness or health program, and confirming dates for insurance claim filings that have a 60-day window.';
+  if (d <= 90) return 'Looking back ' + d + ' days is critical for quarterly reporting periods, employment probation start dates, 90-day warranty claim verification, visa entry date confirmation, academic quarter start dates, and statute of limitations for minor legal claims. Many financial institutions use 90-day lookback periods for account activity reviews and fraud detection.';
+  if (d <= 180) return 'A ' + d + '-day lookback covers approximately half a year and is relevant for semi-annual performance review periods, verifying the start date of a 6-month lease or contract, confirming when a major purchase was made for warranty purposes, reviewing health insurance benefit usage, and establishing timelines for legal proceedings that have a 180-day filing window.';
+  if (d <= 365) return 'Looking back ' + d + ' days spans nearly a full year and is relevant for annual tax record verification, confirming dates of events within the past year for insurance claims, reviewing yearly subscription start dates, establishing timelines for annual performance reviews, verifying employment anniversary dates, and confirming purchase dates for products with one-year warranties.';
+  return 'A ' + d + '-day lookback spans multiple years and is relevant for long-term legal proceedings, property purchase date verification, statute of limitations calculations for significant claims, multi-year warranty verification, investment purchase date confirmation for capital gains calculations, and historical date research for various personal or professional purposes.';
+}
+
+function getContextDescriptionAgo(d: number): string {
+  if (d === 1) return 'One day ago is simply yesterday. While this is the most straightforward date calculation, it can be useful for confirming yesterday\'s date when filling out forms, records, or reports.';
+  if (d <= 7) return d + ' days ago was less than a week in the past. This recent timeframe is often relevant for tracking recent activities, verifying recent purchase dates, and confirming short-term deadlines.';
+  if (d <= 14) return d + ' days ago was approximately ' + weeks + ' weeks in the past. This is a common lookback period for biweekly schedules, recent medical events, and short-term return policies.';
+  if (d <= 30) return d + ' days ago was about ' + approxMonths + ' months in the past. This roughly month-long lookback is one of the most commonly needed date calculations for billing, returns, and record-keeping.';
+  if (d <= 90) return d + ' days ago was approximately ' + approxMonths + ' months in the past. This quarter-like lookback period is important for business reporting, probation tracking, and legal filing deadlines.';
+  if (d <= 180) return d + ' days ago was about ' + approxMonths + ' months or roughly half a year in the past. This significant lookback period is used for semi-annual reviews and medium-term record verification.';
+  if (d <= 365) return d + ' days ago was approximately ' + approxMonths + ' months in the past, approaching or exceeding a full year. This long-range lookback is important for annual reviews, tax records, and warranty verification.';
+  return d + ' days ago was about ' + approxMonths + ' months or roughly ' + (d / 365).toFixed(1) + ' years in the past. This extended lookback period is relevant for legal timelines, property records, and long-term financial calculations.';
+}
+---
+
+<BaseLayout title={title} description={description} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/days-ago/">Days Ago</a> &rsaquo;
+    <span>{days} Days</span>
+  </nav>
+
+  <h1>{days} Days Ago &mdash; What Date Was It?</h1>
+  <p class="page-desc">Find the exact date that was {days} calendar days ago from today.</p>
+
+  <!-- Main Result Card -->
+  <div class="date-result-card">
+    <div class="date-result-label">{days} Days Ago Was</div>
+    <div id="targetDate" class="big-date">Calculating...</div>
+    <div id="dayOfWeek" class="day-of-week"></div>
+  </div>
+
+  <!-- Quick Facts Grid -->
+  <div class="result-cards">
+    <div class="result-card primary">
+      <span class="result-label">Weeks &amp; Days</span>
+      <span class="result-value">{weeks}w {remainderDays}d</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Approx. Months</span>
+      <span class="result-value">~{approxMonths}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Business Days</span>
+      <span class="result-value">~{businessDays.toLocaleString('en-US')}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Calendar Days</span>
+      <span class="result-value">{days.toLocaleString('en-US')}</span>
+    </div>
+  </div>
+
+  <AdUnit slot="days-ago-mid" format="horizontal" />
+
+  <!-- SEO Content Section -->
+  <article class="content-section">
+    <h2>What Was the Date {days} Days Ago?</h2>
+    <p>
+      {getContextDescriptionAgo(days)} When you count {days} days backward from today, you are subtracting {days} full calendar days from the current date, including weekends and holidays. The result shown above updates automatically based on today's date, so you always see the correct answer.
+    </p>
+    <p>
+      Knowing what date fell {days} days in the past is useful in many situations. You may need to verify when a warranty period started, determine the filing date for an insurance claim, confirm when a contract was signed, or establish a timeline for legal proceedings. This calculator eliminates the guesswork and gives you the exact past date.
+    </p>
+    <p>
+      For reference, {days} calendar days is equivalent to {weeks} full weeks and {remainderDays} extra days. In terms of months, this works out to approximately {approxMonths} months, though the precise number depends on which specific months fall within the lookback period since months range from 28 to 31 days in length.
+    </p>
+
+    <h2>How to Calculate {days} Days Ago From Today</h2>
+    <p>
+      Calculating the date that was {days} days ago involves subtracting calendar days from today's date. Here is the step-by-step process:
+    </p>
+    <ol>
+      <li><strong>Start with today's date.</strong> This is your reference point. Our calculator automatically uses the current date from your device's clock.</li>
+      <li><strong>Subtract {days} calendar days.</strong> Count backward {days} days from today. Every day counts regardless of whether it falls on a weekday, weekend, or holiday.</li>
+      <li><strong>Account for month boundaries.</strong> As you count backward, remember that months have different lengths: January has 31 days, February has 28 (or 29 in a leap year), March has 31, April has 30, and so on. The subtraction must correctly cross these month boundaries.</li>
+      <li><strong>Check for leap years.</strong> If the {days}-day lookback period crosses a February, verify whether the relevant year is a leap year. Leap years occur every 4 years (with exceptions for century years not divisible by 400), and this determines whether February had 28 or 29 days.</li>
+      <li><strong>Arrive at the past date.</strong> The final date after subtracting all {days} days is your answer, displayed in the result card above.</li>
+    </ol>
+    <p>
+      Counting backward through a calendar manually is even more error-prone than counting forward, especially for longer periods like {days} days. Our calculator handles all the complexity of month lengths, year boundaries, and leap years automatically, giving you an instant and accurate result.
+    </p>
+    <p>
+      As a rough estimate, {days} days ago was approximately {approxMonths} months in the past. However, for any situation requiring precision, such as legal deadlines, financial records, or medical timelines, always use an exact day-based calculation like this one rather than approximating with months.
+    </p>
+
+    <h2>Why You Might Need to Know the Date {days} Days Ago</h2>
+    <p>
+      {getCommonUsesAgo(days)}
+    </p>
+    <p>
+      In legal contexts, knowing exact past dates is often critical. Statute of limitations periods, filing deadlines measured from an incident date, and notice requirements all depend on precise date calculations. Courts and administrative agencies measure time strictly, and being off by even one day can mean the difference between a timely filing and a missed deadline.
+    </p>
+    <p>
+      For personal record-keeping, people frequently need to determine past dates when completing forms that ask "when did this occur?" or "date of incident." Medical intake forms, insurance claims, police reports, and government applications all commonly require dates that happened a known number of days in the past.
+    </p>
+    <p>
+      Financial professionals use backward date calculations to determine the start of reporting periods, verify transaction dates, calculate interest accrual start dates, and confirm when financial events occurred. Tax professionals in particular rely on accurate past date calculations when determining filing deadlines and establishing timelines for deductions and credits.
+    </p>
+
+    <h2>{days} Calendar Days Ago vs Business Days Ago</h2>
+    <p>
+      When looking back in time, it is important to distinguish between calendar days and business days. Calendar days include every day on the calendar, while business days (also called working days) count only Monday through Friday, excluding weekends.
+    </p>
+    <p>
+      {days} calendar days ago covers approximately <strong>{businessDays} business days</strong>. This means that if you were counting only weekdays, you would go back {businessDays} working days to reach a similar point in time, though the actual calendar date would be different.
+    </p>
+    <p>
+      The distinction between calendar days and business days matters significantly when interpreting deadlines and timeframes. For example, if a contract states that a dispute must be filed "within {days} days," you need to know whether that means calendar days or business days. {days} calendar days is {days - businessDays} days fewer than {days} business days would be when measured on a calendar, since business day counting skips weekends entirely.
+    </p>
+    <p>
+      Government regulations and legal statutes vary in how they define "days." Federal regulations in the United States generally use calendar days unless specifically stated otherwise. State laws and local ordinances may differ. Court rules often specify business days for certain filing deadlines while using calendar days for others. Always verify the specific definition that applies to your situation.
+    </p>
+    <p>
+      For an approximate conversion, you can estimate that {days} calendar days is about {businessDays} business days by multiplying by 5/7. Conversely, {days} business days would span approximately {Math.round(days * 7 / 5)} calendar days. For situations involving holidays, these estimates become less precise since holidays reduce the number of business days within any calendar period.
+    </p>
+  </article>
+
+  <!-- FAQ Section -->
+  <section class="content-section faq-section">
+    <h2>Frequently Asked Questions</h2>
+
+    <div class="faq-item">
+      <h3>What date was {days} days ago?</h3>
+      <p>{days} days ago is calculated by subtracting {days} calendar days from the current date. The exact date depends on today's date. Use our calculator above to see the precise result, which updates automatically every day.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>How many weeks ago was {days} days?</h3>
+      <p>{days} days ago is equal to {weeks} weeks and {remainderDays} days in the past, which is approximately {approxMonths} months ago. This conversion helps you think about the time span in more familiar terms.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>How many business days is {days} days ago?</h3>
+      <p>{days} calendar days ago is approximately {businessDays} business days in the past (weekdays only, excluding Saturday and Sunday). This estimate does not account for public holidays, which vary by location.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>How do you calculate {days} days ago from today?</h3>
+      <p>To calculate {days} days ago, start with today's date and subtract {days} calendar days. The calculation accounts for months with different numbers of days (28, 29, 30, or 31) and leap years. Our calculator handles all of these edge cases automatically.</p>
+    </div>
+  </section>
+
+  <!-- Navigation Links -->
+  <nav class="related-links">
+    <h2>Related Date Calculations</h2>
+    <div class="related-grid">
+      {prevPage && (
+        <a href={'/days-ago/' + prevPage.slug + '/'} class="related-card">
+          {prevPage.days} Days Ago
+        </a>
+      )}
+      {nextPage && (
+        <a href={'/days-ago/' + nextPage.slug + '/'} class="related-card">
+          {nextPage.days} Days Ago
+        </a>
+      )}
+      {relatedPages.map(function (rp) {
+        return (
+          <a href={'/days-ago/' + rp.slug + '/'} class="related-card">
+            {rp.days} Days Ago
+          </a>
+        );
+      })}
+    </div>
+    <p class="related-also">
+      Looking for future dates? See <a href={'/days-from-now/' + page.slug + '/'}>{days} Days From Today</a>.
+      Browse all calculations on the <a href="/days-ago/">Days Ago</a> index page.
+    </p>
+  </nav>
+
+  <AdUnit slot="days-ago-bottom" format="horizontal" />
+</BaseLayout>
+
+<script define:vars={{ days }}>
+  var targetDateEl = document.getElementById('targetDate');
+  var dayOfWeekEl = document.getElementById('dayOfWeek');
+  var today = new Date();
+  var target = new Date(today.getTime());
+  target.setDate(target.getDate() - days);
+  var options = { year: 'numeric', month: 'long', day: 'numeric' };
+  if (targetDateEl) {
+    targetDateEl.textContent = target.toLocaleDateString('en-US', options);
+  }
+  var dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  if (dayOfWeekEl) {
+    dayOfWeekEl.textContent = dayNames[target.getDay()];
+  }
+</script>
+
+<style>
+  .date-result-card {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border: 2px solid var(--color-primary);
+    border-radius: var(--radius);
+    padding: 32px 24px;
+    text-align: center;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-md);
+  }
+  .date-result-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+  .big-date {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--color-primary);
+    line-height: 1.2;
+    margin-bottom: 4px;
+  }
+  .day-of-week {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+  .faq-section {
+    margin-top: 32px;
+  }
+  .faq-item {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .faq-item:last-child {
+    border-bottom: none;
+  }
+  .faq-item h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--color-text);
+  }
+  .faq-item p {
+    color: var(--color-text-muted);
+    line-height: 1.7;
+  }
+  .related-links {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 2px solid var(--color-border);
+  }
+  .related-links h2 {
+    font-size: 1.3rem;
+    margin-bottom: 16px;
+  }
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .related-card {
+    display: block;
+    padding: 14px 16px;
+    background: var(--color-bg-alt, var(--color-bg));
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--color-text);
+    text-decoration: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .related-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+    text-decoration: none;
+    color: var(--color-primary);
+  }
+  .related-also {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    margin-top: 12px;
+  }
+
+  @media (max-width: 640px) {
+    .big-date {
+      font-size: 1.6rem;
+    }
+    .date-result-card {
+      padding: 24px 16px;
+    }
+    .related-grid {
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+  }
+</style>

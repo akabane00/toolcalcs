@@ -1,0 +1,395 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import { getAllDaysCalcPages, type DaysCalcPage } from '../../data/days-calculator';
+
+export function getStaticPaths() {
+  return getAllDaysCalcPages().map((page) => ({
+    params: { days: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: DaysCalcPage };
+const { days, weeks, remainderDays, approxMonths, businessDays } = page;
+
+// Navigation links
+const allPages = getAllDaysCalcPages();
+const currentIndex = allPages.findIndex(function (p) { return p.days === days; });
+const prevPage = currentIndex > 0 ? allPages[currentIndex - 1] : null;
+const nextPage = currentIndex < allPages.length - 1 ? allPages[currentIndex + 1] : null;
+
+// Related day slugs based on day count
+function getRelatedDays(d: number): number[] {
+  var related: number[] = [];
+  var candidates = [7, 14, 30, 45, 60, 90, 120, 150, 180, 200, 240, 270, 300, 365, 500, 730, 1000];
+  for (var i = 0; i < candidates.length; i++) {
+    if (candidates[i] !== d) {
+      related.push(candidates[i]);
+    }
+    if (related.length >= 6) break;
+  }
+  return related;
+}
+const relatedDays = getRelatedDays(days);
+const relatedPages = relatedDays
+  .map(function (d) { return allPages.find(function (p) { return p.days === d; }); })
+  .filter(function (p): p is DaysCalcPage { return !!p; });
+
+// SEO
+const title = days + ' Days From Today - What Date Is ' + days + ' Days From Now? | ToolCalcs';
+const description = 'Find out what date is ' + days + ' days from today. ' + days + ' days from now is approximately ' + weeks + ' weeks and ' + remainderDays + ' days, or about ' + approxMonths + ' months. Free date calculator.';
+
+// Structured data
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Days From Today", "item": "https://toolcalcs.com/days-from-now/" },
+      { "@type": "ListItem", "position": 3, "name": days + " Days" },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What date is " + days + " days from today?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": days + " days from today is calculated by adding " + days + " calendar days to the current date. The exact date depends on today's date. Use our calculator above to see the precise result.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "How many weeks is " + days + " days?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": days + " days is equal to " + weeks + " weeks and " + remainderDays + " days, which is approximately " + approxMonths + " months.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "How many business days is " + days + " days?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": days + " calendar days is approximately " + businessDays + " business days (weekdays only, excluding Saturday and Sunday). This estimate does not account for public holidays.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "How do you calculate " + days + " days from now?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "To calculate " + days + " days from now, start with today's date and add " + days + " calendar days. The calculation accounts for months with different numbers of days (28, 29, 30, or 31) and leap years.",
+        },
+      },
+    ],
+  },
+];
+
+// Context-aware content generation
+function getCommonUses(d: number): string {
+  if (d <= 7) return 'Short periods of ' + d + ' days are commonly used for weekly planning cycles, prescription refill periods, short-term rental agreements, return policies for many online retailers, trial subscription periods, and cooling-off periods for certain contracts. A ' + d + '-day window is also typical for follow-up appointments, shipping delivery estimates, and short project sprints in agile development.';
+  if (d <= 14) return 'A ' + d + '-day period is frequently used for two-week pay cycles, notice periods for certain employment agreements, quarantine or isolation recommendations, trial periods for software and services, and short-term travel itineraries. Many medical follow-ups are scheduled within a ' + d + '-day window, and numerous return policies specify a two-week deadline for product returns.';
+  if (d <= 30) return 'A ' + d + '-day timeframe is one of the most common in everyday life. It aligns closely with monthly billing cycles, credit card statement periods, 30-day money-back guarantees, apartment lease notice periods, insurance claim filing deadlines, and probationary employment reviews. Many government agencies also use 30-day windows for permit applications, comment periods on proposed regulations, and administrative processing times.';
+  if (d <= 60) return 'A ' + d + '-day period is commonly used for extended return or exchange policies, fitness and health challenge programs, medium-term project milestones, court filing deadlines, medical referral validity periods, and warranty claim windows. Many employers use 60-day periods for benefits enrollment, while financial institutions may require this timeframe for dispute resolution processes.';
+  if (d <= 90) return 'A ' + d + '-day period is a critical milestone in many areas. It is the standard probation period for new employees, a common visa validity duration, the typical quarter length in business and academic settings, a standard warranty window for services, and a timeframe used in real estate closing processes. Health insurance special enrollment periods, tax extension deadlines, and financial quarter reporting also commonly use 90-day cycles.';
+  if (d <= 180) return 'A ' + d + '-day period spans approximately half a year. This timeframe is common for semester lengths in education, semi-annual performance reviews, medium-term savings goals, passport processing times, lease break notice periods, and statute of limitations for minor claims. Many subscription services offer 6-month billing options, and health goals like weight loss programs often target this duration.';
+  if (d <= 365) return 'A ' + d + '-day period spans nearly a year. Annual planning cycles, yearly subscription renewals, 12-month lease agreements, annual performance reviews, long-term project timelines, insurance policy terms, and academic year planning all revolve around year-long timeframes. This duration is also significant for tax filing, investment holding periods, and warranty coverage on major appliances and electronics.';
+  return 'A ' + d + '-day period spans multiple years and is relevant for long-term financial planning, mortgage term calculations, multi-year project roadmaps, extended warranty periods, statute of limitations for significant legal matters, long-term investment horizons, and career development timelines. Planning this far ahead requires accounting for potential calendar changes including leap years.';
+}
+
+function getContextDescription(d: number): string {
+  if (d === 1) return 'One day from today represents the next calendar day. This simple calculation is useful for next-day delivery estimates, appointment scheduling, and daily planning.';
+  if (d <= 7) return d + ' days from today is less than a week away. This short timeframe is commonly encountered in daily planning, delivery tracking, and short-term scheduling.';
+  if (d <= 14) return d + ' days from today is approximately ' + weeks + ' weeks away. This is a common timeframe for biweekly pay periods, short vacations, and two-week notice periods.';
+  if (d <= 30) return d + ' days from today is about ' + approxMonths + ' months away. This roughly month-long period is one of the most commonly referenced timeframes in personal and business contexts.';
+  if (d <= 90) return d + ' days from today is approximately ' + approxMonths + ' months away. This quarter-like timeframe is widely used in business planning, employment probation periods, and academic scheduling.';
+  if (d <= 180) return d + ' days from today is about ' + approxMonths + ' months or roughly half a year away. This significant timeframe is used for medium-term planning and goal setting.';
+  if (d <= 365) return d + ' days from today is approximately ' + approxMonths + ' months away, approaching or exceeding a full year. This long-range timeframe is important for annual planning and long-term commitments.';
+  return d + ' days from today is about ' + approxMonths + ' months or roughly ' + (d / 365).toFixed(1) + ' years away. This extended timeframe requires careful consideration of leap years and long-term calendar changes.';
+}
+---
+
+<BaseLayout title={title} description={description} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/days-from-now/">Days From Today</a> &rsaquo;
+    <span>{days} Days</span>
+  </nav>
+
+  <h1>{days} Days From Today</h1>
+  <p class="page-desc">Find the exact date that is {days} calendar days from today.</p>
+
+  <!-- Main Result Card -->
+  <div class="date-result-card">
+    <div class="date-result-label">{days} Days From Today Is</div>
+    <div id="targetDate" class="big-date">Calculating...</div>
+    <div id="dayOfWeek" class="day-of-week"></div>
+  </div>
+
+  <!-- Quick Facts Grid -->
+  <div class="result-cards">
+    <div class="result-card primary">
+      <span class="result-label">Weeks &amp; Days</span>
+      <span class="result-value">{weeks}w {remainderDays}d</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Approx. Months</span>
+      <span class="result-value">~{approxMonths}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Business Days</span>
+      <span class="result-value">~{businessDays.toLocaleString('en-US')}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Calendar Days</span>
+      <span class="result-value">{days.toLocaleString('en-US')}</span>
+    </div>
+  </div>
+
+  <AdUnit slot="days-mid" format="horizontal" />
+
+  <!-- SEO Content Section -->
+  <article class="content-section">
+    <h2>What Is {days} Days From Today?</h2>
+    <p>
+      {getContextDescription(days)} When you count {days} days from today, you are adding {days} full calendar days to the current date, including weekends and holidays. The result shown above updates automatically based on today's date, so you always get an accurate answer.
+    </p>
+    <p>
+      Understanding date calculations is important for a wide variety of personal and professional situations. Whether you are tracking a deadline, planning an event, or calculating when a contract expires, knowing the exact date that falls {days} days in the future can help you plan effectively and avoid missed deadlines.
+    </p>
+    <p>
+      It is worth noting that {days} calendar days is equivalent to {weeks} full weeks and {remainderDays} extra days. In terms of months, this works out to approximately {approxMonths} months, though the exact number of months depends on which specific months fall within the period since months vary in length from 28 to 31 days.
+    </p>
+
+    <h2>How to Calculate {days} Days From Now</h2>
+    <p>
+      Calculating {days} days from today is straightforward in concept but requires attention to the varying lengths of calendar months. Here is the step-by-step process:
+    </p>
+    <ol>
+      <li><strong>Start with today's date.</strong> This is your reference point for the calculation. Our calculator automatically detects today's date from your device.</li>
+      <li><strong>Add {days} calendar days.</strong> Count forward {days} days from today. Each day counts regardless of whether it is a weekday, weekend, or holiday.</li>
+      <li><strong>Account for month boundaries.</strong> As you count through the days, remember that months have different lengths: January has 31 days, February has 28 (or 29 in a leap year), March has 31, April has 30, and so on. The calculation must correctly handle these transitions.</li>
+      <li><strong>Check for leap years.</strong> If the {days}-day period crosses a February, verify whether the year is a leap year. Leap years occur every 4 years (with exceptions for century years not divisible by 400). This affects whether February has 28 or 29 days.</li>
+      <li><strong>Arrive at the target date.</strong> The final date after adding all {days} days is your answer, shown in the result card above.</li>
+    </ol>
+    <p>
+      While you could perform this calculation manually with a physical calendar, our tool does it instantly and eliminates the risk of miscounting across month boundaries. This is especially useful for longer periods like {days} days where manual counting would be tedious and error-prone.
+    </p>
+    <p>
+      For quick mental math, you can estimate that {days} days is roughly {approxMonths} months. However, for precision in legal, financial, or medical contexts, always use an exact day calculation like the one provided on this page.
+    </p>
+
+    <h2>Common Uses for {days}-Day Periods</h2>
+    <p>
+      {getCommonUses(days)}
+    </p>
+    <p>
+      In the legal world, deadlines measured in days from a specific date are extremely common. Statutes of limitations, filing deadlines, appeal windows, and notice requirements are all typically specified as a number of calendar days. Miscounting even a single day can have serious legal consequences, which is why using an accurate date calculator is always recommended.
+    </p>
+    <p>
+      In healthcare, many prescriptions are written for specific day counts, follow-up appointments are scheduled a set number of days after a procedure, and treatment protocols often span defined periods. Knowing exactly when {days} days falls helps patients and providers stay on track with care plans.
+    </p>
+    <p>
+      For project management, setting milestones at specific day intervals helps keep teams accountable. A {days}-day milestone marker can serve as a checkpoint for progress reviews, deliverable deadlines, or phase transitions in larger projects. Using calendar days rather than vague references to "about {approxMonths} months" ensures everyone is aligned on the same target date.
+    </p>
+
+    <h2>{days} Calendar Days vs Business Days</h2>
+    <p>
+      There is an important distinction between calendar days and business days. Calendar days include every day on the calendar, whereas business days (also called working days or weekdays) count only Monday through Friday, excluding weekends.
+    </p>
+    <p>
+      {days} calendar days is approximately <strong>{businessDays} business days</strong>. This estimate is calculated by multiplying the number of days by 5/7 (since 5 out of every 7 days are weekdays). However, this is an approximation because it does not account for public holidays, which vary by country and region.
+    </p>
+    <p>
+      When a contract, law, or policy specifies a deadline in "days," it is crucial to determine whether it means calendar days or business days. The difference can be significant: {days} calendar days is {days - businessDays} days more than {businessDays} business days. If a deadline is specified in business days, you would need to count only weekdays and skip all Saturdays and Sundays, making the actual elapsed time longer than the same number of calendar days.
+    </p>
+    <p>
+      For government filings, court deadlines, and legal notices, the definition of "days" varies by jurisdiction. Some jurisdictions count calendar days by default, while others use business days. Federal agencies in the United States typically use calendar days unless otherwise specified, while state courts may have different rules. Always check the specific rules that apply to your situation.
+    </p>
+    <p>
+      If you need to convert between calendar days and business days, a general rule of thumb is to multiply business days by 7/5 to get the approximate calendar day equivalent, or multiply calendar days by 5/7 to estimate business days. For precise calculations, especially around holidays, consider using a dedicated business day calculator.
+    </p>
+  </article>
+
+  <!-- FAQ Section -->
+  <section class="content-section faq-section">
+    <h2>Frequently Asked Questions</h2>
+
+    <div class="faq-item">
+      <h3>What date is {days} days from today?</h3>
+      <p>{days} days from today is calculated by adding {days} calendar days to the current date. The exact date depends on today's date. Use our calculator above to see the precise result, which updates automatically every day.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>How many weeks is {days} days?</h3>
+      <p>{days} days is equal to {weeks} weeks and {remainderDays} days, which is approximately {approxMonths} months. This conversion is useful for understanding the time span in more familiar terms.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>How many business days is {days} days?</h3>
+      <p>{days} calendar days is approximately {businessDays} business days (weekdays only, excluding Saturday and Sunday). This estimate does not account for public holidays, which vary by location.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>How do you calculate {days} days from now?</h3>
+      <p>To calculate {days} days from now, start with today's date and add {days} calendar days. The calculation accounts for months with different numbers of days (28, 29, 30, or 31) and leap years. Our calculator handles all of these edge cases automatically.</p>
+    </div>
+  </section>
+
+  <!-- Navigation Links -->
+  <nav class="related-links">
+    <h2>Related Date Calculations</h2>
+    <div class="related-grid">
+      {prevPage && (
+        <a href={'/days-from-now/' + prevPage.slug + '/'} class="related-card">
+          {prevPage.days} Days From Today
+        </a>
+      )}
+      {nextPage && (
+        <a href={'/days-from-now/' + nextPage.slug + '/'} class="related-card">
+          {nextPage.days} Days From Today
+        </a>
+      )}
+      {relatedPages.map(function (rp) {
+        return (
+          <a href={'/days-from-now/' + rp.slug + '/'} class="related-card">
+            {rp.days} Days From Today
+          </a>
+        );
+      })}
+    </div>
+    <p class="related-also">
+      Looking for past dates? See <a href={'/days-ago/' + page.slug + '/'}>{days} Days Ago</a>.
+      Browse all calculations on the <a href="/days-from-now/">Days From Today</a> index page.
+    </p>
+  </nav>
+
+  <AdUnit slot="days-bottom" format="horizontal" />
+</BaseLayout>
+
+<script define:vars={{ days }}>
+  var targetDateEl = document.getElementById('targetDate');
+  var dayOfWeekEl = document.getElementById('dayOfWeek');
+  var today = new Date();
+  var target = new Date(today.getTime());
+  target.setDate(target.getDate() + days);
+  var options = { year: 'numeric', month: 'long', day: 'numeric' };
+  if (targetDateEl) {
+    targetDateEl.textContent = target.toLocaleDateString('en-US', options);
+  }
+  var dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  if (dayOfWeekEl) {
+    dayOfWeekEl.textContent = dayNames[target.getDay()];
+  }
+</script>
+
+<style>
+  .date-result-card {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border: 2px solid var(--color-primary);
+    border-radius: var(--radius);
+    padding: 32px 24px;
+    text-align: center;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-md);
+  }
+  .date-result-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+  .big-date {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--color-primary);
+    line-height: 1.2;
+    margin-bottom: 4px;
+  }
+  .day-of-week {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+  .faq-section {
+    margin-top: 32px;
+  }
+  .faq-item {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .faq-item:last-child {
+    border-bottom: none;
+  }
+  .faq-item h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--color-text);
+  }
+  .faq-item p {
+    color: var(--color-text-muted);
+    line-height: 1.7;
+  }
+  .related-links {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 2px solid var(--color-border);
+  }
+  .related-links h2 {
+    font-size: 1.3rem;
+    margin-bottom: 16px;
+  }
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .related-card {
+    display: block;
+    padding: 14px 16px;
+    background: var(--color-bg-alt, var(--color-bg));
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--color-text);
+    text-decoration: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .related-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+    text-decoration: none;
+    color: var(--color-primary);
+  }
+  .related-also {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    margin-top: 12px;
+  }
+
+  @media (max-width: 640px) {
+    .big-date {
+      font-size: 1.6rem;
+    }
+    .date-result-card {
+      padding: 24px 16px;
+    }
+    .related-grid {
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+  }
+</style>
