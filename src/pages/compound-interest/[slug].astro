@@ -1,0 +1,384 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import { getAllCompoundInterestPages, PRINCIPALS, RATES, YEARS, formatMoney } from '../../data/compound-interest';
+import type { CompoundInterestPage } from '../../data/compound-interest';
+
+export function getStaticPaths() {
+  return getAllCompoundInterestPages().map(function (page) {
+    return {
+      params: { slug: page.slug },
+      props: { page },
+    };
+  });
+}
+
+const { page } = Astro.props as { page: CompoundInterestPage };
+const {
+  slug,
+  principal,
+  principalDisplay,
+  rate,
+  years,
+  compoundFreq,
+  finalAmount,
+  totalInterest,
+  effectiveRate,
+  doublingYears,
+  yearlyBreakdown,
+} = page;
+
+const allPages = getAllCompoundInterestPages();
+
+// Related: same principal and years, different rates
+const relatedByRate = allPages.filter(function (p) {
+  return p.principal === principal && p.years === years && p.rate !== rate;
+});
+
+// Related: same principal and rate, different years
+const relatedByYears = allPages.filter(function (p) {
+  return p.principal === principal && p.rate === rate && p.years !== years;
+});
+
+// Related: same rate and years, different principals
+const relatedByPrincipal = allPages.filter(function (p) {
+  return p.rate === rate && p.years === years && p.principal !== principal;
+});
+
+const title = `Compound Interest on ${principalDisplay} at ${rate}% for ${years} Years — $${formatMoney(finalAmount)} | ToolCalcs`;
+const description = `Calculate compound interest on ${principalDisplay} at ${rate}% for ${years} years compounded monthly. Final amount: $${formatMoney(finalAmount)}. Total interest earned: $${formatMoney(totalInterest)}.`;
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Compound Interest Calculator", "item": "https://toolcalcs.com/compound-interest/" },
+      { "@type": "ListItem", "position": 3, "name": `${principalDisplay} at ${rate}%` },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": `How much will ${principalDisplay} grow at ${rate}% for ${years} years?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `${principalDisplay} invested at ${rate}% annual interest compounded monthly will grow to $${formatMoney(finalAmount)} after ${years} years.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `How much interest does ${principalDisplay} earn at ${rate}%?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `${principalDisplay} earns $${formatMoney(totalInterest)} in interest over ${years} years at ${rate}% compounded monthly. The final balance is $${formatMoney(finalAmount)}.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `What is the effective annual rate for ${rate}% compounded monthly?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `A nominal rate of ${rate}% compounded monthly yields an effective annual rate (APY) of ${effectiveRate}%. This means your money effectively earns ${effectiveRate}% per year when compounding is taken into account.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `How long to double money at ${rate}%?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `Using the Rule of 72, money invested at ${rate}% will double in approximately ${doublingYears} years (72 / ${rate} = ${doublingYears}).`,
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout title={title} description={description} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/compound-interest/">Compound Interest Calculator</a> &rsaquo;
+    <span>{principalDisplay} at {rate}%</span>
+  </nav>
+
+  <h1>Compound Interest: {principalDisplay} at {rate}% for {years} Years</h1>
+  <p class="page-desc">See how {principalDisplay} grows at {rate}% annual interest compounded {compoundFreq} over {years} years.</p>
+
+  <!-- Result Cards -->
+  <div class="result-cards ci-result-cards">
+    <div class="result-card primary">
+      <span class="result-label">Final Amount</span>
+      <span class="result-value">${formatMoney(finalAmount)}</span>
+    </div>
+    <div class="result-card success">
+      <span class="result-label">Total Interest Earned</span>
+      <span class="result-value">${formatMoney(totalInterest)}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Effective Annual Rate</span>
+      <span class="result-value">{effectiveRate}%</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Doubling Time</span>
+      <span class="result-value">~{doublingYears} yrs</span>
+    </div>
+  </div>
+
+  <!-- Year-by-Year Growth Table -->
+  <h2 class="section-heading">Year-by-Year Growth</h2>
+  <div class="table-container">
+    <table class="data-table ci-table">
+      <thead>
+        <tr>
+          <th>Year</th>
+          <th>Balance</th>
+          <th>Interest That Year</th>
+          <th>Total Interest Earned</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="ci-row-start">
+          <td>0</td>
+          <td>${formatMoney(principal)}</td>
+          <td>-</td>
+          <td>$0.00</td>
+        </tr>
+        {yearlyBreakdown.map(function (row) {
+          return (
+            <tr>
+              <td>{row.year}</td>
+              <td>${formatMoney(row.balance)}</td>
+              <td>${formatMoney(row.interest)}</td>
+              <td>${formatMoney(row.totalInterest)}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  </div>
+
+  <AdUnit slot="ci-mid" format="horizontal" />
+
+  <!-- Try Different Values Calculator Widget -->
+  <h2 class="section-heading">Try Different Values</h2>
+  <div class="calculator-box">
+    <p class="ci-calc-desc">Adjust the values below to see how different amounts, rates, and time periods affect compound interest.</p>
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="customPrincipal">Principal ($)</label>
+        <input type="number" id="customPrincipal" value={principal} min="1" step="100" />
+      </div>
+      <div class="input-group">
+        <label for="customRate">Annual Rate (%)</label>
+        <input type="number" id="customRate" value={rate} min="0.1" max="50" step="0.1" />
+      </div>
+      <div class="input-group">
+        <label for="customYears">Years</label>
+        <input type="number" id="customYears" value={years} min="1" max="100" step="1" />
+      </div>
+    </div>
+    <button class="calc-btn" id="calcBtn">Calculate</button>
+    <div id="customResult" class="ci-custom-result"></div>
+  </div>
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>Understanding {principalDisplay} at {rate}% Compound Interest</h2>
+    <p>
+      When you invest {principalDisplay} at an annual interest rate of {rate}% compounded monthly, your money does not simply grow in a straight line. Instead, each month the interest earned is added to your balance, and the next month's interest is calculated on that larger amount. This is the fundamental principle behind compound interest: your money earns interest on interest.
+    </p>
+    <p>
+      Starting with {principalDisplay}, at {rate}% annual interest compounded monthly, after {years} years your investment grows to <strong>${formatMoney(finalAmount)}</strong>. That means you earn a total of <strong>${formatMoney(totalInterest)}</strong> in interest alone. To put that in perspective, your interest earnings represent {((totalInterest / principal) * 100).toFixed(1)}% of your original investment.
+    </p>
+    <p>
+      The power of compound interest becomes more dramatic over longer time periods. In the early years, most of your balance comes from the original principal. But as time passes, the accumulated interest begins to generate significant returns of its own. By the end of {years} years, the compounding effect has added substantially more than simple interest would have provided. With simple interest, you would earn only ${formatMoney(principal * (rate / 100) * years)}, which is ${formatMoney(totalInterest - (principal * (rate / 100) * years))} less than what compound interest delivers.
+    </p>
+
+    <h2>Compound Interest Formula</h2>
+    <p>
+      The compound interest formula is used to calculate the future value of an investment with periodic compounding. The standard formula is:
+    </p>
+    <div class="formula-box">
+      A = P(1 + r/n)<sup>nt</sup>
+    </div>
+    <p>Where:</p>
+    <ul>
+      <li><strong>A</strong> = Final amount (principal + interest) = <strong>${formatMoney(finalAmount)}</strong></li>
+      <li><strong>P</strong> = Principal (initial investment) = <strong>{principalDisplay}</strong></li>
+      <li><strong>r</strong> = Annual interest rate (decimal) = <strong>{rate / 100}</strong> ({rate}%)</li>
+      <li><strong>n</strong> = Number of times interest is compounded per year = <strong>12</strong> (monthly)</li>
+      <li><strong>t</strong> = Number of years = <strong>{years}</strong></li>
+    </ul>
+    <p>Plugging in the numbers for this calculation:</p>
+    <div class="formula-box">
+      A = {principalDisplay.replace('$', '')} &times; (1 + {rate / 100} / 12)<sup>12 &times; {years}</sup> = <strong>${formatMoney(finalAmount)}</strong>
+    </div>
+    <p>
+      Each month, the bank divides the annual rate by 12, giving a monthly rate of {(rate / 12).toFixed(4)}%. That small monthly rate is applied to the entire balance, including all previously earned interest. Over {years * 12} compounding periods, these small additions compound into the final amount of ${formatMoney(finalAmount)}.
+    </p>
+
+    <h2>Monthly vs Annual Compounding</h2>
+    <p>
+      This calculation uses monthly compounding, meaning interest is calculated and added to your balance 12 times per year. With a nominal annual rate of {rate}%, the monthly rate is {(rate / 12).toFixed(4)}% ({rate}% divided by 12). Because you earn interest on interest every month rather than once a year, the effective annual rate is actually <strong>{effectiveRate}%</strong>, slightly higher than the stated {rate}%.
+    </p>
+    <p>
+      If interest were compounded annually instead of monthly, your final amount would be ${formatMoney(principal * Math.pow(1 + rate / 100, years))}, which is ${formatMoney(finalAmount - principal * Math.pow(1 + rate / 100, years))} less than with monthly compounding. The difference may seem small for short periods, but it becomes increasingly significant over longer time horizons and with larger balances.
+    </p>
+    <p>
+      The more frequently interest compounds, the faster your money grows. Daily compounding would yield slightly more than monthly, and continuous compounding represents the theoretical maximum. However, for most savings accounts and investment products, monthly compounding is the most common standard.
+    </p>
+
+    <h2>The Rule of 72</h2>
+    <p>
+      The Rule of 72 is a quick mental math shortcut to estimate how long it takes for an investment to double. Simply divide 72 by the annual interest rate. At {rate}%, your money doubles in approximately <strong>{doublingYears} years</strong> (72 &divide; {rate} = {doublingYears}).
+    </p>
+    <p>
+      This means that {principalDisplay} invested at {rate}% would grow to approximately {principalDisplay.replace('$', '$')}{principalDisplay.includes(',') ? '' : ''} doubled, or about ${formatMoney(principal * 2)}, in roughly {doublingYears} years. After another {doublingYears} years, it would double again to approximately ${formatMoney(principal * 4)}. This exponential doubling pattern is what makes compound interest such a powerful tool for long-term wealth building.
+    </p>
+    <p>
+      The Rule of 72 is most accurate for interest rates between 6% and 10%, but provides a reasonable estimate for rates like {rate}%. For precise calculations, use the compound interest formula above or the interactive calculator on this page.
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>How much will {principalDisplay} grow at {rate}% for {years} years?</h3>
+    <p>
+      {principalDisplay} invested at {rate}% annual interest compounded monthly will grow to ${formatMoney(finalAmount)} after {years} years. This includes ${formatMoney(totalInterest)} in interest earned on top of the original {principalDisplay} investment.
+    </p>
+
+    <h3>How much interest does {principalDisplay} earn at {rate}%?</h3>
+    <p>
+      At {rate}% annual interest compounded monthly, {principalDisplay} earns ${formatMoney(totalInterest)} in total interest over {years} years. The final balance after {years} years is ${formatMoney(finalAmount)}. With simple interest (no compounding), you would earn only ${formatMoney(principal * (rate / 100) * years)}, so compounding adds an extra ${formatMoney(totalInterest - (principal * (rate / 100) * years))}.
+    </p>
+
+    <h3>What is the effective annual rate for {rate}% compounded monthly?</h3>
+    <p>
+      A nominal annual rate of {rate}% compounded monthly produces an effective annual rate (APY) of {effectiveRate}%. The effective rate accounts for the compounding effect and represents the true annual return on your investment. The formula is: EAR = (1 + r/n)<sup>n</sup> &minus; 1 = (1 + {rate / 100}/12)<sup>12</sup> &minus; 1 = {effectiveRate}%.
+    </p>
+
+    <h3>How long to double money at {rate}%?</h3>
+    <p>
+      Using the Rule of 72, money invested at {rate}% annual interest will approximately double in {doublingYears} years. This is calculated by dividing 72 by the interest rate: 72 &divide; {rate} = {doublingYears}. So {principalDisplay} would become approximately ${formatMoney(principal * 2)} in about {doublingYears} years.
+    </p>
+
+    <!-- Related Calculations -->
+    <h2>Same Amount, Different Rates</h2>
+    <p>See how {principalDisplay} grows at different interest rates over {years} years:</p>
+    <ul>
+      {relatedByRate.map(function (p) {
+        return (
+          <li>
+            <a href={`/compound-interest/${p.slug}/`}>
+              {p.principalDisplay} at {p.rate}% for {p.years} years &rarr; ${formatMoney(p.finalAmount)}
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+
+    <h2>Same Rate, Different Periods</h2>
+    <p>See how {principalDisplay} grows at {rate}% over different time periods:</p>
+    <ul>
+      {relatedByYears.map(function (p) {
+        return (
+          <li>
+            <a href={`/compound-interest/${p.slug}/`}>
+              {p.principalDisplay} at {p.rate}% for {p.years} years &rarr; ${formatMoney(p.finalAmount)}
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+
+    <h2>Different Starting Amounts</h2>
+    <p>See how different starting amounts grow at {rate}% over {years} years:</p>
+    <ul>
+      {relatedByPrincipal.map(function (p) {
+        return (
+          <li>
+            <a href={`/compound-interest/${p.slug}/`}>
+              {p.principalDisplay} at {p.rate}% for {p.years} years &rarr; ${formatMoney(p.finalAmount)}
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+
+    <p><a href="/compound-interest/">&larr; View All Compound Interest Calculations</a></p>
+  </article>
+
+  <AdUnit slot="ci-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .ci-result-cards {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .ci-result-cards .result-card.primary .result-value {
+    font-size: 1.6rem;
+  }
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+  .ci-table {
+    margin-bottom: 32px;
+  }
+  .ci-table tbody tr:nth-child(even) td {
+    background: var(--color-bg);
+  }
+  .ci-row-start td {
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+  .ci-calc-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 16px;
+  }
+  .ci-custom-result {
+    margin-top: 16px;
+    padding: 14px 16px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    min-height: 44px;
+  }
+
+  @media (max-width: 768px) {
+    .ci-result-cards {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 480px) {
+    .ci-result-cards {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script define:vars={{ principal, rate, years }}>
+  var calcBtn = document.getElementById('calcBtn');
+  var customPrincipal = document.getElementById('customPrincipal');
+  var customRate = document.getElementById('customRate');
+  var customYears = document.getElementById('customYears');
+  var customResult = document.getElementById('customResult');
+
+  function calculate() {
+    var p = parseFloat(customPrincipal.value) || principal;
+    var r = parseFloat(customRate.value) || rate;
+    var y = parseFloat(customYears.value) || years;
+    var amount = p * Math.pow(1 + (r / 100) / 12, 12 * y);
+    var interest = amount - p;
+    customResult.innerHTML = '<strong>Final: $' + amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '</strong><br>Interest: $' + interest.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  }
+
+  if (calcBtn) calcBtn.addEventListener('click', calculate);
+</script>
