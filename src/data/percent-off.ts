@@ -33,7 +33,10 @@ const fractionMap: Record<number, string> = {
   75: '3/4', 80: '4/5', 85: '17/20', 90: '9/10',
 };
 
+let _cache: PercentOffPage[] | null = null;
+
 export function getAllPercentOffPages(): PercentOffPage[] {
+  if (_cache) return _cache;
   const pages: PercentOffPage[] = [];
   for (const pct of discountPercents) {
     for (const price of originalPrices) {
@@ -48,6 +51,7 @@ export function getAllPercentOffPages(): PercentOffPage[] {
       });
     }
   }
+  _cache = pages;
   return pages;
 }
 

@@ -86,7 +86,10 @@ function buildPage(x: number, y: number): WhatPercentPage {
   };
 }
 
+let _cache: WhatPercentPage[] | null = null;
+
 export function getAllWhatPercentPages(): WhatPercentPage[] {
+  if (_cache) return _cache;
   const pages: WhatPercentPage[] = [];
   const seen = new Set<string>();
 
@@ -109,6 +112,7 @@ export function getAllWhatPercentPages(): WhatPercentPage[] {
     }
   }
 
+  _cache = pages;
   return pages;
 }
 

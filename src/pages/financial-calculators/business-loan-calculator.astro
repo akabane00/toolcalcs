@@ -3,8 +3,6 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import AdUnit from '../../components/AdUnit.astro';
 import '../../styles/calculator.css';
 
-var defaultMonth = new Date().toISOString().slice(0, 7);
-
 const structuredData = [
   {
     "@context": "https://schema.org",
@@ -91,7 +89,7 @@ const structuredData = [
         </div>
         <div class="input-group">
           <label for="startDate">Start Date</label>
-          <input type="month" id="startDate" value={defaultMonth} />
+          <input type="month" id="startDate" />
         </div>
         <div class="input-group">
           <label for="extraPayment">Extra Monthly Payment ($)</label>
@@ -206,6 +204,12 @@ const structuredData = [
 </style>
 
 <script>
+  var startDateInput = document.getElementById('startDate');
+  if (!startDateInput.value) {
+    var now = new Date();
+    startDateInput.value = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+  }
+
   function formatCurrency(n) {
     return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }

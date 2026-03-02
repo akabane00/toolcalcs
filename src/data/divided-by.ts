@@ -45,7 +45,10 @@ function toDecimalString(dividend: number, divisor: number): string {
   return String(parseFloat(result.toFixed(10)));
 }
 
+let _cache: DividedByPage[] | null = null;
+
 export function getAllDividedByPages(): DividedByPage[] {
+  if (_cache) return _cache;
   const pages: DividedByPage[] = [];
   const seen = new Set<string>();
 
@@ -69,6 +72,7 @@ export function getAllDividedByPages(): DividedByPage[] {
     }
   }
 
+  _cache = pages;
   return pages;
 }
 

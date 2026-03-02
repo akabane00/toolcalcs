@@ -18,7 +18,10 @@ function round2(n: number): number {
   return Math.round(n * 100) / 100;
 }
 
+let _cache: TipPage[] | null = null;
+
 export function getAllTipPages(): TipPage[] {
+  if (_cache) return _cache;
   const pages: TipPage[] = [];
   for (const pct of PERCENTS) {
     for (const amt of AMOUNTS) {
@@ -38,6 +41,7 @@ export function getAllTipPages(): TipPage[] {
       });
     }
   }
+  _cache = pages;
   return pages;
 }
 

@@ -66,8 +66,11 @@ const TARGET_NUMBERS = [
   1024, 1200, 1440, 1500, 2000, 2500, 3000, 5000, 10000,
 ];
 
+let _cache: FactorsPage[] | null = null;
+
 export function getAllFactorsPages(): FactorsPage[] {
-  return [...new Set(TARGET_NUMBERS)].sort((a, b) => a - b).map(n => {
+  if (_cache) return _cache;
+  _cache = [...new Set(TARGET_NUMBERS)].sort((a, b) => a - b).map(n => {
     const factors = getFactors(n);
     const primeFactors = n > 1 ? getPrimeFactors(n) : [];
     const factorSum = factors.reduce((s, f) => s + f, 0);
@@ -86,6 +89,7 @@ export function getAllFactorsPages(): FactorsPage[] {
       isPerfect: factorSum - n === n,
     };
   });
+  return _cache;
 }
 
 export function getFactorsBySlug(slug: string): FactorsPage | undefined {

@@ -13,7 +13,10 @@ export interface PercentagePage {
 const percentages = [1, 2, 3, 5, 10, 15, 20, 25, 30, 33, 40, 50, 60, 75, 80, 90, 100, 150, 200];
 const baseNumbers = [50, 100, 150, 200, 250, 300, 400, 500, 600, 750, 1000, 1500, 2000, 5000, 10000];
 
+let _cache: PercentagePage[] | null = null;
+
 export function getAllPercentagePages(): PercentagePage[] {
+  if (_cache) return _cache;
   const pages: PercentagePage[] = [];
 
   for (const percentage of percentages) {
@@ -28,6 +31,7 @@ export function getAllPercentagePages(): PercentagePage[] {
     }
   }
 
+  _cache = pages;
   return pages;
 }
 

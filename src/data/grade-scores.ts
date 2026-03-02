@@ -43,7 +43,10 @@ function round2(n: number): number {
   return Math.round(n * 100) / 100;
 }
 
+let _cache: GradeScorePage[] | null = null;
+
 export function getAllGradeScorePages(): GradeScorePage[] {
+  if (_cache) return _cache;
   const pages: GradeScorePage[] = [];
   for (const total of GRADE_TOTALS) {
     for (var score = 1; score <= total; score++) {
@@ -61,6 +64,7 @@ export function getAllGradeScorePages(): GradeScorePage[] {
       });
     }
   }
+  _cache = pages;
   return pages;
 }
 

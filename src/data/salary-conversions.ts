@@ -85,7 +85,10 @@ function formatSlug(rate: number): string {
   return `${rate.toFixed(2).replace('.', '-')}-an-hour`;
 }
 
+let _cache: SalaryPage[] | null = null;
+
 export function getAllSalaryPages(): SalaryPage[] {
+  if (_cache) return _cache;
   const pages: SalaryPage[] = [];
 
   // Hourly -> Annual
@@ -128,6 +131,7 @@ export function getAllSalaryPages(): SalaryPage[] {
     });
   }
 
+  _cache = pages;
   return pages;
 }
 

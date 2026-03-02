@@ -17,7 +17,10 @@ export interface PowerPage {
   cubeRoot: number | null;    // cbrt of result, if perfect cube
 }
 
+let _squaredCache: PowerPage[] | null = null;
+
 export function getAllSquaredPages(): PowerPage[] {
+  if (_squaredCache) return _squaredCache;
   const pages: PowerPage[] = [];
   for (let n = 1; n <= 100; n++) {
     const result = n * n;
@@ -34,10 +37,14 @@ export function getAllSquaredPages(): PowerPage[] {
       cubeRoot: cbrt * cbrt * cbrt === result ? cbrt : null,
     });
   }
+  _squaredCache = pages;
   return pages;
 }
 
+let _cubedCache: PowerPage[] | null = null;
+
 export function getAllCubedPages(): PowerPage[] {
+  if (_cubedCache) return _cubedCache;
   const pages: PowerPage[] = [];
   for (let n = 1; n <= 100; n++) {
     const result = n * n * n;
@@ -54,10 +61,14 @@ export function getAllCubedPages(): PowerPage[] {
       cubeRoot: n,
     });
   }
+  _cubedCache = pages;
   return pages;
 }
 
+let _fourthCache: PowerPage[] | null = null;
+
 export function getAllFourthPowerPages(): PowerPage[] {
+  if (_fourthCache) return _fourthCache;
   const pages: PowerPage[] = [];
   for (let n = 1; n <= 50; n++) {
     const result = n * n * n * n;
@@ -75,6 +86,7 @@ export function getAllFourthPowerPages(): PowerPage[] {
       cubeRoot: cbrt * cbrt * cbrt === result ? cbrt : null,
     });
   }
+  _fourthCache = pages;
   return pages;
 }
 
