@@ -1,0 +1,481 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import { getAllTimeConversionPages, type TimeConversionPage } from '../../data/time-conversions';
+
+export function getStaticPaths() {
+  return getAllTimeConversionPages().map(function(page) {
+    return { params: { slug: page.slug }, props: { page } };
+  });
+}
+
+var { page } = Astro.props as { page: TimeConversionPage };
+
+var {
+  slug,
+  value,
+  fromUnit,
+  toUnit,
+  result,
+  resultDisplay,
+  fromPlural,
+  toPlural,
+  formula,
+  reverseResult,
+  reverseDisplay,
+  category,
+} = page;
+
+// Build all pages for this from->to pair for the reference table
+var allPages = getAllTimeConversionPages();
+var sameConversion = allPages.filter(function(p) {
+  return p.fromUnit === fromUnit && p.toUnit === toUnit;
+});
+
+// Find the index of the current value and grab ~10 nearby rows
+var currentIndex = -1;
+for (var ci = 0; ci < sameConversion.length; ci++) {
+  if (sameConversion[ci].slug === slug) {
+    currentIndex = ci;
+    break;
+  }
+}
+var startIdx = Math.max(0, currentIndex - 4);
+var endIdx = Math.min(sameConversion.length, startIdx + 10);
+if (endIdx - startIdx < 10) {
+  startIdx = Math.max(0, endIdx - 10);
+}
+var tableRows = sameConversion.slice(startIdx, endIdx);
+
+// Related links: same category, different pages (exclude current)
+var relatedLinks = allPages.filter(function(p) {
+  return p.category === category && p.slug !== slug;
+}).slice(0, 8);
+
+// Capitalize first letter helper
+function capitalize(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+// Format a number for display
+function fmtNum(n: number): string {
+  if (Number.isInteger(n)) return n.toLocaleString('en-US');
+  if (n >= 100) return n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+  if (n >= 1) return n.toLocaleString('en-US', { maximumFractionDigits: 4 });
+  return n.toLocaleString('en-US', { maximumFractionDigits: 6 });
+}
+
+// Determine the conversion factor for the interactive converter
+var conversionFactor = result / value;
+var reverseConversionFactor = 1 / conversionFactor;
+
+// Value display
+var valueDisplay = fmtNum(value);
+
+// SEO metadata
+var title = value + ' ' + fromPlural + ' to ' + toPlural + ' - Time Conversion | ToolCalcs';
+var description = value + ' ' + fromPlural.toLowerCase() + ' equals ' + resultDisplay + ' ' + toPlural.toLowerCase() + '. Convert ' + fromPlural.toLowerCase() + ' to ' + toPlural.toLowerCase() + ' with our free time converter. Formula: ' + formula + '.';
+
+// Category-specific use-case content
+var useCases: Record<string, string> = {
+  'Hours & Minutes': 'Converting between hours and minutes is one of the most common time calculations in everyday life. From tracking work hours and scheduling meetings to managing cooking timers and planning travel itineraries, the ability to quickly switch between these two units saves time and prevents errors. Payroll departments regularly convert fractional hours to minutes when calculating employee time sheets. Fitness enthusiasts use this conversion when tracking workout durations, as exercise programs often mix hour-based and minute-based intervals. Students and professionals working with project management tools need to convert between these units when estimating task durations and setting deadlines.',
+  'Minutes & Seconds': 'The relationship between minutes and seconds is fundamental in athletics, music, video production, and scientific measurement. Runners and swimmers track their performance in both minutes and seconds, and understanding the conversion helps when comparing split times and pacing strategies. Musicians use these conversions when working with tempo, beat durations, and recording lengths. Video editors need precise minute-to-second calculations when creating cuts, transitions, and subtitle timing. In manufacturing, production cycle times are often measured in seconds but reported in minutes, making this conversion essential for operational efficiency.',
+  'Hours & Seconds': 'Converting hours to seconds and back is important in scientific calculations, engineering, and data processing. Physicists and engineers frequently work with seconds as the base unit of time in formulas involving velocity, acceleration, and power. Server administrators monitor uptime and response times in seconds but report availability in hours. Astronomers convert between these units when calculating orbital periods and signal transmission delays. This conversion is also useful in everyday contexts, such as understanding how many seconds are in a workday or estimating the total seconds of content in a podcast or video series.',
+  'Days & Hours': 'The conversion between days and hours appears frequently in project management, travel planning, healthcare, and logistics. Project managers estimate task durations in hours but track milestones in days, requiring constant conversion between the two. International travelers crossing time zones need to understand day-hour relationships when planning connections and layovers. In hospitals, medication schedules and patient monitoring intervals are often specified in hours but tracked across multi-day stays. Logistics companies calculate shipping and delivery windows using both days and hours to provide accurate ETAs.',
+  'Weeks & Days': 'Weeks and days are commonly converted in pregnancy tracking, academic scheduling, project planning, and fitness programs. Pregnancy is measured in weeks, but parents and healthcare providers often need to know the equivalent in days for medical milestones. Academic institutions plan semesters in weeks but schedule individual classes and assignments by day. Agile software development teams work in weekly sprints but break tasks into daily increments. Personal fitness challenges, detox programs, and habit-building routines are often described in both weeks and days.',
+  'Weeks & Hours': 'Converting between weeks and hours is especially relevant in employment and labor contexts. Standard work weeks are defined in hours, and employment regulations often specify maximum weekly hours. Freelancers and contractors tracking billable hours need to convert between weekly and hourly totals for invoicing. Event planners organizing multi-week festivals or conferences calculate total hours of programming across weeks. This conversion is also useful for understanding the total commitment required for courses, training programs, and certification requirements.',
+  'Months & Days': 'The month-to-day conversion is essential in financial calculations, rental agreements, subscription management, and healthcare. Financial institutions calculate interest accrual using exact day counts within months. Lease agreements and subscription services need precise day counts to prorate charges across partial months. In healthcare, pregnancy milestones, medication courses, and treatment plans are tracked in both months and days. Travelers planning extended trips abroad use this conversion to understand visa duration limits and accommodation costs.',
+  'Months & Weeks': 'Converting months to weeks and back is important in pregnancy tracking, academic planning, and business forecasting. Pregnancy is commonly described in both weeks and months, and expectant parents frequently need to convert between the two. Academic programs spanning multiple months need week-level scheduling for curriculum planning. Business quarterly forecasts are set in months but operational plans are executed in weekly cycles. Project managers working on multi-month initiatives break timelines into weekly milestones for progress tracking.',
+  'Years & Days': 'The conversion between years and days is used in astronomy, finance, law, and historical research. Astronomers calculate planetary orbital periods in days and convert to years for easier comprehension. Financial analysts use exact day counts in a year for calculating annual percentage rates and bond yields. Legal professionals compute statute of limitations periods and contract terms using both years and days. Historians and genealogists calculate the exact number of days between historical events spanning multiple years.',
+  'Years & Months': 'Converting years to months and vice versa is fundamental in finance, childcare, and long-term planning. Mortgage and loan terms are typically quoted in years but calculated in monthly payments. Child development milestones are tracked in months for the first few years of life. Retirement planners convert between years and months when calculating savings targets and withdrawal schedules. Employment tenure is often expressed in years for resumes but tracked in months for benefits eligibility and vesting schedules.',
+  'Years & Weeks': 'The year-to-week conversion is important in business planning, education, and project management. Annual business plans are broken down into weekly operational targets. Academic years are structured around weeks, and course scheduling requires precise year-to-week mapping. Long-term project timelines spanning multiple years need week-level detail for resource allocation. Fitness and lifestyle programs designed to span a full year use weekly milestones to track progress and maintain motivation.',
+  'Years & Hours': 'Converting years to hours provides perspective on large-scale time measurements. This conversion is useful in calculating total work hours over a career, understanding the scope of multi-year projects, and putting historical time periods into perspective. Engineers use this conversion when estimating equipment lifespan and maintenance schedules measured in operational hours. Educators calculate total instructional hours across multi-year degree programs. The conversion also appears in fun facts and trivia, helping people visualize just how many hours make up a year or a lifetime.',
+};
+
+var useCaseText = useCases[category] || 'Time conversions between ' + fromPlural.toLowerCase() + ' and ' + toPlural.toLowerCase() + ' are useful in planning, scheduling, science, and daily life. Understanding the relationship between these units helps you quickly estimate durations, set accurate timers, and communicate time spans clearly. Whether you are coordinating across time zones, planning a project timeline, or simply converting a recipe cooking time, this conversion is a valuable reference.';
+
+// Structured data
+var structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Time Conversions", "item": "https://toolcalcs.com/time-convert/" },
+      { "@type": "ListItem", "position": 3, "name": valueDisplay + ' ' + fromPlural + ' to ' + toPlural },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How many " + toPlural.toLowerCase() + " are in " + valueDisplay + " " + fromPlural.toLowerCase() + "?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": valueDisplay + " " + fromPlural.toLowerCase() + " is equal to " + resultDisplay + " " + toPlural.toLowerCase() + ". To convert " + fromPlural.toLowerCase() + " to " + toPlural.toLowerCase() + ", " + (conversionFactor >= 1 ? "multiply the value by " + fmtNum(conversionFactor) : "divide the value by " + fmtNum(Math.round(1 / conversionFactor * 10000) / 10000)) + ".",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "What is the formula to convert " + fromPlural.toLowerCase() + " to " + toPlural.toLowerCase() + "?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The formula is: " + formula + ". " + (conversionFactor >= 1 ? "Multiply the number of " + fromPlural.toLowerCase() + " by " + fmtNum(conversionFactor) + " to get the equivalent in " + toPlural.toLowerCase() : "Divide the number of " + fromPlural.toLowerCase() + " by " + fmtNum(Math.round(1 / conversionFactor * 10000) / 10000) + " to get the equivalent in " + toPlural.toLowerCase()) + ".",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "How do I convert " + toPlural.toLowerCase() + " back to " + fromPlural.toLowerCase() + "?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "To convert " + toPlural.toLowerCase() + " to " + fromPlural.toLowerCase() + ", " + (reverseConversionFactor >= 1 ? "multiply by " + fmtNum(Math.round(reverseConversionFactor * 10000) / 10000) : "divide by " + fmtNum(conversionFactor)) + ". For example, 1 " + toUnit + " equals " + reverseDisplay + " " + fromUnit + ".",
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout title={title} description={description} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/time-convert/">Time Conversions</a> &rsaquo;
+    <span>{valueDisplay} {fromPlural} to {toPlural}</span>
+  </nav>
+
+  <h1>{valueDisplay} {fromPlural} to {toPlural}</h1>
+  <p class="page-desc">
+    Quick, free conversion of {valueDisplay} {fromPlural.toLowerCase()} to {toPlural.toLowerCase()} with formula, reference table, and interactive converter.
+  </p>
+
+  <!-- Answer Card -->
+  <div class="answer-card">
+    <div class="answer-card-label">Conversion Result</div>
+    <div class="answer-card-main">
+      {valueDisplay} {fromPlural} = {resultDisplay} {toPlural}
+    </div>
+    <div class="answer-card-note">
+      Formula: {formula}
+    </div>
+  </div>
+
+  <!-- Quick Facts Grid -->
+  <div class="quick-facts-grid">
+    <div class="quick-fact-card">
+      <span class="quick-fact-card-label">Result</span>
+      <span class="quick-fact-card-value">{resultDisplay} {toPlural.toLowerCase()}</span>
+    </div>
+    <div class="quick-fact-card">
+      <span class="quick-fact-card-label">Formula Used</span>
+      <span class="quick-fact-card-value">{formula}</span>
+    </div>
+    <div class="quick-fact-card">
+      <span class="quick-fact-card-label">Reverse</span>
+      <span class="quick-fact-card-value">1 {toUnit} = {reverseDisplay} {fromUnit}</span>
+    </div>
+    <div class="quick-fact-card">
+      <span class="quick-fact-card-label">Category</span>
+      <span class="quick-fact-card-value">{category}</span>
+    </div>
+  </div>
+
+  <!-- Conversion Reference Table -->
+  <h2 class="section-heading">{capitalize(fromPlural)} to {capitalize(toPlural)} Conversion Table</h2>
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>{capitalize(fromPlural)}</th>
+          <th>{capitalize(toPlural)}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {tableRows.map(function(row) {
+          return (
+            <tr class={row.slug === slug ? 'highlight-row' : ''}>
+              <td>
+                <a href={'/time-convert/' + row.slug + '/'}>{fmtNum(row.value)} {row.fromPlural.toLowerCase()}</a>
+              </td>
+              <td>{row.resultDisplay} {row.toPlural.toLowerCase()}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  </div>
+
+  <AdUnit slot="time-convert-mid" format="horizontal" />
+
+  <!-- Interactive Converter Widget -->
+  <div class="converter-widget">
+    <h2 class="converter-widget-heading">{capitalize(fromPlural)} to {capitalize(toPlural)} Converter</h2>
+    <div class="converter-widget-row">
+      <div class="input-group">
+        <label for="fromInput">{capitalize(fromPlural)}</label>
+        <input type="number" id="fromInput" value={value} step="any" min="0" />
+      </div>
+      <div class="converter-widget-equals">=</div>
+      <div class="converter-widget-result">
+        <span class="converter-widget-label">{capitalize(toPlural)}</span>
+        <span class="converter-widget-output" id="toOutput">{resultDisplay}</span>
+      </div>
+    </div>
+    <button class="calc-btn" id="calcBtn" type="button">Calculate</button>
+  </div>
+
+  <!-- SEO Content Article -->
+  <article class="content-section">
+    <h2>How to Convert {valueDisplay} {fromPlural} to {toPlural}</h2>
+    <p>
+      Converting {valueDisplay} {fromPlural.toLowerCase()} to {toPlural.toLowerCase()} is straightforward. The conversion factor between {fromPlural.toLowerCase()} and {toPlural.toLowerCase()} is {fmtNum(conversionFactor)}, meaning that 1 {fromUnit} equals {fmtNum(conversionFactor)} {toPlural.toLowerCase()}. To perform this conversion, {conversionFactor >= 1 ? 'multiply the number of ' + fromPlural.toLowerCase() + ' by ' + fmtNum(conversionFactor) : 'divide the number of ' + fromPlural.toLowerCase() + ' by ' + fmtNum(Math.round(1 / conversionFactor * 10000) / 10000)}.
+    </p>
+    <p>
+      Applying this to our specific value:
+    </p>
+    <div class="formula-box"><code>{formula}</code></div>
+    <p>
+      So {valueDisplay} {fromPlural.toLowerCase()} is exactly {resultDisplay} {toPlural.toLowerCase()}. This relationship is fixed and based on the standard definitions of {fromPlural.toLowerCase()} and {toPlural.toLowerCase()}. Whether you are performing quick mental math or need a precise figure for calculations, this conversion factor remains constant.
+    </p>
+    <p>
+      To convert in the reverse direction, from {toPlural.toLowerCase()} to {fromPlural.toLowerCase()}, {reverseConversionFactor >= 1 ? 'multiply by ' + fmtNum(Math.round(reverseConversionFactor * 10000) / 10000) : 'divide by ' + fmtNum(conversionFactor)}. For instance, 1 {toUnit} equals {reverseDisplay} {fromUnit}. This inverse relationship makes it easy to go back and forth between the two units as needed.
+    </p>
+
+    <h2>When You Need This Conversion</h2>
+    <p>{useCaseText}</p>
+
+    <h2>Understanding the Relationship Between {capitalize(fromPlural)} and {capitalize(toPlural)}</h2>
+    <p>
+      The time units we use every day are based on a system that dates back thousands of years. The division of a day into 24 hours, an hour into 60 minutes, and a minute into 60 seconds originates from the ancient Babylonian base-60 number system. Weeks, months, and years are tied to astronomical cycles: the week is a convenient subdivision, the month roughly follows the lunar cycle, and the year tracks the Earth's orbit around the Sun.
+    </p>
+    <p>
+      Because these units are based on fixed mathematical relationships ({fromPlural.toLowerCase()} to {toPlural.toLowerCase()} uses a factor of {fmtNum(conversionFactor)}), the conversion is always exact for standard time units. There are no rounding issues or approximations involved when converting between {fromPlural.toLowerCase()} and {toPlural.toLowerCase()}, unlike some other measurement conversions that rely on irrational or approximate factors. This makes time conversions reliable for scheduling, scientific calculations, and everyday planning.
+    </p>
+    <p>
+      Knowing that {valueDisplay} {fromPlural.toLowerCase()} equals {resultDisplay} {toPlural.toLowerCase()} helps you develop an intuitive sense for time durations. This kind of number sense is valuable whether you are estimating how long a task will take, comparing time-based data in reports, or simply answering a quick question about scheduling.
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>How many {toPlural.toLowerCase()} are in {valueDisplay} {fromPlural.toLowerCase()}?</h3>
+    <p>
+      There are {resultDisplay} {toPlural.toLowerCase()} in {valueDisplay} {fromPlural.toLowerCase()}. This is calculated using the formula: {formula}. The conversion factor of {fmtNum(conversionFactor)} is a fixed constant based on the standard definition of these time units.
+    </p>
+
+    <h3>What is the formula to convert {fromPlural.toLowerCase()} to {toPlural.toLowerCase()}?</h3>
+    <p>
+      {conversionFactor >= 1
+        ? 'Multiply the number of ' + fromPlural.toLowerCase() + ' by ' + fmtNum(conversionFactor) + ' to get the equivalent in ' + toPlural.toLowerCase() + '.'
+        : 'Divide the number of ' + fromPlural.toLowerCase() + ' by ' + fmtNum(Math.round(1 / conversionFactor * 10000) / 10000) + ' to get the equivalent in ' + toPlural.toLowerCase() + '.'
+      } For example, {formula}. You can use this same formula for any amount of {fromPlural.toLowerCase()}.
+    </p>
+
+    <h3>How do I convert {toPlural.toLowerCase()} back to {fromPlural.toLowerCase()}?</h3>
+    <p>
+      To convert {toPlural.toLowerCase()} to {fromPlural.toLowerCase()}, {reverseConversionFactor >= 1 ? 'multiply by ' + fmtNum(Math.round(reverseConversionFactor * 10000) / 10000) : 'divide by ' + fmtNum(conversionFactor)}. The reverse conversion factor is {reverseDisplay}, so 1 {toUnit} equals {reverseDisplay} {fromUnit}. Use the interactive converter at the top of this page for instant results in either direction.
+    </p>
+
+    <h2>Related Time Conversions</h2>
+    <ul>
+      {relatedLinks.map(function(rp) {
+        return (
+          <li>
+            <a href={'/time-convert/' + rp.slug + '/'}>{fmtNum(rp.value)} {rp.fromPlural} to {rp.toPlural}</a>
+          </li>
+        );
+      })}
+      <li><a href="/time-convert/">Browse all time conversions</a></li>
+    </ul>
+  </article>
+
+  <AdUnit slot="time-convert-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  /* Answer Card */
+  .answer-card {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    color: #fff;
+    border-radius: var(--radius);
+    padding: 32px;
+    margin-bottom: 32px;
+    text-align: center;
+  }
+  .answer-card-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.85;
+    margin-bottom: 8px;
+  }
+  .answer-card-main {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+  .answer-card-note {
+    font-size: 0.85rem;
+    opacity: 0.75;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    padding-top: 12px;
+    margin-top: 8px;
+  }
+
+  /* Quick Facts Grid */
+  .quick-facts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .quick-fact-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-align: center;
+  }
+  .quick-fact-card-label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+  .quick-fact-card-value {
+    display: block;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text);
+    word-break: break-word;
+  }
+
+  /* Converter Widget */
+  .converter-widget {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 32px;
+  }
+  .converter-widget-heading {
+    font-size: 1.1rem;
+    margin: 0 0 16px;
+    border: none;
+    padding: 0;
+  }
+  .converter-widget-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .converter-widget-row .input-group {
+    flex: 1;
+    min-width: 160px;
+  }
+  .converter-widget-equals {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    padding-bottom: 8px;
+    flex-shrink: 0;
+  }
+  .converter-widget-result {
+    flex: 1;
+    min-width: 180px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+  }
+  .converter-widget-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-bottom: 4px;
+  }
+  .converter-widget-output {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    min-height: 1.4em;
+  }
+
+  /* Section Heading */
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+
+  /* Highlight Row */
+  .highlight-row td {
+    background: #eff6ff;
+    font-weight: 700;
+  }
+  .highlight-row:hover td {
+    background: #dbeafe;
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .answer-card {
+      padding: 24px 16px;
+    }
+    .answer-card-main {
+      font-size: 1.6rem;
+    }
+    .quick-facts-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .converter-widget-row {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .converter-widget-equals {
+      text-align: center;
+      padding-bottom: 0;
+    }
+  }
+  @media (max-width: 400px) {
+    .quick-facts-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script define:vars={{ conversionFactor, fromUnitName: fromPlural, toUnitName: toPlural }}>
+  function formatNumber(n) {
+    if (Number.isInteger(n)) return n.toLocaleString('en-US');
+    if (Math.abs(n) >= 100) return n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+    if (Math.abs(n) >= 1) return n.toLocaleString('en-US', { maximumFractionDigits: 4 });
+    if (Math.abs(n) >= 0.01) return n.toLocaleString('en-US', { maximumFractionDigits: 6 });
+    return n.toExponential(4);
+  }
+
+  var fromInput = document.getElementById('fromInput');
+  var toOutput = document.getElementById('toOutput');
+  var calcBtn = document.getElementById('calcBtn');
+
+  function doConvert() {
+    var val = parseFloat(fromInput.value);
+    if (isNaN(val) || val < 0) {
+      toOutput.textContent = '\u2014';
+      return;
+    }
+    var result = val * conversionFactor;
+    toOutput.textContent = formatNumber(result) + ' ' + toUnitName.toLowerCase();
+  }
+
+  if (fromInput && toOutput && calcBtn) {
+    fromInput.addEventListener('input', doConvert);
+    calcBtn.addEventListener('click', doConvert);
+  }
+</script>

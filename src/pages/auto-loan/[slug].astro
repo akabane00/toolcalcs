@@ -1,0 +1,392 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import { getAllAutoLoanPages, getAutoLoanBySlug, LOAN_AMOUNTS, RATES, TERMS, formatMoney } from '../../data/auto-loan';
+import type { AutoLoanPage } from '../../data/auto-loan';
+
+export function getStaticPaths() {
+  return getAllAutoLoanPages().map(function (page) {
+    return {
+      params: { slug: page.slug },
+      props: { page },
+    };
+  });
+}
+
+const { page } = Astro.props as { page: AutoLoanPage };
+const {
+  slug,
+  loanAmount,
+  loanDisplay,
+  rate,
+  termMonths,
+  termYears,
+  monthlyPayment,
+  totalPayment,
+  totalInterest,
+  payoffDate,
+  schedule,
+} = page;
+
+const allPages = getAllAutoLoanPages();
+
+// Related: same amount, different rates (keep same term)
+const relatedByRate = allPages.filter(function (p) {
+  return p.loanAmount === loanAmount && p.termMonths === termMonths && p.rate !== rate;
+});
+
+// Related: same amount and rate, different terms
+const relatedByTerm = allPages.filter(function (p) {
+  return p.loanAmount === loanAmount && p.rate === rate && p.termMonths !== termMonths;
+});
+
+// Related: different amounts at same rate and term
+const relatedByAmount = allPages.filter(function (p) {
+  return p.rate === rate && p.termMonths === termMonths && p.loanAmount !== loanAmount;
+}).slice(0, 8);
+
+const title = `${loanDisplay} Auto Loan at ${rate}% for ${termYears} Years - $${formatMoney(monthlyPayment)}/mo | ToolCalcs`;
+const description = `Calculate the monthly payment on a ${loanDisplay} auto loan at ${rate}% APR for ${termMonths} months. Monthly payment: $${formatMoney(monthlyPayment)}. Total cost: $${formatMoney(totalPayment)}. Total interest: $${formatMoney(totalInterest)}.`;
+
+const interestPercent = ((totalInterest / loanAmount) * 100).toFixed(1);
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Auto Loan Calculator", "item": "https://toolcalcs.com/auto-loan/" },
+      { "@type": "ListItem", "position": 3, "name": `${loanDisplay} at ${rate}%` },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": `What is the monthly payment on a ${loanDisplay} auto loan at ${rate}%?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `The monthly payment on a ${loanDisplay} auto loan at ${rate}% APR for ${termMonths} months (${termYears} years) is $${formatMoney(monthlyPayment)}. Over the life of the loan, you will pay $${formatMoney(totalPayment)} total, which includes $${formatMoney(totalInterest)} in interest.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `How much interest will I pay on a ${loanDisplay} car loan at ${rate}%?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `On a ${loanDisplay} auto loan at ${rate}% for ${termYears} years, you will pay $${formatMoney(totalInterest)} in total interest. That represents ${interestPercent}% of the original loan amount. Your total cost including principal and interest is $${formatMoney(totalPayment)}.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `What is the total cost of a ${loanDisplay} car loan?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `A ${loanDisplay} auto loan at ${rate}% APR for ${termMonths} months will cost $${formatMoney(totalPayment)} in total. This includes the ${loanDisplay} principal plus $${formatMoney(totalInterest)} in interest charges over the ${termYears}-year term.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `How does the loan term affect my auto loan payment?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `A longer loan term lowers your monthly payment but increases the total interest you pay. For a ${loanDisplay} loan at ${rate}%, choosing ${termMonths} months results in a $${formatMoney(monthlyPayment)} monthly payment. Shorter terms mean higher monthly payments but less interest overall.`,
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout title={title} description={description} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/auto-loan/">Auto Loan Calculator</a> &rsaquo;
+    <span>{loanDisplay} at {rate}%</span>
+  </nav>
+
+  <h1>Auto Loan Payment: {loanDisplay} at {rate}% for {termYears} Years</h1>
+  <p class="page-desc">See the monthly payment, total cost, and full amortization schedule for a {loanDisplay} car loan at {rate}% APR over {termMonths} months.</p>
+
+  <!-- Result Cards -->
+  <div class="result-cards al-result-cards">
+    <div class="result-card primary">
+      <span class="result-label">Monthly Payment</span>
+      <span class="result-value">${formatMoney(monthlyPayment)}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Total Payment</span>
+      <span class="result-value">${formatMoney(totalPayment)}</span>
+    </div>
+    <div class="result-card success">
+      <span class="result-label">Total Interest</span>
+      <span class="result-value">${formatMoney(totalInterest)}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Loan Term</span>
+      <span class="result-value">{payoffDate}</span>
+    </div>
+  </div>
+
+  <!-- Amortization Schedule -->
+  <h2 class="section-heading">Amortization Schedule</h2>
+  <p class="al-schedule-note">Showing the first 12 months, then every 12th month through the end of the loan.</p>
+  <div class="table-container">
+    <table class="data-table al-table">
+      <thead>
+        <tr>
+          <th>Month</th>
+          <th>Payment</th>
+          <th>Principal</th>
+          <th>Interest</th>
+          <th>Remaining Balance</th>
+        </tr>
+      </thead>
+      <tbody>
+        {schedule.map(function (row) {
+          return (
+            <tr>
+              <td>{row.month}</td>
+              <td>${formatMoney(row.payment)}</td>
+              <td>${formatMoney(row.principal)}</td>
+              <td>${formatMoney(row.interest)}</td>
+              <td>${formatMoney(row.balance)}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  </div>
+
+  <AdUnit slot="al-mid" format="horizontal" />
+
+  <!-- Interactive Calculator -->
+  <h2 class="section-heading">Try Different Values</h2>
+  <div class="calculator-box">
+    <p class="al-calc-desc">Adjust the loan amount, interest rate, or term to see how your monthly payment changes.</p>
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="calcAmount">Loan Amount ($)</label>
+        <input type="number" id="calcAmount" value={loanAmount} min="1000" step="500" />
+      </div>
+      <div class="input-group">
+        <label for="calcRate">Interest Rate (%)</label>
+        <input type="number" id="calcRate" value={rate} min="0.1" max="30" step="0.1" />
+      </div>
+      <div class="input-group">
+        <label for="calcTerm">Term (months)</label>
+        <input type="number" id="calcTerm" value={termMonths} min="12" max="96" step="12" />
+      </div>
+    </div>
+    <button class="calc-btn" id="calcBtn">Calculate</button>
+    <div id="calcResult" class="al-calc-result"></div>
+  </div>
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>Understanding Your {loanDisplay} Auto Loan Payment</h2>
+    <p>
+      When you finance a vehicle with a {loanDisplay} auto loan at {rate}% APR for {termYears} years, your monthly payment is <strong>${formatMoney(monthlyPayment)}</strong>. This fixed payment stays the same for all {termMonths} months of the loan, but the portion that goes toward principal versus interest changes each month. In the early months, a larger share of your payment covers interest. As the loan matures, more of each payment goes directly toward paying down the principal balance.
+    </p>
+    <p>
+      Over the full {termYears}-year term, you will pay a total of <strong>${formatMoney(totalPayment)}</strong> for this vehicle loan. Of that amount, {loanDisplay} repays the original principal, and <strong>${formatMoney(totalInterest)}</strong> is the cost of borrowing, representing {interestPercent}% of the loan amount. Understanding this total cost is crucial when deciding how much car you can truly afford and whether the interest charges are reasonable for your budget.
+    </p>
+
+    <h2>Auto Loan Payment Formula</h2>
+    <p>
+      The monthly payment for an auto loan is calculated using the standard amortization formula. This formula accounts for both the repayment of principal and the interest charged on the outstanding balance each month:
+    </p>
+    <div class="formula-box">
+      M = P[r(1+r)<sup>n</sup>] / [(1+r)<sup>n</sup> - 1]
+    </div>
+    <p>Where:</p>
+    <ul>
+      <li><strong>M</strong> = Monthly payment = <strong>${formatMoney(monthlyPayment)}</strong></li>
+      <li><strong>P</strong> = Principal (loan amount) = <strong>{loanDisplay}</strong></li>
+      <li><strong>r</strong> = Monthly interest rate = {rate}% / 12 = <strong>{(rate / 12).toFixed(4)}%</strong></li>
+      <li><strong>n</strong> = Total number of payments = <strong>{termMonths}</strong></li>
+    </ul>
+    <p>
+      This formula ensures that each equal monthly payment covers the interest due that month plus a portion of the principal. As the balance decreases over time, the interest portion shrinks and the principal portion grows. By the final payment, nearly the entire amount goes toward principal. The amortization schedule above illustrates this shift month by month.
+    </p>
+
+    <h2>Tips for Getting a Better Auto Loan Rate</h2>
+    <p>
+      The interest rate you receive on an auto loan has a significant impact on both your monthly payment and the total cost of the vehicle. Here are proven strategies to secure the best rate possible:
+    </p>
+    <ul>
+      <li><strong>Check your credit score first.</strong> Lenders use your credit score as a primary factor in determining your rate. Scores above 720 typically qualify for the best rates, while scores below 620 may result in rates above 10%. Review your credit report for errors before applying.</li>
+      <li><strong>Shop multiple lenders.</strong> Do not accept the first offer from the dealership. Get pre-approved through your bank, credit union, and at least one online lender. Credit unions often offer the most competitive auto loan rates.</li>
+      <li><strong>Make a larger down payment.</strong> Putting 20% or more down reduces the loan amount and demonstrates financial stability to lenders. A lower loan-to-value ratio can qualify you for better terms.</li>
+      <li><strong>Choose a shorter loan term.</strong> While longer terms lower your monthly payment, they typically come with higher interest rates. A 36 or 48-month term often carries a lower rate than a 72 or 84-month loan.</li>
+      <li><strong>Consider the total cost, not just the monthly payment.</strong> A longer term with a lower monthly payment may seem attractive, but you will pay significantly more in interest over the life of the loan. Always compare the total cost of different loan options.</li>
+      <li><strong>Time your purchase wisely.</strong> Dealers often offer better financing deals at the end of the month, quarter, or year when they are trying to meet sales targets. Holiday sales events can also yield better rates and incentives.</li>
+    </ul>
+    <p>
+      Even a small reduction in your interest rate can save you hundreds or thousands of dollars over the life of the loan. For this {loanDisplay} loan, the difference between {rate}% and a rate just 1% lower would reduce your total interest by a meaningful amount. Always negotiate and compare before signing any auto loan agreement.
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is the monthly payment on a {loanDisplay} auto loan at {rate}%?</h3>
+    <p>
+      The monthly payment on a {loanDisplay} auto loan at {rate}% APR for {termMonths} months ({termYears} years) is ${formatMoney(monthlyPayment)}. Over the full term, you will pay ${formatMoney(totalPayment)} total, which includes ${formatMoney(totalInterest)} in interest charges.
+    </p>
+
+    <h3>How much interest will I pay on a {loanDisplay} car loan?</h3>
+    <p>
+      At {rate}% APR for {termYears} years, the total interest on a {loanDisplay} auto loan is ${formatMoney(totalInterest)}. This means you pay {interestPercent}% of the original loan amount in interest. The amortization schedule above shows how the interest portion of each payment decreases over time as you pay down the balance.
+    </p>
+
+    <h3>Is {rate}% a good interest rate for a car loan?</h3>
+    <p>
+      Whether {rate}% is a good rate depends on your credit score, the age of the vehicle, and current market conditions. As of 2025, average new car loan rates range from about 5% to 7% for borrowers with good credit (700+). Used car rates are typically 1-2% higher. If your rate is above average, consider improving your credit score or shopping around for a better offer before committing.
+    </p>
+
+    <h3>Should I choose a shorter or longer loan term?</h3>
+    <p>
+      A shorter loan term means higher monthly payments but less total interest. A longer term lowers your monthly payment but costs more overall. For this {loanDisplay} loan at {rate}%, the {termYears}-year term results in ${formatMoney(monthlyPayment)}/month. Consider your monthly budget and the total interest cost when choosing a term. As a general rule, try to keep the term at 60 months or less to avoid paying excessive interest.
+    </p>
+
+    <!-- Related: Same Amount, Different Rates -->
+    <h2>Same Amount, Different Rates</h2>
+    <p>See how the payment on a {loanDisplay} auto loan changes at different interest rates ({termMonths}-month term):</p>
+    <ul>
+      {relatedByRate.map(function (p) {
+        return (
+          <li>
+            <a href={`/auto-loan/${p.slug}/`}>
+              {p.loanDisplay} at {p.rate}% for {p.termMonths} mo &rarr; ${formatMoney(p.monthlyPayment)}/mo
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+
+    <!-- Related: Same Rate, Different Terms -->
+    <h2>Same Rate, Different Terms</h2>
+    <p>See how different loan terms affect the monthly payment on a {loanDisplay} loan at {rate}%:</p>
+    <ul>
+      {relatedByTerm.map(function (p) {
+        return (
+          <li>
+            <a href={`/auto-loan/${p.slug}/`}>
+              {p.loanDisplay} at {p.rate}% for {p.termMonths} mo &rarr; ${formatMoney(p.monthlyPayment)}/mo
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+
+    <!-- Related: Different Amounts -->
+    <h2>Different Loan Amounts</h2>
+    <p>See the monthly payment for different loan amounts at {rate}% for {termMonths} months:</p>
+    <ul>
+      {relatedByAmount.map(function (p) {
+        return (
+          <li>
+            <a href={`/auto-loan/${p.slug}/`}>
+              {p.loanDisplay} at {p.rate}% for {p.termMonths} mo &rarr; ${formatMoney(p.monthlyPayment)}/mo
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+
+    <p><a href="/auto-loan/">&larr; View All Auto Loan Calculations</a></p>
+  </article>
+
+  <AdUnit slot="al-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .al-result-cards {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .al-result-cards .result-card.primary .result-value {
+    font-size: 1.6rem;
+  }
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+  .al-schedule-note {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+  .al-table {
+    margin-bottom: 32px;
+  }
+  .al-table tbody tr:nth-child(even) td {
+    background: var(--color-bg);
+  }
+  .al-calc-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 16px;
+  }
+  .al-calc-result {
+    margin-top: 16px;
+    padding: 14px 16px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    min-height: 44px;
+  }
+
+  @media (max-width: 768px) {
+    .al-result-cards {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 480px) {
+    .al-result-cards {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script define:vars={{ loanAmount, rate, termMonths }}>
+  var calcBtn = document.getElementById('calcBtn');
+  var calcAmount = document.getElementById('calcAmount');
+  var calcRate = document.getElementById('calcRate');
+  var calcTerm = document.getElementById('calcTerm');
+  var calcResult = document.getElementById('calcResult');
+
+  function calculatePayment() {
+    var p = parseFloat(calcAmount.value) || loanAmount;
+    var r = parseFloat(calcRate.value) || rate;
+    var n = parseInt(calcTerm.value) || termMonths;
+
+    var monthlyRate = r / 100 / 12;
+    var monthly;
+    if (monthlyRate === 0) {
+      monthly = p / n;
+    } else {
+      monthly = p * (monthlyRate * Math.pow(1 + monthlyRate, n)) / (Math.pow(1 + monthlyRate, n) - 1);
+    }
+    var total = monthly * n;
+    var interest = total - p;
+    var years = n / 12;
+
+    function fmtMoney(val) {
+      return val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    calcResult.innerHTML =
+      '<strong>Monthly Payment: $' + fmtMoney(monthly) + '</strong><br>' +
+      'Total Payment: $' + fmtMoney(total) + '<br>' +
+      'Total Interest: $' + fmtMoney(interest) + '<br>' +
+      'Term: ' + years.toLocaleString('en-US') + ' years (' + n.toLocaleString('en-US') + ' months)';
+  }
+
+  if (calcBtn) {
+    calcBtn.addEventListener('click', calculatePayment);
+  }
+</script>

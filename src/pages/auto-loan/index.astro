@@ -1,0 +1,200 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import { getAllAutoLoanPages, LOAN_AMOUNTS, RATES, TERMS, formatMoney } from '../../data/auto-loan';
+import type { AutoLoanPage } from '../../data/auto-loan';
+
+const allPages = getAllAutoLoanPages();
+const count = allPages.length;
+
+// Labels for each loan amount section
+const amountLabels: { value: number; display: string }[] = LOAN_AMOUNTS.map(function (a) {
+  return { value: a, display: '$' + a.toLocaleString('en-US') };
+});
+
+// Popular combos to display per amount (6-8 per group)
+const popularCombos = [
+  { rate: 4.5, term: 60 },
+  { rate: 5.5, term: 60 },
+  { rate: 6.5, term: 60 },
+  { rate: 5.5, term: 48 },
+  { rate: 7.5, term: 72 },
+  { rate: 3.5, term: 48 },
+  { rate: 8.5, term: 60 },
+  { rate: 6.5, term: 84 },
+];
+
+function getPagesForAmount(amountVal: number): AutoLoanPage[] {
+  var results: AutoLoanPage[] = [];
+  for (var i = 0; i < popularCombos.length; i++) {
+    var combo = popularCombos[i];
+    var match = allPages.find(function (p) {
+      return p.loanAmount === amountVal && p.rate === combo.rate && p.termMonths === combo.term;
+    });
+    if (match) {
+      results.push(match);
+    }
+  }
+  return results;
+}
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://toolcalcs.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Auto Loan Calculator"
+    }
+  ]
+};
+---
+
+<BaseLayout
+  title="Auto Loan Payment Calculator - Monthly Payments for Every Scenario | ToolCalcs"
+  description={`Browse ${count} pre-calculated auto loan payment scenarios. See monthly payments, total interest, and amortization schedules for loans from $5,000 to $80,000 at rates from 3.5% to 12%.`}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <span>Auto Loan Calculator</span>
+  </nav>
+
+  <h1>Auto Loan Payment Calculator</h1>
+  <p class="page-desc">Browse {count} pre-calculated auto loan scenarios below. Each card shows the monthly payment for a specific loan amount, rate, and term. Click any card to see the full amortization schedule and breakdown.</p>
+
+  <AdUnit slot="al-idx-top" format="horizontal" />
+
+  {amountLabels.map(function (al) {
+    var pages = getPagesForAmount(al.value);
+    if (pages.length === 0) return null;
+    return (
+      <section class="al-amount-section">
+        <h2 class="al-amount-heading">{al.display} Auto Loan Payments</h2>
+        <div class="al-card-grid">
+          {pages.map(function (p) {
+            return (
+              <a href={`/auto-loan/${p.slug}/`} class="al-card">
+                <span class="al-card-terms">{p.rate}% &middot; {p.termMonths} mo</span>
+                <span class="al-card-payment">${formatMoney(p.monthlyPayment)}/mo</span>
+                <span class="al-card-interest">${formatMoney(p.totalInterest)} interest</span>
+              </a>
+            );
+          })}
+        </div>
+      </section>
+    );
+  })}
+
+  <AdUnit slot="al-idx-mid" format="horizontal" />
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>How Auto Loan Payments Work</h2>
+    <p>
+      An auto loan payment is a fixed monthly amount you pay to a lender to repay the money you borrowed to purchase a vehicle. Each payment includes two components: a portion that reduces the principal balance (the amount you originally borrowed) and a portion that covers the interest charges (the cost of borrowing). This structure is known as amortization, and it ensures the loan is fully repaid by the end of the term.
+    </p>
+    <p>
+      The three main factors that determine your monthly auto loan payment are the loan amount, the annual interest rate (APR), and the loan term in months. A higher loan amount or interest rate increases your monthly payment, while a longer term decreases it. However, extending the loan term also means you pay more in total interest over the life of the loan.
+    </p>
+
+    <h2>Understanding Your Auto Loan Options</h2>
+    <p>
+      This page contains {count} pre-calculated auto loan scenarios covering loan amounts from $5,000 to $80,000, interest rates from 3.5% to 12%, and terms from 36 to 84 months. These ranges represent the most common auto financing situations for both new and used vehicles. By browsing the cards above, you can quickly compare how different combinations affect your monthly payment and total cost.
+    </p>
+    <p>
+      When shopping for an auto loan, your credit score plays the biggest role in determining your interest rate. Borrowers with excellent credit (750 and above) typically qualify for rates between 3% and 5%, while those with fair credit (620 to 679) may see rates from 7% to 12% or higher. Before visiting a dealership, check your credit score and get pre-approved from your bank or credit union so you know what rate to expect.
+    </p>
+
+    <h2>Tips for Saving Money on Your Car Loan</h2>
+    <ul>
+      <li><strong>Make a large down payment.</strong> A down payment of 20% or more reduces the loan amount, which lowers both your monthly payment and the total interest you pay. It also helps you avoid being upside down on the loan, meaning you owe more than the car is worth.</li>
+      <li><strong>Keep the term short.</strong> While 72 and 84-month loans are becoming more popular because of lower monthly payments, shorter terms of 36 to 60 months save you thousands in interest. Try to choose the shortest term your budget allows.</li>
+      <li><strong>Negotiate the total price, not the monthly payment.</strong> Dealers may try to stretch out the loan term to give you a lower monthly payment, but this increases your total cost. Focus on the out-the-door price and then arrange financing separately.</li>
+      <li><strong>Consider buying used.</strong> New cars depreciate significantly in the first few years. A 2 to 3-year-old certified pre-owned vehicle can save you thousands while still offering reliability and warranty coverage.</li>
+      <li><strong>Refinance if rates drop.</strong> If interest rates have fallen since you took out your loan, or if your credit score has improved, refinancing to a lower rate can reduce your monthly payment and total interest cost.</li>
+    </ul>
+
+    <h2>New Car vs Used Car Loan Rates</h2>
+    <p>
+      Lenders typically charge higher interest rates for used car loans than for new car loans. The difference is usually 1 to 2 percentage points. This is because used cars have lower resale values and are considered higher risk for the lender. If you are financing a used vehicle, expect to pay slightly more in interest, and consider putting more money down to offset the higher rate.
+    </p>
+    <p>
+      Manufacturer incentives and special financing offers (such as 0% APR for qualified buyers) are generally only available on new vehicles. These promotions can make new car financing very attractive, but make sure to compare the total cost, including any rebates you might forfeit by choosing the low-rate financing instead of a cash discount.
+    </p>
+
+    <p><a href="/">Back to ToolCalcs Home &rarr;</a></p>
+  </article>
+
+  <AdUnit slot="al-idx-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .al-amount-section {
+    margin-bottom: 36px;
+  }
+  .al-amount-heading {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--color-border);
+    color: var(--color-text);
+  }
+  .al-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .al-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 16px 12px;
+    background: var(--color-bg-alt);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--color-text);
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .al-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+  }
+  .al-card-terms {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .al-card-payment {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--color-primary);
+  }
+  .al-card-interest {
+    font-size: 0.8rem;
+    color: var(--color-success, #16a34a);
+    font-weight: 500;
+  }
+
+  @media (max-width: 640px) {
+    .al-card-grid {
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+    .al-card-payment {
+      font-size: 1.1rem;
+    }
+  }
+</style>

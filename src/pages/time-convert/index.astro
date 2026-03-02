@@ -1,0 +1,153 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import { getAllTimeConversionPages, PAIRS } from '../../data/time-conversions';
+
+var allPages = getAllTimeConversionPages();
+var totalPages = allPages.length;
+
+// Determine category order from the PAIRS data
+var categoryOrder: string[] = [];
+for (var i = 0; i < PAIRS.length; i++) {
+  var cat = PAIRS[i].category;
+  if (categoryOrder.indexOf(cat) === -1) {
+    categoryOrder.push(cat);
+  }
+}
+
+// Group pages by category
+var pagesByCategory: Record<string, typeof allPages> = {};
+for (var ci = 0; ci < categoryOrder.length; ci++) {
+  pagesByCategory[categoryOrder[ci]] = [];
+}
+for (var pi = 0; pi < allPages.length; pi++) {
+  var p = allPages[pi];
+  if (pagesByCategory[p.category]) {
+    pagesByCategory[p.category].push(p);
+  }
+}
+
+// Count unique category pairs for the description
+var categoryCount = categoryOrder.length;
+
+var title = 'Time Conversions - Hours, Minutes, Seconds, Days & More | ToolCalcs';
+var description = 'Browse ' + totalPages + ' time conversion pages across ' + categoryCount + ' categories. Convert between hours, minutes, seconds, days, weeks, months, and years with formulas, tables, and calculators.';
+
+var structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://toolcalcs.com/",
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Time Conversions",
+    },
+  ],
+};
+---
+
+<BaseLayout title={title} description={description} structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <span>Time Conversions</span>
+  </nav>
+
+  <h1>Time Conversions</h1>
+  <p class="page-desc">
+    Browse {totalPages.toLocaleString('en-US')} time conversion pages across {categoryCount} categories. Convert between hours, minutes, seconds, days, weeks, months, and years.
+  </p>
+
+  <AdUnit slot="time-convert-top" format="horizontal" />
+
+  {categoryOrder.map(function(cat) {
+    var pages = pagesByCategory[cat] || [];
+    return (
+      <section class="time-section">
+        <h2>{cat} Conversions</h2>
+        <div class="pill-grid">
+          {pages.map(function(pg) {
+            return (
+              <a href={'/time-convert/' + pg.slug + '/'} class="pill-link">
+                {pg.value} {pg.fromPlural.toLowerCase()} &rarr; {pg.resultDisplay} {pg.toPlural.toLowerCase()}
+              </a>
+            );
+          })}
+        </div>
+      </section>
+    );
+  })}
+
+  <article class="content-section">
+    <h2>About Our Time Conversions</h2>
+    <p>
+      Time is one of the most fundamental measurements in daily life, science, and business. Unlike the metric system for length and weight, time units are not based on powers of ten. Instead, they follow historical conventions rooted in astronomy and the ancient Babylonian base-60 number system. A minute has 60 seconds, an hour has 60 minutes, a day has 24 hours, and a week has 7 days. Months vary between 28 and 31 days, and a year averages 365.25 days when accounting for leap years.
+    </p>
+    <p>
+      These irregular relationships make time conversions less intuitive than metric conversions. You cannot simply move a decimal point to convert between hours and minutes the way you would between meters and kilometers. That is why having a reliable reference for time conversions is so valuable. Each of our {totalPages.toLocaleString('en-US')} conversion pages provides the exact result, the formula used, a reference table of nearby values, and an interactive converter for custom amounts.
+    </p>
+    <p>
+      Our time conversion pages cover the most commonly searched conversions across {categoryCount} categories: hours and minutes, minutes and seconds, hours and seconds, days and hours, weeks and days, weeks and hours, months and days, months and weeks, years and days, years and months, years and weeks, and years and hours. Whether you are calculating payroll hours, planning a project timeline, tracking a fitness goal, or helping with homework, you will find the conversion you need.
+    </p>
+    <p>
+      All conversions use standard, universally accepted values. For months and years, where the exact number of days varies, we use the commonly accepted averages: 30.4375 days per month (365.25 divided by 12) and 365.25 days per year (accounting for leap years). These averages are the same ones used by financial institutions, software systems, and scientific calculations worldwide.
+    </p>
+  </article>
+
+  <AdUnit slot="time-convert-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  /* Time Section */
+  .time-section {
+    margin-bottom: 40px;
+  }
+  .time-section h2 {
+    font-size: 1.3rem;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--color-border);
+  }
+
+  /* Pill Grid */
+  .pill-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* Pill Link */
+  .pill-link {
+    display: inline-block;
+    font-size: 0.82rem;
+    padding: 6px 14px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 100px;
+    color: var(--color-text);
+    text-decoration: none;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .pill-link:hover {
+    background: #eff6ff;
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .pill-grid {
+      gap: 6px;
+    }
+    .pill-link {
+      font-size: 0.78rem;
+      padding: 5px 10px;
+    }
+  }
+</style>
