@@ -1,0 +1,350 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Financial Calculators",
+        "item": "https://toolcalcs.com/financial-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "FIRE Calculator"
+      }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is the FIRE number?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Your FIRE number is the amount of money you need to have invested so that the returns cover your annual living expenses indefinitely. It is calculated by multiplying your annual expenses by 25, which is the inverse of the 4% safe withdrawal rate. For example, if you spend $40,000 per year, your FIRE number is $1,000,000. Once your investment portfolio reaches this number, you can theoretically retire and live off withdrawals without depleting your savings.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How is the 4% rule calculated?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The 4% rule comes from the Trinity Study, a 1998 academic research paper that analyzed historical stock and bond market returns from 1926 to 1995. The study found that a retiree who withdraws 4% of their portfolio in the first year of retirement and adjusts that amount for inflation each subsequent year has a very high probability (approximately 95%) of not running out of money over a 30-year retirement period, assuming a diversified portfolio of stocks and bonds.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How do I calculate years to FIRE?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Years to FIRE is calculated using a compound growth formula that accounts for your current savings, annual contributions, and expected investment returns adjusted for inflation. Starting with your current savings balance, the formula compounds growth each year by applying the real rate of return (nominal return minus inflation) and adding your annual savings. The number of years it takes for this growing balance to reach your FIRE number is your years to FIRE.',
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="FIRE Calculator - Financial Independence Retire Early | ToolCalcs"
+  description="Free FIRE calculator. Calculate your FIRE number, years to financial independence, savings rate, and see a year-by-year projection to retirement."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/financial-calculators/">Financial Calculators</a> &rsaquo;
+    <span>FIRE Calculator</span>
+  </nav>
+
+  <AdUnit slot="fire-top" format="horizontal" />
+
+  <h1>FIRE Calculator</h1>
+  <p class="page-desc">Calculate your FIRE number, estimate how many years until financial independence, and see a detailed year-by-year projection of your path to early retirement.</p>
+
+  <!-- Calculator Tool -->
+  <div class="calculator-box">
+    <div class="input-grid">
+      <div class="input-group">
+        <label for="currentSavings">Current Savings ($)</label>
+        <input type="number" id="currentSavings" value="50000" min="0" step="1000" />
+      </div>
+      <div class="input-group">
+        <label for="annualIncome">Annual Income ($)</label>
+        <input type="number" id="annualIncome" value="75000" min="0" step="1000" />
+      </div>
+      <div class="input-group">
+        <label for="annualExpenses">Annual Expenses ($)</label>
+        <input type="number" id="annualExpenses" value="45000" min="0" step="1000" />
+      </div>
+      <div class="input-group">
+        <label for="returnRate">Annual Investment Return (%)</label>
+        <input type="number" id="returnRate" value="7" min="0" max="30" step="0.1" />
+      </div>
+      <div class="input-group">
+        <label for="withdrawalRate">Withdrawal Rate (%)</label>
+        <input type="number" id="withdrawalRate" value="4" min="1" max="10" step="0.1" />
+      </div>
+      <div class="input-group">
+        <label for="inflationRate">Annual Inflation (%)</label>
+        <input type="number" id="inflationRate" value="3" min="0" max="15" step="0.1" />
+      </div>
+    </div>
+    <button class="calc-btn" id="calcBtn">Calculate</button>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">FIRE Number</span>
+          <span class="result-value" id="fireNumber">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Years to FIRE</span>
+          <span class="result-value" id="yearsToFire">0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Monthly Savings Needed</span>
+          <span class="result-value" id="monthlySavings">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Savings Rate</span>
+          <span class="result-value" id="savingsRate">0%</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Annual Savings</span>
+          <span class="result-value" id="annualSavingsResult">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Real Return Rate</span>
+          <span class="result-value" id="realReturnRate">0%</span>
+        </div>
+      </div>
+
+      <div class="projection-table">
+        <h3>FIRE Projection</h3>
+        <div class="table-container">
+          <table id="projectionTable">
+            <thead>
+              <tr>
+                <th>Year</th>
+                <th>Savings Start</th>
+                <th>Annual Contribution</th>
+                <th>Investment Growth</th>
+                <th>Savings End</th>
+                <th>Progress to FIRE</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="fire-mid" format="rectangle" />
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>What is FIRE (Financial Independence, Retire Early)?</h2>
+    <p>FIRE stands for Financial Independence, Retire Early, a movement and lifestyle strategy built on the idea that aggressive saving and investing during your working years can allow you to retire far earlier than the traditional age of 65. At its core, FIRE is about accumulating enough wealth so that the passive income generated by your investments can cover all of your living expenses indefinitely, freeing you from the obligation to work for money.</p>
+    <p>The FIRE movement gained mainstream attention in the 2010s, though its principles are rooted in decades of personal finance wisdom. Followers typically aim to save 50% or more of their income, invest heavily in low-cost index funds, and minimize unnecessary expenses. The goal is not necessarily to stop working entirely, but rather to reach a point where work becomes optional. Many people who achieve FIRE continue to work on passion projects, start businesses, volunteer, or pursue creative endeavors without the pressure of needing a paycheck.</p>
+    <p>There are several variations of FIRE, each reflecting different lifestyle preferences and risk tolerances:</p>
+    <ul>
+      <li><strong>Lean FIRE:</strong> Achieving financial independence with a minimalist lifestyle and lower annual expenses, typically under $40,000 per year. Lean FIRE requires a smaller portfolio but demands a frugal lifestyle in retirement.</li>
+      <li><strong>Fat FIRE:</strong> Reaching financial independence with a larger portfolio that supports a more comfortable or even luxurious lifestyle, typically requiring annual expenses above $75,000 to $100,000. Fat FIRE requires significantly more savings but provides greater financial cushion.</li>
+      <li><strong>Barista FIRE:</strong> A hybrid approach where you accumulate enough savings to cover most of your expenses but continue working part-time or in a lower-stress job to cover the gap and potentially maintain health insurance benefits.</li>
+      <li><strong>Coast FIRE:</strong> Reaching a point where your existing investments, if left untouched, will grow to support your retirement at a traditional age through compound growth alone. Once you reach Coast FIRE, you only need to earn enough to cover current living expenses without saving additional money.</li>
+    </ul>
+    <p>Regardless of which version you pursue, the FIRE movement emphasizes intentional living, conscious spending, and taking control of your financial future rather than following the default path of working until your mid-sixties.</p>
+
+    <h2>The 4% Rule Explained</h2>
+    <p>The 4% rule is the cornerstone of FIRE planning. It originates from the <strong>Trinity Study</strong>, formally known as "Retirement Savings: Choosing a Withdrawal Rate That Is Sustainable," published in 1998 by three professors at Trinity University. The study analyzed rolling 15-year to 30-year periods of historical U.S. stock and bond market returns from 1926 through 1995 and examined what withdrawal rate a retiree could sustain without exhausting their portfolio.</p>
+    <p>The key finding was that a 4% initial withdrawal rate, adjusted annually for inflation, had an approximately 95% success rate over 30-year retirement periods when the portfolio was allocated 50% to 75% in stocks and the remainder in bonds. This means that in the vast majority of historical scenarios, a retiree following this strategy would not run out of money within 30 years.</p>
+    <p>The inverse of the 4% rule gives us the multiplier: 1 / 0.04 = 25. This is why your FIRE number equals 25 times your annual expenses. If you spend $50,000 per year, you need $1,250,000 invested. If you withdraw 4% of $1,250,000 in your first year, you get $50,000, exactly enough to cover your expenses.</p>
+    <p>However, the 4% rule has important limitations. It was designed for a 30-year retirement, which may be insufficient for someone retiring at age 35 or 40 who may need their portfolio to last 50 or 60 years. Critics also note that the study used U.S. market data during a period of exceptional returns, and future returns may be lower. Some financial planners recommend a more conservative 3% to 3.5% withdrawal rate for early retirees, while others argue that the 4% rule is overly conservative because most retirees can adjust their spending in bad market years. The withdrawal rate you choose should reflect your personal risk tolerance, retirement timeline, and flexibility in adjusting expenses.</p>
+
+    <h2>How to Calculate Your FIRE Number</h2>
+    <p>Calculating your FIRE number is straightforward once you know your annual expenses and your chosen withdrawal rate. The formula is:</p>
+    <div class="formula-box">
+      <code>FIRE Number = Annual Expenses / Withdrawal Rate</code>
+    </div>
+    <p>For example, if your annual expenses are $45,000 and you plan to use the standard 4% withdrawal rate, your FIRE number is $45,000 / 0.04 = <strong>$1,125,000</strong>. If you prefer a more conservative 3.5% withdrawal rate, your FIRE number increases to $45,000 / 0.035 = <strong>$1,285,714</strong>.</p>
+    <p>The next step is calculating how many years it will take to reach your FIRE number. This depends on three factors: your current savings, how much you save each year, and your real rate of return (investment returns minus inflation). Starting with your current savings, each year your balance grows by the real return rate and you add your annual savings. The number of years until this growing balance reaches your FIRE number is your estimated time to financial independence. This calculator performs this projection automatically, accounting for compounding returns and inflation-adjusted growth.</p>
+
+    <h2>Strategies to Reach FIRE Faster</h2>
+    <p>The timeline to FIRE is determined almost entirely by your <strong>savings rate</strong>, which is the percentage of your income that you save and invest. Someone saving 10% of their income will take decades longer to reach FIRE than someone saving 50% or more. Here are the most effective strategies for accelerating your FIRE journey:</p>
+    <ul>
+      <li><strong>Increase your income:</strong> Negotiating raises, switching jobs for higher pay, developing high-value skills, and pursuing promotions all increase the gap between what you earn and what you spend. Every additional dollar earned is a dollar that can be directed toward investments.</li>
+      <li><strong>Reduce your expenses:</strong> Cutting expenses has a double benefit for FIRE. It increases the amount you save each month and simultaneously lowers your FIRE number because you need less money to sustain a lower-cost lifestyle. Focus on the big three expenses: housing, transportation, and food, which typically account for 60% to 70% of most budgets.</li>
+      <li><strong>Optimize your investments:</strong> Invest in low-cost, diversified index funds that capture broad market returns while minimizing fees. A difference of just 1% in annual fees can reduce your portfolio by hundreds of thousands of dollars over a 20-year accumulation period. Maximize tax-advantaged accounts like 401(k) plans, IRAs, and HSAs before investing in taxable accounts.</li>
+      <li><strong>Build side income:</strong> Freelancing, consulting, rental income, dividend investing, and building online businesses can all generate additional cash flow to accelerate your savings rate. Side income is especially powerful when it can be directed entirely toward investments rather than expenses.</li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>What is the FIRE number?</h3>
+    <p>Your FIRE number is the total amount of money you need to have saved and invested to achieve financial independence. It is calculated by dividing your annual living expenses by your planned safe withdrawal rate. Using the standard 4% rule, this means multiplying your annual expenses by 25. For example, if you spend $40,000 per year, your FIRE number is $1,000,000. If you spend $60,000 per year, it is $1,500,000. Once your portfolio reaches this number, you can theoretically withdraw enough each year to cover your expenses without ever depleting your principal, because investment growth replaces what you withdraw. The exact number depends on your lifestyle, risk tolerance, and how conservative you want to be with your withdrawal rate.</p>
+
+    <h3>How is the 4% rule calculated?</h3>
+    <p>The 4% rule was derived from the Trinity Study, which analyzed historical U.S. stock and bond market data spanning from 1926 to 1995. Researchers tested various withdrawal rates across rolling 30-year periods to determine the highest rate at which a retiree could withdraw funds each year, adjusted for inflation, without exhausting their portfolio. They found that 4% was the highest sustainable withdrawal rate with a roughly 95% success rate across all historical periods. The rule works by withdrawing 4% of your total portfolio value in the first year of retirement, then adjusting that dollar amount upward each subsequent year to account for inflation. For early retirees planning retirements longer than 30 years, many advisors suggest using a slightly lower withdrawal rate of 3% to 3.5% for additional safety.</p>
+
+    <h3>How do I calculate years to FIRE?</h3>
+    <p>Years to FIRE is calculated using a compound growth simulation that starts with your current savings, adds your annual contributions (income minus expenses), and applies your expected real rate of return (nominal investment return minus inflation) each year. The formula iterates year by year: each year your balance is multiplied by (1 + real return rate) and then your annual savings are added. The process continues until the balance reaches or exceeds your FIRE number. If your current savings already exceed your FIRE number, years to FIRE is zero. If your annual savings are zero or negative, you cannot reach FIRE through saving alone, and the result is shown as infinite. You can accelerate your timeline by increasing your savings rate, earning higher investment returns, or reducing your expenses, which simultaneously lowers the FIRE target.</p>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/financial-calculators/compound-interest-calculator/">Compound Interest Calculator</a> - See how your investments grow over time with the power of compounding.</li>
+      <li><a href="/financial-calculators/401k-calculator/">401(k) Calculator</a> - Estimate your 401(k) balance at retirement with employer matching.</li>
+      <li><a href="/salary/">Salary Calculator</a> - Convert between hourly, weekly, biweekly, monthly, and annual pay.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="fire-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 640px) {
+    .input-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .projection-table {
+    margin-top: 16px;
+    overflow-x: auto;
+  }
+  .projection-table h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 12px 0;
+  }
+  .table-container {
+    overflow-x: auto;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  :global(th), :global(td) {
+    padding: 8px 12px;
+    text-align: right;
+    border-bottom: 1px solid var(--color-border);
+  }
+  :global(th) {
+    text-align: right;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  :global(th:first-child), :global(td:first-child) { text-align: left; }
+  :global(tr:hover td) { background: var(--color-bg); }
+  .formula-box {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin: 12px 0;
+    text-align: center;
+    font-size: 1.1rem;
+  }
+</style>
+
+<script>
+  function formatCurrency(n) {
+    var prefix = n < 0 ? '-$' : '$';
+    return prefix + Math.abs(Math.round(n)).toLocaleString('en-US');
+  }
+
+  function calculate() {
+    var currentSavings = parseFloat(document.getElementById('currentSavings').value) || 0;
+    var income = parseFloat(document.getElementById('annualIncome').value) || 0;
+    var expenses = parseFloat(document.getElementById('annualExpenses').value) || 0;
+    var returnRate = parseFloat(document.getElementById('returnRate').value) || 0;
+    var withdrawalRate = parseFloat(document.getElementById('withdrawalRate').value) || 4;
+    var inflationRate = parseFloat(document.getElementById('inflationRate').value) || 0;
+
+    var fireNumber = expenses / (withdrawalRate / 100);
+    var annualSavings = income - expenses;
+    var savingsRate = income > 0 ? (annualSavings / income * 100) : 0;
+    var monthlySavings = annualSavings / 12;
+    var realReturn = ((1 + returnRate / 100) / (1 + inflationRate / 100) - 1);
+
+    // Years to FIRE
+    var yearsToFire = 0;
+    var needed = fireNumber - currentSavings;
+    if (needed <= 0) {
+      yearsToFire = 0;
+    } else if (annualSavings <= 0) {
+      yearsToFire = Infinity;
+    } else {
+      var years = 0;
+      var balance = currentSavings;
+      while (balance < fireNumber && years < 100) {
+        balance = balance * (1 + realReturn) + annualSavings;
+        years++;
+      }
+      yearsToFire = years;
+    }
+
+    // Update result cards
+    document.getElementById('fireNumber').textContent = formatCurrency(fireNumber);
+    document.getElementById('yearsToFire').textContent = yearsToFire === Infinity ? 'Never' : (yearsToFire >= 100 ? '100+' : yearsToFire.toString());
+    document.getElementById('monthlySavings').textContent = formatCurrency(monthlySavings);
+    document.getElementById('savingsRate').textContent = savingsRate.toFixed(1) + '%';
+    document.getElementById('annualSavingsResult').textContent = formatCurrency(annualSavings);
+    document.getElementById('realReturnRate').textContent = (realReturn * 100).toFixed(2) + '%';
+
+    // Generate projection table
+    var tbody = document.querySelector('#projectionTable tbody');
+    var rows = '';
+    var projBalance = currentSavings;
+    var maxYears = yearsToFire === Infinity ? 10 : Math.min(yearsToFire, 10);
+    if (maxYears === 0) maxYears = 1;
+
+    for (var y = 1; y <= maxYears; y++) {
+      var startBalance = projBalance;
+      var growth = projBalance * realReturn;
+      var contribution = annualSavings;
+      projBalance = projBalance * (1 + realReturn) + annualSavings;
+      var progress = fireNumber > 0 ? Math.min((projBalance / fireNumber) * 100, 100) : 0;
+
+      rows += '<tr>';
+      rows += '<td>' + y + '</td>';
+      rows += '<td>' + formatCurrency(startBalance) + '</td>';
+      rows += '<td>' + formatCurrency(contribution) + '</td>';
+      rows += '<td>' + formatCurrency(growth) + '</td>';
+      rows += '<td>' + formatCurrency(projBalance) + '</td>';
+      rows += '<td>' + progress.toFixed(1) + '%</td>';
+      rows += '</tr>';
+    }
+
+    tbody.innerHTML = rows;
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+
+  // Auto-calculate on load
+  calculate();
+</script>

@@ -55,8 +55,8 @@ export function getBreakdown(num: number): { symbol: string; value: number }[] {
 
 // Numbers to generate pages for
 const targetNumbers: number[] = [
-  // 1-100
-  ...Array.from({ length: 100 }, (_, i) => i + 1),
+  // 1-500
+  ...Array.from({ length: 500 }, (_, i) => i + 1),
   // 1900-2030
   ...Array.from({ length: 131 }, (_, i) => 1900 + i),
 ];

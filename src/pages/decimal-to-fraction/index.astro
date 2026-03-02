@@ -1,0 +1,156 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getAllDecimalToFractionPages } from '../../data/decimal-to-fraction';
+import '../../styles/category.css';
+
+const allPages = getAllDecimalToFractionPages();
+
+// Group by category
+const categoryOrder = [
+  'halves', 'thirds', 'quarters', 'fifths', 'sixths', 'sevenths',
+  'eighths', 'ninths', 'tenths', 'hundredths', 'thousandths', 'over-one',
+];
+
+const categoryLabels: Record<string, string> = {
+  'halves': 'Halves',
+  'thirds': 'Thirds',
+  'quarters': 'Quarters',
+  'fifths': 'Fifths',
+  'sixths': 'Sixths',
+  'sevenths': 'Sevenths',
+  'eighths': 'Eighths',
+  'ninths': 'Ninths',
+  'tenths': 'Tenths',
+  'hundredths': 'Hundredths',
+  'thousandths': 'Thousandths',
+  'over-one': 'Mixed Numbers (Over 1)',
+};
+
+const categoryDescriptions: Record<string, string> = {
+  'halves': 'Decimals that convert to fractions with a denominator of 2.',
+  'thirds': 'Repeating decimals that convert to fractions with a denominator of 3.',
+  'quarters': 'Decimals that convert to fractions with a denominator of 4.',
+  'fifths': 'Decimals that convert to fractions with a denominator of 5.',
+  'sixths': 'Repeating decimals that convert to fractions with a denominator of 6.',
+  'sevenths': 'Repeating decimals that convert to fractions with a denominator of 7.',
+  'eighths': 'Decimals that convert to fractions with a denominator of 8.',
+  'ninths': 'Repeating decimals that convert to fractions with a denominator of 9.',
+  'tenths': 'Decimals that convert to fractions with a denominator of 10.',
+  'hundredths': 'Two-digit decimals that convert to fractions with a denominator of 100 or less.',
+  'thousandths': 'Three-digit decimals that convert to fractions with a denominator of 1000 or less.',
+  'over-one': 'Decimals greater than 1 that convert to improper fractions or mixed numbers.',
+};
+
+const groups = new Map<string, typeof allPages>();
+for (const cat of categoryOrder) {
+  groups.set(cat, []);
+}
+for (const page of allPages) {
+  const list = groups.get(page.category);
+  if (list) {
+    list.push(page);
+  }
+}
+
+const sortedGroups = categoryOrder
+  .map((cat) => ({ key: cat, pages: groups.get(cat) || [] }))
+  .filter((g) => g.pages.length > 0);
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Decimal to Fraction" },
+  ],
+};
+---
+
+<BaseLayout
+  title="Decimal to Fraction Conversion Chart - All Common Decimals | ToolCalcs"
+  description={`Convert ${allPages.length} common decimals to fractions. Browse decimals organized by category: halves, thirds, quarters, fifths, eighths, and more. Each entry shows the simplified fraction, mixed number, and percentage.`}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <span>Decimal to Fraction</span>
+  </nav>
+
+  <h1>Decimal to Fraction Conversion Chart</h1>
+  <p class="page-desc">Browse {allPages.length} common decimal-to-fraction conversions organized by category. Select any decimal to see the full step-by-step conversion, simplified fraction, and interactive converter.</p>
+
+  <AdUnit slot="dec-frac-idx-top" format="horizontal" />
+
+  {sortedGroups.map((group) => (
+    <section class="factors-section">
+      <h2 class="factors-heading">{categoryLabels[group.key] || group.key}</h2>
+      <p class="section-desc">{categoryDescriptions[group.key] || ''}</p>
+      <div class="number-grid">
+        {group.pages.map((p) => (
+          <a href={`/decimal-to-fraction/${p.slug}/`} class="number-card">
+            <span class="number-val">{p.displayDecimal}</span>
+            <span class="number-count">{p.simplifiedNum}/{p.simplifiedDen}</span>
+          </a>
+        ))}
+      </div>
+    </section>
+  ))}
+
+  <AdUnit slot="dec-frac-idx-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .factors-section {
+    margin-bottom: 32px;
+  }
+  .factors-heading {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--color-border);
+  }
+  .section-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 14px;
+  }
+  .number-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+  }
+  .number-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 14px 10px;
+    background: var(--color-bg-alt);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--color-text);
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .number-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+  }
+  .number-val {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--color-primary);
+  }
+  .number-count {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+
+  @media (max-width: 640px) {
+    .number-grid {
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    }
+  }
+</style>

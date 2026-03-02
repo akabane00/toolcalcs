@@ -1,0 +1,340 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Financial Calculators", "item": "https://toolcalcs.com/financial-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Estate Tax Calculator" },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the federal estate tax exemption for 2024?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The federal estate tax exemption for 2024 is $13.61 million per individual. Married couples can effectively shield up to $27.22 million through portability, which allows a surviving spouse to use the deceased spouse's unused exemption. The exemption is indexed to inflation and adjusts annually. Estates valued below the exemption amount owe no federal estate tax.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "How is estate tax calculated?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Estate tax is calculated by first determining the gross estate (total value of all assets including life insurance, real estate, investments, and retirement accounts). Then allowable deductions (debts, funeral expenses, charitable donations, marital deductions) are subtracted to arrive at the taxable estate. Federal estate tax rates are graduated from 18% to 40%, applied to the amount exceeding the exemption threshold.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "Which states have their own estate or inheritance taxes?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "As of 2024, twelve states and Washington D.C. levy estate taxes: Connecticut, Hawaii, Illinois, Maine, Maryland, Massachusetts, Minnesota, New York, Oregon, Rhode Island, Vermont, and Washington. Six states impose inheritance taxes: Iowa, Kentucky, Maryland, Nebraska, New Jersey, and Pennsylvania. Maryland is the only state with both an estate tax and an inheritance tax. State exemption thresholds are often much lower than the federal exemption.",
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Estate Tax Calculator - Federal & State Estate Tax Estimator | ToolCalcs"
+  description="Free estate tax calculator to estimate federal and state estate taxes. Calculate taxable estate, exemptions, graduated tax rates, and effective tax rate for estate planning."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/financial-calculators/">Financial Calculators</a> &rsaquo;
+    <span>Estate Tax Calculator</span>
+  </nav>
+
+  <h1>Estate Tax Calculator</h1>
+  <p class="page-desc">Estimate federal and state estate taxes with graduated rates, exemptions, and deductions.</p>
+
+  <AdUnit slot="estate-top" format="horizontal" />
+
+  <!-- Calculator -->
+  <div class="calculator-box">
+    <div class="input-grid">
+      <div class="input-group">
+        <label for="estateValue">Total Estate Value ($)</label>
+        <input type="number" id="estateValue" value="15000000" min="0" step="10000" />
+      </div>
+      <div class="input-group">
+        <label for="filingStatus">Filing Status</label>
+        <select id="filingStatus">
+          <option value="single">Single / Individual</option>
+          <option value="married">Married (Portability Used)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="lifeInsurance">Life Insurance Proceeds ($)</label>
+        <input type="number" id="lifeInsurance" value="0" min="0" step="1000" />
+      </div>
+      <div class="input-group">
+        <label for="charitable">Charitable Donations ($)</label>
+        <input type="number" id="charitable" value="0" min="0" step="1000" />
+      </div>
+      <div class="input-group">
+        <label for="debts">Debts & Expenses ($)</label>
+        <input type="number" id="debts" value="0" min="0" step="1000" />
+      </div>
+      <div class="input-group">
+        <label for="stateSelect">State</label>
+        <select id="stateSelect">
+          <option value="none">No State Estate Tax</option>
+          <option value="CT">Connecticut</option>
+          <option value="DC">Washington D.C.</option>
+          <option value="HI">Hawaii</option>
+          <option value="IL">Illinois</option>
+          <option value="MA">Massachusetts</option>
+          <option value="MD">Maryland</option>
+          <option value="ME">Maine</option>
+          <option value="MN">Minnesota</option>
+          <option value="NY">New York</option>
+          <option value="OR">Oregon</option>
+          <option value="RI">Rhode Island</option>
+          <option value="VT">Vermont</option>
+          <option value="WA">Washington</option>
+        </select>
+      </div>
+    </div>
+    <button class="calc-btn" id="calcBtn">Calculate Estate Tax</button>
+
+    <div class="result-cards" id="resultCards" style="display:none;">
+      <div class="result-card primary">
+        <span class="result-label">Gross Estate</span>
+        <span class="result-value" id="resGross">—</span>
+      </div>
+      <div class="result-card primary">
+        <span class="result-label">Taxable Estate</span>
+        <span class="result-value" id="resTaxable">—</span>
+      </div>
+      <div class="result-card">
+        <span class="result-label">Federal Estate Tax</span>
+        <span class="result-value" id="resFederal">—</span>
+      </div>
+      <div class="result-card">
+        <span class="result-label">State Estate Tax</span>
+        <span class="result-value" id="resState">—</span>
+      </div>
+      <div class="result-card">
+        <span class="result-label">Total Tax</span>
+        <span class="result-value" id="resTotal">—</span>
+      </div>
+      <div class="result-card">
+        <span class="result-label">Effective Tax Rate</span>
+        <span class="result-value" id="resRate">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tax Bracket Breakdown -->
+  <h2 class="section-heading">Federal Estate Tax Bracket Breakdown</h2>
+  <div class="calculator-box">
+    <div id="bracketTable"></div>
+  </div>
+
+  <AdUnit slot="estate-mid" format="rectangle" />
+
+  <!-- Educational Content -->
+  <article class="content-section">
+    <h2>Understanding the Federal Estate Tax</h2>
+    <p>
+      The federal estate tax is a tax on the transfer of property upon a person's passing. It applies to the total value of the estate, including real estate, investments, business interests, retirement accounts, life insurance proceeds, and personal property. The tax is paid by the estate itself before assets are distributed to beneficiaries.
+    </p>
+    <p>
+      The estate tax exemption has changed significantly over the years. The Tax Cuts and Jobs Act of 2017 roughly doubled the exemption to its current level. For 2024, the individual exemption is $13.61 million, adjusted annually for inflation. Married couples can effectively double this amount through a provision called portability, which allows a surviving spouse to claim the deceased spouse's unused exemption.
+    </p>
+    <p>
+      It is important to note that the current elevated exemption is scheduled to sunset at the end of 2025 unless Congress acts. If the provision expires, the exemption would revert to approximately $6 to $7 million per individual, adjusted for inflation. This potential change makes estate planning particularly important for individuals with estates above that threshold.
+    </p>
+
+    <h2>How Estate Tax Is Calculated</h2>
+    <p>
+      Estate tax calculation begins with determining the gross estate, which includes all assets owned or controlled by the deceased at the time of passing. This includes real property, bank accounts, stocks and bonds, business interests, retirement accounts, life insurance proceeds from policies owned by the deceased, and certain transfers made within three years of passing.
+    </p>
+    <p>
+      From the gross estate, allowable deductions are subtracted. These include outstanding debts, funeral expenses, administrative costs, and the marital deduction for assets passing to a surviving spouse. Charitable bequests are also fully deductible. The result is the taxable estate.
+    </p>
+    <p>
+      Federal estate tax rates are graduated, starting at 18% on the first $10,000 of taxable estate and increasing to 40% on amounts exceeding $1 million. However, because of the unified credit (which effectively shields the exemption amount from tax), only estates exceeding the exemption threshold owe tax. The effective rate on the taxable amount above the exemption is typically close to 40%.
+    </p>
+
+    <h2>State Estate Taxes</h2>
+    <p>
+      In addition to federal estate tax, some states impose their own estate or inheritance taxes. Twelve states plus Washington D.C. have estate taxes, and six states have inheritance taxes. Maryland is unique in having both types. State estate tax exemptions are typically much lower than the federal exemption, ranging from $1 million in Oregon to matching the federal exemption in Connecticut.
+    </p>
+    <p>
+      The distinction between estate and inheritance taxes is important. An estate tax is levied on the total estate before distribution. An inheritance tax is levied on the beneficiary who receives the inheritance, and the rate often depends on the beneficiary's relationship to the deceased. Close family members typically pay lower rates or are exempt entirely, while unrelated beneficiaries may face higher rates.
+    </p>
+    <p>
+      For residents of states with estate taxes, the combined federal and state tax burden can be significant. Some states allow a credit for state taxes paid against federal liability, while others treat them as separate obligations. Consulting with an estate planning attorney in your state is essential for accurate planning.
+    </p>
+
+    <h2>Estate Planning Strategies</h2>
+    <p>
+      Several strategies can help reduce estate tax liability. The annual gift exclusion allows individuals to give up to $18,000 per recipient per year (2024) without affecting the lifetime exemption. Married couples can combine their exclusions to give $36,000 per recipient. Over many years, systematic gifting can substantially reduce the taxable estate.
+    </p>
+    <p>
+      Irrevocable life insurance trusts (ILITs) can remove life insurance proceeds from the taxable estate. Charitable remainder trusts provide income during the grantor's lifetime while benefiting a charity. Grantor retained annuity trusts (GRATs) allow transfer of appreciating assets at reduced gift tax cost. Family limited partnerships can provide valuation discounts for business interests and real estate.
+    </p>
+    <p>
+      Qualified personal residence trusts (QPRTs) allow transfer of a home to beneficiaries at a discounted value while retaining the right to live in the home for a specified period. Dynasty trusts can hold assets for multiple generations while avoiding estate tax at each generational transfer. Each strategy has specific requirements and trade-offs, making professional guidance essential.
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is the federal estate tax exemption for 2024?</h3>
+    <p>
+      The federal estate tax exemption for 2024 is $13.61 million per individual, or $27.22 million for married couples using portability. This means estates valued below the exemption amount owe no federal estate tax. The exemption is adjusted annually for inflation. Under current law, the elevated exemption is scheduled to decrease significantly after 2025 unless Congress extends the provision.
+    </p>
+
+    <h3>How is estate tax calculated?</h3>
+    <p>
+      Estate tax is calculated by determining the gross estate (all assets), subtracting allowable deductions (debts, expenses, charitable donations, marital deduction), and applying graduated tax rates from 18% to 40% on the amount exceeding the exemption. For example, a $16 million estate for a single filer in 2024 would have a taxable amount of $2.39 million ($16M minus $13.61M exemption), subject to the 40% marginal rate.
+    </p>
+
+    <h3>Which states have estate or inheritance taxes?</h3>
+    <p>
+      Twelve states and D.C. have estate taxes: Connecticut, Hawaii, Illinois, Maine, Maryland, Massachusetts, Minnesota, New York, Oregon, Rhode Island, Vermont, and Washington. Six states have inheritance taxes: Iowa, Kentucky, Maryland, Nebraska, New Jersey, and Pennsylvania. State exemptions range from $1 million (Oregon) to matching the federal exemption (Connecticut). Maryland is the only state with both types.
+    </p>
+
+    <p><a href="/financial-calculators/">&larr; All Financial Calculators</a></p>
+  </article>
+
+  <AdUnit slot="estate-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 640px) { .input-grid { grid-template-columns: 1fr; } }
+  .section-heading { font-size: 1.2rem; margin: 32px 0 12px; }
+</style>
+
+<script>
+  var estateInput = document.getElementById('estateValue');
+  var statusSelect = document.getElementById('filingStatus');
+  var lifeInput = document.getElementById('lifeInsurance');
+  var charInput = document.getElementById('charitable');
+  var debtInput = document.getElementById('debts');
+  var stateSelect = document.getElementById('stateSelect');
+  var calcBtn = document.getElementById('calcBtn');
+  var resultCards = document.getElementById('resultCards');
+
+  var SINGLE_EXEMPTION = 13610000;
+  var MARRIED_EXEMPTION = 27220000;
+
+  var brackets = [
+    { min: 0, max: 10000, rate: 0.18 },
+    { min: 10000, max: 20000, rate: 0.20 },
+    { min: 20000, max: 40000, rate: 0.22 },
+    { min: 40000, max: 60000, rate: 0.24 },
+    { min: 60000, max: 80000, rate: 0.26 },
+    { min: 80000, max: 100000, rate: 0.28 },
+    { min: 100000, max: 150000, rate: 0.30 },
+    { min: 150000, max: 250000, rate: 0.32 },
+    { min: 250000, max: 500000, rate: 0.34 },
+    { min: 500000, max: 750000, rate: 0.37 },
+    { min: 750000, max: 1000000, rate: 0.39 },
+    { min: 1000000, max: Infinity, rate: 0.40 }
+  ];
+
+  var stateTaxData = {
+    CT: { exemption: 13610000, rate: 0.12 },
+    DC: { exemption: 4710800, rate: 0.16 },
+    HI: { exemption: 5490000, rate: 0.20 },
+    IL: { exemption: 4000000, rate: 0.16 },
+    MA: { exemption: 2000000, rate: 0.16 },
+    MD: { exemption: 5000000, rate: 0.16 },
+    ME: { exemption: 6800000, rate: 0.12 },
+    MN: { exemption: 3000000, rate: 0.16 },
+    NY: { exemption: 6940000, rate: 0.16 },
+    OR: { exemption: 1000000, rate: 0.16 },
+    RI: { exemption: 1774583, rate: 0.16 },
+    VT: { exemption: 5000000, rate: 0.16 },
+    WA: { exemption: 2193000, rate: 0.20 }
+  };
+
+  function fmtMoney(n) {
+    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+
+  function calcFederalTax(taxableAmount) {
+    if (taxableAmount <= 0) return 0;
+    var tax = 0;
+    for (var i = 0; i < brackets.length; i++) {
+      var b = brackets[i];
+      if (taxableAmount <= b.min) break;
+      var upper = b.max === Infinity ? taxableAmount : Math.min(taxableAmount, b.max);
+      tax += (upper - b.min) * b.rate;
+    }
+    return Math.round(tax);
+  }
+
+  function calculate() {
+    var estateVal = parseFloat(estateInput.value) || 0;
+    var lifeIns = parseFloat(lifeInput.value) || 0;
+    var charitable = parseFloat(charInput.value) || 0;
+    var debts = parseFloat(debtInput.value) || 0;
+    var status = statusSelect.value;
+    var state = stateSelect.value;
+
+    var exemption = status === 'married' ? MARRIED_EXEMPTION : SINGLE_EXEMPTION;
+    var grossEstate = estateVal + lifeIns;
+    var taxableEstate = Math.max(0, grossEstate - exemption - charitable - debts);
+    var federalTax = calcFederalTax(taxableEstate);
+
+    var stateTax = 0;
+    if (state !== 'none' && stateTaxData[state]) {
+      var sd = stateTaxData[state];
+      var stateTaxable = Math.max(0, grossEstate - sd.exemption - charitable - debts);
+      stateTax = Math.round(stateTaxable * sd.rate);
+    }
+
+    var totalTax = federalTax + stateTax;
+    var effectiveRate = grossEstate > 0 ? (totalTax / grossEstate * 100).toFixed(2) : '0.00';
+
+    resultCards.style.display = '';
+    document.getElementById('resGross').textContent = fmtMoney(grossEstate);
+    document.getElementById('resTaxable').textContent = fmtMoney(taxableEstate);
+    document.getElementById('resFederal').textContent = fmtMoney(federalTax);
+    document.getElementById('resState').textContent = fmtMoney(stateTax);
+    document.getElementById('resTotal').textContent = fmtMoney(totalTax);
+    document.getElementById('resRate').textContent = effectiveRate + '%';
+
+    // Build bracket breakdown table
+    var html = '<table class="data-table"><thead><tr><th>Bracket</th><th>Rate</th><th>Taxable in Bracket</th><th>Tax</th></tr></thead><tbody>';
+    var remaining = taxableEstate;
+    for (var i = 0; i < brackets.length; i++) {
+      var b = brackets[i];
+      if (remaining <= 0 && taxableEstate > 0) break;
+      if (taxableEstate === 0 && i > 0) break;
+      var width = b.max === Infinity ? remaining : (b.max - b.min);
+      var inBracket = Math.max(0, Math.min(remaining, width));
+      var bracketTax = Math.round(inBracket * b.rate);
+      var maxLabel = b.max === Infinity ? '+' : fmtMoney(b.max);
+      html += '<tr><td>' + fmtMoney(b.min) + ' – ' + maxLabel + '</td>';
+      html += '<td>' + (b.rate * 100) + '%</td>';
+      html += '<td>' + fmtMoney(inBracket) + '</td>';
+      html += '<td>' + fmtMoney(bracketTax) + '</td></tr>';
+      remaining -= inBracket;
+    }
+    html += '<tr style="font-weight:700;background:#eff6ff;"><td colspan="3">Total Federal Tax</td><td>' + fmtMoney(federalTax) + '</td></tr>';
+    html += '</tbody></table>';
+    document.getElementById('bracketTable').innerHTML = html;
+  }
+
+  calcBtn.addEventListener('click', calculate);
+  calculate();
+</script>

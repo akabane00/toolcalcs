@@ -1,0 +1,166 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/category.css';
+import { getAllTemperaturePages } from '../../data/temperature-conversions';
+
+const allPages = getAllTemperaturePages();
+
+const bodyPages = allPages.filter((p) => p.category === 'body');
+const weatherPages = allPages.filter((p) => p.category === 'weather');
+const cookingPages = allPages.filter((p) => p.category === 'cooking');
+const sciencePages = allPages.filter((p) => p.category === 'science');
+
+function fmtVal(n: number): string {
+  if (n < 0) return '\u2212' + Math.abs(n).toLocaleString('en-US', { maximumFractionDigits: 2 });
+  return n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+}
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://toolcalcs.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Temperature Conversions"
+    }
+  ]
+};
+---
+
+<BaseLayout
+  title="Temperature Conversions - Fahrenheit, Celsius, Kelvin | ToolCalcs"
+  description={`Browse ${allPages.length} temperature conversions between Fahrenheit, Celsius, and Kelvin. Covers body temperature, weather, cooking, and science conversions with formulas and tables.`}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <span>Temperature Conversions</span>
+  </nav>
+
+  <h1>Temperature Conversions</h1>
+  <p class="page-desc">Browse {allPages.length} temperature conversions between Fahrenheit, Celsius, and Kelvin. Select a conversion below to see the formula, step-by-step calculation, and interactive converter.</p>
+
+  <AdUnit slot="temp-idx-top" format="horizontal" />
+
+  <section class="factors-section">
+    <h2 class="factors-heading">Body Temperature</h2>
+    <p class="section-desc">Common body temperature conversions including normal, fever, and hypothermia thresholds.</p>
+    <div class="number-grid">
+      {bodyPages.map((p) => (
+        <a href={`/temperature/${p.slug}/`} class="number-card">
+          <span class="number-val">{fmtVal(p.value)}{p.fromSymbol}</span>
+          <span class="number-count">= {p.resultRounded}{p.toSymbol}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="factors-section">
+    <h2 class="factors-heading">Weather Temperatures</h2>
+    <p class="section-desc">Common weather temperature conversions from freezing cold to extreme heat.</p>
+    <div class="number-grid">
+      {weatherPages.map((p) => (
+        <a href={`/temperature/${p.slug}/`} class="number-card">
+          <span class="number-val">{fmtVal(p.value)}{p.fromSymbol}</span>
+          <span class="number-count">= {p.resultRounded}{p.toSymbol}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <AdUnit slot="temp-idx-mid" format="rectangle" />
+
+  <section class="factors-section">
+    <h2 class="factors-heading">Cooking Temperatures</h2>
+    <p class="section-desc">Oven temperatures, food safety temps, and candy-making stages in both scales.</p>
+    <div class="number-grid">
+      {cookingPages.map((p) => (
+        <a href={`/temperature/${p.slug}/`} class="number-card">
+          <span class="number-val">{fmtVal(p.value)}{p.fromSymbol}</span>
+          <span class="number-count">= {p.resultRounded}{p.toSymbol}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="factors-section">
+    <h2 class="factors-heading">Science Temperatures</h2>
+    <p class="section-desc">Key scientific temperatures including absolute zero, phase changes, and Kelvin conversions.</p>
+    <div class="number-grid">
+      {sciencePages.map((p) => (
+        <a href={`/temperature/${p.slug}/`} class="number-card">
+          <span class="number-val">{fmtVal(p.value)}{p.fromSymbol}</span>
+          <span class="number-count">= {p.resultRounded}{p.toSymbol}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <AdUnit slot="temp-idx-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .factors-section {
+    margin-bottom: 32px;
+  }
+  .factors-heading {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--color-border);
+  }
+  .section-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 14px;
+  }
+  .number-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+  }
+  .number-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 14px 10px;
+    background: var(--color-bg-alt);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--color-text);
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .number-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+  }
+  .number-val {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--color-primary);
+  }
+  .number-count {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+
+  @media (max-width: 640px) {
+    .number-grid {
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    }
+    .number-val {
+      font-size: 0.95rem;
+    }
+  }
+</style>

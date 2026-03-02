@@ -1,0 +1,359 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+
+var defaultMonth = new Date().toISOString().slice(0, 7);
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Financial Calculators", "item": "https://toolcalcs.com/financial-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Business Loan Calculator" },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How do you calculate a business loan payment?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Business loan payments are calculated using the PMT formula: PMT = P × r(1+r)^n / ((1+r)^n - 1), where P is the loan principal, r is the monthly interest rate (annual rate divided by 12), and n is the total number of monthly payments. For example, a $250,000 loan at 7.5% annual interest over 10 years would have a monthly payment of approximately $2,966. The formula assumes fixed-rate amortization where each payment covers both interest and principal.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "What is a typical business loan interest rate?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Business loan interest rates vary significantly by loan type and lender. SBA loans typically range from 5% to 8%, traditional bank term loans from 6% to 12%, and business lines of credit from 7% to 25%. Rates depend on factors including credit score, time in business, annual revenue, collateral, and overall economic conditions. Borrowers with strong credit profiles and established businesses generally qualify for the lowest rates.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "How much can I borrow for a business loan?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The amount you can borrow for a business loan depends on several factors: annual revenue (lenders typically lend 10-30% of annual revenue), personal and business credit scores, available collateral, time in business (most lenders require at least 2 years), and the specific loan program. SBA 7(a) loans go up to $5 million, while SBA microloans cap at $50,000. Traditional bank loans can range from $25,000 to several million depending on the lender and your qualifications.",
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Business Loan Calculator - Estimate Monthly Payments & Total Cost | ToolCalcs"
+  description="Free business loan calculator to estimate monthly payments, total interest, and amortization schedules for term loans, SBA loans, equipment financing, and lines of credit."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/financial-calculators/">Financial Calculators</a> &rsaquo;
+    <span>Business Loan Calculator</span>
+  </nav>
+
+  <AdUnit slot="bizloan-top" format="horizontal" />
+
+  <h1>Business Loan Calculator</h1>
+  <p class="page-desc">Calculate monthly payments, total interest, and view a full amortization schedule for business term loans, SBA loans, equipment financing, and lines of credit.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-grid">
+        <div class="input-group">
+          <label for="loanAmount">Loan Amount ($)</label>
+          <input type="number" id="loanAmount" value="250000" min="1" step="1000" />
+        </div>
+        <div class="input-group">
+          <label for="interestRate">Annual Interest Rate (%)</label>
+          <input type="number" id="interestRate" value="7.5" min="0.1" step="0.1" />
+        </div>
+        <div class="input-group">
+          <label for="loanTerm">Loan Term (years)</label>
+          <input type="number" id="loanTerm" value="10" min="1" step="1" />
+        </div>
+        <div class="input-group">
+          <label for="loanType">Loan Type</label>
+          <select id="loanType">
+            <option value="term">Term Loan (Fixed Rate)</option>
+            <option value="sba">SBA Loan</option>
+            <option value="equipment">Equipment Financing</option>
+            <option value="loc">Line of Credit</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="startDate">Start Date</label>
+          <input type="month" id="startDate" value={defaultMonth} />
+        </div>
+        <div class="input-group">
+          <label for="extraPayment">Extra Monthly Payment ($)</label>
+          <input type="number" id="extraPayment" value="0" min="0" step="50" />
+        </div>
+      </div>
+      <button class="calc-btn" id="calcBtn">Calculate</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Monthly Payment</span>
+          <span class="result-value" id="monthlyPayment">$0.00</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Interest</span>
+          <span class="result-value" id="totalInterest">$0.00</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Cost</span>
+          <span class="result-value" id="totalCost">$0.00</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Payoff Date</span>
+          <span class="result-value" id="payoffDate">--</span>
+        </div>
+        <div class="result-card success">
+          <span class="result-label">Interest Savings</span>
+          <span class="result-value" id="interestSavings">$0.00</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Effective APR</span>
+          <span class="result-value" id="effectiveAPR">0.00%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="amort-section" id="amortTable">
+      <table class="data-table">
+        <thead><tr><th>Period</th><th>Payment</th><th>Principal</th><th>Interest</th><th>Balance</th></tr></thead>
+        <tbody id="amortBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <AdUnit slot="bizloan-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>Understanding Business Loans</h2>
+    <p>Business loans are financial products designed to help companies fund operations, expansion, equipment purchases, and other capital needs. Choosing the right loan type is critical because each product carries different terms, rates, repayment structures, and eligibility requirements. Understanding the landscape of business lending allows you to make informed decisions that align with your company's financial goals and cash flow capabilities.</p>
+    <p><strong>Term loans</strong> are the most traditional form of business financing. A lender provides a lump sum that is repaid over a fixed period with regular monthly payments at a fixed or variable interest rate. Terms typically range from one to ten years, with longer terms available for larger loans secured by real estate or major equipment. Term loans are ideal for one-time investments such as purchasing a building, funding a major expansion, or consolidating existing debt into a single predictable payment.</p>
+    <p><strong>SBA loans</strong> are partially guaranteed by the U.S. Small Business Administration, which reduces risk for lenders and enables them to offer more favorable terms. SBA loans generally feature lower interest rates, longer repayment periods, and smaller down payment requirements compared to conventional loans. However, the application process is more rigorous and approval can take several weeks to months. SBA loans are well-suited for established small businesses that need significant capital at competitive rates and can tolerate a longer approval timeline.</p>
+    <p><strong>Equipment financing</strong> uses the purchased equipment itself as collateral, which often results in easier approval and competitive rates. The loan term is typically matched to the expected useful life of the equipment, and the lender retains a lien until the loan is fully repaid. This option is best when you need to acquire specific machinery, vehicles, technology systems, or other tangible assets that maintain resale value.</p>
+    <p><strong>Lines of credit</strong> provide flexible, revolving access to funds up to a predetermined limit. You draw funds as needed and pay interest only on the amount borrowed. Lines of credit are ideal for managing cash flow fluctuations, covering seasonal inventory purchases, or handling unexpected expenses. Unlike a term loan, you can borrow, repay, and borrow again without reapplying, making it a versatile tool for ongoing working capital needs.</p>
+
+    <h2>How Business Loan Payments Are Calculated</h2>
+    <p>Most business term loans use an amortization schedule based on the standard payment formula:</p>
+    <div class="formula-box">
+      <code>PMT = P &times; r(1 + r)<sup>n</sup> / ((1 + r)<sup>n</sup> - 1)</code>
+    </div>
+    <p>In this formula, P represents the loan principal (the amount borrowed), r is the monthly interest rate (the annual rate divided by 12), and n is the total number of monthly payments. The formula produces a fixed monthly payment amount that covers both principal and interest over the life of the loan. In the early months, a larger portion of each payment goes toward interest, while in later months more goes toward reducing the principal balance. This gradual shift is the essence of amortization.</p>
+    <p>For example, a $250,000 loan at 7.5% annual interest over 10 years (120 months) would have a monthly rate of 0.625% and a monthly payment of approximately $2,966. Over the full term, you would pay roughly $105,920 in total interest, making the total cost of the loan about $355,920. Understanding this breakdown helps you evaluate whether the cost of borrowing is justified by the return your business expects to generate from the borrowed funds.</p>
+    <p>Fixed-rate loans maintain the same payment throughout the term, providing predictability for budgeting. Variable-rate loans adjust periodically based on a benchmark rate such as the prime rate, which means your payment can increase or decrease over time. While variable rates often start lower than fixed rates, they carry the risk of rising costs if market rates increase significantly.</p>
+
+    <h2>SBA Loan Programs</h2>
+    <p>The Small Business Administration offers several loan programs, each targeting specific business needs. Understanding the differences helps you select the right program and prepare the appropriate documentation.</p>
+    <p>The <strong>SBA 7(a) loan program</strong> is the most popular and versatile option, with a maximum loan amount of $5 million. Funds can be used for working capital, equipment purchases, real estate, debt refinancing, and business acquisitions. Interest rates are negotiated between the borrower and lender but are capped by the SBA. Repayment terms extend up to 10 years for working capital, 10 years for equipment, and 25 years for real estate. The SBA guarantees up to 85% of loans of $150,000 or less and 75% of larger loans, which significantly reduces lender risk.</p>
+    <p>The <strong>SBA 504 loan program</strong> is specifically designed for major fixed-asset purchases such as commercial real estate and large equipment. These loans are structured with a conventional lender providing 50% of the project cost, a Certified Development Company (CDC) providing up to 40% backed by an SBA guarantee, and the borrower contributing at least 10% as a down payment. Loan amounts can reach $5.5 million, with terms of 10, 20, or 25 years. The 504 program typically offers below-market fixed interest rates, making it an attractive option for real estate and major capital investments.</p>
+    <p>The <strong>SBA Microloan program</strong> provides smaller loans up to $50,000 to help small businesses and certain nonprofit childcare centers start up and expand. Microloans are administered through nonprofit community-based intermediary lenders, which also provide business training and technical assistance. The average microloan is approximately $13,000, with a maximum repayment term of six years. This program is particularly valuable for startups and early-stage businesses that may not qualify for larger loan programs.</p>
+    <p>Eligibility for SBA loans generally requires operating as a for-profit business in the United States, meeting the SBA's size standards for your industry, demonstrating the ability to repay the loan from business cash flow, and having invested your own time and money in the business. Lenders also evaluate personal credit scores (typically 680 or higher), business financials, and collateral availability.</p>
+
+    <h2>Tips for Getting the Best Business Loan Rate</h2>
+    <p>Securing the lowest possible interest rate can save your business thousands or even tens of thousands of dollars over the life of a loan. Several strategies can improve your chances of qualifying for favorable terms.</p>
+    <p><strong>Strengthen your credit profile</strong> before applying. Both personal and business credit scores influence loan terms. Pay down existing debts, correct any errors on your credit reports, and avoid opening new credit accounts in the months before applying. A personal credit score above 700 and a strong business credit profile significantly improve your negotiating position.</p>
+    <p><strong>Prepare thorough financial documentation</strong> including at least two years of tax returns, current profit and loss statements, balance sheets, cash flow projections, and a detailed business plan. Lenders want to see that your business generates sufficient revenue and cash flow to comfortably cover loan payments. The more organized and transparent your financials, the more confidence a lender will have in your ability to repay.</p>
+    <p><strong>Compare multiple lenders</strong> before committing to any offer. Banks, credit unions, online lenders, and SBA-approved lenders each offer different rate structures and terms. Obtaining quotes from at least three to five lenders gives you leverage to negotiate and ensures you find the most competitive option for your specific situation. Consider working with a loan broker who can access multiple lender networks simultaneously.</p>
+    <p><strong>Offer collateral</strong> when possible. Secured loans backed by real estate, equipment, inventory, or accounts receivable typically carry lower interest rates than unsecured loans because the lender's risk is reduced. If you have valuable business or personal assets, offering them as collateral can meaningfully lower your borrowing costs.</p>
+
+    <h2>Business Loan vs. Line of Credit</h2>
+    <p>Choosing between a term loan and a line of credit depends on how you plan to use the funds and your business's cash flow patterns. Each option serves distinct financial needs, and many businesses benefit from maintaining both.</p>
+    <p>A <strong>term loan</strong> is best suited for large, one-time expenditures with a clear purpose and predictable return. Examples include purchasing commercial real estate, acquiring another business, buying major equipment, or funding a significant expansion project. Term loans provide a lump sum upfront and require fixed monthly payments over a set period. The predictable payment structure makes budgeting straightforward, and the total cost of borrowing is known from the outset.</p>
+    <p>A <strong>line of credit</strong> is ideal for managing day-to-day cash flow variability, covering seasonal revenue gaps, financing inventory purchases, or handling unexpected expenses. You only borrow what you need, when you need it, and pay interest only on the outstanding balance. Once you repay the borrowed amount, the funds become available again without reapplying. This flexibility makes lines of credit a powerful tool for working capital management, but they typically carry higher interest rates than term loans and may have annual fees or maintenance charges.</p>
+    <p>In many cases, the optimal strategy is to use a term loan for major capital investments that generate long-term returns and maintain a line of credit for short-term cash flow management. This combination provides both the stability of fixed payments and the flexibility to handle variable expenses as they arise. When evaluating your options, consider the total cost of borrowing, the urgency of funds, the repayment timeline that best matches your expected cash flows, and whether the investment will generate returns that exceed the cost of financing.</p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>How do you calculate a business loan payment?</h3>
+    <p>Business loan payments are calculated using the standard amortization formula: PMT = P &times; r(1+r)<sup>n</sup> / ((1+r)<sup>n</sup> - 1), where P is the principal loan amount, r is the monthly interest rate (annual rate divided by 12), and n is the total number of monthly payments. This formula produces a fixed monthly payment that gradually shifts from being mostly interest in the early months to mostly principal in the later months. For a $250,000 loan at 7.5% interest over 10 years, the monthly payment would be approximately $2,966, with total interest of about $105,920 over the life of the loan. SBA loans may also include guaranty fees that add to the total cost.</p>
+
+    <h3>What is a typical business loan interest rate?</h3>
+    <p>Business loan interest rates vary widely depending on the loan type, lender, and borrower qualifications. SBA loans typically carry rates between 5% and 8%, making them among the most affordable options for qualifying businesses. Traditional bank term loans generally range from 6% to 12%, with the best rates reserved for borrowers with strong credit, established businesses, and adequate collateral. Business lines of credit tend to have higher rates, typically 7% to 25%, reflecting their flexible, revolving nature. Online lenders may charge even higher rates, particularly for short-term loans or borrowers with limited credit history. Your actual rate depends on your personal credit score, business financials, time in business, industry, and the amount and type of collateral you can offer.</p>
+
+    <h3>How much can I borrow for a business loan?</h3>
+    <p>The amount you can borrow depends on several interconnected factors. Annual revenue is a primary consideration, as lenders typically approve loans amounting to 10% to 30% of your annual revenue for unsecured loans. Personal and business credit scores play a significant role, with higher scores unlocking larger loan amounts and better terms. Collateral availability can substantially increase your borrowing capacity since secured loans carry less risk for lenders. Time in business matters as well; most traditional lenders require at least two years of operating history, although SBA microloans and some online lenders work with newer businesses. Specific loan programs have their own caps: SBA 7(a) loans go up to $5 million, SBA 504 loans reach $5.5 million, and SBA microloans are limited to $50,000. Traditional bank loans can range from $25,000 to several million dollars depending on the institution and your qualifications.</p>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/financial-calculators/breakeven-calculator/">Break-Even Calculator</a> - Determine how many units you need to sell to cover all business costs.</li>
+      <li><a href="/financial-calculators/compound-interest-calculator/">Compound Interest Calculator</a> - See how investments and savings grow over time with compound interest.</li>
+      <li><a href="/financial-calculators/">All Financial Calculators</a> - Browse the full collection of financial planning tools.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="bizloan-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 640px) { .input-grid { grid-template-columns: 1fr; } }
+  .amort-section { margin-top: 24px; overflow-x: auto; }
+</style>
+
+<script>
+  function formatCurrency(n) {
+    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function formatPct(n) {
+    return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
+  }
+
+  function getMonthName(monthIndex) {
+    var names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return names[monthIndex];
+  }
+
+  function calculate() {
+    var P = parseFloat(document.getElementById('loanAmount').value);
+    var annualRate = parseFloat(document.getElementById('interestRate').value);
+    var years = parseFloat(document.getElementById('loanTerm').value);
+    var extra = parseFloat(document.getElementById('extraPayment').value) || 0;
+    var loanType = document.getElementById('loanType').value;
+    var startDateVal = document.getElementById('startDate').value;
+
+    if (isNaN(P) || isNaN(annualRate) || isNaN(years) || P <= 0 || annualRate <= 0 || years <= 0) return;
+
+    var r = annualRate / 100 / 12;
+    var n = Math.round(years * 12);
+
+    // SBA guaranty fees
+    var fees = 0;
+    if (loanType === 'sba') {
+      if (P > 1000000) fees = P * 0.035;
+      else if (P > 500000) fees = P * 0.03;
+      else if (P > 150000) fees = P * 0.02;
+    }
+
+    // Standard monthly payment (without extra)
+    var monthlyPayment = P * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+    var totalPaidStandard = monthlyPayment * n;
+    var totalInterestStandard = totalPaidStandard - P;
+
+    // Amortization with extra payments
+    var balance = P;
+    var totalPaidExtra = 0;
+    var totalInterestExtra = 0;
+    var monthsWithExtra = 0;
+    var schedule = [];
+
+    while (balance > 0.01 && monthsWithExtra < n * 2) {
+      monthsWithExtra++;
+      var interestPmt = balance * r;
+      var principalPmt = monthlyPayment - interestPmt + extra;
+      if (principalPmt > balance) {
+        principalPmt = balance;
+      }
+      var actualPayment = principalPmt + interestPmt;
+      totalPaidExtra += actualPayment;
+      totalInterestExtra += interestPmt;
+      balance = balance - principalPmt;
+      if (balance < 0.01) balance = 0;
+
+      schedule.push({
+        month: monthsWithExtra,
+        payment: actualPayment,
+        principal: principalPmt,
+        interest: interestPmt,
+        balance: balance
+      });
+    }
+
+    var interestSaved = totalInterestStandard - totalInterestExtra;
+    if (interestSaved < 0) interestSaved = 0;
+
+    // Effective APR considering fees
+    var effectiveAPR = annualRate;
+    if (fees > 0) {
+      var totalCostWithFees = totalInterestExtra + fees;
+      effectiveAPR = (totalCostWithFees / P) / (monthsWithExtra / 12) * 100;
+    }
+
+    // Payoff date
+    var payoffDate = '--';
+    if (startDateVal) {
+      var parts = startDateVal.split('-');
+      var startYear = parseInt(parts[0]);
+      var startMonth = parseInt(parts[1]) - 1;
+      var endDate = new Date(startYear, startMonth + monthsWithExtra, 1);
+      payoffDate = getMonthName(endDate.getMonth()) + ' ' + endDate.getFullYear();
+    }
+
+    // Update result cards
+    document.getElementById('monthlyPayment').textContent = formatCurrency(monthlyPayment);
+    document.getElementById('totalInterest').textContent = formatCurrency(totalInterestExtra);
+    document.getElementById('totalCost').textContent = formatCurrency(P + totalInterestExtra + fees);
+    document.getElementById('payoffDate').textContent = payoffDate;
+    document.getElementById('interestSavings').textContent = extra > 0 ? formatCurrency(interestSaved) : '$0.00';
+    document.getElementById('effectiveAPR').textContent = formatPct(effectiveAPR);
+
+    // Build amortization table
+    var tbody = document.getElementById('amortBody');
+    var rows = '';
+
+    // Monthly view for first 12 months
+    var monthLimit = Math.min(12, schedule.length);
+    for (var i = 0; i < monthLimit; i++) {
+      var s = schedule[i];
+      rows += '<tr>';
+      rows += '<td>Month ' + s.month + '</td>';
+      rows += '<td>' + formatCurrency(s.payment) + '</td>';
+      rows += '<td>' + formatCurrency(s.principal) + '</td>';
+      rows += '<td>' + formatCurrency(s.interest) + '</td>';
+      rows += '<td>' + formatCurrency(s.balance) + '</td>';
+      rows += '</tr>';
+    }
+
+    // Yearly summaries for remaining months
+    if (schedule.length > 12) {
+      var currentYear = 2;
+      var yearPayment = 0;
+      var yearPrincipal = 0;
+      var yearInterest = 0;
+      var yearEndBalance = 0;
+
+      for (var j = 12; j < schedule.length; j++) {
+        var entry = schedule[j];
+        yearPayment += entry.payment;
+        yearPrincipal += entry.principal;
+        yearInterest += entry.interest;
+        yearEndBalance = entry.balance;
+
+        if ((j + 1) % 12 === 0 || j === schedule.length - 1) {
+          rows += '<tr>';
+          rows += '<td>Year ' + currentYear + '</td>';
+          rows += '<td>' + formatCurrency(yearPayment) + '</td>';
+          rows += '<td>' + formatCurrency(yearPrincipal) + '</td>';
+          rows += '<td>' + formatCurrency(yearInterest) + '</td>';
+          rows += '<td>' + formatCurrency(yearEndBalance) + '</td>';
+          rows += '</tr>';
+          currentYear++;
+          yearPayment = 0;
+          yearPrincipal = 0;
+          yearInterest = 0;
+          yearEndBalance = 0;
+        }
+      }
+    }
+
+    tbody.innerHTML = rows;
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  calculate();
+</script>

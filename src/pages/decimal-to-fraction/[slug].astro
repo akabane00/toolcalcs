@@ -1,0 +1,482 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import '../../styles/calculator.css';
+import { getAllDecimalToFractionPages, type DecimalToFractionPage } from '../../data/decimal-to-fraction';
+
+export function getStaticPaths() {
+  return getAllDecimalToFractionPages().map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: DecimalToFractionPage };
+const {
+  decimal, displayDecimal, numerator, denominator,
+  simplifiedNum, simplifiedDen, isRepeating,
+  percentage, mixedWhole, mixedNum, mixedDen, category,
+} = page;
+
+const allPages = getAllDecimalToFractionPages();
+
+const isAlreadySimplified = numerator === simplifiedNum && denominator === simplifiedDen;
+const decimalType = isRepeating ? 'Repeating' : 'Terminating';
+const mixedDisplay = mixedWhole !== null && mixedNum !== null && mixedDen !== null
+  ? `${mixedWhole} ${mixedNum}/${mixedDen}`
+  : null;
+
+// Power of 10 used for terminating conversion step display
+const decParts = displayDecimal.replace('...', '').split('.');
+const decPlaces = decParts.length > 1 ? decParts[1].length : 0;
+const powerOf10 = Math.pow(10, decPlaces);
+const rawNumerator = Math.round(parseFloat(displayDecimal.replace('...', '')) * powerOf10);
+
+// Related fractions: same simplified denominator
+const relatedFractions = allPages
+  .filter((p) => p.simplifiedDen === simplifiedDen && p.slug !== page.slug)
+  .sort((a, b) => a.decimal - b.decimal)
+  .slice(0, 12);
+
+// Common equivalents for reference table
+const commonEquivalents = allPages
+  .filter((p) => !p.isRepeating && p.decimal < 1 && p.decimal > 0)
+  .sort((a, b) => a.decimal - b.decimal)
+  .slice(0, 20);
+
+// GCD for step-by-step
+function gcdVal(a: number, b: number): number {
+  a = Math.abs(a); b = Math.abs(b);
+  while (b) { [a, b] = [b, a % b]; }
+  return a;
+}
+const gcdValue = !isRepeating ? gcdVal(rawNumerator, powerOf10) : 1;
+
+// SEO
+const title = `${displayDecimal} as a Fraction - What is ${displayDecimal} in Fraction Form? | ToolCalcs`;
+const description = `${displayDecimal} as a fraction is ${simplifiedNum}/${simplifiedDen}${mixedDisplay ? ` or ${mixedDisplay} as a mixed number` : ''}. Learn the step-by-step conversion process, see the percentage (${percentage}), and use our interactive converter.`;
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Decimal to Fraction", "item": "https://toolcalcs.com/decimal-to-fraction/" },
+      { "@type": "ListItem", "position": 3, "name": `${displayDecimal} as a Fraction` },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": `What is ${displayDecimal} as a fraction?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `${displayDecimal} as a fraction is ${simplifiedNum}/${simplifiedDen}.${mixedDisplay ? ` As a mixed number, this is ${mixedDisplay}.` : ''} As a percentage, it is ${percentage}.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `Is ${displayDecimal} a repeating decimal?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `${displayDecimal} is a ${decimalType.toLowerCase()} decimal. ${isRepeating ? 'The digits after the decimal point repeat in a pattern indefinitely.' : 'The decimal has a finite number of digits and terminates.'}`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `How do you simplify ${numerator}/${denominator}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": isAlreadySimplified
+            ? `The fraction ${numerator}/${denominator} is already in its simplest form because the numerator and denominator share no common factors other than 1.`
+            : `To simplify ${numerator}/${denominator}, find the greatest common divisor (GCD) of ${numerator} and ${denominator}, which is ${gcdVal(numerator, denominator)}. Divide both by the GCD to get ${simplifiedNum}/${simplifiedDen}.`,
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout title={title} description={description} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/decimal-to-fraction/">Decimal to Fraction</a> &rsaquo;
+    <span>{displayDecimal}</span>
+  </nav>
+
+  <h1>{displayDecimal} as a Fraction</h1>
+  <p class="page-desc">Convert the decimal {displayDecimal} to a fraction, simplified form, mixed number, and percentage.</p>
+
+  <!-- Quick Answer -->
+  <div class="quick-fact">
+    <span class="quick-fact-label">Quick Answer:</span>
+    <strong>{displayDecimal} = {simplifiedNum}/{simplifiedDen}</strong>
+    {mixedDisplay && (
+      <span class="quick-fact-extra"> &nbsp;or&nbsp; <strong>{mixedDisplay}</strong> as a mixed number</span>
+    )}
+  </div>
+
+  <!-- Result Cards -->
+  <div class="calculator-box">
+    <div class="result-cards">
+      <div class="result-card primary">
+        <span class="result-label">Fraction</span>
+        <span class="result-value">{numerator}/{denominator}</span>
+      </div>
+      <div class="result-card primary">
+        <span class="result-label">Simplified</span>
+        <span class="result-value">{simplifiedNum}/{simplifiedDen}</span>
+      </div>
+      <div class="result-card">
+        <span class="result-label">Percentage</span>
+        <span class="result-value">{percentage}</span>
+      </div>
+      <div class="result-card">
+        <span class="result-label">Type</span>
+        <span class="result-value">{decimalType}</span>
+      </div>
+      {mixedDisplay && (
+        <div class="result-card">
+          <span class="result-label">Mixed Number</span>
+          <span class="result-value">{mixedDisplay}</span>
+        </div>
+      )}
+    </div>
+  </div>
+
+  <!-- Step-by-Step Conversion -->
+  <h2 class="section-heading">How to Convert {displayDecimal} to a Fraction</h2>
+  <div class="calculator-box">
+    <p class="calc-desc">Follow these steps to convert the decimal {displayDecimal} to a fraction:</p>
+    <div class="step-list">
+      {!isRepeating ? (
+        <>
+          <div class="step">
+            <span class="step-num">1</span>
+            <span class="step-text">Write {displayDecimal} as a fraction over a power of 10: {rawNumerator}/{powerOf10.toLocaleString('en-US')}</span>
+          </div>
+          <div class="step">
+            <span class="step-num">2</span>
+            <span class="step-text">Find the GCD of {rawNumerator} and {powerOf10.toLocaleString('en-US')}: GCD = {gcdValue.toLocaleString('en-US')}</span>
+          </div>
+          <div class="step">
+            <span class="step-num">3</span>
+            <span class="step-text">Divide both numerator and denominator by {gcdValue.toLocaleString('en-US')}: {rawNumerator}/{powerOf10.toLocaleString('en-US')} = {simplifiedNum}/{simplifiedDen}</span>
+          </div>
+        </>
+      ) : (
+        <>
+          <div class="step">
+            <span class="step-num">1</span>
+            <span class="step-text">Recognize that {displayDecimal} is a repeating decimal</span>
+          </div>
+          <div class="step">
+            <span class="step-num">2</span>
+            <span class="step-text">The repeating decimal {displayDecimal} equals the fraction {numerator}/{denominator}</span>
+          </div>
+          {!isAlreadySimplified && (
+            <div class="step">
+              <span class="step-num">3</span>
+              <span class="step-text">Simplify {numerator}/{denominator} to {simplifiedNum}/{simplifiedDen} by dividing both by {gcdVal(numerator, denominator)}</span>
+            </div>
+          )}
+        </>
+      )}
+      {mixedDisplay && (
+        <div class="step">
+          <span class="step-num">{isRepeating ? (isAlreadySimplified ? '3' : '4') : '4'}</span>
+          <span class="step-text">Convert to a mixed number: {simplifiedNum}/{simplifiedDen} = {mixedDisplay}</span>
+        </div>
+      )}
+    </div>
+    <div class="formula-box">
+      {displayDecimal} = {simplifiedNum}/{simplifiedDen}{mixedDisplay ? ` = ${mixedDisplay}` : ''} = {percentage}
+    </div>
+  </div>
+
+  <AdUnit slot="dec-frac-mid" format="rectangle" />
+
+  <!-- Interactive Calculator -->
+  <h2 class="section-heading">Decimal to Fraction Converter</h2>
+  <div class="calculator-box">
+    <p class="calc-desc">Enter any decimal number to instantly convert it to a fraction.</p>
+    <div class="input-row">
+      <div class="input-group">
+        <label for="decInput">Decimal Number</label>
+        <input type="number" id="decInput" step="any" placeholder="e.g. 0.75" />
+      </div>
+    </div>
+    <div class="calc-result" id="fracResult"></div>
+  </div>
+
+  <!-- Related Fractions Table -->
+  {relatedFractions.length > 0 && (
+    <h2 class="section-heading">Related Fractions (Denominator of {simplifiedDen})</h2>
+    <div class="calculator-box">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Decimal</th>
+            <th>Fraction</th>
+            <th>Simplified</th>
+            <th>Percentage</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td><strong>{displayDecimal}</strong></td>
+            <td><strong>{numerator}/{denominator}</strong></td>
+            <td><strong>{simplifiedNum}/{simplifiedDen}</strong></td>
+            <td><strong>{percentage}</strong></td>
+          </tr>
+          {relatedFractions.map((p) => (
+            <tr>
+              <td><a href={`/decimal-to-fraction/${p.slug}/`}>{p.displayDecimal}</a></td>
+              <td>{p.numerator}/{p.denominator}</td>
+              <td>{p.simplifiedNum}/{p.simplifiedDen}</td>
+              <td>{p.percentage}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+
+  <!-- Educational Content -->
+  <article class="content-section">
+    <h2>Understanding Decimal to Fraction Conversion</h2>
+    <p>
+      Converting decimals to fractions is a fundamental skill in mathematics that bridges two common ways of representing numbers. A decimal like {displayDecimal} represents a part of a whole using base-10 notation, while the fraction {simplifiedNum}/{simplifiedDen} represents the same value as a ratio of two integers. Understanding both forms and being able to convert between them is essential for arithmetic, algebra, measurement, cooking, engineering, and everyday problem-solving.
+    </p>
+    <p>
+      For terminating decimals, the conversion is straightforward: write the decimal digits as a numerator over the appropriate power of 10, then simplify by dividing both the numerator and denominator by their greatest common divisor (GCD). For example, 0.75 becomes 75/100, which simplifies to 3/4 after dividing both by 25. Repeating decimals require a different approach, often involving algebraic manipulation where you set the decimal equal to a variable, multiply to shift the repeating portion, and subtract to eliminate the repetition.
+    </p>
+    <p>
+      Fractions are often preferred over decimals in contexts requiring exact values, such as woodworking measurements (3/8 inch), cooking recipes (1/3 cup), and financial calculations. Decimals, on the other hand, are preferred in scientific notation, digital computing, and situations where comparison is more intuitive. The ability to fluidly convert between these representations helps ensure accuracy across various real-world applications.
+    </p>
+
+    <h2>Common Decimal-Fraction Equivalents</h2>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Decimal</th>
+          <th>Fraction</th>
+          <th>Percentage</th>
+        </tr>
+      </thead>
+      <tbody>
+        {commonEquivalents.map((p) => (
+          <tr>
+            <td><a href={`/decimal-to-fraction/${p.slug}/`}>{p.displayDecimal}</a></td>
+            <td>{p.simplifiedNum}/{p.simplifiedDen}</td>
+            <td>{p.percentage}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is {displayDecimal} as a fraction?</h3>
+    <p>
+      {displayDecimal} as a fraction is {simplifiedNum}/{simplifiedDen}.{mixedDisplay ? ` Written as a mixed number, this is ${mixedDisplay}.` : ''} To arrive at this, {isRepeating ? `we recognize that the repeating decimal ${displayDecimal} corresponds to the fraction ${numerator}/${denominator}, which ${isAlreadySimplified ? 'is already in simplest form' : `simplifies to ${simplifiedNum}/${simplifiedDen}`}.` : `we write ${displayDecimal} as ${rawNumerator}/${powerOf10.toLocaleString('en-US')} and simplify by dividing both by their GCD of ${gcdValue.toLocaleString('en-US')}, yielding ${simplifiedNum}/${simplifiedDen}.`} As a percentage, {displayDecimal} equals {percentage}.
+    </p>
+
+    <h3>Is {displayDecimal} a repeating decimal?</h3>
+    <p>
+      {isRepeating
+        ? `Yes, ${displayDecimal} is a repeating decimal. The digits after the decimal point follow a pattern that repeats indefinitely. This happens because the simplified denominator (${simplifiedDen}) has prime factors other than 2 and 5. In practice, repeating decimals are rounded for most calculations, but the fraction form ${simplifiedNum}/${simplifiedDen} represents the exact value.`
+        : `No, ${displayDecimal} is a terminating decimal. It has a finite number of digits after the decimal point and does not repeat. This is because the simplified denominator (${simplifiedDen}) only has factors of 2 and/or 5, which are the prime factors of 10. Terminating decimals can be represented exactly in both decimal and fraction form.`
+      }
+    </p>
+
+    <h3>How do you simplify {numerator}/{denominator}?</h3>
+    <p>
+      {isAlreadySimplified
+        ? `The fraction ${numerator}/${denominator} is already in its simplest form. The numerator (${numerator}) and denominator (${denominator}) share no common factors other than 1, so no further simplification is possible. A fraction is in simplest form when the GCD of its numerator and denominator equals 1.`
+        : `To simplify ${numerator}/${denominator}, find the greatest common divisor (GCD) of ${numerator} and ${denominator}. The GCD is ${gcdVal(numerator, denominator)}. Divide both the numerator and denominator by ${gcdVal(numerator, denominator)}: ${numerator} / ${gcdVal(numerator, denominator)} = ${simplifiedNum} and ${denominator} / ${gcdVal(numerator, denominator)} = ${simplifiedDen}. The simplified fraction is ${simplifiedNum}/${simplifiedDen}.`
+      }
+    </p>
+
+    <p><a href="/decimal-to-fraction/">&larr; View All Decimal to Fraction Conversions</a> | <a href="/math-calculators/">Math Calculators</a></p>
+
+    <CrossLinks links={[
+      { href: '/fraction/', label: 'Fraction Calculator', icon: '/' },
+      { href: '/percentage/', label: 'Percentage Calculator', icon: '%' },
+      { href: '/math/', label: 'Math Tools', icon: '#' },
+    ]} />
+  </article>
+
+  <AdUnit slot="dec-frac-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .quick-fact {
+    background: #eff6ff;
+    border-radius: var(--radius);
+    padding: 16px 24px;
+    margin-bottom: 24px;
+    font-size: 1.1rem;
+  }
+  .quick-fact-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .quick-fact strong {
+    color: var(--color-primary);
+    font-size: 1.3rem;
+  }
+  .quick-fact-extra {
+    font-size: 1rem;
+  }
+
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+
+  .calc-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 16px;
+  }
+
+  .step-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .step-text {
+    font-size: 0.95rem;
+    color: var(--color-text);
+  }
+
+  .input-row {
+    display: flex;
+    gap: 14px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+  }
+  .input-row .input-group {
+    flex: 1;
+    min-width: 200px;
+    max-width: 360px;
+  }
+  .calc-result {
+    margin-top: 14px;
+    padding: 12px 16px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 1rem;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+
+  .highlight-row {
+    background: #eff6ff;
+  }
+  :global(.highlight-row td) {
+    font-weight: 600;
+  }
+
+  @media (max-width: 640px) {
+    .input-row {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .input-row .input-group {
+      max-width: none;
+    }
+  }
+</style>
+
+<script define:vars={{ initialDecimal: decimal }}>
+  var decInput = document.getElementById('decInput');
+  var fracResult = document.getElementById('fracResult');
+
+  decInput.value = initialDecimal;
+
+  function gcd(a, b) {
+    a = Math.abs(a); b = Math.abs(b);
+    while (b) { var t = b; b = a % b; a = t; }
+    return a;
+  }
+
+  function decToFrac(d) {
+    if (isNaN(d) || d === '') return null;
+    var num = parseFloat(d);
+    if (isNaN(num)) return null;
+    var negative = num < 0;
+    num = Math.abs(num);
+    var whole = Math.floor(num);
+    var frac = num - whole;
+    if (frac < 0.0000001) {
+      if (whole === 0) return null;
+      return { num: whole, den: 1, whole: 0, fracNum: 0, fracDen: 1 };
+    }
+    // continued fraction approach
+    var h1 = 1, h2 = 0, k1 = 0, k2 = 1;
+    var b = frac;
+    for (var i = 0; i < 20; i++) {
+      var a = Math.floor(b);
+      var h = a * h1 + h2;
+      var k = a * k1 + k2;
+      h2 = h1; h1 = h; k2 = k1; k1 = k;
+      b = 1 / (b - a);
+      if (Math.abs(frac - h1 / k1) < 0.0000001) break;
+      if (!isFinite(b)) break;
+    }
+    var n = whole * k1 + h1;
+    var g = gcd(n, k1);
+    return {
+      num: (negative ? -1 : 1) * n / g,
+      den: k1 / g,
+      whole: whole,
+      fracNum: h1 / g,
+      fracDen: k1 / g
+    };
+  }
+
+  function update() {
+    var val = decInput.value;
+    var r = decToFrac(val);
+    if (!r) { fracResult.textContent = 'Enter a decimal number to convert.'; return; }
+    var text = r.num + '/' + r.den;
+    if (r.whole && r.whole > 0 && r.fracNum) {
+      text += ' = ' + r.whole + ' ' + r.fracNum + '/' + r.fracDen;
+    }
+    text += ' = ' + (r.num / r.den * 100).toFixed(2).replace(/\.?0+$/, '') + '%';
+    fracResult.textContent = text;
+  }
+
+  decInput.addEventListener('input', update);
+  update();
+</script>

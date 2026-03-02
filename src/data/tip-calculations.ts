@@ -7,10 +7,11 @@ export interface TipPage {
   perPerson: { people: number; tipEach: number; totalEach: number }[];
 }
 
-const PERCENTS = [10, 15, 18, 20, 25];
+const PERCENTS = [10, 12, 15, 16, 18, 20, 22, 25];
 const AMOUNTS = [
   10, 15, 20, 25, 30, 35, 40, 45, 50, 55,
-  60, 65, 70, 75, 80, 85, 90, 95, 100, 125, 150, 200,
+  60, 65, 70, 75, 80, 85, 90, 95, 100, 110,
+  125, 140, 150, 160, 175, 200, 250, 300, 400, 500,
 ];
 
 function round2(n: number): number {

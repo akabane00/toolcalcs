@@ -613,6 +613,30 @@ export const calculators: Calculator[] = [
     categorySlug: 'financial-calculators',
     icon: '🧾',
   },
+  {
+    title: 'FIRE Calculator',
+    slug: 'fire-calculator',
+    description: 'Calculate your Financial Independence number, years to retire early, and savings rate with the 4% rule.',
+    category: 'Financial Calculators',
+    categorySlug: 'financial-calculators',
+    icon: '🔥',
+  },
+  {
+    title: 'Estate Tax Calculator',
+    slug: 'estate-tax-calculator',
+    description: 'Estimate federal and state estate taxes, exemptions, and effective tax rates for estate planning.',
+    category: 'Financial Calculators',
+    categorySlug: 'financial-calculators',
+    icon: '🏛️',
+  },
+  {
+    title: 'Business Loan Calculator',
+    slug: 'business-loan-calculator',
+    description: 'Calculate monthly payments, total interest, and amortization schedule for business loans and SBA loans.',
+    category: 'Financial Calculators',
+    categorySlug: 'financial-calculators',
+    icon: '🏢',
+  },
 ];
 
 export function getCalculatorsByCategory(categorySlug: string): Calculator[] {
