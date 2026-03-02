@@ -1,0 +1,204 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import { getAllCookingPages, INGREDIENTS } from '../../data/cooking-conversions';
+
+const allPages = getAllCookingPages();
+const totalPages = allPages.length;
+const ingredientCount = INGREDIENTS.length;
+
+// Group ingredients by category
+const categoryOrder = [
+  'Flours & Starches',
+  'Sugars & Sweeteners',
+  'Fats & Oils',
+  'Dairy',
+  'Grains & Dry Goods',
+  'Liquids & Basics',
+];
+
+const ingredientsByCategory: Record<string, typeof INGREDIENTS> = {};
+for (var i = 0; i < categoryOrder.length; i++) {
+  ingredientsByCategory[categoryOrder[i]] = [];
+}
+for (var j = 0; j < INGREDIENTS.length; j++) {
+  var ing = INGREDIENTS[j];
+  if (ingredientsByCategory[ing.category]) {
+    ingredientsByCategory[ing.category].push(ing);
+  }
+}
+
+// Build popular links for each ingredient
+function getPopularLinks(ingredientSlug: string) {
+  return [
+    { label: '100g to cups', href: '/cooking/100-grams-' + ingredientSlug + '-to-cups/' },
+    { label: '200g to cups', href: '/cooking/200-grams-' + ingredientSlug + '-to-cups/' },
+    { label: '1 cup in grams', href: '/cooking/1-cup-' + ingredientSlug + '-in-grams/' },
+    { label: '1/2 cup in grams', href: '/cooking/half-cup-' + ingredientSlug + '-in-grams/' },
+    { label: '250g to cups', href: '/cooking/250-grams-' + ingredientSlug + '-to-cups/' },
+  ];
+}
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://toolcalcs.com/",
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Cooking Conversions",
+    },
+  ],
+};
+
+const title = 'Cooking Conversions \u2014 Grams to Cups for ' + ingredientCount + ' Ingredients | ToolCalcs';
+const description = 'Convert between grams and cups for ' + ingredientCount + ' common baking and cooking ingredients. Browse ' + totalPages + ' conversion pages with charts, tables, and measuring tips.';
+---
+
+<BaseLayout title={title} description={description} structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <span>Cooking Conversions</span>
+  </nav>
+
+  <h1>Cooking Conversions &mdash; Grams to Cups</h1>
+  <p class="page-desc">
+    Convert between grams and cups for {ingredientCount} common baking and cooking ingredients. Browse {totalPages} conversions below.
+  </p>
+
+  <AdUnit slot="cooking-top" format="horizontal" />
+
+  {categoryOrder.map(function (cat) {
+    var ingredients = ingredientsByCategory[cat] || [];
+    return (
+      <section class="ingredient-section">
+        <h2>{cat}</h2>
+        <div class="ingredient-grid">
+          {ingredients.map(function (ing) {
+            var links = getPopularLinks(ing.slug);
+            return (
+              <div class="ingredient-card">
+                <h3>
+                  <a href={'/cooking/100-grams-' + ing.slug + '-to-cups/'}>{ing.name}</a>
+                </h3>
+                <p class="ingredient-density">{ing.gramsPerCup}g per cup</p>
+                <div class="ingredient-links">
+                  {links.map(function (link) {
+                    return (
+                      <a href={link.href} class="ingredient-link">{link.label}</a>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+    );
+  })}
+
+  <article class="content-section">
+    <h2>About Our Cooking Conversions</h2>
+    <p>
+      All conversions on this page use the US standard cup, which is exactly 236.588 milliliters (about 8 fluid ounces). This is the cup size used in the vast majority of American cookbooks and recipe websites. Note that the imperial cup (used in some older British recipes) is 284 ml, and the metric cup (used in Australia) is 250 ml. If your recipe uses a different cup standard, the gram equivalents will differ.
+    </p>
+    <p>
+      Ingredient densities vary based on the type and form of the ingredient. Flour, for example, weighs about 120 grams per cup when measured with the spoon-and-level method, but can weigh 150 grams or more per cup if scooped directly from the bag. Our conversions use widely accepted standard densities sourced from culinary references, food science literature, and the USDA National Nutrient Database.
+    </p>
+    <p>
+      For the most accurate results in baking, we always recommend using a kitchen scale. Weight measurements eliminate the variability inherent in volume measurements, giving you consistent results every time. That said, volume measurements work perfectly well for most everyday cooking tasks, and the conversion charts on each ingredient page will help you move confidently between grams, cups, tablespoons, and ounces.
+    </p>
+    <p>
+      Browse the {ingredientCount} ingredients above to find the specific conversion you need, or use the search-friendly individual pages for quick reference while you are cooking. Each page includes a detailed conversion chart, measuring tips specific to that ingredient, and an interactive converter for custom amounts.
+    </p>
+  </article>
+
+  <AdUnit slot="cooking-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  /* Ingredient Sections */
+  .ingredient-section {
+    margin-bottom: 40px;
+  }
+  .ingredient-section h2 {
+    font-size: 1.3rem;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--color-border);
+  }
+
+  /* Ingredient Grid */
+  .ingredient-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  /* Ingredient Card */
+  .ingredient-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 20px;
+    transition: box-shadow 0.15s, border-color 0.15s;
+  }
+  .ingredient-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-md);
+  }
+  .ingredient-card h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+  .ingredient-card h3 a {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+  .ingredient-card h3 a:hover {
+    color: var(--color-primary);
+  }
+  .ingredient-density {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin: 0 0 12px;
+  }
+
+  /* Quick Links inside each card */
+  .ingredient-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .ingredient-link {
+    display: inline-block;
+    font-size: 0.78rem;
+    padding: 4px 10px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 100px;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .ingredient-link:hover {
+    background: #eff6ff;
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .ingredient-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

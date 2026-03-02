@@ -1,0 +1,654 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import { getAllCookingPages, INGREDIENTS, type CookingPage } from '../../data/cooking-conversions';
+
+export function getStaticPaths() {
+  return getAllCookingPages().map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: CookingPage };
+
+const {
+  slug,
+  ingredient,
+  ingredientSlug,
+  direction,
+  grams,
+  cups,
+  cupsDisplay,
+  gramsDisplay,
+  tablespoons,
+  teaspoons,
+  ounces,
+  mlEquiv,
+  density,
+  category,
+} = page;
+
+const isGramsToCups = direction === 'grams-to-cups';
+
+// Build related pages: same ingredient, different amounts (6-8 links)
+const allPages = getAllCookingPages();
+const relatedPages = allPages
+  .filter(function (p) {
+    return p.ingredientSlug === ingredientSlug && p.slug !== slug;
+  })
+  .slice(0, 8);
+
+// Other ingredients: same direction and similar amount, different ingredients (4-6 links)
+const otherIngredients = allPages
+  .filter(function (p) {
+    return p.ingredientSlug !== ingredientSlug
+      && p.direction === direction
+      && p.grams === grams;
+  })
+  .slice(0, 6);
+
+// Opposite direction for this ingredient at a similar amount
+const oppositeDirection = isGramsToCups ? 'cups-to-grams' : 'grams-to-cups';
+const oppositePage = allPages.find(function (p) {
+  return p.ingredientSlug === ingredientSlug
+    && p.direction === oppositeDirection
+    && Math.abs(p.grams - grams) < 30;
+});
+
+// Generate table rows for this ingredient at standard gram amounts
+const standardGrams = [25, 50, 75, 100, 125, 150, 200, 250, 300, 400, 500];
+const tableRows = standardGrams.map(function (g) {
+  var c = g / density;
+  var tbsp = c * 16;
+  var oz = g / 28.3495;
+  return {
+    grams: g,
+    cups: Math.round(c * 100) / 100,
+    tablespoons: Math.round(tbsp * 10) / 10,
+    ounces: Math.round(oz * 100) / 100,
+    isCurrent: g === grams && isGramsToCups,
+  };
+});
+
+// Title logic
+const title = isGramsToCups
+  ? grams + 'g of ' + ingredient + ' to Cups \u2014 ' + cupsDisplay + ' Cups | ToolCalcs'
+  : cupsDisplay + ' of ' + ingredient + ' in Grams \u2014 ' + grams + 'g | ToolCalcs';
+
+const description = isGramsToCups
+  ? grams + ' grams of ' + ingredient + ' equals ' + cupsDisplay + ' cups. Also equals ' + tablespoons + ' tablespoons, ' + ounces + ' oz, and ' + mlEquiv + ' ml. Free cooking conversion chart.'
+  : cupsDisplay + ' of ' + ingredient + ' weighs ' + grams + ' grams. Also equals ' + tablespoons + ' tablespoons, ' + ounces + ' oz, and ' + mlEquiv + ' ml. Free cooking conversion chart.';
+
+// Structured data
+const faqQuestions = isGramsToCups
+  ? [
+      {
+        "@type": "Question",
+        "name": "How many cups is " + grams + " grams of " + ingredient + "?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": grams + " grams of " + ingredient + " is equal to " + cupsDisplay + " cups. This is based on a density of " + density + " grams per cup, which is the standard measurement for " + ingredient.toLowerCase() + " when measured using the spoon-and-level method.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "How do I measure " + ingredient + " without a scale?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "To measure " + ingredient.toLowerCase() + " without a scale, use standard measuring cups. " + grams + " grams of " + ingredient.toLowerCase() + " equals approximately " + cupsDisplay + " cups or " + tablespoons + " tablespoons. For best accuracy, spoon the ingredient into the measuring cup and level off the top with a straight edge.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "Does the type of " + category.toLowerCase() + " affect the conversion?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, different " + category.toLowerCase() + " have different densities, which means the grams-to-cups ratio changes between ingredients. " + ingredient + " weighs " + density + " grams per cup, but other " + category.toLowerCase() + " may weigh more or less per cup. Always use the specific conversion for the ingredient in your recipe.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "How many tablespoons is " + grams + " grams of " + ingredient + "?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": grams + " grams of " + ingredient + " is equal to approximately " + tablespoons + " tablespoons. Since 1 cup equals 16 tablespoons and " + ingredient.toLowerCase() + " weighs " + density + " grams per cup, you can convert any gram amount to tablespoons using these ratios.",
+        },
+      },
+    ]
+  : [
+      {
+        "@type": "Question",
+        "name": "How many grams is " + cupsDisplay + " of " + ingredient + "?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": cupsDisplay + " of " + ingredient + " weighs " + grams + " grams. This conversion uses a density of " + density + " grams per cup, which is the standard weight for " + ingredient.toLowerCase() + " measured using proper technique.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "Why is weighing " + ingredient + " more accurate than using cups?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Weighing " + ingredient.toLowerCase() + " is more accurate because cup measurements depend on how the ingredient is packed, scooped, or settled. A cup of " + ingredient.toLowerCase() + " can vary by 10-20% depending on measuring technique. A kitchen scale eliminates this variability, giving you exactly the amount the recipe calls for every time.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "How many tablespoons is " + cupsDisplay + " of " + ingredient + "?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": cupsDisplay + " of " + ingredient + " is equal to " + tablespoons + " tablespoons. There are 16 tablespoons in one cup, so you can use tablespoons for smaller, more precise portions when a full cup measurement is too large.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "Can I use a regular drinking cup to measure " + ingredient + "?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No, a regular drinking cup is not the same as a standard measuring cup. A US standard cup is exactly 236.588 ml (about 8 fluid ounces). Drinking cups vary widely in size. For accurate baking results with " + ingredient.toLowerCase() + ", always use proper measuring cups or, better yet, a kitchen scale.",
+        },
+      },
+    ];
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Cooking Conversions", "item": "https://toolcalcs.com/cooking/" },
+      { "@type": "ListItem", "position": 3, "name": ingredient, "item": "https://toolcalcs.com/cooking/100-grams-" + ingredientSlug + "-to-cups/" },
+      { "@type": "ListItem", "position": 4, "name": isGramsToCups ? grams + 'g to Cups' : cupsDisplay + ' in Grams' },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqQuestions,
+  },
+];
+
+// Ingredient-specific measuring tips
+const isCategoryFlour = category === 'Flours & Starches';
+const isCategorySugar = category === 'Sugars & Sweeteners';
+const isCategoryFat = category === 'Fats & Oils';
+const isCategoryDairy = category === 'Dairy';
+const isCategoryGrain = category === 'Grains & Dry Goods';
+const isCategoryLiquid = category === 'Liquids & Basics';
+
+// Precompute chart paragraph text (avoids < operator in JSX which Astro interprets as tags)
+var chartParagraphGrams = 'Since you are converting ' + grams + ' grams, your row is highlighted in the table. At ' + cupsDisplay + ' cups, this is ';
+if (cups < 0.5) {
+  chartParagraphGrams += 'less than half a cup, which you may find easier to measure with tablespoons (' + tablespoons + ' tbsp).';
+} else if (cups < 1) {
+  chartParagraphGrams += 'less than one full cup, so a single measuring cup is all you need.';
+} else if (cups < 2) {
+  chartParagraphGrams += 'just over a cup, easy to measure with a standard one-cup measure plus a bit extra.';
+} else {
+  chartParagraphGrams += 'more than two cups, so you will need to measure multiple times or use a larger vessel.';
+}
+
+var chartParagraphCups = 'At ' + cupsDisplay + ', you are working with ' + grams + ' grams, or ' + ounces + ' ounces. ';
+if (cups <= 0.5) {
+  chartParagraphCups += 'For this small amount, measuring spoons might be more convenient than a cup: ' + tablespoons + ' tablespoons is the equivalent.';
+} else {
+  chartParagraphCups += 'This is a straightforward amount to measure with standard measuring cups.';
+}
+
+var chartParagraph = isGramsToCups ? chartParagraphGrams : chartParagraphCups;
+
+// Precompute density comparison text
+var densityComparison = density > 237
+  ? 'denser than water, so it will feel heavier than you might expect for the volume'
+  : 'lighter than water per cup';
+
+// Precompute measuring tip text for FAQ
+var measuringTipText = isCategoryFlour
+  ? 'use the spoon-and-level method: fluff the flour, spoon it into the cup, and level off with a knife.'
+  : isCategorySugar
+    ? 'level off granulated sugar, or pack brown sugar firmly.'
+    : 'spoon the ingredient into the measuring cup and level off the top.';
+
+var gramsPerTablespoon = Math.round(density / 16);
+---
+
+<BaseLayout title={title} description={description} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/cooking/">Cooking Conversions</a> &rsaquo;
+    <span>{ingredient}</span>
+  </nav>
+
+  <h1>
+    {isGramsToCups
+      ? grams + ' Grams of ' + ingredient + ' in Cups'
+      : cupsDisplay + ' of ' + ingredient + ' in Grams'
+    }
+  </h1>
+  <p class="page-desc">
+    {isGramsToCups
+      ? 'Quick answer: ' + grams + ' grams of ' + ingredient.toLowerCase() + ' equals ' + cupsDisplay + ' cups. See the full conversion chart and measuring tips below.'
+      : 'Quick answer: ' + cupsDisplay + ' of ' + ingredient.toLowerCase() + ' weighs ' + grams + ' grams. See the full conversion chart and measuring tips below.'
+    }
+  </p>
+
+  <!-- Answer Card -->
+  <div class="answer-card">
+    <div class="answer-card-label">Conversion Result</div>
+    <div class="answer-card-main">
+      {isGramsToCups
+        ? gramsDisplay + 'g = ' + cupsDisplay + ' cups'
+        : cupsDisplay + ' = ' + gramsDisplay + 'g'
+      }
+    </div>
+    <div class="answer-card-secondary">
+      Also: {tablespoons} tablespoons = {teaspoons} teaspoons
+    </div>
+    <div class="answer-card-tertiary">
+      {ounces} oz = {mlEquiv} ml
+    </div>
+    <div class="answer-card-note">
+      Based on {ingredient} density of {density}g per US cup (236.588 ml)
+    </div>
+  </div>
+
+  <!-- Interactive Converter Widget -->
+  <div class="converter-widget">
+    <h2 class="converter-widget-heading">Custom {ingredient} Converter</h2>
+    <div class="converter-widget-row">
+      <div class="input-group">
+        <label for="gramsInput">Grams of {ingredient}</label>
+        <input type="number" id="gramsInput" placeholder="Enter grams" min="0" step="any" />
+      </div>
+      <div class="converter-widget-equals">=</div>
+      <div class="converter-widget-result">
+        <span class="converter-widget-label">Result</span>
+        <span class="converter-widget-output" id="cupsOutput">&mdash;</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Conversion Table -->
+  <h2 class="section-heading">{ingredient} Conversion Chart &mdash; Grams to Cups</h2>
+  <div class="table-container">
+    <table class="data-table cooking-table">
+      <thead>
+        <tr>
+          <th>Grams</th>
+          <th>Cups</th>
+          <th>Tablespoons</th>
+          <th>Ounces</th>
+        </tr>
+      </thead>
+      <tbody>
+        {tableRows.map(function (row) {
+          return (
+            <tr class={row.isCurrent ? 'highlight-row' : ''}>
+              <td>{row.grams}g</td>
+              <td>{row.cups}</td>
+              <td>{row.tablespoons}</td>
+              <td>{row.ounces} oz</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  </div>
+
+  <AdUnit slot="cooking-mid" format="horizontal" />
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>Converting {ingredient} Between Grams and Cups</h2>
+    <p>
+      {ingredient} has a density of {density} grams per cup, which means that one level US cup of {ingredient.toLowerCase()} weighs exactly {density} grams. This density figure is the key to accurate conversions between weight and volume for this ingredient. Understanding this number helps you move confidently between recipe formats, whether you are working from a European cookbook that lists everything in grams or an American recipe that calls for cups.
+    </p>
+    <p>
+      Density varies significantly from one ingredient to the next. A cup of water weighs about 237 grams, while a cup of all-purpose flour weighs only about 120 grams. This is why you cannot simply use a single conversion factor for all ingredients. The grams-per-cup value depends on how finely ground the ingredient is, how much air it contains, and how it settles in the measuring cup.
+    </p>
+    <p>
+      How you scoop an ingredient also changes the effective density. {isCategoryFlour ? 'Flour that is scooped directly from the bag with a measuring cup will pack more tightly than flour that is spooned into the cup and leveled off. The difference can be as much as 20%, which is enough to noticeably affect your baked goods. Professional bakers and recipe developers overwhelmingly recommend the spoon-and-level method for flour: use a spoon to lightly fill the measuring cup, then sweep a straight edge across the top to level it.' : ''}{isCategorySugar ? 'Brown sugar, for example, is traditionally packed firmly into the measuring cup, which gives it a higher grams-per-cup value than the same sugar measured loosely. Granulated sugar, on the other hand, pours freely and gives fairly consistent measurements either way. Powdered sugar can be sifted or unsifted, and recipes should specify which method to use.' : ''}{isCategoryFat ? 'Butter is typically measured by the stick markings printed on the wrapper, making it one of the easier ingredients to measure by volume. Oils, on the other hand, are liquid and should be measured in a liquid measuring cup placed on a flat surface. The meniscus (the curve at the top of the liquid) should be read at eye level for the most accurate result.' : ''}{isCategoryDairy ? 'Liquid dairy products like milk and cream should be measured in a liquid measuring cup. Place the cup on a flat surface, pour in the liquid, and check the level at eye height. Thicker dairy products like yogurt, sour cream, and cream cheese are measured in dry measuring cups, spooned in and leveled off.' : ''}{isCategoryGrain ? 'Dry goods like rice, oats, and breadcrumbs should be measured using dry measuring cups. Spoon the ingredient into the cup and level it off with a straight edge. Avoid shaking or tapping the cup, as this causes the ingredient to settle and gives you more than the recipe intends.' : ''}{isCategoryLiquid ? 'Liquid ingredients and fine powders each require their own measuring approach. Use a liquid measuring cup for water, milk, and oils. For dry powders like cocoa, baking powder, and salt, use dry measuring cups and level off the top. This distinction matters because liquid measuring cups are designed to be read from the side, while dry measuring cups are designed to be leveled.' : ''}
+    </p>
+    <p>
+      The conversion table above uses the standard density of {density} grams per US cup for {ingredient.toLowerCase()}. If your measurements are slightly different from what the table shows, it likely comes down to measuring technique. For the most consistent results in baking, consider investing in a kitchen scale and measuring by weight rather than volume.
+    </p>
+
+    <h2>How to Measure {ingredient} Accurately</h2>
+    {isCategoryFlour ? (
+      <p>
+        Flour is one of the trickiest ingredients to measure by volume because it compresses easily. The gold standard is the spoon-and-level method: first, fluff the flour in its container with a spoon or fork to aerate it. Then, spoon the flour into your measuring cup until it is heaped above the rim. Finally, use the back of a knife or a straight edge to sweep off the excess, leaving a perfectly level cup. Never scoop the measuring cup directly into the bag of flour, as this packs the flour and can add 20 to 30 extra grams per cup.
+      </p>
+      <p>
+        If a recipe calls for "sifted flour," sift the flour first and then measure it. If it calls for "flour, sifted," measure first and then sift. This distinction changes the amount you use by about 20 grams per cup. When precision matters, especially in pastry and bread baking, weighing your flour is always the best approach.
+      </p>
+      <p>
+        For {ingredient.toLowerCase()} specifically, the standard weight is {density} grams per cup. This means {grams} grams gives you {cupsDisplay} cups, or about {tablespoons} tablespoons. Keep your flour stored in an airtight container at room temperature for the most consistent density over time.
+      </p>
+    ) : isCategorySugar ? (
+      <p>
+        Sugar measuring technique depends on the type. Granulated sugar can be scooped and leveled without much concern for packing, as the crystals flow freely and give a consistent measurement. Brown sugar is different: most recipes assume you will pack it firmly into the measuring cup. Press it down with your fingers or the back of a spoon until it holds the shape of the cup when turned out.
+      </p>
+      <p>
+        Powdered sugar (confectioners' sugar) tends to clump during storage. If a recipe calls for sifted powdered sugar, sift it before measuring. One cup of sifted powdered sugar weighs noticeably less than one cup of unsifted, because sifting introduces air. When in doubt, weigh it: {grams} grams of {ingredient.toLowerCase()} gives you exactly {cupsDisplay} cups regardless of whether it has been sifted.
+      </p>
+      <p>
+        Liquid sweeteners like honey and maple syrup are dense and sticky. Measure them in a liquid measuring cup, or spray your measuring cup with cooking spray first so the sweetener slides out cleanly. At {density} grams per cup, {ingredient.toLowerCase()} is {densityComparison}.
+      </p>
+    ) : isCategoryFat ? (
+      <p>
+        Fats are best measured by weight when possible, but there are reliable volume techniques for each type. Butter in the United States comes in sticks with tablespoon markings printed on the wrapper. One stick equals 8 tablespoons, or half a cup, or about 113 grams. Simply cut the stick at the line corresponding to the amount you need.
+      </p>
+      <p>
+        Liquid oils should be measured in a liquid measuring cup. Pour slowly and check the level at eye height on a flat surface. The meniscus (the slight curve at the top of the oil) should line up with the measurement line. For small amounts, use measuring spoons, filling them to the brim and leveling off.
+      </p>
+      <p>
+        Solid fats like coconut oil and shortening at room temperature should be packed into a dry measuring cup, similar to brown sugar. Press the fat firmly into the cup to eliminate air pockets, then level off the top. At {density} grams per cup, {ingredient.toLowerCase()} converts to {cupsDisplay} cups for every {grams} grams.
+      </p>
+    ) : isCategoryDairy ? (
+      <p>
+        Dairy products span a range from thin liquids to thick solids, and each requires a slightly different measuring approach. For milk, cream, and other pourable dairy, use a liquid measuring cup. Place the cup on a level surface, pour in the liquid, and bend down to check the level at eye height. The bottom of the meniscus should touch the measurement line.
+      </p>
+      <p>
+        For thicker dairy products like yogurt, sour cream, and cream cheese, use dry measuring cups. Spoon the ingredient into the cup, pressing gently to fill any air gaps, and level off the top. Cream cheese is easiest to measure when slightly softened, so let it sit at room temperature for a few minutes before scooping.
+      </p>
+      <p>
+        {ingredient} weighs {density} grams per cup, which means {grams} grams equals {cupsDisplay} cups. Dairy products are generally close to the density of water because they are largely water-based, but the fat and protein content creates slight variations between products.
+      </p>
+    ) : isCategoryGrain ? (
+      <p>
+        Dry goods like rice, oats, breadcrumbs, and chocolate chips should be measured in dry measuring cups. Pour or spoon the ingredient into the cup until it is slightly heaped, then use a straight edge to level off the top. Do not shake, tap, or pack the cup unless the recipe specifically says to. Shaking causes the grains to settle, giving you more ingredient than intended.
+      </p>
+      <p>
+        For small, uniform items like chocolate chips and grains of rice, scooping directly with the measuring cup is acceptable because these items do not compress the way flour does. For irregularly shaped ingredients like rolled oats or breadcrumbs, spooning gives a more consistent result.
+      </p>
+      <p>
+        {ingredient} has a density of {density} grams per cup, so {grams} grams equals approximately {cupsDisplay} cups. When scaling recipes up or down, weight measurements are far more reliable than volume for dry goods, since even small differences in how you scoop can compound over multiple cups.
+      </p>
+    ) : (
+      <p>
+        The right measuring technique depends on whether the ingredient is a liquid or a dry powder. Water and other thin liquids should be measured in a liquid measuring cup, which has a spout and measurement markings on the side. Place the cup on a flat surface, pour in the liquid, and read the level at eye height.
+      </p>
+      <p>
+        Dry powders like cocoa, baking powder, and salt should be measured in dry measuring cups or measuring spoons. Spoon the powder into the cup and level off the top with a straight edge. Do not pack these ingredients unless the recipe specifically calls for it. Salt, in particular, varies dramatically in density between fine table salt, kosher salt, and flaky sea salt, so weight measurements are strongly preferred for salt in baking.
+      </p>
+      <p>
+        At {density} grams per cup, {ingredient.toLowerCase()} converts to {cupsDisplay} cups for every {grams} grams. If you frequently work with this ingredient, memorizing its grams-per-cup value or keeping a reference chart in your kitchen will save you time.
+      </p>
+    )}
+
+    <h2>Why Weight Measurements Are More Accurate</h2>
+    <p>
+      Professional bakers around the world prefer weight measurements over volume for one simple reason: consistency. When you measure {ingredient.toLowerCase()} by volume, the amount you get depends on how you scoop, whether you pack or aerate, and even the humidity in your kitchen. Two people measuring "one cup" of the same ingredient can easily end up with amounts that differ by 10 to 20 percent.
+    </p>
+    <p>
+      A kitchen scale eliminates all of these variables. When a recipe calls for {grams} grams of {ingredient.toLowerCase()}, you put your bowl on the scale, press tare, and add ingredient until the display reads {grams}. There is no ambiguity, no variation, and no guesswork. This is why virtually every professional bakery, culinary school, and cookbook published outside the United States uses weight measurements.
+    </p>
+    <p>
+      Volume measurements persist in home cooking primarily because of tradition and the lower initial cost: a set of measuring cups is cheaper than a kitchen scale. But digital kitchen scales are now available for under ten dollars and last for years. If you bake even occasionally, a scale is one of the best investments you can make. Your recipes will turn out more consistently, and you will find it easier to scale recipes up or down, since doubling 200 grams is simpler than doubling "3/4 cup plus 2 tablespoons."
+    </p>
+    <p>
+      That said, volume measurements are perfectly fine for many everyday cooking tasks where precision is less critical, such as adding oil to a pan or measuring water for cooking rice. The conversion chart on this page gives you reliable equivalents so you can switch between systems confidently.
+    </p>
+
+    <h2>{ingredient} Conversion Chart</h2>
+    <p>
+      The table above shows {ingredient.toLowerCase()} conversions at eleven standard gram amounts, from 25 grams up to 500 grams. Each row gives you the equivalent in cups, tablespoons, and ounces, all calculated using the standard density of {density} grams per cup. You can use this chart for scaling recipes up or down, converting between metric and US customary units, or quickly checking how much {ingredient.toLowerCase()} you need.
+    </p>
+    <p>
+      {chartParagraph}
+    </p>
+    <p>
+      Bookmark this page for quick reference the next time you are baking with {ingredient.toLowerCase()}. If you need a conversion for a different amount, use the custom converter tool at the top of the page or check one of the related conversions listed below.
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    {isGramsToCups ? (
+      <h3>How many cups is {grams} grams of {ingredient}?</h3>
+      <p>
+        {grams} grams of {ingredient.toLowerCase()} is equal to {cupsDisplay} cups. This conversion is based on the standard density of {density} grams per US cup. In tablespoons, the same amount equals {tablespoons} tablespoons, and in teaspoons it equals {teaspoons} teaspoons. These values assume the {ingredient.toLowerCase()} is measured using proper technique: spooned into the cup and leveled off.
+      </p>
+
+      <h3>How do I measure {ingredient} without a scale?</h3>
+      <p>
+        Without a scale, use standard measuring cups and spoons. {grams} grams of {ingredient.toLowerCase()} is approximately {cupsDisplay} cups or {tablespoons} tablespoons. For the most accurate result without a scale, {measuringTipText} Each tablespoon of {ingredient.toLowerCase()} weighs about {gramsPerTablespoon} grams, which can help you fine-tune smaller amounts.
+      </p>
+
+      <h3>Does the type of {category.toLowerCase()} affect the conversion?</h3>
+      <p>
+        Absolutely. Different {category.toLowerCase()} have different densities, so the grams-to-cups conversion changes from one ingredient to the next. {ingredient} weighs {density} grams per cup, but other {category.toLowerCase()} may be lighter or heavier. For example, among common baking ingredients, densities range from about 86 grams per cup (cocoa powder) to over 340 grams per cup (honey). Always use the specific conversion factor for the exact ingredient you are measuring.
+      </p>
+
+      <h3>How many tablespoons is {grams} grams of {ingredient}?</h3>
+      <p>
+        {grams} grams of {ingredient.toLowerCase()} equals approximately {tablespoons} tablespoons. There are 16 tablespoons in one US cup, and since {ingredient.toLowerCase()} weighs {density} grams per cup, each tablespoon weighs about {gramsPerTablespoon} grams. Tablespoons are useful for measuring smaller quantities more precisely than cups.
+      </p>
+    ) : (
+      <h3>How many grams is {cupsDisplay} of {ingredient}?</h3>
+      <p>
+        {cupsDisplay} of {ingredient.toLowerCase()} weighs {grams} grams. This is calculated using the standard density of {density} grams per US cup. You can also express this as {ounces} ounces or {mlEquiv} milliliters by volume. The gram weight is the most reliable way to ensure you are using the right amount in baking.
+      </p>
+
+      <h3>Why is weighing {ingredient} more accurate than using cups?</h3>
+      <p>
+        Cup measurements are volume-based and depend on how the ingredient is scooped, packed, or settled. Two people measuring {cupsDisplay} of {ingredient.toLowerCase()} can easily get different amounts, sometimes varying by 10-20%. A kitchen scale gives you the exact weight every time, eliminating inconsistency. This is especially important in baking, where small differences in ingredient amounts can change the texture and rise of your baked goods.
+      </p>
+
+      <h3>How many tablespoons is {cupsDisplay} of {ingredient}?</h3>
+      <p>
+        {cupsDisplay} of {ingredient.toLowerCase()} equals {tablespoons} tablespoons. Since there are 16 tablespoons in one US cup, you can easily convert between cups and tablespoons for any fraction. Tablespoons are particularly useful when you need a smaller, more precise portion than a full cup.
+      </p>
+
+      <h3>Can I use a regular drinking cup to measure {ingredient}?</h3>
+      <p>
+        No, a regular drinking cup is not a reliable substitute for a standard measuring cup. A US standard measuring cup holds exactly 236.588 ml (about 8 fluid ounces), while drinking cups, mugs, and glasses vary widely in capacity. Using a drinking cup could give you significantly more or less than the intended amount, which can ruin a recipe. Always use proper measuring cups, or better yet, measure {grams} grams on a kitchen scale for {cupsDisplay} of {ingredient.toLowerCase()}.
+      </p>
+    )}
+
+    <h2>Related {ingredient} Conversions</h2>
+    <ul>
+      {oppositePage && (
+        <li>
+          <a href={'/cooking/' + oppositePage.slug + '/'}>
+            {oppositePage.direction === 'grams-to-cups'
+              ? oppositePage.grams + 'g of ' + ingredient + ' to Cups'
+              : oppositePage.cupsDisplay + ' of ' + ingredient + ' in Grams'
+            } (reverse direction)
+          </a>
+        </li>
+      )}
+      {relatedPages.map(function (rp) {
+        return (
+          <li>
+            <a href={'/cooking/' + rp.slug + '/'}>
+              {rp.direction === 'grams-to-cups'
+                ? rp.grams + 'g of ' + ingredient + ' to Cups'
+                : rp.cupsDisplay + ' of ' + ingredient + ' in Grams'
+              }
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+
+    {otherIngredients.length > 0 && (
+      <h2>Other Ingredients at {isGramsToCups ? grams + ' Grams' : cupsDisplay}</h2>
+      <ul>
+        {otherIngredients.map(function (oi) {
+          return (
+            <li>
+              <a href={'/cooking/' + oi.slug + '/'}>
+                {oi.direction === 'grams-to-cups'
+                  ? oi.grams + 'g of ' + oi.ingredient + ' = ' + oi.cupsDisplay + ' cups'
+                  : oi.cupsDisplay + ' of ' + oi.ingredient + ' = ' + oi.grams + 'g'
+                }
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    )}
+
+    <p>
+      <a href="/cooking/">Browse all cooking conversions</a> for more ingredients and amounts.
+    </p>
+  </article>
+
+  <AdUnit slot="cooking-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  /* Answer Card */
+  .answer-card {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    color: #fff;
+    border-radius: var(--radius);
+    padding: 32px;
+    margin-bottom: 32px;
+    text-align: center;
+  }
+  .answer-card-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.85;
+    margin-bottom: 8px;
+  }
+  .answer-card-main {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+  .answer-card-secondary {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 4px;
+  }
+  .answer-card-tertiary {
+    font-size: 1rem;
+    opacity: 0.8;
+    margin-bottom: 12px;
+  }
+  .answer-card-note {
+    font-size: 0.8rem;
+    opacity: 0.7;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    padding-top: 12px;
+    margin-top: 8px;
+  }
+
+  /* Converter Widget */
+  .converter-widget {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 32px;
+  }
+  .converter-widget-heading {
+    font-size: 1.1rem;
+    margin: 0 0 16px;
+    border: none;
+    padding: 0;
+  }
+  .converter-widget-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .converter-widget-row .input-group {
+    flex: 1;
+    min-width: 160px;
+  }
+  .converter-widget-equals {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    padding-bottom: 8px;
+    flex-shrink: 0;
+  }
+  .converter-widget-result {
+    flex: 1;
+    min-width: 180px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+  }
+  .converter-widget-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-bottom: 4px;
+  }
+  .converter-widget-output {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    min-height: 1.4em;
+  }
+
+  /* Conversion Table */
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+  .cooking-table td:first-child {
+    font-weight: 600;
+  }
+  .highlight-row td {
+    background: #eff6ff;
+    font-weight: 700;
+  }
+  .cooking-table tr:hover td {
+    background: var(--color-bg);
+  }
+  .highlight-row:hover td {
+    background: #dbeafe;
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .answer-card {
+      padding: 24px 16px;
+    }
+    .answer-card-main {
+      font-size: 1.6rem;
+    }
+    .answer-card-secondary {
+      font-size: 0.95rem;
+    }
+    .converter-widget-row {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .converter-widget-equals {
+      text-align: center;
+      padding-bottom: 0;
+    }
+  }
+</style>
+
+<script define:vars={{ density, ingredientName: ingredient }}>
+  var gramsInput = document.getElementById('gramsInput');
+  var cupsOutput = document.getElementById('cupsOutput');
+
+  function convertGramsToCups() {
+    var g = parseFloat(gramsInput.value);
+    if (isNaN(g) || g <= 0) {
+      cupsOutput.textContent = '\u2014';
+      return;
+    }
+    var cups = g / density;
+    cupsOutput.textContent = cups.toFixed(2) + ' cups (' + (cups * 16).toFixed(1) + ' tbsp)';
+  }
+
+  if (gramsInput) {
+    gramsInput.addEventListener('input', convertGramsToCups);
+  }
+</script>
