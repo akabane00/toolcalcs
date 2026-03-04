@@ -642,3 +642,81 @@ export const calculators: Calculator[] = [
 export function getCalculatorsByCategory(categorySlug: string): Calculator[] {
   return calculators.filter(c => c.categorySlug === categorySlug);
 }
+
+// Semantic relationship groups for internal linking
+const relatedGroups: Record<string, string[]> = {
+  // Financial - Loans & Mortgages
+  'loans-mortgages': ['mortgage-calculator', 'loan-amortization-calculator', 'refinance-calculator', 'home-affordability-calculator', 'down-payment-calculator', 'rent-vs-buy-calculator', 'auto-loan-calculator', 'student-loan-calculator', 'business-loan-calculator'],
+  // Financial - Income & Tax
+  'income-tax': ['take-home-pay-calculator', 'paycheck-calculator', 'tax-calculator', 'payroll-tax-calculator', 'capital-gains-tax-calculator', 'estate-tax-calculator'],
+  // Financial - Savings & Investment
+  'savings-investment': ['compound-interest-calculator', 'investment-calculator', '401k-calculator', 'retirement-savings-calculator', 'savings-goal-calculator', 'fire-calculator', 'dca-calculator', 'roi-calculator'],
+  // Financial - Business & Wealth
+  'business-wealth': ['margin-calculator', 'breakeven-calculator', 'crypto-profit-calculator', 'rental-yield-calculator', 'net-worth-calculator', 'debt-to-income-calculator', 'credit-card-payoff-calculator'],
+  // Health - Body Composition
+  'body-composition': ['bmi-calculator', 'tdee-calculator', 'calorie-calculator', 'body-fat-calculator', 'ideal-weight-calculator', 'macro-calculator', 'water-intake-calculator'],
+  // Health - Wellness
+  'wellness': ['sleep-calculator', 'pace-calculator', 'pregnancy-due-date-calculator', 'ovulation-calculator'],
+  // Math
+  'math-tools': ['percentage-calculator', 'fraction-calculator', 'standard-deviation-calculator', 'area-calculator', 'probability-calculator', 'gpa-calculator', 'random-number-generator'],
+  // Date & Time
+  'date-time': ['age-calculator', 'date-difference-calculator', 'days-until-calculator', 'time-zone-converter'],
+  // Everyday
+  'everyday': ['tip-calculator', 'discount-calculator', 'hours-calculator', 'square-footage-calculator', 'gas-cost-calculator', 'electricity-cost-calculator', 'word-counter'],
+  // Construction
+  'construction': ['concrete-calculator', 'paint-calculator', 'roofing-calculator', 'flooring-calculator', 'mulch-calculator', 'fence-calculator', 'drywall-calculator', 'deck-calculator', 'solar-panel-calculator'],
+};
+
+// Cross-category links for broader discovery
+const crossCategoryLinks: Record<string, string[]> = {
+  'financial-calculators': ['percentage-calculator', 'hours-calculator', 'discount-calculator'],
+  'health-calculators': ['age-calculator', 'hours-calculator', 'percentage-calculator'],
+  'math-calculators': ['percentage-calculator', 'tip-calculator', 'compound-interest-calculator'],
+  'date-time-calculators': ['age-calculator', 'hours-calculator', 'time-zone-converter'],
+  'conversion-calculators': ['percentage-calculator', 'tip-calculator', 'area-calculator'],
+  'everyday-calculators': ['percentage-calculator', 'tax-calculator', 'mortgage-calculator'],
+  'construction-calculators': ['square-footage-calculator', 'area-calculator', 'percentage-calculator'],
+};
+
+export function getRelatedCalculators(currentSlug: string, limit: number = 5): Calculator[] {
+  const current = calculators.find(c => c.slug === currentSlug);
+  if (!current) return [];
+
+  const related: Calculator[] = [];
+  const seen = new Set<string>([currentSlug]);
+
+  // 1. Same semantic group (highest relevance)
+  for (const group of Object.values(relatedGroups)) {
+    if (group.includes(currentSlug)) {
+      for (const slug of group) {
+        if (!seen.has(slug)) {
+          const calc = calculators.find(c => c.slug === slug);
+          if (calc) { related.push(calc); seen.add(slug); }
+        }
+      }
+    }
+  }
+
+  // 2. Cross-category links
+  const crossLinks = crossCategoryLinks[current.categorySlug];
+  if (crossLinks) {
+    for (const slug of crossLinks) {
+      if (!seen.has(slug)) {
+        const calc = calculators.find(c => c.slug === slug);
+        if (calc) { related.push(calc); seen.add(slug); }
+      }
+    }
+  }
+
+  // 3. Same category fallback
+  if (related.length < limit) {
+    const sameCategory = calculators.filter(c => c.categorySlug === current.categorySlug && !seen.has(c.slug));
+    for (const calc of sameCategory) {
+      if (related.length >= limit * 2) break;
+      related.push(calc);
+      seen.add(calc.slug);
+    }
+  }
+
+  return related.slice(0, limit);
+}

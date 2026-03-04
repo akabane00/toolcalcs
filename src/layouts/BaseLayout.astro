@@ -22,6 +22,10 @@ const props = Astro.props;
   <SEOHead {...props} />
   <!-- AdSense verification only - script loaded after page render -->
   <meta name="google-adsense-account" content="ca-pub-1658942662433818">
+  <!-- Prevent flash of wrong theme -->
+  <script is:inline>
+    (function(){var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.setAttribute('data-theme','dark')}})();
+  </script>
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -57,10 +61,113 @@ const props = Astro.props;
       setTimeout(loadThirdParty, 2000);
     }
 
+    // Track recently visited calculators/tools
+    (function(){
+      var path = location.pathname;
+      if (path === '/' || path.split('/').filter(Boolean).length < 2) return;
+      var cats = ['financial-calculators','health-calculators','math-calculators','date-time-calculators','conversion-calculators','everyday-calculators','construction-calculators','test','tools'];
+      var match = cats.some(function(c){return path.startsWith('/'+c+'/');});
+      if (!match) return;
+      var h1 = document.querySelector('h1');
+      if (!h1) return;
+      var item = {url: path, title: h1.textContent.trim(), ts: Date.now()};
+      try {
+        var key = 'tc_recent';
+        var list = JSON.parse(localStorage.getItem(key)||'[]');
+        list = list.filter(function(r){return r.url !== path;});
+        list.unshift(item);
+        if (list.length > 10) list = list.slice(0, 10);
+        localStorage.setItem(key, JSON.stringify(list));
+      } catch(e){}
+    })();
+
+    // Inject share buttons on tool/calculator pages
+    (function(){
+      var path = location.pathname;
+      var seg = path.split('/').filter(Boolean);
+      if (seg.length < 2) return;
+      var cats = ['financial-calculators','health-calculators','math-calculators','date-time-calculators','conversion-calculators','everyday-calculators','construction-calculators','test','tools','worksheets'];
+      if (!cats.some(function(c){return seg[0]===c;})) return;
+      var bc = document.querySelector('.breadcrumb');
+      if (!bc) return;
+      var bar = document.createElement('div');
+      bar.className = 'share-bar';
+      bar.innerHTML = '<span class="share-label">Share:</span>' +
+        '<button class="share-btn" data-action="twitter" aria-label="Share on X" title="Share on X"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></button>' +
+        '<button class="share-btn" data-action="facebook" aria-label="Share on Facebook" title="Share on Facebook"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></button>' +
+        '<button class="share-btn" data-action="copy" aria-label="Copy link" title="Copy link"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span class="copy-tooltip">Copied!</span></button>';
+      bc.parentNode!.insertBefore(bar, bc.nextSibling);
+      bar.addEventListener('click', function(e: Event){
+        var btn = (e.target as HTMLElement).closest('.share-btn') as HTMLElement;
+        if (!btn) return;
+        var act = btn.dataset.action;
+        var u = encodeURIComponent(location.href);
+        var t = encodeURIComponent(document.title);
+        
+        if (window.gtag && act) {
+          window.gtag('event', 'share_click', {
+            event_category: 'engagement',
+            event_label: act
+          });
+        }
+
+        if (act==='twitter') window.open('https://x.com/intent/tweet?url='+u+'&text='+t,'_blank','width=550,height=420');
+        else if (act==='facebook') window.open('https://www.facebook.com/sharer/sharer.php?u='+u,'_blank','width=550,height=420');
+        else if (act==='copy') navigator.clipboard.writeText(location.href).then(function(){
+          btn.classList.add('copied'); setTimeout(function(){btn.classList.remove('copied');},1500);
+        });
+      });
+    })();
+
+    // Enter key triggers Calculate button on calculator pages
+    var calcBtn = document.getElementById('calculateBtn');
+    if (calcBtn) {
+      document.querySelector('.calculator-box')?.addEventListener('keydown', function(e: KeyboardEvent) {
+        if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'TEXTAREA') {
+          e.preventDefault();
+          calcBtn!.click();
+        }
+      });
+    }
+
+    // Mobile: add inputmode="decimal" to number inputs for better mobile keyboards
+    document.querySelectorAll('input[type="number"]').forEach(function(el) {
+      if (!el.getAttribute('inputmode')) el.setAttribute('inputmode', 'decimal');
+    });
+
     // Register Service Worker for PWA / offline support
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').catch(function(){});
     }
+
+    // GA4 Custom Event Tracking: Calculate Button
+    document.getElementById('calculateBtn')?.addEventListener('click', function() {
+      if (window.gtag) window.gtag('event', 'calculate_click', {
+        event_category: 'engagement',
+        event_label: location.pathname
+      });
+    });
+
+    // GA4 Custom Event Tracking: Worksheet Print
+    document.getElementById('btnPrint')?.addEventListener('click', function() {
+      if (window.gtag) window.gtag('event', 'worksheet_print', {
+        event_category: 'engagement',
+        event_label: location.pathname
+      });
+    });
+
+    // GA4 Custom Event Tracking: FAQ Toggle
+    document.querySelectorAll('details.faq-item').forEach(function(el) {
+      el.addEventListener('toggle', function(e: Event) {
+        var details = e.target as HTMLDetailsElement;
+        if (details.open && window.gtag) {
+          window.gtag('event', 'faq_toggle', {
+            event_category: 'engagement',
+            event_label: details.querySelector('summary')?.textContent || ''
+          });
+        }
+      });
+    });
   </script>
 </body>
 </html>

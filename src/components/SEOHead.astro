@@ -12,9 +12,63 @@ const { title, description, canonical, type = 'website', noindex = false, struct
 const siteUrl = 'https://toolcalcs.com';
 const pageUrl = canonical || `${siteUrl}${Astro.url.pathname}`;
 const fullTitle = title.includes('ToolCalcs') ? title : `${title} | ToolCalcs`;
-const schemaList = structuredData
-  ? Array.isArray(structuredData) ? structuredData : [structuredData]
+const schemaList: object[] = structuredData
+  ? Array.isArray(structuredData) ? [...structuredData] : [structuredData]
   : [];
+
+// Auto-inject WebApplication schema for calculator/tool pages
+const path = Astro.url.pathname;
+const calcCategories: Record<string, string> = {
+  'financial-calculators': 'FinanceApplication',
+  'health-calculators': 'HealthApplication',
+  'math-calculators': 'UtilityApplication',
+  'date-time-calculators': 'UtilityApplication',
+  'conversion-calculators': 'UtilityApplication',
+  'everyday-calculators': 'UtilityApplication',
+  'construction-calculators': 'UtilityApplication',
+};
+const segments = path.split('/').filter(Boolean);
+if (segments.length >= 2 && calcCategories[segments[0]]) {
+  const appName = title.split(' - ')[0].split(' | ')[0].trim();
+  schemaList.push({
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: appName,
+    url: pageUrl,
+    applicationCategory: calcCategories[segments[0]],
+    operatingSystem: 'All',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  });
+}
+
+// Auto-inject WebApplication for tool pages
+if (segments[0] === 'tools' && segments.length >= 2) {
+  const appName = title.split(' - ')[0].split(' | ')[0].trim();
+  schemaList.push({
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: appName,
+    url: pageUrl,
+    applicationCategory: 'DeveloperApplication',
+    operatingSystem: 'All',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  });
+}
+
+// Auto-inject LearningResource for worksheet pages
+if (segments[0] === 'worksheets' && segments.length >= 2) {
+  const appName = title.split(' - ')[0].split(' | ')[0].replace(/^Free\s+/, '').trim();
+  schemaList.push({
+    '@context': 'https://schema.org',
+    '@type': 'LearningResource',
+    name: appName,
+    url: pageUrl,
+    learningResourceType: 'worksheet',
+    educationalUse: 'practice',
+    isAccessibleForFree: true,
+    inLanguage: 'en',
+  });
+}
 ---
 
 <meta charset="utf-8" />

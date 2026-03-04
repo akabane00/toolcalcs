@@ -22,7 +22,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'Addition Worksheets',
     slug: 'addition-worksheets',
-    description: 'Free printable addition worksheets. Generate unlimited practice problems from single-digit to three-digit addition.',
+    description: 'Free printable addition worksheets for grades K-3. Generate unlimited practice problems from single-digit to three-digit addition. Download and print instantly.',
     icon: '➕',
     gradeRange: 'K-3',
     mathTopic: 'Addition',
@@ -35,7 +35,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'Subtraction Worksheets',
     slug: 'subtraction-worksheets',
-    description: 'Free printable subtraction worksheets. Practice from basic facts to multi-digit subtraction with borrowing.',
+    description: 'Free printable subtraction worksheets for grades K-3. Practice from basic facts to multi-digit subtraction with borrowing. Generate unlimited problems instantly.',
     icon: '➖',
     gradeRange: 'K-3',
     mathTopic: 'Subtraction',
@@ -48,7 +48,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'Multiplication Worksheets',
     slug: 'multiplication-worksheets',
-    description: 'Free printable multiplication worksheets. Practice times tables and multi-digit multiplication problems.',
+    description: 'Free printable multiplication worksheets for grades 2-5. Practice times tables and multi-digit multiplication with customizable difficulty. Print unlimited worksheets.',
     icon: '✖️',
     gradeRange: '2-5',
     mathTopic: 'Multiplication',
@@ -61,7 +61,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'Division Worksheets',
     slug: 'division-worksheets',
-    description: 'Free printable division worksheets. Practice basic division facts and long division with or without remainders.',
+    description: 'Free printable division worksheets for grades 3-5. Practice basic division facts and long division with or without remainders. Generate unlimited problems.',
     icon: '➗',
     gradeRange: '3-5',
     mathTopic: 'Division',
@@ -74,7 +74,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'Number Tracing Worksheets',
     slug: 'number-tracing',
-    description: 'Free printable number tracing worksheets for preschool and kindergarten. Practice writing numbers 0-20.',
+    description: 'Free printable number tracing worksheets for preschool and kindergarten. Practice writing numbers 0-20 with guided dotted lines. Generate and print instantly.',
     icon: '✏️',
     gradeRange: 'Pre-K',
     mathTopic: 'Number Writing',
@@ -86,7 +86,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'Skip Counting Worksheets',
     slug: 'skip-counting',
-    description: 'Free printable skip counting worksheets. Practice counting by 2s, 5s, 10s, and more with fill-in-the-blank.',
+    description: 'Free printable skip counting worksheets for grades K-2. Practice counting by 2s, 5s, 10s, and more with fill-in-the-blank exercises. Generate unlimited worksheets.',
     icon: '🔢',
     gradeRange: 'K-2',
     mathTopic: 'Skip Counting',
@@ -99,7 +99,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'Telling Time Worksheets',
     slug: 'telling-time-worksheets',
-    description: 'Free printable telling time worksheets with analog clock faces. Practice reading clocks to the hour and minute.',
+    description: 'Free printable telling time worksheets with analog clock faces for grades 1-3. Practice reading clocks to the hour, half hour, and minute. Print instantly.',
     icon: '🕐',
     gradeRange: '1-3',
     mathTopic: 'Telling Time',
@@ -111,7 +111,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'Counting Money Worksheets',
     slug: 'counting-money-worksheets',
-    description: 'Free printable counting money worksheets with US coins and bills. Practice adding up pennies, nickels, dimes, and quarters.',
+    description: 'Free printable counting money worksheets for grades 1-3. Practice adding US coins and bills including pennies, nickels, dimes, and quarters. Generate unlimited problems.',
     icon: '🪙',
     gradeRange: '1-3',
     mathTopic: 'Counting Money',
@@ -124,7 +124,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'Place Value Worksheets',
     slug: 'place-value-worksheets',
-    description: 'Free printable place value worksheets. Practice identifying digit values, expanded form, and standard form for numbers up to 5 digits.',
+    description: 'Free printable place value worksheets for grades 1-4. Identify digit values, expanded form, and standard form for numbers up to 5 digits. Print unlimited worksheets.',
     icon: '🔟',
     gradeRange: '1-4',
     mathTopic: 'Place Value',
@@ -137,7 +137,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'Rounding Worksheets',
     slug: 'rounding-worksheets',
-    description: 'Free printable rounding worksheets. Practice rounding numbers to the nearest 10, 100, and 1,000 with unlimited problems.',
+    description: 'Free printable rounding worksheets for grades 3-5. Practice rounding numbers to the nearest 10, 100, and 1,000. Generate unlimited customizable problems instantly.',
     icon: '🔄',
     gradeRange: '3-5',
     mathTopic: 'Rounding',
@@ -150,7 +150,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'Comparing Numbers Worksheets',
     slug: 'comparing-numbers-worksheets',
-    description: 'Free printable greater than less than worksheets. Practice comparing numbers using >, <, and = symbols.',
+    description: 'Free printable greater than less than worksheets for grades K-3. Compare numbers using >, <, and = symbols. Generate unlimited customizable practice problems.',
     icon: '⚖️',
     gradeRange: 'K-3',
     mathTopic: 'Comparing Numbers',
@@ -163,7 +163,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'Even & Odd Worksheets',
     slug: 'even-and-odd-worksheets',
-    description: 'Free printable even and odd number worksheets. Practice identifying, sorting, and classifying numbers as even or odd.',
+    description: 'Free printable even and odd number worksheets for grades K-2. Practice identifying, sorting, and classifying numbers as even or odd. Generate unlimited worksheets.',
     icon: '🎯',
     gradeRange: 'K-2',
     mathTopic: 'Even & Odd Numbers',
@@ -176,7 +176,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'Fractions Worksheets',
     slug: 'fractions-worksheets',
-    description: 'Free printable fractions worksheets. Practice identifying, comparing, and adding fractions with visual models and step-by-step problems.',
+    description: 'Free printable fractions worksheets for grades 3-5. Practice identifying, comparing, and adding fractions with visual models. Generate unlimited custom problems.',
     icon: '½',
     gradeRange: '3-5',
     mathTopic: 'Fractions',
@@ -189,7 +189,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'Order of Operations Worksheets',
     slug: 'order-of-operations-worksheets',
-    description: 'Free printable order of operations (PEMDAS) worksheets. Practice evaluating expressions with parentheses, exponents, and mixed operations.',
+    description: 'Free printable PEMDAS worksheets for grades 4-6. Practice order of operations with parentheses, exponents, and mixed operations. Generate unlimited problems.',
     icon: '📐',
     gradeRange: '4-6',
     mathTopic: 'Order of Operations',
@@ -202,7 +202,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'Long Division Worksheets',
     slug: 'long-division-worksheets',
-    description: 'Free printable long division worksheets. Practice dividing 2-4 digit numbers with step-by-step long division format.',
+    description: 'Free printable long division worksheets for grades 4-6. Practice dividing 2-4 digit numbers with step-by-step format. Customize difficulty and print instantly.',
     icon: '➗',
     gradeRange: '4-6',
     mathTopic: 'Long Division',
@@ -215,7 +215,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'Number Patterns Worksheets',
     slug: 'number-patterns-worksheets',
-    description: 'Free printable number patterns worksheets. Practice recognizing and extending addition, subtraction, and multiplication patterns.',
+    description: 'Free printable number patterns worksheets for grades 1-4. Recognize and extend addition, subtraction, and multiplication patterns. Generate unlimited practice sheets.',
     icon: '🔢',
     gradeRange: '1-4',
     mathTopic: 'Number Patterns',
@@ -228,7 +228,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'Number Line Worksheets',
     slug: 'number-line-worksheets',
-    description: 'Free printable number line worksheets. Practice identifying numbers, placing values, and visualizing addition and subtraction on a number line.',
+    description: 'Free printable number line worksheets for grades 1-3. Practice identifying numbers, placing values, and visualizing addition and subtraction. Generate and print.',
     icon: '📏',
     gradeRange: '1-3',
     mathTopic: 'Number Line',
@@ -241,7 +241,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'Area & Perimeter Worksheets',
     slug: 'area-and-perimeter-worksheets',
-    description: 'Free printable area and perimeter worksheets. Practice calculating area and perimeter of rectangles, squares, and triangles with visual diagrams.',
+    description: 'Free printable area and perimeter worksheets for grades 3-5. Calculate area and perimeter of rectangles, squares, and triangles with diagrams. Print instantly.',
     icon: '📐',
     gradeRange: '3-5',
     mathTopic: 'Area & Perimeter',
@@ -255,7 +255,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'Decimals Worksheets',
     slug: 'decimals-worksheets',
-    description: 'Free printable decimals worksheets. Practice adding, subtracting, multiplying, and dividing decimal numbers with configurable decimal places.',
+    description: 'Free printable decimals worksheets for grades 4-6. Practice adding, subtracting, multiplying, and dividing decimals with configurable difficulty. Print instantly.',
     icon: '🔢',
     gradeRange: '4-6',
     mathTopic: 'Decimals',
@@ -268,7 +268,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'Percentages Worksheets',
     slug: 'percentages-worksheets',
-    description: 'Free printable percentages worksheets. Practice finding percent of a number, percent change, discounts, and converting between fractions, decimals, and percents.',
+    description: 'Free printable percentages worksheets for grades 5-7. Practice finding percent of a number, percent change, discounts, and fraction-decimal-percent conversions.',
     icon: '%',
     gradeRange: '5-7',
     mathTopic: 'Percentages',
@@ -281,7 +281,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'Fact Families Worksheets',
     slug: 'fact-families-worksheets',
-    description: 'Free printable fact family worksheets. Practice addition/subtraction and multiplication/division fact families with visual triangle models.',
+    description: 'Free printable fact family worksheets for grades K-2. Practice addition/subtraction and multiplication/division families with triangle models. Print instantly.',
     icon: '🏠',
     gradeRange: 'K-2',
     mathTopic: 'Fact Families',
@@ -294,7 +294,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'Measurement Worksheets',
     slug: 'measurement-worksheets',
-    description: 'Free printable measurement worksheets. Practice converting between customary and metric units, comparing measurements, and solving measurement word problems.',
+    description: 'Free printable measurement worksheets for grades 2-4. Convert between customary and metric units, compare measurements, and solve word problems. Print instantly.',
     icon: '📏',
     gradeRange: '2-4',
     mathTopic: 'Measurement',
@@ -307,7 +307,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'Word Problems Worksheets',
     slug: 'word-problems-worksheets',
-    description: 'Free printable math word problems worksheets. Practice solving addition, subtraction, multiplication, and division word problems for grades 1-6.',
+    description: 'Free printable math word problems for grades 1-6. Solve addition, subtraction, multiplication, and division word problems. Generate unlimited custom worksheets.',
     icon: '📝',
     gradeRange: '1-6',
     mathTopic: 'Word Problems',
@@ -320,7 +320,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'Geometry Worksheets',
     slug: 'geometry-worksheets',
-    description: 'Free printable geometry worksheets. Practice identifying shapes, classifying angles, finding lines of symmetry, and classifying triangles with visual diagrams.',
+    description: 'Free printable geometry worksheets for grades 2-5. Practice identifying shapes, classifying angles, symmetry, and triangles with visual diagrams. Print instantly.',
     icon: '📐',
     gradeRange: '2-5',
     mathTopic: 'Geometry',
@@ -333,7 +333,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'Multiplication Tables Worksheets',
     slug: 'multiplication-tables-worksheets',
-    description: 'Practice specific times tables with drill-style worksheets. Focus on individual tables or mix them all.',
+    description: 'Free printable times tables drill worksheets for grades 2-4. Focus on individual multiplication tables or mix them all. Generate unlimited timed practice sheets.',
     icon: '📊',
     gradeRange: '2-4',
     mathTopic: 'Multiplication Tables',
@@ -346,7 +346,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'Algebra Worksheets',
     slug: 'algebra-worksheets',
-    description: 'Free pre-algebra worksheets. Practice solving equations, evaluating expressions, and simplifying terms.',
+    description: 'Free printable pre-algebra worksheets for grades 5-7. Practice solving equations, evaluating expressions, and simplifying terms. Generate unlimited custom problems.',
     icon: '🔤',
     gradeRange: '5-7',
     mathTopic: 'Algebra',
@@ -359,7 +359,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'Mean Median Mode Worksheets',
     slug: 'mean-median-mode-worksheets',
-    description: 'Practice calculating mean, median, and mode from data sets. Printable statistics worksheets for grades 4-6.',
+    description: 'Free printable mean, median, and mode worksheets for grades 4-6. Practice calculating statistics from data sets with customizable difficulty. Print instantly.',
     icon: '📈',
     gradeRange: '4-6',
     mathTopic: 'Statistics',
@@ -372,7 +372,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'Exponents Worksheets',
     slug: 'exponents-worksheets',
-    description: 'Practice powers and exponents. Evaluate expressions, apply exponent rules, and simplify.',
+    description: 'Free printable exponents worksheets for grades 5-7. Practice evaluating powers, applying product and quotient rules, and simplifying expressions. Print instantly.',
     icon: 'xⁿ',
     gradeRange: '5-7',
     mathTopic: 'Exponents',
@@ -385,7 +385,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'Ratio & Proportion Worksheets',
     slug: 'ratio-and-proportion-worksheets',
-    description: 'Practice ratios, equivalent ratios, and solving proportions. Free printable worksheets for grades 5-7.',
+    description: 'Free printable ratio and proportion worksheets for grades 5-7. Practice equivalent ratios, solving proportions, and simplifying. Generate unlimited custom problems.',
     icon: '⚖️',
     gradeRange: '5-7',
     mathTopic: 'Ratios',
@@ -398,7 +398,7 @@ export const worksheets: Worksheet[] = [
   {
     title: 'GCF & LCM Worksheets',
     slug: 'gcf-and-lcm-worksheets',
-    description: 'Find the greatest common factor and least common multiple. Practice with printable GCF & LCM worksheets.',
+    description: 'Free printable GCF and LCM worksheets for grades 4-6. Practice finding greatest common factor and least common multiple with customizable difficulty. Print instantly.',
     icon: '🔢',
     gradeRange: '4-6',
     mathTopic: 'GCF & LCM',

@@ -44,6 +44,11 @@ const structuredData = {
   name: 'ToolCalcs',
   url: 'https://toolcalcs.com',
   description: 'Free online calculators for finance, health, and math. Simple, fast, and accurate tools.',
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: 'https://toolcalcs.com/?q={search_term_string}',
+    'query-input': 'required name=search_term_string',
+  },
 };
 ---
 
@@ -55,6 +60,14 @@ const structuredData = {
   <section class="hero">
     <h1>Free Online Calculators</h1>
     <p>Simple, fast, and accurate tools for finance, health, and everyday math.</p>
+  </section>
+
+  <!-- Recently Used (populated client-side) -->
+  <section class="recent-section" id="recent-section" style="display:none;">
+    <div class="category-header">
+      <h2><span class="category-icon">🕐</span> Recently Used</h2>
+    </div>
+    <div class="recent-grid" id="recent-grid"></div>
   </section>
 
   <AdUnit slot="home-top" format="horizontal" />
@@ -378,6 +391,27 @@ const structuredData = {
   </section>
 
   <AdUnit slot="home-bottom" format="horizontal" />
+
+  <script>
+    // Render recently used calculators on homepage
+    try {
+      const list = JSON.parse(localStorage.getItem('tc_recent') || '[]');
+      if (list.length > 0) {
+        const section = document.getElementById('recent-section');
+        const grid = document.getElementById('recent-grid');
+        if (section && grid) {
+          list.slice(0, 6).forEach((item: {url: string; title: string}) => {
+            const a = document.createElement('a');
+            a.href = item.url;
+            a.className = 'recent-item';
+            a.textContent = item.title;
+            grid.appendChild(a);
+          });
+          section.style.display = 'block';
+        }
+      }
+    } catch(e) {}
+  </script>
 </BaseLayout>
 
 <style>
@@ -556,6 +590,32 @@ const structuredData = {
     background: #eff6ff;
     padding: 3px 12px;
     border-radius: 12px;
+  }
+  [data-theme="dark"] .section-count { background: #1e3a5f; }
+
+  /* Recently Used */
+  .recent-section { margin-bottom: 32px; }
+  .recent-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .recent-item {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 0.88rem;
+    color: var(--color-text);
+    background: var(--color-surface);
+    transition: border-color 0.15s, color 0.15s;
+    text-decoration: none;
+  }
+  .recent-item:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    text-decoration: none;
   }
 
   @media (max-width: 640px) {

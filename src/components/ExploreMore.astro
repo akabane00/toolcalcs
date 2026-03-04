@@ -1,0 +1,71 @@
+---
+import { categories } from '../data/calculators';
+
+interface Props {
+  currentCategorySlug: string;
+}
+
+const { currentCategorySlug } = Astro.props;
+
+const otherCategories = categories.filter(c => c.slug !== currentCategorySlug);
+
+const extraSections = [
+  { icon: '🎮', label: 'Tests & Games', href: '/test/' },
+  { icon: '🛠️', label: 'Web Tools', href: '/tools/' },
+  { icon: '📝', label: 'Worksheets', href: '/worksheets/' },
+];
+---
+
+<section class="explore-more">
+  <h3>Explore More</h3>
+  <div class="explore-grid">
+    {otherCategories.map(cat => (
+      <a href={`/${cat.slug}/`}>
+        <span class="em-icon">{cat.icon}</span>
+        {cat.name}
+      </a>
+    ))}
+    {extraSections.map(s => (
+      <a href={s.href}>
+        <span class="em-icon">{s.icon}</span>
+        {s.label}
+      </a>
+    ))}
+  </div>
+</section>
+
+<style>
+  .explore-more {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--color-border);
+  }
+  .explore-more h3 {
+    font-size: 1.05rem;
+    margin-bottom: 12px;
+    color: var(--color-text);
+  }
+  .explore-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .explore-grid a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 0.85rem;
+    color: var(--color-text);
+    background: var(--color-surface);
+    transition: border-color 0.15s, color 0.15s;
+    text-decoration: none;
+  }
+  .explore-grid a:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  .em-icon { font-size: 1rem; }
+</style>
