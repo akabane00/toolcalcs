@@ -259,236 +259,236 @@ const structuredData = [
 </style>
 
 <script define:vars={{ gameName: game.title, gameSlug: game.slug, gameIcon: game.icon, metricLabel: game.metricLabel, metricUnit: game.metricUnit }}>
-  (function () {
-    'use strict';
+ (function () {
+ 'use strict';
 
-    const GRID_COLS = 8;
-    const GRID_ROWS = 5;
-    const TOTAL_CELLS = GRID_COLS * GRID_ROWS;
-    const START_NUMBERS = 4;
-    const MAX_STRIKES = 3;
+ const GRID_COLS = 8;
+ const GRID_ROWS = 5;
+ const TOTAL_CELLS = GRID_COLS * GRID_ROWS;
+ const START_NUMBERS = 4;
+ const MAX_STRIKES = 3;
 
-    const RATING_SCALE = [
-      { min: 11, label: 'Chimpanzee Level!', color: '#16a34a' },
-      { min: 9, label: 'Great!', color: '#22c55e' },
-      { min: 7, label: 'Good', color: '#2563eb' },
-      { min: 5, label: 'Average', color: '#f59e0b' },
-      { min: 0, label: 'Below Average', color: '#ef4444' },
-    ];
+ const RATING_SCALE = [
+ { min: 11, label: 'Chimpanzee Level!', color: '#16a34a' },
+ { min: 9, label: 'Great!', color: '#22c55e' },
+ { min: 7, label: 'Good', color: '#2563eb' },
+ { min: 5, label: 'Average', color: '#f59e0b' },
+ { min: 0, label: 'Below Average', color: '#ef4444' },
+ ];
 
-    function getLocalRating(score) {
-      for (const level of RATING_SCALE) {
-        if (score >= level.min) return { label: level.label, color: level.color };
-      }
-      return { label: 'Below Average', color: '#ef4444' };
-    }
+ function getLocalRating(score) {
+ for (const level of RATING_SCALE) {
+ if (score >= level.min) return { label: level.label, color: level.color };
+ }
+ return { label: 'Below Average', color: '#ef4444' };
+ }
 
-    const STORAGE_KEY = 'toolcalcs_chimp-test_history';
-    const MAX_HISTORY = 20;
+ const STORAGE_KEY = 'toolcalcs_chimp-test_history';
+ const MAX_HISTORY = 20;
 
-    function loadHistory() {
-      try { const r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch {}
-      return [];
-    }
-    function saveHistory(h) {
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch {}
-    }
-    function addToHistory(score) {
-      const h = loadHistory();
-      h.unshift({ score, date: new Date().toISOString(), rating: getLocalRating(score).label });
-      saveHistory(h);
-    }
+ function loadHistory() {
+ try { const r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch {}
+ return [];
+ }
+ function saveHistory(h) {
+ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch {}
+ }
+ function addToHistory(score) {
+ const h = loadHistory();
+ h.unshift({ score, date: new Date().toISOString(), rating: getLocalRating(score).label });
+ saveHistory(h);
+ }
 
-    // DOM
-    const instructionsView = document.getElementById('instructionsView')!;
-    const playView = document.getElementById('playView')!;
-    const resultView = document.getElementById('resultView')!;
-    const startBtn = document.getElementById('startBtn')!;
-    const tryAgainBtn = document.getElementById('tryAgainBtn')!;
-    const levelInfo = document.getElementById('levelInfo')!;
-    const livesInfo = document.getElementById('livesInfo')!;
-    const chimpGrid = document.getElementById('chimpGrid')!;
-    const finalScore = document.getElementById('finalScore')!;
-    const ratingBadge = document.getElementById('ratingBadge')!;
-    const attemptHistorySection = document.getElementById('attemptHistory')!;
-    const historyList = document.getElementById('historyList')!;
+ // DOM
+ const instructionsView = document.getElementById('instructionsView');
+ const playView = document.getElementById('playView');
+ const resultView = document.getElementById('resultView');
+ const startBtn = document.getElementById('startBtn');
+ const tryAgainBtn = document.getElementById('tryAgainBtn');
+ const levelInfo = document.getElementById('levelInfo');
+ const livesInfo = document.getElementById('livesInfo');
+ const chimpGrid = document.getElementById('chimpGrid');
+ const finalScore = document.getElementById('finalScore');
+ const ratingBadge = document.getElementById('ratingBadge');
+ const attemptHistorySection = document.getElementById('attemptHistory');
+ const historyList = document.getElementById('historyList');
 
-    let currentNumbers = START_NUMBERS;
-    let strikes = 0;
-    let highestCompleted = 0;
-    let isPlaying = false;
-    let numbersHidden = false;
-    let nextExpected = 1;
-    // Map: cellIndex -> number
-    let numberMap = new Map<number, number>();
-    let canClick = false;
+ let currentNumbers = START_NUMBERS;
+ let strikes = 0;
+ let highestCompleted = 0;
+ let isPlaying = false;
+ let numbersHidden = false;
+ let nextExpected = 1;
+ // Map: cellIndex -> number
+ let numberMap = new Map();
+ let canClick = false;
 
-    function showView(view) {
-      [instructionsView, playView, resultView].forEach(v => v.style.display = 'none');
-      view.style.display = '';
-    }
+ function showView(view) {
+ [instructionsView, playView, resultView].forEach(v => v.style.display = 'none');
+ view.style.display = '';
+ }
 
-    function shufflePositions(count) {
-      const all = Array.from({ length: TOTAL_CELLS }, (_, i) => i);
-      for (let i = all.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [all[i], all[j]] = [all[j], all[i]];
-      }
-      return all.slice(0, count);
-    }
+ function shufflePositions(count) {
+ const all = Array.from({ length: TOTAL_CELLS }, (_, i) => i);
+ for (let i = all.length - 1; i > 0; i--) {
+ const j = Math.floor(Math.random() * (i + 1));
+ [all[i], all[j]] = [all[j], all[i]];
+ }
+ return all.slice(0, count);
+ }
 
-    function renderGrid() {
-      chimpGrid.innerHTML = '';
-      for (let i = 0; i < TOTAL_CELLS; i++) {
-        const btn = document.createElement('button');
-        btn.className = 'chimp-cell';
-        btn.dataset.index = String(i);
-        if (numberMap.has(i)) {
-          btn.className = 'chimp-cell has-number';
-          btn.textContent = String(numberMap.get(i));
-        }
-        chimpGrid.appendChild(btn);
-      }
-    }
+ function renderGrid() {
+ chimpGrid.innerHTML = '';
+ for (let i = 0; i < TOTAL_CELLS; i++) {
+ const btn = document.createElement('button');
+ btn.className = 'chimp-cell';
+ btn.dataset.index = String(i);
+ if (numberMap.has(i)) {
+ btn.className = 'chimp-cell has-number';
+ btn.textContent = String(numberMap.get(i));
+ }
+ chimpGrid.appendChild(btn);
+ }
+ }
 
-    function hideNumbers() {
-      numbersHidden = true;
-      chimpGrid.querySelectorAll('.chimp-cell.has-number').forEach(cell => {
-        cell.classList.add('hidden-num');
-      });
-    }
+ function hideNumbers() {
+ numbersHidden = true;
+ chimpGrid.querySelectorAll('.chimp-cell.has-number').forEach(cell => {
+ cell.classList.add('hidden-num');
+ });
+ }
 
-    function startRound() {
-      nextExpected = 1;
-      numbersHidden = false;
-      canClick = true;
+ function startRound() {
+ nextExpected = 1;
+ numbersHidden = false;
+ canClick = true;
 
-      // Place numbers on random cells
-      const positions = shufflePositions(currentNumbers);
-      numberMap = new Map();
-      for (let i = 0; i < currentNumbers; i++) {
-        numberMap.set(positions[i], i + 1);
-      }
+ // Place numbers on random cells
+ const positions = shufflePositions(currentNumbers);
+ numberMap = new Map();
+ for (let i = 0; i < currentNumbers; i++) {
+ numberMap.set(positions[i], i + 1);
+ }
 
-      levelInfo.textContent = `Numbers: ${currentNumbers}`;
-      livesInfo.textContent = `❌ ${strikes} / ${MAX_STRIKES}`;
+ levelInfo.textContent = `Numbers: ${currentNumbers}`;
+ livesInfo.textContent = `❌ ${strikes} / ${MAX_STRIKES}`;
 
-      renderGrid();
-    }
+ renderGrid();
+ }
 
-    function handleCellClick(e) {
-      if (!isPlaying || !canClick) return;
-      const target = (e.target).closest('.chimp-cell') | null;
-      if (!target) return;
-      const idx = parseInt(target.dataset.index || '-1');
-      if (idx < 0) return;
+ function handleCellClick(e) {
+ if (!isPlaying || !canClick) return;
+ const target = (e.target).closest('.chimp-cell');
+ if (!target) return;
+ const idx = parseInt(target.dataset.index || '-1');
+ if (idx < 0) return;
 
-      // Ignore clicks on cells without numbers or already cleared
-      if (!numberMap.has(idx)) return;
-      if (target.classList.contains('correct-cell')) return;
+ // Ignore clicks on cells without numbers or already cleared
+ if (!numberMap.has(idx)) return;
+ if (target.classList.contains('correct-cell')) return;
 
-      const num = numberMap.get(idx)!;
+ const num = numberMap.get(idx);
 
-      if (num === nextExpected) {
-        // Correct - first click hides all numbers
-        if (nextExpected === 1 && !numbersHidden) {
-          hideNumbers();
-        }
+ if (num === nextExpected) {
+ // Correct - first click hides all numbers
+ if (nextExpected === 1 && !numbersHidden) {
+ hideNumbers();
+ }
 
-        target.classList.remove('hidden-num');
-        target.classList.add('correct-cell');
-        target.textContent = String(num);
-        nextExpected++;
+ target.classList.remove('hidden-num');
+ target.classList.add('correct-cell');
+ target.textContent = String(num);
+ nextExpected++;
 
-        if (nextExpected > currentNumbers) {
-          // Level complete
-          canClick = false;
-          highestCompleted = currentNumbers;
-          currentNumbers++;
-          setTimeout(() => startRound(), 500);
-        }
-      } else {
-        // Wrong
-        target.classList.add('wrong-cell');
-        target.textContent = String(numberMap.get(idx));
-        canClick = false;
-        strikes++;
-        livesInfo.textContent = `❌ ${strikes} / ${MAX_STRIKES}`;
+ if (nextExpected > currentNumbers) {
+ // Level complete
+ canClick = false;
+ highestCompleted = currentNumbers;
+ currentNumbers++;
+ setTimeout(() => startRound(), 500);
+ }
+ } else {
+ // Wrong
+ target.classList.add('wrong-cell');
+ target.textContent = String(numberMap.get(idx));
+ canClick = false;
+ strikes++;
+ livesInfo.textContent = `❌ ${strikes} / ${MAX_STRIKES}`;
 
-        // Reveal all numbers briefly
-        chimpGrid.querySelectorAll('.chimp-cell.has-number').forEach(cell => {
-          const ci = parseInt((cell).dataset.index || '-1');
-          if (numberMap.has(ci)) {
-            cell.classList.remove('hidden-num');
-            cell.textContent = String(numberMap.get(ci));
-          }
-        });
+ // Reveal all numbers briefly
+ chimpGrid.querySelectorAll('.chimp-cell.has-number').forEach(cell => {
+ const ci = parseInt((cell).dataset.index || '-1');
+ if (numberMap.has(ci)) {
+ cell.classList.remove('hidden-num');
+ cell.textContent = String(numberMap.get(ci));
+ }
+ });
 
-        if (strikes >= MAX_STRIKES) {
-          setTimeout(() => endGame(), 800);
-        } else {
-          // Retry same level
-          setTimeout(() => startRound(), 1000);
-        }
-      }
-    }
+ if (strikes >= MAX_STRIKES) {
+ setTimeout(() => endGame(), 800);
+ } else {
+ // Retry same level
+ setTimeout(() => startRound(), 1000);
+ }
+ }
+ }
 
-    function startGame() {
-      currentNumbers = START_NUMBERS;
-      strikes = 0;
-      highestCompleted = 0;
-      isPlaying = true;
-      showView(playView);
-      startRound();
-    }
+ function startGame() {
+ currentNumbers = START_NUMBERS;
+ strikes = 0;
+ highestCompleted = 0;
+ isPlaying = true;
+ showView(playView);
+ startRound();
+ }
 
-    function endGame() {
-      isPlaying = false;
-      const score = highestCompleted;
-      showView(resultView);
-      finalScore.textContent = String(score);
-      const rating = getLocalRating(score);
-      ratingBadge.textContent = rating.label;
-      ratingBadge.style.background = rating.color;
-      addToHistory(score);
-      renderHistory();
+ function endGame() {
+ isPlaying = false;
+ const score = highestCompleted;
+ showView(resultView);
+ finalScore.textContent = String(score);
+ const rating = getLocalRating(score);
+ ratingBadge.textContent = rating.label;
+ ratingBadge.style.background = rating.color;
+ addToHistory(score);
+ renderHistory();
 
-      if (window.GameShare) {
-        window.GameShare.show({
-          gameName: gameName,
-          gameSlug: gameSlug,
-          gameIcon: gameIcon,
-          score: score,
-          unit: metricUnit,
-          metricLabel: metricLabel,
-          ratingLabel: rating.label,
-          ratingColor: rating.color
-        });
-      }
-    }
+ if (window.GameShare) {
+ window.GameShare.show({
+ gameName: gameName,
+ gameSlug: gameSlug,
+ gameIcon: gameIcon,
+ score: score,
+ unit: metricUnit,
+ metricLabel: metricLabel,
+ ratingLabel: rating.label,
+ ratingColor: rating.color
+ });
+ }
+ }
 
-    function renderHistory() {
-      const history = loadHistory();
-      if (history.length === 0) { attemptHistorySection.hidden = true; return; }
-      attemptHistorySection.hidden = false;
-      historyList.innerHTML = history.map(e => {
-        const r = getLocalRating(e.score);
-        return `<div class="history-item">
-          <span class="history-score">${e.score} numbers</span>
-          <span class="history-rating" style="background:${r.color}">${r.label}</span>
-          <span class="history-time">${formatDate(e.date)}</span>
-        </div>`;
-      }).join('');
-    }
+ function renderHistory() {
+ const history = loadHistory();
+ if (history.length === 0) { attemptHistorySection.hidden = true; return; }
+ attemptHistorySection.hidden = false;
+ historyList.innerHTML = history.map(e => {
+ const r = getLocalRating(e.score);
+ return `<div class="history-item">
+ <span class="history-score">${e.score} numbers</span>
+ <span class="history-rating" style="background:${r.color}">${r.label}</span>
+ <span class="history-time">${formatDate(e.date)}</span>
+ </div>`;
+ }).join('');
+ }
 
-    function formatDate(iso) {
-      try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
-      catch { return ''; }
-    }
+ function formatDate(iso) {
+ try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+ catch { return ''; }
+ }
 
-    chimpGrid.addEventListener('click', handleCellClick);
-    startBtn.addEventListener('click', startGame);
-    tryAgainBtn.addEventListener('click', startGame);
-    renderHistory();
-  })();
+ chimpGrid.addEventListener('click', handleCellClick);
+ startBtn.addEventListener('click', startGame);
+ tryAgainBtn.addEventListener('click', startGame);
+ renderHistory();
+ })();
 </script>

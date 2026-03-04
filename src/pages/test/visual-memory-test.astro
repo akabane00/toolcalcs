@@ -231,223 +231,223 @@ const structuredData = [
 </style>
 
 <script define:vars={{ gameName: game.title, gameSlug: game.slug, gameIcon: game.icon, metricLabel: game.metricLabel, metricUnit: game.metricUnit }}>
-  (function () {
-    'use strict';
+ (function () {
+ 'use strict';
 
-    const RATING_SCALE = [
-      { min: 14, label: 'Exceptional!', color: '#16a34a' },
-      { min: 11, label: 'Great!', color: '#22c55e' },
-      { min: 8, label: 'Good', color: '#2563eb' },
-      { min: 5, label: 'Average', color: '#f59e0b' },
-      { min: 0, label: 'Below Average', color: '#ef4444' },
-    ];
+ const RATING_SCALE = [
+ { min: 14, label: 'Exceptional!', color: '#16a34a' },
+ { min: 11, label: 'Great!', color: '#22c55e' },
+ { min: 8, label: 'Good', color: '#2563eb' },
+ { min: 5, label: 'Average', color: '#f59e0b' },
+ { min: 0, label: 'Below Average', color: '#ef4444' },
+ ];
 
-    function getLocalRating(score) {
-      for (const level of RATING_SCALE) {
-        if (score >= level.min) return { label: level.label, color: level.color };
-      }
-      return { label: 'Below Average', color: '#ef4444' };
-    }
+ function getLocalRating(score) {
+ for (const level of RATING_SCALE) {
+ if (score >= level.min) return { label: level.label, color: level.color };
+ }
+ return { label: 'Below Average', color: '#ef4444' };
+ }
 
-    const STORAGE_KEY = 'toolcalcs_visual-memory-test_history';
-    const MAX_HISTORY = 20;
+ const STORAGE_KEY = 'toolcalcs_visual-memory-test_history';
+ const MAX_HISTORY = 20;
 
-    function loadHistory() {
-      try { const r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch {}
-      return [];
-    }
-    function saveHistory(h) {
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch {}
-    }
-    function addToHistory(score) {
-      const h = loadHistory();
-      h.unshift({ score, date: new Date().toISOString(), rating: getLocalRating(score).label });
-      saveHistory(h);
-    }
+ function loadHistory() {
+ try { const r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch {}
+ return [];
+ }
+ function saveHistory(h) {
+ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch {}
+ }
+ function addToHistory(score) {
+ const h = loadHistory();
+ h.unshift({ score, date: new Date().toISOString(), rating: getLocalRating(score).label });
+ saveHistory(h);
+ }
 
-    // DOM
-    const instructionsView = document.getElementById('instructionsView')!;
-    const playView = document.getElementById('playView')!;
-    const resultView = document.getElementById('resultView')!;
-    const startBtn = document.getElementById('startBtn')!;
-    const tryAgainBtn = document.getElementById('tryAgainBtn')!;
-    const levelInfo = document.getElementById('levelInfo')!;
-    const livesInfo = document.getElementById('livesInfo')!;
-    const vmGrid = document.getElementById('vmGrid')!;
-    const finalScore = document.getElementById('finalScore')!;
-    const ratingBadge = document.getElementById('ratingBadge')!;
-    const attemptHistorySection = document.getElementById('attemptHistory')!;
-    const historyList = document.getElementById('historyList')!;
+ // DOM
+ const instructionsView = document.getElementById('instructionsView');
+ const playView = document.getElementById('playView');
+ const resultView = document.getElementById('resultView');
+ const startBtn = document.getElementById('startBtn');
+ const tryAgainBtn = document.getElementById('tryAgainBtn');
+ const levelInfo = document.getElementById('levelInfo');
+ const livesInfo = document.getElementById('livesInfo');
+ const vmGrid = document.getElementById('vmGrid');
+ const finalScore = document.getElementById('finalScore');
+ const ratingBadge = document.getElementById('ratingBadge');
+ const attemptHistorySection = document.getElementById('attemptHistory');
+ const historyList = document.getElementById('historyList');
 
-    let currentLevel = 1;
-    let lives = 3;
-    let isPlaying = false;
-    let canClick = false;
-    let highlightedSet = new Set<number>();
-    let foundSet = new Set<number>();
+ let currentLevel = 1;
+ let lives = 3;
+ let isPlaying = false;
+ let canClick = false;
+ let highlightedSet = new Set();
+ let foundSet = new Set();
 
-    function showView(view) {
-      [instructionsView, playView, resultView].forEach(v => v.style.display = 'none');
-      view.style.display = '';
-    }
+ function showView(view) {
+ [instructionsView, playView, resultView].forEach(v => v.style.display = 'none');
+ view.style.display = '';
+ }
 
-    function getLevelConfig(level) {
-      const tileCount = level + 2; // Level 1=3, Level 2=4, ...
-      let gridSize;
-      if (tileCount <= 4) gridSize = 3;
-      else if (tileCount <= 7) gridSize = 4;
-      else if (tileCount <= 12) gridSize = 5;
-      else if (tileCount <= 18) gridSize = 6;
-      else gridSize = 7;
-      return { gridSize, tileCount: Math.min(tileCount, gridSize * gridSize - 1) };
-    }
+ function getLevelConfig(level) {
+ const tileCount = level + 2; // Level 1=3, Level 2=4, ...
+ let gridSize;
+ if (tileCount <= 4) gridSize = 3;
+ else if (tileCount <= 7) gridSize = 4;
+ else if (tileCount <= 12) gridSize = 5;
+ else if (tileCount <= 18) gridSize = 6;
+ else gridSize = 7;
+ return { gridSize, tileCount: Math.min(tileCount, gridSize * gridSize - 1) };
+ }
 
-    function shuffleArray(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      return arr;
-    }
+ function shuffleArray(arr) {
+ for (let i = arr.length - 1; i > 0; i--) {
+ const j = Math.floor(Math.random() * (i + 1));
+ [arr[i], arr[j]] = [arr[j], arr[i]];
+ }
+ return arr;
+ }
 
-    function startRound() {
-      const { gridSize, tileCount } = getLevelConfig(currentLevel);
-      const totalTiles = gridSize * gridSize;
+ function startRound() {
+ const { gridSize, tileCount } = getLevelConfig(currentLevel);
+ const totalTiles = gridSize * gridSize;
 
-      // Pick random tiles to highlight
-      const indices = Array.from({ length: totalTiles }, (_, i) => i);
-      shuffleArray(indices);
-      highlightedSet = new Set(indices.slice(0, tileCount));
-      foundSet = new Set();
-      canClick = false;
+ // Pick random tiles to highlight
+ const indices = Array.from({ length: totalTiles }, (_, i) => i);
+ shuffleArray(indices);
+ highlightedSet = new Set(indices.slice(0, tileCount));
+ foundSet = new Set();
+ canClick = false;
 
-      // Render grid
-      vmGrid.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
-      vmGrid.innerHTML = '';
+ // Render grid
+ vmGrid.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+ vmGrid.innerHTML = '';
 
-      for (let i = 0; i < totalTiles; i++) {
-        const btn = document.createElement('button');
-        btn.className = 'vm-tile';
-        btn.dataset.index = String(i);
-        btn.setAttribute('aria-label', `Tile ${i + 1}`);
-        vmGrid.appendChild(btn);
-      }
+ for (let i = 0; i < totalTiles; i++) {
+ const btn = document.createElement('button');
+ btn.className = 'vm-tile';
+ btn.dataset.index = String(i);
+ btn.setAttribute('aria-label', `Tile ${i + 1}`);
+ vmGrid.appendChild(btn);
+ }
 
-      levelInfo.textContent = `Level ${currentLevel}`;
-      livesInfo.textContent = '❤️'.repeat(lives);
+ levelInfo.textContent = `Level ${currentLevel}`;
+ livesInfo.textContent = '❤️'.repeat(lives);
 
-      // Show highlighted tiles
-      highlightedSet.forEach(idx => {
-        const tile = vmGrid.children[idx];
-        tile.classList.add('showing');
-      });
+ // Show highlighted tiles
+ highlightedSet.forEach(idx => {
+ const tile = vmGrid.children[idx];
+ tile.classList.add('showing');
+ });
 
-      // Hide after delay (longer for more tiles)
-      const showTime = Math.min(2500, 800 + tileCount * 120);
-      setTimeout(() => {
-        highlightedSet.forEach(idx => {
-          const tile = vmGrid.children[idx];
-          tile.classList.remove('showing');
-        });
-        canClick = true;
-      }, showTime);
-    }
+ // Hide after delay (longer for more tiles)
+ const showTime = Math.min(2500, 800 + tileCount * 120);
+ setTimeout(() => {
+ highlightedSet.forEach(idx => {
+ const tile = vmGrid.children[idx];
+ tile.classList.remove('showing');
+ });
+ canClick = true;
+ }, showTime);
+ }
 
-    function handleTileClick(e) {
-      if (!isPlaying || !canClick) return;
-      const target = (e.target).closest('.vm-tile') | null;
-      if (!target) return;
-      const idx = parseInt(target.dataset.index || '-1');
-      if (idx < 0 || foundSet.has(idx)) return;
-      if (target.classList.contains('correct') || target.classList.contains('wrong')) return;
+ function handleTileClick(e) {
+ if (!isPlaying || !canClick) return;
+ const target = (e.target).closest('.vm-tile');
+ if (!target) return;
+ const idx = parseInt(target.dataset.index || '-1');
+ if (idx < 0 || foundSet.has(idx)) return;
+ if (target.classList.contains('correct') || target.classList.contains('wrong')) return;
 
-      if (highlightedSet.has(idx)) {
-        // Correct
-        foundSet.add(idx);
-        target.classList.add('correct');
-        target.style.cursor = 'default';
+ if (highlightedSet.has(idx)) {
+ // Correct
+ foundSet.add(idx);
+ target.classList.add('correct');
+ target.style.cursor = 'default';
 
-        if (foundSet.size === highlightedSet.size) {
-          // Level complete
-          canClick = false;
-          currentLevel++;
-          setTimeout(() => startRound(), 500);
-        }
-      } else {
-        // Wrong
-        target.classList.add('wrong');
-        lives--;
-        livesInfo.textContent = '❤️'.repeat(Math.max(0, lives));
+ if (foundSet.size === highlightedSet.size) {
+ // Level complete
+ canClick = false;
+ currentLevel++;
+ setTimeout(() => startRound(), 500);
+ }
+ } else {
+ // Wrong
+ target.classList.add('wrong');
+ lives--;
+ livesInfo.textContent = '❤️'.repeat(Math.max(0, lives));
 
-        if (lives <= 0) {
-          canClick = false;
-          // Reveal remaining
-          highlightedSet.forEach(i => {
-            if (!foundSet.has(i)) {
-              const tile = vmGrid.children[i];
-              tile.classList.add('showing');
-            }
-          });
-          setTimeout(() => endGame(), 800);
-        }
-      }
-    }
+ if (lives <= 0) {
+ canClick = false;
+ // Reveal remaining
+ highlightedSet.forEach(i => {
+ if (!foundSet.has(i)) {
+ const tile = vmGrid.children[i];
+ tile.classList.add('showing');
+ }
+ });
+ setTimeout(() => endGame(), 800);
+ }
+ }
+ }
 
-    function startGame() {
-      currentLevel = 1;
-      lives = 3;
-      isPlaying = true;
-      showView(playView);
-      startRound();
-    }
+ function startGame() {
+ currentLevel = 1;
+ lives = 3;
+ isPlaying = true;
+ showView(playView);
+ startRound();
+ }
 
-    function endGame() {
-      isPlaying = false;
-      const score = currentLevel - 1;
-      showView(resultView);
-      finalScore.textContent = String(score);
-      const rating = getLocalRating(score);
-      ratingBadge.textContent = rating.label;
-      ratingBadge.style.background = rating.color;
-      addToHistory(score);
-      renderHistory();
+ function endGame() {
+ isPlaying = false;
+ const score = currentLevel - 1;
+ showView(resultView);
+ finalScore.textContent = String(score);
+ const rating = getLocalRating(score);
+ ratingBadge.textContent = rating.label;
+ ratingBadge.style.background = rating.color;
+ addToHistory(score);
+ renderHistory();
 
-      if (window.GameShare) {
-        window.GameShare.show({
-          gameName: gameName,
-          gameSlug: gameSlug,
-          gameIcon: gameIcon,
-          score: score,
-          unit: metricUnit,
-          metricLabel: metricLabel,
-          ratingLabel: rating.label,
-          ratingColor: rating.color
-        });
-      }
-    }
+ if (window.GameShare) {
+ window.GameShare.show({
+ gameName: gameName,
+ gameSlug: gameSlug,
+ gameIcon: gameIcon,
+ score: score,
+ unit: metricUnit,
+ metricLabel: metricLabel,
+ ratingLabel: rating.label,
+ ratingColor: rating.color
+ });
+ }
+ }
 
-    function renderHistory() {
-      const history = loadHistory();
-      if (history.length === 0) { attemptHistorySection.hidden = true; return; }
-      attemptHistorySection.hidden = false;
-      historyList.innerHTML = history.map(e => {
-        const r = getLocalRating(e.score);
-        return `<div class="history-item">
-          <span class="history-score">${e.score} levels</span>
-          <span class="history-rating" style="background:${r.color}">${r.label}</span>
-          <span class="history-time">${formatDate(e.date)}</span>
-        </div>`;
-      }).join('');
-    }
+ function renderHistory() {
+ const history = loadHistory();
+ if (history.length === 0) { attemptHistorySection.hidden = true; return; }
+ attemptHistorySection.hidden = false;
+ historyList.innerHTML = history.map(e => {
+ const r = getLocalRating(e.score);
+ return `<div class="history-item">
+ <span class="history-score">${e.score} levels</span>
+ <span class="history-rating" style="background:${r.color}">${r.label}</span>
+ <span class="history-time">${formatDate(e.date)}</span>
+ </div>`;
+ }).join('');
+ }
 
-    function formatDate(iso) {
-      try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
-      catch { return ''; }
-    }
+ function formatDate(iso) {
+ try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+ catch { return ''; }
+ }
 
-    vmGrid.addEventListener('click', handleTileClick);
-    startBtn.addEventListener('click', startGame);
-    tryAgainBtn.addEventListener('click', startGame);
-    renderHistory();
-  })();
+ vmGrid.addEventListener('click', handleTileClick);
+ startBtn.addEventListener('click', startGame);
+ tryAgainBtn.addEventListener('click', startGame);
+ renderHistory();
+ })();
 </script>

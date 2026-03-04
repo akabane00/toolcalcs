@@ -259,263 +259,263 @@ const structuredData = [
 </style>
 
 <script define:vars={{ gameName: game.title, gameSlug: game.slug, gameIcon: game.icon, metricLabel: game.metricLabel, metricUnit: game.metricUnit }}>
-  (function() {
-    const TOTAL_TARGETS = 30;
-    const TARGET_MIN_SIZE = 44;
-    const TARGET_MAX_SIZE = 58;
-    const STORAGE_KEY = 'toolcalcs_aim-trainer_history';
-    const MAX_HISTORY = 20;
+ (function() {
+ const TOTAL_TARGETS = 30;
+ const TARGET_MIN_SIZE = 44;
+ const TARGET_MAX_SIZE = 58;
+ const STORAGE_KEY = 'toolcalcs_aim-trainer_history';
+ const MAX_HISTORY = 20;
 
-    // Rating scale (lower is better, matches getRating logic)
-    const ratingScale = [
-      { max: 300, label: 'Sharpshooter', color: '#9333ea' },
-      { max: 450, label: 'Fast', color: '#16a34a' },
-      { max: 600, label: 'Average', color: '#2563eb' },
-      { max: 800, label: 'Slow', color: '#ca8a04' },
-      { max: Infinity, label: 'Needs Practice', color: '#dc2626' },
-    ];
+ // Rating scale (lower is better, matches getRating logic)
+ const ratingScale = [
+ { max: 300, label: 'Sharpshooter', color: '#9333ea' },
+ { max: 450, label: 'Fast', color: '#16a34a' },
+ { max: 600, label: 'Average', color: '#2563eb' },
+ { max: 800, label: 'Slow', color: '#ca8a04' },
+ { max: Infinity, label: 'Needs Practice', color: '#dc2626' },
+ ];
 
-    // DOM elements
-    const gameArea = document.getElementById('game-area');
-    const instructions = document.getElementById('game-instructions');
-    const aimMessage = document.getElementById('aim-message');
-    const aimHud = document.getElementById('aim-hud');
-    const hudHit = document.getElementById('hud-hit');
-    const hudAvg = document.getElementById('hud-avg');
-    const scoreDisplay = document.getElementById('score-display');
-    const scoreValue = document.getElementById('score-value');
-    const ratingBadge = document.getElementById('rating-badge');
-    const btnStart = document.getElementById('btn-start');
-    const btnRetry = document.getElementById('btn-retry');
-    const attemptHistory = document.getElementById('attempt-history');
-    const historyList = document.getElementById('history-list');
+ // DOM elements
+ const gameArea = document.getElementById('game-area');
+ const instructions = document.getElementById('game-instructions');
+ const aimMessage = document.getElementById('aim-message');
+ const aimHud = document.getElementById('aim-hud');
+ const hudHit = document.getElementById('hud-hit');
+ const hudAvg = document.getElementById('hud-avg');
+ const scoreDisplay = document.getElementById('score-display');
+ const scoreValue = document.getElementById('score-value');
+ const ratingBadge = document.getElementById('rating-badge');
+ const btnStart = document.getElementById('btn-start');
+ const btnRetry = document.getElementById('btn-retry');
+ const attemptHistory = document.getElementById('attempt-history');
+ const historyList = document.getElementById('history-list');
 
-    // Game state
-    let hits = 0;
-    let times[] = [];
-    let targetSpawnTime = 0;
-    let currentTarget | null = null;
-    let isPlaying = false;
+ // Game state
+ let hits = 0;
+ let times = [];
+ let targetSpawnTime = 0;
+ let currentTarget = null;
+ let isPlaying = false;
 
-    function getRatingForScore(score) {
-      return ratingScale.find(r => score <= r.max) || ratingScale[ratingScale.length - 1];
-    }
+ function getRatingForScore(score) {
+ return ratingScale.find(r => score <= r.max) || ratingScale[ratingScale.length - 1];
+ }
 
-    function loadHistory(): { score; rating; color; date }[] {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        return raw ? JSON.parse(raw) : [];
-      } catch {
-        return [];
-      }
-    }
+ function loadHistory(): { score; rating; color; date }[] {
+ try {
+ const raw = localStorage.getItem(STORAGE_KEY);
+ return raw ? JSON.parse(raw) : [];
+ } catch {
+ return [];
+ }
+ }
 
-    function saveHistory(score, rating: { label; color }) {
-      const history = loadHistory();
-      history.unshift({
-        score: Math.round(score),
-        rating: rating.label,
-        color: rating.color,
-        date: new Date().toLocaleString(),
-      });
-      if (history.length > MAX_HISTORY) history.length = MAX_HISTORY;
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
-      } catch { /* quota exceeded, silently fail */ }
-    }
+ function saveHistory(score, rating) {
+ const history = loadHistory();
+ history.unshift({
+ score: Math.round(score),
+ rating: rating.label,
+ color: rating.color,
+ date: new Date().toLocaleString(),
+ });
+ if (history.length > MAX_HISTORY) history.length = MAX_HISTORY;
+ try {
+ localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+ } catch { /* quota exceeded, silently fail */ }
+ }
 
-    function renderHistory() {
-      const history = loadHistory();
-      if (history.length === 0) {
-        attemptHistory.style.display = 'none';
-        return;
-      }
-      attemptHistory.style.display = '';
-      historyList.innerHTML = history.map(h =>
-        `<div class="history-item">
-          <span class="history-score">${h.score} ms</span>
-          <span class="history-rating" style="background:${h.color}">${h.rating}</span>
-          <span class="history-time">${h.date}</span>
-        </div>`
-      ).join('');
-    }
+ function renderHistory() {
+ const history = loadHistory();
+ if (history.length === 0) {
+ attemptHistory.style.display = 'none';
+ return;
+ }
+ attemptHistory.style.display = '';
+ historyList.innerHTML = history.map(h =>
+ `<div class="history-item">
+ <span class="history-score">${h.score} ms</span>
+ <span class="history-rating" style="background:${h.color}">${h.rating}</span>
+ <span class="history-time">${h.date}</span>
+ </div>`
+ ).join('');
+ }
 
-    function removeTarget() {
-      if (currentTarget) {
-        currentTarget.remove();
-        currentTarget = null;
-      }
-    }
+ function removeTarget() {
+ if (currentTarget) {
+ currentTarget.remove();
+ currentTarget = null;
+ }
+ }
 
-    function spawnTarget() {
-      removeTarget();
+ function spawnTarget() {
+ removeTarget();
 
-      const areaRect = gameArea.getBoundingClientRect();
-      const size = TARGET_MIN_SIZE + Math.floor(Math.random() * (TARGET_MAX_SIZE - TARGET_MIN_SIZE + 1));
+ const areaRect = gameArea.getBoundingClientRect();
+ const size = TARGET_MIN_SIZE + Math.floor(Math.random() * (TARGET_MAX_SIZE - TARGET_MIN_SIZE + 1));
 
-      // Compute available space, accounting for the HUD bar at the top (~32px)
-      const hudOffset = 36;
-      const padding = 4;
-      const maxX = areaRect.width - size - padding;
-      const maxY = areaRect.height - size - padding;
-      const minX = padding;
-      const minY = hudOffset;
+ // Compute available space, accounting for the HUD bar at the top (~32px)
+ const hudOffset = 36;
+ const padding = 4;
+ const maxX = areaRect.width - size - padding;
+ const maxY = areaRect.height - size - padding;
+ const minX = padding;
+ const minY = hudOffset;
 
-      const x = minX + Math.floor(Math.random() * Math.max(1, maxX - minX));
-      const y = minY + Math.floor(Math.random() * Math.max(1, maxY - minY));
+ const x = minX + Math.floor(Math.random() * Math.max(1, maxX - minX));
+ const y = minY + Math.floor(Math.random() * Math.max(1, maxY - minY));
 
-      const target = document.createElement('div');
-      target.className = 'aim-target';
-      target.style.width = size + 'px';
-      target.style.height = size + 'px';
-      target.style.left = x + 'px';
-      target.style.top = y + 'px';
-      target.setAttribute('role', 'button');
-      target.setAttribute('aria-label', `Target ${hits + 1} of ${TOTAL_TARGETS}`);
-      target.setAttribute('tabindex', '0');
+ const target = document.createElement('div');
+ target.className = 'aim-target';
+ target.style.width = size + 'px';
+ target.style.height = size + 'px';
+ target.style.left = x + 'px';
+ target.style.top = y + 'px';
+ target.setAttribute('role', 'button');
+ target.setAttribute('aria-label', `Target ${hits + 1} of ${TOTAL_TARGETS}`);
+ target.setAttribute('tabindex', '0');
 
-      target.addEventListener('pointerdown', onTargetHit);
-      target.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onTargetHit(e);
-        }
-      });
+ target.addEventListener('pointerdown', onTargetHit);
+ target.addEventListener('keydown', (e) => {
+ if (e.key === 'Enter' || e.key === ' ') {
+ e.preventDefault();
+ onTargetHit(e);
+ }
+ });
 
-      gameArea.appendChild(target);
-      currentTarget = target;
-      targetSpawnTime = performance.now();
-    }
+ gameArea.appendChild(target);
+ currentTarget = target;
+ targetSpawnTime = performance.now();
+ }
 
-    function showHitMarker(x, y, size) {
-      const marker = document.createElement('div');
-      marker.className = 'aim-hit-marker';
-      marker.style.width = size + 'px';
-      marker.style.height = size + 'px';
-      marker.style.left = x + 'px';
-      marker.style.top = y + 'px';
-      gameArea.appendChild(marker);
-      setTimeout(() => marker.remove(), 400);
-    }
+ function showHitMarker(x, y, size) {
+ const marker = document.createElement('div');
+ marker.className = 'aim-hit-marker';
+ marker.style.width = size + 'px';
+ marker.style.height = size + 'px';
+ marker.style.left = x + 'px';
+ marker.style.top = y + 'px';
+ gameArea.appendChild(marker);
+ setTimeout(() => marker.remove(), 400);
+ }
 
-    function updateHud() {
-      hudHit.textContent = `Hits: ${hits} / ${TOTAL_TARGETS}`;
-      if (times.length > 0) {
-        const avg = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
-        hudAvg.textContent = `Avg: ${avg} ms`;
-      } else {
-        hudAvg.textContent = 'Avg: -- ms';
-      }
-    }
+ function updateHud() {
+ hudHit.textContent = `Hits: ${hits} / ${TOTAL_TARGETS}`;
+ if (times.length > 0) {
+ const avg = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
+ hudAvg.textContent = `Avg: ${avg} ms`;
+ } else {
+ hudAvg.textContent = 'Avg: -- ms';
+ }
+ }
 
-    function onTargetHit(e) {
-      if (!isPlaying || !currentTarget) return;
-      e.preventDefault();
-      e.stopPropagation();
+ function onTargetHit(e) {
+ if (!isPlaying || !currentTarget) return;
+ e.preventDefault();
+ e.stopPropagation();
 
-      const hitTime = performance.now() - targetSpawnTime;
-      times.push(hitTime);
-      hits++;
+ const hitTime = performance.now() - targetSpawnTime;
+ times.push(hitTime);
+ hits++;
 
-      // Show hit marker at target position
-      const left = parseInt(currentTarget.style.left);
-      const top = parseInt(currentTarget.style.top);
-      const size = parseInt(currentTarget.style.width);
-      showHitMarker(left, top, size);
+ // Show hit marker at target position
+ const left = parseInt(currentTarget.style.left);
+ const top = parseInt(currentTarget.style.top);
+ const size = parseInt(currentTarget.style.width);
+ showHitMarker(left, top, size);
 
-      removeTarget();
-      updateHud();
+ removeTarget();
+ updateHud();
 
-      if (hits >= TOTAL_TARGETS) {
-        endGame();
-      } else {
-        spawnTarget();
-      }
-    }
+ if (hits >= TOTAL_TARGETS) {
+ endGame();
+ } else {
+ spawnTarget();
+ }
+ }
 
-    function endGame() {
-      isPlaying = false;
-      removeTarget();
+ function endGame() {
+ isPlaying = false;
+ removeTarget();
 
-      const avg = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
-      const rating = getRatingForScore(avg);
+ const avg = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
+ const rating = getRatingForScore(avg);
 
-      // Save to history
-      saveHistory(avg, rating);
+ // Save to history
+ saveHistory(avg, rating);
 
-      if (window.GameShare) {
-        window.GameShare.show({
-          gameName: gameName,
-          gameSlug: gameSlug,
-          gameIcon: gameIcon,
-          score: avg,
-          unit: metricUnit,
-          metricLabel: metricLabel,
-          ratingLabel: rating.label,
-          ratingColor: rating.color
-        });
-      }
+ if (window.GameShare) {
+ window.GameShare.show({
+ gameName: gameName,
+ gameSlug: gameSlug,
+ gameIcon: gameIcon,
+ score: avg,
+ unit: metricUnit,
+ metricLabel: metricLabel,
+ ratingLabel: rating.label,
+ ratingColor: rating.color
+ });
+ }
 
-      // Hide HUD, show results
-      aimHud.classList.remove('visible');
+ // Hide HUD, show results
+ aimHud.classList.remove('visible');
 
-      // Show completion message in game area
-      instructions.style.display = 'none';
-      aimMessage.style.display = '';
-      aimMessage.textContent = 'Round Complete!';
+ // Show completion message in game area
+ instructions.style.display = 'none';
+ aimMessage.style.display = '';
+ aimMessage.textContent = 'Round Complete!';
 
-      // Show score
-      scoreDisplay.style.display = '';
-      scoreValue.textContent = String(avg);
-      ratingBadge.textContent = rating.label;
-      ratingBadge.style.background = rating.color;
+ // Show score
+ scoreDisplay.style.display = '';
+ scoreValue.textContent = String(avg);
+ ratingBadge.textContent = rating.label;
+ ratingBadge.style.background = rating.color;
 
-      // Controls
-      btnStart.style.display = 'none';
-      btnRetry.style.display = '';
+ // Controls
+ btnStart.style.display = 'none';
+ btnRetry.style.display = '';
 
-      renderHistory();
-    }
+ renderHistory();
+ }
 
-    function startGame() {
-      // Reset state
-      hits = 0;
-      times = [];
-      isPlaying = false;
-      removeTarget();
+ function startGame() {
+ // Reset state
+ hits = 0;
+ times = [];
+ isPlaying = false;
+ removeTarget();
 
-      // UI reset
-      instructions.style.display = 'none';
-      aimMessage.style.display = '';
-      scoreDisplay.style.display = 'none';
-      aimHud.classList.add('visible');
-      btnStart.style.display = 'none';
-      btnRetry.style.display = 'none';
+ // UI reset
+ instructions.style.display = 'none';
+ aimMessage.style.display = '';
+ scoreDisplay.style.display = 'none';
+ aimHud.classList.add('visible');
+ btnStart.style.display = 'none';
+ btnRetry.style.display = 'none';
 
-      updateHud();
+ updateHud();
 
-      // Countdown 3-2-1
-      let count = 3;
-      aimMessage.innerHTML = `<span class="aim-countdown">${count}</span>`;
+ // Countdown 3-2-1
+ let count = 3;
+ aimMessage.innerHTML = `<span class="aim-countdown">${count}</span>`;
 
-      const countdownInterval = setInterval(() => {
-        count--;
-        if (count > 0) {
-          aimMessage.innerHTML = `<span class="aim-countdown">${count}</span>`;
-        } else {
-          clearInterval(countdownInterval);
-          aimMessage.style.display = 'none';
-          isPlaying = true;
-          spawnTarget();
-        }
-      }, 600);
-    }
+ const countdownInterval = setInterval(() => {
+ count--;
+ if (count > 0) {
+ aimMessage.innerHTML = `<span class="aim-countdown">${count}</span>`;
+ } else {
+ clearInterval(countdownInterval);
+ aimMessage.style.display = 'none';
+ isPlaying = true;
+ spawnTarget();
+ }
+ }, 600);
+ }
 
-    // Event listeners
-    btnStart.addEventListener('click', startGame);
-    btnRetry.addEventListener('click', startGame);
+ // Event listeners
+ btnStart.addEventListener('click', startGame);
+ btnRetry.addEventListener('click', startGame);
 
-    // Load history on init
-    renderHistory();
-  })();
+ // Load history on init
+ renderHistory();
+ })();
 </script>

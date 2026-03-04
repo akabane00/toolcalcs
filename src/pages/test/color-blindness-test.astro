@@ -239,203 +239,203 @@ const structuredData = [
 </style>
 
 <script define:vars={{ gameName: game.title, gameSlug: game.slug, gameIcon: game.icon, metricLabel: game.metricLabel, metricUnit: game.metricUnit }}>
-  (function () {
-    'use strict';
+ (function () {
+ 'use strict';
 
-    const RATING_SCALE = [
-      { min: 40, label: 'Superhuman!', color: '#16a34a' },
-      { min: 30, label: 'Excellent!', color: '#22c55e' },
-      { min: 20, label: 'Good', color: '#2563eb' },
-      { min: 10, label: 'Average', color: '#f59e0b' },
-      { min: 0, label: 'Below Average', color: '#ef4444' },
-    ];
+ const RATING_SCALE = [
+ { min: 40, label: 'Superhuman!', color: '#16a34a' },
+ { min: 30, label: 'Excellent!', color: '#22c55e' },
+ { min: 20, label: 'Good', color: '#2563eb' },
+ { min: 10, label: 'Average', color: '#f59e0b' },
+ { min: 0, label: 'Below Average', color: '#ef4444' },
+ ];
 
-    function getLocalRating(score) {
-      for (const level of RATING_SCALE) {
-        if (score >= level.min) return { label: level.label, color: level.color };
-      }
-      return { label: 'Below Average', color: '#ef4444' };
-    }
+ function getLocalRating(score) {
+ for (const level of RATING_SCALE) {
+ if (score >= level.min) return { label: level.label, color: level.color };
+ }
+ return { label: 'Below Average', color: '#ef4444' };
+ }
 
-    const STORAGE_KEY = 'toolcalcs_color-blindness-test_history';
-    const MAX_HISTORY = 20;
+ const STORAGE_KEY = 'toolcalcs_color-blindness-test_history';
+ const MAX_HISTORY = 20;
 
-    function loadHistory() {
-      try { const r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch {}
-      return [];
-    }
-    function saveHistory(h) {
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch {}
-    }
-    function addToHistory(score) {
-      const h = loadHistory();
-      h.unshift({ score, date: new Date().toISOString(), rating: getLocalRating(score).label });
-      saveHistory(h);
-    }
+ function loadHistory() {
+ try { const r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch {}
+ return [];
+ }
+ function saveHistory(h) {
+ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch {}
+ }
+ function addToHistory(score) {
+ const h = loadHistory();
+ h.unshift({ score, date: new Date().toISOString(), rating: getLocalRating(score).label });
+ saveHistory(h);
+ }
 
-    // DOM
-    const instructionsView = document.getElementById('instructionsView')!;
-    const playView = document.getElementById('playView')!;
-    const resultView = document.getElementById('resultView')!;
-    const startBtn = document.getElementById('startBtn')!;
-    const tryAgainBtn = document.getElementById('tryAgainBtn')!;
-    const levelInfo = document.getElementById('levelInfo')!;
-    const livesInfo = document.getElementById('livesInfo')!;
-    const tileGrid = document.getElementById('tileGrid')!;
-    const finalScore = document.getElementById('finalScore')!;
-    const ratingBadge = document.getElementById('ratingBadge')!;
-    const attemptHistorySection = document.getElementById('attemptHistory')!;
-    const historyList = document.getElementById('historyList')!;
+ // DOM
+ const instructionsView = document.getElementById('instructionsView');
+ const playView = document.getElementById('playView');
+ const resultView = document.getElementById('resultView');
+ const startBtn = document.getElementById('startBtn');
+ const tryAgainBtn = document.getElementById('tryAgainBtn');
+ const levelInfo = document.getElementById('levelInfo');
+ const livesInfo = document.getElementById('livesInfo');
+ const tileGrid = document.getElementById('tileGrid');
+ const finalScore = document.getElementById('finalScore');
+ const ratingBadge = document.getElementById('ratingBadge');
+ const attemptHistorySection = document.getElementById('attemptHistory');
+ const historyList = document.getElementById('historyList');
 
-    let currentLevel = 1;
-    let lives = 3;
-    let isPlaying = false;
+ let currentLevel = 1;
+ let lives = 3;
+ let isPlaying = false;
 
-    function showView(view) {
-      [instructionsView, playView, resultView].forEach(v => v.style.display = 'none');
-      view.style.display = '';
-    }
+ function showView(view) {
+ [instructionsView, playView, resultView].forEach(v => v.style.display = 'none');
+ view.style.display = '';
+ }
 
-    function getGridSize(level) {
-      if (level <= 2) return 2;
-      if (level <= 6) return 3;
-      if (level <= 12) return 4;
-      if (level <= 20) return 5;
-      if (level <= 30) return 6;
-      if (level <= 42) return 7;
-      return 8;
-    }
+ function getGridSize(level) {
+ if (level <= 2) return 2;
+ if (level <= 6) return 3;
+ if (level <= 12) return 4;
+ if (level <= 20) return 5;
+ if (level <= 30) return 6;
+ if (level <= 42) return 7;
+ return 8;
+ }
 
-    function getColorDiff(level) {
-      // Start at 50, decrease by ~1.5 per level, minimum 2
-      return Math.max(2, 50 - (level - 1) * 1.5);
-    }
+ function getColorDiff(level) {
+ // Start at 50, decrease by ~1.5 per level, minimum 2
+ return Math.max(2, 50 - (level - 1) * 1.5);
+ }
 
-    function generateRound(level) {
-      const gridSize = getGridSize(level);
-      const diff = getColorDiff(level);
-      const totalTiles = gridSize * gridSize;
-      const oddIndex = Math.floor(Math.random() * totalTiles);
+ function generateRound(level) {
+ const gridSize = getGridSize(level);
+ const diff = getColorDiff(level);
+ const totalTiles = gridSize * gridSize;
+ const oddIndex = Math.floor(Math.random() * totalTiles);
 
-      // Random base color in HSL
-      const h = Math.floor(Math.random() * 360);
-      const s = 40 + Math.floor(Math.random() * 35);
-      const l = 30 + Math.floor(Math.random() * 25);
+ // Random base color in HSL
+ const h = Math.floor(Math.random() * 360);
+ const s = 40 + Math.floor(Math.random() * 35);
+ const l = 30 + Math.floor(Math.random() * 25);
 
-      // Direction of lightness shift (brighter or darker)
-      const direction = Math.random() > 0.5 ? 1 : -1;
-      const oddL = Math.max(10, Math.min(85, l + diff * direction));
+ // Direction of lightness shift (brighter or darker)
+ const direction = Math.random() > 0.5 ? 1 : -1;
+ const oddL = Math.max(10, Math.min(85, l + diff * direction));
 
-      const baseColor = `hsl(${h}, ${s}%, ${l}%)`;
-      const oddColor = `hsl(${h}, ${s}%, ${oddL}%)`;
+ const baseColor = `hsl(${h}, ${s}%, ${l}%)`;
+ const oddColor = `hsl(${h}, ${s}%, ${oddL}%)`;
 
-      return { gridSize, totalTiles, oddIndex, baseColor, oddColor };
-    }
+ return { gridSize, totalTiles, oddIndex, baseColor, oddColor };
+ }
 
-    function renderGrid() {
-      const { gridSize, totalTiles, oddIndex, baseColor, oddColor } = generateRound(currentLevel);
+ function renderGrid() {
+ const { gridSize, totalTiles, oddIndex, baseColor, oddColor } = generateRound(currentLevel);
 
-      tileGrid.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
-      tileGrid.innerHTML = '';
+ tileGrid.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+ tileGrid.innerHTML = '';
 
-      for (let i = 0; i < totalTiles; i++) {
-        const btn = document.createElement('button');
-        btn.className = 'color-tile';
-        btn.style.background = i === oddIndex ? oddColor : baseColor;
-        btn.setAttribute('aria-label', `Tile ${i + 1}`);
-        btn.dataset.index = String(i);
-        btn.dataset.isOdd = i === oddIndex ? '1' : '0';
-        tileGrid.appendChild(btn);
-      }
+ for (let i = 0; i < totalTiles; i++) {
+ const btn = document.createElement('button');
+ btn.className = 'color-tile';
+ btn.style.background = i === oddIndex ? oddColor : baseColor;
+ btn.setAttribute('aria-label', `Tile ${i + 1}`);
+ btn.dataset.index = String(i);
+ btn.dataset.isOdd = i === oddIndex ? '1' : '0';
+ tileGrid.appendChild(btn);
+ }
 
-      levelInfo.textContent = `Level ${currentLevel}`;
-      livesInfo.textContent = '❤️'.repeat(lives);
-    }
+ levelInfo.textContent = `Level ${currentLevel}`;
+ livesInfo.textContent = '❤️'.repeat(lives);
+ }
 
-    function handleTileClick(e) {
-      if (!isPlaying) return;
-      const target = (e.target).closest('.color-tile') | null;
-      if (!target) return;
+ function handleTileClick(e) {
+ if (!isPlaying) return;
+ const target = (e.target).closest('.color-tile');
+ if (!target) return;
 
-      if (target.dataset.isOdd === '1') {
-        // Correct
-        target.classList.add('correct-flash');
-        currentLevel++;
-        setTimeout(() => renderGrid(), 350);
-      } else {
-        // Wrong
-        target.classList.add('wrong-flash');
-        lives--;
-        livesInfo.textContent = '❤️'.repeat(Math.max(0, lives));
+ if (target.dataset.isOdd === '1') {
+ // Correct
+ target.classList.add('correct-flash');
+ currentLevel++;
+ setTimeout(() => renderGrid(), 350);
+ } else {
+ // Wrong
+ target.classList.add('wrong-flash');
+ lives--;
+ livesInfo.textContent = '❤️'.repeat(Math.max(0, lives));
 
-        // Briefly highlight the correct tile
-        const correctTile = tileGrid.querySelector('[data-is-odd="1"]');
-        if (correctTile) correctTile.classList.add('correct-flash');
+ // Briefly highlight the correct tile
+ const correctTile = tileGrid.querySelector('[data-is-odd="1"]');
+ if (correctTile) correctTile.classList.add('correct-flash');
 
-        if (lives <= 0) {
-          setTimeout(() => endGame(), 500);
-        } else {
-          setTimeout(() => renderGrid(), 600);
-        }
-      }
-    }
+ if (lives <= 0) {
+ setTimeout(() => endGame(), 500);
+ } else {
+ setTimeout(() => renderGrid(), 600);
+ }
+ }
+ }
 
-    function startGame() {
-      currentLevel = 1;
-      lives = 3;
-      isPlaying = true;
-      showView(playView);
-      renderGrid();
-    }
+ function startGame() {
+ currentLevel = 1;
+ lives = 3;
+ isPlaying = true;
+ showView(playView);
+ renderGrid();
+ }
 
-    function endGame() {
-      isPlaying = false;
-      const score = currentLevel - 1;
-      showView(resultView);
-      finalScore.textContent = String(score);
-      const rating = getLocalRating(score);
-      ratingBadge.textContent = rating.label;
-      ratingBadge.style.background = rating.color;
-      addToHistory(score);
-      renderHistory();
+ function endGame() {
+ isPlaying = false;
+ const score = currentLevel - 1;
+ showView(resultView);
+ finalScore.textContent = String(score);
+ const rating = getLocalRating(score);
+ ratingBadge.textContent = rating.label;
+ ratingBadge.style.background = rating.color;
+ addToHistory(score);
+ renderHistory();
 
-      if (window.GameShare) {
-        window.GameShare.show({
-          gameName: gameName,
-          gameSlug: gameSlug,
-          gameIcon: gameIcon,
-          score: score,
-          unit: metricUnit,
-          metricLabel: metricLabel,
-          ratingLabel: rating.label,
-          ratingColor: rating.color
-        });
-      }
-    }
+ if (window.GameShare) {
+ window.GameShare.show({
+ gameName: gameName,
+ gameSlug: gameSlug,
+ gameIcon: gameIcon,
+ score: score,
+ unit: metricUnit,
+ metricLabel: metricLabel,
+ ratingLabel: rating.label,
+ ratingColor: rating.color
+ });
+ }
+ }
 
-    function renderHistory() {
-      const history = loadHistory();
-      if (history.length === 0) { attemptHistorySection.hidden = true; return; }
-      attemptHistorySection.hidden = false;
-      historyList.innerHTML = history.map(e => {
-        const r = getLocalRating(e.score);
-        return `<div class="history-item">
-          <span class="history-score">${e.score} levels</span>
-          <span class="history-rating" style="background:${r.color}">${r.label}</span>
-          <span class="history-time">${formatDate(e.date)}</span>
-        </div>`;
-      }).join('');
-    }
+ function renderHistory() {
+ const history = loadHistory();
+ if (history.length === 0) { attemptHistorySection.hidden = true; return; }
+ attemptHistorySection.hidden = false;
+ historyList.innerHTML = history.map(e => {
+ const r = getLocalRating(e.score);
+ return `<div class="history-item">
+ <span class="history-score">${e.score} levels</span>
+ <span class="history-rating" style="background:${r.color}">${r.label}</span>
+ <span class="history-time">${formatDate(e.date)}</span>
+ </div>`;
+ }).join('');
+ }
 
-    function formatDate(iso) {
-      try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
-      catch { return ''; }
-    }
+ function formatDate(iso) {
+ try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+ catch { return ''; }
+ }
 
-    // Events
-    tileGrid.addEventListener('click', handleTileClick);
-    startBtn.addEventListener('click', startGame);
-    tryAgainBtn.addEventListener('click', startGame);
-    renderHistory();
-  })();
+ // Events
+ tileGrid.addEventListener('click', handleTileClick);
+ startBtn.addEventListener('click', startGame);
+ tryAgainBtn.addEventListener('click', startGame);
+ renderHistory();
+ })();
 </script>

@@ -384,332 +384,332 @@ const structuredData = [
 </style>
 
 <script define:vars={{ gameName: game.title, gameSlug: game.slug, gameIcon: game.icon, metricLabel: game.metricLabel, metricUnit: game.metricUnit }}>
-  (function () {
-    // --- Rating scale (min-based, as specified) ---
-    const RATING_SCALE = [
-      { min: 12, label: 'Genius', color: '#9333ea' },
-      { min: 9, label: 'Excellent', color: '#16a34a' },
-      { min: 7, label: 'Good', color: '#2563eb' },
-      { min: 5, label: 'Average', color: '#ca8a04' },
-      { min: 0, label: 'Below Average', color: '#dc2626' },
-    ];
+ (function () {
+ // --- Rating scale (min-based, as specified) ---
+ const RATING_SCALE = [
+ { min: 12, label: 'Genius', color: '#9333ea' },
+ { min: 9, label: 'Excellent', color: '#16a34a' },
+ { min: 7, label: 'Good', color: '#2563eb' },
+ { min: 5, label: 'Average', color: '#ca8a04' },
+ { min: 0, label: 'Below Average', color: '#dc2626' },
+ ];
 
-    function getLocalRating(score): { label; color } {
-      for (const level of RATING_SCALE) {
-        if (score >= level.min) {
-          return { label: level.label, color: level.color };
-        }
-      }
-      return { label: 'Below Average', color: '#dc2626' };
-    }
+ function getLocalRating(score) {
+ for (const level of RATING_SCALE) {
+ if (score >= level.min) {
+ return { label: level.label, color: level.color };
+ }
+ }
+ return { label: 'Below Average', color: '#dc2626' };
+ }
 
-    // --- Storage ---
-    const STORAGE_KEY = 'toolcalcs_number-memory-test_history';
-    const MAX_HISTORY = 20;
+ // --- Storage ---
+ const STORAGE_KEY = 'toolcalcs_number-memory-test_history';
+ const MAX_HISTORY = 20;
 
-    function loadHistory() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) return JSON.parse(raw);
-      } catch {}
-      return [];
-    }
+ function loadHistory() {
+ try {
+ const raw = localStorage.getItem(STORAGE_KEY);
+ if (raw) return JSON.parse(raw);
+ } catch {}
+ return [];
+ }
 
-    function saveHistory(history) {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(history.slice(0, MAX_HISTORY)));
-      } catch {}
-    }
+ function saveHistory(history) {
+ try {
+ localStorage.setItem(STORAGE_KEY, JSON.stringify(history.slice(0, MAX_HISTORY)));
+ } catch {}
+ }
 
-    function addToHistory(score) {
-      const history = loadHistory();
-      const rating = getLocalRating(score);
-      history.unshift({
-        score,
-        date: new Date().toISOString(),
-        rating: rating.label,
-      });
-      saveHistory(history);
-    }
+ function addToHistory(score) {
+ const history = loadHistory();
+ const rating = getLocalRating(score);
+ history.unshift({
+ score,
+ date: new Date().toISOString(),
+ rating: rating.label,
+ });
+ saveHistory(history);
+ }
 
-    // --- DOM refs ---
-    const gameArea = document.getElementById('gameArea')!;
-    const instructionsView = document.getElementById('instructionsView')!;
-    const memorizeView = document.getElementById('memorizeView')!;
-    const inputView = document.getElementById('inputView')!;
-    const feedbackView = document.getElementById('feedbackView')!;
-    const resultView = document.getElementById('resultView')!;
+ // --- DOM refs ---
+ const gameArea = document.getElementById('gameArea');
+ const instructionsView = document.getElementById('instructionsView');
+ const memorizeView = document.getElementById('memorizeView');
+ const inputView = document.getElementById('inputView');
+ const feedbackView = document.getElementById('feedbackView');
+ const resultView = document.getElementById('resultView');
 
-    const levelBadgeInstructions = document.getElementById('levelBadgeInstructions')!;
-    const levelBadgeMemorize = document.getElementById('levelBadgeMemorize')!;
-    const levelBadgeInput = document.getElementById('levelBadgeInput')!;
+ const levelBadgeInstructions = document.getElementById('levelBadgeInstructions');
+ const levelBadgeMemorize = document.getElementById('levelBadgeMemorize');
+ const levelBadgeInput = document.getElementById('levelBadgeInput');
 
-    const numberDisplay = document.getElementById('numberDisplay')!;
-    const progressBarFill = document.getElementById('progressBarFill')!;
-    const progressBarContainer = document.getElementById('progressBarContainer')!;
+ const numberDisplay = document.getElementById('numberDisplay');
+ const progressBarFill = document.getElementById('progressBarFill');
+ const progressBarContainer = document.getElementById('progressBarContainer');
 
-    const answerInput = document.getElementById('answerInput');
-    const submitBtn = document.getElementById('submitBtn')!;
+ const answerInput = document.getElementById('answerInput');
+ const submitBtn = document.getElementById('submitBtn');
 
-    const feedbackIcon = document.getElementById('feedbackIcon')!;
-    const feedbackLabel = document.getElementById('feedbackLabel')!;
-    const feedbackNumbers = document.getElementById('feedbackNumbers')!;
-    const nextBtn = document.getElementById('nextBtn')!;
+ const feedbackIcon = document.getElementById('feedbackIcon');
+ const feedbackLabel = document.getElementById('feedbackLabel');
+ const feedbackNumbers = document.getElementById('feedbackNumbers');
+ const nextBtn = document.getElementById('nextBtn');
 
-    const finalScore = document.getElementById('finalScore')!;
-    const ratingBadge = document.getElementById('ratingBadge')!;
+ const finalScore = document.getElementById('finalScore');
+ const ratingBadge = document.getElementById('ratingBadge');
 
-    const startBtn = document.getElementById('startBtn')!;
-    const tryAgainBtn = document.getElementById('tryAgainBtn')!;
+ const startBtn = document.getElementById('startBtn');
+ const tryAgainBtn = document.getElementById('tryAgainBtn');
 
-    const attemptHistorySection = document.getElementById('attemptHistory')!;
-    const historyList = document.getElementById('historyList')!;
+ const attemptHistorySection = document.getElementById('attemptHistory');
+ const historyList = document.getElementById('historyList');
 
-    // --- Game state ---
-    let currentLevel = 1;
-    let currentNumber = '';
-    let highestLevel = 0;
-    let timerInterval: ReturnType<typeof setInterval> | null = null;
-    let isPlaying = false;
+ // --- Game state ---
+ let currentLevel = 1;
+ let currentNumber = '';
+ let highestLevel = 0;
+ let timerInterval = null;
+ let isPlaying = false;
 
-    // --- Utility ---
-    function generateNumber(digits) {
-      let num = '';
-      // First digit should not be 0
-      num += Math.floor(Math.random() * 9) + 1;
-      for (let i = 1; i < digits; i++) {
-        num += Math.floor(Math.random() * 10);
-      }
-      return num;
-    }
+ // --- Utility ---
+ function generateNumber(digits) {
+ let num = '';
+ // First digit should not be 0
+ num += Math.floor(Math.random() * 9) + 1;
+ for (let i = 1; i < digits; i++) {
+ num += Math.floor(Math.random() * 10);
+ }
+ return num;
+ }
 
-    function getDisplayTime(level) {
-      return 1000 + level * 500;
-    }
+ function getDisplayTime(level) {
+ return 1000 + level * 500;
+ }
 
-    function showView(view) {
-      [instructionsView, memorizeView, inputView, feedbackView, resultView].forEach(v => {
-        v.style.display = 'none';
-      });
-      view.style.display = '';
-    }
+ function showView(view) {
+ [instructionsView, memorizeView, inputView, feedbackView, resultView].forEach(v => {
+ v.style.display = 'none';
+ });
+ view.style.display = '';
+ }
 
-    function updateLevelBadges() {
-      const text = `Level ${currentLevel}`;
-      levelBadgeInstructions.textContent = text;
-      levelBadgeMemorize.textContent = text;
-      levelBadgeInput.textContent = text;
-    }
+ function updateLevelBadges() {
+ const text = `Level ${currentLevel}`;
+ levelBadgeInstructions.textContent = text;
+ levelBadgeMemorize.textContent = text;
+ levelBadgeInput.textContent = text;
+ }
 
-    // --- Game flow ---
-    function startGame() {
-      currentLevel = 1;
-      highestLevel = 0;
-      isPlaying = true;
-      updateLevelBadges();
-      startRound();
-    }
+ // --- Game flow ---
+ function startGame() {
+ currentLevel = 1;
+ highestLevel = 0;
+ isPlaying = true;
+ updateLevelBadges();
+ startRound();
+ }
 
-    function startRound() {
-      currentNumber = generateNumber(currentLevel);
-      updateLevelBadges();
-      showView(memorizeView);
-      numberDisplay.textContent = currentNumber;
+ function startRound() {
+ currentNumber = generateNumber(currentLevel);
+ updateLevelBadges();
+ showView(memorizeView);
+ numberDisplay.textContent = currentNumber;
 
-      // Start countdown progress bar
-      const displayTime = getDisplayTime(currentLevel);
-      progressBarFill.style.transition = 'none';
-      progressBarFill.style.width = '100%';
-      progressBarContainer.setAttribute('aria-valuenow', '100');
+ // Start countdown progress bar
+ const displayTime = getDisplayTime(currentLevel);
+ progressBarFill.style.transition = 'none';
+ progressBarFill.style.width = '100%';
+ progressBarContainer.setAttribute('aria-valuenow', '100');
 
-      // Force reflow to reset animation
-      void progressBarFill.offsetWidth;
+ // Force reflow to reset animation
+ void progressBarFill.offsetWidth;
 
-      progressBarFill.style.transition = `width ${displayTime}ms linear`;
-      progressBarFill.style.width = '0%';
+ progressBarFill.style.transition = `width ${displayTime}ms linear`;
+ progressBarFill.style.width = '0%';
 
-      // Update aria-valuenow periodically
-      const startTime = Date.now();
-      if (timerInterval) clearInterval(timerInterval);
-      timerInterval = setInterval(() => {
-        const elapsed = Date.now() - startTime;
-        const pct = Math.max(0, Math.round(100 - (elapsed / displayTime) * 100));
-        progressBarContainer.setAttribute('aria-valuenow', String(pct));
-      }, 200);
+ // Update aria-valuenow periodically
+ const startTime = Date.now();
+ if (timerInterval) clearInterval(timerInterval);
+ timerInterval = setInterval(() => {
+ const elapsed = Date.now() - startTime;
+ const pct = Math.max(0, Math.round(100 - (elapsed / displayTime) * 100));
+ progressBarContainer.setAttribute('aria-valuenow', String(pct));
+ }, 200);
 
-      setTimeout(() => {
-        if (timerInterval) {
-          clearInterval(timerInterval);
-          timerInterval = null;
-        }
-        progressBarContainer.setAttribute('aria-valuenow', '0');
-        showInputView();
-      }, displayTime);
-    }
+ setTimeout(() => {
+ if (timerInterval) {
+ clearInterval(timerInterval);
+ timerInterval = null;
+ }
+ progressBarContainer.setAttribute('aria-valuenow', '0');
+ showInputView();
+ }, displayTime);
+ }
 
-    function showInputView() {
-      showView(inputView);
-      answerInput.value = '';
-      answerInput.maxLength = currentNumber.length + 5;
-      // Small delay to ensure the view is rendered before focus
-      requestAnimationFrame(() => {
-        answerInput.focus();
-      });
-    }
+ function showInputView() {
+ showView(inputView);
+ answerInput.value = '';
+ answerInput.maxLength = currentNumber.length + 5;
+ // Small delay to ensure the view is rendered before focus
+ requestAnimationFrame(() => {
+ answerInput.focus();
+ });
+ }
 
-    function checkAnswer() {
-      const userAnswer = answerInput.value.trim();
-      if (userAnswer.length === 0) return;
+ function checkAnswer() {
+ const userAnswer = answerInput.value.trim();
+ if (userAnswer.length === 0) return;
 
-      if (userAnswer === currentNumber) {
-        // Correct
-        highestLevel = currentLevel;
-        showFeedback(true, userAnswer);
-      } else {
-        // Wrong
-        showFeedback(false, userAnswer);
-      }
-    }
+ if (userAnswer === currentNumber) {
+ // Correct
+ highestLevel = currentLevel;
+ showFeedback(true, userAnswer);
+ } else {
+ // Wrong
+ showFeedback(false, userAnswer);
+ }
+ }
 
-    function showFeedback(correct, userAnswer) {
-      showView(feedbackView);
+ function showFeedback(correct, userAnswer) {
+ showView(feedbackView);
 
-      if (correct) {
-        feedbackView.classList.remove('feedback-wrong');
-        feedbackView.classList.add('feedback-correct');
-        feedbackIcon.textContent = '\u2705';
-        feedbackLabel.textContent = 'Correct!';
-        nextBtn.textContent = 'Next Level';
-        nextBtn.hidden = false;
-        feedbackNumbers.innerHTML = `
-          <div class="feedback-row">
-            <span class="feedback-row-label">Your answer</span>
-            <span class="feedback-row-value" style="color:#16a34a">${escapeHtml(userAnswer)}</span>
-          </div>
-          <div class="feedback-row">
-            <span class="feedback-row-label">Digits</span>
-            <span class="feedback-row-value">${currentNumber.length}</span>
-          </div>
-        `;
-      } else {
-        feedbackView.classList.remove('feedback-correct');
-        feedbackView.classList.add('feedback-wrong');
-        feedbackIcon.textContent = '\u274C';
-        feedbackLabel.textContent = 'Incorrect';
-        nextBtn.hidden = true;
-        feedbackNumbers.innerHTML = `
-          <div class="feedback-row">
-            <span class="feedback-row-label">Your answer</span>
-            <span class="feedback-row-value" style="color:#dc2626">${escapeHtml(userAnswer)}</span>
-          </div>
-          <div class="feedback-row">
-            <span class="feedback-row-label">Correct number</span>
-            <span class="feedback-row-value" style="color:#16a34a">${escapeHtml(currentNumber)}</span>
-          </div>
-        `;
+ if (correct) {
+ feedbackView.classList.remove('feedback-wrong');
+ feedbackView.classList.add('feedback-correct');
+ feedbackIcon.textContent = '\u2705';
+ feedbackLabel.textContent = 'Correct!';
+ nextBtn.textContent = 'Next Level';
+ nextBtn.hidden = false;
+ feedbackNumbers.innerHTML = `
+ <div class="feedback-row">
+ <span class="feedback-row-label">Your answer</span>
+ <span class="feedback-row-value" style="color:#16a34a">${escapeHtml(userAnswer)}</span>
+ </div>
+ <div class="feedback-row">
+ <span class="feedback-row-label">Digits</span>
+ <span class="feedback-row-value">${currentNumber.length}</span>
+ </div>
+ `;
+ } else {
+ feedbackView.classList.remove('feedback-correct');
+ feedbackView.classList.add('feedback-wrong');
+ feedbackIcon.textContent = '\u274C';
+ feedbackLabel.textContent = 'Incorrect';
+ nextBtn.hidden = true;
+ feedbackNumbers.innerHTML = `
+ <div class="feedback-row">
+ <span class="feedback-row-label">Your answer</span>
+ <span class="feedback-row-value" style="color:#dc2626">${escapeHtml(userAnswer)}</span>
+ </div>
+ <div class="feedback-row">
+ <span class="feedback-row-label">Correct number</span>
+ <span class="feedback-row-value" style="color:#16a34a">${escapeHtml(currentNumber)}</span>
+ </div>
+ `;
 
-        // Short delay then show result
-        setTimeout(() => {
-          endGame();
-        }, 2000);
-      }
-    }
+ // Short delay then show result
+ setTimeout(() => {
+ endGame();
+ }, 2000);
+ }
+ }
 
-    function nextLevel() {
-      currentLevel++;
-      startRound();
-    }
+ function nextLevel() {
+ currentLevel++;
+ startRound();
+ }
 
-    function endGame() {
-      isPlaying = false;
-      const score = highestLevel;
-      showView(resultView);
-      finalScore.textContent = String(score);
+ function endGame() {
+ isPlaying = false;
+ const score = highestLevel;
+ showView(resultView);
+ finalScore.textContent = String(score);
 
-      const rating = getLocalRating(score);
-      ratingBadge.textContent = rating.label;
-      ratingBadge.style.background = rating.color;
+ const rating = getLocalRating(score);
+ ratingBadge.textContent = rating.label;
+ ratingBadge.style.background = rating.color;
 
-      // Save to history
-      addToHistory(score);
-      renderHistory();
+ // Save to history
+ addToHistory(score);
+ renderHistory();
 
-      if (window.GameShare) {
-        window.GameShare.show({
-          gameName: gameName,
-          gameSlug: gameSlug,
-          gameIcon: gameIcon,
-          score: score,
-          unit: metricUnit,
-          metricLabel: metricLabel,
-          ratingLabel: rating.label,
-          ratingColor: rating.color
-        });
-      }
-    }
+ if (window.GameShare) {
+ window.GameShare.show({
+ gameName: gameName,
+ gameSlug: gameSlug,
+ gameIcon: gameIcon,
+ score: score,
+ unit: metricUnit,
+ metricLabel: metricLabel,
+ ratingLabel: rating.label,
+ ratingColor: rating.color
+ });
+ }
+ }
 
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
+ function escapeHtml(text) {
+ const div = document.createElement('div');
+ div.textContent = text;
+ return div.innerHTML;
+ }
 
-    // --- History rendering ---
-    function renderHistory() {
-      const history = loadHistory();
-      if (history.length === 0) {
-        attemptHistorySection.hidden = true;
-        return;
-      }
-      attemptHistorySection.hidden = false;
-      historyList.innerHTML = history
-        .map((entry) => {
-          const rating = getLocalRating(entry.score);
-          const dateStr = formatDate(entry.date);
-          return `
-            <div class="history-item">
-              <span class="history-score">${entry.score} digit${entry.score !== 1 ? 's' : ''}</span>
-              <span class="history-rating" style="background:${rating.color}">${rating.label}</span>
-              <span class="history-time">${dateStr}</span>
-            </div>
-          `;
-        })
-        .join('');
-    }
+ // --- History rendering ---
+ function renderHistory() {
+ const history = loadHistory();
+ if (history.length === 0) {
+ attemptHistorySection.hidden = true;
+ return;
+ }
+ attemptHistorySection.hidden = false;
+ historyList.innerHTML = history
+ .map((entry) => {
+ const rating = getLocalRating(entry.score);
+ const dateStr = formatDate(entry.date);
+ return `
+ <div class="history-item">
+ <span class="history-score">${entry.score} digit${entry.score !== 1 ? 's' : ''}</span>
+ <span class="history-rating" style="background:${rating.color}">${rating.label}</span>
+ <span class="history-time">${dateStr}</span>
+ </div>
+ `;
+ })
+ .join('');
+ }
 
-    function formatDate(iso) {
-      try {
-        const d = new Date(iso);
-        return d.toLocaleDateString(undefined, {
-          month: 'short',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-        });
-      } catch {
-        return '';
-      }
-    }
+ function formatDate(iso) {
+ try {
+ const d = new Date(iso);
+ return d.toLocaleDateString(undefined, {
+ month: 'short',
+ day: 'numeric',
+ hour: '2-digit',
+ minute: '2-digit',
+ });
+ } catch {
+ return '';
+ }
+ }
 
-    // --- Event listeners ---
-    startBtn.addEventListener('click', startGame);
-    tryAgainBtn.addEventListener('click', startGame);
-    submitBtn.addEventListener('click', checkAnswer);
-    nextBtn.addEventListener('click', nextLevel);
+ // --- Event listeners ---
+ startBtn.addEventListener('click', startGame);
+ tryAgainBtn.addEventListener('click', startGame);
+ submitBtn.addEventListener('click', checkAnswer);
+ nextBtn.addEventListener('click', nextLevel);
 
-    answerInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        checkAnswer();
-      }
-    });
+ answerInput.addEventListener('keydown', (e) => {
+ if (e.key === 'Enter') {
+ e.preventDefault();
+ checkAnswer();
+ }
+ });
 
-    // Only allow digit input
-    answerInput.addEventListener('input', () => {
-      answerInput.value = answerInput.value.replace(/[^0-9]/g, '');
-    });
+ // Only allow digit input
+ answerInput.addEventListener('input', () => {
+ answerInput.value = answerInput.value.replace(/[^0-9]/g, '');
+ });
 
-    // --- Init ---
-    renderHistory();
-  })();
+ // --- Init ---
+ renderHistory();
+ })();
 </script>

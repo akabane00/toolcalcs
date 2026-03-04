@@ -390,300 +390,300 @@ const structuredData = [
 </style>
 
 <script define:vars={{ gameName: game.title, gameSlug: game.slug, gameIcon: game.icon, metricLabel: game.metricLabel, metricUnit: game.metricUnit }}>
-  (function () {
-    'use strict';
+ (function () {
+ 'use strict';
 
-    var STORAGE_KEY = 'toolcalcs_math-flashcards_history';
-    var MAX_HISTORY = 20;
+ var STORAGE_KEY = 'toolcalcs_math-flashcards_history';
+ var MAX_HISTORY = 20;
 
-    var ratingScale = [
-      { min: 31, label: 'Math Whiz!', color: '#16a34a' },
-      { min: 21, label: 'Great!', color: '#22c55e' },
-      { min: 11, label: 'Good', color: '#2563eb' },
-      { min: 6, label: 'Getting There', color: '#f59e0b' },
-      { min: 0, label: 'Keep Practicing', color: '#ef4444' },
-    ];
+ var ratingScale = [
+ { min: 31, label: 'Math Whiz!', color: '#16a34a' },
+ { min: 21, label: 'Great!', color: '#22c55e' },
+ { min: 11, label: 'Good', color: '#2563eb' },
+ { min: 6, label: 'Getting There', color: '#f59e0b' },
+ { min: 0, label: 'Keep Practicing', color: '#ef4444' },
+ ];
 
-    var setupPanel = document.getElementById('fcSetup');
-    var playingPanel = document.getElementById('fcPlaying');
-    var resultPanel = document.getElementById('fcResult');
-    var controlsPanel = document.getElementById('fcControls');
-    var historySection = document.getElementById('fcHistory');
-    var historyListEl = document.getElementById('fcHistoryList');
+ var setupPanel = document.getElementById('fcSetup');
+ var playingPanel = document.getElementById('fcPlaying');
+ var resultPanel = document.getElementById('fcResult');
+ var controlsPanel = document.getElementById('fcControls');
+ var historySection = document.getElementById('fcHistory');
+ var historyListEl = document.getElementById('fcHistoryList');
 
-    var cfgOperation = document.getElementById('cfgOperation');
-    var cfgDifficulty = document.getElementById('cfgDifficulty');
-    var cfgDuration = document.getElementById('cfgDuration');
+ var cfgOperation = document.getElementById('cfgOperation');
+ var cfgDifficulty = document.getElementById('cfgDifficulty');
+ var cfgDuration = document.getElementById('cfgDuration');
 
-    var timerFill = document.getElementById('fcTimerFill');
-    var correctEl = document.getElementById('fcCorrect');
-    var totalEl = document.getElementById('fcTotal');
-    var streakEl = document.getElementById('fcStreak');
-    var timeLeftEl = document.getElementById('fcTimeLeft');
-    var cardEl = document.getElementById('fcCard');
-    var problemEl = document.getElementById('fcProblem');
-    var feedbackEl = document.getElementById('fcFeedback');
-    var answerInput = document.getElementById('fcAnswer');
-    var btnSubmit = document.getElementById('btnSubmit');
-    var btnStart = document.getElementById('btnStart');
-    var btnRetry = document.getElementById('btnRetry');
-    var scoreValueEl = document.getElementById('fcScoreValue');
-    var ratingBadgeEl = document.getElementById('fcRating');
-    var resultStatsEl = document.getElementById('fcResultStats');
+ var timerFill = document.getElementById('fcTimerFill');
+ var correctEl = document.getElementById('fcCorrect');
+ var totalEl = document.getElementById('fcTotal');
+ var streakEl = document.getElementById('fcStreak');
+ var timeLeftEl = document.getElementById('fcTimeLeft');
+ var cardEl = document.getElementById('fcCard');
+ var problemEl = document.getElementById('fcProblem');
+ var feedbackEl = document.getElementById('fcFeedback');
+ var answerInput = document.getElementById('fcAnswer');
+ var btnSubmit = document.getElementById('btnSubmit');
+ var btnStart = document.getElementById('btnStart');
+ var btnRetry = document.getElementById('btnRetry');
+ var scoreValueEl = document.getElementById('fcScoreValue');
+ var ratingBadgeEl = document.getElementById('fcRating');
+ var resultStatsEl = document.getElementById('fcResultStats');
 
-    var state = 'setup';
-    var duration = 60;
-    var correct = 0;
-    var total = 0;
-    var streak = 0;
-    var maxStreak = 0;
-    var startTime = 0;
-    var currentAnswer = 0;
-    var timerInterval = null;
-    var responseTimes = [];
-    var lastProblemTime = 0;
-    var feedbackTimeout = null;
+ var state = 'setup';
+ var duration = 60;
+ var correct = 0;
+ var total = 0;
+ var streak = 0;
+ var maxStreak = 0;
+ var startTime = 0;
+ var currentAnswer = 0;
+ var timerInterval = null;
+ var responseTimes = [];
+ var lastProblemTime = 0;
+ var feedbackTimeout = null;
 
-    function randInt(min, max) {
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
+ function randInt(min, max) {
+ return Math.floor(Math.random() * (max - min + 1)) + min;
+ }
 
-    function generateProblem(operation, difficulty) {
-      var ops = operation === 'mixed'
-        ? ['addition', 'subtraction', 'multiplication', 'division']
-        : [operation];
-      var op = ops[randInt(0, ops.length - 1)];
-      var a, b, answer, text;
+ function generateProblem(operation, difficulty) {
+ var ops = operation === 'mixed'
+ ? ['addition', 'subtraction', 'multiplication', 'division']
+ : [operation];
+ var op = ops[randInt(0, ops.length - 1)];
+ var a, b, answer, text;
 
-      if (op === 'addition') {
-        var mx = difficulty === 'easy' ? 10 : difficulty === 'medium' ? 50 : 100;
-        a = randInt(1, mx);
-        b = randInt(1, mx);
-        text = a + ' + ' + b;
-        answer = a + b;
-      } else if (op === 'subtraction') {
-        var mx = difficulty === 'easy' ? 10 : difficulty === 'medium' ? 50 : 100;
-        a = randInt(1, mx);
-        b = randInt(1, a);
-        text = a + ' \u2212 ' + b;
-        answer = a - b;
-      } else if (op === 'multiplication') {
-        var mxA = difficulty === 'easy' ? 5 : difficulty === 'medium' ? 12 : 15;
-        var mxB = difficulty === 'easy' ? 5 : 12;
-        a = randInt(2, mxA);
-        b = randInt(2, mxB);
-        text = a + ' \u00d7 ' + b;
-        answer = a * b;
-      } else {
-        var maxDiv = difficulty === 'easy' ? 5 : difficulty === 'medium' ? 12 : 15;
-        b = randInt(2, maxDiv);
-        answer = randInt(2, difficulty === 'easy' ? 5 : difficulty === 'medium' ? 12 : 20);
-        a = b * answer;
-        text = a + ' \u00f7 ' + b;
-      }
+ if (op === 'addition') {
+ var mx = difficulty === 'easy' ? 10 : difficulty === 'medium' ? 50 : 100;
+ a = randInt(1, mx);
+ b = randInt(1, mx);
+ text = a + ' + ' + b;
+ answer = a + b;
+ } else if (op === 'subtraction') {
+ var mx = difficulty === 'easy' ? 10 : difficulty === 'medium' ? 50 : 100;
+ a = randInt(1, mx);
+ b = randInt(1, a);
+ text = a + ' \u2212 ' + b;
+ answer = a - b;
+ } else if (op === 'multiplication') {
+ var mxA = difficulty === 'easy' ? 5 : difficulty === 'medium' ? 12 : 15;
+ var mxB = difficulty === 'easy' ? 5 : 12;
+ a = randInt(2, mxA);
+ b = randInt(2, mxB);
+ text = a + ' \u00d7 ' + b;
+ answer = a * b;
+ } else {
+ var maxDiv = difficulty === 'easy' ? 5 : difficulty === 'medium' ? 12 : 15;
+ b = randInt(2, maxDiv);
+ answer = randInt(2, difficulty === 'easy' ? 5 : difficulty === 'medium' ? 12 : 20);
+ a = b * answer;
+ text = a + ' \u00f7 ' + b;
+ }
 
-      return { text: text + ' = ?', answer: answer };
-    }
+ return { text: text + ' = ?', answer: answer };
+ }
 
-    function getRating(score) {
-      for (var i = 0; i < ratingScale.length; i++) {
-        if (score >= ratingScale[i].min) return ratingScale[i];
-      }
-      return ratingScale[ratingScale.length - 1];
-    }
+ function getRating(score) {
+ for (var i = 0; i < ratingScale.length; i++) {
+ if (score >= ratingScale[i].min) return ratingScale[i];
+ }
+ return ratingScale[ratingScale.length - 1];
+ }
 
-    function showSetup() {
-      state = 'setup';
-      setupPanel.style.display = '';
-      playingPanel.style.display = 'none';
-      resultPanel.style.display = 'none';
-      controlsPanel.style.display = 'none';
-      if (window.GameShare) window.GameShare.hide();
-    }
+ function showSetup() {
+ state = 'setup';
+ setupPanel.style.display = '';
+ playingPanel.style.display = 'none';
+ resultPanel.style.display = 'none';
+ controlsPanel.style.display = 'none';
+ if (window.GameShare) window.GameShare.hide();
+ }
 
-    function startGame() {
-      state = 'playing';
-      duration = parseInt(cfgDuration.value, 10);
-      correct = 0;
-      total = 0;
-      streak = 0;
-      maxStreak = 0;
-      responseTimes = [];
-      startTime = Date.now();
-      lastProblemTime = Date.now();
+ function startGame() {
+ state = 'playing';
+ duration = parseInt(cfgDuration.value, 10);
+ correct = 0;
+ total = 0;
+ streak = 0;
+ maxStreak = 0;
+ responseTimes = [];
+ startTime = Date.now();
+ lastProblemTime = Date.now();
 
-      setupPanel.style.display = 'none';
-      playingPanel.style.display = '';
-      resultPanel.style.display = 'none';
-      controlsPanel.style.display = 'none';
-      if (window.GameShare) window.GameShare.hide();
+ setupPanel.style.display = 'none';
+ playingPanel.style.display = '';
+ resultPanel.style.display = 'none';
+ controlsPanel.style.display = 'none';
+ if (window.GameShare) window.GameShare.hide();
 
-      correctEl.textContent = '0';
-      totalEl.textContent = '0';
-      streakEl.textContent = '0';
-      timeLeftEl.textContent = duration + 's';
-      timerFill.style.width = '100%';
-      timerFill.classList.remove('warning', 'danger');
+ correctEl.textContent = '0';
+ totalEl.textContent = '0';
+ streakEl.textContent = '0';
+ timeLeftEl.textContent = duration + 's';
+ timerFill.style.width = '100%';
+ timerFill.classList.remove('warning', 'danger');
 
-      showNextProblem();
-      answerInput.focus();
-      timerInterval = setInterval(updateTimer, 50);
-    }
+ showNextProblem();
+ answerInput.focus();
+ timerInterval = setInterval(updateTimer, 50);
+ }
 
-    function showNextProblem() {
-      if (feedbackTimeout) clearTimeout(feedbackTimeout);
-      var problem = generateProblem(cfgOperation.value, cfgDifficulty.value);
-      currentAnswer = problem.answer;
-      problemEl.textContent = problem.text;
-      answerInput.value = '';
-      cardEl.classList.remove('correct', 'wrong');
-      feedbackEl.textContent = '';
-      feedbackEl.className = 'fc-feedback';
-      lastProblemTime = Date.now();
-      answerInput.focus();
-    }
+ function showNextProblem() {
+ if (feedbackTimeout) clearTimeout(feedbackTimeout);
+ var problem = generateProblem(cfgOperation.value, cfgDifficulty.value);
+ currentAnswer = problem.answer;
+ problemEl.textContent = problem.text;
+ answerInput.value = '';
+ cardEl.classList.remove('correct', 'wrong');
+ feedbackEl.textContent = '';
+ feedbackEl.className = 'fc-feedback';
+ lastProblemTime = Date.now();
+ answerInput.focus();
+ }
 
-    function submitAnswer() {
-      if (state !== 'playing') return;
-      var userAnswer = parseInt(answerInput.value, 10);
-      if (isNaN(userAnswer)) return;
+ function submitAnswer() {
+ if (state !== 'playing') return;
+ var userAnswer = parseInt(answerInput.value, 10);
+ if (isNaN(userAnswer)) return;
 
-      var responseTime = Date.now() - lastProblemTime;
-      responseTimes.push(responseTime);
-      total++;
-      totalEl.textContent = String(total);
+ var responseTime = Date.now() - lastProblemTime;
+ responseTimes.push(responseTime);
+ total++;
+ totalEl.textContent = String(total);
 
-      if (userAnswer === currentAnswer) {
-        correct++;
-        streak++;
-        if (streak > maxStreak) maxStreak = streak;
-        correctEl.textContent = String(correct);
-        streakEl.textContent = String(streak);
-        cardEl.classList.add('correct');
-        feedbackEl.textContent = 'Correct!';
-        feedbackEl.className = 'fc-feedback correct-text';
-        feedbackTimeout = setTimeout(showNextProblem, 300);
-      } else {
-        streak = 0;
-        streakEl.textContent = '0';
-        cardEl.classList.add('wrong');
-        feedbackEl.textContent = 'Answer: ' + currentAnswer;
-        feedbackEl.className = 'fc-feedback wrong-text';
-        feedbackTimeout = setTimeout(showNextProblem, 1200);
-      }
-    }
+ if (userAnswer === currentAnswer) {
+ correct++;
+ streak++;
+ if (streak > maxStreak) maxStreak = streak;
+ correctEl.textContent = String(correct);
+ streakEl.textContent = String(streak);
+ cardEl.classList.add('correct');
+ feedbackEl.textContent = 'Correct!';
+ feedbackEl.className = 'fc-feedback correct-text';
+ feedbackTimeout = setTimeout(showNextProblem, 300);
+ } else {
+ streak = 0;
+ streakEl.textContent = '0';
+ cardEl.classList.add('wrong');
+ feedbackEl.textContent = 'Answer: ' + currentAnswer;
+ feedbackEl.className = 'fc-feedback wrong-text';
+ feedbackTimeout = setTimeout(showNextProblem, 1200);
+ }
+ }
 
-    function updateTimer() {
-      var elapsed = (Date.now() - startTime) / 1000;
-      var remaining = Math.max(0, duration - elapsed);
-      var pct = (remaining / duration) * 100;
-      timeLeftEl.textContent = Math.ceil(remaining) + 's';
-      timerFill.style.width = pct + '%';
+ function updateTimer() {
+ var elapsed = (Date.now() - startTime) / 1000;
+ var remaining = Math.max(0, duration - elapsed);
+ var pct = (remaining / duration) * 100;
+ timeLeftEl.textContent = Math.ceil(remaining) + 's';
+ timerFill.style.width = pct + '%';
 
-      if (pct <= 20) {
-        timerFill.classList.add('danger');
-        timerFill.classList.remove('warning');
-      } else if (pct <= 40) {
-        timerFill.classList.add('warning');
-        timerFill.classList.remove('danger');
-      }
+ if (pct <= 20) {
+ timerFill.classList.add('danger');
+ timerFill.classList.remove('warning');
+ } else if (pct <= 40) {
+ timerFill.classList.add('warning');
+ timerFill.classList.remove('danger');
+ }
 
-      if (remaining <= 0) endGame();
-    }
+ if (remaining <= 0) endGame();
+ }
 
-    function endGame() {
-      state = 'result';
-      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-      if (feedbackTimeout) { clearTimeout(feedbackTimeout); feedbackTimeout = null; }
+ function endGame() {
+ state = 'result';
+ if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+ if (feedbackTimeout) { clearTimeout(feedbackTimeout); feedbackTimeout = null; }
 
-      var rating = getRating(correct);
-      var accuracy = total > 0 ? Math.round((correct / total) * 100) : 0;
-      var avgTime = responseTimes.length > 0
-        ? Math.round(responseTimes.reduce(function (a, b) { return a + b; }, 0) / responseTimes.length)
-        : 0;
+ var rating = getRating(correct);
+ var accuracy = total > 0 ? Math.round((correct / total) * 100) : 0;
+ var avgTime = responseTimes.length > 0
+ ? Math.round(responseTimes.reduce(function (a, b) { return a + b; }, 0) / responseTimes.length)
+ : 0;
 
-      playingPanel.style.display = 'none';
-      resultPanel.style.display = '';
-      controlsPanel.style.display = '';
+ playingPanel.style.display = 'none';
+ resultPanel.style.display = '';
+ controlsPanel.style.display = '';
 
-      scoreValueEl.textContent = String(correct);
-      ratingBadgeEl.textContent = rating.label;
-      ratingBadgeEl.style.background = rating.color;
+ scoreValueEl.textContent = String(correct);
+ ratingBadgeEl.textContent = rating.label;
+ ratingBadgeEl.style.background = rating.color;
 
-      resultStatsEl.innerHTML =
-        '<span><strong>' + total + '</strong>attempted</span>' +
-        '<span><strong>' + accuracy + '%</strong>accuracy</span>' +
-        '<span><strong>' + (avgTime / 1000).toFixed(1) + 's</strong>avg time</span>' +
-        '<span><strong>' + maxStreak + '</strong>best streak</span>';
+ resultStatsEl.innerHTML =
+ '<span><strong>' + total + '</strong>attempted</span>' +
+ '<span><strong>' + accuracy + '%</strong>accuracy</span>' +
+ '<span><strong>' + (avgTime / 1000).toFixed(1) + 's</strong>avg time</span>' +
+ '<span><strong>' + maxStreak + '</strong>best streak</span>';
 
-      saveAttempt(correct, rating.label);
-      renderHistory();
+ saveAttempt(correct, rating.label);
+ renderHistory();
 
-      if (window.GameShare) {
-        window.GameShare.show({
-          gameName: gameName,
-          gameSlug: gameSlug,
-          gameIcon: gameIcon,
-          score: correct,
-          unit: metricUnit,
-          metricLabel: metricLabel,
-          ratingLabel: rating.label,
-          ratingColor: rating.color
-        });
-      }
-    }
+ if (window.GameShare) {
+ window.GameShare.show({
+ gameName: gameName,
+ gameSlug: gameSlug,
+ gameIcon: gameIcon,
+ score: correct,
+ unit: metricUnit,
+ metricLabel: metricLabel,
+ ratingLabel: rating.label,
+ ratingColor: rating.color
+ });
+ }
+ }
 
-    btnStart.addEventListener('click', startGame);
-    btnRetry.addEventListener('click', showSetup);
-    btnSubmit.addEventListener('click', submitAnswer);
-    answerInput.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') { e.preventDefault(); submitAnswer(); }
-    });
+ btnStart.addEventListener('click', startGame);
+ btnRetry.addEventListener('click', showSetup);
+ btnSubmit.addEventListener('click', submitAnswer);
+ answerInput.addEventListener('keydown', function (e) {
+ if (e.key === 'Enter') { e.preventDefault(); submitAnswer(); }
+ });
 
-    function loadHistory() {
-      try {
-        var raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return [];
-        return JSON.parse(raw);
-      } catch (e) { return []; }
-    }
+ function loadHistory() {
+ try {
+ var raw = localStorage.getItem(STORAGE_KEY);
+ if (!raw) return [];
+ return JSON.parse(raw);
+ } catch (e) { return []; }
+ }
 
-    function saveAttempt(score, rating) {
-      var history = loadHistory();
-      history.unshift({ score: score, rating: rating, timestamp: Date.now() });
-      if (history.length > MAX_HISTORY) history.length = MAX_HISTORY;
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(history)); } catch (e) {}
-    }
+ function saveAttempt(score, rating) {
+ var history = loadHistory();
+ history.unshift({ score: score, rating: rating, timestamp: Date.now() });
+ if (history.length > MAX_HISTORY) history.length = MAX_HISTORY;
+ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(history)); } catch (e) {}
+ }
 
-    function renderHistory() {
-      var history = loadHistory();
-      if (history.length === 0) { historySection.hidden = true; return; }
-      historySection.hidden = false;
-      historyListEl.innerHTML = '';
-      for (var i = 0; i < history.length; i++) {
-        var entry = history[i];
-        var r = getRating(entry.score);
-        var item = document.createElement('div');
-        item.className = 'history-item';
-        item.innerHTML =
-          '<span class="history-score">' + entry.score + ' correct</span>' +
-          '<span class="history-rating" style="background:' + r.color + '">' + entry.rating + '</span>' +
-          '<span class="history-time">' + formatTimeAgo(entry.timestamp) + '</span>';
-        historyListEl.appendChild(item);
-      }
-    }
+ function renderHistory() {
+ var history = loadHistory();
+ if (history.length === 0) { historySection.hidden = true; return; }
+ historySection.hidden = false;
+ historyListEl.innerHTML = '';
+ for (var i = 0; i < history.length; i++) {
+ var entry = history[i];
+ var r = getRating(entry.score);
+ var item = document.createElement('div');
+ item.className = 'history-item';
+ item.innerHTML =
+ '<span class="history-score">' + entry.score + ' correct</span>' +
+ '<span class="history-rating" style="background:' + r.color + '">' + entry.rating + '</span>' +
+ '<span class="history-time">' + formatTimeAgo(entry.timestamp) + '</span>';
+ historyListEl.appendChild(item);
+ }
+ }
 
-    function formatTimeAgo(timestamp) {
-      var diff = Date.now() - timestamp;
-      var seconds = Math.floor(diff / 1000);
-      if (seconds < 60) return 'just now';
-      var minutes = Math.floor(seconds / 60);
-      if (minutes < 60) return minutes + 'm ago';
-      var hours = Math.floor(minutes / 60);
-      if (hours < 24) return hours + 'h ago';
-      return Math.floor(hours / 24) + 'd ago';
-    }
+ function formatTimeAgo(timestamp) {
+ var diff = Date.now() - timestamp;
+ var seconds = Math.floor(diff / 1000);
+ if (seconds < 60) return 'just now';
+ var minutes = Math.floor(seconds / 60);
+ if (minutes < 60) return minutes + 'm ago';
+ var hours = Math.floor(minutes / 60);
+ if (hours < 24) return hours + 'h ago';
+ return Math.floor(hours / 24) + 'd ago';
+ }
 
-    renderHistory();
-  })();
+ renderHistory();
+ })();
 </script>

@@ -293,220 +293,220 @@ const structuredData = [
 </style>
 
 <script define:vars={{ gameName: game.title, gameSlug: game.slug, gameIcon: game.icon, metricLabel: game.metricLabel, metricUnit: game.metricUnit }}>
-  (function () {
-    'use strict';
+ (function () {
+ 'use strict';
 
-    const COLORS = [
-      { name: 'RED', hex: '#ef4444' },
-      { name: 'BLUE', hex: '#3b82f6' },
-      { name: 'GREEN', hex: '#22c55e' },
-      { name: 'YELLOW', hex: '#eab308' },
-    ];
-    const TOTAL_ROUNDS = 20;
+ const COLORS = [
+ { name: 'RED', hex: '#ef4444' },
+ { name: 'BLUE', hex: '#3b82f6' },
+ { name: 'GREEN', hex: '#22c55e' },
+ { name: 'YELLOW', hex: '#eab308' },
+ ];
+ const TOTAL_ROUNDS = 20;
 
-    const RATING_SCALE = [
-      { min: 0, max: 700, label: 'Incredible!', color: '#16a34a' },
-      { min: 0, max: 1000, label: 'Fast!', color: '#22c55e' },
-      { min: 0, max: 1500, label: 'Good', color: '#2563eb' },
-      { min: 0, max: 2000, label: 'Average', color: '#f59e0b' },
-      { min: 0, max: Infinity, label: 'Slow', color: '#ef4444' },
-    ];
+ const RATING_SCALE = [
+ { min: 0, max: 700, label: 'Incredible!', color: '#16a34a' },
+ { min: 0, max: 1000, label: 'Fast!', color: '#22c55e' },
+ { min: 0, max: 1500, label: 'Good', color: '#2563eb' },
+ { min: 0, max: 2000, label: 'Average', color: '#f59e0b' },
+ { min: 0, max: Infinity, label: 'Slow', color: '#ef4444' },
+ ];
 
-    function getLocalRating(score) {
-      for (const level of RATING_SCALE) {
-        if (score <= level.max) return { label: level.label, color: level.color };
-      }
-      return { label: 'Slow', color: '#ef4444' };
-    }
+ function getLocalRating(score) {
+ for (const level of RATING_SCALE) {
+ if (score <= level.max) return { label: level.label, color: level.color };
+ }
+ return { label: 'Slow', color: '#ef4444' };
+ }
 
-    const STORAGE_KEY = 'toolcalcs_stroop-test_history';
-    const MAX_HISTORY = 20;
+ const STORAGE_KEY = 'toolcalcs_stroop-test_history';
+ const MAX_HISTORY = 20;
 
-    function loadHistory() {
-      try { const r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch {}
-      return [];
-    }
-    function saveHistory(h) {
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch {}
-    }
-    function addToHistory(score) {
-      const h = loadHistory();
-      h.unshift({ score, date: new Date().toISOString(), rating: getLocalRating(score).label });
-      saveHistory(h);
-    }
+ function loadHistory() {
+ try { const r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch {}
+ return [];
+ }
+ function saveHistory(h) {
+ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch {}
+ }
+ function addToHistory(score) {
+ const h = loadHistory();
+ h.unshift({ score, date: new Date().toISOString(), rating: getLocalRating(score).label });
+ saveHistory(h);
+ }
 
-    // DOM
-    const instructionsView = document.getElementById('instructionsView')!;
-    const playView = document.getElementById('playView')!;
-    const resultView = document.getElementById('resultView')!;
-    const startBtn = document.getElementById('startBtn')!;
-    const tryAgainBtn = document.getElementById('tryAgainBtn')!;
-    const roundInfo = document.getElementById('roundInfo')!;
-    const correctInfo = document.getElementById('correctInfo')!;
-    const stroopWord = document.getElementById('stroopWord')!;
-    const stroopButtons = document.getElementById('stroopButtons')!;
-    const finalScore = document.getElementById('finalScore')!;
-    const ratingBadge = document.getElementById('ratingBadge')!;
-    const stroopStats = document.getElementById('stroopStats')!;
-    const attemptHistorySection = document.getElementById('attemptHistory')!;
-    const historyList = document.getElementById('historyList')!;
+ // DOM
+ const instructionsView = document.getElementById('instructionsView');
+ const playView = document.getElementById('playView');
+ const resultView = document.getElementById('resultView');
+ const startBtn = document.getElementById('startBtn');
+ const tryAgainBtn = document.getElementById('tryAgainBtn');
+ const roundInfo = document.getElementById('roundInfo');
+ const correctInfo = document.getElementById('correctInfo');
+ const stroopWord = document.getElementById('stroopWord');
+ const stroopButtons = document.getElementById('stroopButtons');
+ const finalScore = document.getElementById('finalScore');
+ const ratingBadge = document.getElementById('ratingBadge');
+ const stroopStats = document.getElementById('stroopStats');
+ const attemptHistorySection = document.getElementById('attemptHistory');
+ const historyList = document.getElementById('historyList');
 
-    let currentRound = 0;
-    let correctCount = 0;
-    let responseTimes[] = [];
-    let roundStartTime = 0;
-    let currentInkColor = '';
-    let canClick = false;
+ let currentRound = 0;
+ let correctCount = 0;
+ let responseTimes = [];
+ let roundStartTime = 0;
+ let currentInkColor = '';
+ let canClick = false;
 
-    function showView(view) {
-      [instructionsView, playView, resultView].forEach(v => v.style.display = 'none');
-      view.style.display = '';
-    }
+ function showView(view) {
+ [instructionsView, playView, resultView].forEach(v => v.style.display = 'none');
+ view.style.display = '';
+ }
 
-    function pickRandom<T>(arr: T[]): T {
-      return arr[Math.floor(Math.random() * arr.length)];
-    }
+ function pickRandom(arr: T[]) {
+ return arr[Math.floor(Math.random() * arr.length)];
+ }
 
-    function renderButtons() {
-      stroopButtons.innerHTML = '';
-      COLORS.forEach(c => {
-        const btn = document.createElement('button');
-        btn.className = 'stroop-color-btn';
-        btn.style.background = c.hex;
-        btn.textContent = c.name;
-        btn.dataset.colorName = c.name;
-        stroopButtons.appendChild(btn);
-      });
-    }
+ function renderButtons() {
+ stroopButtons.innerHTML = '';
+ COLORS.forEach(c => {
+ const btn = document.createElement('button');
+ btn.className = 'stroop-color-btn';
+ btn.style.background = c.hex;
+ btn.textContent = c.name;
+ btn.dataset.colorName = c.name;
+ stroopButtons.appendChild(btn);
+ });
+ }
 
-    function startRound() {
-      currentRound++;
-      if (currentRound > TOTAL_ROUNDS) {
-        endGame();
-        return;
-      }
+ function startRound() {
+ currentRound++;
+ if (currentRound > TOTAL_ROUNDS) {
+ endGame();
+ return;
+ }
 
-      roundInfo.textContent = `${currentRound} / ${TOTAL_ROUNDS}`;
-      correctInfo.textContent = `${correctCount} correct`;
+ roundInfo.textContent = `${currentRound} / ${TOTAL_ROUNDS}`;
+ correctInfo.textContent = `${correctCount} correct`;
 
-      // Pick word and ink color (ensure at least 60% incongruent)
-      const wordColor = pickRandom(COLORS);
-      let inkColor: typeof COLORS[0];
-      if (Math.random() < 0.7) {
-        // Incongruent: pick different color
-        const others = COLORS.filter(c => c.name !== wordColor.name);
-        inkColor = pickRandom(others);
-      } else {
-        inkColor = wordColor;
-      }
+ // Pick word and ink color (ensure at least 60% incongruent)
+ const wordColor = pickRandom(COLORS);
+ let inkColor;
+ if (Math.random() < 0.7) {
+ // Incongruent: pick different color
+ const others = COLORS.filter(c => c.name !== wordColor.name);
+ inkColor = pickRandom(others);
+ } else {
+ inkColor = wordColor;
+ }
 
-      currentInkColor = inkColor.name;
-      stroopWord.textContent = wordColor.name;
-      stroopWord.style.color = inkColor.hex;
+ currentInkColor = inkColor.name;
+ stroopWord.textContent = wordColor.name;
+ stroopWord.style.color = inkColor.hex;
 
-      // Reset button states
-      stroopButtons.querySelectorAll('.stroop-color-btn').forEach(btn => {
-        btn.classList.remove('flash-correct', 'flash-wrong');
-      });
+ // Reset button states
+ stroopButtons.querySelectorAll('.stroop-color-btn').forEach(btn => {
+ btn.classList.remove('flash-correct', 'flash-wrong');
+ });
 
-      roundStartTime = performance.now();
-      canClick = true;
-    }
+ roundStartTime = performance.now();
+ canClick = true;
+ }
 
-    function handleButtonClick(e) {
-      if (!canClick) return;
-      const target = (e.target).closest('.stroop-color-btn') | null;
-      if (!target) return;
+ function handleButtonClick(e) {
+ if (!canClick) return;
+ const target = (e.target).closest('.stroop-color-btn');
+ if (!target) return;
 
-      canClick = false;
-      const responseTime = performance.now() - roundStartTime;
-      const clicked = target.dataset.colorName || '';
+ canClick = false;
+ const responseTime = performance.now() - roundStartTime;
+ const clicked = target.dataset.colorName || '';
 
-      if (clicked === currentInkColor) {
-        // Correct
-        correctCount++;
-        responseTimes.push(responseTime);
-        target.classList.add('flash-correct');
-      } else {
-        // Wrong
-        target.classList.add('flash-wrong');
-        // Highlight correct button
-        stroopButtons.querySelectorAll('.stroop-color-btn').forEach(btn => {
-          if ((btn).dataset.colorName === currentInkColor) {
-            btn.classList.add('flash-correct');
-          }
-        });
-      }
+ if (clicked === currentInkColor) {
+ // Correct
+ correctCount++;
+ responseTimes.push(responseTime);
+ target.classList.add('flash-correct');
+ } else {
+ // Wrong
+ target.classList.add('flash-wrong');
+ // Highlight correct button
+ stroopButtons.querySelectorAll('.stroop-color-btn').forEach(btn => {
+ if ((btn).dataset.colorName === currentInkColor) {
+ btn.classList.add('flash-correct');
+ }
+ });
+ }
 
-      setTimeout(() => startRound(), 400);
-    }
+ setTimeout(() => startRound(), 400);
+ }
 
-    function startGame() {
-      currentRound = 0;
-      correctCount = 0;
-      responseTimes = [];
-      showView(playView);
-      renderButtons();
-      startRound();
-    }
+ function startGame() {
+ currentRound = 0;
+ correctCount = 0;
+ responseTimes = [];
+ showView(playView);
+ renderButtons();
+ startRound();
+ }
 
-    function endGame() {
-      const avgTime = responseTimes.length > 0
-        ? Math.round(responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length)
-        : 9999;
+ function endGame() {
+ const avgTime = responseTimes.length > 0
+ ? Math.round(responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length)
+ : 9999;
 
-      showView(resultView);
-      finalScore.textContent = String(avgTime);
-      const rating = getLocalRating(avgTime);
-      ratingBadge.textContent = rating.label;
-      ratingBadge.style.background = rating.color;
+ showView(resultView);
+ finalScore.textContent = String(avgTime);
+ const rating = getLocalRating(avgTime);
+ ratingBadge.textContent = rating.label;
+ ratingBadge.style.background = rating.color;
 
-      const accuracy = Math.round((correctCount / TOTAL_ROUNDS) * 100);
-      stroopStats.innerHTML = `
-        <span>Accuracy: ${correctCount}/${TOTAL_ROUNDS} (${accuracy}%)</span>
-        <span>Fastest: ${responseTimes.length > 0 ? Math.round(Math.min(...responseTimes)) : '—'}ms</span>
-        <span>Slowest: ${responseTimes.length > 0 ? Math.round(Math.max(...responseTimes)) : '—'}ms</span>
-      `;
+ const accuracy = Math.round((correctCount / TOTAL_ROUNDS) * 100);
+ stroopStats.innerHTML = `
+ <span>Accuracy: ${correctCount}/${TOTAL_ROUNDS} (${accuracy}%)</span>
+ <span>Fastest: ${responseTimes.length > 0 ? Math.round(Math.min(...responseTimes)) : '—'}ms</span>
+ <span>Slowest: ${responseTimes.length > 0 ? Math.round(Math.max(...responseTimes)) : '—'}ms</span>
+ `;
 
-      addToHistory(avgTime);
-      renderHistory();
+ addToHistory(avgTime);
+ renderHistory();
 
-      if (window.GameShare) {
-        window.GameShare.show({
-          gameName: gameName,
-          gameSlug: gameSlug,
-          gameIcon: gameIcon,
-          score: avgTime,
-          unit: metricUnit,
-          metricLabel: metricLabel,
-          ratingLabel: rating.label,
-          ratingColor: rating.color
-        });
-      }
-    }
+ if (window.GameShare) {
+ window.GameShare.show({
+ gameName: gameName,
+ gameSlug: gameSlug,
+ gameIcon: gameIcon,
+ score: avgTime,
+ unit: metricUnit,
+ metricLabel: metricLabel,
+ ratingLabel: rating.label,
+ ratingColor: rating.color
+ });
+ }
+ }
 
-    function renderHistory() {
-      const history = loadHistory();
-      if (history.length === 0) { attemptHistorySection.hidden = true; return; }
-      attemptHistorySection.hidden = false;
-      historyList.innerHTML = history.map(e => {
-        const r = getLocalRating(e.score);
-        return `<div class="history-item">
-          <span class="history-score">${e.score}ms</span>
-          <span class="history-rating" style="background:${r.color}">${r.label}</span>
-          <span class="history-time">${formatDate(e.date)}</span>
-        </div>`;
-      }).join('');
-    }
+ function renderHistory() {
+ const history = loadHistory();
+ if (history.length === 0) { attemptHistorySection.hidden = true; return; }
+ attemptHistorySection.hidden = false;
+ historyList.innerHTML = history.map(e => {
+ const r = getLocalRating(e.score);
+ return `<div class="history-item">
+ <span class="history-score">${e.score}ms</span>
+ <span class="history-rating" style="background:${r.color}">${r.label}</span>
+ <span class="history-time">${formatDate(e.date)}</span>
+ </div>`;
+ }).join('');
+ }
 
-    function formatDate(iso) {
-      try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
-      catch { return ''; }
-    }
+ function formatDate(iso) {
+ try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+ catch { return ''; }
+ }
 
-    stroopButtons.addEventListener('click', handleButtonClick);
-    startBtn.addEventListener('click', startGame);
-    tryAgainBtn.addEventListener('click', startGame);
-    renderHistory();
-  })();
+ stroopButtons.addEventListener('click', handleButtonClick);
+ startBtn.addEventListener('click', startGame);
+ tryAgainBtn.addEventListener('click', startGame);
+ renderHistory();
+ })();
 </script>

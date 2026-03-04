@@ -402,288 +402,288 @@ const structuredData = [
 </style>
 
 <script define:vars={{ gameName: game.title, gameSlug: game.slug, gameIcon: game.icon, metricLabel: game.metricLabel, metricUnit: game.metricUnit }}>
-  (function () {
-    'use strict';
+ (function () {
+ 'use strict';
 
-    var STORAGE_KEY = 'toolcalcs_timed-math-drills_history';
-    var MAX_HISTORY = 20;
+ var STORAGE_KEY = 'toolcalcs_timed-math-drills_history';
+ var MAX_HISTORY = 20;
 
-    var ratingScale = [
-      { min: 51, label: 'Speed Demon!', color: '#16a34a' },
-      { min: 36, label: 'Fast!', color: '#22c55e' },
-      { min: 21, label: 'Good', color: '#2563eb' },
-      { min: 11, label: 'Average', color: '#f59e0b' },
-      { min: 0, label: 'Warming Up', color: '#ef4444' },
-    ];
+ var ratingScale = [
+ { min: 51, label: 'Speed Demon!', color: '#16a34a' },
+ { min: 36, label: 'Fast!', color: '#22c55e' },
+ { min: 21, label: 'Good', color: '#2563eb' },
+ { min: 11, label: 'Average', color: '#f59e0b' },
+ { min: 0, label: 'Warming Up', color: '#ef4444' },
+ ];
 
-    var setupPanel = document.getElementById('drillSetup');
-    var playingPanel = document.getElementById('drillPlaying');
-    var resultPanel = document.getElementById('drillResult');
-    var controlsPanel = document.getElementById('drillControls');
-    var historySection = document.getElementById('drillHistory');
-    var historyListEl = document.getElementById('drillHistoryList');
+ var setupPanel = document.getElementById('drillSetup');
+ var playingPanel = document.getElementById('drillPlaying');
+ var resultPanel = document.getElementById('drillResult');
+ var controlsPanel = document.getElementById('drillControls');
+ var historySection = document.getElementById('drillHistory');
+ var historyListEl = document.getElementById('drillHistoryList');
 
-    var cfgOperation = document.getElementById('cfgOperation');
-    var cfgDifficulty = document.getElementById('cfgDifficulty');
-    var cfgDuration = document.getElementById('cfgDuration');
+ var cfgOperation = document.getElementById('cfgOperation');
+ var cfgDifficulty = document.getElementById('cfgDifficulty');
+ var cfgDuration = document.getElementById('cfgDuration');
 
-    var timerFill = document.getElementById('drillTimerFill');
-    var correctEl = document.getElementById('drillCorrect');
-    var wrongEl = document.getElementById('drillWrong');
-    var timeLeftEl = document.getElementById('drillTimeLeft');
-    var drillListEl = document.getElementById('drillList');
-    var numEl = document.getElementById('drillNum');
-    var problemEl = document.getElementById('drillProblem');
-    var answerInput = document.getElementById('drillAnswer');
+ var timerFill = document.getElementById('drillTimerFill');
+ var correctEl = document.getElementById('drillCorrect');
+ var wrongEl = document.getElementById('drillWrong');
+ var timeLeftEl = document.getElementById('drillTimeLeft');
+ var drillListEl = document.getElementById('drillList');
+ var numEl = document.getElementById('drillNum');
+ var problemEl = document.getElementById('drillProblem');
+ var answerInput = document.getElementById('drillAnswer');
 
-    var btnStart = document.getElementById('btnStart');
-    var btnRetry = document.getElementById('btnRetry');
-    var scoreValueEl = document.getElementById('drillScoreValue');
-    var ratingBadgeEl = document.getElementById('drillRating');
-    var resultStatsEl = document.getElementById('drillResultStats');
+ var btnStart = document.getElementById('btnStart');
+ var btnRetry = document.getElementById('btnRetry');
+ var scoreValueEl = document.getElementById('drillScoreValue');
+ var ratingBadgeEl = document.getElementById('drillRating');
+ var resultStatsEl = document.getElementById('drillResultStats');
 
-    var state = 'setup';
-    var duration = 60;
-    var correct = 0;
-    var wrong = 0;
-    var problemNum = 0;
-    var currentAnswer = 0;
-    var currentProblemText = '';
-    var startTime = 0;
-    var timerInterval = null;
+ var state = 'setup';
+ var duration = 60;
+ var correct = 0;
+ var wrong = 0;
+ var problemNum = 0;
+ var currentAnswer = 0;
+ var currentProblemText = '';
+ var startTime = 0;
+ var timerInterval = null;
 
-    function randInt(min, max) {
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
+ function randInt(min, max) {
+ return Math.floor(Math.random() * (max - min + 1)) + min;
+ }
 
-    function generateProblem(operation, difficulty) {
-      var ops = operation === 'mixed'
-        ? ['addition', 'subtraction', 'multiplication', 'division']
-        : [operation];
-      var op = ops[randInt(0, ops.length - 1)];
-      var a, b, answer, display;
+ function generateProblem(operation, difficulty) {
+ var ops = operation === 'mixed'
+ ? ['addition', 'subtraction', 'multiplication', 'division']
+ : [operation];
+ var op = ops[randInt(0, ops.length - 1)];
+ var a, b, answer, display;
 
-      if (op === 'addition') {
-        var mx = difficulty === 'easy' ? 10 : difficulty === 'medium' ? 50 : 100;
-        a = randInt(1, mx);
-        b = randInt(1, mx);
-        display = a + ' + ' + b + ' =';
-        answer = a + b;
-      } else if (op === 'subtraction') {
-        var mx = difficulty === 'easy' ? 10 : difficulty === 'medium' ? 50 : 100;
-        a = randInt(1, mx);
-        b = randInt(1, a);
-        display = a + ' \u2212 ' + b + ' =';
-        answer = a - b;
-      } else if (op === 'multiplication') {
-        var mxA = difficulty === 'easy' ? 5 : difficulty === 'medium' ? 12 : 15;
-        var mxB = difficulty === 'easy' ? 5 : 12;
-        a = randInt(2, mxA);
-        b = randInt(2, mxB);
-        display = a + ' \u00d7 ' + b + ' =';
-        answer = a * b;
-      } else {
-        var maxDiv = difficulty === 'easy' ? 5 : difficulty === 'medium' ? 12 : 15;
-        b = randInt(2, maxDiv);
-        answer = randInt(2, difficulty === 'easy' ? 5 : difficulty === 'medium' ? 12 : 20);
-        a = b * answer;
-        display = a + ' \u00f7 ' + b + ' =';
-      }
+ if (op === 'addition') {
+ var mx = difficulty === 'easy' ? 10 : difficulty === 'medium' ? 50 : 100;
+ a = randInt(1, mx);
+ b = randInt(1, mx);
+ display = a + ' + ' + b + ' =';
+ answer = a + b;
+ } else if (op === 'subtraction') {
+ var mx = difficulty === 'easy' ? 10 : difficulty === 'medium' ? 50 : 100;
+ a = randInt(1, mx);
+ b = randInt(1, a);
+ display = a + ' \u2212 ' + b + ' =';
+ answer = a - b;
+ } else if (op === 'multiplication') {
+ var mxA = difficulty === 'easy' ? 5 : difficulty === 'medium' ? 12 : 15;
+ var mxB = difficulty === 'easy' ? 5 : 12;
+ a = randInt(2, mxA);
+ b = randInt(2, mxB);
+ display = a + ' \u00d7 ' + b + ' =';
+ answer = a * b;
+ } else {
+ var maxDiv = difficulty === 'easy' ? 5 : difficulty === 'medium' ? 12 : 15;
+ b = randInt(2, maxDiv);
+ answer = randInt(2, difficulty === 'easy' ? 5 : difficulty === 'medium' ? 12 : 20);
+ a = b * answer;
+ display = a + ' \u00f7 ' + b + ' =';
+ }
 
-      return { display: display, answer: answer };
-    }
+ return { display: display, answer: answer };
+ }
 
-    function getRating(score) {
-      for (var i = 0; i < ratingScale.length; i++) {
-        if (score >= ratingScale[i].min) return ratingScale[i];
-      }
-      return ratingScale[ratingScale.length - 1];
-    }
+ function getRating(score) {
+ for (var i = 0; i < ratingScale.length; i++) {
+ if (score >= ratingScale[i].min) return ratingScale[i];
+ }
+ return ratingScale[ratingScale.length - 1];
+ }
 
-    function showSetup() {
-      state = 'setup';
-      setupPanel.style.display = '';
-      playingPanel.style.display = 'none';
-      resultPanel.style.display = 'none';
-      controlsPanel.style.display = 'none';
-      if (window.GameShare) window.GameShare.hide();
-    }
+ function showSetup() {
+ state = 'setup';
+ setupPanel.style.display = '';
+ playingPanel.style.display = 'none';
+ resultPanel.style.display = 'none';
+ controlsPanel.style.display = 'none';
+ if (window.GameShare) window.GameShare.hide();
+ }
 
-    function startGame() {
-      state = 'playing';
-      duration = parseInt(cfgDuration.value, 10);
-      correct = 0;
-      wrong = 0;
-      problemNum = 0;
-      startTime = Date.now();
+ function startGame() {
+ state = 'playing';
+ duration = parseInt(cfgDuration.value, 10);
+ correct = 0;
+ wrong = 0;
+ problemNum = 0;
+ startTime = Date.now();
 
-      setupPanel.style.display = 'none';
-      playingPanel.style.display = '';
-      resultPanel.style.display = 'none';
-      controlsPanel.style.display = 'none';
-      if (window.GameShare) window.GameShare.hide();
+ setupPanel.style.display = 'none';
+ playingPanel.style.display = '';
+ resultPanel.style.display = 'none';
+ controlsPanel.style.display = 'none';
+ if (window.GameShare) window.GameShare.hide();
 
-      correctEl.textContent = '0';
-      wrongEl.textContent = '0';
-      timeLeftEl.textContent = duration + 's';
-      timerFill.style.width = '100%';
-      timerFill.classList.remove('warning', 'danger');
-      drillListEl.innerHTML = '';
+ correctEl.textContent = '0';
+ wrongEl.textContent = '0';
+ timeLeftEl.textContent = duration + 's';
+ timerFill.style.width = '100%';
+ timerFill.classList.remove('warning', 'danger');
+ drillListEl.innerHTML = '';
 
-      showNextProblem();
-      answerInput.focus();
-      timerInterval = setInterval(updateTimer, 50);
-    }
+ showNextProblem();
+ answerInput.focus();
+ timerInterval = setInterval(updateTimer, 50);
+ }
 
-    function showNextProblem() {
-      problemNum++;
-      var problem = generateProblem(cfgOperation.value, cfgDifficulty.value);
-      currentAnswer = problem.answer;
-      currentProblemText = problem.display;
-      numEl.textContent = problemNum + ')';
-      problemEl.textContent = problem.display;
-      answerInput.value = '';
-      answerInput.focus();
-    }
+ function showNextProblem() {
+ problemNum++;
+ var problem = generateProblem(cfgOperation.value, cfgDifficulty.value);
+ currentAnswer = problem.answer;
+ currentProblemText = problem.display;
+ numEl.textContent = problemNum + ')';
+ problemEl.textContent = problem.display;
+ answerInput.value = '';
+ answerInput.focus();
+ }
 
-    function submitAnswer() {
-      if (state !== 'playing') return;
-      var userAnswer = parseInt(answerInput.value, 10);
-      if (isNaN(userAnswer)) return;
+ function submitAnswer() {
+ if (state !== 'playing') return;
+ var userAnswer = parseInt(answerInput.value, 10);
+ if (isNaN(userAnswer)) return;
 
-      var isCorrect = userAnswer === currentAnswer;
-      var item = document.createElement('div');
-      item.className = 'drill-item';
+ var isCorrect = userAnswer === currentAnswer;
+ var item = document.createElement('div');
+ item.className = 'drill-item';
 
-      if (isCorrect) {
-        correct++;
-        correctEl.textContent = String(correct);
-        item.innerHTML =
-          '<span class="drill-mark ok">\u2713</span>' +
-          '<span class="drill-q">' + currentProblemText + '</span>' +
-          '<span class="drill-a ok">' + userAnswer + '</span>';
-      } else {
-        wrong++;
-        wrongEl.textContent = String(wrong);
-        item.innerHTML =
-          '<span class="drill-mark fail">\u2717</span>' +
-          '<span class="drill-q">' + currentProblemText + '</span>' +
-          '<span class="drill-a fail">' + userAnswer + '</span>' +
-          '<span class="drill-correct-val">' + currentAnswer + '</span>';
-      }
+ if (isCorrect) {
+ correct++;
+ correctEl.textContent = String(correct);
+ item.innerHTML =
+ '<span class="drill-mark ok">\u2713</span>' +
+ '<span class="drill-q">' + currentProblemText + '</span>' +
+ '<span class="drill-a ok">' + userAnswer + '</span>';
+ } else {
+ wrong++;
+ wrongEl.textContent = String(wrong);
+ item.innerHTML =
+ '<span class="drill-mark fail">\u2717</span>' +
+ '<span class="drill-q">' + currentProblemText + '</span>' +
+ '<span class="drill-a fail">' + userAnswer + '</span>' +
+ '<span class="drill-correct-val">' + currentAnswer + '</span>';
+ }
 
-      drillListEl.appendChild(item);
-      drillListEl.scrollTop = drillListEl.scrollHeight;
-      showNextProblem();
-    }
+ drillListEl.appendChild(item);
+ drillListEl.scrollTop = drillListEl.scrollHeight;
+ showNextProblem();
+ }
 
-    function updateTimer() {
-      var elapsed = (Date.now() - startTime) / 1000;
-      var remaining = Math.max(0, duration - elapsed);
-      var pct = (remaining / duration) * 100;
-      timeLeftEl.textContent = Math.ceil(remaining) + 's';
-      timerFill.style.width = pct + '%';
+ function updateTimer() {
+ var elapsed = (Date.now() - startTime) / 1000;
+ var remaining = Math.max(0, duration - elapsed);
+ var pct = (remaining / duration) * 100;
+ timeLeftEl.textContent = Math.ceil(remaining) + 's';
+ timerFill.style.width = pct + '%';
 
-      if (pct <= 20) {
-        timerFill.classList.add('danger');
-        timerFill.classList.remove('warning');
-      } else if (pct <= 40) {
-        timerFill.classList.add('warning');
-        timerFill.classList.remove('danger');
-      }
+ if (pct <= 20) {
+ timerFill.classList.add('danger');
+ timerFill.classList.remove('warning');
+ } else if (pct <= 40) {
+ timerFill.classList.add('warning');
+ timerFill.classList.remove('danger');
+ }
 
-      if (remaining <= 0) endGame();
-    }
+ if (remaining <= 0) endGame();
+ }
 
-    function endGame() {
-      state = 'result';
-      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+ function endGame() {
+ state = 'result';
+ if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
 
-      var totalAttempted = correct + wrong;
-      var accuracy = totalAttempted > 0 ? Math.round((correct / totalAttempted) * 100) : 0;
-      var rating = getRating(correct);
+ var totalAttempted = correct + wrong;
+ var accuracy = totalAttempted > 0 ? Math.round((correct / totalAttempted) * 100) : 0;
+ var rating = getRating(correct);
 
-      playingPanel.style.display = 'none';
-      resultPanel.style.display = '';
-      controlsPanel.style.display = '';
+ playingPanel.style.display = 'none';
+ resultPanel.style.display = '';
+ controlsPanel.style.display = '';
 
-      scoreValueEl.textContent = String(correct);
-      ratingBadgeEl.textContent = rating.label;
-      ratingBadgeEl.style.background = rating.color;
+ scoreValueEl.textContent = String(correct);
+ ratingBadgeEl.textContent = rating.label;
+ ratingBadgeEl.style.background = rating.color;
 
-      resultStatsEl.innerHTML =
-        '<span><strong>' + totalAttempted + '</strong>attempted</span>' +
-        '<span><strong>' + accuracy + '%</strong>accuracy</span>' +
-        '<span><strong>' + wrong + '</strong>wrong</span>' +
-        '<span><strong>' + duration + 's</strong>duration</span>';
+ resultStatsEl.innerHTML =
+ '<span><strong>' + totalAttempted + '</strong>attempted</span>' +
+ '<span><strong>' + accuracy + '%</strong>accuracy</span>' +
+ '<span><strong>' + wrong + '</strong>wrong</span>' +
+ '<span><strong>' + duration + 's</strong>duration</span>';
 
-      saveAttempt(correct, rating.label);
-      renderHistory();
+ saveAttempt(correct, rating.label);
+ renderHistory();
 
-      if (window.GameShare) {
-        window.GameShare.show({
-          gameName: gameName,
-          gameSlug: gameSlug,
-          gameIcon: gameIcon,
-          score: correct,
-          unit: metricUnit,
-          metricLabel: metricLabel,
-          ratingLabel: rating.label,
-          ratingColor: rating.color
-        });
-      }
-    }
+ if (window.GameShare) {
+ window.GameShare.show({
+ gameName: gameName,
+ gameSlug: gameSlug,
+ gameIcon: gameIcon,
+ score: correct,
+ unit: metricUnit,
+ metricLabel: metricLabel,
+ ratingLabel: rating.label,
+ ratingColor: rating.color
+ });
+ }
+ }
 
-    btnStart.addEventListener('click', startGame);
-    btnRetry.addEventListener('click', showSetup);
-    answerInput.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') { e.preventDefault(); submitAnswer(); }
-    });
+ btnStart.addEventListener('click', startGame);
+ btnRetry.addEventListener('click', showSetup);
+ answerInput.addEventListener('keydown', function (e) {
+ if (e.key === 'Enter') { e.preventDefault(); submitAnswer(); }
+ });
 
-    function loadHistory() {
-      try {
-        var raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return [];
-        return JSON.parse(raw);
-      } catch (e) { return []; }
-    }
+ function loadHistory() {
+ try {
+ var raw = localStorage.getItem(STORAGE_KEY);
+ if (!raw) return [];
+ return JSON.parse(raw);
+ } catch (e) { return []; }
+ }
 
-    function saveAttempt(score, rating) {
-      var history = loadHistory();
-      history.unshift({ score: score, rating: rating, timestamp: Date.now() });
-      if (history.length > MAX_HISTORY) history.length = MAX_HISTORY;
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(history)); } catch (e) {}
-    }
+ function saveAttempt(score, rating) {
+ var history = loadHistory();
+ history.unshift({ score: score, rating: rating, timestamp: Date.now() });
+ if (history.length > MAX_HISTORY) history.length = MAX_HISTORY;
+ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(history)); } catch (e) {}
+ }
 
-    function renderHistory() {
-      var history = loadHistory();
-      if (history.length === 0) { historySection.hidden = true; return; }
-      historySection.hidden = false;
-      historyListEl.innerHTML = '';
-      for (var i = 0; i < history.length; i++) {
-        var entry = history[i];
-        var r = getRating(entry.score);
-        var item = document.createElement('div');
-        item.className = 'history-item';
-        item.innerHTML =
-          '<span class="history-score">' + entry.score + ' solved</span>' +
-          '<span class="history-rating" style="background:' + r.color + '">' + entry.rating + '</span>' +
-          '<span class="history-time">' + formatTimeAgo(entry.timestamp) + '</span>';
-        historyListEl.appendChild(item);
-      }
-    }
+ function renderHistory() {
+ var history = loadHistory();
+ if (history.length === 0) { historySection.hidden = true; return; }
+ historySection.hidden = false;
+ historyListEl.innerHTML = '';
+ for (var i = 0; i < history.length; i++) {
+ var entry = history[i];
+ var r = getRating(entry.score);
+ var item = document.createElement('div');
+ item.className = 'history-item';
+ item.innerHTML =
+ '<span class="history-score">' + entry.score + ' solved</span>' +
+ '<span class="history-rating" style="background:' + r.color + '">' + entry.rating + '</span>' +
+ '<span class="history-time">' + formatTimeAgo(entry.timestamp) + '</span>';
+ historyListEl.appendChild(item);
+ }
+ }
 
-    function formatTimeAgo(timestamp) {
-      var diff = Date.now() - timestamp;
-      var seconds = Math.floor(diff / 1000);
-      if (seconds < 60) return 'just now';
-      var minutes = Math.floor(seconds / 60);
-      if (minutes < 60) return minutes + 'm ago';
-      var hours = Math.floor(minutes / 60);
-      if (hours < 24) return hours + 'h ago';
-      return Math.floor(hours / 24) + 'd ago';
-    }
+ function formatTimeAgo(timestamp) {
+ var diff = Date.now() - timestamp;
+ var seconds = Math.floor(diff / 1000);
+ if (seconds < 60) return 'just now';
+ var minutes = Math.floor(seconds / 60);
+ if (minutes < 60) return minutes + 'm ago';
+ var hours = Math.floor(minutes / 60);
+ if (hours < 24) return hours + 'h ago';
+ return Math.floor(hours / 24) + 'd ago';
+ }
 
-    renderHistory();
-  })();
+ renderHistory();
+ })();
 </script>

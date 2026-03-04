@@ -338,334 +338,334 @@ const structuredData = [
 </style>
 
 <script define:vars={{ gameName: game.title, gameSlug: game.slug, gameIcon: game.icon, metricLabel: game.metricLabel, metricUnit: game.metricUnit }}>
-  (function () {
-    // --- Passages ---
-    const passages = [
-      "The quick brown fox jumps over the lazy dog near the old stone wall by the river bank on a warm summer afternoon.",
-      "She walked through the garden where flowers bloomed in every color and the gentle breeze carried the sweet scent of roses across the yard.",
-      "Learning to type quickly is a valuable skill that can save you hours of time each week and make your work much more efficient.",
-      "The morning sun cast long shadows across the kitchen floor as he poured a cup of coffee and opened the newspaper to read the headlines.",
-      "Good communication skills are essential in the modern workplace because they help build trust and foster strong relationships with colleagues.",
-      "The old library on the corner of Main Street had thousands of books covering every subject from ancient history to modern technology.",
-      "Every great achievement begins with the decision to try something new and the courage to keep going even when the path seems difficult.",
-      "The mountain trail wound through thick forests of pine and oak before opening up to reveal a stunning view of the valley far below.",
-      "Practice makes progress and the best way to improve your typing speed is to set aside time each day to work on your technique.",
-      "The chef prepared a delicious meal using fresh ingredients from the local market including ripe tomatoes basil and imported olive oil.",
-      "Technology continues to change the way we live and work creating new opportunities and challenges that require us to adapt and learn constantly.",
-      "Rain fell steadily against the window panes as she sat by the fireplace reading her favorite novel and sipping a cup of warm tea.",
-      "A well organized desk can help you stay focused and productive throughout the day by reducing distractions and keeping important items within reach.",
-    ];
+ (function () {
+ // --- Passages ---
+ const passages = [
+ "The quick brown fox jumps over the lazy dog near the old stone wall by the river bank on a warm summer afternoon.",
+ "She walked through the garden where flowers bloomed in every color and the gentle breeze carried the sweet scent of roses across the yard.",
+ "Learning to type quickly is a valuable skill that can save you hours of time each week and make your work much more efficient.",
+ "The morning sun cast long shadows across the kitchen floor as he poured a cup of coffee and opened the newspaper to read the headlines.",
+ "Good communication skills are essential in the modern workplace because they help build trust and foster strong relationships with colleagues.",
+ "The old library on the corner of Main Street had thousands of books covering every subject from ancient history to modern technology.",
+ "Every great achievement begins with the decision to try something new and the courage to keep going even when the path seems difficult.",
+ "The mountain trail wound through thick forests of pine and oak before opening up to reveal a stunning view of the valley far below.",
+ "Practice makes progress and the best way to improve your typing speed is to set aside time each day to work on your technique.",
+ "The chef prepared a delicious meal using fresh ingredients from the local market including ripe tomatoes basil and imported olive oil.",
+ "Technology continues to change the way we live and work creating new opportunities and challenges that require us to adapt and learn constantly.",
+ "Rain fell steadily against the window panes as she sat by the fireplace reading her favorite novel and sipping a cup of warm tea.",
+ "A well organized desk can help you stay focused and productive throughout the day by reducing distractions and keeping important items within reach.",
+ ];
 
-    // --- Rating scale (higher is better) ---
-    const ratingScale = [
-      { min: 80, label: 'Professional', color: '#9333ea' },
-      { min: 60, label: 'Fast', color: '#16a34a' },
-      { min: 40, label: 'Average', color: '#2563eb' },
-      { min: 20, label: 'Beginner', color: '#ca8a04' },
-      { min: 0, label: 'Learning', color: '#dc2626' },
-    ];
+ // --- Rating scale (higher is better) ---
+ const ratingScale = [
+ { min: 80, label: 'Professional', color: '#9333ea' },
+ { min: 60, label: 'Fast', color: '#16a34a' },
+ { min: 40, label: 'Average', color: '#2563eb' },
+ { min: 20, label: 'Beginner', color: '#ca8a04' },
+ { min: 0, label: 'Learning', color: '#dc2626' },
+ ];
 
-    // --- DOM Elements ---
-    const instructions = document.getElementById('instructions');
-    const textDisplay = document.getElementById('text-display');
-    const liveStats = document.getElementById('live-stats');
-    const inputWrapper = document.getElementById('input-wrapper');
-    const typingInput = document.getElementById('typing-input');
-    const scoreSection = document.getElementById('score-section');
-    const finalWpm = document.getElementById('final-wpm');
-    const finalAccuracy = document.getElementById('final-accuracy');
-    const ratingBadge = document.getElementById('rating-badge');
-    const btnStart = document.getElementById('btn-start');
-    const btnRetry = document.getElementById('btn-retry');
-    const liveWpm = document.getElementById('live-wpm');
-    const liveAccuracyEl = document.getElementById('live-accuracy');
-    const liveTime = document.getElementById('live-time');
-    const historySection = document.getElementById('history-section');
-    const historyList = document.getElementById('history-list');
+ // --- DOM Elements ---
+ const instructions = document.getElementById('instructions');
+ const textDisplay = document.getElementById('text-display');
+ const liveStats = document.getElementById('live-stats');
+ const inputWrapper = document.getElementById('input-wrapper');
+ const typingInput = document.getElementById('typing-input');
+ const scoreSection = document.getElementById('score-section');
+ const finalWpm = document.getElementById('final-wpm');
+ const finalAccuracy = document.getElementById('final-accuracy');
+ const ratingBadge = document.getElementById('rating-badge');
+ const btnStart = document.getElementById('btn-start');
+ const btnRetry = document.getElementById('btn-retry');
+ const liveWpm = document.getElementById('live-wpm');
+ const liveAccuracyEl = document.getElementById('live-accuracy');
+ const liveTime = document.getElementById('live-time');
+ const historySection = document.getElementById('history-section');
+ const historyList = document.getElementById('history-list');
 
-    // --- State ---
-    let currentPassage = '';
-    let passageChars[] = [];
-    let typedChars[] = [];
-    let startTime | null = null;
-    let timerInterval | null = null;
-    let isActive = false;
-    let isFinished = false;
+ // --- State ---
+ let currentPassage = '';
+ let passageChars = [];
+ let typedChars = [];
+ let startTime = null;
+ let timerInterval = null;
+ let isActive = false;
+ let isFinished = false;
 
-    const STORAGE_KEY = 'toolcalcs_typing-speed-test_history';
-    const MAX_HISTORY = 20;
+ const STORAGE_KEY = 'toolcalcs_typing-speed-test_history';
+ const MAX_HISTORY = 20;
 
-    // --- Functions ---
-    function pickRandomPassage() {
-      return passages[Math.floor(Math.random() * passages.length)];
-    }
+ // --- Functions ---
+ function pickRandomPassage() {
+ return passages[Math.floor(Math.random() * passages.length)];
+ }
 
-    function getRatingForWpm(wpm): { label; color } {
-      for (const r of ratingScale) {
-        if (wpm >= r.min) return { label: r.label, color: r.color };
-      }
-      return ratingScale[ratingScale.length - 1];
-    }
+ function getRatingForWpm(wpm) {
+ for (const r of ratingScale) {
+ if (wpm >= r.min) return { label: r.label, color: r.color };
+ }
+ return ratingScale[ratingScale.length - 1];
+ }
 
-    function renderPassage() {
-      textDisplay.innerHTML = '';
-      const words = currentPassage.split(' ');
-      let charIndex = 0;
+ function renderPassage() {
+ textDisplay.innerHTML = '';
+ const words = currentPassage.split(' ');
+ let charIndex = 0;
 
-      words.forEach((word, wordIdx) => {
-        const wordSpan = document.createElement('span');
-        wordSpan.className = 'word';
-        wordSpan.dataset.wordIdx = String(wordIdx);
+ words.forEach((word, wordIdx) => {
+ const wordSpan = document.createElement('span');
+ wordSpan.className = 'word';
+ wordSpan.dataset.wordIdx = String(wordIdx);
 
-        for (let i = 0; i < word.length; i++) {
-          const charSpan = document.createElement('span');
-          charSpan.className = 'char';
-          charSpan.dataset.charIdx = String(charIndex);
-          charSpan.textContent = word[i];
-          wordSpan.appendChild(charSpan);
-          charIndex++;
-        }
+ for (let i = 0; i < word.length; i++) {
+ const charSpan = document.createElement('span');
+ charSpan.className = 'char';
+ charSpan.dataset.charIdx = String(charIndex);
+ charSpan.textContent = word[i];
+ wordSpan.appendChild(charSpan);
+ charIndex++;
+ }
 
-        textDisplay.appendChild(wordSpan);
+ textDisplay.appendChild(wordSpan);
 
-        // Add space between words (except after last word)
-        if (wordIdx < words.length - 1) {
-          const spaceSpan = document.createElement('span');
-          spaceSpan.className = 'char';
-          spaceSpan.dataset.charIdx = String(charIndex);
-          spaceSpan.textContent = ' ';
-          textDisplay.appendChild(spaceSpan);
-          charIndex++;
-        }
-      });
+ // Add space between words (except after last word)
+ if (wordIdx < words.length - 1) {
+ const spaceSpan = document.createElement('span');
+ spaceSpan.className = 'char';
+ spaceSpan.dataset.charIdx = String(charIndex);
+ spaceSpan.textContent = ' ';
+ textDisplay.appendChild(spaceSpan);
+ charIndex++;
+ }
+ });
 
-      updateHighlighting();
-    }
+ updateHighlighting();
+ }
 
-    function updateHighlighting() {
-      const charSpans = textDisplay.querySelectorAll('.char') as NodeListOf<HTMLElement>;
-      const typedLen = typedChars.length;
+ function updateHighlighting() {
+ const charSpans = textDisplay.querySelectorAll('.char');
+ const typedLen = typedChars.length;
 
-      // Remove all current-word highlighting
-      textDisplay.querySelectorAll('.word.current').forEach(el => el.classList.remove('current'));
+ // Remove all current-word highlighting
+ textDisplay.querySelectorAll('.word.current').forEach(el => el.classList.remove('current'));
 
-      charSpans.forEach((span, idx) => {
-        span.classList.remove('correct', 'incorrect', 'cursor');
+ charSpans.forEach((span, idx) => {
+ span.classList.remove('correct', 'incorrect', 'cursor');
 
-        if (idx < typedLen) {
-          if (typedChars[idx] === passageChars[idx]) {
-            span.classList.add('correct');
-          } else {
-            span.classList.add('incorrect');
-          }
-        } else if (idx === typedLen) {
-          span.classList.add('cursor');
-          // Highlight current word
-          const parentWord = span.closest('.word');
-          if (parentWord) {
-            parentWord.classList.add('current');
-          }
-        }
-      });
-    }
+ if (idx < typedLen) {
+ if (typedChars[idx] === passageChars[idx]) {
+ span.classList.add('correct');
+ } else {
+ span.classList.add('incorrect');
+ }
+ } else if (idx === typedLen) {
+ span.classList.add('cursor');
+ // Highlight current word
+ const parentWord = span.closest('.word');
+ if (parentWord) {
+ parentWord.classList.add('current');
+ }
+ }
+ });
+ }
 
-    function calculateStats(): { wpm; accuracy; elapsed } {
-      if (!startTime) return { wpm: 0, accuracy: 100, elapsed: 0 };
+ function calculateStats() {
+ if (!startTime) return { wpm: 0, accuracy: 100, elapsed: 0 };
 
-      const elapsed = (Date.now() - startTime) / 1000; // seconds
-      const minutes = elapsed / 60;
-      const typedLen = typedChars.length;
+ const elapsed = (Date.now() - startTime) / 1000; // seconds
+ const minutes = elapsed / 60;
+ const typedLen = typedChars.length;
 
-      let correctCount = 0;
-      for (let i = 0; i < typedLen; i++) {
-        if (typedChars[i] === passageChars[i]) correctCount++;
-      }
+ let correctCount = 0;
+ for (let i = 0; i < typedLen; i++) {
+ if (typedChars[i] === passageChars[i]) correctCount++;
+ }
 
-      const wpm = minutes > 0 ? Math.round((correctCount / 5) / minutes) : 0;
-      const accuracy = typedLen > 0 ? Math.round((correctCount / typedLen) * 100) : 100;
+ const wpm = minutes > 0 ? Math.round((correctCount / 5) / minutes) : 0;
+ const accuracy = typedLen > 0 ? Math.round((correctCount / typedLen) * 100) : 100;
 
-      return { wpm, accuracy, elapsed };
-    }
+ return { wpm, accuracy, elapsed };
+ }
 
-    function updateLiveStats() {
-      const { wpm, accuracy, elapsed } = calculateStats();
-      liveWpm.textContent = String(wpm);
-      liveAccuracyEl.textContent = String(accuracy);
-      liveTime.textContent = elapsed.toFixed(1);
-    }
+ function updateLiveStats() {
+ const { wpm, accuracy, elapsed } = calculateStats();
+ liveWpm.textContent = String(wpm);
+ liveAccuracyEl.textContent = String(accuracy);
+ liveTime.textContent = elapsed.toFixed(1);
+ }
 
-    function startTimer() {
-      if (timerInterval) return;
-      startTime = Date.now();
-      timerInterval = window.setInterval(() => {
-        updateLiveStats();
-      }, 100);
-    }
+ function startTimer() {
+ if (timerInterval) return;
+ startTime = Date.now();
+ timerInterval = window.setInterval(() => {
+ updateLiveStats();
+ }, 100);
+ }
 
-    function stopTimer() {
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-      }
-    }
+ function stopTimer() {
+ if (timerInterval) {
+ clearInterval(timerInterval);
+ timerInterval = null;
+ }
+ }
 
-    function finishTest() {
-      isActive = false;
-      isFinished = true;
-      stopTimer();
-      typingInput.disabled = true;
+ function finishTest() {
+ isActive = false;
+ isFinished = true;
+ stopTimer();
+ typingInput.disabled = true;
 
-      const { wpm, accuracy, elapsed } = calculateStats();
+ const { wpm, accuracy, elapsed } = calculateStats();
 
-      // Show score
-      finalWpm.textContent = String(wpm);
-      finalAccuracy.textContent = `Accuracy: ${accuracy}% | Time: ${elapsed.toFixed(1)}s`;
-      const rating = getRatingForWpm(wpm);
-      ratingBadge.textContent = rating.label;
-      ratingBadge.style.backgroundColor = rating.color;
+ // Show score
+ finalWpm.textContent = String(wpm);
+ finalAccuracy.textContent = `Accuracy: ${accuracy}% | Time: ${elapsed.toFixed(1)}s`;
+ const rating = getRatingForWpm(wpm);
+ ratingBadge.textContent = rating.label;
+ ratingBadge.style.backgroundColor = rating.color;
 
-      scoreSection.hidden = false;
-      inputWrapper.hidden = true;
-      liveStats.style.display = 'none';
-      btnStart.hidden = true;
-      btnRetry.hidden = false;
+ scoreSection.hidden = false;
+ inputWrapper.hidden = true;
+ liveStats.style.display = 'none';
+ btnStart.hidden = true;
+ btnRetry.hidden = false;
 
-      // Save to history
-      saveAttempt(wpm, accuracy);
-      renderHistory();
+ // Save to history
+ saveAttempt(wpm, accuracy);
+ renderHistory();
 
-      if (window.GameShare) {
-        window.GameShare.show({
-          gameName: gameName,
-          gameSlug: gameSlug,
-          gameIcon: gameIcon,
-          score: wpm,
-          unit: metricUnit,
-          metricLabel: metricLabel,
-          ratingLabel: rating.label,
-          ratingColor: rating.color
-        });
-      }
-    }
+ if (window.GameShare) {
+ window.GameShare.show({
+ gameName: gameName,
+ gameSlug: gameSlug,
+ gameIcon: gameIcon,
+ score: wpm,
+ unit: metricUnit,
+ metricLabel: metricLabel,
+ ratingLabel: rating.label,
+ ratingColor: rating.color
+ });
+ }
+ }
 
-    function saveAttempt(wpm, accuracy) {
-      let history: { wpm; accuracy; date }[] = [];
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) history = JSON.parse(raw);
-      } catch {}
+ function saveAttempt(wpm, accuracy) {
+ let history = [];
+ try {
+ const raw = localStorage.getItem(STORAGE_KEY);
+ if (raw) history = JSON.parse(raw);
+ } catch {}
 
-      history.unshift({
-        wpm,
-        accuracy,
-        date: new Date().toLocaleString(),
-      });
+ history.unshift({
+ wpm,
+ accuracy,
+ date: new Date().toLocaleString(),
+ });
 
-      if (history.length > MAX_HISTORY) history = history.slice(0, MAX_HISTORY);
+ if (history.length > MAX_HISTORY) history = history.slice(0, MAX_HISTORY);
 
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
-      } catch {}
-    }
+ try {
+ localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+ } catch {}
+ }
 
-    function renderHistory() {
-      let history: { wpm; accuracy; date }[] = [];
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) history = JSON.parse(raw);
-      } catch {}
+ function renderHistory() {
+ let history = [];
+ try {
+ const raw = localStorage.getItem(STORAGE_KEY);
+ if (raw) history = JSON.parse(raw);
+ } catch {}
 
-      if (history.length === 0) {
-        historySection.hidden = true;
-        return;
-      }
+ if (history.length === 0) {
+ historySection.hidden = true;
+ return;
+ }
 
-      historySection.hidden = false;
-      historyList.innerHTML = '';
+ historySection.hidden = false;
+ historyList.innerHTML = '';
 
-      history.forEach(entry => {
-        const rating = getRatingForWpm(entry.wpm);
-        const item = document.createElement('div');
-        item.className = 'history-item';
-        item.innerHTML = `
-          <span class="history-score">${entry.wpm} WPM</span>
-          <span class="history-rating" style="background:${rating.color}">${rating.label}</span>
-          <span class="history-time">${entry.accuracy}% | ${entry.date}</span>
-        `;
-        historyList.appendChild(item);
-      });
-    }
+ history.forEach(entry => {
+ const rating = getRatingForWpm(entry.wpm);
+ const item = document.createElement('div');
+ item.className = 'history-item';
+ item.innerHTML = `
+ <span class="history-score">${entry.wpm} WPM</span>
+ <span class="history-rating" style="background:${rating.color}">${rating.label}</span>
+ <span class="history-time">${entry.accuracy}% | ${entry.date}</span>
+ `;
+ historyList.appendChild(item);
+ });
+ }
 
-    function resetGame() {
-      stopTimer();
-      isActive = false;
-      isFinished = false;
-      startTime = null;
-      typedChars = [];
+ function resetGame() {
+ stopTimer();
+ isActive = false;
+ isFinished = false;
+ startTime = null;
+ typedChars = [];
 
-      currentPassage = pickRandomPassage();
-      passageChars = currentPassage.split('');
+ currentPassage = pickRandomPassage();
+ passageChars = currentPassage.split('');
 
-      typingInput.value = '';
-      typingInput.disabled = false;
+ typingInput.value = '';
+ typingInput.disabled = false;
 
-      instructions.hidden = true;
-      textDisplay.hidden = false;
-      liveStats.style.display = '';
-      inputWrapper.hidden = false;
-      scoreSection.hidden = true;
-      btnStart.hidden = true;
-      btnRetry.hidden = true;
+ instructions.hidden = true;
+ textDisplay.hidden = false;
+ liveStats.style.display = '';
+ inputWrapper.hidden = false;
+ scoreSection.hidden = true;
+ btnStart.hidden = true;
+ btnRetry.hidden = true;
 
-      liveWpm.textContent = '0';
-      liveAccuracyEl.textContent = '100';
-      liveTime.textContent = '0.0';
+ liveWpm.textContent = '0';
+ liveAccuracyEl.textContent = '100';
+ liveTime.textContent = '0.0';
 
-      renderPassage();
-      typingInput.focus();
-    }
+ renderPassage();
+ typingInput.focus();
+ }
 
-    // --- Event Handlers ---
-    btnStart.addEventListener('click', () => {
-      resetGame();
-    });
+ // --- Event Handlers ---
+ btnStart.addEventListener('click', () => {
+ resetGame();
+ });
 
-    btnRetry.addEventListener('click', () => {
-      resetGame();
-    });
+ btnRetry.addEventListener('click', () => {
+ resetGame();
+ });
 
-    typingInput.addEventListener('input', () => {
-      if (isFinished) return;
+ typingInput.addEventListener('input', () => {
+ if (isFinished) return;
 
-      const value = typingInput.value;
-      typedChars = value.split('');
+ const value = typingInput.value;
+ typedChars = value.split('');
 
-      // Start timer on first keystroke
-      if (!isActive && typedChars.length > 0) {
-        isActive = true;
-        startTimer();
-      }
+ // Start timer on first keystroke
+ if (!isActive && typedChars.length > 0) {
+ isActive = true;
+ startTimer();
+ }
 
-      updateHighlighting();
-      updateLiveStats();
+ updateHighlighting();
+ updateLiveStats();
 
-      // Check if test is complete
-      if (typedChars.length >= passageChars.length) {
-        finishTest();
-      }
-    });
+ // Check if test is complete
+ if (typedChars.length >= passageChars.length) {
+ finishTest();
+ }
+ });
 
-    // Prevent pasting into the input
-    typingInput.addEventListener('paste', (e) => {
-      e.preventDefault();
-    });
+ // Prevent pasting into the input
+ typingInput.addEventListener('paste', (e) => {
+ e.preventDefault();
+ });
 
-    // Prevent drag-and-drop into the input
-    typingInput.addEventListener('drop', (e) => {
-      e.preventDefault();
-    });
+ // Prevent drag-and-drop into the input
+ typingInput.addEventListener('drop', (e) => {
+ e.preventDefault();
+ });
 
-    // --- Initialize ---
-    renderHistory();
-  })();
+ // --- Initialize ---
+ renderHistory();
+ })();
 </script>

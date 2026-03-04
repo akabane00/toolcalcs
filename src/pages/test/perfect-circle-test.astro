@@ -214,343 +214,345 @@ const structuredData = [
 </style>
 
 <script define:vars={{ gameName: game.title, gameSlug: game.slug, gameIcon: game.icon, metricLabel: game.metricLabel, metricUnit: game.metricUnit }}>
+(function () {
+ 'use strict';
+ const STORAGE_KEY = 'toolcalcs_perfect-circle-test_history';
+ const MAX_HISTORY = 20;
 
-  const STORAGE_KEY = 'toolcalcs_perfect-circle-test_history';
-  const MAX_HISTORY = 20;
+ // Rating scale matching games.ts for client-side use
+ const ratingScale = [
+ { max: 50, label: 'Rough', color: '#ef4444' },
+ { max: 70, label: 'Okay', color: '#f59e0b' },
+ { max: 85, label: 'Good', color: '#2563eb' },
+ { max: 95, label: 'Great!', color: '#22c55e' },
+ { max: Infinity, label: 'Perfect!', color: '#16a34a' },
+ ];
 
-  // Rating scale matching games.ts for client-side use
-  const ratingScale = [
-    { max: 50, label: 'Rough', color: '#ef4444' },
-    { max: 70, label: 'Okay', color: '#f59e0b' },
-    { max: 85, label: 'Good', color: '#2563eb' },
-    { max: 95, label: 'Great!', color: '#22c55e' },
-    { max: Infinity, label: 'Perfect!', color: '#16a34a' },
-  ];
+ function getClientRating(score) {
+ for (let i = ratingScale.length - 1; i >= 0; i--) {
+ if (i === 0) return ratingScale[0];
+ const prev = ratingScale[i - 1];
+ if (score >= prev.max) return ratingScale[i];
+ }
+ return ratingScale[0];
+ }
 
-  function getClientRating(score): { label; color } {
-    for (let i = ratingScale.length - 1; i >= 0; i--) {
-      if (i === 0) return ratingScale[0];
-      const prev = ratingScale[i - 1];
-      if (score >= prev.max) return ratingScale[i];
-    }
-    return ratingScale[0];
-  }
+ // DOM elements
+ const canvas = document.getElementById('circleCanvas');
+ const wrapper = document.getElementById('canvasWrapper');
+ const prompt = document.getElementById('canvasPrompt');
+ const scoreDisplay = document.getElementById('scoreDisplay');
+ const scoreValue = document.getElementById('scoreValue');
+ const ratingBadge = document.getElementById('ratingBadge');
+ const circleControls = document.getElementById('circleControls');
+ const tryAgainBtn = document.getElementById('tryAgainBtn');
+ const attemptHistory = document.getElementById('attemptHistory');
+ const historyList = document.getElementById('historyList');
 
-  // DOM elements
-  const canvas = document.getElementById('circleCanvas');
-  const wrapper = document.getElementById('canvasWrapper');
-  const prompt = document.getElementById('canvasPrompt');
-  const scoreDisplay = document.getElementById('scoreDisplay');
-  const scoreValue = document.getElementById('scoreValue');
-  const ratingBadge = document.getElementById('ratingBadge');
-  const circleControls = document.getElementById('circleControls');
-  const tryAgainBtn = document.getElementById('tryAgainBtn');
-  const attemptHistory = document.getElementById('attemptHistory');
-  const historyList = document.getElementById('historyList');
+ // Canvas setup with high-DPI support
+ const ctx = canvas.getContext('2d');
+ let dpr = window.devicePixelRatio || 1;
+ let points = [];
+ let isDrawing = false;
+ let hasDrawn = false;
 
-  // Canvas setup with high-DPI support
-  const ctx = canvas.getContext('2d')!;
-  let dpr = window.devicePixelRatio || 1;
-  let points: { x; y }[] = [];
-  let isDrawing = false;
-  let hasDrawn = false;
+ function resizeCanvas() {
+ dpr = window.devicePixelRatio || 1;
+ const rect = wrapper.getBoundingClientRect();
+ const w = rect.width;
+ const h = rect.height;
+ canvas.width = w * dpr;
+ canvas.height = h * dpr;
+ ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+ }
 
-  function resizeCanvas() {
-    dpr = window.devicePixelRatio || 1;
-    const rect = wrapper.getBoundingClientRect();
-    const w = rect.width;
-    const h = rect.height;
-    canvas.width = w * dpr;
-    canvas.height = h * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  }
+ resizeCanvas();
+ window.addEventListener('resize', () => {
+ resizeCanvas();
+ if (hasDrawn && points.length > 0) {
+ redrawResult();
+ }
+ });
 
-  resizeCanvas();
-  window.addEventListener('resize', () => {
-    resizeCanvas();
-    if (hasDrawn && points.length > 0) {
-      redrawResult();
-    }
-  });
+ function getPos(e | Touch) {
+ const rect = canvas.getBoundingClientRect();
+ return {
+ x: e.clientX - rect.left,
+ y: e.clientY - rect.top,
+ };
+ }
 
-  function getPos(e | Touch): { x; y } {
-    const rect = canvas.getBoundingClientRect();
-    return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    };
-  }
+ function clearCanvas() {
+ const rect = wrapper.getBoundingClientRect();
+ ctx.clearRect(0, 0, rect.width, rect.height);
+ }
 
-  function clearCanvas() {
-    const rect = wrapper.getBoundingClientRect();
-    ctx.clearRect(0, 0, rect.width, rect.height);
-  }
+ function drawStroke() {
+ if (points.length < 2) return;
+ ctx.beginPath();
+ ctx.strokeStyle = '#3b82f6';
+ ctx.lineWidth = 3;
+ ctx.lineCap = 'round';
+ ctx.lineJoin = 'round';
+ ctx.moveTo(points[0].x, points[0].y);
+ for (let i = 1; i < points.length; i++) {
+ ctx.lineTo(points[i].x, points[i].y);
+ }
+ ctx.stroke();
+ }
 
-  function drawStroke() {
-    if (points.length < 2) return;
-    ctx.beginPath();
-    ctx.strokeStyle = '#3b82f6';
-    ctx.lineWidth = 3;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.moveTo(points[0].x, points[0].y);
-    for (let i = 1; i < points.length; i++) {
-      ctx.lineTo(points[i].x, points[i].y);
-    }
-    ctx.stroke();
-  }
+ // --- Start drawing ---
+ function startDraw(pos) {
+ if (hasDrawn) return;
+ isDrawing = true;
+ points = [pos];
+ prompt.classList.add('hidden');
+ clearCanvas();
+ }
 
-  // --- Start drawing ---
-  function startDraw(pos: { x; y }) {
-    if (hasDrawn) return;
-    isDrawing = true;
-    points = [pos];
-    prompt.classList.add('hidden');
-    clearCanvas();
-  }
+ function moveDraw(pos) {
+ if (!isDrawing) return;
+ points.push(pos);
+ clearCanvas();
+ drawStroke();
+ }
 
-  function moveDraw(pos: { x; y }) {
-    if (!isDrawing) return;
-    points.push(pos);
-    clearCanvas();
-    drawStroke();
-  }
+ function endDraw() {
+ if (!isDrawing) return;
+ isDrawing = false;
+ if (points.length < 10) {
+ // Not enough points to evaluate
+ points = [];
+ prompt.classList.remove('hidden');
+ clearCanvas();
+ return;
+ }
+ hasDrawn = true;
+ calculateAndShow();
+ }
 
-  function endDraw() {
-    if (!isDrawing) return;
-    isDrawing = false;
-    if (points.length < 10) {
-      // Not enough points to evaluate
-      points = [];
-      prompt.classList.remove('hidden');
-      clearCanvas();
-      return;
-    }
-    hasDrawn = true;
-    calculateAndShow();
-  }
+ // --- Mouse events ---
+ canvas.addEventListener('mousedown', (e) => {
+ e.preventDefault();
+ startDraw(getPos(e));
+ });
+ canvas.addEventListener('mousemove', (e) => {
+ e.preventDefault();
+ moveDraw(getPos(e));
+ });
+ canvas.addEventListener('mouseup', (e) => {
+ e.preventDefault();
+ endDraw();
+ });
+ canvas.addEventListener('mouseleave', () => {
+ if (isDrawing) endDraw();
+ });
 
-  // --- Mouse events ---
-  canvas.addEventListener('mousedown', (e) => {
-    e.preventDefault();
-    startDraw(getPos(e));
-  });
-  canvas.addEventListener('mousemove', (e) => {
-    e.preventDefault();
-    moveDraw(getPos(e));
-  });
-  canvas.addEventListener('mouseup', (e) => {
-    e.preventDefault();
-    endDraw();
-  });
-  canvas.addEventListener('mouseleave', () => {
-    if (isDrawing) endDraw();
-  });
+ // --- Touch events ---
+ canvas.addEventListener('touchstart', (e) => {
+ e.preventDefault();
+ if (e.touches.length === 1) {
+ startDraw(getPos(e.touches[0]));
+ }
+ }, { passive: false });
+ canvas.addEventListener('touchmove', (e) => {
+ e.preventDefault();
+ if (e.touches.length === 1) {
+ moveDraw(getPos(e.touches[0]));
+ }
+ }, { passive: false });
+ canvas.addEventListener('touchend', (e) => {
+ e.preventDefault();
+ endDraw();
+ }, { passive: false });
+ canvas.addEventListener('touchcancel', () => {
+ if (isDrawing) endDraw();
+ });
 
-  // --- Touch events ---
-  canvas.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    if (e.touches.length === 1) {
-      startDraw(getPos(e.touches[0]));
-    }
-  }, { passive: false });
-  canvas.addEventListener('touchmove', (e) => {
-    e.preventDefault();
-    if (e.touches.length === 1) {
-      moveDraw(getPos(e.touches[0]));
-    }
-  }, { passive: false });
-  canvas.addEventListener('touchend', (e) => {
-    e.preventDefault();
-    endDraw();
-  }, { passive: false });
-  canvas.addEventListener('touchcancel', () => {
-    if (isDrawing) endDraw();
-  });
+ // --- Scoring ---
+ function calculateScore() {
+ if (points.length < 10) return 0;
 
-  // --- Scoring ---
-  function calculateScore() {
-    if (points.length < 10) return 0;
+ // 1. Find center (average x, average y)
+ let sumX = 0;
+ let sumY = 0;
+ for (const p of points) {
+ sumX += p.x;
+ sumY += p.y;
+ }
+ const centerX = sumX / points.length;
+ const centerY = sumY / points.length;
 
-    // 1. Find center (average x, average y)
-    let sumX = 0;
-    let sumY = 0;
-    for (const p of points) {
-      sumX += p.x;
-      sumY += p.y;
-    }
-    const centerX = sumX / points.length;
-    const centerY = sumY / points.length;
+ // 2. Calculate distance from each point to center
+ const distances = [];
+ for (const p of points) {
+ const dx = p.x - centerX;
+ const dy = p.y - centerY;
+ distances.push(Math.sqrt(dx * dx + dy * dy));
+ }
 
-    // 2. Calculate distance from each point to center
-    const distances[] = [];
-    for (const p of points) {
-      const dx = p.x - centerX;
-      const dy = p.y - centerY;
-      distances.push(Math.sqrt(dx * dx + dy * dy));
-    }
+ // 3. Average radius
+ let sumDist = 0;
+ for (const d of distances) {
+ sumDist += d;
+ }
+ const avgRadius = sumDist / distances.length;
 
-    // 3. Average radius
-    let sumDist = 0;
-    for (const d of distances) {
-      sumDist += d;
-    }
-    const avgRadius = sumDist / distances.length;
+ if (avgRadius < 5) return 0; // Circle too small
 
-    if (avgRadius < 5) return 0; // Circle too small
+ // 4. Standard deviation of distances
+ let sumSqDiff = 0;
+ for (const d of distances) {
+ const diff = d - avgRadius;
+ sumSqDiff += diff * diff;
+ }
+ const stdDev = Math.sqrt(sumSqDiff / distances.length);
 
-    // 4. Standard deviation of distances
-    let sumSqDiff = 0;
-    for (const d of distances) {
-      const diff = d - avgRadius;
-      sumSqDiff += diff * diff;
-    }
-    const stdDev = Math.sqrt(sumSqDiff / distances.length);
+ // 5. Score
+ const score = Math.max(0, Math.round((1 - stdDev / avgRadius) * 100));
+ return score;
+ }
 
-    // 5. Score
-    const score = Math.max(0, Math.round((1 - stdDev / avgRadius) * 100));
-    return score;
-  }
+ function getCircleParams() {
+ let sumX = 0;
+ let sumY = 0;
+ for (const p of points) {
+ sumX += p.x;
+ sumY += p.y;
+ }
+ const cx = sumX / points.length;
+ const cy = sumY / points.length;
 
-  function getCircleParams(): { cx; cy; radius } {
-    let sumX = 0;
-    let sumY = 0;
-    for (const p of points) {
-      sumX += p.x;
-      sumY += p.y;
-    }
-    const cx = sumX / points.length;
-    const cy = sumY / points.length;
+ let sumDist = 0;
+ for (const p of points) {
+ const dx = p.x - cx;
+ const dy = p.y - cy;
+ sumDist += Math.sqrt(dx * dx + dy * dy);
+ }
+ const radius = sumDist / points.length;
 
-    let sumDist = 0;
-    for (const p of points) {
-      const dx = p.x - cx;
-      const dy = p.y - cy;
-      sumDist += Math.sqrt(dx * dx + dy * dy);
-    }
-    const radius = sumDist / points.length;
+ return { cx, cy, radius };
+ }
 
-    return { cx, cy, radius };
-  }
+ function redrawResult() {
+ clearCanvas();
+ drawStroke();
 
-  function redrawResult() {
-    clearCanvas();
-    drawStroke();
+ const { cx, cy, radius } = getCircleParams();
 
-    const { cx, cy, radius } = getCircleParams();
+ // Draw perfect circle overlay (dashed green)
+ ctx.beginPath();
+ ctx.setLineDash([8, 6]);
+ ctx.strokeStyle = '#22c55e';
+ ctx.lineWidth = 2;
+ ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+ ctx.stroke();
+ ctx.setLineDash([]);
 
-    // Draw perfect circle overlay (dashed green)
-    ctx.beginPath();
-    ctx.setLineDash([8, 6]);
-    ctx.strokeStyle = '#22c55e';
-    ctx.lineWidth = 2;
-    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.setLineDash([]);
+ // Draw center point (small red dot)
+ ctx.beginPath();
+ ctx.fillStyle = '#ef4444';
+ ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+ ctx.fill();
+ }
 
-    // Draw center point (small red dot)
-    ctx.beginPath();
-    ctx.fillStyle = '#ef4444';
-    ctx.arc(cx, cy, 4, 0, Math.PI * 2);
-    ctx.fill();
-  }
+ function calculateAndShow() {
+ const score = calculateScore();
+ redrawResult();
 
-  function calculateAndShow() {
-    const score = calculateScore();
-    redrawResult();
+ // Show score
+ scoreValue.textContent = score + '%';
+ const rating = getClientRating(score);
+ ratingBadge.textContent = rating.label;
+ ratingBadge.style.backgroundColor = rating.color;
+ scoreDisplay.style.display = '';
+ circleControls.style.display = '';
 
-    // Show score
-    scoreValue.textContent = score + '%';
-    const rating = getClientRating(score);
-    ratingBadge.textContent = rating.label;
-    ratingBadge.style.backgroundColor = rating.color;
-    scoreDisplay.style.display = '';
-    circleControls.style.display = '';
+ // Save to history
+ saveToHistory(score, rating.label, rating.color);
+ renderHistory();
 
-    // Save to history
-    saveToHistory(score, rating.label, rating.color);
-    renderHistory();
+ if (window.GameShare) {
+ window.GameShare.show({
+ gameName: gameName,
+ gameSlug: gameSlug,
+ gameIcon: gameIcon,
+ score: score,
+ unit: metricUnit,
+ metricLabel: metricLabel,
+ ratingLabel: rating.label,
+ ratingColor: rating.color
+ });
+ }
+ }
 
-    if (window.GameShare) {
-      window.GameShare.show({
-        gameName: gameName,
-        gameSlug: gameSlug,
-        gameIcon: gameIcon,
-        score: score,
-        unit: metricUnit,
-        metricLabel: metricLabel,
-        ratingLabel: rating.label,
-        ratingColor: rating.color
-      });
-    }
-  }
+ // --- Try Again ---
+ tryAgainBtn.addEventListener('click', () => {
+ hasDrawn = false;
+ isDrawing = false;
+ points = [];
+ clearCanvas();
+ prompt.classList.remove('hidden');
+ scoreDisplay.style.display = 'none';
+ circleControls.style.display = 'none';
+ });
 
-  // --- Try Again ---
-  tryAgainBtn.addEventListener('click', () => {
-    hasDrawn = false;
-    isDrawing = false;
-    points = [];
-    clearCanvas();
-    prompt.classList.remove('hidden');
-    scoreDisplay.style.display = 'none';
-    circleControls.style.display = 'none';
-  });
+ // --- History ---
+ function loadHistory() {
+ try {
+ const raw = localStorage.getItem(STORAGE_KEY);
+ if (!raw) return [];
+ return JSON.parse(raw);
+ } catch {
+ return [];
+ }
+ }
 
-  // --- History ---
-  function loadHistory(): HistoryEntry[] {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return [];
-      return JSON.parse(raw) as HistoryEntry[];
-    } catch {
-      return [];
-    }
-  }
+ function saveToHistory(score, rating, color) {
+ const history = loadHistory();
+ history.unshift({ score, rating, color, timestamp: Date.now() });
+ if (history.length > MAX_HISTORY) history.length = MAX_HISTORY;
+ try {
+ localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+ } catch {
+ // Storage full or unavailable
+ }
+ }
 
-  function saveToHistory(score, rating, color) {
-    const history = loadHistory();
-    history.unshift({ score, rating, color, timestamp: Date.now() });
-    if (history.length > MAX_HISTORY) history.length = MAX_HISTORY;
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
-    } catch {
-      // Storage full or unavailable
-    }
-  }
+ function formatTime(ts) {
+ const d = new Date(ts);
+ const now = new Date();
+ const diffMs = now.getTime() - d.getTime();
+ const diffMin = Math.floor(diffMs / 60000);
+ if (diffMin < 1) return 'Just now';
+ if (diffMin < 60) return diffMin + 'm ago';
+ const diffHr = Math.floor(diffMin / 60);
+ if (diffHr < 24) return diffHr + 'h ago';
+ const diffDay = Math.floor(diffHr / 24);
+ if (diffDay < 7) return diffDay + 'd ago';
+ return d.toLocaleDateString();
+ }
 
-  function formatTime(ts) {
-    const d = new Date(ts);
-    const now = new Date();
-    const diffMs = now.getTime() - d.getTime();
-    const diffMin = Math.floor(diffMs / 60000);
-    if (diffMin < 1) return 'Just now';
-    if (diffMin < 60) return diffMin + 'm ago';
-    const diffHr = Math.floor(diffMin / 60);
-    if (diffHr < 24) return diffHr + 'h ago';
-    const diffDay = Math.floor(diffHr / 24);
-    if (diffDay < 7) return diffDay + 'd ago';
-    return d.toLocaleDateString();
-  }
+ function renderHistory() {
+ const history = loadHistory();
+ if (history.length === 0) {
+ attemptHistory.style.display = 'none';
+ return;
+ }
+ attemptHistory.style.display = '';
+ historyList.innerHTML = '';
+ for (const entry of history) {
+ const item = document.createElement('div');
+ item.className = 'history-item';
+ item.innerHTML =
+ '<span class="history-score">' + entry.score + '%</span>' +
+ '<span class="history-rating" style="background:' + entry.color + '">' + entry.rating + '</span>' +
+ '<span class="history-time">' + formatTime(entry.timestamp) + '</span>';
+ historyList.appendChild(item);
+ }
+ }
 
-  function renderHistory() {
-    const history = loadHistory();
-    if (history.length === 0) {
-      attemptHistory.style.display = 'none';
-      return;
-    }
-    attemptHistory.style.display = '';
-    historyList.innerHTML = '';
-    for (const entry of history) {
-      const item = document.createElement('div');
-      item.className = 'history-item';
-      item.innerHTML =
-        '<span class="history-score">' + entry.score + '%</span>' +
-        '<span class="history-rating" style="background:' + entry.color + '">' + entry.rating + '</span>' +
-        '<span class="history-time">' + formatTime(entry.timestamp) + '</span>';
-      historyList.appendChild(item);
-    }
-  }
-
-  // Initial render
-  renderHistory();
+ // Initial render
+ renderHistory();
+})();
 </script>
