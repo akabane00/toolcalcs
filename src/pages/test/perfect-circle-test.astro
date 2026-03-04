@@ -214,12 +214,6 @@ const structuredData = [
 </style>
 
 <script define:vars={{ gameName: game.title, gameSlug: game.slug, gameIcon: game.icon, metricLabel: game.metricLabel, metricUnit: game.metricUnit }}>
-  interface HistoryEntry {
-    score: number;
-    rating: string;
-    color: string;
-    timestamp: number;
-  }
 
   const STORAGE_KEY = 'toolcalcs_perfect-circle-test_history';
   const MAX_HISTORY = 20;
@@ -233,7 +227,7 @@ const structuredData = [
     { max: Infinity, label: 'Perfect!', color: '#16a34a' },
   ];
 
-  function getClientRating(score: number): { label: string; color: string } {
+  function getClientRating(score): { label; color } {
     for (let i = ratingScale.length - 1; i >= 0; i--) {
       if (i === 0) return ratingScale[0];
       const prev = ratingScale[i - 1];
@@ -243,21 +237,21 @@ const structuredData = [
   }
 
   // DOM elements
-  const canvas = document.getElementById('circleCanvas') as HTMLCanvasElement;
-  const wrapper = document.getElementById('canvasWrapper') as HTMLDivElement;
-  const prompt = document.getElementById('canvasPrompt') as HTMLDivElement;
-  const scoreDisplay = document.getElementById('scoreDisplay') as HTMLDivElement;
-  const scoreValue = document.getElementById('scoreValue') as HTMLSpanElement;
-  const ratingBadge = document.getElementById('ratingBadge') as HTMLSpanElement;
-  const circleControls = document.getElementById('circleControls') as HTMLDivElement;
-  const tryAgainBtn = document.getElementById('tryAgainBtn') as HTMLButtonElement;
-  const attemptHistory = document.getElementById('attemptHistory') as HTMLDivElement;
-  const historyList = document.getElementById('historyList') as HTMLDivElement;
+  const canvas = document.getElementById('circleCanvas');
+  const wrapper = document.getElementById('canvasWrapper');
+  const prompt = document.getElementById('canvasPrompt');
+  const scoreDisplay = document.getElementById('scoreDisplay');
+  const scoreValue = document.getElementById('scoreValue');
+  const ratingBadge = document.getElementById('ratingBadge');
+  const circleControls = document.getElementById('circleControls');
+  const tryAgainBtn = document.getElementById('tryAgainBtn');
+  const attemptHistory = document.getElementById('attemptHistory');
+  const historyList = document.getElementById('historyList');
 
   // Canvas setup with high-DPI support
   const ctx = canvas.getContext('2d')!;
   let dpr = window.devicePixelRatio || 1;
-  let points: { x: number; y: number }[] = [];
+  let points: { x; y }[] = [];
   let isDrawing = false;
   let hasDrawn = false;
 
@@ -279,7 +273,7 @@ const structuredData = [
     }
   });
 
-  function getPos(e: MouseEvent | Touch): { x: number; y: number } {
+  function getPos(e | Touch): { x; y } {
     const rect = canvas.getBoundingClientRect();
     return {
       x: e.clientX - rect.left,
@@ -307,7 +301,7 @@ const structuredData = [
   }
 
   // --- Start drawing ---
-  function startDraw(pos: { x: number; y: number }) {
+  function startDraw(pos: { x; y }) {
     if (hasDrawn) return;
     isDrawing = true;
     points = [pos];
@@ -315,7 +309,7 @@ const structuredData = [
     clearCanvas();
   }
 
-  function moveDraw(pos: { x: number; y: number }) {
+  function moveDraw(pos: { x; y }) {
     if (!isDrawing) return;
     points.push(pos);
     clearCanvas();
@@ -375,7 +369,7 @@ const structuredData = [
   });
 
   // --- Scoring ---
-  function calculateScore(): number {
+  function calculateScore() {
     if (points.length < 10) return 0;
 
     // 1. Find center (average x, average y)
@@ -389,7 +383,7 @@ const structuredData = [
     const centerY = sumY / points.length;
 
     // 2. Calculate distance from each point to center
-    const distances: number[] = [];
+    const distances[] = [];
     for (const p of points) {
       const dx = p.x - centerX;
       const dy = p.y - centerY;
@@ -418,7 +412,7 @@ const structuredData = [
     return score;
   }
 
-  function getCircleParams(): { cx: number; cy: number; radius: number } {
+  function getCircleParams(): { cx; cy; radius } {
     let sumX = 0;
     let sumY = 0;
     for (const p of points) {
@@ -513,7 +507,7 @@ const structuredData = [
     }
   }
 
-  function saveToHistory(score: number, rating: string, color: string) {
+  function saveToHistory(score, rating, color) {
     const history = loadHistory();
     history.unshift({ score, rating, color, timestamp: Date.now() });
     if (history.length > MAX_HISTORY) history.length = MAX_HISTORY;
@@ -524,7 +518,7 @@ const structuredData = [
     }
   }
 
-  function formatTime(ts: number): string {
+  function formatTime(ts) {
     const d = new Date(ts);
     const now = new Date();
     const diffMs = now.getTime() - d.getTime();

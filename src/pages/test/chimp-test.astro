@@ -276,7 +276,7 @@ const structuredData = [
       { min: 0, label: 'Below Average', color: '#ef4444' },
     ];
 
-    function getLocalRating(score: number) {
+    function getLocalRating(score) {
       for (const level of RATING_SCALE) {
         if (score >= level.min) return { label: level.label, color: level.color };
       }
@@ -286,14 +286,14 @@ const structuredData = [
     const STORAGE_KEY = 'toolcalcs_chimp-test_history';
     const MAX_HISTORY = 20;
 
-    function loadHistory(): Array<{ score: number; date: string; rating: string }> {
+    function loadHistory() {
       try { const r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch {}
       return [];
     }
-    function saveHistory(h: Array<{ score: number; date: string; rating: string }>) {
+    function saveHistory(h) {
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch {}
     }
-    function addToHistory(score: number) {
+    function addToHistory(score) {
       const h = loadHistory();
       h.unshift({ score, date: new Date().toISOString(), rating: getLocalRating(score).label });
       saveHistory(h);
@@ -323,12 +323,12 @@ const structuredData = [
     let numberMap = new Map<number, number>();
     let canClick = false;
 
-    function showView(view: HTMLElement) {
+    function showView(view) {
       [instructionsView, playView, resultView].forEach(v => v.style.display = 'none');
       view.style.display = '';
     }
 
-    function shufflePositions(count: number): number[] {
+    function shufflePositions(count): number[] {
       const all = Array.from({ length: TOTAL_CELLS }, (_, i) => i);
       for (let i = all.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -376,9 +376,9 @@ const structuredData = [
       renderGrid();
     }
 
-    function handleCellClick(e: Event) {
+    function handleCellClick(e) {
       if (!isPlaying || !canClick) return;
-      const target = (e.target as HTMLElement).closest('.chimp-cell') as HTMLElement | null;
+      const target = (e.target).closest('.chimp-cell') | null;
       if (!target) return;
       const idx = parseInt(target.dataset.index || '-1');
       if (idx < 0) return;
@@ -417,7 +417,7 @@ const structuredData = [
 
         // Reveal all numbers briefly
         chimpGrid.querySelectorAll('.chimp-cell.has-number').forEach(cell => {
-          const ci = parseInt((cell as HTMLElement).dataset.index || '-1');
+          const ci = parseInt((cell).dataset.index || '-1');
           if (numberMap.has(ci)) {
             cell.classList.remove('hidden-num');
             cell.textContent = String(numberMap.get(ci));
@@ -481,7 +481,7 @@ const structuredData = [
       }).join('');
     }
 
-    function formatDate(iso: string): string {
+    function formatDate(iso) {
       try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
       catch { return ''; }
     }

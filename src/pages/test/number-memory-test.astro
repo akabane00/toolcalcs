@@ -394,7 +394,7 @@ const structuredData = [
       { min: 0, label: 'Below Average', color: '#dc2626' },
     ];
 
-    function getLocalRating(score: number): { label: string; color: string } {
+    function getLocalRating(score): { label; color } {
       for (const level of RATING_SCALE) {
         if (score >= level.min) {
           return { label: level.label, color: level.color };
@@ -407,7 +407,7 @@ const structuredData = [
     const STORAGE_KEY = 'toolcalcs_number-memory-test_history';
     const MAX_HISTORY = 20;
 
-    function loadHistory(): Array<{ score: number; date: string; rating: string }> {
+    function loadHistory() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (raw) return JSON.parse(raw);
@@ -415,13 +415,13 @@ const structuredData = [
       return [];
     }
 
-    function saveHistory(history: Array<{ score: number; date: string; rating: string }>) {
+    function saveHistory(history) {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(history.slice(0, MAX_HISTORY)));
       } catch {}
     }
 
-    function addToHistory(score: number) {
+    function addToHistory(score) {
       const history = loadHistory();
       const rating = getLocalRating(score);
       history.unshift({
@@ -448,7 +448,7 @@ const structuredData = [
     const progressBarFill = document.getElementById('progressBarFill')!;
     const progressBarContainer = document.getElementById('progressBarContainer')!;
 
-    const answerInput = document.getElementById('answerInput') as HTMLInputElement;
+    const answerInput = document.getElementById('answerInput');
     const submitBtn = document.getElementById('submitBtn')!;
 
     const feedbackIcon = document.getElementById('feedbackIcon')!;
@@ -473,7 +473,7 @@ const structuredData = [
     let isPlaying = false;
 
     // --- Utility ---
-    function generateNumber(digits: number): string {
+    function generateNumber(digits) {
       let num = '';
       // First digit should not be 0
       num += Math.floor(Math.random() * 9) + 1;
@@ -483,11 +483,11 @@ const structuredData = [
       return num;
     }
 
-    function getDisplayTime(level: number): number {
+    function getDisplayTime(level) {
       return 1000 + level * 500;
     }
 
-    function showView(view: HTMLElement) {
+    function showView(view) {
       [instructionsView, memorizeView, inputView, feedbackView, resultView].forEach(v => {
         v.style.display = 'none';
       });
@@ -571,7 +571,7 @@ const structuredData = [
       }
     }
 
-    function showFeedback(correct: boolean, userAnswer: string) {
+    function showFeedback(correct, userAnswer) {
       showView(feedbackView);
 
       if (correct) {
@@ -648,7 +648,7 @@ const structuredData = [
       }
     }
 
-    function escapeHtml(text: string): string {
+    function escapeHtml(text) {
       const div = document.createElement('div');
       div.textContent = text;
       return div.innerHTML;
@@ -677,7 +677,7 @@ const structuredData = [
         .join('');
     }
 
-    function formatDate(iso: string): string {
+    function formatDate(iso) {
       try {
         const d = new Date(iso);
         return d.toLocaleDateString(undefined, {
@@ -697,7 +697,7 @@ const structuredData = [
     submitBtn.addEventListener('click', checkAnswer);
     nextBtn.addEventListener('click', nextLevel);
 
-    answerInput.addEventListener('keydown', (e: KeyboardEvent) => {
+    answerInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
         checkAnswer();

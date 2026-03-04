@@ -242,7 +242,7 @@ const structuredData = [
       { min: 0, label: 'Below Average', color: '#ef4444' },
     ];
 
-    function getLocalRating(score: number) {
+    function getLocalRating(score) {
       for (const level of RATING_SCALE) {
         if (score >= level.min) return { label: level.label, color: level.color };
       }
@@ -252,14 +252,14 @@ const structuredData = [
     const STORAGE_KEY = 'toolcalcs_visual-memory-test_history';
     const MAX_HISTORY = 20;
 
-    function loadHistory(): Array<{ score: number; date: string; rating: string }> {
+    function loadHistory() {
       try { const r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch {}
       return [];
     }
-    function saveHistory(h: Array<{ score: number; date: string; rating: string }>) {
+    function saveHistory(h) {
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch {}
     }
-    function addToHistory(score: number) {
+    function addToHistory(score) {
       const h = loadHistory();
       h.unshift({ score, date: new Date().toISOString(), rating: getLocalRating(score).label });
       saveHistory(h);
@@ -286,14 +286,14 @@ const structuredData = [
     let highlightedSet = new Set<number>();
     let foundSet = new Set<number>();
 
-    function showView(view: HTMLElement) {
+    function showView(view) {
       [instructionsView, playView, resultView].forEach(v => v.style.display = 'none');
       view.style.display = '';
     }
 
-    function getLevelConfig(level: number) {
+    function getLevelConfig(level) {
       const tileCount = level + 2; // Level 1=3, Level 2=4, ...
-      let gridSize: number;
+      let gridSize;
       if (tileCount <= 4) gridSize = 3;
       else if (tileCount <= 7) gridSize = 4;
       else if (tileCount <= 12) gridSize = 5;
@@ -302,7 +302,7 @@ const structuredData = [
       return { gridSize, tileCount: Math.min(tileCount, gridSize * gridSize - 1) };
     }
 
-    function shuffleArray(arr: number[]): number[] {
+    function shuffleArray(arr[]): number[] {
       for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [arr[i], arr[j]] = [arr[j], arr[i]];
@@ -338,7 +338,7 @@ const structuredData = [
 
       // Show highlighted tiles
       highlightedSet.forEach(idx => {
-        const tile = vmGrid.children[idx] as HTMLElement;
+        const tile = vmGrid.children[idx];
         tile.classList.add('showing');
       });
 
@@ -346,16 +346,16 @@ const structuredData = [
       const showTime = Math.min(2500, 800 + tileCount * 120);
       setTimeout(() => {
         highlightedSet.forEach(idx => {
-          const tile = vmGrid.children[idx] as HTMLElement;
+          const tile = vmGrid.children[idx];
           tile.classList.remove('showing');
         });
         canClick = true;
       }, showTime);
     }
 
-    function handleTileClick(e: Event) {
+    function handleTileClick(e) {
       if (!isPlaying || !canClick) return;
-      const target = (e.target as HTMLElement).closest('.vm-tile') as HTMLElement | null;
+      const target = (e.target).closest('.vm-tile') | null;
       if (!target) return;
       const idx = parseInt(target.dataset.index || '-1');
       if (idx < 0 || foundSet.has(idx)) return;
@@ -384,7 +384,7 @@ const structuredData = [
           // Reveal remaining
           highlightedSet.forEach(i => {
             if (!foundSet.has(i)) {
-              const tile = vmGrid.children[i] as HTMLElement;
+              const tile = vmGrid.children[i];
               tile.classList.add('showing');
             }
           });
@@ -440,7 +440,7 @@ const structuredData = [
       }).join('');
     }
 
-    function formatDate(iso: string): string {
+    function formatDate(iso) {
       try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
       catch { return ''; }
     }

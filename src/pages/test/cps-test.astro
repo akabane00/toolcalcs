@@ -347,19 +347,19 @@ const structuredData = [
     const STORAGE_KEY = 'toolcalcs_cps-test_history';
     const MAX_HISTORY = 20;
 
-    const area = document.getElementById('cpsArea') as HTMLElement;
-    const instructions = document.getElementById('cpsInstructions') as HTMLElement;
-    const activeDisplay = document.getElementById('cpsActiveDisplay') as HTMLElement;
-    const timerDisplay = document.getElementById('cpsTimer') as HTMLElement;
-    const clickCountDisplay = document.getElementById('cpsClickCount') as HTMLElement;
-    const scoreDisplay = document.getElementById('cpsScoreDisplay') as HTMLElement;
-    const scoreValue = document.getElementById('cpsScoreValue') as HTMLElement;
-    const ratingBadge = document.getElementById('cpsRating') as HTMLElement;
-    const statsEl = document.getElementById('cpsStats') as HTMLElement;
-    const controls = document.getElementById('cpsControls') as HTMLElement;
-    const tryAgainBtn = document.getElementById('cpsTryAgain') as HTMLButtonElement;
-    const historySection = document.getElementById('cpsHistory') as HTMLElement;
-    const historyList = document.getElementById('cpsHistoryList') as HTMLElement;
+    const area = document.getElementById('cpsArea');
+    const instructions = document.getElementById('cpsInstructions');
+    const activeDisplay = document.getElementById('cpsActiveDisplay');
+    const timerDisplay = document.getElementById('cpsTimer');
+    const clickCountDisplay = document.getElementById('cpsClickCount');
+    const scoreDisplay = document.getElementById('cpsScoreDisplay');
+    const scoreValue = document.getElementById('cpsScoreValue');
+    const ratingBadge = document.getElementById('cpsRating');
+    const statsEl = document.getElementById('cpsStats');
+    const controls = document.getElementById('cpsControls');
+    const tryAgainBtn = document.getElementById('cpsTryAgain');
+    const historySection = document.getElementById('cpsHistory');
+    const historyList = document.getElementById('cpsHistoryList');
     const durationBtns = document.querySelectorAll('.duration-btn') as NodeListOf<HTMLButtonElement>;
 
     // --- State ---
@@ -389,7 +389,7 @@ const structuredData = [
     });
 
     // --- Rating lookup ---
-    function getScoreRating(score: number): { label: string; color: string } {
+    function getScoreRating(score): { label; color } {
       for (const level of ratingScale) {
         if (score >= level.min) return level;
       }
@@ -397,7 +397,7 @@ const structuredData = [
     }
 
     // --- Ripple effect ---
-    function createRipple(x: number, y: number) {
+    function createRipple(x, y) {
       const ripple = document.createElement('div');
       ripple.className = 'click-ripple';
       ripple.style.left = x + 'px';
@@ -486,7 +486,7 @@ const structuredData = [
     }
 
     // --- Click handler on game area ---
-    function handleAreaClick(e: MouseEvent | TouchEvent) {
+    function handleAreaClick(e | TouchEvent) {
       if (state === 'finished') return;
 
       if (state === 'idle') {
@@ -501,7 +501,7 @@ const structuredData = [
 
       // Ripple at click position
       const rect = area.getBoundingClientRect();
-      let clientX: number, clientY: number;
+      let clientX, clientY;
       if ('touches' in e) {
         clientX = e.touches[0]?.clientX ?? e.changedTouches[0]?.clientX ?? 0;
         clientY = e.touches[0]?.clientY ?? e.changedTouches[0]?.clientY ?? 0;
@@ -547,11 +547,6 @@ const structuredData = [
     });
 
     // --- LocalStorage history ---
-    interface HistoryEntry {
-      score: number;
-      rating: string;
-      timestamp: number;
-    }
 
     function loadHistory(): HistoryEntry[] {
       try {
@@ -563,7 +558,7 @@ const structuredData = [
       }
     }
 
-    function saveAttempt(score: number, rating: string) {
+    function saveAttempt(score, rating) {
       const history = loadHistory();
       history.unshift({
         score: parseFloat(score.toFixed(1)),
@@ -602,7 +597,7 @@ const structuredData = [
       });
     }
 
-    function formatTimeAgo(timestamp: number): string {
+    function formatTimeAgo(timestamp) {
       const diff = Date.now() - timestamp;
       const seconds = Math.floor(diff / 1000);
       if (seconds < 60) return 'just now';

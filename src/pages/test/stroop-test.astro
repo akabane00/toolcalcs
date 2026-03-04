@@ -312,7 +312,7 @@ const structuredData = [
       { min: 0, max: Infinity, label: 'Slow', color: '#ef4444' },
     ];
 
-    function getLocalRating(score: number) {
+    function getLocalRating(score) {
       for (const level of RATING_SCALE) {
         if (score <= level.max) return { label: level.label, color: level.color };
       }
@@ -322,14 +322,14 @@ const structuredData = [
     const STORAGE_KEY = 'toolcalcs_stroop-test_history';
     const MAX_HISTORY = 20;
 
-    function loadHistory(): Array<{ score: number; date: string; rating: string }> {
+    function loadHistory() {
       try { const r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch {}
       return [];
     }
-    function saveHistory(h: Array<{ score: number; date: string; rating: string }>) {
+    function saveHistory(h) {
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch {}
     }
-    function addToHistory(score: number) {
+    function addToHistory(score) {
       const h = loadHistory();
       h.unshift({ score, date: new Date().toISOString(), rating: getLocalRating(score).label });
       saveHistory(h);
@@ -353,12 +353,12 @@ const structuredData = [
 
     let currentRound = 0;
     let correctCount = 0;
-    let responseTimes: number[] = [];
+    let responseTimes[] = [];
     let roundStartTime = 0;
     let currentInkColor = '';
     let canClick = false;
 
-    function showView(view: HTMLElement) {
+    function showView(view) {
       [instructionsView, playView, resultView].forEach(v => v.style.display = 'none');
       view.style.display = '';
     }
@@ -413,9 +413,9 @@ const structuredData = [
       canClick = true;
     }
 
-    function handleButtonClick(e: Event) {
+    function handleButtonClick(e) {
       if (!canClick) return;
-      const target = (e.target as HTMLElement).closest('.stroop-color-btn') as HTMLElement | null;
+      const target = (e.target).closest('.stroop-color-btn') | null;
       if (!target) return;
 
       canClick = false;
@@ -432,7 +432,7 @@ const structuredData = [
         target.classList.add('flash-wrong');
         // Highlight correct button
         stroopButtons.querySelectorAll('.stroop-color-btn').forEach(btn => {
-          if ((btn as HTMLElement).dataset.colorName === currentInkColor) {
+          if ((btn).dataset.colorName === currentInkColor) {
             btn.classList.add('flash-correct');
           }
         });
@@ -499,7 +499,7 @@ const structuredData = [
       }).join('');
     }
 
-    function formatDate(iso: string): string {
+    function formatDate(iso) {
       try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
       catch { return ''; }
     }
