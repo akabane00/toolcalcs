@@ -6,6 +6,24 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://toolcalcs.com',
   integrations: [sitemap({
+    filter(page) {
+      // Exclude noindexed programmatic routes from sitemap
+      const noindexRoutes = [
+        '/auto-loan/', '/born-in/', '/compound-interest/', '/cooking/',
+        '/days-ago/', '/days-from-now/', '/decimal-to-fraction/', '/factors-of/',
+        '/fraction/', '/grade/', '/math/', '/number-to-words/',
+        '/percent-off/', '/percentage/', '/roman-numerals/', '/salary/',
+        '/temperature/', '/time-convert/', '/times-tables/', '/tip/',
+        '/what-percent/'
+      ];
+      // Keep index pages (exact route match), exclude sub-pages
+      for (const route of noindexRoutes) {
+        if (page.includes(route) && page !== `https://toolcalcs.com${route}`) {
+          return false;
+        }
+      }
+      return true;
+    },
     serialize(item) {
       const url = item.url;
 
