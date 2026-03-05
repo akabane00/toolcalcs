@@ -1,0 +1,71 @@
+---
+import { getArticlesForCalculator } from '../data/blog-articles';
+
+interface Props {
+  calculatorSlug: string;
+}
+
+const { calculatorSlug } = Astro.props;
+const articles = getArticlesForCalculator(calculatorSlug);
+---
+
+{articles.length > 0 && (
+  <section class="related-articles">
+    <h3>Related Articles</h3>
+    <div class="related-articles-list">
+      {articles.map(article => (
+        <a href={`/blog/${article.slug}/`}>
+          <span class="ra-category">{article.category}</span>
+          <span class="ra-title">{article.title}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+)}
+
+<style>
+  .related-articles {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--color-border);
+  }
+  .related-articles h3 {
+    font-size: 1.05rem;
+    margin-bottom: 12px;
+    color: var(--color-text);
+  }
+  .related-articles-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 8px;
+  }
+  .related-articles-list a {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    color: var(--color-text);
+    background: var(--color-surface);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    text-decoration: none;
+  }
+  .related-articles-list a:hover {
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-sm);
+  }
+  .ra-category {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-primary);
+  }
+  .ra-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text);
+    line-height: 1.4;
+  }
+</style>

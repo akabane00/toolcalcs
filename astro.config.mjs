@@ -31,15 +31,17 @@ export default defineConfig({
       if (url === 'https://toolcalcs.com/' ||
           url.match(/toolcalcs\.com\/(financial|health|math|date-time|conversion|everyday|construction)-calculators\/$/) ||
           url.match(/toolcalcs\.com\/test\/$/) ||
-          url.match(/toolcalcs\.com\/tools\/$/)) {
+          url.match(/toolcalcs\.com\/tools\/$/) ||
+          url.match(/toolcalcs\.com\/blog\/$/)) {
         item.priority = 1.0;
         item.changefreq = 'weekly';
       }
-      // Medium-high: individual calculators, games, tools, worksheets
+      // Medium-high: individual calculators, games, tools, worksheets, blog articles
       else if (url.match(/toolcalcs\.com\/(financial|health|math|date-time|conversion|everyday|construction)-calculators\/[^/]+\/$/) ||
                url.match(/toolcalcs\.com\/test\/[^/]+\/$/) ||
                url.match(/toolcalcs\.com\/tools\/[^/]+\/$/) ||
-               url.match(/toolcalcs\.com\/worksheets\/[^/]+\/$/)) {
+               url.match(/toolcalcs\.com\/worksheets\/[^/]+\/$/) ||
+               url.match(/toolcalcs\.com\/blog\/[^/]+\/$/)) {
         item.priority = 0.8;
         item.changefreq = 'monthly';
       }
