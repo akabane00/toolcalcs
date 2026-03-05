@@ -110,6 +110,52 @@ export const blogArticles: BlogArticle[] = [
     category: 'Health',
     relatedCalculatorSlugs: ['calorie-calculator', 'tdee-calculator', 'macro-calculator', 'bmi-calculator'],
   },
+  // Sprint 2 articles
+  {
+    title: 'Understanding Your 401(k): Contributions, Match, and Growth',
+    slug: 'understanding-your-401k',
+    description: 'How 401(k) plans work, contribution limits, employer matching, investment growth projections, and common mistakes to avoid.',
+    datePublished: '2026-03-05',
+    dateModified: '2026-03-05',
+    category: 'Finance',
+    relatedCalculatorSlugs: ['401k-calculator', 'retirement-savings-calculator', 'compound-interest-calculator', 'fire-calculator'],
+  },
+  {
+    title: 'How to Calculate Square Footage for Any Room or Space',
+    slug: 'how-to-calculate-square-footage',
+    description: 'Step-by-step guide to measuring square footage for rooms, irregular shapes, flooring, and real estate with practical examples.',
+    datePublished: '2026-03-05',
+    dateModified: '2026-03-05',
+    category: 'Everyday',
+    relatedCalculatorSlugs: ['square-footage-calculator', 'area-calculator', 'flooring-calculator'],
+  },
+  {
+    title: 'Standard Deviation Explained: What It Is and When You Need It',
+    slug: 'standard-deviation-explained',
+    description: 'A plain-English guide to standard deviation with step-by-step calculations, the 68-95-99.7 rule, and real-world applications.',
+    datePublished: '2026-03-05',
+    dateModified: '2026-03-05',
+    category: 'Math',
+    relatedCalculatorSlugs: ['standard-deviation-calculator', 'probability-calculator', 'gpa-calculator'],
+  },
+  {
+    title: 'Do Solar Panels Really Save Money? A Full Cost Breakdown',
+    slug: 'how-solar-panels-save-money',
+    description: 'Complete cost analysis of residential solar panels: installation costs, tax credits, monthly savings, payback period, and 25-year projections.',
+    datePublished: '2026-03-05',
+    dateModified: '2026-03-05',
+    category: 'Construction',
+    relatedCalculatorSlugs: ['solar-panel-calculator', 'electricity-cost-calculator', 'roi-calculator'],
+  },
+  {
+    title: 'Sleep Cycles Explained: How to Wake Up Feeling Refreshed',
+    slug: 'sleep-cycles-explained',
+    description: 'Understand the four stages of sleep, why waking mid-cycle feels terrible, and how to time your bedtime for better mornings.',
+    datePublished: '2026-03-05',
+    dateModified: '2026-03-05',
+    category: 'Health',
+    relatedCalculatorSlugs: ['sleep-calculator', 'age-calculator'],
+  },
 ];
 
 export function getArticlesForCalculator(calculatorSlug: string): BlogArticle[] {
