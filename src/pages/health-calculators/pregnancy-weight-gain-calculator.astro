@@ -1,0 +1,397 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Health Calculators",
+        "item": "https://toolcalcs.com/health-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Pregnancy Weight Gain Calculator"
+      }
+    ]
+  },
+  {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'How much weight should I gain during pregnancy?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'The recommended weight gain during pregnancy depends on your pre-pregnancy BMI. According to the Institute of Medicine (IOM) 2009 guidelines, underweight women (BMI below 18.5) should gain 28-40 pounds, normal weight women (BMI 18.5-24.9) should gain 25-35 pounds, overweight women (BMI 25-29.9) should gain 15-25 pounds, and obese women (BMI 30 or above) should gain 11-20 pounds. For twin pregnancies, the recommended ranges are higher.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How much weight should I gain per week during pregnancy?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'During the first trimester, most women gain only 1 to 4.4 pounds total regardless of pre-pregnancy BMI. In the second and third trimesters, the rate of gain depends on BMI category: underweight women should gain about 1 to 1.3 pounds per week, normal weight women about 0.8 to 1 pound per week, overweight women about 0.5 to 0.7 pounds per week, and obese women about 0.4 to 0.6 pounds per week.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Is it dangerous to gain too much or too little weight during pregnancy?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes, both excessive and insufficient weight gain carry risks. Gaining too much weight increases the risk of gestational diabetes, preeclampsia, cesarean delivery, and postpartum weight retention. It can also lead to macrosomia, where the baby is born larger than average. Gaining too little weight raises the risk of preterm birth and having a baby with low birth weight, which can lead to developmental challenges. Always discuss your weight gain with your healthcare provider.',
+      },
+    },
+  ],
+},
+];
+---
+
+<BaseLayout
+  title="Pregnancy Weight Gain Calculator - Track Healthy Weight Gain | ToolCalcs"
+  description="Free pregnancy weight gain calculator. Enter your pre-pregnancy weight, height, and current week to see recommended weight gain based on IOM guidelines."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/health-calculators/">Health Calculators</a> &rsaquo;
+    <span>Pregnancy Weight Gain Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Pregnancy Weight Gain Calculator</h1>
+  <p class="page-desc">Estimate your recommended pregnancy weight gain based on the Institute of Medicine (IOM) 2009 guidelines. Enter your pre-pregnancy weight, height, and current week of pregnancy to see personalized recommendations.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-row">
+        <div class="input-group">
+          <label for="preWeight">Pre-pregnancy Weight (lbs)</label>
+          <input type="number" id="preWeight" value="150" min="70" max="400" step="1" />
+        </div>
+        <div class="input-group">
+          <label for="heightFeet">Height (feet)</label>
+          <input type="number" id="heightFeet" value="5" min="3" max="7" step="1" />
+        </div>
+        <div class="input-group">
+          <label for="heightInches">Height (inches)</label>
+          <input type="number" id="heightInches" value="5" min="0" max="11" step="1" />
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label for="currentWeek">Current Week of Pregnancy</label>
+          <input type="number" id="currentWeek" value="20" min="1" max="42" step="1" />
+        </div>
+        <div class="input-group">
+          <label for="numBabies">Number of Babies</label>
+          <select id="numBabies">
+            <option value="single" selected>Single</option>
+            <option value="twins">Twins</option>
+          </select>
+        </div>
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-primary">
+        <span class="result-primary-label">Recommended Total Weight Gain</span>
+        <span class="result-primary-value" id="totalGainRange">--</span>
+      </div>
+
+      <div class="result-cards">
+        <div class="result-card">
+          <span class="result-label">Pre-pregnancy BMI</span>
+          <span class="result-value" id="bmiValue">--</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">BMI Category</span>
+          <span class="result-value" id="bmiCategory">--</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Recommended Gain So Far</span>
+          <span class="result-value" id="gainSoFar">--</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Current Week</span>
+          <span class="result-value" id="weekDisplay">--</span>
+          <span class="result-detail" id="weekRate"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>IOM Weight Gain Guidelines</h2>
+    <p>The Institute of Medicine (now the National Academy of Medicine) published comprehensive pregnancy weight gain guidelines in 2009 that remain the clinical standard used by obstetricians and midwives worldwide. These evidence-based recommendations are tailored to a woman's pre-pregnancy Body Mass Index and account for the physiological demands of pregnancy, the needs of the developing fetus, and the long-term health of both mother and child. The guidelines replaced earlier recommendations that offered a single range for all women, recognizing that optimal weight gain varies significantly based on starting weight.</p>
+    <p>The IOM guidelines were developed after reviewing hundreds of studies on pregnancy outcomes, maternal health, and neonatal well-being. The committee examined how weight gain patterns affect the risk of preterm birth, cesarean delivery, gestational diabetes, preeclampsia, postpartum weight retention, and childhood obesity. The resulting recommendations balance the needs of the baby for adequate nutrition and growth against the risks to the mother of excessive weight gain.</p>
+    <table class="info-table">
+      <thead>
+        <tr><th>Pre-pregnancy BMI</th><th>BMI Category</th><th>Singleton (lbs)</th><th>Twins (lbs)</th><th>2nd/3rd Trimester Rate (lbs/week)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Below 18.5</td><td>Underweight</td><td>28 - 40</td><td>50 - 62</td><td>1.0 - 1.3</td></tr>
+        <tr><td>18.5 - 24.9</td><td>Normal weight</td><td>25 - 35</td><td>37 - 54</td><td>0.8 - 1.0</td></tr>
+        <tr><td>25.0 - 29.9</td><td>Overweight</td><td>15 - 25</td><td>31 - 50</td><td>0.5 - 0.7</td></tr>
+        <tr><td>30.0 or above</td><td>Obese</td><td>11 - 20</td><td>25 - 42</td><td>0.4 - 0.6</td></tr>
+      </tbody>
+    </table>
+    <p>These ranges represent the total weight gain from the start of pregnancy through delivery. The first trimester typically accounts for only a small fraction of total gain, with the majority of weight accumulating during the second and third trimesters when the fetus grows most rapidly. Individual variation is normal, and your healthcare provider may adjust these targets based on your unique medical history, nutritional status, and pregnancy progression. Women carrying twins or higher-order multiples have higher recommended ranges because of the additional demands of supporting multiple fetuses, placentas, and increased blood volume.</p>
+
+    <h2>Why Pregnancy Weight Gain Matters</h2>
+    <p>Weight gain during pregnancy is not simply about the mother adding body fat. The total weight gained includes the baby, placenta, amniotic fluid, increased blood volume, uterine growth, breast tissue enlargement, and additional fluid and fat stores that support lactation after delivery. Understanding where the weight goes helps expectant mothers appreciate why adequate gain is essential for a healthy pregnancy.</p>
+    <p>A typical breakdown of pregnancy weight gain at term for a woman who gains 30 pounds includes approximately 7.5 pounds for the baby, 1.5 pounds for the placenta, 2 pounds for amniotic fluid, 4 pounds of increased blood volume, 2 pounds of uterine growth, 2 pounds of breast tissue, 4 pounds of additional body fluid, and 7 pounds of maternal fat and nutrient stores. These reserves provide energy for labor, delivery, and breastfeeding.</p>
+    <p><strong>Too little weight gain</strong> is associated with an increased risk of preterm birth, low birth weight, and developmental challenges for the newborn. Babies born too small may face difficulties with temperature regulation, feeding, and immune function. They may also be at higher risk for chronic health conditions later in life, including cardiovascular disease and type 2 diabetes, a concept known as the developmental origins of health and disease hypothesis.</p>
+    <p><strong>Too much weight gain</strong> raises the risk of gestational diabetes, preeclampsia, cesarean delivery, birth injuries, and macrosomia (a birth weight over 8 pounds 13 ounces). Excessive gain also makes it harder for the mother to return to her pre-pregnancy weight after delivery and is associated with long-term weight retention and increased obesity risk. Studies have shown that women who gain more than the recommended amount during pregnancy retain an average of 10 to 15 extra pounds one year after delivery compared to women who gain within guidelines.</p>
+    <p>Appropriate weight gain supports optimal fetal brain development, organ maturation, and bone mineralization. The fetus depends entirely on the mother for all nutrients, and maternal weight gain patterns serve as a proxy for the nutritional environment the baby experiences during this critical period of growth.</p>
+
+    <h2>Weight Gain by Trimester</h2>
+    <p>Pregnancy weight gain does not follow a linear pattern. The rate and distribution of weight gain change substantially across the three trimesters, reflecting the evolving needs of the developing baby and the physiological adaptations of the mother's body.</p>
+
+    <h3>First Trimester (Weeks 1-13)</h3>
+    <p>During the first trimester, most women gain only 1 to 4.4 pounds total, regardless of their pre-pregnancy BMI category. This relatively small amount of gain is normal because the embryo and placenta are still very small during this period. The embryo weighs only about one ounce by the end of the first trimester, so most early weight gain comes from increased blood volume, uterine growth, and breast tissue changes.</p>
+    <p>Some women actually lose weight during the first trimester due to morning sickness, food aversions, and nausea. Mild weight loss in the first trimester is generally not a cause for concern as long as it resolves and adequate nutrition is maintained. However, severe weight loss due to hyperemesis gravidarum, a condition involving persistent vomiting, requires medical attention and may necessitate intravenous hydration and nutritional support.</p>
+    <p>The first trimester is a critical time for fetal organ development, making the quality of nutrition more important than the quantity. Adequate folic acid, iron, and other micronutrients are essential during this period even though caloric needs increase by only about 100 calories per day compared to pre-pregnancy levels.</p>
+
+    <h3>Second Trimester (Weeks 14-27)</h3>
+    <p>The second trimester is when weight gain typically accelerates to a steady weekly rate. This is the period of rapid fetal growth, and the baby's weight increases from about one ounce to approximately two pounds. The placenta matures, amniotic fluid volume increases, and the mother's blood volume expands by up to 50 percent to meet the demands of the growing pregnancy.</p>
+    <p>Most women find that their appetite returns or increases during the second trimester as morning sickness subsides. Caloric needs increase by approximately 340 extra calories per day above pre-pregnancy levels. The steady weekly weight gain during this period is a reassuring sign that the pregnancy is progressing well and the baby is receiving adequate nutrition.</p>
+
+    <h3>Third Trimester (Weeks 28-40)</h3>
+    <p>The third trimester is the final stretch, and weight gain continues at a similar or slightly slower weekly rate compared to the second trimester. The baby gains the majority of its birth weight during this period, approximately five to six pounds. The fetus develops its fat layer, which is essential for temperature regulation after birth, and the lungs and brain undergo final maturation.</p>
+    <p>Caloric needs peak at about 450 extra calories per day above pre-pregnancy levels. Some women experience a slight plateau or decrease in weight gain during the final two to three weeks before delivery as the body prepares for labor. This is normal and not a cause for concern. However, sudden weight gain of more than two pounds per week, especially when accompanied by swelling, headaches, or vision changes, could be a sign of preeclampsia and warrants immediate medical evaluation.</p>
+
+    <h2>Healthy Weight Gain Tips</h2>
+    <p>Achieving the recommended weight gain during pregnancy requires attention to nutrition quality, portion sizes, and overall lifestyle habits. The goal is not to eat for two in terms of quantity but rather to ensure that every calorie counts toward nourishing both mother and baby.</p>
+    <ul>
+      <li><strong>Focus on nutrient-dense foods:</strong> Prioritize whole grains, lean proteins, fruits, vegetables, dairy, and healthy fats. These foods provide the vitamins, minerals, and macronutrients needed for fetal development without excessive empty calories. Include iron-rich foods like lean red meat, spinach, and fortified cereals, as well as calcium-rich foods like yogurt, cheese, and leafy greens.</li>
+      <li><strong>Eat regular, balanced meals:</strong> Rather than skipping meals and then overeating, aim for three moderate meals and two to three healthy snacks throughout the day. This approach helps maintain stable blood sugar levels, reduces nausea, and provides a consistent supply of nutrients to the developing baby.</li>
+      <li><strong>Stay hydrated:</strong> Drink eight to twelve cups of water daily. Adequate hydration supports increased blood volume, amniotic fluid production, and nutrient transport. Water also helps prevent constipation, a common pregnancy complaint. Use our <a href="/health-calculators/water-intake-calculator/">water intake calculator</a> to estimate your daily hydration needs.</li>
+      <li><strong>Limit empty calories:</strong> Reduce consumption of sugary drinks, candy, chips, and highly processed foods. These items contribute calories without meaningful nutritional value and can lead to excessive weight gain. Replace soda with sparkling water and fruit, and choose whole grain snacks over refined alternatives.</li>
+      <li><strong>Exercise regularly:</strong> The American College of Obstetricians and Gynecologists recommends at least 150 minutes of moderate-intensity aerobic activity per week during pregnancy. Walking, swimming, prenatal yoga, and stationary cycling are excellent options that help manage weight gain, reduce stress, improve sleep, and prepare the body for labor. Use our <a href="/health-calculators/calorie-calculator/">calorie calculator</a> to understand your baseline energy needs.</li>
+      <li><strong>Monitor your gain pattern:</strong> Weigh yourself at the same time each week using the same scale and track the trend over time. Single-day fluctuations are normal due to fluid retention, meals, and bowel movements. Focus on the overall trajectory rather than daily numbers. This calculator can help you assess whether your gain is on track at any point during pregnancy.</li>
+      <li><strong>Manage cravings mindfully:</strong> Pregnancy cravings are common and can be satisfied in moderation. If you crave ice cream, try a small serving of frozen yogurt or a fruit smoothie. If you crave salty foods, choose air-popped popcorn or nuts instead of chips. Completely restricting cravings can lead to binge eating, so moderation is the best approach.</li>
+      <li><strong>Take prenatal vitamins:</strong> A prenatal vitamin ensures you receive adequate folic acid (at least 600 micrograms during pregnancy), iron (27 milligrams daily), calcium (1,000 milligrams daily), and vitamin D (600 IU daily). These supplements complement a healthy diet but do not replace the need for nutritious food.</li>
+    </ul>
+    <p>If you are underweight and struggling to gain enough weight, consider adding healthy calorie-dense foods like avocados, nuts, nut butters, olive oil, and smoothies to your diet. If you are overweight or obese, work with your healthcare provider or a registered dietitian to create a plan that supports the baby's growth while managing your overall gain. Restrictive dieting during pregnancy is never recommended, even for women with obesity, as it can deprive the baby of essential nutrients.</p>
+
+    <h2>When to Talk to Your Doctor</h2>
+    <p>While some variation from the recommended weight gain ranges is normal, certain patterns warrant a conversation with your healthcare provider. Being proactive about discussing weight concerns can help prevent complications and ensure the best possible outcome for both mother and baby.</p>
+    <ul>
+      <li><strong>Gaining significantly more than recommended:</strong> If you are consistently gaining more than the upper end of your recommended range, your provider may screen for gestational diabetes, evaluate your diet, and discuss strategies to moderate gain. Excessive weight gain in the second trimester particularly warrants early screening.</li>
+      <li><strong>Gaining significantly less than recommended:</strong> If you are not gaining enough weight, especially in the second and third trimesters, your provider may order additional ultrasounds to monitor fetal growth, assess your nutritional intake, and check for conditions that could affect absorption like hyperemesis gravidarum or thyroid disorders.</li>
+      <li><strong>Sudden rapid weight gain:</strong> Gaining more than two pounds in a single week, especially after week 20, can be a sign of preeclampsia, particularly if accompanied by swelling in the face and hands, persistent headaches, upper abdominal pain, or vision changes. This requires immediate medical evaluation.</li>
+      <li><strong>Weight loss after the first trimester:</strong> While first-trimester weight loss due to nausea is common, unexplained weight loss in the second or third trimester is unusual and should be evaluated by your healthcare provider to rule out underlying health issues.</li>
+      <li><strong>History of eating disorders:</strong> Women with a history of anorexia, bulimia, or other eating disorders may have complex relationships with weight gain during pregnancy. Working with a healthcare team that includes a mental health professional and a nutritionist can provide the specialized support needed to navigate this challenge safely.</li>
+    </ul>
+    <p>Remember that the numbers on the scale are only one metric of pregnancy health. Your provider monitors many other indicators including blood pressure, blood sugar, baby's heart rate, fundal height, and fetal movement patterns. If you are eating well, staying active, and attending regular prenatal visits, you are taking excellent care of yourself and your baby. Use our <a href="/health-calculators/pregnancy-due-date-calculator/">pregnancy due date calculator</a> to track your pregnancy timeline alongside your weight gain goals.</p>
+    <p>For women planning a pregnancy, knowing your <a href="/health-calculators/bmi-calculator/">pre-pregnancy BMI</a> before conception allows you to set realistic weight gain expectations from the start. An <a href="/health-calculators/ovulation-calculator/">ovulation calculator</a> can also help with conception planning so that you can optimize your health before pregnancy begins.</p>
+
+    <h2>Frequently Asked Questions</h2>
+<div class="faq-list">
+  <details class="faq-item">
+    <summary>How much weight should I gain during pregnancy?</summary>
+    <p>The recommended weight gain depends on your pre-pregnancy Body Mass Index. According to the IOM 2009 guidelines, underweight women (BMI below 18.5) should gain 28 to 40 pounds, normal weight women (BMI 18.5-24.9) should gain 25 to 35 pounds, overweight women (BMI 25-29.9) should gain 15 to 25 pounds, and obese women (BMI 30 or above) should gain 11 to 20 pounds. For twin pregnancies, the recommended ranges are higher: 50-62 pounds for underweight women, 37-54 pounds for normal weight, 31-50 pounds for overweight, and 25-42 pounds for obese women. These ranges represent total gain from the start of pregnancy through delivery and are designed to optimize outcomes for both mother and baby.</p>
+  </details>
+  <details class="faq-item">
+    <summary>How much weight should I gain per week during pregnancy?</summary>
+    <p>Weight gain rate varies by trimester and BMI category. During the first trimester (weeks 1-13), most women gain only 1 to 4.4 pounds total regardless of their pre-pregnancy weight. The significant weekly gain begins in the second trimester. Underweight women should gain about 1 to 1.3 pounds per week, normal weight women about 0.8 to 1 pound per week, overweight women about 0.5 to 0.7 pounds per week, and obese women about 0.4 to 0.6 pounds per week. These rates continue through the third trimester. Keep in mind that weekly fluctuations are normal, and the overall trend matters more than any single week's measurement.</p>
+  </details>
+  <details class="faq-item">
+    <summary>Is it dangerous to gain too much or too little weight during pregnancy?</summary>
+    <p>Both excessive and insufficient weight gain during pregnancy carry health risks. Gaining too much weight increases the risk of gestational diabetes, preeclampsia, cesarean delivery, macrosomia (a large baby), birth injuries, and long-term postpartum weight retention. Gaining too little weight raises the risk of preterm birth, low birth weight, and developmental challenges for the newborn. Low birth weight babies may have difficulty with temperature regulation, feeding, and immune function. The IOM guidelines are designed to minimize both sets of risks. If you are consistently above or below the recommended range, discuss it with your healthcare provider so adjustments can be made to your nutrition and activity plan.</p>
+  </details>
+  <details class="faq-item">
+    <summary>Where does pregnancy weight gain go?</summary>
+    <p>Pregnancy weight gain is distributed among many components beyond just the baby. For a typical 30-pound total gain, roughly 7.5 pounds is the baby, 1.5 pounds is the placenta, 2 pounds is amniotic fluid, 4 pounds is increased blood volume, 2 pounds is uterine enlargement, 2 pounds is breast tissue growth, 4 pounds is additional body fluid, and 7 pounds is maternal fat and energy stores that support breastfeeding after delivery. This breakdown illustrates why pregnancy weight gain is a physiological necessity rather than excess body fat.</p>
+  </details>
+  <details class="faq-item">
+    <summary>Should I diet to lose weight during pregnancy?</summary>
+    <p>No, restrictive dieting during pregnancy is not recommended, even for women who are overweight or obese. The growing baby depends entirely on the mother for nutrition, and calorie restriction can deprive the fetus of essential nutrients needed for brain development, organ maturation, and growth. Instead of dieting, focus on eating nutrient-dense foods, limiting empty calories from sugary drinks and processed snacks, and maintaining regular physical activity as approved by your healthcare provider. Even women with a high pre-pregnancy BMI should gain some weight during pregnancy within the recommended IOM ranges for their BMI category.</p>
+  </details>
+</div>
+<h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/health-calculators/pregnancy-due-date-calculator/">Pregnancy Due Date Calculator</a> - Estimate your baby's due date and track pregnancy milestones.</li>
+      <li><a href="/health-calculators/bmi-calculator/">BMI Calculator</a> - Calculate your Body Mass Index to understand your weight category.</li>
+      <li><a href="/health-calculators/calorie-calculator/">Calorie Calculator</a> - Determine your daily calorie needs for your activity level.</li>
+      <li><a href="/health-calculators/ovulation-calculator/">Ovulation Calculator</a> - Predict your fertile window and ovulation date.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+  <RelatedArticles calculatorSlug="pregnancy-weight-gain-calculator" />
+  <RelatedCalculators currentSlug="pregnancy-weight-gain-calculator" />
+</BaseLayout>
+
+<style>
+  .input-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .result-primary {
+    text-align: center;
+    margin-bottom: 24px;
+    padding: 20px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+  }
+  .result-primary-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    margin-bottom: 6px;
+  }
+  .result-primary-value {
+    display: block;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--color-primary);
+  }
+  .result-value { display: block; font-size: 1.5rem; font-weight: 800; }
+  .result-detail { display: block; font-size: 0.8rem; color: var(--color-text-muted); margin-top: 2px; }
+
+  @media (max-width: 640px) {
+    .input-row { flex-direction: column; }
+    .result-cards { grid-template-columns: 1fr 1fr; }
+    .result-primary-value { font-size: 1.5rem; }
+  }
+  .last-updated { font-size: 0.75rem; color: var(--color-text-muted); margin: 4px 0 0; }
+</style>
+
+<script>
+  // IOM 2009 Guidelines data
+  const guidelines: Record<string, { single: [number, number]; twins: [number, number]; rateLow: number; rateHigh: number }> = {
+    underweight: { single: [28, 40], twins: [50, 62], rateLow: 1.0, rateHigh: 1.3 },
+    normal:      { single: [25, 35], twins: [37, 54], rateLow: 0.8, rateHigh: 1.0 },
+    overweight:  { single: [15, 25], twins: [31, 50], rateLow: 0.5, rateHigh: 0.7 },
+    obese:       { single: [11, 20], twins: [25, 42], rateLow: 0.4, rateHigh: 0.6 },
+  };
+
+  // First trimester gain (weeks 1-13): 1 to 4.4 lbs total regardless of category
+  const firstTrimesterGainLow = 1.0;
+  const firstTrimesterGainHigh = 4.4;
+  const firstTrimesterEnd = 13;
+
+  function getBmiCategory(bmi: number): string {
+    if (bmi < 18.5) return 'underweight';
+    if (bmi < 25) return 'normal';
+    if (bmi < 30) return 'overweight';
+    return 'obese';
+  }
+
+  function getCategoryLabel(cat: string): string {
+    const labels: Record<string, string> = {
+      underweight: 'Underweight',
+      normal: 'Normal',
+      overweight: 'Overweight',
+      obese: 'Obese',
+    };
+    return labels[cat] || cat;
+  }
+
+  function calculateExpectedGain(week: number, cat: string, isTwins: boolean): [number, number] {
+    const guide = guidelines[cat];
+    if (!guide) return [0, 0];
+
+    if (week <= 0) return [0, 0];
+
+    // First trimester: linear ramp to 1-4.4 lbs by week 13
+    if (week <= firstTrimesterEnd) {
+      const fraction = week / firstTrimesterEnd;
+      return [
+        Math.round(firstTrimesterGainLow * fraction * 10) / 10,
+        Math.round(firstTrimesterGainHigh * fraction * 10) / 10,
+      ];
+    }
+
+    // Second and third trimesters: first trimester gain + weekly rate for remaining weeks
+    const weeksAfterFirst = week - firstTrimesterEnd;
+    const totalRange = isTwins ? guide.twins : guide.single;
+
+    // Calculate based on weekly rate from the IOM
+    const lowGain = firstTrimesterGainLow + guide.rateLow * weeksAfterFirst;
+    const highGain = firstTrimesterGainHigh + guide.rateHigh * weeksAfterFirst;
+
+    // Clamp to total recommended range
+    return [
+      Math.round(Math.min(lowGain, totalRange[1]) * 10) / 10,
+      Math.round(Math.min(highGain, totalRange[1]) * 10) / 10,
+    ];
+  }
+
+  function calculate() {
+    const weightLbs = parseFloat((document.getElementById('preWeight') as HTMLInputElement).value) || 0;
+    const feet = parseFloat((document.getElementById('heightFeet') as HTMLInputElement).value) || 0;
+    const inches = parseFloat((document.getElementById('heightInches') as HTMLInputElement).value) || 0;
+    const week = parseInt((document.getElementById('currentWeek') as HTMLInputElement).value) || 0;
+    const numBabies = (document.getElementById('numBabies') as HTMLSelectElement).value;
+
+    const totalInches = feet * 12 + inches;
+    if (totalInches === 0 || weightLbs === 0 || week < 1 || week > 42) return;
+
+    // Calculate BMI
+    const bmi = (703 * weightLbs) / (totalInches * totalInches);
+    const bmiCategory = getBmiCategory(bmi);
+    const guide = guidelines[bmiCategory];
+    const isTwins = numBabies === 'twins';
+
+    // Total recommended range
+    const totalRange = isTwins ? guide.twins : guide.single;
+
+    // Expected gain at current week
+    const [gainLow, gainHigh] = calculateExpectedGain(week, bmiCategory, isTwins);
+
+    // Weekly rate text
+    let rateText = '';
+    if (week <= firstTrimesterEnd) {
+      rateText = '1st trimester: 1 - 4.4 lbs total';
+    } else {
+      rateText = guide.rateLow + ' - ' + guide.rateHigh + ' lbs/week';
+    }
+
+    // Update DOM
+    document.getElementById('totalGainRange')!.textContent = totalRange[0] + ' - ' + totalRange[1] + ' lbs';
+    document.getElementById('bmiValue')!.textContent = bmi.toFixed(1);
+    document.getElementById('bmiCategory')!.textContent = getCategoryLabel(bmiCategory);
+    document.getElementById('gainSoFar')!.textContent = gainLow + ' - ' + gainHigh + ' lbs';
+    document.getElementById('weekDisplay')!.textContent = 'Week ' + week;
+    document.getElementById('weekRate')!.textContent = rateText;
+  }
+
+  // Event listeners
+  document.getElementById('calculateBtn')?.addEventListener('click', calculate);
+
+  // Auto-recalculate on input change
+  ['preWeight', 'heightFeet', 'heightInches', 'currentWeek', 'numBabies'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('input', calculate);
+      el.addEventListener('change', calculate);
+    }
+  });
+
+  // Calculate on load with defaults
+  calculate();
+</script>

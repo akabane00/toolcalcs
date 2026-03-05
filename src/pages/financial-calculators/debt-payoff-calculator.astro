@@ -1,0 +1,504 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Financial Calculators",
+        "item": "https://toolcalcs.com/financial-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Debt Payoff Calculator"
+      }
+    ]
+  },
+  {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'What is the difference between the debt snowball and debt avalanche methods?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'The debt snowball method prioritizes paying off debts from smallest balance to largest, regardless of interest rate, giving you quick psychological wins. The debt avalanche method prioritizes debts from highest interest rate to lowest, which saves the most money on interest over time. Both methods require making minimum payments on all debts while directing extra funds toward the priority debt. The avalanche method is mathematically optimal, while the snowball method is often preferred for its motivational benefits.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How much money can I save using the avalanche method instead of the snowball method?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'The savings depend on the difference in interest rates across your debts and your total balances. In many cases, the avalanche method saves hundreds to thousands of dollars in interest compared to the snowball method. For example, if you have high-interest credit card debt alongside low-interest student loans, the avalanche method targets the expensive credit card first, preventing costly interest from compounding. Use the calculator above to compare both methods with your specific debts.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How does the debt snowball or avalanche method work with extra payments?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Both methods work by making minimum payments on all debts and directing any extra money toward one priority debt. With the snowball method, the extra goes to the smallest balance. With the avalanche method, the extra goes to the highest interest rate debt. Once the priority debt is paid off, its entire payment amount (minimum plus extra) rolls into the next priority debt. This rollover effect creates a growing payment that accelerates payoff as each debt is eliminated.',
+      },
+    },
+  ],
+},
+];
+---
+
+<BaseLayout
+  title="Debt Payoff Calculator - Snowball vs Avalanche Comparison"
+  description="Free debt payoff calculator. Compare snowball and avalanche methods to find the fastest, cheapest way to pay off multiple debts. See total interest, payoff time, and savings."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/financial-calculators/">Financial Calculators</a> &rsaquo;
+    <span>Debt Payoff Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Debt Payoff Calculator</h1>
+  <p class="page-desc">Compare the debt snowball and debt avalanche methods side by side. Add your debts below to see which payoff strategy saves you the most money and gets you debt-free fastest.</p>
+
+  <div class="calculator-box">
+    <div class="debt-list-section">
+      <h3 class="section-label">Your Debts</h3>
+      <div id="debtList"></div>
+      <button class="calc-btn add-debt-btn" id="addDebtBtn" type="button">+ Add Debt</button>
+    </div>
+
+    <div class="extra-payment-section">
+      <div class="input-group">
+        <label for="extraPayment">Extra Monthly Payment ($)</label>
+        <input type="number" id="extraPayment" value="200" min="0" step="25" />
+      </div>
+      <button class="calc-btn" id="calculateBtn" type="button">Compare Methods</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <h3 class="scenario-heading">Avalanche Method (Highest APR First)</h3>
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Months to Debt-Free</span>
+          <span class="result-value" id="avalancheMonths">0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Interest Paid</span>
+          <span class="result-value" id="avalancheInterest">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Amount Paid</span>
+          <span class="result-value" id="avalancheTotal">$0</span>
+        </div>
+      </div>
+
+      <h3 class="scenario-heading">Snowball Method (Smallest Balance First)</h3>
+      <div class="result-cards">
+        <div class="result-card">
+          <span class="result-label">Months to Debt-Free</span>
+          <span class="result-value" id="snowballMonths">0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Interest Paid</span>
+          <span class="result-value" id="snowballInterest">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Amount Paid</span>
+          <span class="result-value" id="snowballTotal">$0</span>
+        </div>
+      </div>
+
+      <h3 class="scenario-heading">Avalanche Savings Over Snowball</h3>
+      <div class="result-cards">
+        <div class="result-card success">
+          <span class="result-label">Interest Saved</span>
+          <span class="result-value" id="interestSaved">$0</span>
+        </div>
+        <div class="result-card success">
+          <span class="result-label">Time Saved</span>
+          <span class="result-value" id="timeSaved">0 months</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>How the Snowball and Avalanche Methods Work</h2>
+    <p>When you are juggling multiple debts, choosing the right repayment strategy can mean the difference between paying thousands of extra dollars in interest or becoming debt-free years sooner. The two most widely recommended approaches are the debt snowball method and the debt avalanche method. Both use the same fundamental mechanic of focusing extra payments on one priority debt while making minimum payments on all others, but they differ in how they choose which debt gets the focus.</p>
+    <p><strong>The Debt Avalanche Method</strong> ranks your debts from the highest interest rate to the lowest. You make minimum payments on every debt, then direct all available extra money toward the debt with the highest APR. Once that debt is fully paid off, the entire amount you were paying on it, both the minimum payment and the extra, rolls down to the debt with the next highest interest rate. This creates an ever-growing payment that accelerates as each debt is eliminated. Because you are eliminating the most expensive debt first, the avalanche method minimizes the total interest you pay across all your debts, making it the mathematically optimal strategy.</p>
+    <p><strong>The Debt Snowball Method</strong>, popularized by financial educator Dave Ramsey, ranks your debts from the smallest balance to the largest, regardless of interest rate. You make minimum payments on everything, then throw all extra money at the smallest balance. That small debt gets wiped out quickly, giving you a psychological win and freeing up its minimum payment to roll into the next smallest debt. The snowball grows larger with each debt you eliminate. While you may pay slightly more in total interest compared to the avalanche method, the quick early wins keep many people motivated to stick with the plan, which is often more important than mathematical optimization.</p>
+    <p>Consider a real-world example: suppose you have a credit card with a $5,000 balance at 22.99% APR, a car loan with a $15,000 balance at 6.5% APR, and a student loan with a $25,000 balance at 5.5% APR, with $200 in extra monthly funds. The avalanche method targets the credit card first because 22.99% is the highest rate. The snowball method also targets the credit card first because $5,000 is the smallest balance. In this scenario, both methods agree on the first target, but they would diverge if the balances and rates were ordered differently, for instance, if a low-rate debt had the smallest balance.</p>
+
+    <h2>How This Calculator Works</h2>
+    <p>This debt payoff calculator simulates both the snowball and avalanche methods month by month to give you an accurate comparison. Here is what happens behind the scenes when you click Compare Methods.</p>
+    <p>First, the calculator takes your list of debts with their names, balances, APRs, and minimum payments. It then creates two separate copies of this list: one sorted by balance (smallest first) for the snowball method and one sorted by APR (highest first) for the avalanche method. For each method, it runs a monthly simulation where the minimum payment is applied to every debt, interest accrues on each remaining balance, and the extra monthly payment is directed entirely to the priority debt at the top of the sorted list.</p>
+    <p>When the priority debt reaches a zero balance, its minimum payment and any leftover extra payment are added to the extra pool and redirected to the next debt in the list. This rollover effect is what gives both methods their power: the payment directed at the focus debt grows larger each time a debt is eliminated. The simulation continues month by month until all debts reach zero, tracking the total interest paid and the number of months required.</p>
+    <p>The calculator then displays both results side by side, along with the difference in interest paid and months required. This allows you to make an informed decision based on real numbers rather than guesswork. You can adjust the extra monthly payment amount to see how increasing or decreasing your extra contribution affects both methods. Even an additional $50 per month can shave months off your payoff timeline and save hundreds in interest.</p>
+    <p>Keep in mind that this calculator uses the monthly periodic rate (APR divided by 12) to compute interest. Most credit cards use daily compounding, which produces slightly higher actual interest charges, but the monthly approximation is close enough for planning purposes and is the standard approach used by financial planning tools.</p>
+
+    <h2>Which Method Is Right for You?</h2>
+    <p>Choosing between the snowball and avalanche methods is not purely a mathematical decision. It is also a behavioral one. The best debt payoff strategy is the one you will actually follow through with, month after month, until every balance hits zero. Here are the key considerations for each approach.</p>
+    <p><strong>Choose the Avalanche Method if</strong> you are motivated by saving money and you can stay disciplined even when progress feels slow. If your highest-rate debt also happens to have a large balance, it may take many months before you see that first debt disappear. You need the patience to trust the math and keep going. The avalanche method is ideal for analytical thinkers who are motivated by efficiency and who can find satisfaction in watching total interest paid remain lower than it would under the alternative approach.</p>
+    <p><strong>Choose the Snowball Method if</strong> you need early momentum to stay motivated. If you have been struggling with debt for a long time and feel overwhelmed, the quick win of eliminating a small debt in just a few months can be transformative. That sense of progress, going from five debts to four, and then to three, provides a powerful emotional boost that keeps you committed to the plan. Research published in the Harvard Business Review found that people who focused on small wins were more likely to persist with debt repayment than those who focused on interest optimization.</p>
+    <p>In many real-world scenarios, the difference between the two methods is relatively small, perhaps a few hundred dollars in interest and a month or two in timeline. When the gap is narrow, the behavioral advantage of the snowball method may outweigh the mathematical advantage of the avalanche method. However, when there is a large spread between your highest and lowest interest rates, the avalanche method can save significantly more money, sometimes thousands of dollars. Use the calculator above with your actual debts to see exactly how the two methods compare for your specific situation.</p>
+
+    <h2>Tips to Accelerate Debt Payoff</h2>
+    <p>Regardless of which method you choose, the following strategies can help you eliminate debt faster and save even more on interest.</p>
+    <ul>
+      <li><strong>Increase your extra payment.</strong> Even an additional $50 per month beyond your current extra payment can meaningfully reduce your payoff timeline. Run the calculator with different extra payment amounts to see the impact. Going from $200 to $300 extra per month might save you six months and several hundred dollars in interest.</li>
+      <li><strong>Apply windfalls to debt.</strong> Tax refunds, work bonuses, birthday cash, and any other unexpected income should be applied directly to your priority debt. A single $2,000 tax refund can eliminate an entire small debt or dramatically reduce the balance on a larger one, accelerating the rollover effect.</li>
+      <li><strong>Negotiate lower interest rates.</strong> Call each creditor and ask for a rate reduction. If you have been making on-time payments, many creditors will lower your rate to retain you. Even a 2% reduction on a $15,000 balance saves roughly $300 per year in interest, and that money goes to principal instead.</li>
+      <li><strong>Consider balance transfers or consolidation.</strong> If you qualify for a 0% APR balance transfer card, moving high-interest credit card debt to the new card eliminates interest during the promotional period, typically 12 to 21 months. Alternatively, a debt consolidation loan at a lower rate than your weighted average can simplify payments and reduce total interest. Just be cautious about extending your repayment term, which can increase total interest even at a lower rate.</li>
+      <li><strong>Automate your payments.</strong> Set up automatic payments for at least the minimum on every debt to avoid missed payments and late fees. Then set up a separate automatic transfer for your extra payment directed at the priority debt. Automation removes the temptation to skip a month and ensures consistent progress.</li>
+      <li><strong>Trim expenses temporarily.</strong> Review subscriptions, dining out, and discretionary spending. Temporarily redirecting $100 to $200 per month from non-essential expenses to debt repayment can shorten your timeline by months. This does not need to be permanent; once the debt is gone, you can restore those expenses with a much healthier financial foundation.</li>
+      <li><strong>Earn extra income.</strong> Freelancing, overtime, selling unused items, or picking up a temporary side job can generate a burst of cash that dramatically accelerates your payoff. Directing even three to six months of side income to debt can eliminate an entire balance and trigger the rollover effect sooner.</li>
+    </ul>
+
+    <h2>The Psychology of Debt Repayment</h2>
+    <p>Paying off debt is as much a psychological challenge as a financial one. Understanding the mental and emotional aspects of debt repayment can help you design a plan you will actually stick with, which is ultimately more important than choosing the theoretically perfect method.</p>
+    <p><strong>Debt fatigue</strong> is one of the biggest obstacles to successful debt repayment. When you are making payments month after month and the balances barely seem to move, it is natural to feel discouraged and consider giving up. This is particularly common with the avalanche method when the highest-rate debt has a large balance, because it can take a year or more before that first debt is eliminated. Combating debt fatigue requires celebrating small milestones along the way: every $1,000 reduction in total debt, every time a balance crosses below a round number, every month that your interest charges decrease. Track your progress visually with a chart or spreadsheet so you can see the downward trend, even when individual months feel slow.</p>
+    <p><strong>The endowment effect</strong> can also work against you. Once you have freed up a payment by eliminating a debt, it can be tempting to redirect that money to lifestyle spending rather than rolling it into the next debt. You have become accustomed to not having that money available, and suddenly it feels like a raise. Resist this temptation. The power of both the snowball and avalanche methods lies entirely in the rollover: each eliminated debt makes the next one fall faster. Breaking the chain by spending the freed-up payment resets your progress and can add years to your payoff timeline.</p>
+    <p>Research from the Kellogg School of Management at Northwestern University supports the idea that small wins drive persistence. Their study found that consumers who concentrated payments on a single account, rather than spreading extra money across all accounts, repaid their debt more quickly. This aligns with both the snowball and avalanche methods, which share the principle of focusing extra funds on one debt at a time. The key takeaway is that concentrated effort produces faster visible progress, which sustains motivation.</p>
+    <p>Another psychological technique is to give each debt a name and a narrative. Instead of "Debt #3," call it "the car loan from that dealership." Making debts specific and personal can increase your emotional drive to eliminate them. Some people find it helpful to write down why they want to be debt-free: financial security, the ability to save for retirement, freedom to change careers, or simply the peace of mind that comes from owing nothing to anyone. Revisiting your "why" during difficult months can reignite your commitment.</p>
+    <p>Finally, consider sharing your debt payoff journey with a trusted friend, family member, or online community. Accountability partners can provide encouragement during tough months and celebrate your milestones with you. The combination of a solid mathematical strategy, behavioral awareness, and social support creates the most robust path to becoming debt-free.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>What is the difference between the debt snowball and debt avalanche methods?</summary>
+        <p>The debt snowball method orders your debts from smallest balance to largest and targets the smallest balance first with extra payments. The debt avalanche method orders debts from highest interest rate to lowest and targets the most expensive debt first. Both methods require making minimum payments on all debts simultaneously. The avalanche method saves more money on interest, while the snowball method provides faster psychological wins by eliminating individual debts sooner. The right choice depends on whether you prioritize mathematical savings or motivational momentum.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How much money can I save by choosing the avalanche method over the snowball method?</summary>
+        <p>Savings depend on the spread between your interest rates and your total balances. If all your debts have similar interest rates, the difference between the two methods is minimal, often less than $100. However, if you have a mix of high-rate credit card debt (20%+) and low-rate loans (5-7%), the avalanche method can save you hundreds to thousands of dollars. For example, with the sample debts in this calculator (credit card at 22.99%, car loan at 6.5%, and student loan at 5.5%), the avalanche method saves several hundred dollars compared to the snowball method because it eliminates the expensive credit card interest first.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How does the payment rollover work in both methods?</summary>
+        <p>Payment rollover, sometimes called the "snowball effect," is the engine that powers both methods. When you pay off your priority debt, the entire payment you were making on it, both the minimum and the extra, gets added to the payment you are making on the next priority debt. For example, if you were paying $300 per month on your first debt ($100 minimum + $200 extra) and the minimum on your second debt is $250, you now pay $550 per month on the second debt. This growing payment means each subsequent debt falls faster than the previous one, creating an accelerating payoff trajectory.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Should I include my mortgage in the debt payoff calculator?</summary>
+        <p>Most financial advisors recommend excluding your mortgage from snowball or avalanche calculations unless you are already debt-free except for the mortgage. Mortgage debt typically carries the lowest interest rate of any consumer debt, has significant tax advantages, and involves a much larger balance that would take years to pay off before you could roll those payments to other debts. Focus on consumer debts first: credit cards, personal loans, auto loans, and student loans. Once those are eliminated, you can direct the freed-up cash flow toward extra mortgage payments if you choose.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What if I cannot afford any extra payments beyond the minimums?</summary>
+        <p>If your budget is tight and you can only afford minimum payments, focus on two things: avoiding new debt and finding even small amounts of extra money. Look for subscriptions to cancel, expenses to reduce, or items to sell. Even $25 to $50 extra per month makes a difference over time. You might also contact your creditors to negotiate lower rates or explore nonprofit credit counseling for a debt management plan that reduces your rates. The most important thing is to keep making on-time minimum payments to protect your credit score while working toward finding extra funds.</p>
+      </details>
+    </div>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/financial-calculators/credit-card-payoff-calculator/">Credit Card Payoff Calculator</a> - Calculate payoff time and interest for a single credit card balance.</li>
+      <li><a href="/financial-calculators/loan-amortization-calculator/">Loan Amortization Calculator</a> - See a full amortization schedule for any loan with monthly breakdowns.</li>
+      <li><a href="/financial-calculators/debt-to-income-calculator/">Debt-to-Income Calculator</a> - Determine your DTI ratio to understand your overall debt burden.</li>
+      <li><a href="/financial-calculators/savings-goal-calculator/">Savings Goal Calculator</a> - Plan monthly savings to reach your financial goal after becoming debt-free.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+  <RelatedArticles calculatorSlug="debt-payoff-calculator" />
+  <RelatedCalculators currentSlug="debt-payoff-calculator" />
+</BaseLayout>
+
+<style>
+  .last-updated { font-size: 0.75rem; color: var(--color-text-muted); margin: 4px 0 0; }
+  .scenario-heading {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 16px 0 8px;
+    color: var(--color-text-muted);
+  }
+  .scenario-heading:first-child {
+    margin-top: 0;
+  }
+
+  .debt-list-section {
+    margin-bottom: 16px;
+  }
+  .section-label {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 12px;
+    color: var(--color-text-muted);
+  }
+  .debt-row {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 0.8fr 1fr auto;
+    gap: 8px;
+    align-items: end;
+    margin-bottom: 8px;
+  }
+  .debt-row label {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    display: block;
+    margin-bottom: 2px;
+  }
+  .debt-row input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--color-border, #d1d5db);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    box-sizing: border-box;
+  }
+  .remove-debt-btn {
+    background: #ef4444;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: background 0.15s;
+    height: fit-content;
+  }
+  .remove-debt-btn:hover {
+    background: #dc2626;
+  }
+  .add-debt-btn {
+    margin-top: 4px;
+    font-size: 0.85rem;
+    padding: 8px 16px;
+    background: var(--color-bg-secondary, #f3f4f6);
+    color: var(--color-text, #111827);
+    border: 1px dashed var(--color-border, #d1d5db);
+  }
+  .add-debt-btn:hover {
+    background: var(--color-bg-tertiary, #e5e7eb);
+  }
+  .extra-payment-section {
+    display: flex;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .extra-payment-section .input-group {
+    flex: 1;
+    min-width: 200px;
+  }
+  .extra-payment-section .calc-btn {
+    height: fit-content;
+  }
+  .result-card.warning { background: #fef2f2; }
+  .result-card.warning .result-value { color: #dc2626; }
+
+  @media (max-width: 640px) {
+    .debt-row {
+      grid-template-columns: 1fr 1fr;
+    }
+    .debt-row .debt-name-group {
+      grid-column: 1 / -1;
+    }
+    .remove-debt-btn {
+      grid-column: 1 / -1;
+      justify-self: end;
+    }
+  }
+</style>
+
+<script>
+  interface Debt {
+    name: string;
+    balance: number;
+    apr: number;
+    minPayment: number;
+  }
+
+  interface PayoffResult {
+    months: number;
+    totalInterest: number;
+    totalPaid: number;
+  }
+
+  let debtCounter = 0;
+
+  function createDebtRow(name: string, balance: number, apr: number, minPayment: number): HTMLDivElement {
+    const row = document.createElement('div');
+    row.className = 'debt-row';
+    row.dataset.id = String(debtCounter++);
+
+    row.innerHTML = `
+      <div class="debt-name-group">
+        <label>Debt Name</label>
+        <input type="text" class="debt-name" value="${name}" placeholder="e.g. Credit Card" />
+      </div>
+      <div>
+        <label>Balance ($)</label>
+        <input type="number" class="debt-balance" value="${balance}" min="0" step="100" />
+      </div>
+      <div>
+        <label>APR (%)</label>
+        <input type="number" class="debt-apr" value="${apr}" min="0" max="40" step="0.01" />
+      </div>
+      <div>
+        <label>Min Payment ($)</label>
+        <input type="number" class="debt-min" value="${minPayment}" min="0" step="5" />
+      </div>
+      <button type="button" class="remove-debt-btn" title="Remove this debt">&times;</button>
+    `;
+
+    row.querySelector('.remove-debt-btn')!.addEventListener('click', () => {
+      row.remove();
+    });
+
+    return row;
+  }
+
+  function getDebts(): Debt[] {
+    const rows = document.querySelectorAll('.debt-row');
+    const debts: Debt[] = [];
+    rows.forEach(row => {
+      const name = (row.querySelector('.debt-name') as HTMLInputElement).value || 'Unnamed Debt';
+      const balance = parseFloat((row.querySelector('.debt-balance') as HTMLInputElement).value) || 0;
+      const apr = parseFloat((row.querySelector('.debt-apr') as HTMLInputElement).value) || 0;
+      const minPayment = parseFloat((row.querySelector('.debt-min') as HTMLInputElement).value) || 0;
+      if (balance > 0) {
+        debts.push({ name, balance, apr, minPayment });
+      }
+    });
+    return debts;
+  }
+
+  function simulatePayoff(debts: Debt[], extraPayment: number, sortFn: (a: Debt, b: Debt) => number): PayoffResult {
+    if (debts.length === 0) return { months: 0, totalInterest: 0, totalPaid: 0 };
+
+    // Deep copy and sort
+    let debtsCopy = debts.map(d => ({ ...d, remaining: d.balance }));
+    debtsCopy.sort(sortFn);
+
+    let totalInterest = 0;
+    let totalPaid = 0;
+    let months = 0;
+    const maxMonths = 1200;
+
+    while (debtsCopy.some(d => d.remaining > 0.01) && months < maxMonths) {
+      months++;
+      let extraAvailable = extraPayment;
+
+      // Apply minimum payments and interest to all debts
+      for (const debt of debtsCopy) {
+        if (debt.remaining <= 0.01) continue;
+
+        const monthlyRate = debt.apr / 100 / 12;
+        const interest = debt.remaining * monthlyRate;
+        totalInterest += interest;
+        debt.remaining += interest;
+
+        let payment = Math.min(debt.minPayment, debt.remaining);
+        debt.remaining -= payment;
+        totalPaid += payment;
+
+        if (debt.remaining < 0.01) {
+          // Debt is paid off by minimum alone, reclaim leftover min payment
+          extraAvailable += (debt.minPayment - payment);
+          debt.remaining = 0;
+        }
+      }
+
+      // Apply extra payment to priority debts in order
+      for (const debt of debtsCopy) {
+        if (debt.remaining <= 0.01 || extraAvailable <= 0) continue;
+
+        const payment = Math.min(extraAvailable, debt.remaining);
+        debt.remaining -= payment;
+        totalPaid += payment;
+        extraAvailable -= payment;
+
+        if (debt.remaining < 0.01) {
+          debt.remaining = 0;
+          // The freed-up minimum payment will be available next month through the loop logic
+        }
+      }
+    }
+
+    const totalOriginalBalance = debts.reduce((sum, d) => sum + d.balance, 0);
+    return { months, totalInterest, totalPaid };
+  }
+
+  function formatCurrency(n: number): string {
+    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+
+  function calculate() {
+    const debts = getDebts();
+    const extraPayment = parseFloat((document.getElementById('extraPayment') as HTMLInputElement).value) || 0;
+
+    if (debts.length === 0) return;
+
+    // Avalanche: highest APR first
+    const avalanche = simulatePayoff(debts, extraPayment, (a, b) => b.apr - a.apr);
+
+    // Snowball: smallest balance first
+    const snowball = simulatePayoff(debts, extraPayment, (a, b) => a.balance - b.balance);
+
+    // Display avalanche results
+    document.getElementById('avalancheMonths')!.textContent = String(avalanche.months);
+    document.getElementById('avalancheInterest')!.textContent = formatCurrency(avalanche.totalInterest);
+    document.getElementById('avalancheTotal')!.textContent = formatCurrency(avalanche.totalPaid);
+
+    // Display snowball results
+    document.getElementById('snowballMonths')!.textContent = String(snowball.months);
+    document.getElementById('snowballInterest')!.textContent = formatCurrency(snowball.totalInterest);
+    document.getElementById('snowballTotal')!.textContent = formatCurrency(snowball.totalPaid);
+
+    // Display savings
+    const interestSaved = snowball.totalInterest - avalanche.totalInterest;
+    const monthsSaved = snowball.months - avalanche.months;
+
+    document.getElementById('interestSaved')!.textContent = formatCurrency(Math.max(0, interestSaved));
+
+    if (monthsSaved > 12) {
+      const years = Math.floor(monthsSaved / 12);
+      const remainMonths = monthsSaved % 12;
+      document.getElementById('timeSaved')!.textContent = years + (years === 1 ? ' year' : ' years') + (remainMonths > 0 ? ', ' + remainMonths + (remainMonths === 1 ? ' month' : ' months') : '');
+    } else if (monthsSaved > 0) {
+      document.getElementById('timeSaved')!.textContent = monthsSaved + (monthsSaved === 1 ? ' month' : ' months');
+    } else {
+      document.getElementById('timeSaved')!.textContent = '0 months';
+    }
+  }
+
+  // Initialize with sample debts
+  const debtList = document.getElementById('debtList')!;
+  const sampleDebts = [
+    { name: 'Credit Card', balance: 5000, apr: 22.99, minPayment: 100 },
+    { name: 'Car Loan', balance: 15000, apr: 6.5, minPayment: 300 },
+    { name: 'Student Loan', balance: 25000, apr: 5.5, minPayment: 280 },
+  ];
+
+  sampleDebts.forEach(d => {
+    debtList.appendChild(createDebtRow(d.name, d.balance, d.apr, d.minPayment));
+  });
+
+  document.getElementById('addDebtBtn')!.addEventListener('click', () => {
+    debtList.appendChild(createDebtRow('', 0, 0, 0));
+  });
+
+  document.getElementById('calculateBtn')!.addEventListener('click', calculate);
+
+  // Auto-calculate on load
+  calculate();
+</script>

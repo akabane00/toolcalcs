@@ -72,7 +72,7 @@ export const blogArticles: BlogArticle[] = [
     datePublished: '2026-03-05',
     dateModified: '2026-03-05',
     category: 'Finance',
-    relatedCalculatorSlugs: ['credit-card-payoff-calculator', 'debt-to-income-calculator', 'loan-amortization-calculator'],
+    relatedCalculatorSlugs: ['credit-card-payoff-calculator', 'debt-to-income-calculator', 'loan-amortization-calculator', 'debt-payoff-calculator'],
   },
   {
     title: 'How to Calculate Your BMI (And What It Actually Means)',
@@ -90,7 +90,7 @@ export const blogArticles: BlogArticle[] = [
     datePublished: '2026-03-05',
     dateModified: '2026-03-05',
     category: 'Finance',
-    relatedCalculatorSlugs: ['mortgage-calculator', 'home-affordability-calculator', 'down-payment-calculator', 'rent-vs-buy-calculator'],
+    relatedCalculatorSlugs: ['mortgage-calculator', 'home-affordability-calculator', 'down-payment-calculator', 'rent-vs-buy-calculator', 'mortgage-amortization-calculator'],
   },
   {
     title: 'How Much Paint Do I Need? A Room-by-Room Guide',
@@ -99,7 +99,7 @@ export const blogArticles: BlogArticle[] = [
     datePublished: '2026-03-05',
     dateModified: '2026-03-05',
     category: 'Construction',
-    relatedCalculatorSlugs: ['paint-calculator', 'square-footage-calculator'],
+    relatedCalculatorSlugs: ['paint-calculator', 'square-footage-calculator', 'gravel-calculator'],
   },
   {
     title: 'How Many Calories Should I Eat to Lose Weight?',
@@ -127,7 +127,7 @@ export const blogArticles: BlogArticle[] = [
     datePublished: '2026-03-05',
     dateModified: '2026-03-05',
     category: 'Everyday',
-    relatedCalculatorSlugs: ['square-footage-calculator', 'area-calculator', 'flooring-calculator'],
+    relatedCalculatorSlugs: ['square-footage-calculator', 'area-calculator', 'flooring-calculator', 'gravel-calculator'],
   },
   {
     title: 'Standard Deviation Explained: What It Is and When You Need It',

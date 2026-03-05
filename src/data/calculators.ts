@@ -637,6 +637,49 @@ export const calculators: Calculator[] = [
     categorySlug: 'financial-calculators',
     icon: '🏢',
   },
+  {
+    title: 'Debt Payoff Calculator',
+    slug: 'debt-payoff-calculator',
+    description: 'Compare snowball and avalanche methods to pay off multiple debts. See payoff timeline, total interest, and the best strategy.',
+    category: 'Financial Calculators',
+    categorySlug: 'financial-calculators',
+    icon: '🎯',
+  },
+  {
+    title: 'Mortgage Amortization Calculator',
+    slug: 'mortgage-amortization-calculator',
+    description: 'Generate a full mortgage amortization schedule. See monthly principal and interest breakdown over the life of your loan.',
+    category: 'Financial Calculators',
+    categorySlug: 'financial-calculators',
+    icon: '📋',
+  },
+  // Health (new)
+  {
+    title: 'Pregnancy Weight Gain Calculator',
+    slug: 'pregnancy-weight-gain-calculator',
+    description: 'Calculate recommended pregnancy weight gain by week based on pre-pregnancy BMI. Track healthy weight targets per trimester.',
+    category: 'Health Calculators',
+    categorySlug: 'health-calculators',
+    icon: '🤰',
+  },
+  // Everyday (new)
+  {
+    title: 'Dog Age Calculator',
+    slug: 'dog-age-calculator',
+    description: 'Convert your dog\'s age to human years using the latest veterinary science. Accounts for breed size and life stage.',
+    category: 'Everyday Calculators',
+    categorySlug: 'everyday-calculators',
+    icon: '🐕',
+  },
+  // Construction (new)
+  {
+    title: 'Gravel Calculator',
+    slug: 'gravel-calculator',
+    description: 'Calculate tons and cubic yards of gravel needed for driveways, paths, and landscaping. Includes cost estimates by gravel type.',
+    category: 'Construction Calculators',
+    categorySlug: 'construction-calculators',
+    icon: '🪨',
+  },
 ];
 
 export function getCalculatorsByCategory(categorySlug: string): Calculator[] {
@@ -646,25 +689,25 @@ export function getCalculatorsByCategory(categorySlug: string): Calculator[] {
 // Semantic relationship groups for internal linking
 const relatedGroups: Record<string, string[]> = {
   // Financial - Loans & Mortgages
-  'loans-mortgages': ['mortgage-calculator', 'loan-amortization-calculator', 'refinance-calculator', 'home-affordability-calculator', 'down-payment-calculator', 'rent-vs-buy-calculator', 'auto-loan-calculator', 'student-loan-calculator', 'business-loan-calculator'],
+  'loans-mortgages': ['mortgage-calculator', 'loan-amortization-calculator', 'refinance-calculator', 'home-affordability-calculator', 'down-payment-calculator', 'rent-vs-buy-calculator', 'auto-loan-calculator', 'student-loan-calculator', 'business-loan-calculator', 'mortgage-amortization-calculator'],
   // Financial - Income & Tax
   'income-tax': ['take-home-pay-calculator', 'paycheck-calculator', 'tax-calculator', 'payroll-tax-calculator', 'capital-gains-tax-calculator', 'estate-tax-calculator'],
   // Financial - Savings & Investment
   'savings-investment': ['compound-interest-calculator', 'investment-calculator', '401k-calculator', 'retirement-savings-calculator', 'savings-goal-calculator', 'fire-calculator', 'dca-calculator', 'roi-calculator'],
   // Financial - Business & Wealth
-  'business-wealth': ['margin-calculator', 'breakeven-calculator', 'crypto-profit-calculator', 'rental-yield-calculator', 'net-worth-calculator', 'debt-to-income-calculator', 'credit-card-payoff-calculator'],
+  'business-wealth': ['margin-calculator', 'breakeven-calculator', 'crypto-profit-calculator', 'rental-yield-calculator', 'net-worth-calculator', 'debt-to-income-calculator', 'credit-card-payoff-calculator', 'debt-payoff-calculator'],
   // Health - Body Composition
   'body-composition': ['bmi-calculator', 'tdee-calculator', 'calorie-calculator', 'body-fat-calculator', 'ideal-weight-calculator', 'macro-calculator', 'water-intake-calculator'],
   // Health - Wellness
-  'wellness': ['sleep-calculator', 'pace-calculator', 'pregnancy-due-date-calculator', 'ovulation-calculator'],
+  'wellness': ['sleep-calculator', 'pace-calculator', 'pregnancy-due-date-calculator', 'ovulation-calculator', 'pregnancy-weight-gain-calculator'],
   // Math
   'math-tools': ['percentage-calculator', 'fraction-calculator', 'standard-deviation-calculator', 'area-calculator', 'probability-calculator', 'gpa-calculator', 'random-number-generator'],
   // Date & Time
   'date-time': ['age-calculator', 'date-difference-calculator', 'days-until-calculator', 'time-zone-converter'],
   // Everyday
-  'everyday': ['tip-calculator', 'discount-calculator', 'hours-calculator', 'square-footage-calculator', 'gas-cost-calculator', 'electricity-cost-calculator', 'word-counter'],
+  'everyday': ['tip-calculator', 'discount-calculator', 'hours-calculator', 'square-footage-calculator', 'gas-cost-calculator', 'electricity-cost-calculator', 'word-counter', 'dog-age-calculator'],
   // Construction
-  'construction': ['concrete-calculator', 'paint-calculator', 'roofing-calculator', 'flooring-calculator', 'mulch-calculator', 'fence-calculator', 'drywall-calculator', 'deck-calculator', 'solar-panel-calculator'],
+  'construction': ['concrete-calculator', 'paint-calculator', 'roofing-calculator', 'flooring-calculator', 'mulch-calculator', 'fence-calculator', 'drywall-calculator', 'deck-calculator', 'solar-panel-calculator', 'gravel-calculator'],
 };
 
 // Cross-category links for broader discovery

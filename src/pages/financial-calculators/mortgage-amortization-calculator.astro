@@ -1,0 +1,556 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Financial Calculators",
+        "item": "https://toolcalcs.com/financial-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Mortgage Amortization Calculator"
+      }
+    ]
+  },
+  {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'What is a mortgage amortization schedule?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'A mortgage amortization schedule is a detailed table showing every monthly payment over the life of your mortgage, broken down into principal and interest components. It reveals how much of each payment reduces your loan balance versus how much goes to the lender as interest. Early payments are mostly interest, while later payments are mostly principal.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How much can I save by making extra mortgage payments?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Extra mortgage payments can save tens of thousands of dollars in interest and shorten your loan by years. For example, adding $200 per month to a $350,000 mortgage at 6.5% over 30 years can save over $100,000 in interest and pay off the loan roughly 7 years early. The savings are largest when extra payments begin early in the loan term.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Why does most of my mortgage payment go to interest at the beginning?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Interest is calculated on the outstanding loan balance each month. At the start of your mortgage, the balance is at its highest, so the interest charge is largest. As you gradually pay down the principal, less interest accrues each month and a larger share of each payment goes toward reducing the balance. This shift accelerates over time.',
+      },
+    },
+  ],
+},
+];
+---
+
+<BaseLayout
+  title="Mortgage Amortization Calculator - Full Payment Schedule & Breakdown"
+  description="Free mortgage amortization calculator with full payment schedule. See monthly principal vs. interest breakdown, extra payment savings, and payoff date for any mortgage."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/financial-calculators/">Financial Calculators</a> &rsaquo;
+    <span>Mortgage Amortization Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Mortgage Amortization Calculator</h1>
+  <p class="page-desc">Generate a complete mortgage amortization schedule showing how each payment splits between principal and interest. See the impact of extra payments on your payoff date and total interest.</p>
+
+  <!-- Calculator Tool -->
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="loanAmount">Loan Amount ($)</label>
+        <input type="number" id="loanAmount" value="350000" min="0" step="1000" />
+      </div>
+      <div class="input-group">
+        <label for="interestRate">Interest Rate (%)</label>
+        <input type="number" id="interestRate" value="6.5" min="0" max="30" step="0.1" />
+      </div>
+      <div class="input-group">
+        <label for="loanTerm">Loan Term</label>
+        <select id="loanTerm">
+          <option value="30" selected>30 Years</option>
+          <option value="25">25 Years</option>
+          <option value="20">20 Years</option>
+          <option value="15">15 Years</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="extraPayment">Extra Monthly Payment ($)</label>
+        <input type="number" id="extraPayment" value="0" min="0" step="50" />
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Monthly Payment</span>
+          <span class="result-value" id="monthlyPayment">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Interest</span>
+          <span class="result-value" id="totalInterest">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Cost</span>
+          <span class="result-value" id="totalCost">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Payoff Date</span>
+          <span class="result-value" id="payoffDate">--</span>
+        </div>
+        <div class="result-card success" id="savedCard" style="display:none">
+          <span class="result-label">Interest Saved</span>
+          <span class="result-value" id="interestSaved">$0</span>
+        </div>
+        <div class="result-card success" id="timeSavedCard" style="display:none">
+          <span class="result-label">Time Saved</span>
+          <span class="result-value" id="timeSaved">--</span>
+        </div>
+      </div>
+
+      <!-- Amortization Schedule Table -->
+      <div id="amortSection" class="amort-section">
+        <h3 class="amort-heading">Amortization Schedule</h3>
+        <div class="amort-table-wrap">
+          <table class="amort-table" id="amortTable">
+            <thead>
+              <tr>
+                <th>Payment #</th>
+                <th>Payment</th>
+                <th>Principal</th>
+                <th>Interest</th>
+                <th>Extra Payment</th>
+                <th>Balance</th>
+              </tr>
+            </thead>
+            <tbody id="amortBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>What Is Mortgage Amortization?</h2>
+    <p>Mortgage amortization is the process of paying off a home loan through a series of fixed monthly payments over a set period of time, typically 15 to 30 years. Each payment covers both the interest owed on the outstanding balance and a portion of the loan principal. While the total monthly payment remains constant throughout the term of a fixed-rate mortgage, the proportion allocated to principal versus interest changes dramatically from the first payment to the last.</p>
+    <p>At the beginning of your mortgage, the outstanding balance is at its highest, which means the interest charge each month is at its peak. As a result, in the early years, the majority of your payment goes toward interest and only a small fraction reduces the actual loan balance. Over time, as the principal decreases, the interest portion shrinks and more of each payment chips away at the remaining balance. This gradual shift is the essence of amortization.</p>
+    <p>Understanding how amortization works is essential for any homeowner. It helps you see the true cost of borrowing, reveals how long it takes to build meaningful equity, and demonstrates the powerful financial impact of making extra payments. A mortgage amortization schedule lays out every single payment over the life of the loan, giving you a complete roadmap of your debt repayment journey from the first month to the last.</p>
+    <p>This calculator generates a full amortization schedule for your specific mortgage, including the option to add extra monthly payments. You can see exactly how each dollar is allocated, when your loan will be paid off, and how much interest you will save by paying more than the minimum required amount. Use it alongside our <a href="/financial-calculators/mortgage-calculator/">mortgage calculator</a> to get a comprehensive view of your home financing costs.</p>
+
+    <h2>How Amortization Works: The Formula Behind Your Payment</h2>
+    <p>The monthly payment on a fixed-rate mortgage is determined by the standard amortization formula. This formula calculates a single, fixed payment amount that will fully pay off both the principal and all accrued interest over the specified loan term.</p>
+    <div class="formula-box">
+      <code>M = P &times; [r(1+r)<sup>n</sup>] / [(1+r)<sup>n</sup> - 1]</code>
+    </div>
+    <p>Where:</p>
+    <ul>
+      <li><strong>M</strong> = Monthly payment (principal and interest only)</li>
+      <li><strong>P</strong> = Loan principal (the total amount borrowed)</li>
+      <li><strong>r</strong> = Monthly interest rate (annual rate divided by 12)</li>
+      <li><strong>n</strong> = Total number of monthly payments (loan term in years multiplied by 12)</li>
+    </ul>
+    <p><strong>Example calculation:</strong> For a $350,000 mortgage at 6.5% annual interest over 30 years, the monthly interest rate is 0.065 / 12 = 0.005417, and the total number of payments is 30 x 12 = 360. Plugging these values into the formula yields a monthly payment of approximately $2,212. Over the full 30-year term, you would pay a total of $796,348, meaning $446,348 goes to interest alone. That is more than the original loan amount paid in interest, which is why understanding and optimizing your amortization schedule matters so much.</p>
+    <p>Once the monthly payment is determined, each month the lender calculates the interest due on the current outstanding balance, subtracts that from the fixed payment, and applies the remainder to the principal. This process repeats every month until the balance reaches zero. The amortization schedule above shows this month-by-month breakdown for your specific inputs.</p>
+
+    <h2>Understanding Your Amortization Schedule</h2>
+    <p>An amortization schedule is a complete table of every payment you will make over the life of your mortgage. Each row in the schedule shows the payment number, the total payment amount, how much goes to principal, how much goes to interest, any extra payment applied, and the remaining loan balance after that payment. Reviewing this table gives you several important insights.</p>
+    <p>First, you can see the <strong>interest-to-principal ratio</strong> at any point in time. On a $350,000 loan at 6.5% for 30 years, the very first payment of $2,212 breaks down as approximately $1,896 in interest and only $316 in principal. That means 86% of your first payment goes to the lender and only 14% reduces your debt. By contrast, in your final payment, nearly the entire amount goes to principal with only a few dollars of interest.</p>
+    <p>Second, you can identify the <strong>crossover point</strong>, which is the month when the principal portion of your payment first exceeds the interest portion. For a 30-year mortgage at 6.5%, this crossover happens around month 222, or about 18.5 years into the loan. Before this point, interest dominates every payment. After it, you are finally paying down the balance faster than you are paying interest.</p>
+    <p>Third, the schedule reveals how much <strong>total interest</strong> you will pay. Many homeowners are surprised to learn that the total interest on a 30-year mortgage often exceeds the original loan amount. Seeing this number in black and white motivates many borrowers to make extra payments or consider shorter loan terms.</p>
+    <p>Use the yearly summary rows in the schedule above (click to expand and see individual months) to quickly scan your amortization trajectory without scrolling through hundreds of rows. Each year row shows the total principal paid, total interest paid, and ending balance for that year.</p>
+
+    <h2>The Power of Extra Payments</h2>
+    <p>Making extra payments toward your mortgage principal is one of the most effective ways to save money and build equity faster. Because extra payments go directly to reducing the principal balance, they eliminate future interest charges on the amount paid early. The earlier you start making extra payments, the greater the compounding savings.</p>
+    <p>Consider a $350,000 mortgage at 6.5% over 30 years with a standard monthly payment of $2,212. Here is the impact of various extra payment amounts:</p>
+    <ul>
+      <li><strong>$100/month extra:</strong> Saves approximately $63,000 in interest and pays off the loan about 4.5 years early.</li>
+      <li><strong>$250/month extra:</strong> Saves approximately $118,000 in interest and pays off the loan about 8.5 years early.</li>
+      <li><strong>$500/month extra:</strong> Saves approximately $177,000 in interest and pays off the loan about 12.5 years early.</li>
+    </ul>
+    <p>The reason extra payments are so effective early in the loan is that each dollar of principal you eliminate today prevents interest from accruing on that dollar for the remaining decades of your term. A $500 extra payment in month 1 of a 30-year loan saves far more interest than the same $500 extra payment in year 25. Use the extra payment field in the calculator above to model your specific scenario and see the precise savings.</p>
+    <p>Before directing extra money toward your mortgage, ensure you have built an emergency fund covering 3 to 6 months of expenses and have paid off any higher-interest debt such as credit cards. Once those bases are covered, extra <a href="/financial-calculators/loan-amortization-calculator/">loan amortization</a> payments offer a guaranteed return equal to your mortgage interest rate, which is often better than conservative investment alternatives. You can also use our <a href="/financial-calculators/down-payment-calculator/">down payment calculator</a> if you are still in the planning stage of your home purchase.</p>
+
+    <h2>Amortization in the Early Years vs. Late Years</h2>
+    <p>The difference between early and late years of a mortgage is striking and has important implications for your financial strategy. In the first few years of a 30-year mortgage, you are barely making a dent in the principal. On a $350,000 loan at 6.5%, after making 12 monthly payments totaling approximately $26,544, your principal has only decreased by about $3,876. The remaining $22,668 went entirely to interest. After five years of payments totaling approximately $132,720, you have only paid down roughly $21,800 of the original balance. You still owe about $328,200.</p>
+    <p>This slow progress in the early years is why selling a home shortly after purchase can be financially painful. If you sell after two or three years, you may find that you have barely built any equity beyond your original down payment, yet you have paid tens of thousands of dollars in interest plus closing costs on both the purchase and sale.</p>
+    <p>In the later years of the mortgage, the dynamics reverse. The principal portion accelerates rapidly as the balance shrinks. In years 25 through 30 of the same loan, each monthly payment sends the majority of its amount to principal. The interest portion becomes negligible as the remaining balance dwindles toward zero. This is why homeowners in the later years of their mortgage often choose not to refinance, even when lower rates are available. Resetting the amortization schedule would send them back to the interest-heavy early years.</p>
+    <p>Understanding this timeline helps you make better decisions about refinancing, selling, making extra payments, and choosing between a 15-year and 30-year term. It also reinforces why the early years of your mortgage are the most critical time to make additional principal payments. Every extra dollar paid in years 1 through 5 has a far greater impact than the same extra dollar paid in years 25 through 30.</p>
+
+    <h2>Refinancing and Amortization</h2>
+    <p>Refinancing replaces your existing mortgage with a brand-new loan, which means your amortization schedule resets from the beginning. While refinancing to a lower interest rate can reduce your monthly payment and total interest, the amortization reset is a critical factor that many borrowers overlook.</p>
+    <p>For example, suppose you are 10 years into a 30-year mortgage at 7% and you refinance into a new 30-year mortgage at 5.5%. Your monthly payment drops, but you are now back to making interest-heavy payments because the new amortization schedule starts fresh. If you had 20 years remaining on your original loan, you now have 30 years remaining on the new one. To compare refinancing options objectively, use our <a href="/financial-calculators/refinance-calculator/">refinance calculator</a> to find your break-even point.</p>
+    <p>To avoid extending your timeline when refinancing, consider these strategies:</p>
+    <ul>
+      <li><strong>Refinance into a shorter term.</strong> If you are 10 years into a 30-year loan, refinance into a 20-year or 15-year term to stay on pace or accelerate your payoff.</li>
+      <li><strong>Continue making your old payment.</strong> If your new payment is lower, keep paying the old (higher) amount. The difference goes directly to principal and shortens your new loan significantly.</li>
+      <li><strong>Calculate the break-even point.</strong> Divide your total refinancing costs by the monthly payment savings. If you plan to stay in the home longer than that number of months, refinancing makes financial sense.</li>
+    </ul>
+    <p>Also consider the total cost over the remaining life of each option. Sometimes a lower monthly payment with a longer term actually costs more in total interest than keeping the existing loan. Running both scenarios through this amortization calculator can reveal the true cost difference. If you are evaluating whether you can afford a home purchase or a refinance, our <a href="/financial-calculators/home-affordability-calculator/">home affordability calculator</a> can help determine what fits your budget.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>What is a mortgage amortization schedule?</summary>
+        <p>A mortgage amortization schedule is a complete table showing every monthly payment over the life of your loan. Each row breaks down the payment into its principal and interest components and shows the remaining loan balance. The schedule reveals how the split between principal and interest shifts over time: early payments are mostly interest, while later payments are mostly principal. This table helps you understand the true cost of borrowing and plan strategies like extra payments to reduce total interest.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How much can I save with extra mortgage payments?</summary>
+        <p>The amount you save depends on your loan balance, interest rate, and how much extra you pay each month. As a general example, adding $200 per month to a $350,000 mortgage at 6.5% over 30 years saves over $100,000 in total interest and pays off the loan approximately 7 years early. Extra payments made early in the loan term have the greatest impact because they prevent interest from compounding on the prepaid principal for the remaining decades. Enter your specific details in the calculator above to see your exact savings.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Why does most of my payment go to interest at the beginning?</summary>
+        <p>Interest is calculated each month on your outstanding loan balance. When your balance is at its highest, which is at the start of the loan, the interest charge is correspondingly at its peak. On a $350,000 loan at 6.5%, the first month's interest alone is about $1,896. Since your fixed payment is $2,212, only $316 goes to principal. As you slowly reduce the balance over time, less interest accrues each month, allowing more of your payment to go toward principal. This gradual shift is the fundamental nature of amortization.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Should I choose a 15-year or 30-year mortgage?</summary>
+        <p>The choice depends on your budget and financial goals. A 15-year mortgage has significantly higher monthly payments but typically comes with a lower interest rate and saves you hundreds of thousands of dollars in total interest. For a $350,000 loan, a 30-year mortgage at 6.5% costs about $446,000 in interest, while a 15-year mortgage at around 5.9% costs about $188,000 in interest, a savings of over $258,000. However, the 15-year payment is roughly $1,000 more per month. Choose 15 years if you can comfortably afford the higher payment; choose 30 years if you need budget flexibility, and consider making extra payments when possible.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Does making one extra payment per year really help?</summary>
+        <p>Yes, one extra payment per year has a significant impact. On a $350,000 mortgage at 6.5% over 30 years, making one additional monthly payment each year (equivalent to paying 1/12 extra each month, or about $184 extra per month) can shave approximately 5 years off the loan term and save over $80,000 in interest. A common way to achieve this is through biweekly payments: paying half the monthly amount every two weeks results in 26 half-payments, or 13 full payments, per year instead of 12.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What happens to my amortization if I refinance?</summary>
+        <p>Refinancing creates an entirely new loan with a fresh amortization schedule. Even if you are many years into your current mortgage, the new loan starts from scratch with interest-heavy payments. This means refinancing can extend the time it takes to pay off your home unless you choose a shorter term. To avoid this, consider refinancing into a loan term that matches your remaining years or shorter, or continue making your old higher payment on the new lower-rate loan. Always calculate the break-even point by dividing total refinancing costs by monthly savings to ensure the refinance is worthwhile.</p>
+      </details>
+    </div>
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/financial-calculators/mortgage-calculator/">Mortgage Calculator</a> - Estimate monthly mortgage payments with taxes and insurance.</li>
+      <li><a href="/financial-calculators/refinance-calculator/">Refinance Calculator</a> - Determine if refinancing your mortgage makes financial sense.</li>
+      <li><a href="/financial-calculators/home-affordability-calculator/">Home Affordability Calculator</a> - Find out how much house you can afford.</li>
+      <li><a href="/financial-calculators/loan-amortization-calculator/">Loan Amortization Calculator</a> - View amortization schedules for any type of loan.</li>
+      <li><a href="/financial-calculators/down-payment-calculator/">Down Payment Calculator</a> - Calculate how much to save for a down payment.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+<RelatedArticles calculatorSlug="mortgage-amortization-calculator" />
+
+<RelatedCalculators currentSlug="mortgage-amortization-calculator" />
+</BaseLayout>
+
+<style>
+  .last-updated { font-size: 0.75rem; color: var(--color-text-muted); margin: 4px 0 0; }
+
+  .amort-section { margin-top: 24px; }
+  .amort-heading {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 12px;
+    color: var(--color-text);
+  }
+  .amort-table-wrap {
+    overflow-x: auto;
+    max-height: 600px;
+    overflow-y: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+  .amort-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
+  .amort-table th,
+  .amort-table td {
+    padding: 6px 10px;
+    text-align: right;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .amort-table th {
+    font-weight: 600;
+    color: var(--color-text-muted);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    position: sticky;
+    top: 0;
+    background: var(--color-surface);
+    z-index: 2;
+  }
+  .amort-table th:first-child,
+  .amort-table td:first-child {
+    text-align: left;
+  }
+  .amort-table tbody tr:nth-child(even) {
+    background: var(--color-bg);
+  }
+  .amort-table tbody tr:nth-child(odd) {
+    background: var(--color-surface);
+  }
+  .amort-table .year-row {
+    background: var(--color-primary-light, #eef2ff) !important;
+    font-weight: 700;
+    cursor: pointer;
+    user-select: none;
+  }
+  .amort-table .year-row:hover {
+    background: var(--color-primary-lighter, #dbeafe) !important;
+  }
+  .amort-table .year-row td:first-child {
+    padding-left: 8px;
+  }
+  .amort-table .month-row {
+    display: none;
+  }
+  .amort-table .month-row.expanded {
+    display: table-row;
+  }
+  .amort-table .month-row td:first-child {
+    padding-left: 24px;
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+  }
+  .toggle-arrow {
+    display: inline-block;
+    width: 14px;
+    font-size: 0.7rem;
+    transition: transform 0.15s ease;
+  }
+  .toggle-arrow.open {
+    transform: rotate(90deg);
+  }
+</style>
+
+<script>
+  function fmtCurrency(n: number): string {
+    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+  function fmtCurrency2(n: number): string {
+    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function calculate() {
+    const P = parseFloat((document.getElementById('loanAmount') as HTMLInputElement).value) || 0;
+    const annualRate = parseFloat((document.getElementById('interestRate') as HTMLInputElement).value) || 0;
+    const years = parseInt((document.getElementById('loanTerm') as HTMLSelectElement).value) || 30;
+    const extra = parseFloat((document.getElementById('extraPayment') as HTMLInputElement).value) || 0;
+
+    const r = annualRate / 100 / 12;
+    const n = years * 12;
+
+    if (P <= 0 || r <= 0) {
+      document.getElementById('monthlyPayment')!.textContent = '$0';
+      document.getElementById('totalInterest')!.textContent = '$0';
+      document.getElementById('totalCost')!.textContent = '$0';
+      document.getElementById('payoffDate')!.textContent = '--';
+      (document.getElementById('savedCard') as HTMLElement).style.display = 'none';
+      (document.getElementById('timeSavedCard') as HTMLElement).style.display = 'none';
+      document.getElementById('amortBody')!.innerHTML = '';
+      return;
+    }
+
+    // Monthly payment using standard amortization formula: M = P[r(1+r)^n]/[(1+r)^n-1]
+    const monthlyPayment = P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+
+    // Build month-by-month amortization schedule
+    interface MonthData {
+      month: number;
+      payment: number;
+      principal: number;
+      interest: number;
+      extraApplied: number;
+      balance: number;
+    }
+
+    const schedule: MonthData[] = [];
+    let balance = P;
+    let totalInterestPaid = 0;
+    let totalPaid = 0;
+    let actualMonths = 0;
+
+    for (let month = 1; month <= n && balance > 0.005; month++) {
+      const interestPart = balance * r;
+      let principalPart = monthlyPayment - interestPart;
+      let extraApplied = extra;
+
+      // Ensure we don't overpay
+      if (principalPart + extraApplied > balance) {
+        const totalPrincipal = balance;
+        extraApplied = Math.max(0, totalPrincipal - principalPart);
+        principalPart = totalPrincipal - extraApplied;
+      }
+
+      balance -= (principalPart + extraApplied);
+      if (balance < 0.005) balance = 0;
+
+      totalInterestPaid += interestPart;
+      const paymentThisMonth = principalPart + interestPart + extraApplied;
+      totalPaid += paymentThisMonth;
+      actualMonths = month;
+
+      schedule.push({
+        month,
+        payment: paymentThisMonth,
+        principal: principalPart,
+        interest: interestPart,
+        extraApplied,
+        balance
+      });
+
+      if (balance === 0) break;
+    }
+
+    // Calculate standard totals (no extra payments) for comparison
+    const totalInterestNoExtra = (monthlyPayment * n) - P;
+    const totalCostNoExtra = monthlyPayment * n;
+
+    // Display results
+    document.getElementById('monthlyPayment')!.textContent = fmtCurrency(monthlyPayment + extra);
+    document.getElementById('totalInterest')!.textContent = fmtCurrency(totalInterestPaid);
+    document.getElementById('totalCost')!.textContent = fmtCurrency(totalPaid);
+
+    // Calculate payoff date from current date
+    const now = new Date();
+    const payoffDate = new Date(now.getFullYear(), now.getMonth() + actualMonths, 1);
+    const payoffMonthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    document.getElementById('payoffDate')!.textContent = payoffMonthNames[payoffDate.getMonth()] + ' ' + payoffDate.getFullYear();
+
+    // Show savings from extra payments
+    if (extra > 0) {
+      const interestSaved = totalInterestNoExtra - totalInterestPaid;
+      const monthsSaved = n - actualMonths;
+      const yearsSaved = Math.floor(monthsSaved / 12);
+      const remainingMonths = monthsSaved % 12;
+
+      document.getElementById('interestSaved')!.textContent = fmtCurrency(interestSaved);
+      (document.getElementById('savedCard') as HTMLElement).style.display = '';
+
+      let timeStr = '';
+      if (yearsSaved > 0) timeStr += yearsSaved + ' yr' + (yearsSaved > 1 ? 's' : '');
+      if (remainingMonths > 0) timeStr += (timeStr ? ' ' : '') + remainingMonths + ' mo';
+      if (!timeStr) timeStr = '0 mo';
+      document.getElementById('timeSaved')!.textContent = timeStr;
+      (document.getElementById('timeSavedCard') as HTMLElement).style.display = '';
+    } else {
+      (document.getElementById('savedCard') as HTMLElement).style.display = 'none';
+      (document.getElementById('timeSavedCard') as HTMLElement).style.display = 'none';
+    }
+
+    // Build amortization table with yearly summaries (collapsed) and monthly details (expandable)
+    const tbody = document.getElementById('amortBody')!;
+    const rows: string[] = [];
+
+    // Group schedule by year
+    let currentYear = 1;
+    let yearStart = 0;
+
+    while (yearStart < schedule.length) {
+      const yearEnd = Math.min(yearStart + 12, schedule.length);
+      const yearMonths = schedule.slice(yearStart, yearEnd);
+
+      // Calculate yearly totals
+      let yearPayment = 0;
+      let yearPrincipal = 0;
+      let yearInterest = 0;
+      let yearExtra = 0;
+
+      for (const m of yearMonths) {
+        yearPayment += m.payment;
+        yearPrincipal += m.principal;
+        yearInterest += m.interest;
+        yearExtra += m.extraApplied;
+      }
+
+      const endBalance = yearMonths[yearMonths.length - 1].balance;
+      const yearId = 'year-' + currentYear;
+
+      // Yearly summary row (clickable)
+      rows.push(
+        `<tr class="year-row" data-year="${yearId}">` +
+          `<td><span class="toggle-arrow" id="arrow-${yearId}">&#9654;</span> Year ${currentYear}</td>` +
+          `<td>${fmtCurrency(yearPayment)}</td>` +
+          `<td>${fmtCurrency(yearPrincipal)}</td>` +
+          `<td>${fmtCurrency(yearInterest)}</td>` +
+          `<td>${yearExtra > 0 ? fmtCurrency(yearExtra) : '$0'}</td>` +
+          `<td>${fmtCurrency2(endBalance)}</td>` +
+        `</tr>`
+      );
+
+      // Monthly detail rows (hidden by default)
+      for (const m of yearMonths) {
+        rows.push(
+          `<tr class="month-row ${yearId}">` +
+            `<td>${m.month}</td>` +
+            `<td>${fmtCurrency2(m.payment)}</td>` +
+            `<td>${fmtCurrency2(m.principal)}</td>` +
+            `<td>${fmtCurrency2(m.interest)}</td>` +
+            `<td>${m.extraApplied > 0 ? fmtCurrency2(m.extraApplied) : '$0.00'}</td>` +
+            `<td>${fmtCurrency2(m.balance)}</td>` +
+          `</tr>`
+        );
+      }
+
+      currentYear++;
+      yearStart = yearEnd;
+    }
+
+    tbody.innerHTML = rows.join('');
+
+    // Attach click handlers to year rows for expand/collapse
+    document.querySelectorAll('.year-row').forEach(row => {
+      row.addEventListener('click', () => {
+        const yearId = (row as HTMLElement).dataset.year!;
+        const monthRows = document.querySelectorAll(`.month-row.${yearId}`);
+        const arrow = document.getElementById('arrow-' + yearId);
+        const isExpanded = monthRows[0]?.classList.contains('expanded');
+
+        monthRows.forEach(r => {
+          if (isExpanded) {
+            r.classList.remove('expanded');
+          } else {
+            r.classList.add('expanded');
+          }
+        });
+
+        if (arrow) {
+          if (isExpanded) {
+            arrow.classList.remove('open');
+          } else {
+            arrow.classList.add('open');
+          }
+        }
+      });
+    });
+  }
+
+  // Auto-calculate on button click
+  document.getElementById('calculateBtn')?.addEventListener('click', calculate);
+
+  // Auto-recalculate on any input change
+  document.querySelectorAll('#loanAmount, #interestRate, #loanTerm, #extraPayment').forEach(el => {
+    el.addEventListener('input', calculate);
+    el.addEventListener('change', calculate);
+  });
+
+  // Auto-calculate on load with defaults
+  calculate();
+</script>
