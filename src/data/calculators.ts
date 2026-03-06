@@ -57,6 +57,12 @@ export const categories: Category[] = [
     description: 'Concrete, roofing, paint, flooring, mulch, fence, drywall, and deck calculators for home improvement projects.',
     icon: '🔨',
   },
+  {
+    name: 'Astrology Calculators',
+    slug: 'astrology-calculators',
+    description: 'Zodiac sign, tarot reading, numerology, angel numbers, and compatibility tools for self-discovery.',
+    icon: '🔮',
+  },
 ];
 
 export const calculators: Calculator[] = [
@@ -723,6 +729,55 @@ export const calculators: Calculator[] = [
     categorySlug: 'math-calculators',
     icon: '🔬',
   },
+  // Astrology
+  {
+    title: 'Zodiac Sign Calculator',
+    slug: 'zodiac-sign-calculator',
+    description: 'Find your zodiac sign based on your birthday. Get detailed personality traits, strengths, weaknesses, and compatibility insights.',
+    category: 'Astrology Calculators',
+    categorySlug: 'astrology-calculators',
+    icon: '♈',
+  },
+  {
+    title: 'Zodiac Compatibility Calculator',
+    slug: 'zodiac-compatibility-calculator',
+    description: 'Check zodiac sign compatibility for love, friendship, and work. Get a detailed compatibility score and relationship analysis.',
+    category: 'Astrology Calculators',
+    categorySlug: 'astrology-calculators',
+    icon: '💕',
+  },
+  {
+    title: 'Numerology Calculator',
+    slug: 'numerology-calculator',
+    description: 'Calculate your Life Path Number from your birthday and discover what it reveals about your personality, strengths, and life purpose.',
+    category: 'Astrology Calculators',
+    categorySlug: 'astrology-calculators',
+    icon: '🔢',
+  },
+  {
+    title: 'Angel Number Calculator',
+    slug: 'angel-number-calculator',
+    description: 'Look up the meaning of any angel number. Discover what messages the universe may be sending you through repeating numbers.',
+    category: 'Astrology Calculators',
+    categorySlug: 'astrology-calculators',
+    icon: '👼',
+  },
+  {
+    title: 'Tarot Card Reading',
+    slug: 'tarot-reading',
+    description: 'Get a free interactive tarot card reading. Draw cards for a Past-Present-Future spread or a single daily guidance card.',
+    category: 'Astrology Calculators',
+    categorySlug: 'astrology-calculators',
+    icon: '🃏',
+  },
+  {
+    title: 'Chinese Zodiac Calculator',
+    slug: 'chinese-zodiac-calculator',
+    description: 'Find your Chinese zodiac animal and element based on your birth year. Learn about your personality traits and compatibility.',
+    category: 'Astrology Calculators',
+    categorySlug: 'astrology-calculators',
+    icon: '🐉',
+  },
 ];
 
 export function getCalculatorsByCategory(categorySlug: string): Calculator[] {
@@ -751,6 +806,8 @@ const relatedGroups: Record<string, string[]> = {
   'everyday': ['tip-calculator', 'discount-calculator', 'hours-calculator', 'square-footage-calculator', 'gas-cost-calculator', 'electricity-cost-calculator', 'word-counter', 'dog-age-calculator'],
   // Construction
   'construction': ['concrete-calculator', 'paint-calculator', 'roofing-calculator', 'flooring-calculator', 'mulch-calculator', 'fence-calculator', 'drywall-calculator', 'deck-calculator', 'solar-panel-calculator', 'gravel-calculator', 'stair-calculator'],
+  // Astrology
+  'astrology': ['zodiac-sign-calculator', 'zodiac-compatibility-calculator', 'numerology-calculator', 'angel-number-calculator', 'tarot-reading', 'chinese-zodiac-calculator'],
 };
 
 // Cross-category links for broader discovery
@@ -762,6 +819,7 @@ const crossCategoryLinks: Record<string, string[]> = {
   'conversion-calculators': ['percentage-calculator', 'tip-calculator', 'area-calculator'],
   'everyday-calculators': ['percentage-calculator', 'tax-calculator', 'mortgage-calculator', 'bmi-calculator'],
   'construction-calculators': ['square-footage-calculator', 'area-calculator', 'percentage-calculator', 'concrete-calculator'],
+  'astrology-calculators': ['age-calculator', 'random-number-generator', 'date-difference-calculator'],
 };
 
 export function getRelatedCalculators(currentSlug: string, limit: number = 5): Calculator[] {

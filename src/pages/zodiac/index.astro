@@ -1,0 +1,195 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import { zodiacSigns } from '../../data/zodiac-data';
+import '../../styles/category.css';
+
+const elementGroups = [
+  { element: 'Fire', label: 'Fire Signs', color: '#E74C3C', signs: zodiacSigns.filter(s => s.element === 'Fire') },
+  { element: 'Earth', label: 'Earth Signs', color: '#27AE60', signs: zodiacSigns.filter(s => s.element === 'Earth') },
+  { element: 'Air', label: 'Air Signs', color: '#3498DB', signs: zodiacSigns.filter(s => s.element === 'Air') },
+  { element: 'Water', label: 'Water Signs', color: '#9B59B6', signs: zodiacSigns.filter(s => s.element === 'Water') },
+];
+
+const breadcrumbItems = [
+  { name: 'Home', url: '/' },
+  { name: 'Zodiac Signs' },
+];
+---
+
+<BaseLayout
+  title="12 Zodiac Signs - Dates, Traits & Compatibility | ToolCalcs"
+  description="Explore all 12 zodiac signs with dates, personality traits, compatibility, and element groupings. Discover your sign's strengths, weaknesses, and cosmic connections."
+>
+  <Breadcrumb items={breadcrumbItems} />
+
+  <h1>12 Zodiac Signs</h1>
+  <p class="page-desc">Explore each zodiac sign's personality traits, compatibility, and cosmic profile. Select a sign below to learn more.</p>
+
+  <AdUnit slot="zodiac-idx-top" format="horizontal" />
+
+  {elementGroups.map((group) => (
+    <section class="element-section">
+      <h2 class="element-heading" style={`border-color: ${group.color};`}>
+        <span class="element-dot" style={`background: ${group.color};`}></span>
+        {group.label}
+      </h2>
+      <div class="zodiac-grid">
+        {group.signs.map((sign) => (
+          <a href={`/zodiac/${sign.slug}/`} class="zodiac-card" style={`--accent: ${group.color};`}>
+            <span class="zodiac-symbol">{sign.symbol}</span>
+            <span class="zodiac-name">{sign.name}</span>
+            <span class="zodiac-dates">{sign.dateRange}</span>
+            <span class="zodiac-element-badge" style={`background: ${group.color}; color: #fff;`}>{sign.element}</span>
+          </a>
+        ))}
+      </div>
+    </section>
+  ))}
+
+  <section class="zodiac-overview">
+    <h2>Understanding the Zodiac</h2>
+    <p>The Western zodiac consists of 12 signs, each spanning approximately 30 degrees of the celestial ecliptic. Your zodiac sign, also known as your Sun sign, is determined by the position of the Sun at the time of your birth. Each sign belongs to one of four elements &mdash; Fire, Earth, Air, or Water &mdash; and one of three qualities &mdash; Cardinal, Fixed, or Mutable.</p>
+    <p>The four elements represent fundamental personality energies: <strong>Fire signs</strong> (Aries, Leo, Sagittarius) are passionate and dynamic. <strong>Earth signs</strong> (Taurus, Virgo, Capricorn) are grounded and practical. <strong>Air signs</strong> (Gemini, Libra, Aquarius) are intellectual and communicative. <strong>Water signs</strong> (Cancer, Scorpio, Pisces) are intuitive and emotional.</p>
+
+    <div class="cta-links">
+      <a href="/astrology-calculators/zodiac-sign-calculator/" class="cta-link">Calculate Your Zodiac Sign</a>
+      <a href="/astrology-calculators/zodiac-compatibility-calculator/" class="cta-link">Check Compatibility</a>
+    </div>
+  </section>
+
+  <AdUnit slot="zodiac-idx-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .element-section {
+    margin-bottom: 36px;
+  }
+  .element-heading {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 3px solid var(--color-border);
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .element-dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .zodiac-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+  .zodiac-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 20px 14px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--color-text);
+    transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+    position: relative;
+  }
+  .zodiac-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+    text-decoration: none;
+  }
+
+  .zodiac-symbol {
+    font-size: 2.2rem;
+    line-height: 1;
+  }
+  .zodiac-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+  .zodiac-dates {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    text-align: center;
+  }
+  .zodiac-element-badge {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 2px;
+  }
+
+  .zodiac-overview {
+    margin-top: 40px;
+    max-width: 800px;
+    line-height: 1.8;
+  }
+  .zodiac-overview h2 {
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+  }
+  .zodiac-overview p {
+    margin-bottom: 12px;
+    color: var(--color-text);
+  }
+
+  .cta-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .cta-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 20px;
+    background: var(--color-primary);
+    color: #fff;
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: background 0.15s;
+  }
+  .cta-link:hover {
+    background: var(--color-primary-dark);
+    text-decoration: none;
+  }
+
+  @media (max-width: 900px) {
+    .zodiac-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  @media (max-width: 640px) {
+    .zodiac-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .zodiac-symbol {
+      font-size: 1.8rem;
+    }
+    .zodiac-name {
+      font-size: 0.95rem;
+    }
+    .zodiac-card {
+      padding: 16px 10px;
+    }
+  }
+</style>

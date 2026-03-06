@@ -1,0 +1,969 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Astrology Calculators",
+        "item": "https://toolcalcs.com/astrology-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Angel Number Calculator"
+      }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What are angel numbers?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Angel numbers are repeating number sequences such as 111, 222, 333, or patterns like 1234 and 1212 that many people believe carry spiritual significance. The concept originates from numerology, the ancient study of the mystical relationship between numbers and events. Practitioners believe these numbers appear as messages from guardian angels, spirit guides, or the universe itself, offering guidance, reassurance, or warnings related to your current life path.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why do I keep seeing the same number everywhere?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Repeatedly seeing the same number is often explained by two factors. Psychologically, it may be the frequency illusion (Baader-Meinhof phenomenon), where your brain begins noticing something more after it first catches your attention. Spiritually, many believe it is a sign that the universe is trying to communicate a specific message relevant to your current situation, and the repetition is meant to ensure you pay attention to its meaning.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Are angel numbers real?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Angel numbers are a belief system rooted in numerology and spiritual traditions, not a scientifically proven phenomenon. There is no empirical evidence that numbers carry supernatural messages. However, many people find personal value in angel numbers as a tool for self-reflection, mindfulness, and introspection. Whether they hold metaphysical significance is a matter of personal faith and interpretation.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How do I know if a number is an angel number?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Traditionally, angel numbers are identified by their repeating patterns, such as double digits (11, 22), triple digits (111, 222, 333), quadruple digits (1111, 2222), sequences (1234, 456), or mirror numbers (1221, 1001). However, any number that repeatedly catches your attention in daily life, such as on clocks, receipts, license plates, or phone numbers, can be considered personally significant in the angel number framework.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What should I do when I see an angel number?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'When you notice an angel number, practitioners recommend pausing to acknowledge it, reflecting on what you were thinking or feeling at that moment, looking up the traditional meaning of the number, and considering how its message might apply to your current life circumstances. Many people journal about their angel number sightings to track patterns and personal insights over time. The key is to use the number as a prompt for self-reflection rather than as a directive.',
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Angel Number Calculator - Look Up Any Angel Number Meaning | ToolCalcs"
+  description="Free angel number calculator. Look up the spiritual meaning of any angel number from 0 to 9999. Discover messages about love, career, and spiritual growth."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/astrology-calculators/">Astrology Calculators</a> &rsaquo;
+    <span>Angel Number Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Angel Number Calculator</h1>
+  <p class="page-desc">Enter any number from 0 to 9999 to discover its spiritual meaning, guidance for love and career, and actionable steps when you see it.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="angelNumber">Enter Angel Number</label>
+        <input type="number" id="angelNumber" min="0" max="9999" value="" placeholder="e.g. 444" />
+      </div>
+      <button class="calc-btn" id="lookupBtn">Look Up Meaning</button>
+    </div>
+
+    <div class="quick-select">
+      <p class="quick-label">Popular angel numbers:</p>
+      <div class="quick-grid">
+        <button class="quick-btn" data-num="111">111</button>
+        <button class="quick-btn" data-num="222">222</button>
+        <button class="quick-btn" data-num="333">333</button>
+        <button class="quick-btn" data-num="444">444</button>
+        <button class="quick-btn" data-num="555">555</button>
+        <button class="quick-btn" data-num="666">666</button>
+        <button class="quick-btn" data-num="777">777</button>
+        <button class="quick-btn" data-num="888">888</button>
+        <button class="quick-btn" data-num="999">999</button>
+        <button class="quick-btn" data-num="1111">1111</button>
+        <button class="quick-btn" data-num="1212">1212</button>
+        <button class="quick-btn" data-num="1234">1234</button>
+      </div>
+    </div>
+
+    <div id="results" class="angel-results" style="display:none;">
+      <div class="angel-display">
+        <span class="angel-number-glow" id="displayNumber"></span>
+        <p class="angel-short-meaning" id="shortMeaning"></p>
+      </div>
+
+      <div class="angel-detail-section">
+        <h3>Detailed Interpretation</h3>
+        <p id="detailedMeaning"></p>
+      </div>
+
+      <div class="angel-categories">
+        <div class="angel-category">
+          <h4><span class="cat-icon">&#x1F495;</span> Love &amp; Relationships</h4>
+          <p id="loveMeaning"></p>
+        </div>
+        <div class="angel-category">
+          <h4><span class="cat-icon">&#x1F4BC;</span> Career &amp; Money</h4>
+          <p id="careerMeaning"></p>
+        </div>
+        <div class="angel-category">
+          <h4><span class="cat-icon">&#x2728;</span> Spiritual Growth</h4>
+          <p id="spiritualMeaning"></p>
+        </div>
+      </div>
+
+      <div class="angel-actions">
+        <h4>When You See This Number...</h4>
+        <ul id="actionSteps" class="action-list"></ul>
+      </div>
+
+      <div class="angel-related-nums">
+        <h4>Related Angel Numbers</h4>
+        <div id="relatedNumbers" class="related-nums-grid"></div>
+      </div>
+
+      <p class="angel-full-link" id="fullPageLink"></p>
+
+      <p class="disclaimer">For entertainment and self-reflection purposes only.</p>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>What Are Angel Numbers?</h2>
+    <p>Angel numbers are specific sequences of numbers that many people believe carry spiritual messages from the universe, guardian angels, or higher powers. These numbers typically appear as repeating digits such as 111, 222, or 333, but they can also take the form of sequential patterns like 1234, mirror numbers like 1221, or any combination that repeatedly draws your attention. The study of angel numbers is a modern branch of numerology, an ancient practice that dates back thousands of years and assigns mystical significance to numbers and their vibrations.</p>
+    <p>The concept of angel numbers gained widespread popularity through the work of Doreen Virtue, who published extensively about the topic in the early 2000s. However, the roots of this belief system extend much further back. Pythagoras, the ancient Greek mathematician, believed that numbers were the fundamental building blocks of the universe and that each number carried its own unique vibration and meaning. In many spiritual traditions around the world, from Kabbalah to Chinese numerology, numbers have long been associated with cosmic forces and divine communication.</p>
+    <p>When people talk about seeing angel numbers, they typically mean noticing the same number or pattern repeatedly in everyday life. You might glance at the clock and see 11:11, then notice the same digits on a receipt, a license plate, or a phone number, all within a short period. This synchronicity, a term coined by psychologist Carl Jung to describe meaningful coincidences, is what angel number practitioners interpret as a spiritual sign worth paying attention to.</p>
+
+    <h2>The Meaning of Each Digit (0-9)</h2>
+    <p>In angel number numerology, every digit from 0 to 9 carries its own unique energy and meaning. When a digit repeats, its influence is considered amplified. Understanding the foundational meaning of each digit is the key to interpreting any angel number, even those you will not find in a standard reference guide.</p>
+    <ul>
+      <li><strong>0 - Infinite Potential:</strong> The number 0 represents the void from which all creation emerges. It symbolizes wholeness, eternity, and the beginning of a spiritual journey. Zero amplifies the energy of whatever number it appears beside and is often associated with God, Source energy, or the universe itself. Seeing 0 suggests you are at a starting point with unlimited possibilities stretching before you.</li>
+      <li><strong>1 - New Beginnings:</strong> The number 1 is the energy of creation, independence, and initiative. It represents the start of something new, whether a project, relationship, or phase of personal growth. Number 1 encourages you to trust your instincts, take the lead, and recognize that your thoughts are manifesting rapidly. It is a reminder that you create your own reality through your beliefs and actions.</li>
+      <li><strong>2 - Balance and Partnership:</strong> The number 2 embodies duality, cooperation, and diplomacy. It speaks to the importance of relationships, both with others and within yourself. When 2 appears, it often signals that patience and faith are needed, that things are working behind the scenes even if you cannot yet see the results. It is the number of trust and divine timing.</li>
+      <li><strong>3 - Creativity and Expression:</strong> The number 3 vibrates with creative energy, self-expression, and joy. It is associated with the Ascended Masters in many spiritual traditions and suggests that your creative abilities are being highlighted. Number 3 encourages you to communicate authentically, embrace your artistic side, and find the humor and lightness in life.</li>
+      <li><strong>4 - Stability and Foundation:</strong> The number 4 represents hard work, discipline, and building solid foundations. It is the energy of practicality and determination. When 4 appears, it often means your angels are nearby, offering support and encouragement as you work toward your goals. It is a reminder to stay organized, be patient with the process, and trust that your efforts will pay off.</li>
+      <li><strong>5 - Change and Freedom:</strong> The number 5 signals significant life changes, personal freedom, and adventure. It is associated with making important decisions and breaking free from restrictions that no longer serve you. While change can be uncomfortable, the presence of 5 suggests that these shifts are ultimately positive and necessary for your growth.</li>
+      <li><strong>6 - Harmony and Home:</strong> The number 6 relates to domestic life, family, nurturing, and responsibility. It asks you to find balance between your material concerns and your spiritual needs. When 6 appears, it may indicate that you are focusing too heavily on financial worries or material pursuits and need to redirect some energy toward your relationships and home life.</li>
+      <li><strong>7 - Spirituality and Wisdom:</strong> The number 7 is deeply spiritual, representing inner wisdom, intuition, and mystical insight. It is the number of the seeker and the philosopher. Seeing 7 suggests you are on the right path spiritually and encourages you to continue your inner work, whether through meditation, study, or contemplation. It confirms that you are gaining wisdom that will serve you well.</li>
+      <li><strong>8 - Abundance and Power:</strong> The number 8 resonates with material abundance, personal power, and karmic balance. Its shape, the infinity symbol turned upright, reflects the infinite flow of energy and resources. When 8 appears, it often indicates that financial abundance or professional success is approaching, but it also reminds you of the spiritual law of cause and effect: what you put out, you receive back.</li>
+      <li><strong>9 - Completion and Humanitarianism:</strong> The number 9 represents endings, fulfillment, and service to humanity. It is the most spiritually evolved single digit and is associated with compassion, generosity, and universal love. When 9 appears, it may signal that a chapter in your life is concluding to make room for something new, and it encourages you to embrace your role as a lightworker or humanitarian.</li>
+    </ul>
+
+    <h2>Common Angel Number Patterns</h2>
+    <p>Angel numbers appear in several recognizable patterns, each carrying its own layer of interpretation beyond the individual digit meanings.</p>
+    <h3>Repeating Digits</h3>
+    <p>When a digit repeats, its energy is amplified. The number 111 carries triple the energy of new beginnings, while 4444 quadruples the message of stability and angelic support. The more a digit repeats, the more urgently the message is considered. Triple-digit angel numbers like 111 through 999 are the most commonly recognized and discussed, but double digits (11, 22, 33) and quadruple digits (1111, 2222) are equally significant. In numerology, 11, 22, and 33 are considered Master Numbers, carrying especially powerful spiritual vibrations that transcend their single-digit roots.</p>
+    <h3>Sequential Numbers</h3>
+    <p>Sequences like 123, 456, or 1234 represent forward movement, progress, and growth. They suggest you are on the right path and that things are unfolding in the correct order. Ascending sequences indicate upward momentum, while descending sequences like 321 or 987 may indicate a need to revisit previous lessons or simplify your life. The number 1234, in particular, is often interpreted as a sign to streamline, declutter, and take things step by step.</p>
+    <h3>Mirror Numbers</h3>
+    <p>Mirror or palindrome numbers like 1221, 1001, or 2332 reflect themes of balance, self-reflection, and seeing the truth. The mirrored structure suggests looking inward, examining how your external world reflects your internal state. These numbers often appear during periods of self-discovery or when you need to reconcile opposing aspects of your personality or life situation.</p>
+
+    <h2>How to Recognize Angel Numbers in Daily Life</h2>
+    <p>Angel numbers can appear virtually anywhere numbers are present. The most commonly reported sightings include digital clocks (especially 11:11 or 3:33), license plates, phone numbers, receipts and transaction totals, page numbers in books, addresses, and flight or ticket numbers. The key element is not where you see the number but how you feel when you see it. A genuine angel number sighting, according to practitioners, is accompanied by a sense of recognition, a subtle feeling that the number is significant and meant for you specifically.</p>
+    <p>Some people report seeing the same number dozens of times within a single week, while others may notice a particular number only occasionally over months or years. The frequency is less important than the personal resonance. If a number keeps catching your attention, practitioners recommend looking up its meaning and reflecting on how it might relate to your current circumstances, questions, or challenges.</p>
+    <p>It is worth noting that from a psychological perspective, the frequency illusion, also known as the Baader-Meinhof phenomenon, plays a significant role in why people notice repeating numbers. Once your brain registers a particular number as meaningful, it begins filtering for it unconsciously, causing you to notice it more frequently than you otherwise would. This does not necessarily invalidate the experience for those who find spiritual value in it, but it is an important factor to be aware of.</p>
+
+    <h2>History of Numerology in Spiritual Traditions</h2>
+    <p>The practice of assigning spiritual meaning to numbers predates recorded history and spans virtually every major civilization. In ancient Egypt, numbers were considered the language of the gods, and temple architecture was designed according to sacred numerical proportions. The ancient Babylonians developed one of the earliest known systems of numerology, using numbers to predict the future and understand the will of the gods.</p>
+    <p>Pythagoras, often called the father of Western numerology, established a school in ancient Greece around 500 BCE where students studied the mystical properties of numbers alongside mathematics and music. He believed that the universe could be understood through numbers and that numerical vibrations influenced all aspects of human life. His system, which reduces multi-digit numbers to single digits through addition (a process still used in modern numerology), forms the foundation of most Western numerological practices today.</p>
+    <p>In the Jewish mystical tradition of Kabbalah, gematria assigns numerical values to Hebrew letters, allowing practitioners to find hidden connections between words and phrases that share the same numerical value. This system has been used for centuries to interpret sacred texts and uncover deeper layers of meaning. Similarly, in Chinese culture, certain numbers are considered auspicious (such as 8, which sounds like the word for prosperity) while others are avoided (such as 4, which sounds like the word for death). These beliefs influence everything from business addresses to wedding dates.</p>
+    <p>In Hinduism and Buddhism, numbers carry profound spiritual significance. The number 108, for example, is sacred in both traditions, reflected in the 108 beads on a mala (prayer necklace) and the 108 Upanishads in Hindu philosophy. Islamic tradition also recognizes the significance of certain numbers, with 99 representing the names of Allah and the number 7 appearing frequently in the Quran.</p>
+    <p>The modern angel number movement draws from all of these traditions while adding its own contemporary interpretation focused on personal guidance and self-improvement. Whether approached as a spiritual practice, a psychological tool for self-reflection, or simply an interesting cultural phenomenon, angel numbers continue to fascinate millions of people worldwide and provide a framework for finding meaning in the numerical patterns that surround us every day.</p>
+
+    <h2>How to Use This Angel Number Calculator</h2>
+    <p>To use this angel number calculator, simply enter any number between 0 and 9999 in the input field above, or click one of the popular angel number buttons for instant results. The calculator provides a comprehensive interpretation including the overall meaning of your number, its significance for love and relationships, career and financial guidance, spiritual growth insights, and practical action steps you can take when you encounter this number in your daily life.</p>
+    <p>For the twenty most commonly searched angel numbers, the calculator provides detailed, curated interpretations written specifically for that number. For all other numbers, the calculator uses a sophisticated interpretation algorithm based on the foundational meanings of each individual digit, the pattern type (repeating, sequential, mirrored, or mixed), and the principles of classical numerology. This ensures that every number from 0 to 9999 receives a meaningful and relevant interpretation.</p>
+    <p>You can also explore the full dedicated page for any angel number by clicking the link provided in the results, where you will find even more detailed information, historical context, and user perspectives. Whether you are new to angel numbers or a long-time practitioner, this calculator is designed to be a comprehensive starting point for understanding the messages behind any number you encounter.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>What are angel numbers?</summary>
+        <p>Angel numbers are repeating or patterned number sequences that many people believe carry spiritual messages from guardian angels, spirit guides, or the universe. Common examples include 111, 444, 777, 1111, and 1234. The concept is rooted in numerology, the ancient study of numbers and their mystical significance. Practitioners believe that when you repeatedly notice a specific number in your daily life, it is a sign meant to offer guidance, reassurance, or insight about your current path.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Why do I keep seeing the same number everywhere?</summary>
+        <p>There are two common explanations. Psychologically, once you notice a number and assign it significance, your brain's reticular activating system begins filtering for it, making you notice it more often. This is called the frequency illusion or Baader-Meinhof phenomenon. Spiritually, practitioners believe the repetition is intentional and that the universe is amplifying its message until you pay attention. Both explanations can coexist: the psychological mechanism may be the vehicle through which spiritual messages are delivered, depending on your personal belief system.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Are angel numbers real?</summary>
+        <p>Angel numbers are a belief system, not a scientifically verified phenomenon. There is no empirical evidence that numbers carry supernatural messages. However, many people find genuine value in angel numbers as a framework for self-reflection, mindfulness, and personal growth. The practice of pausing to reflect when you notice a meaningful number can be beneficial regardless of whether you believe in a spiritual mechanism behind it. Whether angel numbers are "real" ultimately depends on your personal beliefs and how you define reality.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How do I know if a number is an angel number?</summary>
+        <p>Traditionally, angel numbers are identified by their patterns: repeating digits (111, 2222), sequences (1234, 567), mirror numbers (1221, 1001), or Master Numbers (11, 22, 33). However, any number can be considered an angel number if it repeatedly appears in your awareness in a way that feels personally significant. Common places to spot angel numbers include digital clocks, license plates, receipts, phone numbers, and addresses. The key indicator is not the number itself but the frequency and emotional resonance of your encounters with it.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What should I do when I see an angel number?</summary>
+        <p>When you notice an angel number, practitioners recommend a simple practice: pause and take a breath, note what you were thinking or feeling at that moment, look up the traditional meaning of the number, and reflect on how its message might relate to your current life situation. Many people keep an angel number journal to track their sightings and the insights they gain. The most important step is to use the number as a prompt for self-reflection and intentional living rather than treating it as a rigid instruction or prediction.</p>
+      </details>
+    </div>
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/astrology-calculators/numerology-calculator/">Numerology Calculator</a> - Calculate your life path number and discover your numerological profile.</li>
+      <li><a href="/astrology-calculators/zodiac-sign-calculator/">Zodiac Sign Calculator</a> - Find your zodiac sign and learn about your astrological traits.</li>
+      <li><a href="/astrology-calculators/zodiac-compatibility-calculator/">Zodiac Compatibility Calculator</a> - Check romantic compatibility between two zodiac signs.</li>
+      <li><a href="/astrology-calculators/tarot-reading/">Tarot Card Reading</a> - Draw tarot cards and explore their meanings for guidance.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+  <RelatedArticles calculatorSlug="angel-number-calculator" />
+
+  <RelatedCalculators currentSlug="angel-number-calculator" />
+</BaseLayout>
+
+<style>
+  .last-updated { font-size: 0.75rem; color: var(--color-text-muted); margin: 4px 0 0; }
+
+  /* Quick Select */
+  .quick-select { margin-top: 16px; }
+  .quick-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-bottom: 8px;
+  }
+  .quick-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .quick-btn {
+    padding: 8px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .quick-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background: #eff6ff;
+  }
+  [data-theme="dark"] .quick-btn:hover {
+    background: #1e3a5f;
+  }
+
+  /* Angel Number Display */
+  .angel-results { margin-top: 24px; }
+  .angel-display {
+    text-align: center;
+    padding: 32px 16px;
+    margin-bottom: 24px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+  }
+  .angel-number-glow {
+    display: block;
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: #7c3aed;
+    text-shadow:
+      0 0 10px rgba(124, 58, 237, 0.3),
+      0 0 20px rgba(124, 58, 237, 0.2),
+      0 0 40px rgba(124, 58, 237, 0.1);
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+  [data-theme="dark"] .angel-number-glow {
+    color: #a78bfa;
+    text-shadow:
+      0 0 10px rgba(167, 139, 250, 0.4),
+      0 0 20px rgba(167, 139, 250, 0.3),
+      0 0 40px rgba(167, 139, 250, 0.15);
+  }
+  .angel-short-meaning {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  /* Detail Sections */
+  .angel-detail-section {
+    margin-bottom: 24px;
+  }
+  .angel-detail-section h3 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+    color: var(--color-text);
+  }
+  .angel-detail-section p {
+    color: var(--color-text-muted);
+    line-height: 1.8;
+  }
+
+  /* Category Grid */
+  .angel-categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .angel-category {
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    padding: 20px;
+    border: 1px solid var(--color-border);
+  }
+  .angel-category h4 {
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .cat-icon { font-size: 1.1rem; }
+  .angel-category p {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  /* Action Steps */
+  .angel-actions {
+    margin-bottom: 24px;
+  }
+  .angel-actions h4 {
+    font-size: 1rem;
+    margin-bottom: 12px;
+  }
+  .action-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  :global(.action-item) {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 16px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--color-text);
+  }
+  :global(.action-check) {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #7c3aed;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    margin-top: 2px;
+  }
+  [data-theme="dark"] :global(.action-check) {
+    background: #a78bfa;
+    color: #1a1a2e;
+  }
+
+  /* Related Numbers */
+  .angel-related-nums {
+    margin-bottom: 24px;
+  }
+  .angel-related-nums h4 {
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+  .related-nums-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  :global(.related-num-link) {
+    display: inline-block;
+    padding: 6px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text);
+    text-decoration: none;
+    transition: all 0.15s;
+  }
+  :global(.related-num-link:hover) {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+
+  /* Full Page Link */
+  .angel-full-link {
+    text-align: center;
+    margin: 20px 0 16px;
+  }
+  .angel-full-link a {
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+
+  /* Disclaimer */
+  .disclaimer {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    text-align: center;
+    font-style: italic;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border);
+  }
+
+  @media (max-width: 640px) {
+    .angel-number-glow { font-size: 2.8rem; }
+    .angel-categories { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+  interface AngelNumberData {
+    shortMeaning: string;
+    detailed: string;
+    love: string;
+    career: string;
+    spiritual: string;
+    actions: string[];
+    related: number[];
+  }
+
+  const angelDatabase: Record<number, AngelNumberData> = {
+    0: {
+      shortMeaning: "Infinite potential and the beginning of a spiritual journey.",
+      detailed: "Angel number 000 (or 0) represents the infinite void from which all creation springs. It is one of the most powerful angel numbers because it symbolizes both everything and nothing simultaneously, the pure potential that exists before manifestation begins. When you see this number, the universe is reminding you that you are at a point of absolute possibility. No doors are closed, no paths are blocked, and the only limitations are those you place on yourself. This number carries the energy of the cosmic egg, the primordial state of being before form takes shape. It is a call to connect with your highest self and recognize that you are one with the infinite source of all creation. The appearance of 000 often coincides with moments of deep spiritual awakening, where old identities and belief systems are dissolving to make way for a more authentic expression of who you truly are. Embrace this emptiness not as a lack but as the fertile ground from which your next chapter will grow. The universe is pressing the reset button, giving you a clean slate and the freedom to create your reality from scratch.",
+      love: "In love, 000 signals a fresh start. If you are single, it suggests that you are being prepared for a deeply spiritual connection that will transform your understanding of love. If you are in a relationship, this number encourages you to release old patterns and resentments, allowing your partnership to be reborn with renewed energy and deeper intimacy.",
+      career: "For career and finances, 000 represents unlimited potential. You may be at a crossroads where every direction is equally viable. This is not a time for fear but for visionary thinking. Consider what you would pursue if failure were impossible. The universe is telling you that the resources and opportunities you need will appear once you commit to a direction.",
+      spiritual: "Spiritually, 000 is the most profound number you can encounter. It represents your direct connection to Source energy, the divine, or whatever name you give to the infinite intelligence of the universe. This is a call to deepen your spiritual practice through meditation, prayer, or contemplation. You are being invited to dissolve the boundaries between your individual self and the universal consciousness.",
+      actions: [
+        "Meditate on the concept of infinite possibility and release any limiting beliefs about what you can achieve.",
+        "Start a new journal or creative project, treating this moment as day one of a new era in your life.",
+        "Practice letting go of something that no longer serves you, whether it is a habit, a grudge, or an outdated self-image.",
+        "Spend time in nature connecting with the vastness of the universe to put your life into perspective."
+      ],
+      related: [111, 1111, 1010, 999]
+    },
+    111: {
+      shortMeaning: "Your thoughts are manifesting rapidly. Stay focused on what you want, not what you fear.",
+      detailed: "Angel number 111 is one of the most powerful manifestation numbers in the angel number system. It serves as an urgent reminder that your thoughts are creating your reality at an accelerated pace right now. The universe is acting like a mirror, reflecting your dominant mental patterns back to you in the form of real-world experiences and circumstances. When you see 111, it is crucial to monitor your thoughts carefully and ensure they align with what you actually want to create in your life, because negative thoughts will manifest just as quickly as positive ones during this heightened period. This number represents a gateway or portal of opportunity. The triple repetition of 1, the number of new beginnings and individual will, creates a powerful energetic alignment that amplifies your creative power threefold. Many people report seeing 111 at the exact moment they are thinking about a new venture, making a decision, or setting an intention, and this synchronicity is considered confirmation that the universe is fully supporting your vision. The energy of 111 asks you to step into your role as a conscious creator and take responsibility for the reality you are building with every thought, word, and action.",
+      love: "In matters of love, 111 signals that a new romantic chapter is opening. If you are single, someone aligned with your values and energy may be entering your life soon. If you are in a relationship, 111 encourages you to bring fresh energy and intentionality to your partnership. Focus on what you appreciate about your partner, as your positive thoughts about the relationship will manifest improvements.",
+      career: "For career and money, 111 is a green light to pursue your ambitions. A new opportunity, promotion, or business idea that has been on your mind is worth pursuing. Your professional thoughts are manifesting, so visualize success clearly and take decisive action. This is the universe telling you that you have the creative power to build the career you envision.",
+      spiritual: "Spiritually, 111 marks an awakening. You are becoming more conscious of the connection between your inner world and outer reality. This number encourages you to develop your manifestation practice, work with affirmations, and recognize that you are not separate from the creative force of the universe but an active expression of it.",
+      actions: [
+        "Write down three specific intentions for what you want to manifest, phrasing them as if they have already happened.",
+        "For the next 24 hours, consciously replace every negative thought with a positive affirmation.",
+        "Take one concrete action step toward a goal you have been thinking about but hesitating to start.",
+        "Create a vision board or visualization practice to focus your manifesting energy."
+      ],
+      related: [1111, 222, 333, 1010]
+    },
+    222: {
+      shortMeaning: "Trust the process. Everything is aligning for you behind the scenes.",
+      detailed: "Angel number 222 is a message of faith, patience, and divine timing. When this number appears repeatedly in your life, the universe is asking you to trust that everything is unfolding exactly as it should, even when you cannot see the full picture. The energy of 2 represents balance, partnership, and harmony, and when tripled, it creates a powerful vibration of reassurance that the seeds you have planted are germinating beneath the surface. You may be in a period where progress feels slow or invisible, but 222 confirms that significant developments are happening behind the scenes. This number often appears when you are on the verge of giving up or losing faith in a process, relationship, or goal, and it serves as a cosmic nudge to keep going. The duality inherent in the number 2 also speaks to the importance of balance in your life right now: balancing work and rest, giving and receiving, action and patience, logic and intuition. The universe is orchestrating events in your favor, but it needs you to maintain your positive energy and trust the timeline that is unfolding.",
+      love: "For love, 222 is one of the most encouraging numbers you can see. It signals that a meaningful partnership is forming or deepening. If you are single, 222 suggests that a balanced and harmonious relationship is being prepared for you, and the person you are meant to meet will arrive at the perfect time. If you are in a relationship, this number encourages patience and mutual understanding during challenging periods.",
+      career: "In career matters, 222 asks you to stay the course. A project, negotiation, or application that seems stalled is actually progressing. Partnerships and collaborations are especially favored now, so consider teaming up with others rather than going it alone. Financial matters will resolve in your favor if you remain patient and avoid impulsive decisions.",
+      spiritual: "Spiritually, 222 deepens your trust in divine timing and the larger plan for your life. This number invites you to surrender control and allow the universe to handle the details of how your desires will manifest. Practice trusting your intuition and recognizing that delays are not denials but redirections.",
+      actions: [
+        "Identify an area where you have been feeling impatient and consciously choose to trust the timing.",
+        "Reach out to someone for collaboration or support, honoring the partnership energy of 222.",
+        "Practice a daily gratitude exercise to maintain positive energy while waiting for results.",
+        "Look for ways to bring more balance into your daily routine, whether between work and rest or solitude and socializing."
+      ],
+      related: [2222, 111, 444, 1212]
+    },
+    333: {
+      shortMeaning: "The Ascended Masters are with you. Express yourself boldly and creatively.",
+      detailed: "Angel number 333 carries the vibrant energy of creativity, self-expression, and divine encouragement. In many spiritual traditions, 333 is associated with the Ascended Masters, enlightened beings such as Jesus, Buddha, and Quan Yin, who are believed to be guiding and supporting you from the spiritual realm. When this number appears, it is a powerful affirmation that you are surrounded by loving, supportive spiritual energy and that your creative abilities are being amplified. The number 3 is the number of the Trinity in many religions, representing the union of mind, body, and spirit. When tripled, this energy becomes a call to step fully into your creative power and share your unique gifts with the world. You may have been holding back your true self-expression due to fear of judgment, self-doubt, or a belief that your ideas are not good enough. Angel number 333 is the universe's way of saying that your voice matters, your creativity is needed, and now is the time to express yourself authentically and joyfully. This number also carries the energy of expansion and growth, suggesting that you are entering a period of personal and spiritual development that will lead to greater fulfillment.",
+      love: "In love, 333 encourages playfulness, open communication, and joyful expression. If you have been holding back your true feelings in a relationship, this number urges you to speak your heart. For singles, 333 suggests that embracing your authentic self and pursuing your passions will naturally attract the right romantic partner into your life.",
+      career: "For career, 333 is a powerful sign to pursue creative endeavors. If you have been considering a creative project, artistic venture, or business that involves self-expression, 333 is the universe saying yes. Your creative ideas have real potential, and the spiritual support you need to bring them to fruition is available to you now.",
+      spiritual: "Spiritually, 333 confirms that you are deeply connected to higher guidance. The Ascended Masters are encouraging your growth and are available for support whenever you ask. This is a time to expand your spiritual practice, explore new teachings, and share your spiritual insights with others through teaching, writing, or creative expression.",
+      actions: [
+        "Start a creative project you have been putting off, whether it is writing, painting, music, or any other form of self-expression.",
+        "Practice speaking your truth openly in a situation where you have been holding back.",
+        "Connect with the Ascended Masters through meditation, asking for guidance on your creative path.",
+        "Share your knowledge or talents with others by teaching, mentoring, or posting your creative work."
+      ],
+      related: [3333, 111, 555, 777]
+    },
+    444: {
+      shortMeaning: "Angels are surrounding you with protection and support. You are on the right path.",
+      detailed: "Angel number 444 is widely regarded as one of the most comforting and reassuring numbers in the angel number system. It is a direct message from your guardian angels that they are nearby, offering protection, support, and encouragement as you navigate your current challenges. The number 4 represents stability, foundation, hard work, and determination, and when it appears three times, it amplifies these qualities while adding a layer of divine protection. When you see 444, the universe is confirming that you are on the right path, even if the journey feels difficult or uncertain. The hard work you have been putting in is recognized, valued, and will produce tangible results. This number often appears during periods of struggle or doubt, serving as a reassuring reminder that you are not alone and that your efforts are building something lasting and meaningful. The four corners, four seasons, and four elements all reflect the grounding, stabilizing energy of this number. Your angels are asking you to continue building your dreams on a solid foundation of integrity, discipline, and perseverance. The structure you are creating now will support you for years to come.",
+      love: "In love, 444 provides deep reassurance that your relationship is built on a solid foundation. If you are going through a rough patch with your partner, 444 signals that the relationship is worth fighting for and that the challenges you face are strengthening your bond. For singles, this number suggests building a strong foundation of self-love before seeking partnership.",
+      career: "For career and finances, 444 confirms that your hard work will pay off. Stay disciplined, maintain your current course, and trust that the foundations you are building will support long-term success. This is not a time for shortcuts but for steady, determined effort. Financial stability is approaching as a reward for your perseverance.",
+      spiritual: "Spiritually, 444 is the most direct sign that your angels are present and actively working on your behalf. Take comfort in knowing that you are protected and guided. This number invites you to strengthen your connection with your guardian angels through prayer, meditation, or simply talking to them in your mind throughout the day.",
+      actions: [
+        "Take a moment to thank your guardian angels for their presence and ask for specific guidance on a challenge you face.",
+        "Double down on the project or goal you have been working toward, trusting that your persistence will be rewarded.",
+        "Evaluate the foundations of your life, including finances, health, and relationships, and shore up any areas that need attention.",
+        "Create a structured daily routine that supports your long-term goals and well-being."
+      ],
+      related: [4444, 222, 888, 1111]
+    },
+    555: {
+      shortMeaning: "Major life changes are coming. Embrace transformation and release the old.",
+      detailed: "Angel number 555 is the universe's announcement that significant, transformative change is approaching or already underway in your life. The number 5 represents change, freedom, adventure, and the breaking of old patterns, and when tripled, its energy becomes impossible to ignore. This is not subtle, gradual change but the kind of shift that alters the trajectory of your life. While change can feel frightening, 555 assures you that these changes are ultimately positive and necessary for your growth, even if they are uncomfortable in the moment. This number often appears before or during major life transitions such as career changes, relocations, the end or beginning of significant relationships, health transformations, or spiritual awakenings. The universe is clearing away what no longer serves you to make room for something better. Your job is not to resist the change but to flow with it, trusting that you are being guided toward a more authentic and fulfilling version of your life. The freedom energy of 555 also encourages you to release any attachments to how things used to be or how you thought they should be, and instead embrace the exciting unknown that lies ahead.",
+      love: "In love, 555 signals significant changes in your romantic life. A stagnant relationship may undergo a transformation, or you may be about to meet someone who completely changes your perspective on love. If a relationship is ending, 555 assures you that this ending is making way for something more aligned with who you are becoming. Embrace the change rather than clinging to the familiar.",
+      career: "For career, 555 often precedes a major professional shift. You may be changing careers, starting a business, receiving an unexpected opportunity, or breaking free from a job that has been limiting your growth. Financially, short-term instability may accompany the change, but 555 promises that the new direction will ultimately be more prosperous and fulfilling than the old one.",
+      spiritual: "Spiritually, 555 marks a period of accelerated growth and transformation. Old beliefs, habits, and identities are being shed to reveal a more authentic version of yourself. This can feel like a spiritual crisis, but it is actually a breakthrough. Trust the process of dismantling and rebuilding, knowing that you are evolving into a higher version of yourself.",
+      actions: [
+        "Identify what you have been resisting changing in your life and take the first step toward making that change.",
+        "Declutter your physical space, as releasing material items creates energetic space for new opportunities.",
+        "Say yes to an opportunity or experience that takes you outside your comfort zone.",
+        "Journal about what you would do differently if you knew you could not fail, and then take action on one of those items."
+      ],
+      related: [5555, 333, 777, 1234]
+    },
+    666: {
+      shortMeaning: "Rebalance your focus. Shift attention from material worries to spiritual and emotional well-being.",
+      detailed: "Angel number 666, despite its negative association in popular culture, is actually a gentle and caring message about finding balance and harmony in your life. In angel number numerology, 6 represents home, family, nurturing, and responsibility, and when tripled, it highlights an imbalance in how you are distributing your energy. Most often, 666 appears when you are overly focused on material concerns, finances, work, or external achievements at the expense of your emotional, spiritual, and relational well-being. It is a loving reminder from the universe that you are more than your job title, bank balance, or material possessions. This number asks you to step back, reassess your priorities, and redirect some of your energy toward the things that truly nourish your soul: your relationships, your creative passions, your health, and your inner peace. The appearance of 666 does not mean something bad is happening. It means you have an opportunity to course-correct before an imbalance becomes a problem. Think of it as a compassionate nudge from your angels saying, you are working too hard, worrying too much, and forgetting to take care of yourself and the people you love.",
+      love: "In love, 666 asks you to refocus on your relationships. You may have been so consumed by work or financial stress that you have neglected your partner, family, or friendships. This number encourages you to prioritize quality time with loved ones, express your affection openly, and remember that love and connection are the true wealth of life.",
+      career: "For career and finances, 666 warns against becoming consumed by material pursuits. While financial responsibility is important, this number suggests you may be sacrificing too much for money or status. Consider whether your current work-life balance is sustainable and whether your career choices align with your deeper values and purpose.",
+      spiritual: "Spiritually, 666 is a call to reconnect with your inner world. Material concerns have likely been dominating your thoughts, leaving little room for spiritual practice, self-reflection, or creative expression. Set aside time each day for meditation, prayer, or any activity that feeds your soul rather than your bank account.",
+      actions: [
+        "List three non-material things that bring you genuine joy and commit to spending more time on them this week.",
+        "Have a meaningful conversation with a loved one you have been neglecting due to work or stress.",
+        "Take a break from checking finances, news, or work email and spend that time in nature, meditation, or creative play.",
+        "Volunteer or perform an act of service to shift your focus from personal gain to community connection."
+      ],
+      related: [999, 222, 444, 888]
+    },
+    777: {
+      shortMeaning: "You are on a deeply spiritual path. Divine wisdom and good fortune are flowing to you.",
+      detailed: "Angel number 777 is considered one of the most auspicious and spiritually significant numbers you can encounter. It represents divine alignment, inner wisdom, spiritual awakening, and what many traditions call luck or good fortune. When 777 appears, it is a powerful confirmation that you are walking your highest spiritual path and that the universe is rewarding your dedication to inner growth with blessings in all areas of your life. The number 7 has been regarded as sacred across virtually every spiritual tradition on Earth: seven days of creation, seven chakras, seven heavens, seven notes in a musical scale. When tripled, this sacred energy becomes a concentrated beam of spiritual power directed at your life. You may notice that your intuition is heightened, synchronicities are increasing, and a deep sense of knowing is guiding your decisions. This number tells you to trust those inner whispers, because they are coming from a place of genuine wisdom. The good fortune associated with 777 is not random luck but the natural consequence of being aligned with your soul's purpose. When you live authentically and follow your spiritual guidance, the universe supports you in ways that may seem miraculous to others but are simply the natural flow of a life lived in harmony with the divine.",
+      love: "In love, 777 brings deeply spiritual connections. You may meet a soulmate or twin flame who mirrors your spiritual growth, or your existing relationship may deepen on a profound soul level. This number encourages you to seek relationships that nourish your spirit, not just your emotions or physical needs. Love guided by 777 transcends the ordinary and touches the sacred.",
+      career: "For career, 777 suggests that following your spiritual calling will lead to professional fulfillment and abundance. If you have been considering a career in healing, teaching, counseling, or any field aligned with your spiritual values, now is the time. The universe is opening doors in response to your authentic alignment. Trust that doing what you love will also provide what you need.",
+      spiritual: "Spiritually, 777 is the ultimate confirmation that you are on the right path. Your spiritual practices are working, your consciousness is expanding, and you are receiving direct guidance from the divine. Continue deepening your meditation practice, studying spiritual teachings, and trusting your intuition. You are becoming a channel for higher wisdom.",
+      actions: [
+        "Dedicate extra time to your spiritual practice this week, whether meditation, prayer, yoga, or contemplation.",
+        "Trust a strong intuitive feeling you have been second-guessing and follow its guidance.",
+        "Share your spiritual insights with someone who may benefit from your wisdom and perspective.",
+        "Keep a synchronicity journal this week, recording meaningful coincidences and the messages they may carry."
+      ],
+      related: [7777, 333, 111, 999]
+    },
+    888: {
+      shortMeaning: "Abundance and prosperity are flowing into your life. You are in a cycle of karmic reward.",
+      detailed: "Angel number 888 is the number of abundance, prosperity, and the infinite flow of universal energy. Its shape, three infinity symbols stacked side by side, represents the endless circulation of resources, opportunities, and blessings that is available to you when you are in alignment with your highest good. When 888 appears, the universe is signaling that a period of material and financial abundance is approaching or has already begun. This is not random fortune but the karmic result of the positive energy, hard work, and integrity you have invested in your life. The law of cause and effect, central to the energy of 8, is working in your favor. What you have given, you are now receiving back multiplied. This number also carries a message about financial wisdom: the abundance coming your way is meant to be managed wisely and shared generously, not hoarded out of fear. The universe trusts you with prosperity because you have demonstrated the character to handle it responsibly. Additionally, 888 often appears at the end of a difficult financial period, confirming that the struggles are ending and a new era of stability and wealth is beginning.",
+      love: "In love, 888 brings abundance and depth to your relationships. Existing partnerships become richer and more rewarding, and singles may attract partners who are emotionally, intellectually, and spiritually prosperous. This number reminds you that healthy love is abundant, not scarce, and that you deserve a relationship that adds to your life in every dimension.",
+      career: "For career and finances, 888 is one of the strongest indicators of incoming prosperity. A raise, promotion, successful investment, new client, or unexpected financial windfall may be on the horizon. The key is to remain grateful and generous with what you receive. The flow of abundance continues as long as you keep the energy of giving and receiving in motion.",
+      spiritual: "Spiritually, 888 teaches the principle of infinite abundance. The universe is not a place of scarcity but of endless supply. Your spiritual growth has brought you to a place where you can receive without guilt and give without depletion. This number encourages you to examine and release any beliefs about not deserving abundance or about spirituality and wealth being incompatible.",
+      actions: [
+        "Express gratitude for the abundance already present in your life, no matter how small it may seem.",
+        "Make a financial plan that includes both saving for your future and giving generously to others or causes you care about.",
+        "Release any subconscious beliefs that you do not deserve prosperity or that money is inherently negative.",
+        "Look for opportunities to invest in yourself through education, health, or personal development."
+      ],
+      related: [8888, 444, 111, 1234]
+    },
+    999: {
+      shortMeaning: "A major chapter is ending. Prepare for completion and the beginning of a new cycle.",
+      detailed: "Angel number 999 marks the completion of a significant cycle in your life and the threshold of a powerful new beginning. The number 9 is the final single digit, representing endings, fulfillment, wisdom gained through experience, and service to humanity. When tripled, this energy becomes a clear signal that something in your life, a relationship, career, belief system, living situation, or personal identity, is reaching its natural conclusion. While endings can be bittersweet, 999 assures you that this completion is necessary and divinely guided. What is ending has served its purpose and taught you everything it was meant to teach. Holding on to it will only prevent you from stepping into the next, higher chapter of your life. This number also carries a strong humanitarian vibration, encouraging you to consider how your experiences and wisdom can be used to serve others. You have been through enough to have something valuable to offer the world, whether through teaching, mentoring, creative work, or simple acts of compassion. The ending signaled by 999 is not a loss but a graduation, the successful completion of a level that qualifies you for the next stage of your soul's evolution.",
+      love: "In love, 999 can indicate the natural end of a relationship that has run its course, or the completion of a difficult chapter within a relationship that is ultimately growing stronger. If a partnership is ending, 999 asks you to release it with gratitude for what it taught you. If you are single, this number suggests completing your healing from past relationships before the next one begins.",
+      career: "For career, 999 signals that a professional chapter is closing. This might mean leaving a job, completing a major project, or transitioning out of a career path you have outgrown. Do not fear the ending. The wisdom and skills you have accumulated are preparing you for something greater. Consider what you would do if you could start fresh with everything you now know.",
+      spiritual: "Spiritually, 999 represents the completion of a karmic cycle. Lessons you have been working through across this lifetime, and perhaps others, are reaching resolution. This is a time of profound spiritual maturity and the recognition that endings are just the other side of beginnings. Release, forgive, and prepare to step into a new cycle of growth.",
+      actions: [
+        "Identify what in your life has run its course and take steps to bring it to a graceful and complete conclusion.",
+        "Write a gratitude letter to a chapter of your life that is ending, acknowledging what it taught you.",
+        "Consider how you can use your experiences to help others who are going through similar challenges.",
+        "Create space for the new by completing unfinished business, tying up loose ends, and clearing physical and emotional clutter."
+      ],
+      related: [9999, 111, 555, 000]
+    },
+    1010: {
+      shortMeaning: "Stay positive and trust your intuition. A new beginning paired with infinite potential awaits.",
+      detailed: "Angel number 1010 combines the powerful energies of 1 and 0, creating a number that speaks to new beginnings infused with limitless potential. The alternating pattern of 1 and 0 represents the dance between action and surrender, doing and being, creation and the infinite source from which creation flows. When you see 1010, the universe is encouraging you to stay positive and optimistic about the future because your thoughts and beliefs are actively shaping the reality that is forming around you. The presence of 0 amplifies the manifesting power of 1, suggesting that whatever new venture, relationship, or phase you are entering carries the potential to be truly extraordinary. This number often appears during times of transition or uncertainty, offering reassurance that you are moving in the right direction. The repetition of 10, which in numerology reduces to 1 (1+0=1), doubles the message of new beginnings and personal initiative. Trust your instincts, take inspired action, and know that the universe is providing you with a clean canvas and unlimited colors to paint whatever future you desire.",
+      love: "In love, 1010 signals an exciting new phase. Singles may be on the verge of meeting someone significant, while those in relationships are encouraged to bring fresh energy and renewed intention to their partnerships. This number asks you to believe in the possibility of deep, fulfilling love and to take positive action toward creating the relationship you desire.",
+      career: "For career, 1010 encourages you to pursue new opportunities with confidence and optimism. A new job, promotion, business venture, or creative project is strongly supported by the universe right now. Trust your vision for your professional life and take bold steps toward making it reality. The combination of initiative (1) and infinite possibility (0) makes this an ideal time for career moves.",
+      spiritual: "Spiritually, 1010 marks a period of heightened awareness and personal evolution. You are being encouraged to step out of your comfort zone and explore new spiritual practices, teachings, or communities. Your spiritual journey is entering a new phase that requires courage and openness to the unknown. Trust that you are being guided every step of the way.",
+      actions: [
+        "Set a clear intention for what you want to create in this new chapter of your life.",
+        "Practice positive affirmations daily to keep your mental vibration high during this pivotal time.",
+        "Take one bold action step toward a goal that excites and slightly frightens you.",
+        "Spend time in quiet reflection or meditation, connecting with the infinite potential within you."
+      ],
+      related: [111, 1111, 1212, 000]
+    },
+    1111: {
+      shortMeaning: "A powerful spiritual gateway is open. Your thoughts are manifesting instantly. Make a wish.",
+      detailed: "Angel number 1111 is widely considered the most powerful and recognizable angel number in existence. Often called a spiritual wake-up call or a manifestation portal, 1111 represents the ultimate alignment between your thoughts, your intentions, and the creative power of the universe. When you see 11:11 on a clock or 1111 in any context, many traditions believe that a gateway between the physical and spiritual worlds has momentarily opened, amplifying your ability to manifest your desires into reality. The four ones create a pillar of pure creative energy, a direct channel between your consciousness and the universal mind. This is why 1111 has become synonymous with making a wish: at this moment, your thoughts carry extraordinary manifesting power. However, this power works in both directions. Positive, focused thoughts will manifest positive results, while fears and worries will also find their way into reality. The responsibility that comes with 1111 is to maintain conscious control of your mental focus and to direct your thoughts exclusively toward what you desire rather than what you fear. This number also signals that you are on the verge of a significant spiritual awakening, a shift in consciousness that will change how you perceive yourself and your relationship to the universe.",
+      love: "In love, 1111 is a powerful sign of alignment and soul connection. It often appears when you are about to meet a soulmate or twin flame, or when an existing relationship is deepening to a spiritual level. This number encourages you to be clear about what you want in love and to trust that the universe is bringing the perfect partnership into your reality.",
+      career: "For career and finances, 1111 is the ultimate green light for manifestation. Whatever professional goal or financial vision you have been holding, 1111 says it is time to focus on it intensely and take action. Business launches, creative projects, and career pivots initiated under the influence of 1111 carry exceptional potential for success. Think big and act boldly.",
+      spiritual: "Spiritually, 1111 represents a major awakening or upgrade in consciousness. You are being called to a higher level of awareness, purpose, and service. Pay attention to the spiritual signs and synchronicities appearing in your life, as they are increasing in frequency and significance. You may feel called to explore new spiritual practices or to step into a leadership role in your spiritual community.",
+      actions: [
+        "When you see 1111, pause immediately and focus your thoughts on your deepest desire or highest intention.",
+        "Write down your most important goals and read them aloud as affirmations every morning and evening.",
+        "Pay close attention to your thoughts throughout the day, replacing negative patterns with positive ones the moment you notice them.",
+        "Begin or deepen a manifestation practice such as visualization, scripting, or a gratitude-and-intention journal."
+      ],
+      related: [111, 1010, 1212, 1234]
+    },
+    1212: {
+      shortMeaning: "Stay focused on your highest ideals. You are manifesting your dreams into reality.",
+      detailed: "Angel number 1212 is a dynamic and encouraging number that combines the manifesting energy of 1 with the trusting energy of 2, repeated twice for emphasis. This number is a message from the universe that you are on the right track toward manifesting your dreams and that you should maintain your positive focus despite any challenges or doubts. The alternating pattern of 1 and 2 represents the balance between taking action (1) and having faith (2), doing your part and then trusting the universe to do its part. When you see 1212, the universe is telling you that the vision you hold for your life is not just a fantasy but a genuine possibility that is actively being brought into being. Your role is to stay focused on your highest ideals, take consistent inspired action, and trust that the details will work themselves out. This number also carries the energy of stepping out of your comfort zone and embracing new experiences that will support your growth. The repetition of 12 suggests that you are moving through a cycle of personal development that requires both initiative and patience, assertiveness and receptivity, in equal measure.",
+      love: "In love, 1212 encourages you to pursue relationships that align with your highest vision for your life. Do not settle for connections that pull you away from your goals and values. If you are in a relationship, this number asks both partners to support each other's individual growth while strengthening their shared vision. Singles should focus on becoming the person who would naturally attract their ideal partner.",
+      career: "For career, 1212 is a sign to pursue your professional dreams with determination and trust. You may need to step out of your comfort zone, learn new skills, or take a calculated risk, but the universe supports these moves. Stay focused on your long-term vision rather than getting discouraged by short-term setbacks. Success is closer than it appears.",
+      spiritual: "Spiritually, 1212 represents the integration of your human will with divine will. You are learning to dance between effort and surrender, finding the sweet spot where personal initiative and spiritual faith work together. This number encourages you to trust your inner guidance system and to recognize that your spiritual growth is directly connected to your ability to manifest positive change in the physical world.",
+      actions: [
+        "Create a clear written vision for your ideal life in all areas: love, career, health, and spiritual growth.",
+        "Identify one fear or comfort zone that is holding you back and take a step to overcome it today.",
+        "Practice the balance of action and faith: do your best work, then release attachment to the specific outcome.",
+        "Surround yourself with people, content, and environments that reinforce your highest aspirations."
+      ],
+      related: [1221, 1111, 222, 1234]
+    },
+    1234: {
+      shortMeaning: "Simplify your life and take things step by step. Progress is happening in perfect order.",
+      detailed: "Angel number 1234 is the universe's message to simplify, organize, and approach your life with a step-by-step mindset. The ascending sequence from 1 to 4 represents natural progression, forward momentum, and the building of something meaningful through systematic effort. When you see 1234, the universe is telling you that you do not need to have everything figured out at once. Instead, focus on the next step, then the one after that, and trust that each step will reveal the path forward. This number is particularly powerful for people who feel overwhelmed by the complexity of their goals or the chaos of their current circumstances. It says: start with 1, the spark of intention; move to 2, the commitment and partnership needed; progress to 3, the creative expansion; and arrive at 4, the solid foundation. Life does not have to be complicated. The most effective path to success is often the simplest one, taken one deliberate step at a time. This number also encourages decluttering, both physically and mentally, to remove the distractions and complications that prevent you from seeing the clear, natural progression of your journey.",
+      love: "In love, 1234 suggests a natural progression in your romantic life. A new relationship is developing through healthy stages, from initial attraction to deeper commitment. If you are in a long-term relationship, this number encourages simplifying your dynamic, letting go of unnecessary drama, and focusing on the fundamental building blocks of a strong partnership: communication, trust, respect, and shared goals.",
+      career: "For career, 1234 is the ultimate number for project management and professional growth. It encourages a methodical, step-by-step approach to your goals. Break large ambitions into small, manageable tasks and tackle them in order. Declutter your workspace, simplify your processes, and focus on the next action rather than the distant finish line. Progress is happening, one step at a time.",
+      spiritual: "Spiritually, 1234 represents the journey from awakening (1) to faith (2) to expression (3) to foundation (4). It encourages a grounded, practical approach to spiritual growth. Rather than trying to achieve enlightenment overnight, focus on daily practices that build a strong spiritual foundation: meditation, gratitude, service, and study, one step at a time.",
+      actions: [
+        "Write down a goal and break it into four sequential steps. Focus only on step one today.",
+        "Declutter one area of your life this week, whether physical space, digital files, social commitments, or mental worry.",
+        "Simplify your daily routine by eliminating one unnecessary complexity or time-wasting habit.",
+        "Create a simple daily checklist that keeps you focused on progress rather than perfection."
+      ],
+      related: [1212, 111, 444, 555]
+    },
+    2222: {
+      shortMeaning: "Powerful alignment is occurring. Your patience and faith are about to be rewarded abundantly.",
+      detailed: "Angel number 2222 is an intensified version of 222, carrying its message of trust, patience, and divine timing to the highest level. When the number 2 appears four times, it creates an overwhelming vibration of harmony, cooperation, and faith that something beautiful is being orchestrated on your behalf. This number often appears during the most challenging phases of waiting, when you have done everything you can and now must rely entirely on faith that the universe will deliver. And it will. The quadruple 2 is the universe's strongest possible assurance that your patience is about to be rewarded in ways that exceed your expectations. Relationships are aligning, opportunities are forming behind the scenes, and the perfect timing for everything you have been working toward is approaching rapidly. This number also emphasizes the power of partnerships and collaborative efforts. Whether in business, love, or community, your success right now is connected to working harmoniously with others rather than going it alone. Trust the people who show up to support you and be willing to offer your own support in return.",
+      love: "In love, 2222 is one of the most powerful partnership numbers. A deeply balanced, harmonious, and spiritually aligned relationship is either present or approaching. For couples, this number signals a period of exceptional closeness and mutual understanding. For singles, your soulmate connection is very near, and your patience in waiting for the right person is about to be beautifully rewarded.",
+      career: "For career, 2222 promises that collaborative efforts and partnerships will produce extraordinary results. Joint ventures, team projects, and business partnerships are especially favored. Financially, stability and balance are coming after a period of uncertainty. Continue to trust the process and maintain your professionalism and integrity.",
+      spiritual: "Spiritually, 2222 represents the deepest level of trust in the divine plan. You are being asked to surrender your need to control outcomes and to rest in the knowledge that everything is unfolding perfectly. This level of faith is a spiritual achievement in itself and will be met with blessings that confirm your trust was well placed.",
+      actions: [
+        "Identify where you have been trying to force outcomes and consciously practice surrendering those situations to divine timing.",
+        "Strengthen a partnership or collaboration that is important to your current goals.",
+        "Write a list of everything you are waiting for and beside each item, write: This is coming at the perfect time.",
+        "Practice patience as a spiritual discipline, recognizing that waiting with faith is an active and powerful choice."
+      ],
+      related: [222, 1111, 444, 1212]
+    },
+    3333: {
+      shortMeaning: "Your creative powers are at their peak. The Ascended Masters strongly encourage you to create and express.",
+      detailed: "Angel number 3333 quadruples the creative and expressive energy of the number 3, creating what many practitioners consider a direct call from the Ascended Masters to embrace your role as a creative being. This number appears when your creative potential is at its absolute peak and the spiritual realm is urging you not to waste this powerful window. Whether your creativity expresses itself through art, writing, music, business innovation, problem-solving, or interpersonal communication, 3333 says that now is the time to channel it fully and fearlessly. The quadruple repetition also amplifies the joyful, optimistic energy of 3, suggesting that you should approach your creative endeavors with playfulness and enthusiasm rather than perfectionism and pressure. The Ascended Masters are not just encouraging your creativity; they are actively assisting you, sending inspiration, opportunities, and the right people to support your creative vision. This is a rare and powerful moment of creative alignment that should be seized with both hands.",
+      love: "In love, 3333 brings joy, laughter, and creative expression to your relationships. This is a time for fun, spontaneity, and honest self-expression with your partner. For singles, your natural charm and creative energy are magnetic right now, so get out, socialize, and let your authentic personality shine. Love that arrives under 3333 is playful, creative, and deeply fulfilling.",
+      career: "For career, 3333 is the strongest possible signal to pursue creative and expressive work. If you have been considering launching a creative business, writing a book, starting a podcast, or any endeavor that requires self-expression, 3333 says the universe is fully behind you. Your creative ideas have exceptional potential right now and the spiritual support to bring them to fruition.",
+      spiritual: "Spiritually, 3333 represents an extraordinarily strong connection with the Ascended Masters and the creative force of the universe. You are being channeled creative energy from higher dimensions. Use this gift wisely and generously, sharing your creative and spiritual insights with others. Your creative expression is a form of spiritual service.",
+      actions: [
+        "Commit to a major creative project and work on it daily for the next 30 days without judging the results.",
+        "Express yourself authentically in a conversation or situation where you have been holding back.",
+        "Explore a new creative medium or art form that excites you, even if you have no experience with it.",
+        "Ask the Ascended Masters in meditation for creative inspiration and then act immediately on whatever ideas come to you."
+      ],
+      related: [333, 111, 555, 777]
+    },
+    4444: {
+      shortMeaning: "Maximum angelic protection surrounds you. Your foundation is rock-solid and divinely supported.",
+      detailed: "Angel number 4444 represents the highest level of angelic protection and support available in the angel number system. When the number 4 appears four times, it creates an impenetrable shield of divine energy around you, assuring you that you are completely safe, supported, and guided. This number typically appears during your most challenging moments, when you feel tested to your limits and need reassurance that you are not alone. And you are absolutely not alone. The entire angelic realm is focused on your well-being, providing strength, courage, and practical guidance for every challenge you face. Beyond protection, 4444 confirms that the work you have been doing to build your life on a solid foundation is not only recognized but divinely blessed. Every sacrifice, every early morning, every difficult decision made with integrity is being honored by the universe. The foundations you have built are unshakeable, and the structure of success, stability, and security you are constructing will stand the test of time. This is the universe's strongest confirmation that your hard work matters and will produce lasting results.",
+      love: "In love, 4444 provides ultimate security and reassurance. Your relationship is built on the strongest possible foundation, and even the most difficult challenges cannot shake it. For singles, this number assures you that you are being divinely prepared for a deeply stable, secure, and lasting partnership. The angels are working to bring you together with someone who shares your values and commitment.",
+      career: "For career, 4444 is the ultimate sign of professional stability and long-term success. The business, career, or project you have been building is divinely supported and will produce enduring results. Keep working with discipline and integrity. Financial security is not just approaching; it is being guaranteed by the highest spiritual forces.",
+      spiritual: "Spiritually, 4444 represents the most powerful connection to your guardian angels possible. They are not just nearby; they are surrounding you completely, answering every prayer and responding to every request for help. This is the time to deepen your relationship with your angels, to talk to them openly, and to trust their guidance completely.",
+      actions: [
+        "Acknowledge the angelic protection surrounding you and express heartfelt gratitude for their presence.",
+        "Continue building your foundations with renewed confidence, knowing they are divinely supported.",
+        "Help someone else who is struggling, extending the protective energy you are receiving to those who need it.",
+        "Strengthen the weakest foundation in your life, whether it is financial savings, physical health, or an important relationship."
+      ],
+      related: [444, 1111, 888, 2222]
+    },
+    5555: {
+      shortMeaning: "Massive, life-altering transformation is here. Release everything that no longer serves your highest good.",
+      detailed: "Angel number 5555 is the most powerful change number in the angel number system, signaling that a complete life transformation is underway or imminent. The quadruple 5 creates an unstoppable wave of change energy that will sweep through every area of your life, clearing away the old and making room for something entirely new. This is not minor adjustment; it is the kind of seismic shift that redefines who you are, where you are, and what your life looks like. While this level of change can feel overwhelming or even frightening, 5555 carries the absolute assurance that these changes are divinely orchestrated and will ultimately lead you to a life that is more authentic, more free, and more aligned with your soul's purpose than anything you have experienced before. The key to navigating 5555 energy is complete surrender and radical trust. Let go of your need to control the process, release your attachment to how things used to be, and embrace the unknown with the knowledge that the universe has your back. The changes coming are not random; they are the answer to prayers you may have forgotten you made.",
+      love: "In love, 5555 signals a complete transformation of your romantic life. Old patterns, dynamics, and relationships that do not serve your highest good are being swept away to make room for love that matches who you are becoming. This may feel turbulent, but the romantic life waiting for you on the other side of this change is beyond what you currently imagine is possible.",
+      career: "For career, 5555 represents a complete professional reinvention. The career, business model, or professional identity you have known is transforming into something new. Embrace this change rather than resisting it. The professional path that emerges from this transformation will offer more freedom, fulfillment, and abundance than the one you are leaving behind.",
+      spiritual: "Spiritually, 5555 marks the most profound transformation available in the human experience. Entire belief systems, identities, and ways of being are being dismantled and rebuilt. This is a spiritual death and rebirth that will leave you fundamentally changed. Trust the process completely, knowing that who you are becoming is infinitely more powerful and authentic than who you have been.",
+      actions: [
+        "Let go of one major attachment, whether to a possession, a habit, a relationship, or an identity, that is holding you in the past.",
+        "Say yes to the biggest change that is presenting itself in your life right now, even if it scares you.",
+        "Create a ritual of release: write down what you are letting go of and ceremonially burn or bury the paper.",
+        "Embrace uncertainty as a gift and make a list of all the positive possibilities that change could bring."
+      ],
+      related: [555, 999, 1111, 1234]
+    },
+    717: {
+      shortMeaning: "You are on the right spiritual path. Keep going, good fortune is aligning with your journey.",
+      detailed: "Angel number 717 blends the spiritual wisdom of 7 with the manifesting power of 1, creating a number that confirms you are making the right choices and walking a path blessed by the universe. The sandwich structure, with 1 nestled between two 7s, suggests that your new beginning or fresh initiative is deeply supported by spiritual wisdom on both sides. This number often appears when you have recently made a difficult decision based on your inner guidance and need confirmation that you chose correctly. And you did. The universe is affirming that your intuitive wisdom has led you to the right place. The double 7 also amplifies the energy of good fortune and divine blessing, suggesting that serendipitous events and lucky breaks are heading your way as a natural consequence of being spiritually aligned. This is not random luck but the universe rewarding your commitment to living authentically and following your inner truth. Continue trusting your instincts, deepening your spiritual practice, and taking inspired action, because the path you are on leads to exactly where you are meant to be.",
+      love: "In love, 717 suggests that a spiritually significant relationship is either present or approaching. Your romantic life is being guided by higher wisdom, and the partner you attract or deepen your connection with will share your spiritual values and support your personal growth. Trust your intuition about matters of the heart.",
+      career: "For career, 717 confirms that a recent professional decision or new direction was the right call. The path you have chosen is aligned with both your practical goals and your deeper purpose. Keep following your instincts in professional matters and watch for lucky opportunities that seem to appear at just the right moment.",
+      spiritual: "Spiritually, 717 is a beautiful confirmation that your spiritual journey is progressing exactly as it should. Your wisdom is growing, your intuition is sharpening, and you are becoming a beacon of spiritual light. Continue studying, practicing, and sharing your insights. The universe is pleased with your dedication to inner growth.",
+      actions: [
+        "Affirm your recent decisions by taking the next logical step forward with confidence.",
+        "Spend time in meditation connecting with your spiritual guides and thanking them for their guidance.",
+        "Notice and record any lucky coincidences or synchronicities that appear this week, as they carry messages for you.",
+        "Trust a strong gut feeling about a situation and act on it without overanalyzing."
+      ],
+      related: [777, 111, 1717, 818]
+    },
+    818: {
+      shortMeaning: "An old chapter is closing as new abundance begins. Trust the transition between endings and prosperity.",
+      detailed: "Angel number 818 carries a powerful message about the transition between endings and new beginnings, particularly in the realm of abundance and personal power. The structure of this number, with 1 held between two 8s, suggests that a new beginning is emerging from a cycle of abundance and karmic completion. The ending of one prosperous chapter does not mean the end of prosperity itself; rather, it means that a new, even more abundant chapter is beginning. This number often appears when you are leaving a job, closing a business, ending a financial arrangement, or transitioning out of a phase that once served you well but has now run its course. The double 8 ensures that the principle of abundance continues through the transition, while the central 1 promises that what comes next will be fresh, exciting, and aligned with who you are now rather than who you used to be. Trust that the universe is not taking away your abundance but restructuring it in a way that better serves your current path and potential.",
+      love: "In love, 818 indicates that as one romantic dynamic ends or transforms, a more empowering one is beginning. This number encourages you to step into relationships as your most confident, self-assured self. The love that is aligning with you matches your growing sense of personal power and self-worth. Do not settle for less than you deserve.",
+      career: "For career, 818 signals a prosperous transition. If a job or business phase is ending, trust that the next opportunity will bring even greater abundance. This number particularly favors entrepreneurship, leadership roles, and any career path that allows you to exercise your personal power. Financial abundance is flowing to you through new channels.",
+      spiritual: "Spiritually, 818 teaches that abundance is your natural state and that transitions do not diminish it but redirect it. You are learning to hold your spiritual power through change, recognizing that your worth and prosperity come from within, not from external circumstances. This is a profound spiritual lesson about the infinite nature of true abundance.",
+      actions: [
+        "If something in your life is ending, release it with gratitude and affirm that something better is already on its way.",
+        "Step into a leadership position or take charge of a situation that calls for your personal power.",
+        "Review your finances and create a plan that honors both the closing of old income streams and the opening of new ones.",
+        "Affirm daily: I am worthy of abundance, and prosperity flows to me easily through every transition."
+      ],
+      related: [888, 111, 717, 1010]
+    }
+  };
+
+  const digitMeanings: Record<number, {keyword: string, energy: string}> = {
+    0: { keyword: "infinite potential", energy: "wholeness, eternity, and the beginning of a spiritual journey" },
+    1: { keyword: "new beginnings", energy: "creation, independence, leadership, and manifestation" },
+    2: { keyword: "balance and partnership", energy: "cooperation, trust, patience, and divine timing" },
+    3: { keyword: "creativity", energy: "self-expression, joy, communication, and spiritual connection" },
+    4: { keyword: "stability and foundation", energy: "hard work, determination, protection, and discipline" },
+    5: { keyword: "change and freedom", energy: "transformation, adventure, adaptability, and life lessons" },
+    6: { keyword: "harmony and home", energy: "family, nurturing, responsibility, and domestic balance" },
+    7: { keyword: "spirituality and wisdom", energy: "inner wisdom, intuition, mystical insight, and spiritual awakening" },
+    8: { keyword: "abundance and power", energy: "prosperity, karmic balance, personal authority, and material success" },
+    9: { keyword: "completion and humanitarianism", energy: "endings, fulfillment, compassion, and universal love" }
+  };
+
+  function getDigits(num: number): number[] {
+    return String(num).split('').map(Number);
+  }
+
+  function isRepeating(num: number): boolean {
+    const s = String(num);
+    return s.length > 1 && s.split('').every(d => d === s[0]);
+  }
+
+  function isSequential(num: number): boolean {
+    const digits = getDigits(num);
+    if (digits.length < 3) return false;
+    let ascending = true;
+    let descending = true;
+    for (let i = 1; i < digits.length; i++) {
+      if (digits[i] !== digits[i - 1] + 1) ascending = false;
+      if (digits[i] !== digits[i - 1] - 1) descending = false;
+    }
+    return ascending || descending;
+  }
+
+  function isMirror(num: number): boolean {
+    const s = String(num);
+    if (s.length < 3) return false;
+    return s === s.split('').reverse().join('');
+  }
+
+  function digitRoot(num: number): number {
+    let n = num;
+    while (n > 9) {
+      n = String(n).split('').reduce((sum, d) => sum + parseInt(d), 0);
+    }
+    return n;
+  }
+
+  function generateFallback(num: number): AngelNumberData {
+    const digits = getDigits(num);
+    const uniqueDigits = [...new Set(digits)];
+    const root = digitRoot(num);
+    const rootInfo = digitMeanings[root];
+    const repeating = isRepeating(num);
+    const sequential = isSequential(num);
+    const mirror = isMirror(num);
+
+    let patternType = "unique combination";
+    let patternDesc = "";
+    if (repeating) {
+      patternType = "repeating";
+      const d = digits[0];
+      const info = digitMeanings[d];
+      patternDesc = `As a repeating number, ${num} amplifies the energy of ${d} (${info.keyword}) ${digits.length} times over, creating an intensified vibration of ${info.energy}. The repetition is a clear sign that this message is urgent and demands your attention.`;
+    } else if (sequential) {
+      patternType = "sequential";
+      const ascending = digits[1] > digits[0];
+      patternDesc = ascending
+        ? `As an ascending sequence, ${num} represents forward progress, natural growth, and step-by-step advancement. Each digit builds upon the last, showing a clear trajectory of development and evolution in your journey.`
+        : `As a descending sequence, ${num} represents revisiting past lessons, simplification, and returning to fundamentals. It encourages you to strip away complexity and reconnect with what truly matters.`;
+    } else if (mirror) {
+      patternDesc = `As a mirror number, ${num} reflects themes of balance, self-reflection, and duality. The palindromic structure invites you to examine how your outer world mirrors your inner state and to seek harmony between the two.`;
+    } else {
+      const digitDescs = uniqueDigits.map(d => `${d} (${digitMeanings[d].keyword})`).join(', ');
+      patternDesc = `This number combines the energies of ${digitDescs}. Together, they create a unique message tailored specifically to your current life circumstances and spiritual journey.`;
+    }
+
+    const primaryDigit = repeating ? digits[0] : root;
+    const primaryInfo = digitMeanings[primaryDigit];
+
+    const shortMeaning = repeating
+      ? `The energy of ${primaryInfo.keyword} is powerfully amplified. Pay close attention to ${primaryInfo.energy}.`
+      : `A ${patternType} number carrying the vibration of ${rootInfo.keyword} and ${rootInfo.energy}.`;
+
+    const detailed = `Angel number ${num} carries a distinctive spiritual vibration that combines multiple layers of meaning. ${patternDesc} The digit root of ${num} is ${root}, which connects this number to the fundamental energy of ${rootInfo.keyword}: ${rootInfo.energy}. When you encounter ${num} repeatedly, the universe is drawing your attention to themes of ${rootInfo.keyword} in your current life situation. ` +
+      `Each digit in ${num} contributes its own frequency to the overall message. ${digits.map((d, i) => `The ${['first', 'second', 'third', 'fourth'][i] || 'next'} digit, ${d}, brings the energy of ${digitMeanings[d].keyword}`).join('. ')}. ` +
+      `Combined, these energies suggest that you are in a period where ${rootInfo.energy} are particularly relevant to your growth and well-being. The universe is using this specific combination to communicate a nuanced message about maintaining awareness of these interconnected themes as you navigate your current path. Trust that seeing this number is not random but a purposeful sign meant to guide you toward greater alignment with your highest self and deepest purpose.`;
+
+    const love = repeating
+      ? `In love, the repeated energy of ${primaryInfo.keyword} suggests that ${primaryInfo.energy} are central themes in your romantic life right now. ${primaryDigit <= 4 ? 'Focus on building a strong, stable foundation in your relationships and communicating your needs clearly.' : 'Embrace changes in your love life and trust that they are leading you toward a more authentic and fulfilling connection.'}`
+      : `In love, the combined energy of ${num} encourages you to bring ${rootInfo.keyword} into your relationships. ${root <= 4 ? 'This is a time for building trust, deepening commitment, and creating stability with your partner or within yourself before seeking partnership.' : 'This is a time for transformation in love, being open to new connections, and allowing your romantic life to evolve in ways that honor your growth.'}`;
+
+    const career = repeating
+      ? `For career and finances, the amplified energy of ${primaryDigit} (${primaryInfo.keyword}) directs you toward ${primaryInfo.energy} in your professional life. ${primaryDigit >= 7 ? 'Trust your intuition about professional opportunities and know that prosperity is aligning with your efforts.' : 'Focus on practical steps, consistent effort, and building professional relationships that support your goals.'}`
+      : `For career and money, ${num} brings the vibration of ${rootInfo.keyword} to your professional life. ${root >= 7 ? 'You are being guided toward work that aligns with your deeper purpose, and financial abundance will follow authenticity.' : 'Practical effort and disciplined action are your path to professional success right now. Stay focused and trust the process.'}`;
+
+    const spiritual = `Spiritually, angel number ${num} with its digit root of ${root} connects you to the energy of ${rootInfo.keyword}. This number invites deeper exploration of ${rootInfo.energy} as part of your spiritual journey. ${repeating ? 'The repeating pattern amplifies this spiritual message, suggesting that this lesson is particularly important for your soul growth right now.' : mirror ? 'The mirror pattern of this number encourages introspection and finding spiritual balance between your inner and outer worlds.' : sequential ? 'The sequential pattern suggests spiritual progress and evolutionary growth, one step at a time.' : 'The unique combination of digits in this number creates a personalized spiritual message meant specifically for you at this moment in your journey.'}`;
+
+    const actions = [
+      `Reflect on how the theme of ${rootInfo.keyword} is showing up in your life and what adjustments might bring greater alignment.`,
+      `Meditate on the number ${num}, focusing on each digit individually and then as a unified message from the universe.`,
+      `Journal about what was on your mind or happening around you each time you noticed ${num}, looking for patterns in the context.`,
+      `Trust that this number is a purposeful sign and take one meaningful action today that aligns with its energy of ${rootInfo.keyword}.`
+    ];
+
+    const relatedNums: number[] = [];
+    if (repeating && digits.length < 4) {
+      relatedNums.push(parseInt(String(digits[0]).repeat(digits.length + 1)));
+    }
+    if (root !== 0) {
+      const tripleRoot = parseInt(String(root).repeat(3));
+      if (tripleRoot !== num && !relatedNums.includes(tripleRoot)) relatedNums.push(tripleRoot);
+    }
+    uniqueDigits.forEach(d => {
+      if (d !== 0) {
+        const triple = parseInt(String(d).repeat(3));
+        if (triple !== num && !relatedNums.includes(triple)) relatedNums.push(triple);
+      }
+    });
+    [111, 222, 333, 444, 555, 777, 888, 999, 1111, 1212].forEach(n => {
+      if (n !== num && !relatedNums.includes(n) && relatedNums.length < 5) relatedNums.push(n);
+    });
+
+    return {
+      shortMeaning,
+      detailed,
+      love,
+      career,
+      spiritual,
+      actions,
+      related: relatedNums.slice(0, 5)
+    };
+  }
+
+  function lookupNumber(num: number): void {
+    const data = angelDatabase[num] || generateFallback(num);
+
+    const resultsEl = document.getElementById('results')!;
+    resultsEl.style.display = 'block';
+
+    document.getElementById('displayNumber')!.textContent = String(num);
+    document.getElementById('shortMeaning')!.textContent = data.shortMeaning;
+    document.getElementById('detailedMeaning')!.textContent = data.detailed;
+    document.getElementById('loveMeaning')!.textContent = data.love;
+    document.getElementById('careerMeaning')!.textContent = data.career;
+    document.getElementById('spiritualMeaning')!.textContent = data.spiritual;
+
+    const actionList = document.getElementById('actionSteps')!;
+    actionList.innerHTML = '';
+    data.actions.forEach(action => {
+      const li = document.createElement('li');
+      li.className = 'action-item';
+      const check = document.createElement('span');
+      check.className = 'action-check';
+      check.textContent = '\u2713';
+      const text = document.createElement('span');
+      text.textContent = action;
+      li.appendChild(check);
+      li.appendChild(text);
+      actionList.appendChild(li);
+    });
+
+    const relatedGrid = document.getElementById('relatedNumbers')!;
+    relatedGrid.innerHTML = '';
+    data.related.forEach(rn => {
+      const a = document.createElement('a');
+      a.className = 'related-num-link';
+      a.href = '#';
+      a.textContent = String(rn);
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        (document.getElementById('angelNumber') as HTMLInputElement).value = String(rn);
+        lookupNumber(rn);
+        resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      relatedGrid.appendChild(a);
+    });
+
+    const linkContainer = document.getElementById('fullPageLink')!;
+    linkContainer.innerHTML = `<a href="/angel-number/angel-number-${num}/">Read the full guide for Angel Number ${num} &rarr;</a>`;
+  }
+
+  document.getElementById('lookupBtn')?.addEventListener('click', () => {
+    const input = document.getElementById('angelNumber') as HTMLInputElement;
+    const val = parseInt(input.value);
+    if (isNaN(val) || val < 0 || val > 9999) {
+      input.setCustomValidity('Please enter a number between 0 and 9999.');
+      input.reportValidity();
+      return;
+    }
+    input.setCustomValidity('');
+    lookupNumber(val);
+  });
+
+  document.getElementById('angelNumber')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      document.getElementById('lookupBtn')?.click();
+    }
+  });
+
+  document.querySelectorAll('.quick-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const num = parseInt((btn as HTMLElement).dataset.num || '0');
+      (document.getElementById('angelNumber') as HTMLInputElement).value = String(num);
+      lookupNumber(num);
+    });
+  });
+</script>

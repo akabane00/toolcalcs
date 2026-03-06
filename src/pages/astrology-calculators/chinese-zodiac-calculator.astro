@@ -1,0 +1,835 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Astrology Calculators",
+        "item": "https://toolcalcs.com/astrology-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Chinese Zodiac Calculator"
+      }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How do I find my Chinese zodiac animal?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Your Chinese zodiac animal is determined by your birth year. There are 12 animals in the cycle: Rat, Ox, Tiger, Rabbit, Dragon, Snake, Horse, Goat, Monkey, Rooster, Dog, and Pig. The formula is (birth year minus 4) modulo 12. For example, someone born in 2000 would be a Dragon. However, if you were born in January or February, you need to check whether your birthday falls before or after the Lunar New Year, which shifts each year between January 21 and February 20.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What are the five elements in Chinese astrology?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The five elements in Chinese astrology are Wood, Fire, Earth, Metal, and Water. Each element governs a two-year period and combines with the 12 zodiac animals to create a 60-year cycle. Years ending in 0 or 1 are Metal, 2 or 3 are Water, 4 or 5 are Wood, 6 or 7 are Fire, and 8 or 9 are Earth. Your element adds another layer of personality traits to your zodiac animal sign.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why does the Chinese zodiac year start on a different date each year?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The Chinese zodiac follows the traditional Chinese lunisolar calendar, not the Gregorian calendar. The Chinese New Year, also called the Lunar New Year or Spring Festival, falls on the second new moon after the winter solstice. This means it shifts between January 21 and February 20 each year. If you were born in January or early February, your zodiac animal might belong to the previous year depending on whether the Lunar New Year had already passed.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Which Chinese zodiac signs are most compatible?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Chinese zodiac compatibility follows a pattern based on triangular groups of four animals each. The most compatible groups are: Rat, Dragon, and Monkey; Ox, Snake, and Rooster; Tiger, Horse, and Dog; and Rabbit, Goat, and Pig. Animals within the same group tend to share similar temperaments and values. The least compatible pairings are generally animals six positions apart on the zodiac wheel, such as Rat and Horse, or Ox and Goat.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is a Ben Ming Nian (zodiac year of birth)?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'A Ben Ming Nian is the year that shares your zodiac animal sign, occurring every 12 years. In Chinese tradition, your Ben Ming Nian is actually considered an unlucky year because it is believed you may offend Tai Sui, the god of age. People traditionally wear red underwear, red socks, or a red belt throughout their Ben Ming Nian to ward off bad luck. For example, if you are a Dragon, every Year of the Dragon is your Ben Ming Nian.',
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Chinese Zodiac Calculator - Find Your Animal Sign & Element"
+  description="Free Chinese zodiac calculator. Enter your birth year to discover your zodiac animal, heavenly element, personality traits, compatibility, lucky numbers, and more."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/astrology-calculators/">Astrology Calculators</a> &rsaquo;
+    <span>Chinese Zodiac Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Chinese Zodiac Calculator</h1>
+  <p class="page-desc">Enter your birth year to discover your Chinese zodiac animal, heavenly element, personality traits, compatibility, and more.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="birthYear">Birth Year</label>
+        <input type="number" id="birthYear" value="2000" min="1924" max="2031" step="1" />
+      </div>
+    </div>
+    <p class="lunar-note">If born in January or February, check whether your birthday falls before or after the Lunar New Year to confirm your zodiac animal.</p>
+
+    <div id="resultArea" class="cz-result-area" style="display:none;">
+      <div class="cz-hero">
+        <div class="cz-animal-display">
+          <span class="cz-big-emoji" id="animalEmoji"></span>
+          <h2 class="cz-animal-name" id="animalName"></h2>
+        </div>
+        <div class="cz-element-badge" id="elementBadge">
+          <span id="elementName"></span>
+        </div>
+      </div>
+
+      <div class="cz-wheel-container">
+        <div class="cz-wheel" id="zodiacWheel">
+          <div class="cz-wheel-inner">
+            <span id="wheelCenter"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cz-section">
+        <h3>Personality</h3>
+        <p id="personalityDesc"></p>
+      </div>
+
+      <div class="cz-section">
+        <h3>Key Traits</h3>
+        <ul class="cz-traits" id="keyTraits"></ul>
+      </div>
+
+      <div class="cz-section cz-strengths-weaknesses">
+        <div class="cz-sw-col">
+          <h3>Strengths</h3>
+          <p id="strengths"></p>
+        </div>
+        <div class="cz-sw-col">
+          <h3>Weaknesses</h3>
+          <p id="weaknesses"></p>
+        </div>
+      </div>
+
+      <div class="cz-section">
+        <h3>Compatibility</h3>
+        <div class="cz-compat">
+          <div class="cz-compat-group cz-compat-best">
+            <h4>Most Compatible</h4>
+            <div class="cz-compat-animals" id="bestMatch"></div>
+          </div>
+          <div class="cz-compat-group cz-compat-worst">
+            <h4>Least Compatible</h4>
+            <div class="cz-compat-animals" id="worstMatch"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cz-section cz-lucky">
+        <div class="cz-lucky-col">
+          <h3>Lucky Numbers</h3>
+          <p id="luckyNumbers"></p>
+        </div>
+        <div class="cz-lucky-col">
+          <h3>Lucky Colors</h3>
+          <p id="luckyColors"></p>
+        </div>
+      </div>
+
+      <div class="cz-section">
+        <h3>Famous People</h3>
+        <p id="famousPeople"></p>
+      </div>
+
+      <p class="cz-disclaimer">For entertainment and self-reflection purposes only.</p>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>What Is the Chinese Zodiac?</h2>
+    <p>The Chinese zodiac, known as Sheng Xiao in Mandarin, is one of the oldest astrological systems in the world, with a history stretching back more than two thousand years. Unlike the Western zodiac, which assigns signs based on the month of your birth, the Chinese zodiac operates on a 12-year cycle, with each year represented by a different animal. These 12 animals are the Rat, Ox, Tiger, Rabbit, Dragon, Snake, Horse, Goat (also called Sheep or Ram), Monkey, Rooster, Dog, and Pig. Your birth year determines which animal governs your personality, your fortune, and your compatibility with other signs.</p>
+    <p>The Chinese zodiac is deeply embedded in Chinese culture and influences everything from naming children and choosing wedding dates to making business decisions and evaluating romantic partners. During the Lunar New Year, celebrations honor the incoming animal, and people born under that sign pay special attention to the year ahead, as their own zodiac year, called Ben Ming Nian, is traditionally considered a time of both heightened opportunity and potential misfortune. The system has spread far beyond China and is recognized throughout East Asia, Southeast Asia, and increasingly around the world.</p>
+    <p>This Chinese zodiac calculator determines your zodiac animal and heavenly element based on your birth year. Enter any year between 1924 and 2031 to see your full Chinese zodiac profile, including personality traits, strengths and weaknesses, compatibility with other signs, lucky numbers and colors, and famous people who share your animal sign.</p>
+
+    <h2>The 12 Chinese Zodiac Animals</h2>
+    <p>Each of the 12 animals in the Chinese zodiac carries distinct personality traits, strengths, and weaknesses. The order of the animals is fixed and repeats every 12 years. According to legend, the Jade Emperor held a great race across a river to determine the order. The Rat, being clever and resourceful, rode on the back of the Ox and jumped off at the last moment to cross the finish line first. Here is a brief overview of each animal in the cycle.</p>
+
+    <h3>Rat (Years: 1924, 1936, 1948, 1960, 1972, 1984, 1996, 2008, 2020)</h3>
+    <p>The Rat is the first animal in the cycle and symbolizes cleverness, resourcefulness, and adaptability. People born in the Year of the Rat are quick-witted, charming, and ambitious. They tend to be natural leaders who excel at finding opportunities where others see obstacles. Rats are sociable and enjoy being around people, though they can also be shrewd and secretive when it suits their interests. They are best matched with the Dragon and Monkey, forming a powerful triad of ambition and intelligence.</p>
+
+    <h3>Ox (Years: 1925, 1937, 1949, 1961, 1973, 1985, 1997, 2009, 2021)</h3>
+    <p>The Ox represents diligence, dependability, and strength. Those born in the Year of the Ox are hardworking, patient, and methodical in their approach to life. They value tradition, prefer stability over risk, and are fiercely loyal to family and friends. While Oxen can be stubborn and resistant to change, their determination and work ethic make them highly reliable partners and colleagues. The Ox is most compatible with the Snake and Rooster.</p>
+
+    <h3>Tiger (Years: 1926, 1938, 1950, 1962, 1974, 1986, 1998, 2010, 2022)</h3>
+    <p>The Tiger embodies courage, confidence, and passion. People born under this sign are natural-born leaders who thrive on challenge and adventure. Tigers are competitive, charismatic, and unafraid to take risks. They can be impulsive and hot-tempered, but their bravery and generosity win them many admirers. Tigers pair well with the Horse and Dog, as these signs share a love of action and justice.</p>
+
+    <h3>Rabbit (Years: 1927, 1939, 1951, 1963, 1975, 1987, 1999, 2011, 2023)</h3>
+    <p>The Rabbit signifies gentleness, elegance, and diplomacy. Those born in the Year of the Rabbit are refined, compassionate, and skilled at avoiding conflict. They have excellent taste, appreciate beauty in all forms, and often create harmonious environments. Rabbits can be overly cautious and may avoid confrontation to a fault, but their kindness and sensitivity make them wonderful friends. The Rabbit is most compatible with the Goat and Pig.</p>
+
+    <h3>Dragon (Years: 1928, 1940, 1952, 1964, 1976, 1988, 2000, 2012, 2024)</h3>
+    <p>The Dragon is the most revered animal in the Chinese zodiac, symbolizing power, ambition, and good fortune. Dragons are confident, fearless, and natural achievers who set high goals and pursue them relentlessly. They are charismatic and often attract followers, but they can also be domineering and impatient. In Chinese culture, the Year of the Dragon is the most popular year for having children. Dragons are best matched with the Rat and Monkey.</p>
+
+    <h3>Snake (Years: 1929, 1941, 1953, 1965, 1977, 1989, 2001, 2013, 2025)</h3>
+    <p>The Snake represents wisdom, intuition, and sophistication. People born in the Year of the Snake are deep thinkers who rely on their instincts and intellect to navigate life. They are private, observant, and often possess a magnetic charm that draws others to them. Snakes can be possessive and secretive, but their analytical minds and quiet determination make them formidable in any endeavor. The Snake pairs well with the Ox and Rooster.</p>
+
+    <h3>Horse (Years: 1930, 1942, 1954, 1966, 1978, 1990, 2002, 2014, 2026)</h3>
+    <p>The Horse embodies energy, freedom, and enthusiasm. Those born under the Horse sign are active, adventurous, and love to travel. They are warm, friendly, and popular in social settings, with an infectious energy that lifts the spirits of everyone around them. Horses can be impatient and have difficulty with commitment, but their optimism and vitality make them exciting companions. The Horse is most compatible with the Tiger and Dog.</p>
+
+    <h3>Goat (Years: 1931, 1943, 1955, 1967, 1979, 1991, 2003, 2015, 2027)</h3>
+    <p>The Goat, also called the Sheep or Ram, symbolizes creativity, gentleness, and empathy. People born in the Year of the Goat are artistic, compassionate, and deeply in tune with the emotions of others. They prefer peace and harmony and are often drawn to creative pursuits such as art, music, and writing. Goats can be indecisive and overly dependent on others, but their warmth and generosity make them beloved friends. The Goat is best matched with the Rabbit and Pig.</p>
+
+    <h3>Monkey (Years: 1932, 1944, 1956, 1968, 1980, 1992, 2004, 2016, 2028)</h3>
+    <p>The Monkey represents intelligence, wit, and versatility. Those born in the Year of the Monkey are clever, curious, and always looking for new experiences. They are excellent problem-solvers with a playful sense of humor and a talent for entertaining others. Monkeys can be mischievous and restless, sometimes lacking follow-through on long-term projects, but their quick minds and adaptability serve them well. The Monkey pairs best with the Rat and Dragon.</p>
+
+    <h3>Rooster (Years: 1933, 1945, 1957, 1969, 1981, 1993, 2005, 2017, 2029)</h3>
+    <p>The Rooster symbolizes confidence, honesty, and hard work. People born under this sign are punctual, organized, and take great pride in their appearance and achievements. They are straightforward communicators who value truth and integrity above all else. Roosters can be overly critical and blunt, but their dedication and attention to detail make them highly effective in professional settings. The Rooster is most compatible with the Ox and Snake.</p>
+
+    <h3>Dog (Years: 1934, 1946, 1958, 1970, 1982, 1994, 2006, 2018, 2030)</h3>
+    <p>The Dog represents loyalty, honesty, and a strong sense of justice. Those born in the Year of the Dog are faithful, protective, and always willing to help those in need. They have a deep sense of right and wrong and will fight passionately for causes they believe in. Dogs can be anxious and pessimistic, often worrying about worst-case scenarios, but their unwavering loyalty makes them the most trusted of all zodiac signs. The Dog pairs well with the Tiger and Horse.</p>
+
+    <h3>Pig (Years: 1935, 1947, 1959, 1971, 1983, 1995, 2007, 2019, 2031)</h3>
+    <p>The Pig, also called the Boar, symbolizes generosity, warmth, and good fortune. People born in the Year of the Pig are kind, tolerant, and enjoy the pleasures of life including good food, comfortable surroundings, and the company of friends. They are optimistic and trusting, sometimes to the point of naivety. Pigs can be overindulgent and easily taken advantage of, but their big hearts and genuine kindness make them wonderful partners and friends. The Pig is best matched with the Rabbit and Goat.</p>
+
+    <h2>The Five Elements and the 60-Year Cycle</h2>
+    <p>The Chinese zodiac is not simply a 12-year cycle. It is a 60-year cycle created by combining the 12 animals with five heavenly elements: Wood, Fire, Earth, Metal, and Water. Each element governs two consecutive years, so the complete cycle of all possible animal-element combinations takes 60 years to complete. This means that a Wood Rat, for example, occurs only once every 60 years, making each combination truly unique.</p>
+    <p>The five elements correspond to the last digit of the birth year. Years ending in 0 or 1 are governed by Metal, years ending in 2 or 3 by Water, years ending in 4 or 5 by Wood, years ending in 6 or 7 by Fire, and years ending in 8 or 9 by Earth. Each element adds its own qualities to the base personality of the zodiac animal, creating a more nuanced and specific profile.</p>
+    <p><strong>Wood</strong> represents growth, creativity, and flexibility. Wood element people are compassionate, idealistic, and have a strong sense of ethics. They tend to be generous and community-minded, with a natural ability to inspire others. Wood tempers aggressive animals and amplifies the creativity of artistic ones.</p>
+    <p><strong>Fire</strong> represents passion, dynamism, and leadership. Fire element people are bold, adventurous, and highly energetic. They are natural leaders who attract attention and inspire action in others. Fire can make already confident animals even more assertive, sometimes to the point of impulsiveness.</p>
+    <p><strong>Earth</strong> represents stability, patience, and practicality. Earth element people are grounded, reliable, and focused on building secure foundations. They are nurturing and responsible, with a strong sense of duty to family and community. Earth adds steadiness to restless animals and deepens the loyalty of faithful ones.</p>
+    <p><strong>Metal</strong> represents determination, rigidity, and ambition. Metal element people are focused, disciplined, and unafraid of hard work. They have strong opinions and can be inflexible, but their resolve and perseverance allow them to achieve remarkable things. Metal adds strength and focus to any animal sign.</p>
+    <p><strong>Water</strong> represents wisdom, adaptability, and communication. Water element people are intuitive, diplomatic, and skilled at reading other people. They are flexible and can adapt to almost any situation, though they may sometimes lack direction. Water adds emotional depth and perceptiveness to every animal sign.</p>
+
+    <h2>The Lunar New Year and Zodiac Boundaries</h2>
+    <p>One of the most important things to understand about the Chinese zodiac is that the Chinese year does not begin on January 1. The Chinese New Year, also known as the Lunar New Year or Spring Festival, falls on the second new moon after the winter solstice. This means the start date varies each year, falling somewhere between January 21 and February 20 on the Gregorian calendar.</p>
+    <p>This has significant implications for people born in January or early February. If you were born on February 1, 1990, for example, you might assume you are a Horse (since 1990 is a Horse year). However, the Lunar New Year in 1990 did not begin until January 27, so in this case, a February 1 birthday would indeed fall in the Year of the Horse. But if the Lunar New Year had been on February 5 that year, someone born on February 1 would actually belong to the previous zodiac year, the Year of the Snake (1989).</p>
+    <p>For people born in January or the first three weeks of February, it is essential to check the exact date of the Lunar New Year for your birth year. Our calculator provides a reminder about this boundary. If you were born during this period, look up the Lunar New Year date for your birth year and compare it to your birthday to confirm which zodiac animal truly governs your sign.</p>
+
+    <h2>Chinese Zodiac Compatibility</h2>
+    <p>Compatibility in the Chinese zodiac follows a structured system based on triangular affinities and opposing relationships. The 12 animals are divided into four groups of three, called compatibility triangles, where the animals within each group share similar temperaments and values. These groups are Rat, Dragon, and Monkey (action-oriented, ambitious); Ox, Snake, and Rooster (intellectual, determined); Tiger, Horse, and Dog (passionate, freedom-loving); and Rabbit, Goat, and Pig (peaceful, compassionate). Signs within the same triangle tend to understand each other deeply and form strong bonds.</p>
+    <p>On the opposite end, animals that are six positions apart on the zodiac wheel are considered the least compatible. These pairs are Rat and Horse, Ox and Goat, Tiger and Monkey, Rabbit and Rooster, Dragon and Dog, and Snake and Pig. While these pairings are not impossible, they tend to involve significant differences in temperament and values that require extra effort to bridge.</p>
+    <p>Of course, compatibility in any system is never absolute. Individual personality, upbringing, life experiences, and the element associated with each person's birth year all play a role in how two people interact. The Chinese zodiac compatibility system is a traditional framework for understanding relationship dynamics, not a definitive prediction of success or failure.</p>
+
+    <h2>How to Use This Chinese Zodiac Calculator</h2>
+    <p>Using this calculator is simple. Enter your birth year in the input field above. The calculator accepts any year between 1924 and 2031, covering a full range of modern birth years. Once you enter your year, the calculator instantly determines your Chinese zodiac animal using the formula (year minus 4) modulo 12, and your heavenly element based on the last digit of your birth year.</p>
+    <p>The results display your animal sign with its emoji, your governing element with color coding, a detailed personality description of over 150 words, key character traits, strengths and weaknesses, your three most compatible animal signs and two least compatible signs, lucky numbers and colors, and a list of famous people who share your zodiac animal. The zodiac wheel graphic highlights your animal's position in the 12-year cycle, giving you a visual sense of where your sign falls in relation to the others.</p>
+    <p>Remember that if you were born in January or early February, the Lunar New Year boundary may affect your result. The calculator uses the Gregorian year as input, so you may need to adjust by one year if your birthday falls before the Lunar New Year of that year. Check your specific birth year's Lunar New Year date to be sure.</p>
+    <p>Explore your results, share them with friends and family, and use them as a starting point for deeper exploration of Chinese astrology and cultural traditions. Whether you take the zodiac seriously or enjoy it as a fun cultural artifact, learning about your Chinese zodiac sign connects you to a rich tradition that has shaped lives for thousands of years.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>How do I find my Chinese zodiac animal?</summary>
+        <p>Your Chinese zodiac animal is determined by your birth year. There are 12 animals in the cycle: Rat, Ox, Tiger, Rabbit, Dragon, Snake, Horse, Goat, Monkey, Rooster, Dog, and Pig. The formula is (birth year minus 4) modulo 12. For example, someone born in 2000 would be a Dragon. However, if you were born in January or February, you need to check whether your birthday falls before or after the Lunar New Year, which shifts each year between January 21 and February 20.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What are the five elements in Chinese astrology?</summary>
+        <p>The five elements in Chinese astrology are Wood, Fire, Earth, Metal, and Water. Each element governs a two-year period and combines with the 12 zodiac animals to create a 60-year cycle. Years ending in 0 or 1 are Metal, 2 or 3 are Water, 4 or 5 are Wood, 6 or 7 are Fire, and 8 or 9 are Earth. Your element adds another layer of personality traits to your zodiac animal sign, creating a more specific and nuanced profile.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Why does the Chinese zodiac year start on a different date each year?</summary>
+        <p>The Chinese zodiac follows the traditional Chinese lunisolar calendar, not the Gregorian calendar. The Chinese New Year, also called the Lunar New Year or Spring Festival, falls on the second new moon after the winter solstice. This means it shifts between January 21 and February 20 each year. If you were born in January or early February, your zodiac animal might belong to the previous year depending on whether the Lunar New Year had already passed at the time of your birth.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Which Chinese zodiac signs are most compatible?</summary>
+        <p>Chinese zodiac compatibility follows a pattern based on triangular groups of four animals each. The most compatible groups are: Rat, Dragon, and Monkey; Ox, Snake, and Rooster; Tiger, Horse, and Dog; and Rabbit, Goat, and Pig. Animals within the same group tend to share similar temperaments and values, making for strong friendships and romantic partnerships. The least compatible pairings are generally animals six positions apart on the zodiac wheel, such as Rat and Horse, or Ox and Goat.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is a Ben Ming Nian (zodiac year of birth)?</summary>
+        <p>A Ben Ming Nian is the year that shares your zodiac animal sign, occurring every 12 years. In Chinese tradition, your Ben Ming Nian is actually considered an unlucky year because it is believed you may offend Tai Sui, the god of age. People traditionally wear red underwear, red socks, or a red belt throughout their Ben Ming Nian to ward off bad luck. For example, if you are a Dragon, every Year of the Dragon is your Ben Ming Nian.</p>
+      </details>
+    </div>
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/astrology-calculators/zodiac-sign-calculator/">Zodiac Sign Calculator</a> - Find your Western zodiac sign based on your birthday.</li>
+      <li><a href="/astrology-calculators/zodiac-compatibility-calculator/">Zodiac Compatibility Calculator</a> - Check compatibility between two Western zodiac signs.</li>
+      <li><a href="/astrology-calculators/numerology-calculator/">Numerology Calculator</a> - Discover your Life Path Number and what it means.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+  <RelatedArticles calculatorSlug="chinese-zodiac-calculator" />
+  <RelatedCalculators currentSlug="chinese-zodiac-calculator" />
+</BaseLayout>
+
+<style>
+  .last-updated { font-size: 0.75rem; color: var(--color-text-muted); margin: 4px 0 0; }
+  .lunar-note {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    background: #fef3c7;
+    border: 1px solid #fde68a;
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+  [data-theme="dark"] .lunar-note {
+    background: #422006;
+    border-color: #854d0e;
+  }
+
+  /* Hero: big emoji + animal name + element badge */
+  .cz-hero {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .cz-animal-display {
+    margin-bottom: 10px;
+  }
+  .cz-big-emoji {
+    font-size: 5rem;
+    line-height: 1.1;
+    display: block;
+  }
+  .cz-animal-name {
+    font-size: 1.6rem;
+    margin: 8px 0 0;
+  }
+  .cz-element-badge {
+    display: inline-block;
+    padding: 6px 18px;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #fff;
+    margin-top: 8px;
+  }
+
+  /* Zodiac Wheel */
+  .cz-wheel-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 28px;
+  }
+  .cz-wheel {
+    position: relative;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    border: 3px solid var(--color-border);
+    background: var(--color-bg);
+  }
+  .cz-wheel-inner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.2;
+  }
+  .cz-wheel-animal {
+    position: absolute;
+    font-size: 1.4rem;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--color-surface);
+    border: 2px solid var(--color-border);
+    transform: translate(-50%, -50%);
+    transition: all 0.3s;
+  }
+  .cz-wheel-animal.active {
+    font-size: 1.6rem;
+    width: 44px;
+    height: 44px;
+    border-color: var(--color-primary);
+    background: #eff6ff;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+    z-index: 2;
+  }
+  [data-theme="dark"] .cz-wheel-animal.active {
+    background: #1e3a5f;
+  }
+
+  /* Sections */
+  .cz-section {
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .cz-section:last-of-type { border-bottom: none; }
+  .cz-section h3 {
+    font-size: 1rem;
+    margin-bottom: 8px;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+  }
+
+  /* Traits */
+  .cz-traits {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .cz-traits li {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  /* Strengths & Weaknesses */
+  .cz-strengths-weaknesses {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .cz-sw-col h3 { font-size: 0.95rem; }
+
+  /* Compatibility */
+  .cz-compat {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .cz-compat-group h4 {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-bottom: 8px;
+  }
+  .cz-compat-animals {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .cz-compat-chip {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg);
+  }
+  .cz-compat-best .cz-compat-chip {
+    border-color: #86efac;
+    background: #f0fdf4;
+  }
+  .cz-compat-worst .cz-compat-chip {
+    border-color: #fca5a5;
+    background: #fef2f2;
+  }
+  [data-theme="dark"] .cz-compat-best .cz-compat-chip {
+    background: #14532d;
+    border-color: #166534;
+  }
+  [data-theme="dark"] .cz-compat-worst .cz-compat-chip {
+    background: #450a0a;
+    border-color: #7f1d1d;
+  }
+
+  /* Lucky numbers & colors */
+  .cz-lucky {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .cz-lucky-col h3 { font-size: 0.95rem; }
+
+  /* Disclaimer */
+  .cz-disclaimer {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    text-align: center;
+    margin-top: 20px;
+    font-style: italic;
+  }
+
+  /* FAQ */
+  .faq-list { margin-top: 16px; }
+  .faq-item {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    margin-bottom: 8px;
+    background: var(--color-surface);
+  }
+  .faq-item summary {
+    padding: 14px 16px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.95rem;
+  }
+  .faq-item p {
+    padding: 0 16px 14px;
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: var(--color-text-muted);
+  }
+
+  /* Table in SEO content */
+  .table-responsive { overflow-x: auto; margin: 16px 0; }
+  .table-responsive table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .table-responsive th,
+  .table-responsive td {
+    padding: 8px 12px;
+    border: 1px solid var(--color-border);
+    text-align: left;
+  }
+  .table-responsive th {
+    background: var(--color-bg);
+    font-weight: 600;
+  }
+
+  @media (max-width: 640px) {
+    .cz-big-emoji { font-size: 3.5rem; }
+    .cz-animal-name { font-size: 1.3rem; }
+    .cz-wheel { width: 220px; height: 220px; }
+    .cz-wheel-animal { font-size: 1.1rem; width: 30px; height: 30px; }
+    .cz-wheel-animal.active { font-size: 1.3rem; width: 38px; height: 38px; }
+    .cz-strengths-weaknesses,
+    .cz-compat,
+    .cz-lucky { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script is:inline>
+  var zodiacAnimals = [
+    {
+      name: 'Rat',
+      emoji: '\uD83D\uDC00',
+      traits: ['Clever', 'Resourceful', 'Adaptable', 'Quick-witted', 'Charming'],
+      strengths: 'Rats are highly intelligent and resourceful. They have a sharp instinct for opportunity and can thrive in almost any situation. Their social skills make them excellent networkers, and their attention to detail helps them succeed in business and finance. Rats are also deeply loyal to the small circle of people they trust.',
+      weaknesses: 'Rats can be secretive, calculating, and overly cautious with money. They may come across as manipulative or self-serving, especially when pursuing their goals. Their tendency to hoard resources and worry about security can make them appear stingy or anxious to those who do not understand them.',
+      bestMatch: ['Dragon', 'Monkey', 'Ox'],
+      worstMatch: ['Horse', 'Rooster'],
+      luckyNumbers: ['2', '3', '6'],
+      luckyColors: ['Gold', 'Blue', 'Green'],
+      description: 'People born in the Year of the Rat are among the most quick-witted and resourceful of all the zodiac signs. They possess a natural charm that draws others to them and a keen intelligence that allows them to navigate complex situations with ease. Rats are excellent planners who think several steps ahead, making them formidable in business, negotiations, and strategic endeavors. They are observant and detail-oriented, rarely missing an important piece of information. Socially, Rats are warm and engaging, though they tend to maintain a small circle of truly close friends rather than a wide network of acquaintances. They are deeply loyal to family and will go to great lengths to provide security and comfort for their loved ones. Rats are ambitious and driven by a desire for success, which they define in both financial and personal terms. Their adaptability means they can reinvent themselves when circumstances change, turning setbacks into stepping stones. While they can be cautious and even secretive, this is often a protective instinct rather than a sign of dishonesty.',
+      famousPeople: ['Shakespeare', 'Mozart', 'George Washington', 'Prince Charles', 'Scarlett Johansson']
+    },
+    {
+      name: 'Ox',
+      emoji: '\uD83D\uDC02',
+      traits: ['Dependable', 'Patient', 'Diligent', 'Strong', 'Determined'],
+      strengths: 'Oxen are the workhorses of the zodiac. Their patience and determination make them unstoppable once they set their mind to a goal. They are honest, trustworthy, and deeply loyal to family and friends. Their practical approach to life provides stability and security to everyone around them.',
+      weaknesses: 'Oxen can be stubborn to a fault, refusing to change course even when the evidence suggests they should. They may be rigid in their thinking, resistant to new ideas, and slow to forgive. Their lack of flexibility can lead to missed opportunities and strained relationships with more spontaneous personalities.',
+      bestMatch: ['Snake', 'Rooster', 'Rat'],
+      worstMatch: ['Goat', 'Horse'],
+      luckyNumbers: ['1', '4', '9'],
+      luckyColors: ['White', 'Yellow', 'Green'],
+      description: 'People born in the Year of the Ox are known for their remarkable diligence, unwavering determination, and quiet strength. They are the dependable foundation upon which families, teams, and communities are built. Oxen approach life methodically, preferring to work steadily toward their goals rather than seeking shortcuts or taking unnecessary risks. They believe in earning success through hard work and are often the most reliable person in any group. Their patience is legendary; where others give up, Oxen persist until the job is done. They value tradition and stability, finding comfort in routines and well-established systems. In relationships, Oxen are deeply loyal and devoted, often putting the needs of their loved ones before their own. They may not be the most verbally expressive of the zodiac signs, but they demonstrate their love through consistent actions and unwavering support. Oxen have a strong moral compass and believe in doing the right thing even when it is difficult. Their calm exterior hides a deep well of inner strength that surfaces in times of crisis, making them natural anchors for those around them.',
+      famousPeople: ['Barack Obama', 'Napoleon Bonaparte', 'Walt Disney', 'Margaret Thatcher', 'Vincent van Gogh']
+    },
+    {
+      name: 'Tiger',
+      emoji: '\uD83D\uDC05',
+      traits: ['Brave', 'Confident', 'Competitive', 'Charismatic', 'Passionate'],
+      strengths: 'Tigers are courageous leaders who inspire others with their boldness and conviction. They are natural protectors who stand up for the underdog and fight against injustice. Their confidence and charisma draw followers, and their passionate nature makes them exciting partners and dynamic friends.',
+      weaknesses: 'Tigers can be impulsive, hot-tempered, and overconfident, sometimes rushing into situations without adequate preparation. They may struggle with authority and resist following rules they disagree with. Their need for excitement can make them restless and impatient with routine.',
+      bestMatch: ['Horse', 'Dog', 'Pig'],
+      worstMatch: ['Monkey', 'Snake'],
+      luckyNumbers: ['1', '3', '4'],
+      luckyColors: ['Blue', 'Gray', 'Orange'],
+      description: 'People born in the Year of the Tiger are natural-born leaders who command attention wherever they go. They possess an innate courage that enables them to face challenges head-on, often taking risks that others would never consider. Tigers are fiercely competitive and thrive in environments where they can test their abilities against worthy opponents. Their confidence is contagious, inspiring those around them to push beyond their own limitations. Tigers have a magnetic charisma that draws people to them, and they often find themselves at the center of social gatherings. They are passionate about their beliefs and will fight tirelessly for causes they consider just. In relationships, Tigers are intense and devoted, though they need partners who can match their energy and give them the freedom they crave. Their adventurous spirit means they are always seeking new experiences, whether through travel, creative pursuits, or physical challenges. Tigers are generous and warm-hearted, often going out of their way to help friends and strangers alike. While their impulsiveness can sometimes lead to trouble, it is also the source of their greatest achievements.',
+      famousPeople: ['Queen Elizabeth II', 'Tom Cruise', 'Leonardo DiCaprio', 'Lady Gaga', 'Beethoven']
+    },
+    {
+      name: 'Rabbit',
+      emoji: '\uD83D\uDC07',
+      traits: ['Gentle', 'Elegant', 'Diplomatic', 'Compassionate', 'Refined'],
+      strengths: 'Rabbits are graceful, tactful, and excellent at maintaining harmony in any group. They have refined taste and a keen eye for beauty. Their compassion and empathy make them wonderful friends and partners, and their diplomatic skills help them resolve conflicts peacefully.',
+      weaknesses: 'Rabbits can be overly cautious, avoiding confrontation even when it is necessary. They may be indecisive, prone to melancholy, and overly sensitive to criticism. Their desire for comfort and security can make them resistant to change and reluctant to take necessary risks.',
+      bestMatch: ['Goat', 'Pig', 'Dog'],
+      worstMatch: ['Rooster', 'Dragon'],
+      luckyNumbers: ['3', '4', '6'],
+      luckyColors: ['Pink', 'Purple', 'Red'],
+      description: 'People born in the Year of the Rabbit are among the most graceful and refined of all the zodiac signs. They possess an innate elegance that manifests in their appearance, their manners, and their surroundings. Rabbits are gentle souls who seek harmony and beauty in all aspects of life. They are natural diplomats with an extraordinary ability to navigate social situations, resolve conflicts, and make everyone around them feel comfortable and valued. Their compassion runs deep, and they are often the first to offer comfort to someone in distress. Rabbits have excellent taste and are drawn to the finer things in life, from art and music to fashion and home decor. They create warm, inviting environments that reflect their aesthetic sensibility. In relationships, Rabbits are loving and attentive partners who prioritize emotional connection and mutual understanding. They may avoid conflict at all costs, preferring to smooth things over rather than confront issues directly. While this can sometimes lead to unresolved tensions, it also means that Rabbits are among the most pleasant and agreeable companions one could ask for. Their quiet strength lies in their ability to endure and adapt without losing their essential grace.',
+      famousPeople: ['Albert Einstein', 'Michael Jordan', 'Angelina Jolie', 'Frank Sinatra', 'David Beckham']
+    },
+    {
+      name: 'Dragon',
+      emoji: '\uD83D\uDC09',
+      traits: ['Ambitious', 'Energetic', 'Fearless', 'Charismatic', 'Confident'],
+      strengths: 'Dragons are the most powerful and auspicious sign in the Chinese zodiac. They are natural leaders with boundless energy and unwavering confidence. Their ambition drives them to achieve great things, and their charisma attracts loyal followers and supporters. Dragons are innovative thinkers who are not afraid to challenge the status quo.',
+      weaknesses: 'Dragons can be arrogant, domineering, and intolerant of others\' shortcomings. Their perfectionism can make them demanding and difficult to please. They may struggle to accept criticism or admit mistakes, and their intense drive can leave them feeling isolated or burnt out.',
+      bestMatch: ['Rat', 'Monkey', 'Rooster'],
+      worstMatch: ['Dog', 'Rabbit'],
+      luckyNumbers: ['1', '6', '7'],
+      luckyColors: ['Gold', 'Silver', 'Gray'],
+      description: 'People born in the Year of the Dragon are blessed with an extraordinary combination of ambition, charisma, and confidence that sets them apart from all other zodiac signs. The Dragon is the only mythical creature in the Chinese zodiac, and those born under its influence seem to carry a touch of the extraordinary in everything they do. Dragons are natural leaders who command respect and admiration without effort. Their energy is boundless, and they approach life with a fearlessness that can border on recklessness but more often leads to remarkable achievements. Dragons set high standards for themselves and others, constantly pushing the boundaries of what is possible. They are visionaries who see the big picture and inspire others to share their ambitious goals. In Chinese culture, the Dragon is associated with imperial power and good fortune, and Dragon years see a notable spike in birth rates as parents hope their children will inherit the Dragon\'s auspicious qualities. In relationships, Dragons are passionate and devoted but need partners who are strong enough to stand beside them without being overshadowed. Their pride can make them reluctant to show vulnerability, but beneath the powerful exterior lies a generous heart that cares deeply about the well-being of those they love.',
+      famousPeople: ['Bruce Lee', 'John Lennon', 'Martin Luther King Jr.', 'Rihanna', 'Vladimir Putin']
+    },
+    {
+      name: 'Snake',
+      emoji: '\uD83D\uDC0D',
+      traits: ['Wise', 'Intuitive', 'Sophisticated', 'Analytical', 'Mysterious'],
+      strengths: 'Snakes are deeply intelligent and perceptive, with an uncanny ability to read people and situations. Their intuition is among the strongest in the zodiac, and they often know things before they can explain how. Snakes are elegant, sophisticated, and possess a quiet magnetism that draws others to them.',
+      weaknesses: 'Snakes can be possessive, jealous, and secretive, keeping their true feelings hidden behind a composed exterior. They may be distrustful of others and prone to holding grudges. Their tendency to overthink can lead to anxiety, and their need for control can suffocate partners and friends.',
+      bestMatch: ['Ox', 'Rooster', 'Monkey'],
+      worstMatch: ['Pig', 'Tiger'],
+      luckyNumbers: ['2', '8', '9'],
+      luckyColors: ['Black', 'Red', 'Yellow'],
+      description: 'People born in the Year of the Snake are among the most enigmatic and intellectually gifted of all the zodiac signs. They possess a deep wisdom that goes beyond mere intelligence, drawing on intuition, observation, and a profound understanding of human nature. Snakes are private individuals who reveal themselves slowly, preferring to observe and analyze before acting. This measured approach gives them a significant advantage in negotiations, business, and personal relationships, as they rarely make hasty decisions or impulsive moves. Their sophistication is evident in their taste, their conversation, and their bearing, and they often gravitate toward careers in the arts, sciences, or finance where their analytical minds can shine. Snakes have a magnetic quality that is difficult to define but impossible to ignore. They attract others with their calm confidence and mysterious air, and they are capable of deep, transformative relationships when they find partners worthy of their trust. In times of crisis, Snakes remain calm and collected, their cool exterior hiding a mind that is rapidly calculating the best course of action. While their secretive nature can sometimes create distance in relationships, it is balanced by an intense loyalty to the few people they let into their inner circle.',
+      famousPeople: ['Abraham Lincoln', 'Mahatma Gandhi', 'Oprah Winfrey', 'Taylor Swift', 'J.K. Rowling']
+    },
+    {
+      name: 'Horse',
+      emoji: '\uD83D\uDC0E',
+      traits: ['Energetic', 'Free-spirited', 'Adventurous', 'Warm', 'Enthusiastic'],
+      strengths: 'Horses are vibrant, sociable, and full of life. Their infectious enthusiasm lifts the spirits of everyone around them. They are honest, straightforward, and generous with their time and energy. Their love of adventure and new experiences makes them fascinating companions and dynamic team members.',
+      weaknesses: 'Horses can be impatient, impulsive, and have difficulty with long-term commitment. They may lose interest quickly and jump from project to project without finishing. Their need for freedom can make them unreliable, and their blunt honesty can sometimes hurt others\' feelings.',
+      bestMatch: ['Tiger', 'Dog', 'Goat'],
+      worstMatch: ['Rat', 'Ox'],
+      luckyNumbers: ['2', '3', '7'],
+      luckyColors: ['Yellow', 'Brown', 'Purple'],
+      description: 'People born in the Year of the Horse are the free spirits of the Chinese zodiac, blessed with an abundance of energy, enthusiasm, and a deep love of life. They are natural adventurers who crave new experiences, whether through travel, sports, social events, or creative pursuits. Horses are warm and genuinely friendly, making connections easily and lighting up any room they enter. Their optimism is contagious, and they have a remarkable ability to find the silver lining in any situation. Horses value their independence above almost everything else and need the freedom to explore, create, and move at their own pace. They are honest and straightforward in their communication, preferring to speak their mind rather than engage in politics or deception. This directness, combined with their natural warmth, makes them trustworthy and refreshing companions. In their professional lives, Horses thrive in dynamic environments that offer variety and challenge, and they often excel in fields that involve communication, travel, or physical activity. In relationships, Horses are passionate and devoted but need partners who understand their need for space and adventure. They are most fulfilled when they can share their zest for life with someone who matches their energy and supports their dreams.',
+      famousPeople: ['Genghis Khan', 'Rembrandt', 'Teddy Roosevelt', 'Paul McCartney', 'Emma Watson']
+    },
+    {
+      name: 'Goat',
+      emoji: '\uD83D\uDC10',
+      traits: ['Creative', 'Gentle', 'Empathetic', 'Artistic', 'Kind'],
+      strengths: 'Goats are among the most creative and artistically gifted signs in the zodiac. They have a profound empathy that allows them to understand and share the feelings of others. Their gentleness and kindness make them nurturing friends, partners, and parents. Goats create beauty and harmony wherever they go.',
+      weaknesses: 'Goats can be indecisive, overly dependent on others, and prone to worry and pessimism. They may struggle with self-confidence and avoid taking initiative. Their sensitivity means they are easily hurt by criticism, and their desire for comfort can make them complacent.',
+      bestMatch: ['Rabbit', 'Pig', 'Horse'],
+      worstMatch: ['Ox', 'Dog'],
+      luckyNumbers: ['2', '7', '8'],
+      luckyColors: ['Green', 'Brown', 'Red'],
+      description: 'People born in the Year of the Goat, also known as the Sheep or Ram, are the gentle artists and compassionate caretakers of the Chinese zodiac. They possess a deep sensitivity to beauty, emotion, and the subtle currents of the world around them. Goats are natural creatives who express themselves through art, music, writing, design, or any medium that allows them to channel their rich inner life into tangible form. Their empathy is extraordinary, allowing them to understand and share the feelings of others with a depth that few signs can match. This makes them wonderful listeners, supportive friends, and nurturing partners who create warm, loving environments for those they care about. Goats prefer peace and harmony and will go out of their way to avoid conflict or discord. They are most comfortable in serene, beautiful surroundings and may feel overwhelmed by chaos, aggression, or harshness. While their gentle nature can sometimes be mistaken for weakness, Goats possess a quiet inner strength and resilience that allows them to endure difficulties with grace. They are dreamers who imagine a better world and often work quietly behind the scenes to make it a reality. Their kindness, generosity, and warmth enrich the lives of everyone fortunate enough to know them.',
+      famousPeople: ['Michelangelo', 'Mark Twain', 'Thomas Edison', 'Steve Jobs', 'Julia Roberts']
+    },
+    {
+      name: 'Monkey',
+      emoji: '\uD83D\uDC12',
+      traits: ['Intelligent', 'Witty', 'Curious', 'Versatile', 'Playful'],
+      strengths: 'Monkeys are the brightest and most versatile of all zodiac signs. Their quick minds and natural curiosity drive them to learn constantly and master new skills with ease. They have a wonderful sense of humor that makes them the life of any gathering, and their problem-solving abilities are unmatched.',
+      weaknesses: 'Monkeys can be restless, mischievous, and lack follow-through on long-term commitments. They may be manipulative when they want to get their way and can become bored easily, abandoning projects and relationships before they reach their full potential.',
+      bestMatch: ['Rat', 'Dragon', 'Snake'],
+      worstMatch: ['Tiger', 'Pig'],
+      luckyNumbers: ['4', '8', '9'],
+      luckyColors: ['White', 'Blue', 'Gold'],
+      description: 'People born in the Year of the Monkey are the intellectual dynamos of the Chinese zodiac, blessed with sharp minds, quick reflexes, and an insatiable curiosity about the world. They are natural problem-solvers who approach challenges as puzzles to be solved rather than obstacles to be feared. Monkeys learn quickly and adapt effortlessly, often picking up new skills, languages, or concepts faster than anyone around them. Their wit and sense of humor make them irresistible companions, and they have a talent for entertainment that ranges from clever wordplay to elaborate practical jokes. Monkeys are social creatures who thrive on interaction and stimulation, and they often maintain wide networks of friends and acquaintances across diverse fields. Their versatility means they can succeed in almost any career, though they tend to gravitate toward roles that offer variety, challenge, and the opportunity to use their creative intelligence. In relationships, Monkeys are playful and attentive partners who keep the romance alive with surprises, humor, and spontaneous adventures. They need partners who can keep up with their intellectual pace and appreciate their need for mental stimulation. While their restless energy can sometimes make commitment challenging, Monkeys who find the right partner are loyal, devoted, and endlessly entertaining.',
+      famousPeople: ['Julius Caesar', 'Leonardo da Vinci', 'Charles Dickens', 'Will Smith', 'Selena Gomez']
+    },
+    {
+      name: 'Rooster',
+      emoji: '\uD83D\uDC13',
+      traits: ['Honest', 'Hardworking', 'Confident', 'Observant', 'Punctual'],
+      strengths: 'Roosters are among the most honest and hardworking signs in the zodiac. They take pride in everything they do and hold themselves to the highest standards. Their attention to detail and organizational skills make them excellent managers and leaders. Roosters are brave, outspoken, and unafraid to voice their opinions.',
+      weaknesses: 'Roosters can be overly critical, both of themselves and others, setting impossibly high standards that lead to frustration. They may be vain, attention-seeking, and abrasive in their honesty. Their need for perfection can make them inflexible and difficult to work with.',
+      bestMatch: ['Ox', 'Snake', 'Dragon'],
+      worstMatch: ['Rabbit', 'Dog'],
+      luckyNumbers: ['5', '7', '8'],
+      luckyColors: ['Gold', 'Brown', 'Yellow'],
+      description: 'People born in the Year of the Rooster are the perfectionists and truth-tellers of the Chinese zodiac. They approach life with a precision and discipline that few other signs can match, setting high standards for themselves and everyone around them. Roosters are deeply honest, sometimes to a fault, preferring to speak the uncomfortable truth rather than offer false comfort. This directness, while sometimes jarring, earns them the respect and trust of those who value integrity above flattery. Roosters take enormous pride in their appearance and achievements, always presenting themselves at their best and expecting others to do the same. They are early risers, punctual to a fault, and organized in every aspect of their lives, from their immaculate homes to their meticulously planned schedules. In the workplace, Roosters are natural managers who thrive on structure, efficiency, and measurable results. They have keen observational skills and rarely miss a detail, making them excellent in fields that require precision such as finance, law, medicine, or engineering. In relationships, Roosters are loyal and devoted partners who show their love through acts of service and practical support. They may not be the most emotionally expressive sign, but their commitment and reliability speak louder than words. Roosters who learn to temper their critical tendencies with compassion become truly exceptional friends and partners.',
+      famousPeople: ['Confucius', 'Catherine the Great', 'Benjamin Franklin', 'Beyonce', 'Roger Federer']
+    },
+    {
+      name: 'Dog',
+      emoji: '\uD83D\uDC15',
+      traits: ['Loyal', 'Honest', 'Protective', 'Just', 'Faithful'],
+      strengths: 'Dogs are the most loyal and trustworthy of all zodiac signs. They have an unshakable sense of right and wrong and will always defend those they love. Their honesty and reliability make them the foundation of any group, and their willingness to sacrifice for others inspires deep devotion in return.',
+      weaknesses: 'Dogs can be anxious, pessimistic, and prone to worrying about worst-case scenarios. They may be overly suspicious of strangers and resistant to change. Their stubbornness and tendency to see the world in black and white can lead to unnecessary conflicts.',
+      bestMatch: ['Tiger', 'Horse', 'Rabbit'],
+      worstMatch: ['Dragon', 'Goat'],
+      luckyNumbers: ['3', '4', '9'],
+      luckyColors: ['Red', 'Green', 'Purple'],
+      description: 'People born in the Year of the Dog are the loyal guardians and moral compasses of the Chinese zodiac. They possess an unwavering sense of justice and a deep commitment to doing what is right, even when it comes at a personal cost. Dogs are honest to the core, incapable of deception or pretense, and they expect the same transparency from others. Their loyalty to friends and family is legendary, and they will go to extraordinary lengths to protect and support the people they care about. Dogs have a natural instinct to stand up for the underdog and fight against injustice, making them passionate advocates for social causes and humanitarian efforts. They are cautious by nature, preferring to observe and assess before committing to new relationships or ventures. This careful approach, while sometimes mistaken for coldness, is actually a sign of their deep desire to invest in people and causes that truly deserve their devotion. In relationships, Dogs are faithful, supportive, and deeply caring partners who prioritize emotional security and mutual trust. They may struggle with anxiety and pessimism, often imagining worst-case scenarios, but their partners can always count on them to be present, reliable, and fiercely protective. Dogs who learn to manage their worrying tendencies discover a life filled with deep, meaningful connections and the satisfaction of living according to their principles.',
+      famousPeople: ['Winston Churchill', 'Mother Teresa', 'Elvis Presley', 'Jennifer Lopez', 'Prince William']
+    },
+    {
+      name: 'Pig',
+      emoji: '\uD83D\uDC16',
+      traits: ['Generous', 'Warm', 'Trusting', 'Compassionate', 'Optimistic'],
+      strengths: 'Pigs are the most generous and warm-hearted of all zodiac signs. They genuinely enjoy making others happy and are always willing to share what they have. Their optimism and positive outlook on life make them uplifting companions, and their tolerance and acceptance create safe spaces for everyone around them.',
+      weaknesses: 'Pigs can be naive, overindulgent, and easily taken advantage of by less scrupulous individuals. They may avoid conflict to an unhealthy degree, letting problems fester rather than addressing them. Their love of comfort and pleasure can lead to laziness and a lack of discipline.',
+      bestMatch: ['Rabbit', 'Goat', 'Tiger'],
+      worstMatch: ['Snake', 'Monkey'],
+      luckyNumbers: ['2', '5', '8'],
+      luckyColors: ['Yellow', 'Gray', 'Brown'],
+      description: 'People born in the Year of the Pig, also called the Boar, are the warm-hearted optimists of the Chinese zodiac. They approach life with a genuine kindness and generosity that touches everyone they meet. Pigs believe in the fundamental goodness of people and extend trust and compassion freely, sometimes to a fault. Their warm, accepting nature creates a welcoming atmosphere that makes others feel valued, heard, and comfortable being themselves. Pigs are lovers of life who appreciate good food, beautiful surroundings, comfortable homes, and the company of people they care about. They work hard not for status or power but to create a life of comfort and contentment for themselves and their loved ones. Their tolerance is remarkable, as they accept people as they are without judgment or criticism, making them among the easiest signs to get along with. In relationships, Pigs are devoted, affectionate, and deeply romantic partners who express their love through generosity, physical affection, and thoughtful gestures. They seek harmony in their relationships and will make significant sacrifices to maintain peace and happiness at home. Pigs have a quiet strength that emerges when their loved ones are threatened, and they can be surprisingly fierce when protecting those they care about. While their trusting nature can sometimes be exploited, the depth of their kindness and the warmth of their spirit make them irreplaceable friends and partners.',
+      famousPeople: ['Henry Ford', 'Ernest Hemingway', 'Alfred Hitchcock', 'Hillary Clinton', 'Arnold Schwarzenegger']
+    }
+  ];
+
+  var elementColors = {
+    Wood: '#27AE60',
+    Fire: '#E74C3C',
+    Earth: '#F39C12',
+    Metal: '#95A5A6',
+    Water: '#3498DB'
+  };
+
+  function getAnimalIndex(year) {
+    return (year - 4) % 12;
+  }
+
+  function getElement(year) {
+    var lastDigit = year % 10;
+    if (lastDigit === 0 || lastDigit === 1) return 'Metal';
+    if (lastDigit === 2 || lastDigit === 3) return 'Water';
+    if (lastDigit === 4 || lastDigit === 5) return 'Wood';
+    if (lastDigit === 6 || lastDigit === 7) return 'Fire';
+    return 'Earth';
+  }
+
+  function buildWheel(activeIndex) {
+    var wheel = document.getElementById('zodiacWheel');
+    // Remove old animal nodes
+    var oldNodes = wheel.querySelectorAll('.cz-wheel-animal');
+    for (var i = 0; i < oldNodes.length; i++) {
+      wheel.removeChild(oldNodes[i]);
+    }
+
+    var isMobile = window.innerWidth <= 640;
+    var radius = isMobile ? 86 : 105;
+
+    for (var i = 0; i < 12; i++) {
+      var angle = (i * 30 - 90) * (Math.PI / 180);
+      var x = 50 + (radius / (isMobile ? 110 : 130)) * 50 * Math.cos(angle);
+      var y = 50 + (radius / (isMobile ? 110 : 130)) * 50 * Math.sin(angle);
+
+      var el = document.createElement('span');
+      el.className = 'cz-wheel-animal' + (i === activeIndex ? ' active' : '');
+      el.textContent = zodiacAnimals[i].emoji;
+      el.title = zodiacAnimals[i].name;
+      el.style.left = x + '%';
+      el.style.top = y + '%';
+      wheel.appendChild(el);
+    }
+
+    document.getElementById('wheelCenter').textContent = zodiacAnimals[activeIndex].emoji;
+  }
+
+  function calculate() {
+    var yearInput = document.getElementById('birthYear');
+    var year = parseInt(yearInput.value, 10);
+    if (isNaN(year) || year < 1924 || year > 2031) {
+      document.getElementById('resultArea').style.display = 'none';
+      return;
+    }
+
+    var animalIndex = getAnimalIndex(year);
+    var animal = zodiacAnimals[animalIndex];
+    var element = getElement(year);
+
+    // Show result area
+    document.getElementById('resultArea').style.display = 'block';
+
+    // Hero
+    document.getElementById('animalEmoji').textContent = animal.emoji;
+    document.getElementById('animalName').textContent = element + ' ' + animal.name + ' (' + year + ')';
+
+    var badge = document.getElementById('elementBadge');
+    badge.style.backgroundColor = elementColors[element];
+    document.getElementById('elementName').textContent = element + ' Element';
+
+    // Wheel
+    buildWheel(animalIndex);
+
+    // Personality
+    document.getElementById('personalityDesc').textContent = animal.description;
+
+    // Traits
+    var traitsList = document.getElementById('keyTraits');
+    traitsList.innerHTML = '';
+    for (var i = 0; i < animal.traits.length; i++) {
+      var li = document.createElement('li');
+      li.textContent = animal.traits[i];
+      traitsList.appendChild(li);
+    }
+
+    // Strengths & weaknesses
+    document.getElementById('strengths').textContent = animal.strengths;
+    document.getElementById('weaknesses').textContent = animal.weaknesses;
+
+    // Compatibility
+    var bestContainer = document.getElementById('bestMatch');
+    bestContainer.innerHTML = '';
+    for (var i = 0; i < animal.bestMatch.length; i++) {
+      var matchName = animal.bestMatch[i];
+      var matchAnimal = null;
+      for (var j = 0; j < zodiacAnimals.length; j++) {
+        if (zodiacAnimals[j].name === matchName) { matchAnimal = zodiacAnimals[j]; break; }
+      }
+      if (matchAnimal) {
+        var chip = document.createElement('span');
+        chip.className = 'cz-compat-chip';
+        chip.textContent = matchAnimal.emoji + ' ' + matchAnimal.name;
+        bestContainer.appendChild(chip);
+      }
+    }
+
+    var worstContainer = document.getElementById('worstMatch');
+    worstContainer.innerHTML = '';
+    for (var i = 0; i < animal.worstMatch.length; i++) {
+      var matchName = animal.worstMatch[i];
+      var matchAnimal = null;
+      for (var j = 0; j < zodiacAnimals.length; j++) {
+        if (zodiacAnimals[j].name === matchName) { matchAnimal = zodiacAnimals[j]; break; }
+      }
+      if (matchAnimal) {
+        var chip = document.createElement('span');
+        chip.className = 'cz-compat-chip';
+        chip.textContent = matchAnimal.emoji + ' ' + matchAnimal.name;
+        worstContainer.appendChild(chip);
+      }
+    }
+
+    // Lucky
+    document.getElementById('luckyNumbers').textContent = animal.luckyNumbers.join(', ');
+    document.getElementById('luckyColors').textContent = animal.luckyColors.join(', ');
+
+    // Famous people
+    document.getElementById('famousPeople').textContent = animal.famousPeople.join(', ');
+  }
+
+  // Real-time calculation
+  document.getElementById('birthYear').addEventListener('input', calculate);
+
+  // Initial calculation
+  calculate();
+</script>

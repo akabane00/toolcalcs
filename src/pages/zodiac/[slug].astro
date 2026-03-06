@@ -1,0 +1,780 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import '../../styles/calculator.css';
+import { zodiacSigns, getCompatibility } from '../../data/zodiac-data';
+
+export function getStaticPaths() {
+  return zodiacSigns.map((sign) => ({
+    params: { slug: sign.slug },
+    props: { sign },
+  }));
+}
+
+const { sign } = Astro.props;
+
+// Element colors
+const elementColors: Record<string, string> = {
+  Fire: '#E74C3C',
+  Earth: '#27AE60',
+  Air: '#3498DB',
+  Water: '#9B59B6',
+};
+const accentColor = elementColors[sign.element] || '#2563eb';
+
+// Lucky day mapping
+const luckyDays: Record<string, string> = {
+  Aries: 'Tuesday',
+  Taurus: 'Friday',
+  Gemini: 'Wednesday',
+  Cancer: 'Monday',
+  Leo: 'Sunday',
+  Virgo: 'Wednesday',
+  Libra: 'Friday',
+  Scorpio: 'Tuesday',
+  Sagittarius: 'Thursday',
+  Capricorn: 'Saturday',
+  Aquarius: 'Saturday',
+  Pisces: 'Thursday',
+};
+
+// Compute compatibility with all 12 signs
+const compatData = zodiacSigns.map((other) => {
+  const compat = getCompatibility(sign.name, other.name);
+  return {
+    name: other.name,
+    slug: other.slug,
+    symbol: other.symbol,
+    element: other.element,
+    overall: compat.overall,
+    love: compat.love,
+    friendship: compat.friendship,
+    work: compat.work,
+    description: compat.description,
+    isSelf: other.name === sign.name,
+  };
+});
+
+// Sort by overall score for highlights
+const sortedCompat = [...compatData].filter(c => !c.isSelf).sort((a, b) => b.overall - a.overall);
+const top3 = sortedCompat.slice(0, 3);
+const bottom2 = sortedCompat.slice(-2).reverse();
+
+// Related signs (same element, excluding self)
+const relatedSigns = zodiacSigns.filter(s => s.element === sign.element && s.name !== sign.name);
+
+// Score color helper
+function getScoreColor(score: number): string {
+  if (score >= 75) return '#27AE60';
+  if (score >= 50) return '#F39C12';
+  return '#E74C3C';
+}
+
+// Cross-links
+const crossLinks = [
+  { href: '/astrology-calculators/zodiac-sign-calculator/', label: 'Calculate Your Zodiac Sign', icon: '\u2728' },
+  { href: '/astrology-calculators/zodiac-compatibility-calculator/', label: 'Check Compatibility', icon: '\u2764\uFE0F' },
+  { href: '/astrology-calculators/numerology-calculator/', label: 'Find Your Life Path Number', icon: '\uD83D\uDD22' },
+];
+
+// Breadcrumb
+const breadcrumbItems = [
+  { name: 'Home', url: '/' },
+  { name: 'Zodiac Signs', url: '/zodiac/' },
+  { name: sign.name },
+];
+
+// SEO
+const title = `${sign.name} Zodiac Sign: Traits, Compatibility & More | ToolCalcs`;
+const description = `Everything about ${sign.name} (${sign.dateRange}). Discover personality traits, compatibility with all 12 signs, strengths, weaknesses, and lucky numbers.`;
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": `What are the key personality traits of ${sign.name}?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": `${sign.name} is known for being ${sign.traits.slice(0, 4).join(', ').toLowerCase()}. As a ${sign.element} sign ruled by ${sign.rulingPlanet}, ${sign.name} individuals are ${sign.traits.slice(0, 2).join(' and ').toLowerCase()}.`,
+      },
+    },
+    {
+      "@type": "Question",
+      "name": `What signs are most compatible with ${sign.name}?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": `The most compatible signs with ${sign.name} are ${top3.map(c => c.name).join(', ')}. These pairings score highest in overall compatibility including love, friendship, and work dimensions.`,
+      },
+    },
+    {
+      "@type": "Question",
+      "name": `What are the dates for ${sign.name}?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": `${sign.name} dates are ${sign.dateRange}. People born during this period have the Sun in ${sign.name} and share the sign's characteristic traits.`,
+      },
+    },
+  ],
+};
+---
+
+<BaseLayout title={title} description={description} type="article" structuredData={structuredData}>
+  <Breadcrumb items={breadcrumbItems} />
+
+  <!-- Hero Section -->
+  <div class="zodiac-hero" style={`--accent: ${accentColor};`}>
+    <div class="hero-symbol">{sign.symbol}</div>
+    <div class="hero-info">
+      <h1>{sign.name}</h1>
+      <p class="hero-dates">{sign.dateRange}</p>
+      <div class="hero-meta">
+        <span class="hero-badge" style={`background: ${accentColor}; color: #fff;`}>{sign.element}</span>
+        <span class="hero-detail"><strong>Quality:</strong> {sign.quality}</span>
+        <span class="hero-detail"><strong>Ruler:</strong> {sign.rulingPlanet}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overview -->
+  <section class="zodiac-section">
+    <h2>Overview</h2>
+    <p>{sign.description}</p>
+    <p>
+      {sign.name} is a {sign.quality.toLowerCase()} {sign.element.toLowerCase()} sign, ruled by {sign.rulingPlanet}. People born between {sign.dateRange} carry the energy of {sign.name}, which shapes their approach to relationships, career, and personal growth. The {sign.element.toLowerCase()} element gives {sign.name} individuals their characteristic {sign.element === 'Fire' ? 'passion and drive' : sign.element === 'Earth' ? 'groundedness and practicality' : sign.element === 'Air' ? 'intellectual curiosity and social grace' : 'emotional depth and intuition'}, while the {sign.quality.toLowerCase()} quality adds a {sign.quality === 'Cardinal' ? 'natural leadership ability and initiative' : sign.quality === 'Fixed' ? 'determination, persistence, and stability' : 'flexibility, adaptability, and versatility'} that defines how they interact with the world.
+    </p>
+    <div class="trait-chips">
+      {sign.traits.map((trait) => (
+        <span class="trait-chip" style={`border-color: ${accentColor}; color: ${accentColor};`}>{trait}</span>
+      ))}
+    </div>
+  </section>
+
+  <AdUnit slot="zodiac-detail-top" format="horizontal" />
+
+  <!-- Personality Traits -->
+  <section class="zodiac-section">
+    <h2>Personality Traits</h2>
+    <div class="traits-grid">
+      <div class="traits-col strengths">
+        <h3>Strengths</h3>
+        <ul>
+          {sign.strengths.map((s) => (
+            <li>{s}</li>
+          ))}
+        </ul>
+      </div>
+      <div class="traits-col weaknesses">
+        <h3>Weaknesses</h3>
+        <ul>
+          {sign.weaknesses.map((w) => (
+            <li>{w}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Compatibility Section -->
+  <section class="zodiac-section">
+    <h2>{sign.name} Compatibility</h2>
+    <p>See how {sign.name} matches with every zodiac sign. Scores are based on overall compatibility including love, friendship, and work dimensions.</p>
+
+    <!-- Compatibility highlights -->
+    <div class="compat-highlights">
+      <div class="compat-highlight best">
+        <h3>Best Matches</h3>
+        <div class="compat-highlight-list">
+          {top3.map((c) => (
+            <a href={`/zodiac/${c.slug}/`} class="compat-highlight-item">
+              <span class="compat-highlight-symbol">{c.symbol}</span>
+              <span class="compat-highlight-name">{c.name}</span>
+              <span class="compat-highlight-score" style={`color: ${getScoreColor(c.overall)};`}>{c.overall}%</span>
+            </a>
+          ))}
+        </div>
+      </div>
+      <div class="compat-highlight challenging">
+        <h3>Challenging Matches</h3>
+        <div class="compat-highlight-list">
+          {bottom2.map((c) => (
+            <a href={`/zodiac/${c.slug}/`} class="compat-highlight-item">
+              <span class="compat-highlight-symbol">{c.symbol}</span>
+              <span class="compat-highlight-name">{c.name}</span>
+              <span class="compat-highlight-score" style={`color: ${getScoreColor(c.overall)};`}>{c.overall}%</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Full compatibility table -->
+    <div class="compat-table-wrap">
+      <table class="compat-table">
+        <thead>
+          <tr>
+            <th>Sign</th>
+            <th>Overall</th>
+            <th>Love</th>
+            <th>Friendship</th>
+            <th>Work</th>
+            <th class="compat-desc-col">Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {compatData.filter(c => !c.isSelf).sort((a, b) => b.overall - a.overall).map((c) => (
+            <tr>
+              <td class="compat-sign-cell">
+                <a href={`/zodiac/${c.slug}/`}>
+                  <span class="compat-cell-symbol">{c.symbol}</span> {c.name}
+                </a>
+              </td>
+              <td>
+                <div class="score-bar-wrap">
+                  <div class="score-bar" style={`width: ${c.overall}%; background: ${getScoreColor(c.overall)};`}></div>
+                </div>
+                <span class="score-num" style={`color: ${getScoreColor(c.overall)};`}>{c.overall}%</span>
+              </td>
+              <td class="score-cell">{c.love}%</td>
+              <td class="score-cell">{c.friendship}%</td>
+              <td class="score-cell">{c.work}%</td>
+              <td class="compat-desc-col">{c.description.split('.')[0]}.</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <AdUnit slot="zodiac-detail-mid" format="rectangle" />
+
+  <!-- Lucky Section -->
+  <section class="zodiac-section">
+    <h2>Lucky Attributes</h2>
+    <div class="lucky-grid">
+      <div class="lucky-card">
+        <span class="lucky-label">Lucky Numbers</span>
+        <span class="lucky-value">{sign.luckyNumbers.join(', ')}</span>
+      </div>
+      <div class="lucky-card">
+        <span class="lucky-label">Lucky Color</span>
+        <span class="lucky-value">{sign.luckyColor}</span>
+      </div>
+      <div class="lucky-card">
+        <span class="lucky-label">Lucky Day</span>
+        <span class="lucky-value">{luckyDays[sign.name]}</span>
+      </div>
+      <div class="lucky-card">
+        <span class="lucky-label">Ruling Planet</span>
+        <span class="lucky-value">{sign.rulingPlanet}</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Famous People -->
+  <section class="zodiac-section">
+    <h2>Famous {sign.name} Celebrities</h2>
+    <p>These well-known personalities share the {sign.name} zodiac sign:</p>
+    <ul class="famous-list">
+      {sign.famousPeople.map((person) => (
+        <li>{person}</li>
+      ))}
+    </ul>
+  </section>
+
+  <!-- CTA Links -->
+  <section class="zodiac-section cta-section">
+    <h2>Explore More</h2>
+    <div class="cta-grid">
+      <a href="/astrology-calculators/zodiac-sign-calculator/" class="cta-card">
+        <span class="cta-icon">&#x2728;</span>
+        <span class="cta-title">Calculate Your Zodiac Sign</span>
+        <span class="cta-desc">Enter your birthday to find your Sun sign</span>
+      </a>
+      <a href="/astrology-calculators/zodiac-compatibility-calculator/" class="cta-card">
+        <span class="cta-icon">&#x2764;&#xFE0F;</span>
+        <span class="cta-title">Check Compatibility</span>
+        <span class="cta-desc">See how two signs match in love, friendship & work</span>
+      </a>
+      <a href="/astrology-calculators/numerology-calculator/" class="cta-card">
+        <span class="cta-icon">&#x1F522;</span>
+        <span class="cta-title">Find Your Life Path Number</span>
+        <span class="cta-desc">Discover your numerology profile</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Related Signs (same element) -->
+  <section class="zodiac-section">
+    <h2>Other {sign.element} Signs</h2>
+    <p>{sign.element} signs share a natural affinity and understanding. Explore the other {sign.element.toLowerCase()} signs:</p>
+    <div class="related-signs">
+      {relatedSigns.map((rs) => (
+        <a href={`/zodiac/${rs.slug}/`} class="related-sign-card" style={`--accent: ${accentColor};`}>
+          <span class="related-sign-symbol">{rs.symbol}</span>
+          <span class="related-sign-name">{rs.name}</span>
+          <span class="related-sign-dates">{rs.dateRange}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- SEO Content Article -->
+  <article class="content-section">
+    <h2>Everything You Need to Know About {sign.name}</h2>
+    <p>
+      {sign.name} ({sign.dateRange}) is the {zodiacSigns.findIndex(s => s.name === sign.name) + 1}{zodiacSigns.findIndex(s => s.name === sign.name) === 0 ? 'st' : zodiacSigns.findIndex(s => s.name === sign.name) === 1 ? 'nd' : zodiacSigns.findIndex(s => s.name === sign.name) === 2 ? 'rd' : 'th'} sign of the zodiac. As a {sign.element.toLowerCase()} sign with a {sign.quality.toLowerCase()} quality, {sign.name} brings a unique combination of energy to the astrological wheel. Ruled by {sign.rulingPlanet}, those born under this sign are known for being {sign.traits.slice(0, 3).join(', ').toLowerCase()}.
+    </p>
+    <p>
+      In relationships, {sign.name} pairs best with {sign.bestMatch.join(', ')}, who complement their energy and provide balance. The {sign.element.toLowerCase()} element connects {sign.name} with {relatedSigns.map(s => s.name).join(' and ')}, creating an intuitive understanding between these signs.
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What are the dates for {sign.name}?</h3>
+    <p>{sign.name} dates are {sign.dateRange}. If you were born during this period, your Sun sign is {sign.name}. Those born on the cusp (the first or last day) may show traits of the neighboring sign as well.</p>
+
+    <h3>What are {sign.name}'s best matches?</h3>
+    <p>The most compatible signs with {sign.name} are {top3.map(c => c.name).join(', ')}, scoring {top3.map(c => c.overall + '%').join(', ')} respectively in overall compatibility. These pairings share complementary energies that create harmonious relationships.</p>
+
+    <h3>What element is {sign.name}?</h3>
+    <p>{sign.name} is a {sign.element} sign, along with {relatedSigns.map(s => s.name).join(' and ')}. {sign.element} signs are characterized by {sign.element === 'Fire' ? 'passion, energy, and enthusiasm' : sign.element === 'Earth' ? 'practicality, reliability, and groundedness' : sign.element === 'Air' ? 'intellect, communication, and social connection' : 'emotion, intuition, and empathy'}.</p>
+
+    <p><a href="/zodiac/">&larr; View All 12 Zodiac Signs</a></p>
+
+    <CrossLinks links={crossLinks} />
+  </article>
+
+  <AdUnit slot="zodiac-detail-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  /* Hero Section */
+  .zodiac-hero {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 28px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    border-left: 5px solid var(--accent);
+    margin-bottom: 32px;
+  }
+  .hero-symbol {
+    font-size: 4rem;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .hero-info h1 {
+    margin-bottom: 4px;
+  }
+  .hero-dates {
+    font-size: 1.05rem;
+    color: var(--color-text-muted);
+    margin-bottom: 10px;
+  }
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+  .hero-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 12px;
+    border-radius: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .hero-detail {
+    font-size: 0.88rem;
+    color: var(--color-text-muted);
+  }
+  .hero-detail strong {
+    color: var(--color-text);
+  }
+
+  /* Sections */
+  .zodiac-section {
+    margin-bottom: 36px;
+  }
+  .zodiac-section h2 {
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .zodiac-section p {
+    margin-bottom: 12px;
+    line-height: 1.7;
+    color: var(--color-text);
+  }
+
+  /* Trait Chips */
+  .trait-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .trait-chip {
+    display: inline-block;
+    padding: 5px 14px;
+    border: 1px solid;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  /* Personality Traits Grid */
+  .traits-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .traits-col h3 {
+    font-size: 1.05rem;
+    margin-bottom: 10px;
+    padding: 8px 14px;
+    border-radius: var(--radius);
+    font-weight: 600;
+  }
+  .strengths h3 {
+    background: #f0fdf4;
+    color: #15803d;
+  }
+  .weaknesses h3 {
+    background: #fef2f2;
+    color: #b91c1c;
+  }
+  [data-theme="dark"] .strengths h3 {
+    background: #14532d;
+    color: #86efac;
+  }
+  [data-theme="dark"] .weaknesses h3 {
+    background: #450a0a;
+    color: #fca5a5;
+  }
+  .traits-col ul {
+    list-style: none;
+    padding: 0;
+  }
+  .traits-col li {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--color-border);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  .traits-col li:last-child {
+    border-bottom: none;
+  }
+  .strengths li::before {
+    content: '\2713 ';
+    color: #16a34a;
+    font-weight: 700;
+    margin-right: 6px;
+  }
+  .weaknesses li::before {
+    content: '\2717 ';
+    color: #dc2626;
+    font-weight: 700;
+    margin-right: 6px;
+  }
+
+  /* Compatibility Highlights */
+  .compat-highlights {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .compat-highlight {
+    padding: 16px;
+    border-radius: var(--radius);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+  }
+  .compat-highlight h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .best h3 { color: #16a34a; }
+  .challenging h3 { color: #dc2626; }
+  .compat-highlight-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .compat-highlight-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: var(--radius);
+    background: var(--color-bg);
+    text-decoration: none;
+    color: var(--color-text);
+    transition: background 0.15s;
+  }
+  .compat-highlight-item:hover {
+    background: var(--color-border);
+    text-decoration: none;
+  }
+  .compat-highlight-symbol {
+    font-size: 1.2rem;
+  }
+  .compat-highlight-name {
+    flex: 1;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .compat-highlight-score {
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+
+  /* Compatibility Table */
+  .compat-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .compat-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    min-width: 700px;
+  }
+  .compat-table th,
+  .compat-table td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+    vertical-align: middle;
+  }
+  .compat-table th {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .compat-table tr:hover td {
+    background: var(--color-bg);
+  }
+  .compat-sign-cell a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .compat-cell-symbol {
+    font-size: 1.1rem;
+  }
+  .score-bar-wrap {
+    width: 80px;
+    height: 8px;
+    background: var(--color-border);
+    border-radius: 4px;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  .score-bar {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s;
+  }
+  .score-num {
+    font-weight: 700;
+    font-size: 0.85rem;
+  }
+  .score-cell {
+    font-weight: 500;
+    color: var(--color-text-muted);
+  }
+  .compat-desc-col {
+    max-width: 260px;
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    line-height: 1.4;
+  }
+
+  /* Lucky Grid */
+  .lucky-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .lucky-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-align: center;
+  }
+  .lucky-label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+  }
+  .lucky-value {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+
+  /* Famous People */
+  .famous-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .famous-list li {
+    padding: 6px 14px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    font-size: 0.88rem;
+    font-weight: 500;
+  }
+
+  /* CTA Grid */
+  .cta-section h2 {
+    border-bottom: none;
+  }
+  .cta-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .cta-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 6px;
+    padding: 20px 16px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--color-text);
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .cta-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-md);
+    text-decoration: none;
+  }
+  .cta-icon {
+    font-size: 1.6rem;
+  }
+  .cta-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+  .cta-desc {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  /* Related Signs */
+  .related-signs {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .related-sign-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 16px 24px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--color-text);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    flex: 1;
+    min-width: 140px;
+  }
+  .related-sign-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    text-decoration: none;
+  }
+  .related-sign-symbol {
+    font-size: 1.8rem;
+    line-height: 1;
+  }
+  .related-sign-name {
+    font-weight: 700;
+    font-size: 1rem;
+  }
+  .related-sign-dates {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .compat-desc-col {
+      display: none;
+    }
+    .compat-table {
+      min-width: 480px;
+    }
+  }
+  @media (max-width: 640px) {
+    .zodiac-hero {
+      flex-direction: column;
+      text-align: center;
+      padding: 20px;
+    }
+    .hero-meta {
+      justify-content: center;
+    }
+    .traits-grid {
+      grid-template-columns: 1fr;
+    }
+    .compat-highlights {
+      grid-template-columns: 1fr;
+    }
+    .lucky-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .cta-grid {
+      grid-template-columns: 1fr;
+    }
+    .related-signs {
+      flex-direction: column;
+    }
+    .related-sign-card {
+      flex-direction: row;
+      gap: 10px;
+      padding: 12px 16px;
+    }
+    .related-sign-symbol {
+      font-size: 1.4rem;
+    }
+  }
+</style>

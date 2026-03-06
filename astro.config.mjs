@@ -14,7 +14,8 @@ export default defineConfig({
         '/fraction/', '/grade/', '/math/', '/number-to-words/',
         '/percent-off/', '/percentage/', '/roman-numerals/', '/salary/',
         '/temperature/', '/time-convert/', '/times-tables/', '/tip/',
-        '/what-percent/'
+        '/what-percent/',
+        '/zodiac/', '/angel-number/'
       ];
       // Keep index pages (exact route match), exclude sub-pages
       for (const route of noindexRoutes) {
@@ -29,7 +30,7 @@ export default defineConfig({
 
       // High-priority: homepage, category indexes, interactive tools/games
       if (url === 'https://toolcalcs.com/' ||
-          url.match(/toolcalcs\.com\/(financial|health|math|date-time|conversion|everyday|construction)-calculators\/$/) ||
+          url.match(/toolcalcs\.com\/(financial|health|math|date-time|conversion|everyday|construction|astrology)-calculators\/$/) ||
           url.match(/toolcalcs\.com\/test\/$/) ||
           url.match(/toolcalcs\.com\/tools\/$/) ||
           url.match(/toolcalcs\.com\/blog\/$/)) {
@@ -37,7 +38,7 @@ export default defineConfig({
         item.changefreq = 'weekly';
       }
       // Medium-high: individual calculators, games, tools, worksheets, blog articles
-      else if (url.match(/toolcalcs\.com\/(financial|health|math|date-time|conversion|everyday|construction)-calculators\/[^/]+\/$/) ||
+      else if (url.match(/toolcalcs\.com\/(financial|health|math|date-time|conversion|everyday|construction|astrology)-calculators\/[^/]+\/$/) ||
                url.match(/toolcalcs\.com\/test\/[^/]+\/$/) ||
                url.match(/toolcalcs\.com\/tools\/[^/]+\/$/) ||
                url.match(/toolcalcs\.com\/worksheets\/[^/]+\/$/) ||
@@ -46,7 +47,7 @@ export default defineConfig({
         item.changefreq = 'monthly';
       }
       // Medium: programmatic index pages
-      else if (url.match(/toolcalcs\.com\/(percentage|convert|salary|roman-numerals|number-to-words|born-in|fraction|tip|time-zone|factors-of|days-until|days-from-now|days-ago|random|cooking|compound-interest|time-convert|auto-loan|currency|how-many|worksheets|math|times-tables|percent-off|what-percent|grade|decimal-to-fraction|temperature)\/$/) ) {
+      else if (url.match(/toolcalcs\.com\/(percentage|convert|salary|roman-numerals|number-to-words|born-in|fraction|tip|time-zone|factors-of|days-until|days-from-now|days-ago|random|cooking|compound-interest|time-convert|auto-loan|currency|how-many|worksheets|math|times-tables|percent-off|what-percent|grade|decimal-to-fraction|temperature|zodiac|angel-number)\/$/) ) {
         item.priority = 0.7;
         item.changefreq = 'monthly';
       }

@@ -1,0 +1,618 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import { zodiacSigns, getZodiacSign } from '../../data/zodiac-data';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Astrology Calculators",
+        "item": "https://toolcalcs.com/astrology-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Zodiac Sign Calculator"
+      }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What are the 12 zodiac signs?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The 12 zodiac signs in order are Aries (March 21 – April 19), Taurus (April 20 – May 20), Gemini (May 21 – June 20), Cancer (June 21 – July 22), Leo (July 23 – August 22), Virgo (August 23 – September 22), Libra (September 23 – October 22), Scorpio (October 23 – November 21), Sagittarius (November 22 – December 21), Capricorn (December 22 – January 19), Aquarius (January 20 – February 18), and Pisces (February 19 – March 20).',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How are zodiac signs determined?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Your zodiac sign (also called your sun sign) is determined by the position of the Sun along the ecliptic at the time of your birth. The ecliptic is divided into 12 equal segments of 30 degrees each, and each segment corresponds to one of the 12 zodiac constellations. Your birthday falls within one of these segments, which determines your sun sign.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What are the zodiac elements?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The 12 zodiac signs are grouped into four elements: Fire (Aries, Leo, Sagittarius), Earth (Taurus, Virgo, Capricorn), Air (Gemini, Libra, Aquarius), and Water (Cancer, Scorpio, Pisces). Fire signs are passionate and energetic, Earth signs are practical and grounded, Air signs are intellectual and communicative, and Water signs are emotional and intuitive.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Can your zodiac sign change?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'No, your zodiac sign does not change. Your sun sign is fixed based on your date of birth and the position of the Sun at that time. However, if you were born on the cusp (the boundary between two signs), different astrologers may assign you to either sign depending on the exact time and location of your birth. The concept of a 13th sign, Ophiuchus, is based on astronomical constellations rather than the astrological zodiac and is not used in Western astrology.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: "What's the difference between sun sign and moon sign?",
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Your sun sign represents your core identity, ego, and conscious self — it is determined by the Sun\'s position at birth and is what most people mean when they say "my zodiac sign." Your moon sign reflects your inner emotional world, instincts, and subconscious patterns — it is determined by the Moon\'s position at birth and changes signs roughly every 2.5 days. Together, sun and moon signs provide a more complete picture of your astrological personality.',
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Zodiac Sign Calculator - What's My Zodiac Sign?"
+  description="Find your zodiac sign instantly by entering your birthday. Get your sign's symbol, element, ruling planet, personality traits, strengths, weaknesses, and compatibility."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/astrology-calculators/">Astrology Calculators</a> &rsaquo;
+    <span>Zodiac Sign Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Zodiac Sign Calculator</h1>
+  <p class="page-desc">Enter your birthday to discover your zodiac sign, element, ruling planet, personality traits, and compatible signs.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="birthMonth">Birth Month</label>
+        <select id="birthMonth">
+          <option value="1">January</option>
+          <option value="2">February</option>
+          <option value="3">March</option>
+          <option value="4">April</option>
+          <option value="5">May</option>
+          <option value="6">June</option>
+          <option value="7">July</option>
+          <option value="8">August</option>
+          <option value="9">September</option>
+          <option value="10">October</option>
+          <option value="11">November</option>
+          <option value="12">December</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="birthDay">Birth Day</label>
+        <select id="birthDay">
+          {Array.from({ length: 31 }, (_, i) => (
+            <option value={i + 1}>{i + 1}</option>
+          ))}
+        </select>
+      </div>
+      <button class="calc-btn" id="calculateBtn">Find My Zodiac Sign</button>
+    </div>
+
+    <div class="zodiac-result" id="zodiacResult" style="display:none;">
+      <div class="zodiac-header" id="zodiacHeader">
+        <span class="zodiac-symbol" id="zodiacSymbol"></span>
+        <div class="zodiac-title-group">
+          <h2 class="zodiac-name" id="zodiacName"></h2>
+          <p class="zodiac-dates" id="zodiacDates"></p>
+        </div>
+      </div>
+
+      <div class="zodiac-meta-row">
+        <div class="zodiac-meta" id="elementBadge">
+          <span class="meta-label">Element</span>
+          <span class="meta-value" id="zodiacElement"></span>
+        </div>
+        <div class="zodiac-meta">
+          <span class="meta-label">Quality</span>
+          <span class="meta-value" id="zodiacQuality"></span>
+        </div>
+        <div class="zodiac-meta">
+          <span class="meta-label">Ruling Planet</span>
+          <span class="meta-value" id="zodiacPlanet"></span>
+        </div>
+      </div>
+
+      <p class="zodiac-description" id="zodiacDesc"></p>
+
+      <div class="zodiac-detail-grid">
+        <div class="zodiac-detail-card">
+          <h3>Key Personality Traits</h3>
+          <ul id="zodiacTraits"></ul>
+        </div>
+        <div class="zodiac-detail-card">
+          <h3>Strengths</h3>
+          <ul id="zodiacStrengths"></ul>
+        </div>
+        <div class="zodiac-detail-card">
+          <h3>Weaknesses</h3>
+          <ul id="zodiacWeaknesses"></ul>
+        </div>
+      </div>
+
+      <div class="zodiac-compat">
+        <h3>Top Compatible Signs</h3>
+        <div class="compat-chips" id="compatChips"></div>
+        <div class="zodiac-cta-row">
+          <a href="/astrology-calculators/zodiac-compatibility-calculator/" class="cta-link">Check your compatibility &rarr;</a>
+          <a href="/zodiac/" class="cta-link secondary">View all zodiac signs &rarr;</a>
+        </div>
+      </div>
+    </div>
+
+    <p class="disclaimer">For entertainment and self-reflection purposes only.</p>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>What's My Zodiac Sign?</h2>
+    <p>If you have ever wondered "what's my zodiac sign?", the answer is simple: your zodiac sign is determined by your date of birth. The Western zodiac system divides the year into 12 equal segments, each associated with a specific constellation along the Sun's apparent path across the sky (called the ecliptic). When you were born, the Sun was positioned in one of these 12 constellations, and that constellation became your sun sign — the zodiac sign most people refer to when they talk about astrology.</p>
+    <p>Our zodiac sign calculator makes it easy. Just enter your birth month and day, and you will instantly see your sign, its symbol, element, ruling planet, personality traits, strengths, weaknesses, and most compatible signs. Whether you are new to astrology or a longtime enthusiast, understanding your zodiac sign is the first step to exploring the rich world of astrological insight.</p>
+
+    <h2>The 12 Zodiac Signs at a Glance</h2>
+    <p>The zodiac wheel contains 12 signs arranged in a specific order, starting with Aries and ending with Pisces. Each sign occupies a 30-degree arc of the 360-degree ecliptic and spans roughly one month of the calendar year. Here is a brief overview of each:</p>
+    <ul>
+      <li><strong>Aries (March 21 – April 19)</strong> — The Ram. A fire sign ruled by Mars, Aries is bold, competitive, and thrives on challenges. They are natural-born leaders who charge headfirst into every situation.</li>
+      <li><strong>Taurus (April 20 – May 20)</strong> — The Bull. An earth sign ruled by Venus, Taurus values stability, comfort, and loyalty. They are patient, reliable, and appreciate the finer things in life.</li>
+      <li><strong>Gemini (May 21 – June 20)</strong> — The Twins. An air sign ruled by Mercury, Gemini is curious, adaptable, and an exceptional communicator. Their dual nature makes them versatile and socially engaging.</li>
+      <li><strong>Cancer (June 21 – July 22)</strong> — The Crab. A water sign ruled by the Moon, Cancer is deeply intuitive, nurturing, and protective of loved ones. They create warm, welcoming environments.</li>
+      <li><strong>Leo (July 23 – August 22)</strong> — The Lion. A fire sign ruled by the Sun, Leo radiates confidence, creativity, and generosity. They are natural performers who love to be in the spotlight.</li>
+      <li><strong>Virgo (August 23 – September 22)</strong> — The Maiden. An earth sign ruled by Mercury, Virgo is analytical, detail-oriented, and service-minded. They find satisfaction in organizing and problem-solving.</li>
+      <li><strong>Libra (September 23 – October 22)</strong> — The Scales. An air sign ruled by Venus, Libra seeks harmony, fairness, and beauty in all things. They are natural diplomats and peacemakers.</li>
+      <li><strong>Scorpio (October 23 – November 21)</strong> — The Scorpion. A water sign ruled by Pluto, Scorpio is passionate, resourceful, and intensely determined. They are drawn to life's deeper mysteries.</li>
+      <li><strong>Sagittarius (November 22 – December 21)</strong> — The Archer. A fire sign ruled by Jupiter, Sagittarius is adventurous, optimistic, and philosophical. They crave freedom, knowledge, and new experiences.</li>
+      <li><strong>Capricorn (December 22 – January 19)</strong> — The Sea-Goat. An earth sign ruled by Saturn, Capricorn is ambitious, disciplined, and strategic. They build their success through patience and persistence.</li>
+      <li><strong>Aquarius (January 20 – February 18)</strong> — The Water Bearer. An air sign ruled by Uranus, Aquarius is innovative, independent, and humanitarian. They are forward-thinking visionaries.</li>
+      <li><strong>Pisces (February 19 – March 20)</strong> — The Fish. A water sign ruled by Neptune, Pisces is compassionate, imaginative, and deeply intuitive. They are the zodiac's dreamers and healers.</li>
+    </ul>
+
+    <h2>Understanding the Zodiac Elements</h2>
+    <p>One of the most important concepts in astrology is the grouping of zodiac signs by element. The four elements — Fire, Earth, Air, and Water — each influence the temperament, motivation, and core nature of the signs they govern. Understanding your sign's element reveals a great deal about how you approach life, relationships, and challenges.</p>
+    <h3>Fire Signs (Aries, Leo, Sagittarius)</h3>
+    <p>Fire signs are known for their passion, enthusiasm, and dynamic energy. They are action-oriented, courageous, and have a natural ability to inspire others. Fire signs tend to be spontaneous and thrive on excitement, though they can sometimes act impulsively. They bring warmth, creativity, and leadership to every situation. When aligned, fire signs radiate confidence; when out of balance, they can be reckless or aggressive.</p>
+    <h3>Earth Signs (Taurus, Virgo, Capricorn)</h3>
+    <p>Earth signs are grounded, practical, and reliable. They value stability, hard work, and tangible results. These signs approach life methodically, preferring to build their success step by step rather than taking shortcuts. Earth signs are deeply connected to the material world — they appreciate comfort, quality, and financial security. Their challenges include rigidity, resistance to change, and occasional stubbornness.</p>
+    <h3>Air Signs (Gemini, Libra, Aquarius)</h3>
+    <p>Air signs are intellectual, communicative, and socially oriented. They live in the world of ideas, concepts, and connections. Air signs excel at analyzing situations, communicating their thoughts, and bringing people together. They value freedom, mental stimulation, and fairness. However, they can sometimes be detached, indecisive, or overly theoretical at the expense of emotional depth.</p>
+    <h3>Water Signs (Cancer, Scorpio, Pisces)</h3>
+    <p>Water signs are emotional, intuitive, and deeply empathetic. They experience the world through their feelings and possess an extraordinary ability to sense the emotional undercurrents in any situation. Water signs are nurturing, compassionate, and capable of forming profound emotional bonds. Their challenges include moodiness, over-sensitivity, and a tendency to absorb the emotions of those around them.</p>
+
+    <h2>Zodiac Qualities (Modalities)</h2>
+    <p>In addition to elements, each zodiac sign is classified by one of three qualities, also known as modalities: Cardinal, Fixed, or Mutable. These qualities describe how each sign interacts with the world and approaches change.</p>
+    <h3>Cardinal Signs (Aries, Cancer, Libra, Capricorn)</h3>
+    <p>Cardinal signs are the initiators of the zodiac. They mark the beginning of each season — Aries begins spring, Cancer starts summer, Libra opens fall, and Capricorn launches winter. These signs are natural leaders and self-starters who are excellent at launching new projects, setting goals, and taking decisive action. They thrive when they are in charge and creating something new.</p>
+    <h3>Fixed Signs (Taurus, Leo, Scorpio, Aquarius)</h3>
+    <p>Fixed signs fall in the middle of each season and represent stability, determination, and persistence. They are the builders and sustainers of the zodiac, excelling at seeing things through to completion. Fixed signs are loyal, focused, and resistant to change — which can be both a strength (reliability) and a weakness (stubbornness). When they commit to something, they give it their all.</p>
+    <h3>Mutable Signs (Gemini, Virgo, Sagittarius, Pisces)</h3>
+    <p>Mutable signs close out each season and are the most adaptable and flexible of the zodiac. They excel at navigating transitions, adjusting to new circumstances, and finding creative solutions. Mutable signs are versatile and open-minded, but they can struggle with consistency and follow-through. Their greatest gift is their ability to flow with change and help others do the same.</p>
+
+    <h2>The Zodiac Wheel and the Ecliptic</h2>
+    <p>The zodiac wheel is a circular diagram that maps the 12 zodiac signs along the ecliptic — the apparent path the Sun traces across the sky as seen from Earth over the course of a year. This 360-degree circle is divided into 12 equal segments of 30 degrees each, and each segment corresponds to one zodiac sign.</p>
+    <p>As the Earth orbits the Sun throughout the year, the Sun appears to move through each of these 12 constellations. The sign the Sun occupies at the moment of your birth becomes your sun sign. This system dates back thousands of years to ancient Babylonian and Greek astronomers who observed the regularity of the Sun's journey and correlated it with seasonal patterns and human temperament.</p>
+    <p>It is worth noting that due to a phenomenon called precession of the equinoxes, the astronomical constellations no longer perfectly align with the astrological signs. Western astrology uses the tropical zodiac, which is fixed to the seasons (the vernal equinox always marks the start of Aries), while Vedic astrology uses the sidereal zodiac, which tracks the actual constellation positions. Both systems have been used for centuries and offer valuable insights.</p>
+
+    <h2>Cusp Signs: Born on the Border</h2>
+    <p>If your birthday falls within a day or two of the transition between two zodiac signs, you may be considered a "cusp baby." For example, someone born on April 19 sits on the Aries-Taurus cusp. While traditional astrology assigns one definitive sign based on the exact solar position, many people born on the cusp feel influenced by both signs. The precise time and location of your birth can determine which side of the cusp you fall on.</p>
+    <p>Cusp individuals often display a blend of characteristics from both signs. For example, an Aries-Taurus cusp person may combine Aries' boldness with Taurus' patience and stability. If you are born on a cusp, our calculator assigns the sign based on the standard date boundaries, but you may want to explore both signs to see which resonates more with your personality.</p>
+
+    <h2>Sun Sign vs. Full Birth Chart</h2>
+    <p>While your sun sign is the most well-known aspect of your astrological profile, it represents only one layer of a much more detailed picture. A complete birth chart (also called a natal chart) includes your moon sign, rising sign (ascendant), and the positions of all planets at the exact time and place of your birth. Each of these placements adds nuance to your personality:</p>
+    <ul>
+      <li><strong>Sun sign:</strong> Your core identity, ego, and the self you express to the world.</li>
+      <li><strong>Moon sign:</strong> Your emotional inner world, instincts, and subconscious patterns.</li>
+      <li><strong>Rising sign (Ascendant):</strong> The mask you wear in public and the first impression you make.</li>
+      <li><strong>Venus sign:</strong> How you approach love, beauty, and relationships.</li>
+      <li><strong>Mars sign:</strong> Your drive, ambition, and how you take action.</li>
+    </ul>
+    <p>Your sun sign is the foundation, but for a truly personalized astrological reading, exploring your full birth chart reveals the complete picture. Our zodiac sign calculator focuses on your sun sign as the ideal starting point for astrological exploration.</p>
+
+    <h2>Zodiac Compatibility Basics</h2>
+    <p>One of the most popular applications of zodiac signs is understanding compatibility between signs. In general, signs of the same element tend to get along naturally — fire with fire, earth with earth, and so on. Complementary elements also pair well: fire and air signs energize each other, while earth and water signs ground and nurture each other.</p>
+    <p>However, compatibility is far more complex than just element matching. The qualities (Cardinal, Fixed, Mutable) also play a role, as do the specific planetary rulers of each sign. Opposite signs on the zodiac wheel (such as Aries and Libra, or Taurus and Scorpio) often have a magnetic attraction despite their differences — they balance what the other lacks.</p>
+    <p>For a detailed compatibility analysis between any two zodiac signs, use our <a href="/astrology-calculators/zodiac-compatibility-calculator/">Zodiac Compatibility Calculator</a>. And remember, real relationships involve far more than astrology — communication, shared values, and effort matter most.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>What are the 12 zodiac signs?</summary>
+        <p>The 12 zodiac signs in order are Aries, Taurus, Gemini, Cancer, Leo, Virgo, Libra, Scorpio, Sagittarius, Capricorn, Aquarius, and Pisces. Each sign spans approximately one month and is associated with a specific constellation along the ecliptic. The cycle begins with Aries at the spring equinox and ends with Pisces just before it.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How are zodiac signs determined?</summary>
+        <p>Your zodiac sign is determined by the position of the Sun relative to the constellations at the time of your birth. The ecliptic (the Sun's apparent path) is divided into 12 equal sections of 30 degrees, each corresponding to a zodiac sign. Your birthday falls within one of these sections, making that your sun sign. The exact time of birth matters mainly for cusp dates.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What are the zodiac elements?</summary>
+        <p>The four zodiac elements are Fire (Aries, Leo, Sagittarius), Earth (Taurus, Virgo, Capricorn), Air (Gemini, Libra, Aquarius), and Water (Cancer, Scorpio, Pisces). Fire signs are passionate and energetic. Earth signs are practical and grounded. Air signs are intellectual and communicative. Water signs are emotional and intuitive. Your element significantly influences your temperament.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can your zodiac sign change?</summary>
+        <p>No, your zodiac sun sign does not change. It is permanently set by the Sun's position at the moment of your birth. The idea of a "13th sign" (Ophiuchus) occasionally appears in news stories but is based on astronomical constellations, not the tropical zodiac system used in Western astrology. If you were born on a cusp, your exact sign depends on the precise time of your birth.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What's the difference between sun sign and moon sign?</summary>
+        <p>Your sun sign represents your core identity and conscious self — it is determined by the Sun's position on your birthday and is what most people mean by "my zodiac sign." Your moon sign reflects your emotions, instincts, and subconscious — it is determined by the Moon's position at the exact time of your birth and changes signs every 2-3 days. Both are important parts of your astrological profile.</p>
+      </details>
+    </div>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/astrology-calculators/zodiac-compatibility-calculator/">Zodiac Compatibility Calculator</a> — See how your sign pairs with others for love, friendship, and work.</li>
+      <li><a href="/astrology-calculators/numerology-calculator/">Numerology Calculator</a> — Calculate your Life Path Number from your birthday.</li>
+      <li><a href="/astrology-calculators/chinese-zodiac-calculator/">Chinese Zodiac Calculator</a> — Find your Chinese zodiac animal based on birth year.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+  <RelatedArticles calculatorSlug="zodiac-sign-calculator" />
+  <RelatedCalculators currentSlug="zodiac-sign-calculator" />
+</BaseLayout>
+
+<style>
+  /* Zodiac Result Card */
+  .zodiac-result {
+    margin-top: 24px;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .zodiac-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  .zodiac-symbol {
+    font-size: 4rem;
+    line-height: 1;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--color-bg);
+    flex-shrink: 0;
+  }
+  .zodiac-title-group {
+    flex: 1;
+  }
+  .zodiac-name {
+    font-size: 1.6rem;
+    margin: 0 0 4px;
+    font-weight: 800;
+  }
+  .zodiac-dates {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    margin: 0;
+  }
+
+  /* Meta Row (Element, Quality, Planet) */
+  .zodiac-meta-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .zodiac-meta {
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    padding: 12px 18px;
+    flex: 1;
+    min-width: 120px;
+    text-align: center;
+  }
+  .meta-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+  .meta-value {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .zodiac-description {
+    margin-bottom: 20px;
+    line-height: 1.7;
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+  }
+
+  /* Detail Grid (Traits, Strengths, Weaknesses) */
+  .zodiac-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .zodiac-detail-card {
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  .zodiac-detail-card h3 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--color-text);
+  }
+  .zodiac-detail-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .zodiac-detail-card li {
+    font-size: 0.88rem;
+    line-height: 1.5;
+    padding: 4px 0;
+    color: var(--color-text-muted);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .zodiac-detail-card li:last-child {
+    border-bottom: none;
+  }
+  .zodiac-detail-card li::before {
+    content: "";
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+  .zodiac-detail-card:nth-child(1) li::before { background: var(--color-primary); }
+  .zodiac-detail-card:nth-child(2) li::before { background: var(--color-success); }
+  .zodiac-detail-card:nth-child(3) li::before { background: #ef4444; }
+
+  /* Compatibility Section */
+  .zodiac-compat {
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .zodiac-compat h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .compat-chips {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .compat-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    background: var(--color-surface);
+    color: var(--color-text);
+  }
+  .compat-chip .chip-symbol {
+    font-size: 1.1rem;
+  }
+
+  .zodiac-cta-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .cta-link {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+  .cta-link:hover {
+    text-decoration: underline;
+  }
+  .cta-link.secondary {
+    color: var(--color-text-muted);
+  }
+
+  /* Disclaimer */
+  .disclaimer {
+    margin-top: 20px;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    text-align: center;
+    font-style: italic;
+  }
+
+  /* Element color accents */
+  .element-fire .zodiac-symbol { background: #fde8e8; color: #E74C3C; }
+  .element-earth .zodiac-symbol { background: #e8f5e8; color: #27AE60; }
+  .element-air .zodiac-symbol { background: #e8f0fd; color: #3498DB; }
+  .element-water .zodiac-symbol { background: #f0e8fd; color: #9B59B6; }
+
+  .element-fire .meta-value.element-val { color: #E74C3C; }
+  .element-earth .meta-value.element-val { color: #27AE60; }
+  .element-air .meta-value.element-val { color: #3498DB; }
+  .element-water .meta-value.element-val { color: #9B59B6; }
+
+  [data-theme="dark"] .element-fire .zodiac-symbol { background: #3b1515; }
+  [data-theme="dark"] .element-earth .zodiac-symbol { background: #153b1f; }
+  [data-theme="dark"] .element-air .zodiac-symbol { background: #152a3b; }
+  [data-theme="dark"] .element-water .zodiac-symbol { background: #271539; }
+
+  .last-updated { font-size: 0.75rem; color: var(--color-text-muted); margin: 4px 0 0; }
+
+  @media (max-width: 640px) {
+    .zodiac-header { flex-direction: column; text-align: center; }
+    .zodiac-symbol { margin: 0 auto; }
+    .zodiac-meta-row { flex-direction: column; }
+    .zodiac-detail-grid { grid-template-columns: 1fr; }
+    .zodiac-cta-row { flex-direction: column; gap: 8px; }
+  }
+</style>
+
+<script>
+  // Full zodiac data embedded for client-side lookup
+  const zodiacData = [
+    { name: 'Aries', symbol: '\u2648', dateRange: 'March 21 \u2013 April 19', startMonth: 3, startDay: 21, endMonth: 4, endDay: 19, element: 'Fire', quality: 'Cardinal', rulingPlanet: 'Mars', traits: ['Courageous', 'Energetic', 'Optimistic', 'Passionate', 'Determined', 'Confident'], strengths: ['Natural leader who inspires others to take action', 'Fearless in the face of challenges and adversity', 'Honest and direct in communication', 'Enthusiastic and full of energy', 'Adventurous spirit that embraces new experiences'], weaknesses: ['Can be impatient and short-tempered', 'Tendency toward impulsiveness without thinking through consequences', 'May come across as aggressive or confrontational', 'Struggles with compromise and seeing other perspectives', 'Can lose interest quickly and abandon projects'], bestMatch: ['Leo', 'Sagittarius', 'Gemini'], description: 'Aries is the first sign of the zodiac, symbolizing new beginnings and bold initiative. As a fire sign ruled by Mars, Aries individuals are natural-born leaders who charge headfirst into every situation with confidence and courage. They thrive on competition and are always ready for a challenge.' },
+    { name: 'Taurus', symbol: '\u2649', dateRange: 'April 20 \u2013 May 20', startMonth: 4, startDay: 20, endMonth: 5, endDay: 20, element: 'Earth', quality: 'Fixed', rulingPlanet: 'Venus', traits: ['Reliable', 'Patient', 'Practical', 'Devoted', 'Responsible', 'Stable'], strengths: ['Incredibly loyal and dependable in relationships', 'Strong work ethic and determination to finish what they start', 'Excellent with finances and building long-term security', 'Patient and methodical approach to problem-solving', 'Deep appreciation for beauty, art, and comfort'], weaknesses: ['Stubbornness can make them resistant to change', 'Possessive tendencies in relationships', 'Can be overly materialistic or focused on comfort', 'Tendency to hold grudges for extended periods', 'May become lazy or complacent when comfortable'], bestMatch: ['Virgo', 'Capricorn', 'Cancer'], description: 'Taurus is the second sign of the zodiac, representing stability, sensuality, and determination. Ruled by Venus, the planet of love and beauty, Taurus individuals value comfort, security, and the finer things in life. They are grounded earth signs who build their lives on solid foundations.' },
+    { name: 'Gemini', symbol: '\u264A', dateRange: 'May 21 \u2013 June 20', startMonth: 5, startDay: 21, endMonth: 6, endDay: 20, element: 'Air', quality: 'Mutable', rulingPlanet: 'Mercury', traits: ['Adaptable', 'Curious', 'Witty', 'Expressive', 'Versatile', 'Sociable'], strengths: ['Brilliant communicator who can connect with anyone', 'Quick learner with an insatiable thirst for knowledge', 'Highly adaptable and thrives in changing environments', 'Witty and entertaining in social situations', 'Able to see multiple sides of any issue'], weaknesses: ['Can be inconsistent and indecisive', 'Tendency toward superficiality and not diving deep', 'May be perceived as two-faced or unreliable', 'Nervous energy and restlessness', 'Difficulty committing to one path or person'], bestMatch: ['Libra', 'Aquarius', 'Aries'], description: 'Gemini is the third sign of the zodiac, embodying intellectual curiosity, communication, and duality. Ruled by Mercury, the messenger planet, Geminis are quick-witted, socially adept, and endlessly curious about the world around them. They are the zodiac\'s storytellers and connectors.' },
+    { name: 'Cancer', symbol: '\u264B', dateRange: 'June 21 \u2013 July 22', startMonth: 6, startDay: 21, endMonth: 7, endDay: 22, element: 'Water', quality: 'Cardinal', rulingPlanet: 'Moon', traits: ['Intuitive', 'Nurturing', 'Protective', 'Empathetic', 'Loyal', 'Sentimental'], strengths: ['Deeply empathetic and emotionally intelligent', 'Fiercely protective of loved ones', 'Strong intuition that guides wise decisions', 'Creates warm and welcoming environments', 'Excellent memory and attention to emotional detail'], weaknesses: ['Prone to moodiness and emotional swings', 'Can be overly clingy or dependent in relationships', 'Tendency to retreat into their shell when hurt', 'May manipulate through guilt or emotional appeal', 'Difficulty letting go of past wounds'], bestMatch: ['Scorpio', 'Pisces', 'Taurus'], description: 'Cancer is the fourth sign of the zodiac, representing home, family, and emotional depth. Ruled by the Moon, Cancer individuals are deeply intuitive and nurturing. They feel everything intensely and create deep emotional bonds with the people they care about.' },
+    { name: 'Leo', symbol: '\u264C', dateRange: 'July 23 \u2013 August 22', startMonth: 7, startDay: 23, endMonth: 8, endDay: 22, element: 'Fire', quality: 'Fixed', rulingPlanet: 'Sun', traits: ['Charismatic', 'Generous', 'Creative', 'Warm-hearted', 'Confident', 'Dramatic'], strengths: ['Natural charisma that draws people in effortlessly', 'Extremely generous with time, energy, and resources', 'Creative vision and artistic talent', 'Loyal and protective of their inner circle', 'Courageous and willing to stand up for what is right'], weaknesses: ['Can be arrogant or self-centered', 'Need for constant attention and validation', 'Stubbornness and difficulty admitting mistakes', 'Tendency toward dramatic reactions', 'May dominate conversations and situations'], bestMatch: ['Aries', 'Sagittarius', 'Libra'], description: 'Leo is the fifth sign of the zodiac, symbolizing self-expression, creativity, and leadership. Ruled by the Sun, Leo individuals radiate warmth, confidence, and magnetism. They are born performers who light up every room they enter.' },
+    { name: 'Virgo', symbol: '\u264D', dateRange: 'August 23 \u2013 September 22', startMonth: 8, startDay: 23, endMonth: 9, endDay: 22, element: 'Earth', quality: 'Mutable', rulingPlanet: 'Mercury', traits: ['Analytical', 'Practical', 'Detail-oriented', 'Modest', 'Hardworking', 'Helpful'], strengths: ['Exceptional attention to detail and precision', 'Highly organized and efficient in everything they do', 'Genuinely helpful and service-oriented', 'Practical problem-solver who finds workable solutions', 'Dedicated and hardworking with high standards'], weaknesses: ['Overly critical of themselves and others', 'Tendency toward perfectionism that causes stress', 'Can be overly cautious or worry excessively', 'May focus too much on flaws instead of the big picture', 'Difficulty relaxing and enjoying the moment'], bestMatch: ['Taurus', 'Capricorn', 'Cancer'], description: 'Virgo is the sixth sign of the zodiac, representing analysis, service, and refinement. Ruled by Mercury, Virgo individuals are detail-oriented perfectionists who find satisfaction in order, efficiency, and helping others. They are the zodiac\'s problem-solvers.' },
+    { name: 'Libra', symbol: '\u264E', dateRange: 'September 23 \u2013 October 22', startMonth: 9, startDay: 23, endMonth: 10, endDay: 22, element: 'Air', quality: 'Cardinal', rulingPlanet: 'Venus', traits: ['Diplomatic', 'Charming', 'Fair-minded', 'Social', 'Idealistic', 'Graceful'], strengths: ['Natural diplomat who brings people together', 'Strong sense of justice and fairness', 'Charming and graceful in social situations', 'Appreciation for beauty, art, and harmony', 'Excellent at seeing all sides of an issue'], weaknesses: ['Indecisive and may avoid making tough choices', 'Can be people-pleasing to a fault', 'Tendency to avoid conflict even when it is necessary', 'May sacrifice their own needs for peace', 'Can be superficial or overly concerned with appearances'], bestMatch: ['Gemini', 'Aquarius', 'Leo'], description: 'Libra is the seventh sign of the zodiac, symbolizing balance, partnership, and harmony. Ruled by Venus, Libra individuals are natural peacemakers who value fairness, beauty, and meaningful connections. They are the zodiac\'s diplomats and aesthetes.' },
+    { name: 'Scorpio', symbol: '\u264F', dateRange: 'October 23 \u2013 November 21', startMonth: 10, startDay: 23, endMonth: 11, endDay: 21, element: 'Water', quality: 'Fixed', rulingPlanet: 'Pluto', traits: ['Passionate', 'Resourceful', 'Determined', 'Intense', 'Magnetic', 'Perceptive'], strengths: ['Incredible determination and willpower', 'Deeply loyal and protective of loved ones', 'Exceptional intuition and ability to read people', 'Resourceful and strategic in achieving goals', 'Emotional depth that creates powerful connections'], weaknesses: ['Can be jealous and possessive', 'Tendency toward secrecy and distrust', 'May hold grudges and seek revenge', 'Can be manipulative when feeling threatened', 'All-or-nothing approach that leaves little room for nuance'], bestMatch: ['Cancer', 'Pisces', 'Virgo'], description: 'Scorpio is the eighth sign of the zodiac, representing transformation, intensity, and emotional depth. Ruled by Pluto, Scorpio individuals are passionate, perceptive, and fiercely determined. They are drawn to life\'s mysteries and are not afraid of the darkness.' },
+    { name: 'Sagittarius', symbol: '\u2650', dateRange: 'November 22 \u2013 December 21', startMonth: 11, startDay: 22, endMonth: 12, endDay: 21, element: 'Fire', quality: 'Mutable', rulingPlanet: 'Jupiter', traits: ['Adventurous', 'Optimistic', 'Philosophical', 'Honest', 'Independent', 'Enthusiastic'], strengths: ['Boundless optimism and enthusiasm for life', 'Love of adventure and exploration', 'Honest and straightforward communication', 'Philosophical mind that seeks deeper meaning', 'Open-minded and accepting of different cultures and ideas'], weaknesses: ['Can be tactless and blunt to the point of rudeness', 'Restless and struggles with commitment', 'Tendency to overpromise and underdeliver', 'Impatient with routine and mundane tasks', 'May be irresponsible with practical matters'], bestMatch: ['Aries', 'Leo', 'Aquarius'], description: 'Sagittarius is the ninth sign of the zodiac, symbolizing exploration, wisdom, and freedom. Ruled by Jupiter, the planet of expansion, Sagittarius individuals are eternal optimists who crave adventure, knowledge, and new experiences. They are the zodiac\'s philosophers and travelers.' },
+    { name: 'Capricorn', symbol: '\u2651', dateRange: 'December 22 \u2013 January 19', startMonth: 12, startDay: 22, endMonth: 1, endDay: 19, element: 'Earth', quality: 'Cardinal', rulingPlanet: 'Saturn', traits: ['Ambitious', 'Disciplined', 'Responsible', 'Practical', 'Patient', 'Strategic'], strengths: ['Incredible work ethic and self-discipline', 'Strategic thinker with long-term vision', 'Responsible and reliable in all commitments', 'Patient and persistent in pursuit of goals', 'Strong sense of duty and traditional values'], weaknesses: ['Can be overly rigid and resistant to change', 'Tendency toward pessimism and expecting the worst', 'May prioritize work over personal relationships', 'Can be condescending or dismissive of those less driven', 'Difficulty expressing emotions and vulnerability'], bestMatch: ['Taurus', 'Virgo', 'Pisces'], description: 'Capricorn is the tenth sign of the zodiac, representing ambition, discipline, and mastery. Ruled by Saturn, the planet of structure, Capricorn individuals are determined achievers who build their success brick by brick. They are the zodiac\'s executives and empire-builders.' },
+    { name: 'Aquarius', symbol: '\u2652', dateRange: 'January 20 \u2013 February 18', startMonth: 1, startDay: 20, endMonth: 2, endDay: 18, element: 'Air', quality: 'Fixed', rulingPlanet: 'Uranus', traits: ['Innovative', 'Humanitarian', 'Independent', 'Progressive', 'Original', 'Intellectual'], strengths: ['Visionary thinker who sees possibilities others miss', 'Deeply humanitarian and committed to social justice', 'Fiercely independent and true to themselves', 'Innovative and original in ideas and approach', 'Accepting of all people regardless of background'], weaknesses: ['Can be emotionally detached and aloof', 'Stubbornly contrarian just for the sake of being different', 'May prioritize ideals over individual relationships', 'Tendency to be unpredictable and hard to pin down', 'Can come across as cold or uncaring in personal matters'], bestMatch: ['Gemini', 'Libra', 'Sagittarius'], description: 'Aquarius is the eleventh sign of the zodiac, symbolizing innovation, independence, and humanitarian ideals. Ruled by Uranus, the planet of revolution, Aquarius individuals are forward-thinking visionaries who march to the beat of their own drum.' },
+    { name: 'Pisces', symbol: '\u2653', dateRange: 'February 19 \u2013 March 20', startMonth: 2, startDay: 19, endMonth: 3, endDay: 20, element: 'Water', quality: 'Mutable', rulingPlanet: 'Neptune', traits: ['Compassionate', 'Imaginative', 'Intuitive', 'Gentle', 'Artistic', 'Empathetic'], strengths: ['Extraordinary empathy and compassion for others', 'Rich imagination and creative talent', 'Strong intuition that borders on psychic ability', 'Selfless and willing to sacrifice for loved ones', 'Ability to connect with people on a deep emotional level'], weaknesses: ['Can be overly escapist and avoidant of reality', 'Tendency to play the victim or be a martyr', 'Easily influenced by others and their environment', 'May struggle with boundaries and saying no', 'Prone to idealizing people and situations'], bestMatch: ['Cancer', 'Scorpio', 'Capricorn'], description: 'Pisces is the twelfth and final sign of the zodiac, representing intuition, spirituality, and universal compassion. Ruled by Neptune, the planet of dreams, Pisces individuals are deeply empathetic souls who feel the full spectrum of human emotion. They are the zodiac\'s dreamers and healers.' },
+  ];
+
+  // Map sign names to symbols for compatibility chips
+  const signSymbols: Record<string, string> = {};
+  zodiacData.forEach(s => { signSymbols[s.name] = s.symbol; });
+
+  function getZodiacSign(month: number, day: number) {
+    for (const sign of zodiacData) {
+      if (sign.startMonth > sign.endMonth) {
+        // Spans year boundary (Capricorn)
+        if ((month === sign.startMonth && day >= sign.startDay) ||
+            (month === sign.endMonth && day <= sign.endDay)) {
+          return sign;
+        }
+      } else {
+        if ((month === sign.startMonth && day >= sign.startDay) ||
+            (month === sign.endMonth && day <= sign.endDay)) {
+          return sign;
+        }
+      }
+    }
+    return zodiacData[0];
+  }
+
+  // Update day dropdown based on month
+  const monthSelect = document.getElementById('birthMonth') as HTMLSelectElement;
+  const daySelect = document.getElementById('birthDay') as HTMLSelectElement;
+
+  function updateDays() {
+    const month = parseInt(monthSelect.value);
+    const daysInMonth = new Date(2024, month, 0).getDate(); // 2024 is a leap year
+    const currentDay = parseInt(daySelect.value);
+    daySelect.innerHTML = '';
+    for (let d = 1; d <= daysInMonth; d++) {
+      const opt = document.createElement('option');
+      opt.value = String(d);
+      opt.textContent = String(d);
+      if (d === currentDay) opt.selected = true;
+      daySelect.appendChild(opt);
+    }
+    if (currentDay > daysInMonth) {
+      daySelect.value = String(daysInMonth);
+    }
+  }
+
+  monthSelect.addEventListener('change', updateDays);
+
+  // Set default to today's date
+  const today = new Date();
+  monthSelect.value = String(today.getMonth() + 1);
+  updateDays();
+  daySelect.value = String(today.getDate());
+
+  function calculate() {
+    const month = parseInt(monthSelect.value);
+    const day = parseInt(daySelect.value);
+    if (!month || !day) return;
+
+    const sign = getZodiacSign(month, day);
+    const result = document.getElementById('zodiacResult')!;
+    result.style.display = 'block';
+
+    // Set element class on result container
+    result.className = 'zodiac-result element-' + sign.element.toLowerCase();
+
+    // Header
+    document.getElementById('zodiacSymbol')!.textContent = sign.symbol;
+    document.getElementById('zodiacName')!.textContent = sign.name;
+    document.getElementById('zodiacDates')!.textContent = sign.dateRange;
+
+    // Meta
+    const elementVal = document.getElementById('zodiacElement')!;
+    elementVal.textContent = sign.element;
+    elementVal.className = 'meta-value element-val';
+    document.getElementById('zodiacQuality')!.textContent = sign.quality;
+    document.getElementById('zodiacPlanet')!.textContent = sign.rulingPlanet;
+
+    // Description
+    document.getElementById('zodiacDesc')!.textContent = sign.description;
+
+    // Traits
+    const traitsList = document.getElementById('zodiacTraits')!;
+    traitsList.innerHTML = sign.traits.map(t => `<li>${t}</li>`).join('');
+
+    // Strengths
+    const strengthsList = document.getElementById('zodiacStrengths')!;
+    strengthsList.innerHTML = sign.strengths.map(s => `<li>${s}</li>`).join('');
+
+    // Weaknesses
+    const weaknessesList = document.getElementById('zodiacWeaknesses')!;
+    weaknessesList.innerHTML = sign.weaknesses.map(w => `<li>${w}</li>`).join('');
+
+    // Compatibility chips
+    const compatContainer = document.getElementById('compatChips')!;
+    compatContainer.innerHTML = sign.bestMatch.map(m =>
+      `<span class="compat-chip"><span class="chip-symbol">${signSymbols[m] || ''}</span> ${m}</span>`
+    ).join('');
+
+    // Scroll result into view
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  document.getElementById('calculateBtn')?.addEventListener('click', calculate);
+</script>

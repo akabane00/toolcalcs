@@ -1,0 +1,423 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import { getAllAngelNumbers, getAngelNumberBySlug } from '../../data/angel-numbers';
+
+export function getStaticPaths() {
+  return getAllAngelNumbers().map((an) => ({
+    params: { slug: an.slug },
+    props: { angelNumber: an },
+  }));
+}
+
+const { angelNumber } = Astro.props;
+
+const allNumbers = getAllAngelNumbers();
+
+// Build related numbers list from data
+const relatedAngelNumbers = angelNumber.relatedNumbers
+  .map((num: string) => allNumbers.find((an) => an.number === num))
+  .filter(Boolean);
+
+const seoTitle = `${angelNumber.title} — Love, Career & Spiritual Guide | ToolCalcs`;
+const seoDescription = `Discover the meaning of angel number ${angelNumber.number}. ${angelNumber.shortMeaning} Full interpretation for love, career, spiritual growth, and what to do when you see ${angelNumber.number}.`;
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Angel Numbers", "item": "https://toolcalcs.com/angel-number/" },
+      { "@type": "ListItem", "position": 3, "name": `Angel Number ${angelNumber.number}` },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": `What does angel number ${angelNumber.number} mean?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": angelNumber.shortMeaning + ' ' + angelNumber.detailed.split('.').slice(0, 2).join('.') + '.',
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `What does ${angelNumber.number} mean in love?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": angelNumber.love,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `What should I do when I see ${angelNumber.number}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": angelNumber.action.join(' '),
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout title={seoTitle} description={seoDescription} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/angel-number/">Angel Numbers</a> &rsaquo;
+    <span>Angel Number {angelNumber.number}</span>
+  </nav>
+
+  <!-- Hero Section -->
+  <div class="angel-hero">
+    <div class="angel-hero-number">{angelNumber.number}</div>
+    <h1>{angelNumber.title}</h1>
+    <p class="angel-hero-meaning">{angelNumber.shortMeaning}</p>
+  </div>
+
+  <AdUnit slot="angel-detail-top" format="horizontal" />
+
+  <!-- Detailed Meaning -->
+  <article class="angel-content">
+    <section class="angel-section">
+      <h2>What Does Angel Number {angelNumber.number} Mean?</h2>
+      <div class="detailed-text">
+        {angelNumber.detailed.split('\n\n').map((paragraph: string) => (
+          <p>{paragraph}</p>
+        ))}
+      </div>
+    </section>
+
+    <!-- Love & Relationships -->
+    <section class="angel-section interpretation-card love-card">
+      <div class="interpretation-header">
+        <span class="interpretation-icon" aria-hidden="true">&#x1F495;</span>
+        <h2>Love &amp; Relationships</h2>
+      </div>
+      <p>{angelNumber.love}</p>
+    </section>
+
+    <!-- Career & Money -->
+    <section class="angel-section interpretation-card career-card">
+      <div class="interpretation-header">
+        <span class="interpretation-icon" aria-hidden="true">&#x1F4BC;</span>
+        <h2>Career &amp; Money</h2>
+      </div>
+      <p>{angelNumber.career}</p>
+    </section>
+
+    <AdUnit slot="angel-detail-mid" format="horizontal" />
+
+    <!-- Spiritual Growth -->
+    <section class="angel-section interpretation-card spiritual-card">
+      <div class="interpretation-header">
+        <span class="interpretation-icon" aria-hidden="true">&#x2728;</span>
+        <h2>Spiritual Growth</h2>
+      </div>
+      <p>{angelNumber.spiritual}</p>
+    </section>
+
+    <!-- What to Do -->
+    <section class="angel-section action-section">
+      <h2>What to Do When You See {angelNumber.number}</h2>
+      <ul class="action-checklist">
+        {angelNumber.action.map((step: string) => (
+          <li class="action-item">
+            <span class="action-check" aria-hidden="true">&#x2610;</span>
+            <span>{step}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- Related Angel Numbers -->
+    {relatedAngelNumbers.length > 0 && (
+      <section class="angel-section related-section">
+        <h2>Related Angel Numbers</h2>
+        <div class="related-grid">
+          {relatedAngelNumbers.map((related: any) => (
+            <a href={`/angel-number/${related.slug}/`} class="related-card">
+              <span class="related-number">{related.number}</span>
+              <span class="related-meaning">{related.shortMeaning}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <!-- CTA -->
+    <section class="angel-section cta-section">
+      <h2>Look Up Any Angel Number</h2>
+      <p>Spotted a different number? Use our Angel Number Calculator to instantly decode any number sequence the universe is sending you.</p>
+      <a href="/astrology-calculators/angel-number-calculator/" class="cta-btn">
+        Angel Number Calculator &rarr;
+      </a>
+    </section>
+  </article>
+
+  <AdUnit slot="angel-detail-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  /* --- Angel Hero --- */
+  .angel-hero {
+    text-align: center;
+    padding: 40px 20px 32px;
+    margin-bottom: 32px;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.06), rgba(99, 102, 241, 0.06), rgba(59, 130, 246, 0.04));
+    border-radius: var(--radius);
+    border: 1px solid var(--color-border);
+  }
+  .angel-hero-number {
+    font-size: 5rem;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #8b5cf6, #6366f1, #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+    filter: drop-shadow(0 0 24px rgba(139, 92, 246, 0.3));
+  }
+  .angel-hero h1 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--color-text);
+  }
+  .angel-hero-meaning {
+    font-size: 1.05rem;
+    color: var(--color-text-muted);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* --- Content Layout --- */
+  .angel-content {
+    max-width: 800px;
+    line-height: 1.8;
+  }
+  .angel-section {
+    margin-bottom: 32px;
+  }
+  .angel-section h2 {
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border);
+    color: var(--color-text);
+  }
+  .angel-section:first-child h2 {
+    border-top: none;
+    padding-top: 0;
+  }
+  .angel-section p {
+    margin-bottom: 12px;
+    color: var(--color-text);
+  }
+
+  .detailed-text p {
+    margin-bottom: 16px;
+  }
+
+  /* --- Interpretation Cards --- */
+  .interpretation-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 24px;
+    border-top: none;
+  }
+  .interpretation-card h2 {
+    border-top: none;
+    padding-top: 0;
+    margin-bottom: 8px;
+  }
+  .interpretation-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .interpretation-icon {
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+
+  .love-card {
+    border-left: 3px solid #ec4899;
+  }
+  .career-card {
+    border-left: 3px solid #f59e0b;
+  }
+  .spiritual-card {
+    border-left: 3px solid #8b5cf6;
+  }
+
+  /* --- Action Checklist --- */
+  .action-section {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 24px;
+  }
+  .action-section h2 {
+    border-top: none;
+    padding-top: 0;
+  }
+  .action-checklist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .action-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--color-border);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+  .action-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  .action-check {
+    color: #8b5cf6;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* --- Related Numbers --- */
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+  }
+  .related-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 18px 14px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    text-align: center;
+    transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+  }
+  .related-card:hover {
+    border-color: #8b5cf6;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.12);
+    transform: translateY(-2px);
+    text-decoration: none;
+  }
+  .related-number {
+    font-size: 1.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #8b5cf6, #6366f1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .related-meaning {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    line-height: 1.4;
+  }
+
+  /* --- CTA --- */
+  .cta-section {
+    text-align: center;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.06), rgba(99, 102, 241, 0.06));
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 32px 24px;
+  }
+  .cta-section h2 {
+    border-top: none;
+    padding-top: 0;
+  }
+  .cta-section p {
+    color: var(--color-text-muted);
+    margin-bottom: 16px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .cta-btn {
+    display: inline-block;
+    padding: 12px 32px;
+    background: linear-gradient(135deg, #8b5cf6, #6366f1);
+    color: #fff;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: opacity 0.15s, transform 0.15s;
+  }
+  .cta-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    text-decoration: none;
+  }
+
+  /* --- Dark Mode --- */
+  [data-theme="dark"] .angel-hero {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(99, 102, 241, 0.08), rgba(59, 130, 246, 0.06));
+  }
+  [data-theme="dark"] .angel-hero-number {
+    background: linear-gradient(135deg, #a78bfa, #818cf8, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 28px rgba(167, 139, 250, 0.4));
+  }
+  [data-theme="dark"] .interpretation-card {
+    background: var(--color-surface);
+  }
+  [data-theme="dark"] .related-card:hover {
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+  }
+  [data-theme="dark"] .related-number {
+    background: linear-gradient(135deg, #a78bfa, #818cf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  [data-theme="dark"] .cta-section {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(99, 102, 241, 0.08));
+  }
+
+  /* --- Responsive --- */
+  @media (max-width: 640px) {
+    .angel-hero {
+      padding: 28px 16px 24px;
+    }
+    .angel-hero-number {
+      font-size: 3.5rem;
+    }
+    .angel-hero h1 {
+      font-size: 1.2rem;
+    }
+    .interpretation-card {
+      padding: 18px 16px;
+    }
+    .related-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .cta-section {
+      padding: 24px 16px;
+    }
+  }
+</style>

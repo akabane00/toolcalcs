@@ -202,6 +202,43 @@ export const blogArticles: BlogArticle[] = [
     category: 'Health',
     relatedCalculatorSlugs: ['bac-calculator', 'bmi-calculator'],
   },
+  // Sprint 8 articles — Astrology
+  {
+    title: 'The Complete Guide to the 12 Zodiac Signs',
+    slug: 'zodiac-signs-complete-guide',
+    description: 'Learn about all 12 zodiac signs: dates, personality traits, elements, compatibility, and what your sun sign reveals about you.',
+    datePublished: '2026-03-06',
+    dateModified: '2026-03-06',
+    category: 'Astrology',
+    relatedCalculatorSlugs: ['zodiac-sign-calculator', 'zodiac-compatibility-calculator', 'chinese-zodiac-calculator'],
+  },
+  {
+    title: 'Life Path Numbers 1-9: What Yours Reveals About You',
+    slug: 'life-path-number-guide',
+    description: 'Discover your Life Path Number and what it means for your personality, career, relationships, and life purpose. Includes calculation method and all 12 numbers.',
+    datePublished: '2026-03-06',
+    dateModified: '2026-03-06',
+    category: 'Astrology',
+    relatedCalculatorSlugs: ['numerology-calculator', 'zodiac-sign-calculator'],
+  },
+  {
+    title: 'Angel Numbers Explained: Why You Keep Seeing 111, 222, 333',
+    slug: 'angel-numbers-explained',
+    description: 'What are angel numbers and why do you keep seeing repeating numbers? Learn the meaning of 111, 222, 333, 444, 555 and other common angel number sequences.',
+    datePublished: '2026-03-06',
+    dateModified: '2026-03-06',
+    category: 'Astrology',
+    relatedCalculatorSlugs: ['angel-number-calculator', 'numerology-calculator'],
+  },
+  {
+    title: 'How to Read Tarot Cards: A Complete Beginner\'s Guide',
+    slug: 'tarot-reading-beginners-guide',
+    description: 'Learn the basics of tarot reading: Major and Minor Arcana explained, how to do a 3-card spread, and tips for interpreting your first reading.',
+    datePublished: '2026-03-06',
+    dateModified: '2026-03-06',
+    category: 'Astrology',
+    relatedCalculatorSlugs: ['tarot-reading', 'zodiac-sign-calculator', 'numerology-calculator'],
+  },
 ];
 
 export function getArticlesForCalculator(calculatorSlug: string): BlogArticle[] {
