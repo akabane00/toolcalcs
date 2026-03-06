@@ -755,13 +755,13 @@ const relatedGroups: Record<string, string[]> = {
 
 // Cross-category links for broader discovery
 const crossCategoryLinks: Record<string, string[]> = {
-  'financial-calculators': ['percentage-calculator', 'hours-calculator', 'discount-calculator'],
-  'health-calculators': ['age-calculator', 'hours-calculator', 'percentage-calculator'],
-  'math-calculators': ['percentage-calculator', 'tip-calculator', 'compound-interest-calculator'],
+  'financial-calculators': ['percentage-calculator', 'hours-calculator', 'discount-calculator', 'bmi-calculator'],
+  'health-calculators': ['age-calculator', 'hours-calculator', 'percentage-calculator', 'calorie-calculator'],
+  'math-calculators': ['percentage-calculator', 'tip-calculator', 'compound-interest-calculator', 'bmi-calculator'],
   'date-time-calculators': ['age-calculator', 'hours-calculator', 'time-zone-converter'],
   'conversion-calculators': ['percentage-calculator', 'tip-calculator', 'area-calculator'],
-  'everyday-calculators': ['percentage-calculator', 'tax-calculator', 'mortgage-calculator'],
-  'construction-calculators': ['square-footage-calculator', 'area-calculator', 'percentage-calculator'],
+  'everyday-calculators': ['percentage-calculator', 'tax-calculator', 'mortgage-calculator', 'bmi-calculator'],
+  'construction-calculators': ['square-footage-calculator', 'area-calculator', 'percentage-calculator', 'concrete-calculator'],
 };
 
 export function getRelatedCalculators(currentSlug: string, limit: number = 5): Calculator[] {
