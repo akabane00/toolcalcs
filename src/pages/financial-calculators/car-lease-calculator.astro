@@ -1,0 +1,433 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Financial Calculators",
+        "item": "https://toolcalcs.com/financial-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Car Lease Calculator"
+      }
+    ]
+  },
+  {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'How is a monthly car lease payment calculated?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'A monthly car lease payment has two components: the depreciation fee and the finance charge. The depreciation fee equals the adjusted capitalized cost minus the residual value, divided by the lease term in months. The finance charge equals the adjusted capitalized cost plus the residual value, multiplied by the money factor. Your total monthly payment is the sum of these two amounts plus applicable taxes.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is a good money factor for a car lease?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'A good money factor depends on current market rates and your credit score. To compare a money factor to a traditional interest rate, multiply it by 2,400. For example, a money factor of 0.00100 equals a 2.4% APR, and 0.00125 equals 3.0% APR. Generally, a money factor below 0.00150 (3.6% APR) is considered competitive. Shoppers with excellent credit can often negotiate money factors below 0.00100, and manufacturer-subsidized leases sometimes offer even lower rates.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Is it cheaper to lease or buy a car?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Leasing typically has lower monthly payments than buying because you only pay for the vehicle\'s depreciation during the lease term, not its full value. However, buying is usually cheaper in the long run because you build equity and eventually own the car outright with no payments. If you keep a purchased car for 8-10 years, the total cost of ownership is significantly lower than leasing multiple vehicles over the same period. Leasing makes more financial sense if you want a new car every 2-3 years, drive fewer than 12,000-15,000 miles per year, and prefer predictable costs with warranty coverage.',
+      },
+    },
+  ],
+},
+];
+---
+
+<BaseLayout
+  title="Car Lease Calculator - Calculate Monthly Lease Payments | ToolCalcs"
+  description="Free car lease calculator. Estimate monthly lease payments, total lease cost, and equivalent APR. Compare leasing vs buying with a full cost breakdown."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/financial-calculators/">Financial Calculators</a> &rsaquo;
+    <span>Car Lease Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Car Lease Calculator</h1>
+  <p class="page-desc">Calculate your monthly car lease payment, total lease cost, finance charges, and equivalent APR based on vehicle price, residual value, and money factor.</p>
+
+  <!-- Calculator Tool -->
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="msrp">MSRP / Sticker Price ($)</label>
+        <input type="number" id="msrp" value="40000" min="0" step="500" />
+      </div>
+      <div class="input-group">
+        <label for="negotiatedPrice">Negotiated Price ($)</label>
+        <input type="number" id="negotiatedPrice" value="38000" min="0" step="500" />
+      </div>
+      <div class="input-group">
+        <label for="residualPct">Residual Value (%)</label>
+        <input type="number" id="residualPct" value="55" min="0" max="100" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="moneyFactor">Money Factor</label>
+        <input type="number" id="moneyFactor" value="0.00125" min="0" max="0.01" step="0.00001" />
+      </div>
+      <div class="input-group">
+        <label for="leaseTerm">Lease Term</label>
+        <select id="leaseTerm">
+          <option value="24">24 Months</option>
+          <option value="36" selected>36 Months</option>
+          <option value="48">48 Months</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="downPayment">Down Payment ($)</label>
+        <input type="number" id="downPayment" value="2000" min="0" step="500" />
+      </div>
+      <div class="input-group">
+        <label for="tradeIn">Trade-In Value ($)</label>
+        <input type="number" id="tradeIn" value="0" min="0" step="500" />
+      </div>
+      <div class="input-group">
+        <label for="fees">Fees (Acquisition, Doc, etc.) ($)</label>
+        <input type="number" id="fees" value="895" min="0" step="50" />
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate Lease</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Monthly Payment</span>
+          <span class="result-value" id="monthlyPayment">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Lease Cost</span>
+          <span class="result-value" id="totalLeaseCost">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Finance Charges</span>
+          <span class="result-value" id="totalFinanceCharges">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Depreciation Cost</span>
+          <span class="result-value" id="depreciationCost">$0</span>
+        </div>
+        <div class="result-card success">
+          <span class="result-label">Equivalent APR</span>
+          <span class="result-value" id="equivalentApr">0%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>How Car Leases Work</h2>
+    <p>A car lease is essentially a long-term rental agreement between you and a leasing company, which is usually the financing arm of an automaker or a third-party lender. Unlike purchasing a vehicle with a loan, leasing means you are paying for the right to use the car for a set period, typically 24 to 48 months, rather than paying to own it outright. At the end of the lease, you return the vehicle to the dealer unless you choose to buy it at its predetermined residual value.</p>
+    <p>When you lease, your monthly payment covers the vehicle's depreciation during the lease term plus a finance charge. Because you are only paying for a portion of the car's value rather than the entire purchase price, monthly lease payments are almost always lower than monthly loan payments on the same vehicle. This is one of the primary reasons leasing appeals to drivers who want a newer, more expensive car than they could afford to buy.</p>
+    <p>However, leasing comes with restrictions that buying does not. Most leases limit annual mileage to 10,000, 12,000, or 15,000 miles, and exceeding that limit results in per-mile overage charges, usually between $0.15 and $0.30 per mile. You are also expected to maintain the vehicle in good condition and will be charged for excessive wear and tear when you return it. Modifications to the vehicle are generally not permitted, and terminating a lease early often involves substantial penalties.</p>
+    <p>Despite these constraints, leasing remains popular because it offers predictable costs, warranty coverage for the entire term, and the ability to drive a new car every few years without the hassle of selling or trading in your old vehicle. Understanding how lease payments are calculated empowers you to negotiate a better deal and determine whether leasing is the right financial choice for your situation.</p>
+
+    <h2>Key Lease Terms Explained</h2>
+    <p>Car leasing has its own vocabulary that can be confusing for first-time lessees. Understanding these terms is essential for evaluating any lease offer and negotiating effectively.</p>
+    <ul>
+      <li><strong>MSRP (Manufacturer's Suggested Retail Price):</strong> The sticker price set by the manufacturer. This is the starting point for negotiations but rarely the price you should agree to pay. The MSRP is also used as the basis for calculating the residual value.</li>
+      <li><strong>Capitalized Cost (Cap Cost):</strong> The negotiated price of the vehicle for the purpose of the lease. Think of this as the equivalent of the purchase price when buying. A lower cap cost reduces your monthly payment directly, so negotiating this number down is critical.</li>
+      <li><strong>Residual Value:</strong> The estimated value of the vehicle at the end of the lease term, expressed as a percentage of the MSRP. A higher residual value means less depreciation and a lower monthly payment. Residual values are set by the leasing company and are generally not negotiable, though they vary by make, model, and lease term.</li>
+      <li><strong>Money Factor:</strong> The interest rate on a lease, expressed in a unique decimal format. To convert a money factor to an equivalent annual percentage rate, multiply by 2,400. For example, a money factor of 0.00125 equals a 3.0% APR. The money factor is sometimes negotiable, especially if you have excellent credit.</li>
+      <li><strong>Adjusted Capitalized Cost:</strong> The final amount used to calculate your lease payments after adding fees and subtracting your down payment and trade-in value. This is the effective amount you are financing through the lease.</li>
+      <li><strong>Acquisition Fee:</strong> A fee charged by the leasing company to arrange the lease, typically ranging from $595 to $1,095. This fee is usually rolled into the capitalized cost rather than paid upfront.</li>
+      <li><strong>Disposition Fee:</strong> A fee charged when you return the vehicle at the end of the lease, typically $300 to $500. This fee covers the cost of inspecting and remarketing the vehicle.</li>
+    </ul>
+
+    <h2>How Monthly Lease Payments Are Calculated</h2>
+    <p>Unlike a traditional auto loan, which uses an amortization formula, a car lease payment is calculated by combining two separate components: the depreciation fee and the finance charge.</p>
+    <div class="formula-box">
+      <code>Adjusted Cap Cost = Negotiated Price + Fees - Down Payment - Trade-In</code>
+    </div>
+    <div class="formula-box">
+      <code>Residual Value = MSRP &times; Residual %</code>
+    </div>
+    <div class="formula-box">
+      <code>Monthly Depreciation = (Adjusted Cap Cost - Residual Value) / Lease Term</code>
+    </div>
+    <div class="formula-box">
+      <code>Monthly Finance Charge = (Adjusted Cap Cost + Residual Value) &times; Money Factor</code>
+    </div>
+    <div class="formula-box">
+      <code>Monthly Payment = Monthly Depreciation + Monthly Finance Charge</code>
+    </div>
+    <p>Let us walk through an example. Suppose you are leasing a vehicle with an MSRP of $40,000. You negotiate the price down to $38,000, and there is an $895 acquisition fee. You make a $2,000 down payment and have no trade-in. The residual value is 55% over 36 months, and the money factor is 0.00125.</p>
+    <p>First, calculate the adjusted capitalized cost: $38,000 + $895 - $2,000 - $0 = $36,895. The residual value is $40,000 times 0.55 = $22,000. Monthly depreciation is ($36,895 - $22,000) / 36 = $413.75. The monthly finance charge is ($36,895 + $22,000) times 0.00125 = $73.62. Your total monthly payment would be $413.75 + $73.62 = $487.37.</p>
+    <p>The total lease cost would be ($487.37 times 36) + $2,000 = $19,545. Of that amount, $2,650 is attributable to finance charges ($73.62 times 36), and $14,895 represents the depreciation cost. Understanding this breakdown helps you identify which parts of the lease are negotiable and where you can save money.</p>
+
+    <h2>Money Factor vs Interest Rate</h2>
+    <p>The money factor is one of the most misunderstood aspects of car leasing. Unlike a traditional interest rate expressed as a percentage, the money factor is a small decimal number, which makes it difficult to compare against loan rates at first glance.</p>
+    <div class="formula-box">
+      <code>APR = Money Factor &times; 2,400</code>
+    </div>
+    <p>This conversion works because the money factor formula is derived from the lease finance charge calculation. When you multiply the money factor by 2,400, you get an approximate annual percentage rate that can be directly compared to auto loan interest rates. For example:</p>
+    <ul>
+      <li>Money factor 0.00050 = 1.2% APR</li>
+      <li>Money factor 0.00100 = 2.4% APR</li>
+      <li>Money factor 0.00125 = 3.0% APR</li>
+      <li>Money factor 0.00150 = 3.6% APR</li>
+      <li>Money factor 0.00200 = 4.8% APR</li>
+      <li>Money factor 0.00250 = 6.0% APR</li>
+    </ul>
+    <p>Not all dealers voluntarily disclose the money factor. Some prefer to discuss only the monthly payment amount, which makes it harder for you to assess whether the financing terms are competitive. Always ask for the money factor before signing any lease agreement. If the dealer is reluctant to share it, that may be a sign that the rate includes a markup above what you qualify for based on your credit score.</p>
+    <p>Manufacturers sometimes offer subvented or subsidized money factors as part of promotional lease deals. These reduced rates can make leasing significantly more affordable, as they lower the finance charge portion of your monthly payment. When evaluating lease specials, convert the money factor to an APR to see exactly how much you are paying in financing costs compared to a traditional auto loan.</p>
+
+    <h2>Understanding Residual Value</h2>
+    <p>The residual value is the single most important number in a lease calculation, yet most consumers pay far more attention to the monthly payment. The residual value represents the leasing company's estimate of what the vehicle will be worth at the end of the lease term, expressed as a percentage of the MSRP.</p>
+    <p>A higher residual value is better for you as the lessee because it means less depreciation, which translates directly to a lower monthly payment. For example, a $40,000 vehicle with a 60% residual value has an expected depreciation of $16,000 over the lease term, while the same vehicle with a 50% residual has $20,000 in depreciation. That $4,000 difference, spread over 36 months, adds roughly $111 to your monthly payment.</p>
+    <p>Residual values are determined by the leasing company or its financial partner and are based on historical depreciation data, market conditions, vehicle segment, and projected demand. Luxury brands and vehicles known for holding their value, such as certain Toyota, Lexus, Honda, and Porsche models, tend to have higher residual values. Vehicles that depreciate quickly, such as some domestic sedans and electric vehicles with rapidly improving technology, tend to have lower residuals.</p>
+    <p>Residual values are generally not negotiable because they are set at the corporate level by the leasing company. However, you can benefit from higher residuals by timing your lease to coincide with manufacturer incentive programs that temporarily boost residual values to make certain models more attractive. You can also choose shorter lease terms, which typically carry higher residual percentages since there is less time for the vehicle to depreciate.</p>
+    <p>At the end of your lease, you typically have the option to purchase the vehicle for its residual value. If the car's actual market value exceeds the residual, this can be a good deal. If the car is worth less than the residual, you simply return it and walk away, which is one of the advantages of leasing over buying.</p>
+
+    <h2>Lease vs Buy Comparison</h2>
+    <p>Deciding whether to lease or buy a vehicle is one of the most common dilemmas facing car shoppers. Each option has distinct financial and lifestyle implications, and the right choice depends on your driving habits, financial goals, and personal preferences.</p>
+    <div class="comparison-table-wrapper">
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Factor</th>
+            <th>Leasing</th>
+            <th>Buying</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Monthly Payment</td>
+            <td>Lower</td>
+            <td>Higher</td>
+          </tr>
+          <tr>
+            <td>Ownership</td>
+            <td>No equity built</td>
+            <td>Build equity, own the asset</td>
+          </tr>
+          <tr>
+            <td>Mileage</td>
+            <td>Limited (10K-15K/year)</td>
+            <td>Unlimited</td>
+          </tr>
+          <tr>
+            <td>Maintenance</td>
+            <td>Usually under warranty</td>
+            <td>Your responsibility after warranty</td>
+          </tr>
+          <tr>
+            <td>Customization</td>
+            <td>Not allowed</td>
+            <td>Full freedom</td>
+          </tr>
+          <tr>
+            <td>Long-Term Cost</td>
+            <td>Higher (perpetual payments)</td>
+            <td>Lower (eventually payment-free)</td>
+          </tr>
+          <tr>
+            <td>Down Payment</td>
+            <td>Often lower or $0</td>
+            <td>Typically 10%-20%</td>
+          </tr>
+          <tr>
+            <td>End of Term</td>
+            <td>Return car or buy it</td>
+            <td>Own the car outright</td>
+          </tr>
+          <tr>
+            <td>Wear and Tear</td>
+            <td>Excess wear charges apply</td>
+            <td>No penalties</td>
+          </tr>
+          <tr>
+            <td>New Car Frequency</td>
+            <td>New car every 2-3 years</td>
+            <td>Keep as long as you want</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>From a purely financial standpoint, buying a car and keeping it for many years is almost always the cheaper option in the long run. Once the loan is paid off, you enjoy years of payment-free driving while the car still retains some value. With leasing, you always have a monthly payment because you start a new lease every time the previous one ends.</p>
+    <p>However, leasing can make sense financially if you value driving a newer vehicle with the latest safety features and technology, if you drive relatively few miles, or if you use the vehicle for business and can deduct lease payments. Leasing also eliminates the risk of owning a depreciating asset and protects you from unexpected repair costs since the vehicle remains under warranty for the duration of the lease.</p>
+
+    <h2>Tips for Negotiating a Lease</h2>
+    <p>Many consumers assume lease terms are fixed and non-negotiable, but several components of a lease deal can be negotiated to lower your monthly payment and reduce the total cost of the lease.</p>
+    <ol>
+      <li><strong>Negotiate the capitalized cost first.</strong> Just as you would negotiate the purchase price of a car you are buying, you should negotiate the cap cost on a lease. A lower cap cost directly reduces your monthly depreciation fee. Research the vehicle's invoice price and fair market value before visiting the dealer, and negotiate the price independently of the lease terms.</li>
+      <li><strong>Ask for the money factor.</strong> Dealers are not required to disclose the money factor, but you have every right to ask for it. If the money factor seems high relative to your credit score, push back. Dealers can mark up the money factor above what the leasing company charges, pocketing the difference as profit. Knowing the base money factor set by the manufacturer gives you leverage.</li>
+      <li><strong>Look for manufacturer incentives.</strong> Automakers frequently offer lease specials that include reduced money factors, bonus cash applied to the cap cost, or inflated residual values. These incentives can dramatically improve the economics of a lease. Check manufacturer websites and timing your lease to coincide with end-of-model-year or holiday promotions.</li>
+      <li><strong>Minimize upfront costs.</strong> Financial advisors generally recommend putting as little money down on a lease as possible. Unlike a car purchase, where a down payment builds equity, a lease down payment is essentially a prepayment of depreciation. If the car is totaled or stolen early in the lease, you lose that down payment entirely because gap insurance does not reimburse it.</li>
+      <li><strong>Negotiate fees where possible.</strong> While the acquisition fee is typically set by the leasing company and non-negotiable, the documentation fee and dealer-added charges may be negotiable. Ask for an itemized list of all fees and challenge any that seem excessive or unfamiliar.</li>
+      <li><strong>Choose the right mileage allowance.</strong> Estimate your annual driving realistically and choose a mileage tier that covers your needs without paying for miles you will not use. It is usually cheaper to buy extra miles upfront at the time of signing than to pay overage charges at lease-end.</li>
+    </ol>
+
+    <h2>Common Lease Fees</h2>
+    <p>In addition to the monthly payment, several fees are associated with leasing a vehicle. Being aware of these charges helps you calculate the true cost of a lease and avoid surprises at signing or return.</p>
+    <ul>
+      <li><strong>Acquisition Fee:</strong> Charged by the leasing company to initiate the lease, typically $595 to $1,095. This fee is usually rolled into the capitalized cost and financed over the lease term, though you can sometimes pay it upfront to reduce your monthly payment slightly.</li>
+      <li><strong>Documentation Fee:</strong> A dealer-charged fee for processing paperwork, ranging from $100 to $500 depending on the state. Some states cap documentation fees by law.</li>
+      <li><strong>Registration and Title Fees:</strong> State-required fees for registering the vehicle. These vary widely by state and are typically paid upfront or included in the first month's payment.</li>
+      <li><strong>Security Deposit:</strong> Some leases require a refundable security deposit, usually equal to one monthly payment rounded up to the nearest $50. Not all leasing companies require this, and those with strong credit can often have it waived.</li>
+      <li><strong>Disposition Fee:</strong> Charged when you return the vehicle at the end of the lease, typically $300 to $500. This fee is disclosed in your lease agreement and covers the cost of preparing the vehicle for resale. You can avoid this fee by purchasing the vehicle or signing a new lease with the same brand.</li>
+      <li><strong>Excess Mileage Fee:</strong> Charged for every mile driven over your annual mileage allowance, typically $0.15 to $0.30 per mile. On a 36-month lease, exceeding your limit by just 5,000 miles per year could cost $2,250 to $4,500 at lease-end.</li>
+      <li><strong>Excess Wear and Tear:</strong> Charges for damage beyond normal use, including dents, scratches, interior stains, and worn tires. Leasing companies provide wear-and-tear guidelines in the lease agreement, and some offer optional wear-and-tear protection packages for an additional monthly fee.</li>
+      <li><strong>Early Termination Fee:</strong> If you need to end your lease before the term expires, you may owe a substantial penalty, often equal to the remaining lease payments plus additional charges. Lease transfer services exist as an alternative, allowing someone else to assume your lease for a smaller fee.</li>
+    </ul>
+
+    <h2>When Leasing Makes Sense</h2>
+    <p>Leasing is not the right choice for everyone, but it can be financially and practically advantageous in several specific situations.</p>
+    <p><strong>You want a new car every few years.</strong> If you enjoy having the latest technology, safety features, and styling, leasing lets you upgrade every two to three years without the hassle of selling or trading in a vehicle. You simply return the car and sign a new lease.</p>
+    <p><strong>You drive fewer than 12,000-15,000 miles per year.</strong> Standard lease mileage allowances align well with average or below-average driving habits. If your commute is short and you do not take frequent long road trips, you are less likely to incur costly mileage overage charges.</p>
+    <p><strong>You use the vehicle for business.</strong> Business owners and self-employed individuals can often deduct lease payments as a business expense, which can make leasing more tax-efficient than buying. Consult a tax professional to understand how lease deductions apply to your specific situation.</p>
+    <p><strong>You prefer predictable, lower monthly costs.</strong> Lease payments are consistently lower than loan payments for the same vehicle because you are only paying for depreciation, not the full purchase price. Additionally, the vehicle remains under manufacturer warranty for the entire lease term, eliminating the risk of major repair bills.</p>
+    <p><strong>You want to avoid negative equity risk.</strong> When you buy a car, rapid depreciation can leave you owing more than the car is worth, especially with a small down payment and long loan term. With a lease, you return the vehicle at the end and are not exposed to the risk of the car being worth less than your remaining balance.</p>
+
+    <h2>When Buying Makes Sense</h2>
+    <p>For many consumers, buying a car and keeping it for an extended period is the more financially sound choice. Here are the situations where buying clearly wins.</p>
+    <p><strong>You plan to keep the car for more than five years.</strong> The biggest financial advantage of buying emerges after the loan is paid off. If you keep the car for eight to ten years, you enjoy several years of payment-free driving, which dramatically reduces your long-term cost per year of ownership compared to leasing continuously.</p>
+    <p><strong>You drive a lot of miles.</strong> If you routinely drive 15,000 to 20,000 miles per year or more, lease mileage restrictions will either force you into an expensive high-mileage lease or result in steep overage charges at lease-end. Buying eliminates this concern entirely because there are no mileage penalties on a vehicle you own.</p>
+    <p><strong>You want to customize your vehicle.</strong> Owners can modify their vehicles however they like, from aftermarket wheels and performance upgrades to roof racks and towing packages. Leased vehicles must be returned in close to original condition, so any modifications must be reversible.</p>
+    <p><strong>You want to build equity.</strong> Every loan payment you make brings you closer to owning the vehicle outright. Once the loan is paid off, the car still has value that you can realize through a sale or trade-in. With a lease, your payments build no equity, and you have nothing to show for them when the lease ends.</p>
+    <p><strong>You are on a tight budget long-term.</strong> While lease payments are lower in the short term, the perpetual nature of leasing means you always have a car payment. If your goal is to minimize total transportation costs over time, buying a reliable vehicle and driving it until the wheels fall off is the most economical approach. A paid-off car that costs a few hundred dollars in occasional maintenance is always cheaper than a $400 to $600 monthly lease payment.</p>
+    <p><strong>You are financing with a low interest rate.</strong> When you can secure a competitive auto loan rate, buying becomes even more attractive because the total finance charges are modest relative to the vehicle's value. Combine a low rate with a reasonable loan term and a solid down payment, and buying delivers both affordable monthly payments and long-term financial benefit through equity accumulation.</p>
+
+    <h2>Frequently Asked Questions</h2>
+<div class="faq-list">
+  <details class="faq-item">
+    <summary>How is a monthly car lease payment calculated?</summary>
+    <p>
+      A monthly lease payment consists of two parts. The depreciation fee is calculated by subtracting the residual value from the adjusted capitalized cost and dividing by the lease term in months. The finance charge is calculated by adding the adjusted capitalized cost and the residual value, then multiplying by the money factor. Your monthly payment is the sum of these two amounts. The adjusted capitalized cost is the negotiated vehicle price plus fees minus your down payment and trade-in value.
+    </p>
+  </details>
+  <details class="faq-item">
+    <summary>What is a good money factor for a car lease?</summary>
+    <p>
+      To evaluate a money factor, multiply it by 2,400 to convert it to an equivalent APR. A money factor of 0.00125 equals 3.0% APR, while 0.00100 equals 2.4% APR. Generally, anything below 0.00150 (3.6% APR) is considered competitive. Shoppers with excellent credit scores above 720 can often negotiate money factors below 0.00100. Manufacturer-subsidized lease specials sometimes offer even lower rates as promotional incentives.
+    </p>
+  </details>
+  <details class="faq-item">
+    <summary>Is it cheaper to lease or buy a car?</summary>
+    <p>
+      Leasing has lower monthly payments because you only pay for the car's depreciation during the lease term. However, buying is usually cheaper over the long term because you eventually own the car and stop making payments. If you keep a purchased vehicle for 8 to 10 years, the total cost of ownership is significantly less than leasing multiple vehicles over the same period. Leasing can be the better value if you want a new car every few years, drive under 12,000 to 15,000 miles annually, and prefer warranty coverage and predictable costs.
+    </p>
+  </details>
+</div>
+<h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/financial-calculators/auto-loan-calculator/">Auto Loan Calculator</a> - Calculate monthly car loan payments and total interest.</li>
+      <li><a href="/financial-calculators/loan-amortization-calculator/">Loan Amortization Calculator</a> - See a full amortization schedule for any loan.</li>
+      <li><a href="/financial-calculators/mortgage-calculator/">Mortgage Calculator</a> - Calculate home loan payments with taxes and insurance.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+  <RelatedArticles calculatorSlug="car-lease-calculator" />
+
+  <RelatedCalculators currentSlug="car-lease-calculator" />
+</BaseLayout>
+
+<style>
+  .comparison-table-wrapper {
+    overflow-x: auto;
+    margin: 16px 0;
+  }
+  .comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  .comparison-table th,
+  .comparison-table td {
+    padding: 10px 14px;
+    text-align: left;
+    border: 1px solid var(--color-border, #e5e7eb);
+  }
+  .comparison-table th {
+    background: var(--color-bg-muted, #f9fafb);
+    font-weight: 600;
+  }
+  .comparison-table tr:nth-child(even) td {
+    background: var(--color-bg-muted, #f9fafb);
+  }
+  .last-updated { font-size: 0.75rem; color: var(--color-text-muted); margin: 4px 0 0; }
+</style>
+
+<script>
+  function formatCurrency(n: number): string {
+    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+
+  function calculate() {
+    const msrp = parseFloat((document.getElementById('msrp') as HTMLInputElement).value) || 0;
+    const negotiatedPrice = parseFloat((document.getElementById('negotiatedPrice') as HTMLInputElement).value) || 0;
+    const residualPct = parseFloat((document.getElementById('residualPct') as HTMLInputElement).value) || 0;
+    const moneyFactor = parseFloat((document.getElementById('moneyFactor') as HTMLInputElement).value) || 0;
+    const term = parseInt((document.getElementById('leaseTerm') as HTMLSelectElement).value) || 36;
+    const downPayment = parseFloat((document.getElementById('downPayment') as HTMLInputElement).value) || 0;
+    const tradeIn = parseFloat((document.getElementById('tradeIn') as HTMLInputElement).value) || 0;
+    const fees = parseFloat((document.getElementById('fees') as HTMLInputElement).value) || 0;
+
+    // Adjusted capitalized cost
+    const adjustedCapCost = negotiatedPrice + fees - downPayment - tradeIn;
+
+    // Residual value (based on MSRP)
+    const residualValue = msrp * (residualPct / 100);
+
+    // Depreciation
+    const depreciation = adjustedCapCost - residualValue;
+    const monthlyDepreciation = depreciation / term;
+
+    // Finance charge
+    const monthlyFinanceCharge = (adjustedCapCost + residualValue) * moneyFactor;
+
+    // Monthly payment
+    const monthlyPayment = monthlyDepreciation + monthlyFinanceCharge;
+
+    // Totals
+    const totalLeaseCost = (monthlyPayment * term) + downPayment;
+    const totalFinanceCharges = monthlyFinanceCharge * term;
+    const depreciationCost = monthlyDepreciation * term;
+    const equivalentApr = moneyFactor * 2400;
+
+    document.getElementById('monthlyPayment')!.textContent = formatCurrency(Math.max(0, monthlyPayment));
+    document.getElementById('totalLeaseCost')!.textContent = formatCurrency(Math.max(0, totalLeaseCost));
+    document.getElementById('totalFinanceCharges')!.textContent = formatCurrency(Math.max(0, totalFinanceCharges));
+    document.getElementById('depreciationCost')!.textContent = formatCurrency(Math.max(0, depreciationCost));
+    document.getElementById('equivalentApr')!.textContent = equivalentApr.toFixed(1) + '%';
+  }
+
+  document.getElementById('calculateBtn')?.addEventListener('click', calculate);
+
+  // Auto-calculate on load
+  calculate();
+</script>

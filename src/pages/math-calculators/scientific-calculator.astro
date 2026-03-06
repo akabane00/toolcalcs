@@ -1,0 +1,799 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Math Calculators", "item": "https://toolcalcs.com/math-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Scientific Calculator" },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How do I switch between degrees and radians on this scientific calculator?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Click the DEG/RAD button in the bottom-left corner of the calculator to toggle between degree mode and radian mode. When DEG is displayed, trigonometric functions like sin, cos, and tan interpret input as degrees. When RAD is displayed, they interpret input as radians. Most everyday angle problems use degrees, while calculus and physics often require radians.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between log and ln on a scientific calculator?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The log button calculates the common logarithm (base 10), while ln calculates the natural logarithm (base e, approximately 2.71828). For example, log(100) = 2 because 10 squared is 100, and ln(e) = 1 because e to the first power is e. Common logarithms are used in engineering and chemistry (like pH calculations), while natural logarithms appear frequently in calculus, compound interest, and population growth models.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "Does this calculator follow the standard order of operations?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. This scientific calculator follows the standard mathematical order of operations (PEMDAS/BODMAS): parentheses first, then exponents, followed by multiplication and division from left to right, and finally addition and subtraction from left to right. You can use parentheses to override the default order when needed.",
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Scientific Calculator - Free Online Calculator with Trig & Log | ToolCalcs"
+  description="Free online scientific calculator with sin, cos, tan, logarithms, exponents, square roots, factorial, and more. Supports degrees and radians."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/math-calculators/">Math Calculators</a> &rsaquo;
+    <span>Scientific Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Scientific Calculator</h1>
+  <p class="page-desc">A full-featured scientific calculator with trigonometry, logarithms, exponents, and more.</p>
+
+  <div class="calculator-box game-box sci-calc-wrapper">
+    <div class="sci-display" id="sciDisplay">
+      <div class="sci-expression" id="sciExpression">&nbsp;</div>
+      <div class="sci-result" id="sciResult">0</div>
+    </div>
+    <div class="sci-mode-indicator" id="modeIndicator">DEG</div>
+    <div class="sci-buttons">
+      <!-- Row 1: Parentheses, Percent, Clear -->
+      <button class="sci-btn op" data-action="(">(</button>
+      <button class="sci-btn op" data-action=")">)</button>
+      <button class="sci-btn op" data-action="%">%</button>
+      <button class="sci-btn clear" data-action="clear">C</button>
+
+      <!-- Row 2: Trig + Pi -->
+      <button class="sci-btn fn" data-action="sin">sin</button>
+      <button class="sci-btn fn" data-action="cos">cos</button>
+      <button class="sci-btn fn" data-action="tan">tan</button>
+      <button class="sci-btn const" data-action="pi">&pi;</button>
+
+      <!-- Row 3: Powers + e -->
+      <button class="sci-btn fn" data-action="square">x&sup2;</button>
+      <button class="sci-btn fn" data-action="sqrt">&radic;x</button>
+      <button class="sci-btn fn" data-action="power">x<sup>y</sup></button>
+      <button class="sci-btn const" data-action="e">e</button>
+
+      <!-- Row 4: Log, Ln, Factorial, Reciprocal -->
+      <button class="sci-btn fn" data-action="log">log</button>
+      <button class="sci-btn fn" data-action="ln">ln</button>
+      <button class="sci-btn fn" data-action="factorial">n!</button>
+      <button class="sci-btn fn" data-action="reciprocal">1/x</button>
+
+      <!-- Row 5: 7 8 9 / -->
+      <button class="sci-btn num" data-action="7">7</button>
+      <button class="sci-btn num" data-action="8">8</button>
+      <button class="sci-btn num" data-action="9">9</button>
+      <button class="sci-btn op" data-action="/">&divide;</button>
+
+      <!-- Row 6: 4 5 6 * -->
+      <button class="sci-btn num" data-action="4">4</button>
+      <button class="sci-btn num" data-action="5">5</button>
+      <button class="sci-btn num" data-action="6">6</button>
+      <button class="sci-btn op" data-action="*">&times;</button>
+
+      <!-- Row 7: 1 2 3 - -->
+      <button class="sci-btn num" data-action="1">1</button>
+      <button class="sci-btn num" data-action="2">2</button>
+      <button class="sci-btn num" data-action="3">3</button>
+      <button class="sci-btn op" data-action="-">&minus;</button>
+
+      <!-- Row 8: 0 . +/- + -->
+      <button class="sci-btn num" data-action="0">0</button>
+      <button class="sci-btn num" data-action=".">.</button>
+      <button class="sci-btn fn" data-action="negate">&plusmn;</button>
+      <button class="sci-btn op" data-action="+">+</button>
+
+      <!-- Row 9: DEG/RAD, Backspace, Equals -->
+      <button class="sci-btn fn" data-action="toggleMode" id="btnMode">DEG</button>
+      <button class="sci-btn fn" data-action="backspace">&larr;</button>
+      <button class="sci-btn equals" data-action="equals">=</button>
+    </div>
+  </div>
+
+  <AdUnit slot="scientific-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>How to Use This Scientific Calculator</h2>
+    <p>
+      This free online scientific calculator works just like a physical scientific calculator. Type numbers and operations using the on-screen buttons or your keyboard to build an expression, then press the equals button (or the Enter key) to evaluate it. The display area shows two lines: the top line displays the expression you are building, and the bottom line shows the current result or the last computed answer.
+    </p>
+    <p>
+      To enter a basic arithmetic expression like 25 + 17, simply press the number buttons and the plus operator, then press equals. The calculator respects the standard mathematical order of operations, so an expression like 3 + 4 &times; 2 returns 11 rather than 14. Use parentheses to override the default order when needed — for instance, (3 + 4) &times; 2 equals 14.
+    </p>
+    <p>
+      For scientific functions such as sine or logarithm, press the function button first and then enter the number. For example, to compute the sine of 45 degrees, make sure the calculator is in DEG mode, press sin, type 45, close the parenthesis, and press equals. The result is approximately 0.7071. Functions like square root, factorial, and reciprocal work the same way: press the function, enter the value, and evaluate.
+    </p>
+    <p>
+      The calculator supports full keyboard input. Use number keys for digits, standard operator keys (+, -, *, /) for arithmetic, Enter for equals, Backspace to delete the last character, and Escape to clear the entire expression. This makes it fast to compute results without reaching for the mouse.
+    </p>
+
+    <h2>Functions Available</h2>
+    <p>
+      This scientific calculator provides a comprehensive set of mathematical functions beyond basic arithmetic. Here is what each button does:
+    </p>
+    <ul>
+      <li><strong>sin, cos, tan:</strong> Trigonometric functions that calculate the sine, cosine, and tangent of an angle. Use the DEG/RAD toggle to switch between degree and radian input.</li>
+      <li><strong>x&sup2;:</strong> Squares the current number. For example, entering 5 and pressing x&sup2; returns 25.</li>
+      <li><strong>&radic;x:</strong> Calculates the square root. The square root of 144 is 12.</li>
+      <li><strong>x<sup>y</sup>:</strong> Raises a number to any power. To compute 2 to the 10th power, enter 2, press x<sup>y</sup>, enter 10, and press equals to get 1024.</li>
+      <li><strong>log:</strong> Common logarithm (base 10). log(1000) = 3 because 10&sup3; = 1000.</li>
+      <li><strong>ln:</strong> Natural logarithm (base e). ln(e) = 1, and ln(1) = 0.</li>
+      <li><strong>n!:</strong> Factorial. Computes the product of all positive integers up to n. For example, 5! = 120.</li>
+      <li><strong>1/x:</strong> Reciprocal. Returns the multiplicative inverse. The reciprocal of 4 is 0.25.</li>
+      <li><strong>&pi;:</strong> Inserts the value of pi (approximately 3.14159265).</li>
+      <li><strong>e:</strong> Inserts Euler's number (approximately 2.71828183).</li>
+      <li><strong>%:</strong> Percentage operator. Divides the preceding number by 100.</li>
+      <li><strong>&plusmn;:</strong> Negates the current number, toggling between positive and negative.</li>
+    </ul>
+
+    <h2>Trigonometric Functions Explained</h2>
+    <p>
+      Trigonometric functions describe relationships between the angles and sides of triangles. They are foundational to geometry, physics, engineering, and many branches of applied mathematics. The three primary trigonometric functions are sine (sin), cosine (cos), and tangent (tan).
+    </p>
+    <p>
+      In a right triangle, the sine of an angle equals the length of the opposite side divided by the hypotenuse. Cosine equals the adjacent side divided by the hypotenuse. Tangent equals the opposite side divided by the adjacent side, or equivalently, sin divided by cos.
+    </p>
+    <p>
+      Common reference values are worth memorizing. In degrees: sin(0) = 0, sin(30) = 0.5, sin(45) &asymp; 0.7071, sin(60) &asymp; 0.8660, and sin(90) = 1. Cosine values mirror sine in the opposite direction: cos(0) = 1 and cos(90) = 0. Tangent of 45 degrees is exactly 1.
+    </p>
+    <p>
+      The DEG/RAD toggle on this calculator determines how angle input is interpreted. Degrees divide a full circle into 360 parts, while radians divide it into 2&pi; parts (approximately 6.2832). To convert between them: radians = degrees &times; &pi; / 180. Most everyday problems — architecture, navigation, construction — use degrees. Calculus, physics, and advanced engineering typically use radians.
+    </p>
+
+    <h2>Logarithms Explained</h2>
+    <p>
+      A logarithm answers the question: "To what power must I raise the base to get this number?" For example, log<sub>10</sub>(100) = 2 because 10&sup2; = 100. The natural logarithm (ln) uses base e (approximately 2.71828). So ln(e&sup3;) = 3 because e raised to the third power equals e&sup3;.
+    </p>
+    <p>
+      Logarithms turn multiplication into addition and exponentiation into multiplication, which makes them extraordinarily useful for simplifying complex calculations. Before electronic calculators existed, engineers and scientists used logarithm tables and slide rules to perform multiplication and division by converting them to addition and subtraction problems.
+    </p>
+    <p>
+      Common logarithms (base 10) appear in the decibel scale for sound intensity, the Richter scale for earthquake magnitude, and the pH scale in chemistry. Each step on these scales represents a tenfold change: an earthquake of magnitude 6 is ten times more powerful than one of magnitude 5. Natural logarithms appear throughout calculus, particularly in integration, and model continuous growth and decay processes such as compound interest, radioactive decay, and population dynamics.
+    </p>
+    <p>
+      Key properties of logarithms include: log(a &times; b) = log(a) + log(b), log(a / b) = log(a) - log(b), and log(a<sup>n</sup>) = n &times; log(a). These identities are essential tools in algebra and are frequently tested in standardized math exams.
+    </p>
+
+    <h2>Order of Operations</h2>
+    <p>
+      The order of operations is a set of rules that determines the sequence in which mathematical operations are performed. In the United States this is commonly taught as PEMDAS (Parentheses, Exponents, Multiplication/Division, Addition/Subtraction). In the United Kingdom and other countries it is known as BODMAS (Brackets, Orders, Division/Multiplication, Addition/Subtraction). Both acronyms describe the same rules.
+    </p>
+    <p>
+      Consider the expression 8 + 2 &times; 5. Without order of operations, reading left to right gives 50. But the correct answer is 18, because multiplication is performed before addition. Adding parentheses changes the result: (8 + 2) &times; 5 = 50.
+    </p>
+    <p>
+      This calculator fully implements PEMDAS. When you type an expression, it is parsed and evaluated according to these rules automatically. Functions like sin, cos, log, and sqrt are evaluated as they are encountered, similar to how exponents take priority. For example, sin(30) + 5 first computes sin(30) = 0.5, then adds 5 to get 5.5 — the function is not applied to the sum.
+    </p>
+    <p>
+      A common mistake is assuming that multiplication always comes before division. In fact, multiplication and division have equal priority and are evaluated left to right. The same applies to addition and subtraction. So 12 / 4 &times; 3 = 9 (not 1), because 12 / 4 is computed first to get 3, then 3 &times; 3 = 9.
+    </p>
+
+    <h2>When You Need a Scientific Calculator</h2>
+    <p>
+      A basic four-function calculator handles addition, subtraction, multiplication, and division. But many academic and professional tasks require more advanced functions. Here are situations where a scientific calculator is essential:
+    </p>
+    <ul>
+      <li><strong>High school and college math:</strong> Algebra II, precalculus, trigonometry, and calculus courses all require trigonometric functions, logarithms, and exponents.</li>
+      <li><strong>Standardized tests:</strong> The SAT, ACT, GRE, and AP exams permit scientific calculators. Being familiar with one before test day saves valuable time.</li>
+      <li><strong>Physics and engineering:</strong> Calculating forces, velocities, wave functions, circuit resistance, and signal processing all involve trig and logarithmic functions.</li>
+      <li><strong>Chemistry:</strong> pH calculations use logarithms. Stoichiometry and gas law problems involve exponents and scientific notation.</li>
+      <li><strong>Finance:</strong> Compound interest formulas use exponents. Loan amortization involves powers. The natural logarithm helps solve for time-to-double problems.</li>
+      <li><strong>Statistics:</strong> Standard deviation, z-scores, probability distributions, and regression analysis use square roots and logarithms extensively.</li>
+      <li><strong>Construction and surveying:</strong> Calculating roof pitch, lot angles, elevation changes, and structural loads involves trigonometry.</li>
+    </ul>
+
+    <h2>Calculator vs Phone App</h2>
+    <p>
+      Every smartphone includes a basic calculator, and many phone calculators can switch to a scientific mode (often by rotating the phone to landscape). So why use a dedicated online scientific calculator?
+    </p>
+    <p>
+      First, visibility. A phone calculator screen is small, and the scientific function buttons are often tiny and crowded. This online calculator displays all buttons at a comfortable size with clear labels, making it easier to find and press the right function — especially on a desktop or laptop screen during homework or work.
+    </p>
+    <p>
+      Second, expression display. Most phone calculators show only one number at a time, without the full expression. This calculator displays the complete expression as you build it, so you can visually verify what you have entered before pressing equals. Seeing "sin(45) + cos(30)" on screen is far more reassuring than trusting a single intermediate number.
+    </p>
+    <p>
+      Third, keyboard support. When you are at a computer — writing a paper, coding, working on homework — it is significantly faster to use your keyboard to type numbers and operators than to switch to a phone app. This calculator accepts keyboard input for all basic operations.
+    </p>
+    <p>
+      Fourth, no installation or login required. This tool loads instantly in any web browser with no app store download, no account creation, and no ads interrupting your workflow. It works offline once loaded and is always available as a browser tab.
+    </p>
+
+    <h2>Tips for Complex Calculations</h2>
+    <p>
+      When working with complex expressions, break them into manageable parts. For example, to evaluate the quadratic formula (-b &plusmn; &radic;(b&sup2; - 4ac)) / 2a, first compute the discriminant b&sup2; - 4ac, then take the square root, and finally combine the pieces. Trying to enter the entire expression at once increases the chance of misplaced parentheses.
+    </p>
+    <p>
+      Use parentheses liberally. When in doubt, adding extra parentheses never hurts — it just makes your intent explicit. A common error is writing sin 45 + 30 and expecting sin(75). The calculator interprets this as sin(45) + 30 because the function only applies to the immediately following argument. Write sin(45 + 30) to get the correct result.
+    </p>
+    <p>
+      Double-check your angle mode. If you expect sin(90) to equal 1 but get 0.8940, you are likely in radian mode. 90 radians is not the same as 90 degrees. Look at the mode indicator at the top of the button grid and toggle as needed.
+    </p>
+    <p>
+      For repeated calculations with slightly different inputs, note down intermediate results and re-enter only the parts that change. Some students find it helpful to write the expression on paper first, then enter it carefully into the calculator.
+    </p>
+    <p>
+      Remember that floating-point arithmetic has inherent precision limits. A result like 0.30000000000000004 for 0.1 + 0.2 is a well-known floating-point quirk, not a calculator bug. For practical purposes, rounding to 10 or 12 significant digits eliminates these artifacts. This calculator displays up to 12 significant digits to keep results clean.
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>How do I switch between degrees and radians?</summary>
+        <p>
+          Click the DEG/RAD button in the bottom-left area of the calculator. When the indicator shows DEG, trigonometric functions interpret angles as degrees. When it shows RAD, they interpret angles as radians. One full circle is 360 degrees or 2&pi; radians.
+        </p>
+      </details>
+      <details class="faq-item">
+        <summary>What is the difference between log and ln?</summary>
+        <p>
+          The log button computes the common logarithm (base 10), so log(100) = 2. The ln button computes the natural logarithm (base e &asymp; 2.71828), so ln(e) = 1. Common logarithms are used in pH, decibels, and the Richter scale. Natural logarithms are used in calculus, growth models, and compound interest calculations.
+        </p>
+      </details>
+      <details class="faq-item">
+        <summary>Does this calculator follow PEMDAS order of operations?</summary>
+        <p>
+          Yes. The calculator evaluates expressions using standard mathematical order of operations: parentheses first, then exponents and functions, then multiplication and division left to right, and finally addition and subtraction left to right. Use parentheses to control evaluation order when needed.
+        </p>
+      </details>
+    </div>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/math-calculators/percentage-calculator/">Percentage Calculator</a> — Calculate percentages, increases, and decreases.</li>
+      <li><a href="/math-calculators/fraction-calculator/">Fraction Calculator</a> — Add, subtract, multiply, and divide fractions.</li>
+      <li><a href="/math-calculators/standard-deviation-calculator/">Standard Deviation Calculator</a> — Compute mean, variance, and standard deviation.</li>
+      <li><a href="/math-calculators/probability-calculator/">Probability Calculator</a> — Single event, multiple event, and conditional probability.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="scientific-bottom" format="horizontal" />
+  <RelatedArticles calculatorSlug="scientific-calculator" />
+
+  <RelatedCalculators currentSlug="scientific-calculator" />
+</BaseLayout>
+
+<style>
+  .sci-calc-wrapper {
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 16px;
+    background: #1e293b;
+    border-color: #334155;
+    border-radius: 16px;
+  }
+  .sci-display {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 8px;
+    text-align: right;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+  .sci-expression {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.9rem;
+    color: #94a3b8;
+    min-height: 1.4em;
+    word-break: break-all;
+    overflow-wrap: break-word;
+  }
+  .sci-result {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    line-height: 1.2;
+    word-break: break-all;
+    overflow-wrap: break-word;
+  }
+  .sci-mode-indicator {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #60a5fa;
+    padding: 0 4px 8px;
+    text-align: left;
+  }
+  .sci-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  .sci-btn {
+    min-height: 48px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.12s, transform 0.08s;
+    user-select: none;
+    -webkit-user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 4px;
+  }
+  .sci-btn:active { transform: scale(0.95); }
+  .sci-btn.num {
+    background: #334155;
+    color: #f1f5f9;
+  }
+  .sci-btn.num:hover { background: #475569; }
+  .sci-btn.op {
+    background: #475569;
+    color: #fbbf24;
+  }
+  .sci-btn.op:hover { background: #64748b; }
+  .sci-btn.fn {
+    background: #1e3a5f;
+    color: #93c5fd;
+  }
+  .sci-btn.fn:hover { background: #1e4d7b; }
+  .sci-btn.const {
+    background: #1e3a5f;
+    color: #a5b4fc;
+  }
+  .sci-btn.const:hover { background: #1e4d7b; }
+  .sci-btn.clear {
+    background: #991b1b;
+    color: #fecaca;
+  }
+  .sci-btn.clear:hover { background: #b91c1c; }
+  .sci-btn.equals {
+    grid-column: span 2;
+    background: var(--color-primary);
+    color: #fff;
+    font-size: 1.3rem;
+  }
+  .sci-btn.equals:hover { background: var(--color-primary-dark); }
+  /* Dark mode overrides - calculator is always dark */
+  [data-theme="dark"] .sci-calc-wrapper {
+    background: #0f172a;
+    border-color: #1e293b;
+  }
+  [data-theme="dark"] .sci-display {
+    background: #020617;
+    border-color: #1e293b;
+  }
+  [data-theme="dark"] .sci-btn.num { background: #1e293b; }
+  [data-theme="dark"] .sci-btn.num:hover { background: #334155; }
+  [data-theme="dark"] .sci-btn.op { background: #334155; }
+  [data-theme="dark"] .sci-btn.op:hover { background: #475569; }
+  [data-theme="dark"] .sci-btn.fn { background: #172554; }
+  [data-theme="dark"] .sci-btn.fn:hover { background: #1e3a5f; }
+  [data-theme="dark"] .sci-btn.const { background: #172554; }
+  [data-theme="dark"] .sci-btn.const:hover { background: #1e3a5f; }
+  @media (max-width: 640px) {
+    .sci-calc-wrapper { max-width: 100%; }
+    .sci-result { font-size: 1.6rem; }
+    .sci-btn { min-height: 50px; font-size: 0.9rem; }
+    .sci-buttons { gap: 6px; }
+  }
+  .last-updated { font-size: 0.75rem; color: var(--color-text-muted); margin: 4px 0 0; }
+</style>
+
+<script>
+  // ── Scientific Calculator Logic (No eval) ──
+  const expressionEl = document.getElementById('sciExpression') as HTMLDivElement;
+  const resultEl = document.getElementById('sciResult') as HTMLDivElement;
+  const modeIndicator = document.getElementById('modeIndicator') as HTMLDivElement;
+  const modeBtn = document.getElementById('btnMode') as HTMLButtonElement;
+
+  let expression = '';
+  let lastResult = '';
+  let useDegrees = true;
+  let justEvaluated = false;
+
+  // ── Tokenizer ──
+  type Token = { type: 'number'; value: number } | { type: 'op'; value: string } | { type: 'func'; value: string } | { type: 'lparen' } | { type: 'rparen' };
+
+  function tokenize(expr: string): Token[] {
+    const tokens: Token[] = [];
+    let i = 0;
+    while (i < expr.length) {
+      const ch = expr[i];
+      if (ch === ' ') { i++; continue; }
+
+      // Numbers (including decimals)
+      if (/[0-9.]/.test(ch)) {
+        let num = '';
+        while (i < expr.length && /[0-9.]/.test(expr[i])) {
+          num += expr[i]; i++;
+        }
+        tokens.push({ type: 'number', value: parseFloat(num) });
+        continue;
+      }
+
+      // Named functions and constants
+      if (/[a-z]/i.test(ch)) {
+        let name = '';
+        while (i < expr.length && /[a-z]/i.test(expr[i])) {
+          name += expr[i]; i++;
+        }
+        if (name === 'pi') {
+          tokens.push({ type: 'number', value: Math.PI });
+        } else if (name === 'e' && (i >= expr.length || !/[a-z]/i.test(expr[i]))) {
+          tokens.push({ type: 'number', value: Math.E });
+        } else {
+          tokens.push({ type: 'func', value: name });
+        }
+        continue;
+      }
+
+      if (ch === '(') { tokens.push({ type: 'lparen' }); i++; continue; }
+      if (ch === ')') { tokens.push({ type: 'rparen' }); i++; continue; }
+
+      // Handle unary minus
+      if (ch === '-' || ch === '\u2212') {
+        const prev = tokens[tokens.length - 1];
+        if (!prev || prev.type === 'op' || prev.type === 'lparen' || prev.type === 'func') {
+          // Unary minus: read the number that follows
+          i++;
+          if (i < expr.length && /[0-9.]/.test(expr[i])) {
+            let num = '';
+            while (i < expr.length && /[0-9.]/.test(expr[i])) {
+              num += expr[i]; i++;
+            }
+            tokens.push({ type: 'number', value: -parseFloat(num) });
+          } else if (i < expr.length && expr[i] === '(') {
+            // -(expr): push -1 * (
+            tokens.push({ type: 'number', value: -1 });
+            tokens.push({ type: 'op', value: '*' });
+          } else if (i < expr.length && /[a-z]/i.test(expr[i])) {
+            // -func(...): push -1 *
+            tokens.push({ type: 'number', value: -1 });
+            tokens.push({ type: 'op', value: '*' });
+          } else {
+            tokens.push({ type: 'number', value: 0 });
+          }
+          continue;
+        }
+        tokens.push({ type: 'op', value: '-' });
+        i++; continue;
+      }
+
+      if ('+-*/^%'.includes(ch)) {
+        tokens.push({ type: 'op', value: ch });
+        i++; continue;
+      }
+
+      // Skip unknown chars
+      i++;
+    }
+    return tokens;
+  }
+
+  // ── Recursive Descent Parser (PEMDAS) ──
+  let pos = 0;
+  let tokenList: Token[] = [];
+
+  function parseExpression(): number {
+    let left = parseTerm();
+    while (pos < tokenList.length && tokenList[pos].type === 'op' && (tokenList[pos].value === '+' || tokenList[pos].value === '-')) {
+      const op = tokenList[pos].value; pos++;
+      const right = parseTerm();
+      left = op === '+' ? left + right : left - right;
+    }
+    return left;
+  }
+
+  function parseTerm(): number {
+    let left = parsePower();
+    while (pos < tokenList.length && tokenList[pos].type === 'op' && (tokenList[pos].value === '*' || tokenList[pos].value === '/' || tokenList[pos].value === '%')) {
+      const op = tokenList[pos].value; pos++;
+      const right = parsePower();
+      if (op === '*') left *= right;
+      else if (op === '/') {
+        if (right === 0) throw new Error('Division by zero');
+        left /= right;
+      } else { left = left % right; }
+    }
+    return left;
+  }
+
+  function parsePower(): number {
+    let base = parseUnary();
+    if (pos < tokenList.length && tokenList[pos].type === 'op' && tokenList[pos].value === '^') {
+      pos++;
+      const exp = parsePower(); // Right-associative
+      base = Math.pow(base, exp);
+    }
+    return base;
+  }
+
+  function parseUnary(): number {
+    if (pos < tokenList.length && tokenList[pos].type === 'op' && tokenList[pos].value === '-') {
+      pos++;
+      return -parseUnary();
+    }
+    if (pos < tokenList.length && tokenList[pos].type === 'op' && tokenList[pos].value === '+') {
+      pos++;
+      return parseUnary();
+    }
+    return parseAtom();
+  }
+
+  function factorial(n: number): number {
+    if (n < 0) throw new Error('Factorial of negative');
+    if (n !== Math.floor(n)) throw new Error('Factorial of non-integer');
+    if (n > 170) return Infinity;
+    let result = 1;
+    for (let i = 2; i <= n; i++) result *= i;
+    return result;
+  }
+
+  function toRadians(val: number): number {
+    return useDegrees ? val * Math.PI / 180 : val;
+  }
+
+  function parseAtom(): number {
+    const token = tokenList[pos];
+    if (!token) throw new Error('Unexpected end of expression');
+
+    // Function call
+    if (token.type === 'func') {
+      const fname = token.value;
+      pos++;
+      // Expect opening paren
+      if (pos < tokenList.length && tokenList[pos].type === 'lparen') {
+        pos++;
+        const arg = parseExpression();
+        if (pos < tokenList.length && tokenList[pos].type === 'rparen') pos++;
+        return applyFunc(fname, arg);
+      }
+      // No paren — try to apply to next atom
+      const arg = parseAtom();
+      return applyFunc(fname, arg);
+    }
+
+    // Parenthesised group
+    if (token.type === 'lparen') {
+      pos++;
+      const val = parseExpression();
+      if (pos < tokenList.length && tokenList[pos].type === 'rparen') pos++;
+      return val;
+    }
+
+    // Number
+    if (token.type === 'number') {
+      pos++;
+      return token.value;
+    }
+
+    throw new Error('Unexpected token');
+  }
+
+  function applyFunc(name: string, arg: number): number {
+    switch (name) {
+      case 'sin': return Math.sin(toRadians(arg));
+      case 'cos': return Math.cos(toRadians(arg));
+      case 'tan': return Math.tan(toRadians(arg));
+      case 'log': return Math.log10(arg);
+      case 'ln': return Math.log(arg);
+      case 'sqrt': return Math.sqrt(arg);
+      case 'abs': return Math.abs(arg);
+      case 'factorial': return factorial(arg);
+      default: throw new Error('Unknown function: ' + name);
+    }
+  }
+
+  function evaluate(expr: string): string {
+    try {
+      tokenList = tokenize(expr);
+      if (tokenList.length === 0) return '0';
+      pos = 0;
+      const result = parseExpression();
+      if (!isFinite(result)) return result === Infinity ? 'Infinity' : result === -Infinity ? '-Infinity' : 'Error';
+      // Format: up to 12 significant digits, strip trailing zeros
+      const formatted = parseFloat(result.toPrecision(12)).toString();
+      return formatted;
+    } catch {
+      return 'Error';
+    }
+  }
+
+  // ── Display Update ──
+  function updateDisplay() {
+    expressionEl.textContent = expression || '\u00A0';
+    if (expression) {
+      // Live evaluation preview
+      const preview = evaluate(expression);
+      if (preview !== 'Error') {
+        resultEl.textContent = preview;
+      }
+    }
+  }
+
+  function showResult(val: string) {
+    resultEl.textContent = val;
+  }
+
+  // ── Button Handlers ──
+  function handleAction(action: string) {
+    if (justEvaluated && /^[0-9.]$/.test(action)) {
+      expression = '';
+      justEvaluated = false;
+    }
+    if (justEvaluated && !'+-*/^%'.includes(action) && action !== '(' && action !== ')') {
+      if (!['backspace', 'clear', 'toggleMode'].includes(action)) {
+        // For functions after evaluation, use last result as start
+        if (['sin', 'cos', 'tan', 'log', 'ln', 'sqrt', 'factorial', 'reciprocal', 'square', 'negate', 'power'].includes(action)) {
+          // Keep expression or use result
+        } else {
+          expression = '';
+        }
+      }
+      justEvaluated = false;
+    }
+
+    switch (action) {
+      case '0': case '1': case '2': case '3': case '4':
+      case '5': case '6': case '7': case '8': case '9':
+        expression += action;
+        break;
+      case '.':
+        expression += '.';
+        break;
+      case '+': case '-': case '*': case '/':
+        expression += action;
+        break;
+      case '%':
+        expression += '%';
+        break;
+      case '(':
+        expression += '(';
+        break;
+      case ')':
+        expression += ')';
+        break;
+      case 'pi':
+        expression += 'pi';
+        break;
+      case 'e':
+        expression += 'e';
+        break;
+      case 'sin':
+        expression += 'sin(';
+        break;
+      case 'cos':
+        expression += 'cos(';
+        break;
+      case 'tan':
+        expression += 'tan(';
+        break;
+      case 'log':
+        expression += 'log(';
+        break;
+      case 'ln':
+        expression += 'ln(';
+        break;
+      case 'sqrt':
+        expression += 'sqrt(';
+        break;
+      case 'square':
+        expression += '^2';
+        break;
+      case 'power':
+        expression += '^';
+        break;
+      case 'factorial':
+        expression += 'factorial(';
+        break;
+      case 'reciprocal':
+        expression = '1/(' + expression + ')';
+        break;
+      case 'negate':
+        if (expression && expression !== '0') {
+          if (expression.startsWith('-')) {
+            expression = expression.slice(1);
+          } else {
+            expression = '-' + expression;
+          }
+        }
+        break;
+      case 'backspace':
+        expression = expression.slice(0, -1);
+        break;
+      case 'clear':
+        expression = '';
+        lastResult = '';
+        resultEl.textContent = '0';
+        expressionEl.textContent = '\u00A0';
+        return;
+      case 'toggleMode':
+        useDegrees = !useDegrees;
+        modeIndicator.textContent = useDegrees ? 'DEG' : 'RAD';
+        modeBtn.textContent = useDegrees ? 'DEG' : 'RAD';
+        // Re-evaluate if there is an expression
+        if (expression) updateDisplay();
+        return;
+      case 'equals': {
+        const result = evaluate(expression);
+        expressionEl.textContent = expression;
+        showResult(result);
+        if (result !== 'Error') {
+          lastResult = result;
+          expression = result;
+        }
+        justEvaluated = true;
+        return;
+      }
+      default:
+        break;
+    }
+    updateDisplay();
+  }
+
+  // ── Button Click Listeners ──
+  document.querySelectorAll('.sci-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const action = (btn as HTMLElement).dataset.action;
+      if (action) handleAction(action);
+    });
+  });
+
+  // ── Keyboard Support ──
+  document.addEventListener('keydown', (e: KeyboardEvent) => {
+    // Only handle if not focused on an input/textarea
+    const tag = (e.target as HTMLElement).tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+
+    const key = e.key;
+
+    if (/^[0-9]$/.test(key)) { handleAction(key); e.preventDefault(); return; }
+    if (key === '.') { handleAction('.'); e.preventDefault(); return; }
+    if (key === '+') { handleAction('+'); e.preventDefault(); return; }
+    if (key === '-') { handleAction('-'); e.preventDefault(); return; }
+    if (key === '*') { handleAction('*'); e.preventDefault(); return; }
+    if (key === '/') { handleAction('/'); e.preventDefault(); return; }
+    if (key === '%') { handleAction('%'); e.preventDefault(); return; }
+    if (key === '(') { handleAction('('); e.preventDefault(); return; }
+    if (key === ')') { handleAction(')'); e.preventDefault(); return; }
+    if (key === '^') { handleAction('power'); e.preventDefault(); return; }
+    if (key === 'Enter') { handleAction('equals'); e.preventDefault(); return; }
+    if (key === 'Backspace') { handleAction('backspace'); e.preventDefault(); return; }
+    if (key === 'Escape') { handleAction('clear'); e.preventDefault(); return; }
+    if (key === 'Delete') { handleAction('clear'); e.preventDefault(); return; }
+  });
+</script>

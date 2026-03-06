@@ -156,6 +156,52 @@ export const blogArticles: BlogArticle[] = [
     category: 'Health',
     relatedCalculatorSlugs: ['sleep-calculator', 'age-calculator'],
   },
+  // Sprint 6 articles
+  {
+    title: 'How Much Protein Do You Really Need?',
+    slug: 'how-much-protein-do-you-need',
+    description: 'Calculate your daily protein needs based on body weight, activity level, and goals. Covers RDA guidelines, athlete needs, and high-protein food sources.',
+    datePublished: '2026-03-05',
+    dateModified: '2026-03-05',
+    category: 'Health',
+    relatedCalculatorSlugs: ['protein-intake-calculator', 'macro-calculator', 'calorie-calculator', 'tdee-calculator'],
+  },
+  {
+    title: 'Car Lease vs Buy: Which Saves You More Money?',
+    slug: 'car-lease-vs-buy',
+    description: 'Compare the true costs of leasing vs buying a car over 3-6 years. Includes monthly payments, total cost of ownership, and when each option makes sense.',
+    datePublished: '2026-03-05',
+    dateModified: '2026-03-05',
+    category: 'Finance',
+    relatedCalculatorSlugs: ['car-lease-calculator', 'auto-loan-calculator', 'roi-calculator'],
+  },
+  {
+    title: 'Tax Season Checklist: Deductions You Might Be Missing',
+    slug: 'tax-season-checklist',
+    description: 'A complete tax preparation checklist covering commonly missed deductions, credits, and documents you need to maximize your refund.',
+    datePublished: '2026-03-05',
+    dateModified: '2026-03-05',
+    category: 'Finance',
+    relatedCalculatorSlugs: ['tax-calculator', 'take-home-pay-calculator', 'paycheck-calculator'],
+  },
+  {
+    title: 'How to Calculate and Build Deck Stairs',
+    slug: 'how-to-build-deck-stairs',
+    description: 'Step-by-step guide to calculating stair rise, run, and stringer dimensions for deck stairs. Includes building code requirements and material estimates.',
+    datePublished: '2026-03-05',
+    dateModified: '2026-03-05',
+    category: 'Construction',
+    relatedCalculatorSlugs: ['stair-calculator', 'square-footage-calculator', 'concrete-calculator'],
+  },
+  {
+    title: 'How BAC Works: What Every Adult Should Know',
+    slug: 'bac-and-alcohol-guide',
+    description: 'Understand blood alcohol concentration (BAC), how your body processes alcohol, factors that affect BAC levels, and legal limits by state.',
+    datePublished: '2026-03-05',
+    dateModified: '2026-03-05',
+    category: 'Health',
+    relatedCalculatorSlugs: ['bac-calculator', 'bmi-calculator'],
+  },
 ];
 
 export function getArticlesForCalculator(calculatorSlug: string): BlogArticle[] {

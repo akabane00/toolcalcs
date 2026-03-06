@@ -1,0 +1,467 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Health Calculators", "item": "https://toolcalcs.com/health-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Protein Intake Calculator" },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How much protein do I need per day?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The recommended dietary allowance (RDA) for protein is 0.36 grams per pound of body weight (0.8g per kg), which is the minimum to prevent deficiency. However, most active adults benefit from 0.5-1.0g per pound depending on activity level and goals. Athletes and those building muscle may need up to 1.0-1.2g per pound.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "Can you eat too much protein?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "For most healthy adults, eating up to 1.0-1.2g of protein per pound of body weight is safe. Very high protein intakes (above 1.5g per pound) over long periods may stress the kidneys in people with pre-existing kidney conditions. Healthy individuals with normal kidney function can generally tolerate higher intakes without issues, but there is no proven benefit beyond 1.2g per pound for muscle building.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "Is it better to spread protein intake across meals or eat it all at once?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Research shows that distributing protein evenly across 3-4 meals per day (20-40g per meal) optimizes muscle protein synthesis better than consuming most of your protein in one large meal. Aim for at least 20g of protein per meal to trigger the muscle-building response, and include protein in every eating occasion throughout the day.",
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Protein Intake Calculator - Daily Protein Needs | ToolCalcs"
+  description="Calculate your daily protein needs based on body weight, activity level, and fitness goals. Get a per-meal breakdown and calorie estimate."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/health-calculators/">Health Calculators</a> &rsaquo;
+    <span>Protein Intake Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Protein Intake Calculator</h1>
+  <p class="page-desc">Calculate your daily protein needs based on body weight, activity level, and fitness goals.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="weight">Body Weight</label>
+        <div class="input-with-toggle">
+          <input type="number" id="weight" value="160" min="50" max="500" step="1" />
+          <div class="unit-toggle">
+            <button type="button" class="unit-btn active" data-unit="lb">lb</button>
+            <button type="button" class="unit-btn" data-unit="kg">kg</button>
+          </div>
+        </div>
+      </div>
+      <div class="input-group">
+        <label for="age">Age</label>
+        <input type="number" id="age" value="30" min="13" max="120" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="gender">Gender</label>
+        <select id="gender">
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="activity">Activity Level</label>
+        <select id="activity">
+          <option value="sedentary">Sedentary</option>
+          <option value="lightly" selected>Lightly Active</option>
+          <option value="moderately">Moderately Active</option>
+          <option value="very">Very Active</option>
+          <option value="extremely">Extremely Active</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="goal">Goal</label>
+        <select id="goal">
+          <option value="maintenance" selected>Maintenance</option>
+          <option value="muscle">Muscle Gain</option>
+          <option value="weightloss">Weight Loss</option>
+          <option value="health">General Health</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="calc-results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Daily Protein</span>
+          <span class="result-value" id="dailyProtein">80g</span>
+          <span class="result-sub" id="proteinPerLb">0.50 g/lb</span>
+        </div>
+        <div class="result-card meal-card">
+          <span class="result-label">Per Meal (3 meals)</span>
+          <span class="result-value" id="perMeal">27g</span>
+        </div>
+        <div class="result-card snack-card">
+          <span class="result-label">Snack</span>
+          <span class="result-value" id="snackProtein">0g</span>
+          <span class="result-sub">Remaining after 3 meals</span>
+        </div>
+        <div class="result-card cal-card">
+          <span class="result-label">Calories from Protein</span>
+          <span class="result-value" id="proteinCals">320</span>
+          <span class="result-sub">4 calories per gram</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calculator-top" format="rectangle" />
+
+  <article class="content-section">
+    <h2>What Is Protein?</h2>
+    <p>
+      Protein is one of the three macronutrients essential for human life, alongside carbohydrates and fat. It is composed of amino acids, which are the building blocks your body uses to construct and repair tissues, produce enzymes and hormones, support immune function, and maintain healthy skin, hair, and nails. Of the 20 amino acids that make up protein, nine are considered "essential" because your body cannot manufacture them on its own — they must come from food.
+    </p>
+    <p>
+      When you eat protein-rich foods like chicken, fish, eggs, beans, or tofu, your digestive system breaks the protein down into individual amino acids. Those amino acids then enter your bloodstream and are reassembled by your cells into the specific proteins your body needs — from the structural collagen in your joints to the hemoglobin that carries oxygen in your blood.
+    </p>
+    <p>
+      Unlike fat, your body has no dedicated protein storage depot. That means you need a steady daily intake to keep all of your protein-dependent systems running smoothly. If you consistently eat less protein than your body requires, you may experience muscle loss, fatigue, weakened immunity, and slower recovery from exercise or injury.
+    </p>
+
+    <h2>Why Protein Matters</h2>
+    <p>
+      Protein is involved in virtually every biological process in the human body. Understanding why protein matters can help you prioritize it in your daily diet and make better food choices.
+    </p>
+    <ul>
+      <li><strong>Muscle building and repair:</strong> Protein provides the amino acids necessary to repair muscle fibers damaged during exercise and to build new muscle tissue. This is why protein needs increase with physical activity, especially resistance training.</li>
+      <li><strong>Weight management:</strong> Protein is the most satiating macronutrient, meaning it keeps you feeling full longer than carbohydrates or fat. Studies consistently show that higher-protein diets reduce overall calorie intake by curbing hunger and cravings. Protein also has a higher thermic effect — your body burns roughly 20-30% of protein calories during digestion, compared to 5-10% for carbs and 0-3% for fat.</li>
+      <li><strong>Bone health:</strong> Contrary to outdated myths, adequate protein intake supports bone density and reduces fracture risk, particularly in older adults. Protein works alongside calcium and vitamin D to maintain skeletal strength.</li>
+      <li><strong>Immune function:</strong> Antibodies are proteins. Your immune system relies on adequate protein intake to produce the immunoglobulins and cytokines needed to fight infections and disease.</li>
+      <li><strong>Hormone production:</strong> Many hormones, including insulin and growth hormone, are proteins or peptides. Insufficient protein can disrupt hormonal balance and affect metabolism, mood, and energy levels.</li>
+      <li><strong>Healthy aging:</strong> Older adults face accelerated muscle loss (sarcopenia) if protein intake is inadequate. Research suggests that adults over 65 should aim for higher protein intakes — at least 0.5-0.7g per pound — to preserve muscle mass, maintain independence, and reduce fall risk.</li>
+    </ul>
+
+    <h2>How Much Protein Do You Need?</h2>
+    <p>
+      The Recommended Dietary Allowance (RDA) for protein is 0.36 grams per pound of body weight (0.8 grams per kilogram). This is the minimum amount required to prevent deficiency in sedentary adults, not the optimal amount for health, performance, or body composition. For a 160-pound person, the RDA works out to roughly 58 grams per day.
+    </p>
+    <p>
+      Most nutrition researchers and sports scientists agree that the RDA is too low for anyone who exercises regularly, wants to build or maintain muscle, or is trying to lose weight. Here is how protein needs scale with activity:
+    </p>
+    <div class="formula-box">
+      <code>Daily Protein (g) = Body Weight (lb) &times; Activity Factor + Goal Adjustment</code>
+    </div>
+    <ul>
+      <li><strong>Sedentary (minimal exercise):</strong> 0.36g per pound — the RDA baseline.</li>
+      <li><strong>Lightly active (1-3 days/week):</strong> 0.5g per pound — covers light recreational exercise.</li>
+      <li><strong>Moderately active (3-5 days/week):</strong> 0.7g per pound — supports regular gym workouts or sports.</li>
+      <li><strong>Very active (6-7 days/week, intense):</strong> 0.9g per pound — for serious athletes and heavy training.</li>
+      <li><strong>Extremely active (twice daily / physical job):</strong> 1.0g per pound — for competitive athletes, manual laborers, or very high volume training.</li>
+    </ul>
+    <p>
+      On top of the activity factor, your goal matters. If your goal is muscle gain, add an extra 0.2g per pound to fuel muscle protein synthesis. For weight loss, add 0.1g per pound to help preserve lean mass during a calorie deficit. General health and maintenance use the base activity factor without any addition.
+    </p>
+
+    <h2>Protein for Different Goals</h2>
+    <h3>Muscle Gain</h3>
+    <p>
+      Building muscle requires a calorie surplus and ample protein. Most research supports consuming 0.7-1.0g of protein per pound of body weight to maximize muscle protein synthesis. Timing also matters: spreading protein across 4-5 eating occasions and consuming 20-40g within two hours after resistance training can enhance results. Our calculator adds 0.2g per pound to your activity-based rate when you select the muscle gain goal.
+    </p>
+
+    <h3>Weight Loss</h3>
+    <p>
+      During a calorie deficit, the body is at risk of breaking down muscle tissue for energy. Higher protein intake — around 0.6-1.0g per pound — helps preserve lean mass while you lose fat. The increased satiety from protein also makes it easier to stick to your calorie target without feeling deprived. The calculator adds 0.1g per pound for the weight loss goal to provide extra muscle-sparing protection.
+    </p>
+
+    <h3>General Health and Maintenance</h3>
+    <p>
+      If you are not actively trying to change your body composition, your protein needs are determined primarily by your activity level. For most moderately active adults, 0.5-0.7g per pound is sufficient to maintain muscle mass, support recovery, and keep your immune system and hormones functioning well.
+    </p>
+
+    <h3>Older Adults</h3>
+    <p>
+      Adults over 50 have a reduced ability to stimulate muscle protein synthesis, a condition sometimes called "anabolic resistance." The International Society of Sports Nutrition recommends that older adults consume at least 0.5-0.7g of protein per pound to counteract age-related muscle loss. Pairing higher protein with resistance exercise produces the best outcomes for maintaining strength and mobility.
+    </p>
+
+    <h2>Best Protein Sources</h2>
+    <p>
+      Not all protein sources are created equal. "Complete" proteins contain all nine essential amino acids in adequate proportions. Most animal proteins are complete, while many plant proteins are incomplete but can be combined throughout the day to cover all amino acids. Here are some of the best protein sources ranked by protein content per serving:
+    </p>
+
+    <div class="table-container">
+      <table class="info-table protein-table">
+        <thead>
+          <tr>
+            <th>Food</th>
+            <th>Serving Size</th>
+            <th>Protein (g)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Chicken breast (cooked)</td><td>6 oz (170g)</td><td>54g</td></tr>
+          <tr><td>Ground turkey (93% lean)</td><td>6 oz (170g)</td><td>48g</td></tr>
+          <tr><td>Salmon (cooked)</td><td>6 oz (170g)</td><td>40g</td></tr>
+          <tr><td>Lean ground beef (90%)</td><td>6 oz (170g)</td><td>46g</td></tr>
+          <tr><td>Sirloin steak (cooked)</td><td>6 oz (170g)</td><td>52g</td></tr>
+          <tr><td>Tuna (canned, drained)</td><td>5 oz (142g)</td><td>36g</td></tr>
+          <tr><td>Shrimp (cooked)</td><td>6 oz (170g)</td><td>36g</td></tr>
+          <tr><td>Eggs (whole)</td><td>3 large</td><td>18g</td></tr>
+          <tr><td>Egg whites</td><td>1 cup (243g)</td><td>26g</td></tr>
+          <tr><td>Greek yogurt (plain, nonfat)</td><td>1 cup (245g)</td><td>20g</td></tr>
+          <tr><td>Cottage cheese (low-fat)</td><td>1 cup (226g)</td><td>28g</td></tr>
+          <tr><td>Whey protein powder</td><td>1 scoop (30g)</td><td>24g</td></tr>
+          <tr><td>Tofu (firm)</td><td>1/2 block (200g)</td><td>20g</td></tr>
+          <tr><td>Lentils (cooked)</td><td>1 cup (198g)</td><td>18g</td></tr>
+          <tr><td>Black beans (cooked)</td><td>1 cup (172g)</td><td>15g</td></tr>
+          <tr><td>Chickpeas (cooked)</td><td>1 cup (164g)</td><td>15g</td></tr>
+          <tr><td>Edamame (shelled)</td><td>1 cup (155g)</td><td>18g</td></tr>
+          <tr><td>Peanut butter</td><td>2 tbsp (32g)</td><td>8g</td></tr>
+          <tr><td>Almonds</td><td>1 oz (28g)</td><td>6g</td></tr>
+          <tr><td>Milk (1%)</td><td>1 cup (244ml)</td><td>8g</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Plant-Based Protein</h2>
+    <p>
+      Meeting your protein needs on a vegetarian or vegan diet is entirely achievable, but it requires more intentional food choices. Most individual plant foods are "incomplete" proteins, meaning they are low in one or more essential amino acids. However, you do not need to combine complementary proteins in every single meal — eating a variety of plant proteins throughout the day will cover all your amino acid needs.
+    </p>
+    <p>
+      Some of the best plant-based protein sources include:
+    </p>
+    <ul>
+      <li><strong>Soy products:</strong> Tofu, tempeh, and edamame are among the few plant foods that provide complete protein. A half-block of firm tofu delivers about 20g of protein.</li>
+      <li><strong>Legumes:</strong> Lentils, chickpeas, black beans, and kidney beans are excellent sources, providing 15-18g of protein per cooked cup along with fiber and micronutrients.</li>
+      <li><strong>Seitan:</strong> Made from wheat gluten, seitan provides approximately 25g of protein per 3.5 oz serving, making it one of the most protein-dense plant foods available.</li>
+      <li><strong>Quinoa:</strong> One of the few grains that is a complete protein, with about 8g per cooked cup.</li>
+      <li><strong>Nuts and seeds:</strong> Hemp seeds, pumpkin seeds, almonds, and peanuts contribute meaningful protein alongside healthy fats. Hemp seeds offer about 10g per 3-tablespoon serving.</li>
+      <li><strong>Plant protein powders:</strong> Pea protein, rice protein, and soy protein isolate offer 20-25g per scoop and can help vegans hit their daily targets conveniently.</li>
+    </ul>
+    <p>
+      Vegans and vegetarians may want to aim for the higher end of the protein range for their activity level, as plant proteins are generally less digestible than animal proteins (around 80-90% vs 95-99% digestibility). Adding 10-15% more total protein can compensate for this difference.
+    </p>
+
+    <h2>Common Protein Myths</h2>
+    <p>
+      Protein is surrounded by misconceptions that can lead to confusion about how much to eat and what sources to choose. Here are the most common myths debunked:
+    </p>
+    <ul>
+      <li><strong>Myth: High protein damages your kidneys.</strong> In healthy individuals with normal kidney function, there is no evidence that high-protein diets (up to 1.0-1.2g per pound) cause kidney damage. This concern applies only to people with pre-existing kidney disease, who should follow their doctor's guidance.</li>
+      <li><strong>Myth: You can only absorb 30g of protein per meal.</strong> Your body can absorb far more than 30g of protein in a single sitting. The 30g figure relates to the amount that maximally stimulates muscle protein synthesis in one meal, not the total amount your body can process. Excess protein is still used for other bodily functions, not wasted.</li>
+      <li><strong>Myth: Plant protein is inferior to animal protein.</strong> While individual plant proteins may be lower in certain amino acids, a varied plant-based diet easily provides all essential amino acids. Soy protein, in particular, has been shown to be as effective as whey for muscle building when consumed in adequate amounts.</li>
+      <li><strong>Myth: You need protein immediately after a workout.</strong> While post-workout protein is beneficial, the "anabolic window" is much wider than the 30-minute myth suggests. Research shows that total daily protein intake matters far more than precise meal timing. As long as you eat protein within a few hours of training, you will not miss out on gains.</li>
+      <li><strong>Myth: More protein always means more muscle.</strong> There is a ceiling to how much protein your muscles can use for growth. Beyond approximately 0.7-1.0g per pound (for most people), additional protein does not further increase muscle protein synthesis. The excess is simply used for energy or other metabolic processes.</li>
+    </ul>
+
+    <h2>Tips to Increase Protein Intake</h2>
+    <p>
+      If you have calculated your protein target and realize you are falling short, here are practical strategies to boost your daily intake without overhauling your entire diet:
+    </p>
+    <ul>
+      <li><strong>Prioritize protein at every meal:</strong> Build each meal around a protein source first, then add carbohydrates and fats. Aim for at least 20-30g of protein per meal.</li>
+      <li><strong>Start the day with protein:</strong> Swap cereal or toast for eggs, Greek yogurt, or a protein smoothie. A high-protein breakfast reduces cravings later in the day.</li>
+      <li><strong>Choose protein-rich snacks:</strong> Replace chips and crackers with jerky, cottage cheese, hard-boiled eggs, edamame, or a handful of almonds.</li>
+      <li><strong>Add protein powder strategically:</strong> A scoop of whey or plant protein in a smoothie, oatmeal, or pancake batter adds 20-25g effortlessly.</li>
+      <li><strong>Use the "protein swap" technique:</strong> Replace lower-protein ingredients with higher-protein alternatives. Swap regular yogurt for Greek yogurt (double the protein), use lentil pasta instead of regular pasta, or choose cottage cheese over cream cheese.</li>
+      <li><strong>Batch prep protein sources:</strong> Cook large batches of chicken, ground turkey, or beans at the start of the week so you always have protein ready to add to any meal.</li>
+      <li><strong>Track your intake for a week:</strong> Use a food tracking app to identify gaps in your protein intake. Many people discover they eat most of their protein at dinner and very little at breakfast or lunch — redistributing protein more evenly can improve results.</li>
+      <li><strong>Do not forget dairy:</strong> Milk, cheese, and yogurt are convenient protein sources that also provide calcium. A glass of milk with dinner adds 8g, and an ounce of cheese adds 7g.</li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>How much protein do I need per day?</summary>
+        <p>
+          The RDA minimum is 0.36g per pound of body weight (0.8g/kg), but most active adults benefit from 0.5-1.0g per pound depending on their exercise habits and goals. Athletes and those building muscle should aim for the higher end of that range. Use the calculator above for a personalized recommendation.
+        </p>
+      </details>
+      <details class="faq-item">
+        <summary>Can you eat too much protein?</summary>
+        <p>
+          For healthy individuals, protein intakes up to 1.0-1.2g per pound of body weight are safe and well-studied. Very high intakes above 1.5g per pound offer no additional muscle-building benefit and may be unnecessary. Those with kidney disease should consult their doctor before increasing protein intake.
+        </p>
+      </details>
+      <details class="faq-item">
+        <summary>Is it better to spread protein across meals or eat it all at once?</summary>
+        <p>
+          Distributing protein evenly across 3-4 meals (20-40g per meal) is more effective for muscle protein synthesis than loading all your protein into a single meal. Your body can use protein from large meals, but the muscle-building signal is optimized when you hit the 20-40g threshold multiple times per day.
+        </p>
+      </details>
+    </div>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/health-calculators/macro-calculator/">Macro Calculator</a> — Calculate your daily protein, carbs, and fat targets.</li>
+      <li><a href="/health-calculators/calorie-calculator/">Calorie Calculator</a> — Find your daily calorie needs.</li>
+      <li><a href="/health-calculators/tdee-calculator/">TDEE Calculator</a> — Determine your Total Daily Energy Expenditure.</li>
+      <li><a href="/health-calculators/body-fat-calculator/">Body Fat Calculator</a> — Estimate your body fat percentage.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calculator-bottom" format="horizontal" />
+  <RelatedArticles calculatorSlug="protein-intake-calculator" />
+
+  <RelatedCalculators currentSlug="protein-intake-calculator" />
+</BaseLayout>
+
+<style>
+  .input-with-toggle {
+    display: flex;
+    gap: 0;
+  }
+  .input-with-toggle input {
+    flex: 1;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-right: none;
+    border-radius: var(--radius) 0 0 var(--radius);
+    font-size: 1rem;
+    background: var(--color-bg);
+    color: var(--color-text);
+  }
+  .input-with-toggle input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+  .unit-toggle {
+    display: flex;
+  }
+  .unit-btn {
+    padding: 10px 14px;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg);
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .unit-btn:first-child {
+    border-left: none;
+  }
+  .unit-btn:last-child {
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+  .unit-btn.active {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+  }
+  .meal-card { border-left: 3px solid #f59e0b; }
+  .snack-card { border-left: 3px solid #8b5cf6; }
+  .cal-card { border-left: 3px solid #10b981; }
+  .result-sub {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+  }
+  .protein-table {
+    max-width: 600px;
+  }
+  .last-updated { font-size: 0.75rem; color: var(--color-text-muted); margin: 4px 0 0; }
+</style>
+
+<script>
+  const weightEl = document.getElementById('weight') as HTMLInputElement;
+  const ageEl = document.getElementById('age') as HTMLInputElement;
+  const genderEl = document.getElementById('gender') as HTMLSelectElement;
+  const activityEl = document.getElementById('activity') as HTMLSelectElement;
+  const goalEl = document.getElementById('goal') as HTMLSelectElement;
+  const unitBtns = document.querySelectorAll('.unit-btn');
+
+  let currentUnit: 'lb' | 'kg' = 'lb';
+
+  // Activity factors in g per lb
+  const activityFactors: Record<string, number> = {
+    sedentary: 0.36,
+    lightly: 0.5,
+    moderately: 0.7,
+    very: 0.9,
+    extremely: 1.0,
+  };
+
+  // Goal adjustments in g per lb
+  const goalAdjustments: Record<string, number> = {
+    maintenance: 0,
+    muscle: 0.2,
+    weightloss: 0.1,
+    health: 0,
+  };
+
+  function getWeightInLb(): number {
+    const raw = parseFloat(weightEl.value) || 0;
+    return currentUnit === 'kg' ? raw * 2.20462 : raw;
+  }
+
+  function calculate() {
+    const weightLb = getWeightInLb();
+    const baseFactor = activityFactors[activityEl.value] || 0.5;
+    const goalAdj = goalAdjustments[goalEl.value] || 0;
+    const gPerLb = baseFactor + goalAdj;
+    const dailyProtein = Math.round(weightLb * gPerLb);
+
+    // Per-meal breakdown: 3 meals get equal share, remainder goes to snack
+    const perMeal = Math.round((dailyProtein * 0.3));
+    const snack = dailyProtein - (perMeal * 3);
+    const proteinCals = dailyProtein * 4;
+
+    document.getElementById('dailyProtein')!.textContent = dailyProtein + 'g';
+    document.getElementById('proteinPerLb')!.textContent = gPerLb.toFixed(2) + ' g/lb';
+    document.getElementById('perMeal')!.textContent = perMeal + 'g';
+    document.getElementById('snackProtein')!.textContent = snack + 'g';
+    document.getElementById('proteinCals')!.textContent = proteinCals.toLocaleString('en-US');
+  }
+
+  // Unit toggle
+  unitBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const newUnit = (btn as HTMLButtonElement).dataset.unit as 'lb' | 'kg';
+      if (newUnit === currentUnit) return;
+
+      const raw = parseFloat(weightEl.value) || 0;
+      if (newUnit === 'kg') {
+        weightEl.value = String(Math.round(raw / 2.20462));
+        weightEl.min = '20';
+        weightEl.max = '230';
+      } else {
+        weightEl.value = String(Math.round(raw * 2.20462));
+        weightEl.min = '50';
+        weightEl.max = '500';
+      }
+      currentUnit = newUnit;
+
+      unitBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      calculate();
+    });
+  });
+
+  // Recalculate on any input change
+  [weightEl, ageEl].forEach(el => el.addEventListener('input', calculate));
+  [genderEl, activityEl, goalEl].forEach(el => el.addEventListener('change', calculate));
+
+  calculate();
+</script>

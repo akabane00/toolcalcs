@@ -1,0 +1,596 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Health Calculators", "item": "https://toolcalcs.com/health-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "BAC Calculator" },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How long does it take for BAC to reach 0.00?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Your body eliminates alcohol at a relatively constant rate of about 0.015 BAC per hour. This means it takes roughly one hour to process one standard drink. If your BAC is 0.08, it will take approximately 5.3 hours to return to 0.00. Factors like liver health and metabolism can cause slight variation, but 0.015 per hour is the widely accepted average.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "What is a standard drink?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "In the United States, a standard drink contains approximately 14 grams of pure alcohol. This equals about 12 ounces of regular beer (5% ABV), 5 ounces of wine (12% ABV), or 1.5 ounces of distilled spirits (40% ABV / 80 proof). Many cocktails and craft beers contain significantly more alcohol than one standard drink.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "Is a BAC of 0.05 safe to drive?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Even at 0.05 BAC, coordination, steering ability, and response to emergency situations are measurably impaired. While 0.08 is the legal limit in most U.S. states, many countries set the limit at 0.05 or lower. No amount of alcohol is truly 'safe' for driving. The safest option is always to avoid driving after any amount of drinking.",
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="BAC Calculator - Estimate Blood Alcohol Content | ToolCalcs"
+  description="Free BAC calculator using the Widmark formula. Estimate your blood alcohol concentration based on drinks consumed, body weight, gender, and time elapsed."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/health-calculators/">Health Calculators</a> &rsaquo;
+    <span>BAC Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>BAC Calculator</h1>
+  <p class="page-desc">Estimate your blood alcohol concentration (BAC) based on drinks consumed, body weight, gender, and time elapsed.</p>
+
+  <div class="bac-disclaimer">
+    <strong>Disclaimer:</strong> This calculator provides an <em>estimate only</em> based on average metabolism. Actual BAC varies by individual. <strong>Never drink and drive.</strong>
+  </div>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="bodyWeight">Body Weight</label>
+        <div class="weight-input-row">
+          <input type="number" id="bodyWeight" value="160" min="50" max="500" step="1" />
+          <select id="weightUnit">
+            <option value="lbs">lbs</option>
+            <option value="kg">kg</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Gender</label>
+        <div class="radio-group">
+          <label class="radio-label"><input type="radio" name="gender" value="male" checked /> Male</label>
+          <label class="radio-label"><input type="radio" name="gender" value="female" /> Female</label>
+        </div>
+      </div>
+      <div class="input-group">
+        <label for="numDrinks">Number of Standard Drinks</label>
+        <input type="number" id="numDrinks" value="3" min="0" max="30" step="0.5" />
+      </div>
+      <div class="input-group">
+        <label for="drinkType">Drink Type</label>
+        <select id="drinkType">
+          <option value="standard">Standard Drink (14g alcohol)</option>
+          <option value="beer">Beer (12 oz, 5% ABV)</option>
+          <option value="wine">Wine (5 oz, 12% ABV)</option>
+          <option value="spirits">Spirits (1.5 oz, 40% ABV)</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+      <div class="input-group custom-drink-group hidden" id="customDrinkGroup">
+        <label for="customOz">Volume (oz)</label>
+        <input type="number" id="customOz" value="12" min="0.5" max="100" step="0.5" />
+      </div>
+      <div class="input-group custom-drink-group hidden" id="customAbvGroup">
+        <label for="customAbv">ABV (%)</label>
+        <input type="number" id="customAbv" value="5" min="0.5" max="100" step="0.1" />
+      </div>
+      <div class="input-group">
+        <label for="hoursDrinking">Hours Since First Drink</label>
+        <input type="number" id="hoursDrinking" value="1" min="0" max="24" step="0.25" />
+      </div>
+    </div>
+
+    <div class="calc-results">
+      <div class="result-cards">
+        <div class="result-card bac-card" id="bacCard">
+          <span class="result-label">Estimated BAC</span>
+          <span class="result-value" id="bacValue">0.000%</span>
+          <span class="result-sub" id="bacStatus">Sober</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Impairment Level</span>
+          <span class="result-value" id="impairmentLevel">None</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Time to 0.00 BAC</span>
+          <span class="result-value" id="timeToSober">0h 0m</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Legal Status (US 0.08)</span>
+          <span class="result-value" id="legalStatus">Under Limit</span>
+        </div>
+      </div>
+      <div class="bac-bar-container">
+        <div class="bac-bar">
+          <div class="bac-bar-fill" id="bacBarFill"></div>
+          <div class="bac-bar-marker" id="bacBarMarker" style="left: 0%">
+            <span class="bac-bar-marker-label" id="bacBarLabel">0.000</span>
+          </div>
+        </div>
+        <div class="bac-bar-labels">
+          <span>0.00</span>
+          <span>0.08</span>
+          <span>0.15</span>
+          <span>0.30+</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="bac-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>What Is BAC?</h2>
+    <p>
+      Blood Alcohol Concentration (BAC) is the percentage of alcohol present in your bloodstream. A BAC of 0.08% means that there are 0.08 grams of alcohol per 100 milliliters of blood. BAC is the standard measurement used by law enforcement, medical professionals, and researchers to quantify alcohol intoxication.
+    </p>
+    <p>
+      When you consume an alcoholic beverage, the alcohol is absorbed through the stomach lining and small intestine into the bloodstream. From there, it circulates throughout the body, affecting the central nervous system. BAC rises as you drink and falls as your liver metabolizes the alcohol. Understanding your BAC helps you make informed decisions about driving, operating machinery, and general safety.
+    </p>
+    <p>
+      BAC is influenced by many factors beyond just the number of drinks you consume. Body weight, biological sex, the rate of drinking, whether you have eaten, medications, and individual metabolism all play significant roles. This calculator uses the Widmark formula, the most widely accepted scientific method for estimating BAC, to give you an approximation based on the most impactful variables.
+    </p>
+
+    <h2>How BAC Is Calculated</h2>
+    <p>
+      BAC estimation relies on the relationship between the amount of alcohol consumed, your body composition, and the time your body has had to metabolize the alcohol. The core calculation accounts for alcohol absorption and elimination:
+    </p>
+    <ol>
+      <li><strong>Alcohol consumed:</strong> Each standard drink contains roughly 14 grams of pure ethanol. The total grams of alcohol are calculated from the number and type of drinks.</li>
+      <li><strong>Body water distribution:</strong> Alcohol distributes through body water. Since body water percentage differs between males and females, a gender-specific distribution ratio is used.</li>
+      <li><strong>Time-based elimination:</strong> The liver metabolizes alcohol at a near-constant rate of approximately 0.015 BAC per hour. This amount is subtracted from the calculated peak BAC.</li>
+    </ol>
+    <p>
+      The result is an estimate of the alcohol remaining in your bloodstream at the time specified. Keep in mind that this is a mathematical model — real-world BAC can vary based on genetics, liver health, hydration, food intake, and more.
+    </p>
+
+    <h2>The Widmark Formula</h2>
+    <p>
+      Erik Widmark, a Swedish physician, developed the foundational formula for estimating BAC in the 1930s. The Widmark formula remains the most commonly cited BAC estimation method in forensic science and toxicology. The formula used in this calculator is:
+    </p>
+    <div class="formula-box">
+      <code>BAC = (Alcohol in grams / (Body weight in grams &times; r)) &minus; (0.015 &times; hours)</code>
+    </div>
+    <p>
+      In this formula, <strong>r</strong> is the Widmark distribution ratio, which accounts for the proportion of body weight in which alcohol distributes. The values are:
+    </p>
+    <ul>
+      <li><strong>r = 0.68</strong> for males (higher water content relative to body weight)</li>
+      <li><strong>r = 0.55</strong> for females (lower water content, higher proportion of body fat)</li>
+    </ul>
+    <p>
+      The constant <strong>0.015</strong> represents the average rate at which the liver eliminates alcohol from the bloodstream per hour. For one standard drink (14 grams of alcohol), this means it takes roughly one hour for your body to process the alcohol. The formula subtracts this elimination rate multiplied by the number of hours since you began drinking.
+    </p>
+    <p>
+      For example, a 160-pound male who has consumed 3 standard drinks over 1 hour would have an estimated BAC of approximately: (3 &times; 14) / (72,575 &times; 0.68) &minus; (0.015 &times; 1) = 0.0685 or about 0.069%.
+    </p>
+
+    <h2>Factors That Affect BAC</h2>
+    <p>
+      While the Widmark formula provides a useful estimate, many factors can cause your actual BAC to differ from the calculated value:
+    </p>
+    <ul>
+      <li><strong>Body weight and composition:</strong> Heavier individuals generally have a lower BAC after the same number of drinks. People with more muscle and less fat tend to have lower BAC because muscle tissue contains more water, which dilutes the alcohol.</li>
+      <li><strong>Biological sex:</strong> Women typically reach higher BAC levels than men of the same weight after consuming the same amount of alcohol. This is due to differences in body water content, body fat percentage, and the enzyme alcohol dehydrogenase.</li>
+      <li><strong>Food intake:</strong> Drinking on an empty stomach causes faster alcohol absorption, leading to higher peak BAC. Food in the stomach slows absorption and can reduce peak BAC by up to 20%.</li>
+      <li><strong>Rate of consumption:</strong> Drinking rapidly produces a higher peak BAC than sipping the same amount over several hours, because the liver can only process about one standard drink per hour.</li>
+      <li><strong>Medications:</strong> Many medications interact with alcohol and can intensify its effects or slow its metabolism, including antihistamines, painkillers, antidepressants, and antibiotics.</li>
+      <li><strong>Tolerance:</strong> Regular drinkers may develop functional tolerance, meaning they appear less impaired at a given BAC. However, their BAC is still the same, and their driving and cognitive abilities are still degraded.</li>
+      <li><strong>Age:</strong> Older adults tend to reach higher BAC levels because of reduced body water content and slower metabolism.</li>
+      <li><strong>Genetics:</strong> Variations in the genes coding for alcohol dehydrogenase and aldehyde dehydrogenase enzymes affect how quickly individuals metabolize alcohol.</li>
+    </ul>
+
+    <h2>BAC Levels and Their Effects</h2>
+    <p>
+      The following table describes the typical effects of alcohol at various BAC levels. Individual responses vary, but these ranges are based on well-established clinical research:
+    </p>
+    <div class="table-container">
+      <table class="info-table bac-effects-table">
+        <thead>
+          <tr>
+            <th>BAC Range</th>
+            <th>Level</th>
+            <th>Typical Effects</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>0.00 &ndash; 0.02%</td>
+            <td>Sober</td>
+            <td>Little to no noticeable effects. Normal behavior and coordination.</td>
+          </tr>
+          <tr>
+            <td>0.02 &ndash; 0.04%</td>
+            <td>Mildly Relaxed</td>
+            <td>Slight euphoria, mild relaxation. Subtle impairment of judgment.</td>
+          </tr>
+          <tr>
+            <td>0.04 &ndash; 0.08%</td>
+            <td>Buzzed / Impaired</td>
+            <td>Lowered inhibitions, impaired coordination, reduced reaction time. Feeling of warmth and sociability.</td>
+          </tr>
+          <tr>
+            <td>0.08 &ndash; 0.15%</td>
+            <td>Legally Impaired</td>
+            <td>Significant impairment of motor control and judgment. Slurred speech, poor balance. Illegal to drive in all U.S. states.</td>
+          </tr>
+          <tr>
+            <td>0.15 &ndash; 0.30%</td>
+            <td>Severely Impaired</td>
+            <td>Major loss of balance and coordination. Nausea, vomiting, blurred vision. High risk of blackout.</td>
+          </tr>
+          <tr>
+            <td>0.30%+</td>
+            <td>Dangerous / Life-Threatening</td>
+            <td>Loss of consciousness, risk of alcohol poisoning, respiratory depression. Medical emergency likely.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Legal BAC Limits by Country</h2>
+    <p>
+      Most countries enforce a maximum legal BAC for operating a motor vehicle. Exceeding the limit results in criminal charges, license suspension, fines, and potentially jail time. Here are the limits in several major countries:
+    </p>
+    <ul>
+      <li><strong>United States:</strong> 0.08% in all 50 states (0.04% for commercial drivers, 0.00-0.02% for under-21 drivers)</li>
+      <li><strong>Canada:</strong> 0.08% federal limit; many provinces enforce penalties starting at 0.05%</li>
+      <li><strong>United Kingdom:</strong> 0.08% in England and Wales; 0.05% in Scotland</li>
+      <li><strong>Australia:</strong> 0.05% for full license holders; 0.00% for learner and provisional drivers</li>
+      <li><strong>Germany:</strong> 0.05% general limit; 0.00% for new drivers (first 2 years)</li>
+      <li><strong>Japan:</strong> 0.03% — one of the strictest limits among major countries</li>
+      <li><strong>Sweden, Norway, Poland:</strong> 0.02% — effectively a zero-tolerance approach</li>
+      <li><strong>Brazil, Czech Republic, Hungary:</strong> 0.00% — absolute zero tolerance</li>
+    </ul>
+    <p>
+      Even if your estimated BAC is below the legal limit, your driving ability may still be impaired. Research consistently shows that reaction time, peripheral vision, and decision-making are affected at BAC levels well below 0.08%.
+    </p>
+
+    <h2>How Your Body Processes Alcohol</h2>
+    <p>
+      When you consume alcohol, it travels to your stomach and small intestine where it is absorbed into the bloodstream. About 20% of alcohol is absorbed through the stomach lining, and the remaining 80% through the small intestine. Once in the blood, alcohol is distributed throughout the body, with higher concentrations in organs with rich blood supply like the brain and liver.
+    </p>
+    <p>
+      The liver is responsible for metabolizing approximately 90-95% of the alcohol you consume. The primary enzyme involved is alcohol dehydrogenase (ADH), which converts ethanol to acetaldehyde — a toxic compound. Acetaldehyde is then further broken down by aldehyde dehydrogenase (ALDH) into acetate, which is eventually converted to carbon dioxide and water.
+    </p>
+    <p>
+      The remaining 5-10% of alcohol is eliminated unchanged through breath, urine, and sweat. This is why breathalyzers can measure BAC — the alcohol in your bloodstream is released into the air in your lungs in a predictable ratio.
+    </p>
+    <p>
+      The liver processes alcohol at a fairly constant rate regardless of how much you have consumed. For most people, this rate is approximately 0.015 BAC per hour, which translates to roughly one standard drink per hour. Drinking faster than your liver can metabolize alcohol causes BAC to rise. No amount of coffee, cold showers, or exercise can speed up this process.
+    </p>
+
+    <h2>Standard Drink Sizes</h2>
+    <p>
+      Understanding what constitutes a "standard drink" is essential for accurate BAC estimation. In the United States, one standard drink contains approximately 14 grams (0.6 ounces) of pure ethanol. The following are equivalent to one standard drink:
+    </p>
+    <ul>
+      <li><strong>Beer:</strong> 12 ounces of regular beer at 5% ABV. Craft beers often range from 6-12% ABV, meaning a single pint could equal 1.5 to 2.5 standard drinks.</li>
+      <li><strong>Wine:</strong> 5 ounces of wine at 12% ABV. A typical restaurant pour may be 6 ounces, and many wines range from 13-15% ABV.</li>
+      <li><strong>Spirits:</strong> 1.5 ounces of distilled spirits (vodka, whiskey, rum, gin, tequila) at 40% ABV (80 proof). Mixed drinks often contain more than 1.5 ounces of liquor.</li>
+      <li><strong>Malt liquor:</strong> 8-9 ounces at 7% ABV. A typical 40-ounce bottle of malt liquor contains about 4.5 standard drinks.</li>
+    </ul>
+    <p>
+      One of the most common mistakes in estimating BAC is underestimating the number of standard drinks consumed. A large cocktail at a bar may contain 2-3 standard drinks worth of alcohol. A 16-ounce craft IPA at 8% ABV equals about 2.1 standard drinks. Always check the ABV and serving size to make an accurate count.
+    </p>
+
+    <h2>Safety Considerations</h2>
+    <p>
+      This BAC calculator is designed as an educational tool to help you understand the relationship between alcohol consumption and blood alcohol concentration. It should never be used as the sole basis for deciding whether it is safe to drive or operate machinery. Important safety points to remember:
+    </p>
+    <ul>
+      <li><strong>Estimates are not exact:</strong> Your actual BAC can be higher or lower than the calculated value depending on many individual factors.</li>
+      <li><strong>Impairment begins before the legal limit:</strong> Coordination, judgment, and reaction time are affected at BAC levels well below 0.08%.</li>
+      <li><strong>Plan ahead:</strong> Designate a sober driver, use a ride-share service, or take public transportation if you plan to drink.</li>
+      <li><strong>Alcohol poisoning is a medical emergency:</strong> If someone is unconscious, vomiting while passed out, has slow or irregular breathing, or has a BAC above 0.30%, call emergency services (911) immediately.</li>
+      <li><strong>Wait it out:</strong> Only time reduces BAC. There are no shortcuts — coffee, food, and water will not lower your BAC faster.</li>
+      <li><strong>Know your limits:</strong> Everyone metabolizes alcohol differently. What feels manageable for one person may be dangerous for another.</li>
+    </ul>
+    <p>
+      If you or someone you know is struggling with alcohol consumption, help is available. Contact the SAMHSA National Helpline at 1-800-662-4357 for free, confidential treatment referrals.
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>How long does it take for BAC to reach 0.00?</summary>
+        <p>
+          Your body eliminates alcohol at roughly 0.015 BAC per hour. To estimate how long until your BAC reaches zero, divide your current BAC by 0.015. For example, a BAC of 0.08 would take about 5 hours and 20 minutes. A BAC of 0.15 would take about 10 hours. These are averages — individual metabolism varies.
+        </p>
+      </details>
+      <details class="faq-item">
+        <summary>What is a standard drink?</summary>
+        <p>
+          In the United States, a standard drink contains about 14 grams of pure alcohol. This is equivalent to 12 ounces of beer (5% ABV), 5 ounces of wine (12% ABV), or 1.5 ounces of spirits (40% ABV). Many drinks served at bars and restaurants exceed these sizes, so it is common to consume more standard drinks than you realize.
+        </p>
+      </details>
+      <details class="faq-item">
+        <summary>Is a BAC of 0.05 safe to drive?</summary>
+        <p>
+          No amount of alcohol is truly safe for driving. At 0.05% BAC, studies show measurable impairment in steering, tracking moving objects, and responding to emergencies. While 0.08% is the legal limit in most U.S. states, many countries enforce a 0.05% or lower limit. The only safe BAC for driving is 0.00%.
+        </p>
+      </details>
+    </div>
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/health-calculators/calorie-calculator/">Calorie Calculator</a> — Calculate your daily calorie needs.</li>
+      <li><a href="/health-calculators/bmi-calculator/">BMI Calculator</a> — Check your Body Mass Index.</li>
+      <li><a href="/health-calculators/water-intake-calculator/">Water Intake Calculator</a> — Find your daily hydration target.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="bac-bottom" format="horizontal" />
+  <RelatedArticles calculatorSlug="bac-calculator" />
+
+  <RelatedCalculators currentSlug="bac-calculator" />
+</BaseLayout>
+
+<style>
+  .bac-disclaimer {
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    border-left: 4px solid #ef4444;
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    color: #991b1b;
+    line-height: 1.5;
+  }
+  [data-theme="dark"] .bac-disclaimer {
+    background: #451a1a;
+    border-color: #7f1d1d;
+    color: #fca5a5;
+  }
+  .weight-input-row {
+    display: flex;
+    gap: 8px;
+  }
+  .weight-input-row input { flex: 1; }
+  .weight-input-row select {
+    width: 70px;
+    padding: 10px 8px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    background: var(--color-bg);
+    color: var(--color-text);
+  }
+  .radio-group {
+    display: flex;
+    gap: 16px;
+    padding: 10px 0;
+  }
+  .radio-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+  .custom-drink-group.hidden { display: none; }
+  .bac-card {
+    border-left: 4px solid #22c55e;
+    transition: border-color 0.3s, background 0.3s;
+  }
+  .bac-card.level-sober { border-left-color: #22c55e; background: #f0fdf4; }
+  .bac-card.level-mild { border-left-color: #84cc16; background: #f7fee7; }
+  .bac-card.level-buzzed { border-left-color: #eab308; background: #fefce8; }
+  .bac-card.level-impaired { border-left-color: #ef4444; background: #fef2f2; }
+  .bac-card.level-severe { border-left-color: #991b1b; background: #fef2f2; }
+  .bac-card.level-dangerous { border-left-color: #7c3aed; background: #f5f3ff; }
+  [data-theme="dark"] .bac-card.level-sober { background: #14532d; }
+  [data-theme="dark"] .bac-card.level-mild { background: #365314; }
+  [data-theme="dark"] .bac-card.level-buzzed { background: #422006; }
+  [data-theme="dark"] .bac-card.level-impaired { background: #451a1a; }
+  [data-theme="dark"] .bac-card.level-severe { background: #3b0a0a; }
+  [data-theme="dark"] .bac-card.level-dangerous { background: #2e1065; }
+  .result-sub {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+  }
+  .bac-bar-container { margin-top: 16px; }
+  .bac-bar {
+    position: relative;
+    height: 20px;
+    background: linear-gradient(to right, #22c55e 0%, #84cc16 15%, #eab308 30%, #ef4444 55%, #991b1b 75%, #7c3aed 100%);
+    border-radius: 10px;
+    overflow: visible;
+  }
+  .bac-bar-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.3s;
+  }
+  .bac-bar-marker {
+    position: absolute;
+    top: -6px;
+    width: 4px;
+    height: 32px;
+    background: var(--color-text);
+    border-radius: 2px;
+    transition: left 0.3s;
+  }
+  .bac-bar-marker-label {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.75rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .bac-bar-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin-top: 6px;
+  }
+  .bac-effects-table { max-width: 100%; }
+  .bac-effects-table th,
+  .bac-effects-table td { font-size: 0.88rem; }
+  .last-updated { font-size: 0.75rem; color: var(--color-text-muted); margin: 4px 0 0; }
+</style>
+
+<script>
+  const bodyWeightEl = document.getElementById('bodyWeight') as HTMLInputElement;
+  const weightUnitEl = document.getElementById('weightUnit') as HTMLSelectElement;
+  const numDrinksEl = document.getElementById('numDrinks') as HTMLInputElement;
+  const drinkTypeEl = document.getElementById('drinkType') as HTMLSelectElement;
+  const customOzEl = document.getElementById('customOz') as HTMLInputElement;
+  const customAbvEl = document.getElementById('customAbv') as HTMLInputElement;
+  const hoursDrinkingEl = document.getElementById('hoursDrinking') as HTMLInputElement;
+  const customDrinkGroups = document.querySelectorAll('.custom-drink-group');
+
+  function getGender(): string {
+    const checked = document.querySelector('input[name="gender"]:checked') as HTMLInputElement;
+    return checked ? checked.value : 'male';
+  }
+
+  function getAlcoholGramsPerDrink(): number {
+    const drinkType = drinkTypeEl.value;
+    switch (drinkType) {
+      case 'standard': return 14;
+      case 'beer': return 12 * 29.5735 * 0.05 * 0.789;    // ~14g
+      case 'wine': return 5 * 29.5735 * 0.12 * 0.789;     // ~14g
+      case 'spirits': return 1.5 * 29.5735 * 0.40 * 0.789; // ~14g
+      case 'custom': {
+        const oz = parseFloat(customOzEl.value) || 0;
+        const abv = parseFloat(customAbvEl.value) || 0;
+        return oz * 29.5735 * (abv / 100) * 0.789;
+      }
+      default: return 14;
+    }
+  }
+
+  function calculate() {
+    let weightLbs = parseFloat(bodyWeightEl.value) || 0;
+    const unit = weightUnitEl.value;
+    if (unit === 'kg') {
+      weightLbs = weightLbs * 2.20462;
+    }
+    const weightGrams = weightLbs * 453.592;
+
+    const gender = getGender();
+    const r = gender === 'male' ? 0.68 : 0.55;
+
+    const numDrinks = parseFloat(numDrinksEl.value) || 0;
+    const alcoholPerDrink = getAlcoholGramsPerDrink();
+    const totalAlcoholGrams = numDrinks * alcoholPerDrink;
+
+    const hours = parseFloat(hoursDrinkingEl.value) || 0;
+
+    let bac = 0;
+    if (weightGrams > 0) {
+      bac = (totalAlcoholGrams / (weightGrams * r)) - (0.015 * hours);
+    }
+    if (bac < 0) bac = 0;
+
+    // Determine level
+    let level = 'sober';
+    let levelLabel = 'Sober';
+    let impairment = 'None';
+    let legalStatus = 'Under Limit';
+    let statusColor = '#22c55e';
+
+    if (bac >= 0.30) {
+      level = 'dangerous'; levelLabel = 'Dangerous'; impairment = 'Life-threatening';
+      legalStatus = 'Far Over Limit'; statusColor = '#7c3aed';
+    } else if (bac >= 0.15) {
+      level = 'severe'; levelLabel = 'Severely Impaired'; impairment = 'Major loss of coordination';
+      legalStatus = 'Over Limit'; statusColor = '#991b1b';
+    } else if (bac >= 0.08) {
+      level = 'impaired'; levelLabel = 'Legally Impaired'; impairment = 'Significant impairment';
+      legalStatus = 'Over Limit'; statusColor = '#ef4444';
+    } else if (bac >= 0.04) {
+      level = 'buzzed'; levelLabel = 'Buzzed / Impaired'; impairment = 'Reduced coordination';
+      legalStatus = 'Under Limit'; statusColor = '#eab308';
+    } else if (bac >= 0.02) {
+      level = 'mild'; levelLabel = 'Mildly Relaxed'; impairment = 'Subtle impairment';
+      legalStatus = 'Under Limit'; statusColor = '#84cc16';
+    } else {
+      level = 'sober'; levelLabel = 'Sober'; impairment = 'None';
+      legalStatus = 'Under Limit'; statusColor = '#22c55e';
+    }
+
+    // Time to sober
+    const hoursToSober = bac > 0 ? bac / 0.015 : 0;
+    const soberH = Math.floor(hoursToSober);
+    const soberM = Math.round((hoursToSober - soberH) * 60);
+
+    // Update DOM
+    document.getElementById('bacValue')!.textContent = bac.toFixed(3) + '%';
+    document.getElementById('bacStatus')!.textContent = levelLabel;
+    document.getElementById('impairmentLevel')!.textContent = impairment;
+    document.getElementById('timeToSober')!.textContent = soberH + 'h ' + soberM + 'm';
+    document.getElementById('legalStatus')!.textContent = legalStatus;
+    (document.getElementById('legalStatus') as HTMLElement).style.color = bac >= 0.08 ? '#ef4444' : '#22c55e';
+
+    // Card styling
+    const card = document.getElementById('bacCard')!;
+    card.className = 'result-card bac-card level-' + level;
+
+    // Bar marker
+    const barPercent = Math.min((bac / 0.35) * 100, 100);
+    (document.getElementById('bacBarMarker') as HTMLElement).style.left = barPercent + '%';
+    document.getElementById('bacBarLabel')!.textContent = bac.toFixed(3);
+  }
+
+  // Toggle custom drink fields
+  drinkTypeEl.addEventListener('change', () => {
+    const isCustom = drinkTypeEl.value === 'custom';
+    customDrinkGroups.forEach(el => {
+      (el as HTMLElement).classList.toggle('hidden', !isCustom);
+    });
+    calculate();
+  });
+
+  // Listen for changes on all inputs
+  [bodyWeightEl, weightUnitEl, numDrinksEl, drinkTypeEl, customOzEl, customAbvEl, hoursDrinkingEl].forEach(el => {
+    el.addEventListener('input', calculate);
+    el.addEventListener('change', calculate);
+  });
+
+  // Listen for gender radio changes
+  document.querySelectorAll('input[name="gender"]').forEach(el => {
+    el.addEventListener('change', calculate);
+  });
+
+  calculate();
+</script>

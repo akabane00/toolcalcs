@@ -1,0 +1,571 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Construction Calculators",
+        "item": "https://toolcalcs.com/construction-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Stair Calculator"
+      }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How do I calculate the number of stairs I need?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Measure the total rise (floor-to-floor height) in inches and divide by 7.5 inches, which is a comfortable target rise per step. Round to the nearest whole number. For example, a total rise of 108 inches (9 feet) divided by 7.5 gives 14.4, which rounds to 14 steps with an actual rise of 7.71 inches per step.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is the building code for stairs?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The International Residential Code (IRC) requires a maximum riser height of 7.75 inches and a minimum tread depth (run) of 10 inches. The minimum riser height is 4 inches. All risers and treads must be uniform, with no more than 3/8 inch variation between the largest and smallest in a flight.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is the 17-18 rule for stairs?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The comfort rule states that the sum of one riser height plus one tread depth should equal 17 to 18 inches for a comfortable staircase. For example, a 7.5-inch rise with a 10-inch run totals 17.5 inches, which falls within the ideal range. Stairs outside this range feel either too steep or too shallow to climb comfortably.',
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Stair Calculator - Calculate Rise, Run, Steps & Stringer | ToolCalcs"
+  description="Free stair calculator. Calculate number of steps, rise per step, run, stringer length, and stair angle. Check IRC building code compliance for safe stairs."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/construction-calculators/">Construction Calculators</a> &rsaquo;
+    <span>Stair Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Stair Calculator</h1>
+  <p class="page-desc">Calculate stair dimensions including number of steps, rise per step, total run, stringer length, and stair angle. Checks IRC building code compliance.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="totalRise">Total Rise (floor to floor)</label>
+        <input type="number" id="totalRise" value="108" min="1" max="600" step="0.25" />
+      </div>
+      <div class="input-group">
+        <label for="runPerStep">Run per Step (tread depth)</label>
+        <input type="number" id="runPerStep" value="10" min="1" max="24" step="0.25" />
+      </div>
+      <div class="input-group">
+        <label for="unit">Unit</label>
+        <select id="unit">
+          <option value="in">Inches (in)</option>
+          <option value="cm">Centimeters (cm)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="calc-results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Number of Steps</span>
+          <span class="result-value" id="numSteps">14</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Rise per Step</span>
+          <span class="result-value" id="risePerStep">7.71"</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Run per Step</span>
+          <span class="result-value" id="runDisplay">10.00"</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Run</span>
+          <span class="result-value" id="totalRun">130.00"</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Stringer Length</span>
+          <span class="result-value" id="stringerLength">169.00"</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Stair Angle</span>
+          <span class="result-value" id="stairAngle">39.7&deg;</span>
+        </div>
+      </div>
+      <div class="code-compliance" id="codeCompliance"></div>
+    </div>
+
+    <div class="stair-diagram" id="stairDiagram"></div>
+  </div>
+
+  <AdUnit slot="stair-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>How to Calculate Stairs</h2>
+    <p>
+      Calculating stairs correctly is one of the most important tasks in residential and commercial construction. Improperly designed stairs are a leading cause of falls and injuries in buildings, which is why building codes set strict requirements for stair dimensions. Whether you are building interior stairs between floors, deck stairs to your backyard, or basement stairs to a lower level, the process starts with one critical measurement: the total rise.
+    </p>
+    <p>
+      The total rise is the vertical distance from the finished floor at the bottom of the stairs to the finished floor at the top. This measurement must be precise because every fraction of an inch is divided among all the steps. A measurement error of even half an inch can push your riser height out of code compliance or create an uneven step that becomes a tripping hazard. Always measure the total rise after finished flooring is installed, or account for the thickness of flooring materials that will be added later.
+    </p>
+    <p>
+      Once you have the total rise, divide it by the ideal riser height of 7.5 inches to determine the number of steps. Round this number to the nearest whole number. Then divide the total rise by the number of steps to get the actual rise per step. For example, if your total rise is 108 inches (9 feet), dividing by 7.5 gives 14.4, which rounds to 14 steps. The actual rise per step would be 108 / 14 = 7.71 inches, which falls within the IRC code maximum of 7.75 inches.
+    </p>
+    <div class="formula-box">
+      <code>Number of Steps = Round(Total Rise / 7.5)</code>
+    </div>
+    <div class="formula-box">
+      <code>Actual Rise per Step = Total Rise / Number of Steps</code>
+    </div>
+    <p>
+      The total run is calculated by multiplying the run per step (tread depth) by one fewer than the number of steps, because the top step is typically the landing or upper floor itself. The stringer length is determined using the Pythagorean theorem, and the stair angle is calculated using the arctangent function.
+    </p>
+    <div class="formula-box">
+      <code>Total Run = (Number of Steps - 1) &times; Run per Step</code>
+    </div>
+    <div class="formula-box">
+      <code>Stringer Length = &radic;(Total Rise&sup2; + Total Run&sup2;)</code>
+    </div>
+
+    <h2>Building Code Requirements</h2>
+    <p>
+      The International Residential Code (IRC) establishes minimum and maximum dimensions for residential stairs. These requirements exist to ensure that stairs are safe and comfortable for all users, including children, elderly residents, and people carrying items up and down the stairs. Local building codes may adopt the IRC with modifications, so always check with your local building department before starting construction.
+    </p>
+    <div class="info-table">
+      <h3>IRC Stair Dimension Requirements</h3>
+      <table>
+        <thead>
+          <tr><th>Requirement</th><th>IRC Standard</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Maximum Riser Height</td><td>7.75 inches (196 mm)</td></tr>
+          <tr><td>Minimum Riser Height</td><td>4 inches (102 mm)</td></tr>
+          <tr><td>Minimum Tread Depth</td><td>10 inches (254 mm)</td></tr>
+          <tr><td>Minimum Stair Width</td><td>36 inches (914 mm)</td></tr>
+          <tr><td>Maximum Riser Variation</td><td>3/8 inch (9.5 mm)</td></tr>
+          <tr><td>Minimum Headroom</td><td>6 ft 8 in (2,032 mm)</td></tr>
+          <tr><td>Handrail Height</td><td>34-38 inches (864-965 mm)</td></tr>
+          <tr><td>Nosing Projection</td><td>3/4 to 1-1/4 inches (19-32 mm)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      One of the most critical code requirements is uniformity. The tallest riser and the shortest riser in a flight of stairs cannot differ by more than 3/8 inch. The same rule applies to tread depth. Non-uniform steps are a major tripping hazard because people develop a rhythm as they climb or descend stairs, and an unexpected change in step height breaks that rhythm. This is why the total rise must be measured carefully and divided equally among all steps.
+    </p>
+    <p>
+      Handrails are required on at least one side of stairs with four or more risers. The handrail must be between 34 and 38 inches high, measured vertically from the stair nosing. Handrails must be graspable, meaning they are either circular with a 1-1/4 to 2-inch diameter, or they have a non-circular cross section with a perimeter of 4 to 6-1/4 inches and a maximum cross section of 2-1/4 inches. Guards (balusters) are required where the open side of the stairway is more than 30 inches above the floor below, with a maximum spacing of 4 inches between balusters.
+    </p>
+
+    <h2>Understanding Rise and Run</h2>
+    <p>
+      Rise and run are the two fundamental measurements of every stair step. The rise is the vertical height of one step, measured from the top of one tread to the top of the next tread. The run is the horizontal depth of one tread, measured from the face of one riser to the face of the next riser. Together, these two dimensions determine how steep or shallow the staircase feels to walk on.
+    </p>
+    <p>
+      A taller rise with a shorter run creates a steeper staircase that takes up less floor space but is harder to climb. A shorter rise with a longer run creates a more gradual staircase that is easier to climb but requires more horizontal space. Building codes limit the range of acceptable rise and run dimensions to ensure that all stairs fall within a safe and comfortable zone. The ideal rise for most residential stairs is between 7 and 7.5 inches, with a run of 10 to 11 inches. These proportions have been used for centuries and feel natural to most people.
+    </p>
+    <p>
+      The nosing is the portion of the tread that overhangs the riser below. Nosing adds effective tread depth without increasing the total run of the staircase. IRC code allows a nosing projection of 3/4 to 1-1/4 inches. When measuring tread depth for code compliance, the nosing is not included. The 10-inch minimum tread depth is measured from the front edge of one nosing to the front edge of the next, which is the actual usable surface where your foot lands.
+    </p>
+
+    <h2>The Comfort Rule</h2>
+    <p>
+      Beyond the minimum code requirements, experienced builders use a time-tested comfort rule to design stairs that feel natural and easy to climb. The rule states that the sum of one riser height plus one tread depth should equal 17 to 18 inches. This relationship was first documented by the French architect Jacques-Francois Blondel in the 17th century and has been validated by modern ergonomic studies.
+    </p>
+    <div class="formula-box">
+      <code>Comfort Rule: Rise + Run = 17" to 18"</code>
+    </div>
+    <p>
+      A staircase with a 7.5-inch rise and a 10-inch run has a comfort sum of 17.5 inches, which is right in the sweet spot. A staircase with a 7-inch rise and an 11-inch run totals 18 inches, which is also comfortable. Stairs that fall outside this range can feel awkward. A comfort sum below 17 inches means the stairs are too steep with short treads, forcing you to place your feet carefully on each step. A sum above 18 inches means the stairs are too shallow, causing you to take unnaturally long strides with minimal height gain per step.
+    </p>
+    <p>
+      Another common formula used by builders is the 2R + T rule, where two times the riser height plus the tread depth should fall between 24 and 25 inches. For a 7.5-inch rise and 10-inch run, this gives 2(7.5) + 10 = 25 inches, which is right at the upper limit. Both formulas produce similar results and are widely accepted in the construction industry as guidelines for comfortable stair design.
+    </p>
+
+    <h2>Stringer Calculations</h2>
+    <p>
+      The stringer is the structural backbone of a staircase. It is the angled board that supports the treads and risers, running from the bottom floor to the top landing. Stringers are typically cut from 2x12 lumber for residential stairs, though engineered wood or steel stringers are used in some applications. Most staircases have three stringers: one on each side and one in the center for additional support on wider stairs.
+    </p>
+    <p>
+      The length of a stringer is calculated using the Pythagorean theorem. The total rise and total run form the two legs of a right triangle, and the stringer is the hypotenuse. For a staircase with a total rise of 108 inches and a total run of 130 inches, the stringer length is the square root of (108 squared plus 130 squared), which equals the square root of (11,664 + 16,900) = the square root of 28,564 = approximately 169.0 inches, or about 14 feet 1 inch.
+    </p>
+    <div class="formula-box">
+      <code>Stringer Length = &radic;(Total Rise&sup2; + Total Run&sup2;)</code>
+    </div>
+    <p>
+      When purchasing lumber for stringers, always buy boards that are at least 12 inches longer than the calculated stringer length to allow for the top and bottom cuts. A 2x12 board should have a minimum of 5 inches of solid wood remaining at the narrowest point after the notches are cut. This is known as the throat of the stringer, and it provides the structural strength. If the throat is too thin, the stringer can crack under load. For the standard 7.5-inch rise and 10-inch tread depth, a 2x12 provides about 5.5 inches of throat, which is adequate for residential use.
+    </p>
+    <p>
+      To lay out a stringer, use a framing square with stair gauges clamped at the rise measurement on one leg and the run measurement on the other. Starting at one end of the board, align the gauges against the board edge and mark the first step. Slide the square along and mark successive steps until you have marked all risers and treads. The bottom of the stringer must be cut shorter by the thickness of one tread to compensate for the added height of the tread material on the first step. Similarly, the top of the stringer may need adjustment depending on how it connects to the upper landing.
+    </p>
+
+    <h2>Types of Stairs</h2>
+    <p>
+      Staircases come in many configurations, each suited to different spaces and architectural styles. The most common types include straight stairs, L-shaped stairs, U-shaped stairs, winding stairs, and spiral stairs.
+    </p>
+    <p>
+      <strong>Straight stairs</strong> are the simplest and most economical to build. They run in a single direction from bottom to top without any turns. Straight stairs are easy to calculate, easy to build, and easy to move furniture on. However, they require the most horizontal floor space, which can be a limitation in smaller homes. A straight staircase with 14 steps and a 10-inch run requires over 10 feet of horizontal space.
+    </p>
+    <p>
+      <strong>L-shaped stairs</strong> have a 90-degree turn at a landing platform, creating an L shape when viewed from above. The landing breaks up the staircase into two shorter flights, which can be safer because a fall only extends the length of one flight rather than the entire staircase. L-shaped stairs fit well into corners and can work in spaces where a straight staircase would not fit.
+    </p>
+    <p>
+      <strong>U-shaped stairs</strong> (also called switchback stairs) make a 180-degree turn at a landing, with the upper flight running parallel to and above the lower flight. This configuration fits into a compact rectangular footprint and is common in two-story homes where space is limited. U-shaped stairs require careful attention to headroom clearance where the upper flight passes over the lower flight.
+    </p>
+    <p>
+      <strong>Winding stairs</strong> use pie-shaped treads (called winders) at the turns instead of flat landings. Winders save space but are more difficult to build and can be less safe than landings because the tread depth varies from the narrow inside to the wide outside. Building codes require that winder treads measure at least 10 inches at a point 12 inches from the narrow end and at least 6 inches at the narrowest point.
+    </p>
+    <p>
+      <strong>Spiral stairs</strong> wind around a central pole in a continuous curve. They take up the least floor space of any staircase type but are the most difficult to navigate, especially with furniture or large items. Building codes have specific requirements for spiral stairs, including a minimum clear width of 26 inches and a minimum tread depth of 7-1/2 inches measured 12 inches from the narrow edge.
+    </p>
+
+    <h2>Common Stair Materials</h2>
+    <p>
+      The choice of materials for stairs depends on the location (interior vs. exterior), budget, aesthetic preferences, and local building code requirements. Each material has advantages and limitations that should be considered during the planning phase.
+    </p>
+    <p>
+      <strong>Dimensional lumber</strong> (pine, fir, spruce) is the most common material for stair framing. Stringers are typically cut from 2x12 boards, treads from 2x10 or 2x12 boards, and risers from 1x8 boards. Softwood lumber is affordable, widely available, and easy to work with. However, softwood treads wear quickly under heavy foot traffic and are best covered with carpet, hardwood treads, or another durable finish material.
+    </p>
+    <p>
+      <strong>Hardwood</strong> (oak, maple, hickory, walnut) is the premium choice for interior stair treads and handrails. Hardwood treads are beautiful, extremely durable, and can last the lifetime of the home. Oak is the most popular species for stairs due to its hardness, attractive grain, and relatively moderate cost compared to other hardwoods. Prefinished hardwood stair treads are available from most lumber suppliers and can be installed over a plywood or softwood substrate.
+    </p>
+    <p>
+      <strong>Pressure-treated lumber</strong> is required for exterior stairs that are exposed to moisture and ground contact. The preservatives in pressure-treated wood resist rot, decay, and insect damage. Common species include southern yellow pine and hem-fir. Pressure-treated stairs should be allowed to dry for several weeks before staining or sealing. Composite decking materials can also be used for exterior stair treads and provide low-maintenance durability.
+    </p>
+    <p>
+      <strong>Concrete</strong> is used for basement stairs, exterior entry stairs, and commercial applications. Concrete stairs are formed and poured as a single unit, creating a solid, fire-resistant structure. They are typically finished with carpet, tile, stone, or a concrete overlay. Concrete stairs are extremely durable but difficult to modify once poured.
+    </p>
+    <p>
+      <strong>Steel</strong> is used for structural stair stringers in commercial buildings, industrial settings, and modern residential designs. Steel stringers can span longer distances than wood and support heavier loads. They are often combined with wood or glass treads for a contemporary look. Steel stairs require welding or bolting for assembly and should be treated with primer and paint or powder coating to prevent rust.
+    </p>
+
+    <h2>Planning Your Staircase</h2>
+    <p>
+      Proper planning is the key to a successful staircase project. Before cutting a single board, take the time to verify measurements, check code requirements, and consider how the staircase will integrate with the surrounding structure and finish materials.
+    </p>
+    <p>
+      <strong>Measure the total rise precisely.</strong> Use a level and tape measure or a story pole to measure the exact vertical distance from finished floor to finished floor. If the finish flooring is not yet installed, add the thickness of the floor material to your measurement. A common mistake is measuring from subfloor to subfloor and forgetting to account for tile, hardwood, or carpet that will be added later. This oversight can throw off the riser height by 1/2 to 3/4 inch.
+    </p>
+    <p>
+      <strong>Check headroom clearance.</strong> Building codes require a minimum of 6 feet 8 inches of headroom measured vertically from the nosing of any tread to the ceiling, header, or any obstruction above. Headroom is often the limiting factor when adding stairs through an existing floor. If headroom is tight, you may need to lengthen the stair opening (the hole in the upper floor) or adjust the stair layout.
+    </p>
+    <p>
+      <strong>Determine the stair width.</strong> The minimum width for residential stairs is 36 inches measured between the finished walls or between the handrails if there are no walls. However, 42 inches is more comfortable and allows two people to pass. Main staircases in many homes are 42 to 48 inches wide. Basement stairs and secondary stairs can be narrower but still must meet the 36-inch minimum.
+    </p>
+    <p>
+      <strong>Plan for landings.</strong> A landing is required at the top and bottom of every staircase. The landing must be at least as wide as the staircase and at least 36 inches deep in the direction of travel. Doors that open over a staircase must have a landing on the stair side with enough depth to accommodate the door swing. This is a commonly overlooked requirement that can create costly problems during framing inspections.
+    </p>
+
+    <h2>Deck Stair Considerations</h2>
+    <p>
+      Deck stairs present unique challenges compared to interior stairs because they are exposed to weather, connect to an elevated structure, and often must accommodate varying ground conditions. The same basic calculations for rise, run, and stringer length apply, but additional factors must be considered during design and construction.
+    </p>
+    <p>
+      The total rise for deck stairs is measured from the ground level to the top of the deck surface. Because the ground may not be perfectly level at the base of the stairs, measure the total rise using a level extended out from the deck edge and a tape measure dropped vertically to the ground. If the ground slopes, measure at the point where the stairs will actually land and plan for a gravel or concrete pad at the base to provide a level, stable footing.
+    </p>
+    <p>
+      Deck stair stringers must be securely attached to the deck frame at the top and to a solid footing at the bottom. At the top, use a stair stringer connector or a ledger board bolted to the rim joist. The stringers should never be attached with nails alone. At the bottom, stringers should bear on a concrete pad or footing that extends at least 6 inches beyond the stringer in all directions. The pad prevents the stringers from sinking into the ground, shifting sideways, or being undermined by erosion.
+    </p>
+    <p>
+      All exterior stair lumber must be rated for ground contact or elevated outdoor use. Use pressure-treated lumber rated for the appropriate exposure level. For stringers and framing in ground contact, use lumber rated UC4A or UC4B. For treads and risers above ground, UC3B is typically sufficient. Alternatively, composite decking and PVC materials can be used for treads and are popular choices for low-maintenance deck stairs.
+    </p>
+    <p>
+      Deck stairs wider than 36 inches should have a center stringer for additional support. Stairs wider than 6 feet may need two center stringers spaced evenly. Handrails are required on at least one side of deck stairs with four or more risers, and guards are required on the open side of any stairway where the drop exceeds 30 inches. Guard balusters must be spaced no more than 4 inches apart to prevent children from squeezing through.
+    </p>
+
+    <h2>Safety Requirements</h2>
+    <p>
+      Stair safety involves more than just meeting dimensional code requirements. Proper lighting, slip-resistant surfaces, secure handrails, and clear pathways all contribute to a safe staircase. Falls on stairs are one of the most common causes of serious injuries in homes, and many of these falls are preventable with proper design and maintenance.
+    </p>
+    <p>
+      <strong>Lighting:</strong> Building codes require a light at the top and bottom of every stairway. The light switch must be accessible from both levels, typically using three-way switches. For exterior stairs, use weather-rated fixtures rated for wet or damp locations. Consider low-voltage LED step lights installed in the risers or along the stringer to illuminate each tread individually, especially for exterior stairs used at night.
+    </p>
+    <p>
+      <strong>Slip resistance:</strong> Stair treads should provide adequate traction in all conditions. For interior stairs, carpet runners, non-slip paint, or textured hardwood finishes improve traction. For exterior stairs, use textured composite treads, non-slip tape, or treads with molded grip patterns. Outdoor wood treads can become slippery when wet or icy, so consider anti-slip coatings or metal tread covers in climates with rain, snow, or freezing conditions.
+    </p>
+    <p>
+      <strong>Handrail continuity:</strong> Handrails should run the full length of the stairway without interruption. The handrail must extend horizontally at least 12 inches beyond the top riser and at least the depth of one tread beyond the bottom riser. These extensions give users something to grab before they start ascending or after they finish descending. The handrail must be securely mounted to the wall or to posts that are anchored to the stair structure, not just the finish material.
+    </p>
+    <p>
+      <strong>Clear width:</strong> Keep the stair path clear of obstructions at all times. Do not store items on stairs or landings. The minimum clear width of 36 inches must be maintained at all points, including past handrail brackets, lighting fixtures, and decorative elements. In an emergency, stairs are the primary exit route, and any obstruction can be dangerous.
+    </p>
+    <p>
+      <strong>Uniformity:</strong> As mentioned throughout this guide, uniform rise and run dimensions are perhaps the single most important safety feature of any staircase. The human body quickly adapts to a rhythm when climbing or descending stairs, and any unexpected variation in step height or depth disrupts that rhythm and causes stumbles. The IRC limits the variation between the tallest and shortest riser (and between the deepest and shallowest tread) to 3/8 inch within any single flight of stairs.
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+<div class="faq-list">
+  <details class="faq-item">
+    <summary>How do I calculate the number of stairs I need?</summary>
+    <p>
+      Measure the total rise from the finished floor at the bottom to the finished floor at the top, in inches. Divide this number by 7.5 (the ideal riser height) and round to the nearest whole number. This gives you the number of steps. For example, a 9-foot (108-inch) total rise divided by 7.5 equals 14.4, which rounds to 14 steps. The actual riser height would be 108 / 14 = 7.71 inches per step. Always verify that the resulting riser height falls within code requirements of 4 to 7.75 inches.
+    </p>
+  </details>
+  <details class="faq-item">
+    <summary>What is the building code for stairs?</summary>
+    <p>
+      The IRC requires a maximum riser height of 7.75 inches and a minimum tread depth of 10 inches. The minimum riser height is 4 inches. Stairs must be at least 36 inches wide with a minimum headroom of 6 feet 8 inches. Handrails are required on at least one side for stairs with four or more risers, mounted between 34 and 38 inches high. All risers and treads must be uniform with no more than 3/8-inch variation within a flight.
+    </p>
+  </details>
+  <details class="faq-item">
+    <summary>What is the 17-18 rule for stairs?</summary>
+    <p>
+      The comfort rule states that the riser height plus the tread depth should equal 17 to 18 inches. This ratio creates a staircase that feels natural and easy to climb. A 7.5-inch riser with a 10-inch tread equals 17.5 inches, which is ideal. Stairs outside this range may feel too steep (sum below 17) or too shallow (sum above 18). Another similar rule is 2R + T = 24 to 25 inches, where R is rise and T is tread.
+    </p>
+  </details>
+</div>
+<h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/construction-calculators/concrete-calculator/">Concrete Calculator</a> - Calculate cubic yards of concrete for stairs, slabs, and footings.</li>
+      <li><a href="/construction-calculators/deck-calculator/">Deck Calculator</a> - Estimate decking boards, joists, posts, and hardware for your deck project.</li>
+      <li><a href="/construction-calculators/flooring-calculator/">Flooring Calculator</a> - Calculate materials for hardwood, tile, laminate, and carpet.</li>
+      <li><a href="/everyday-calculators/square-footage-calculator/">Square Footage Calculator</a> - Calculate area in square feet for any space or project.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="stair-bottom" format="horizontal" />
+  <RelatedArticles calculatorSlug="stair-calculator" />
+
+  <RelatedCalculators currentSlug="stair-calculator" />
+</BaseLayout>
+
+<style>
+  .code-compliance {
+    margin-top: 16px;
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.6;
+  }
+  .code-compliance.pass {
+    background: #f0fdf4;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+  }
+  .code-compliance.fail {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+  }
+  .stair-diagram {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+  }
+  .stair-diagram svg {
+    max-width: 100%;
+    height: auto;
+  }
+  .last-updated { font-size: 0.75rem; color: var(--color-text-muted); margin: 4px 0 0; }
+</style>
+
+<script is:inline>
+  function calculate() {
+    var unitEl = document.getElementById('unit');
+    var unit = unitEl.value;
+    var suffix = unit === 'in' ? '"' : ' cm';
+    var toInches = unit === 'cm' ? 1 / 2.54 : 1;
+    var fromInches = unit === 'cm' ? 2.54 : 1;
+
+    var totalRiseInput = parseFloat(document.getElementById('totalRise').value) || 0;
+    var runPerStepInput = parseFloat(document.getElementById('runPerStep').value) || 0;
+
+    // Convert to inches for calculation
+    var totalRiseIn = totalRiseInput * toInches;
+    var runPerStepIn = runPerStepInput * toInches;
+
+    // Calculate number of steps (aiming for ~7.5" rise per step)
+    var numSteps = Math.round(totalRiseIn / 7.5);
+    if (numSteps < 1) numSteps = 1;
+
+    // Actual rise per step
+    var risePerStepIn = totalRiseIn / numSteps;
+
+    // Total run (one fewer tread than risers)
+    var totalRunIn = (numSteps - 1) * runPerStepIn;
+
+    // Stringer length (Pythagorean theorem)
+    var stringerLengthIn = Math.sqrt(totalRiseIn * totalRiseIn + totalRunIn * totalRunIn);
+
+    // Stair angle
+    var stairAngleDeg = 0;
+    if (totalRunIn > 0) {
+      stairAngleDeg = Math.atan(totalRiseIn / totalRunIn) * (180 / Math.PI);
+    }
+
+    // Convert back to display unit
+    var risePerStepDisplay = risePerStepIn * fromInches;
+    var runPerStepDisplay = runPerStepInput;
+    var totalRunDisplay = totalRunIn * fromInches;
+    var stringerLengthDisplay = stringerLengthIn * fromInches;
+
+    // Update result displays
+    document.getElementById('numSteps').textContent = numSteps;
+    document.getElementById('risePerStep').textContent = risePerStepDisplay.toFixed(2) + suffix;
+    document.getElementById('runDisplay').textContent = runPerStepDisplay.toFixed(2) + suffix;
+    document.getElementById('totalRun').textContent = totalRunDisplay.toFixed(2) + suffix;
+    document.getElementById('stringerLength').textContent = stringerLengthDisplay.toFixed(2) + suffix;
+    document.getElementById('stairAngle').textContent = stairAngleDeg.toFixed(1) + '\u00B0';
+
+    // Code compliance check (always in inches)
+    var checks = [];
+    var allPass = true;
+
+    // Rise check: 4" to 7.75"
+    if (risePerStepIn >= 4 && risePerStepIn <= 7.75) {
+      checks.push('\u2705 Rise per step: ' + risePerStepIn.toFixed(2) + '" (code: 4" - 7.75")');
+    } else {
+      allPass = false;
+      checks.push('\u274C Rise per step: ' + risePerStepIn.toFixed(2) + '" (code: 4" - 7.75")');
+    }
+
+    // Run check: minimum 10"
+    if (runPerStepIn >= 10) {
+      checks.push('\u2705 Run per step: ' + runPerStepIn.toFixed(2) + '" (code: min 10")');
+    } else {
+      allPass = false;
+      checks.push('\u274C Run per step: ' + runPerStepIn.toFixed(2) + '" (code: min 10")');
+    }
+
+    // Comfort rule: rise + run = 17" to 18"
+    var comfortSum = risePerStepIn + runPerStepIn;
+    if (comfortSum >= 17 && comfortSum <= 18) {
+      checks.push('\u2705 Comfort rule (rise + run): ' + comfortSum.toFixed(2) + '" (ideal: 17" - 18")');
+    } else {
+      allPass = false;
+      checks.push('\u274C Comfort rule (rise + run): ' + comfortSum.toFixed(2) + '" (ideal: 17" - 18")');
+    }
+
+    var complianceEl = document.getElementById('codeCompliance');
+    complianceEl.className = 'code-compliance ' + (allPass ? 'pass' : 'fail');
+    complianceEl.innerHTML = '<strong>' + (allPass ? 'Code Compliant' : 'Code Issues Detected') + '</strong><br>' + checks.join('<br>');
+
+    // Draw SVG diagram
+    drawStairDiagram(numSteps, risePerStepIn, runPerStepIn, totalRiseIn, totalRunIn, stringerLengthIn, stairAngleDeg);
+  }
+
+  function drawStairDiagram(numSteps, risePerStep, runPerStep, totalRise, totalRun, stringerLength, angle) {
+    var container = document.getElementById('stairDiagram');
+    var maxStepsToShow = Math.min(numSteps, 12);
+
+    var padding = 60;
+    var stepW = 40;
+    var stepH = 25;
+    var svgW = maxStepsToShow * stepW + padding * 2 + 80;
+    var svgH = maxStepsToShow * stepH + padding * 2 + 40;
+
+    var startX = padding;
+    var startY = svgH - padding;
+
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + svgW + ' ' + svgH + '" width="' + svgW + '" height="' + svgH + '">';
+
+    // Background
+    svg += '<rect width="' + svgW + '" height="' + svgH + '" fill="#f8fafc" rx="8"/>';
+
+    // Draw steps
+    var path = 'M ' + startX + ' ' + startY;
+    for (var i = 0; i < maxStepsToShow; i++) {
+      var x1 = startX + i * stepW;
+      var y1 = startY - i * stepH;
+      var x2 = startX + i * stepW;
+      var y2 = startY - (i + 1) * stepH;
+      var x3 = startX + (i + 1) * stepW;
+      var y3 = startY - (i + 1) * stepH;
+      path += ' L ' + x2 + ' ' + y2 + ' L ' + x3 + ' ' + y3;
+    }
+    svg += '<path d="' + path + '" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>';
+
+    // Stringer line (dashed)
+    var endX = startX + maxStepsToShow * stepW;
+    var endY = startY - maxStepsToShow * stepH;
+    svg += '<line x1="' + startX + '" y1="' + startY + '" x2="' + endX + '" y2="' + endY + '" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="6,4"/>';
+
+    // Total rise dimension (right side)
+    var dimX = endX + 20;
+    svg += '<line x1="' + dimX + '" y1="' + startY + '" x2="' + dimX + '" y2="' + endY + '" stroke="#64748b" stroke-width="1"/>';
+    svg += '<line x1="' + (dimX - 5) + '" y1="' + startY + '" x2="' + (dimX + 5) + '" y2="' + startY + '" stroke="#64748b" stroke-width="1"/>';
+    svg += '<line x1="' + (dimX - 5) + '" y1="' + endY + '" x2="' + (dimX + 5) + '" y2="' + endY + '" stroke="#64748b" stroke-width="1"/>';
+    var midY = (startY + endY) / 2;
+    svg += '<text x="' + (dimX + 8) + '" y="' + midY + '" font-size="11" fill="#334155" font-family="sans-serif" dominant-baseline="middle">Total Rise</text>';
+
+    // Total run dimension (bottom)
+    var dimY = startY + 25;
+    svg += '<line x1="' + startX + '" y1="' + dimY + '" x2="' + endX + '" y2="' + dimY + '" stroke="#64748b" stroke-width="1"/>';
+    svg += '<line x1="' + startX + '" y1="' + (dimY - 5) + '" x2="' + startX + '" y2="' + (dimY + 5) + '" stroke="#64748b" stroke-width="1"/>';
+    svg += '<line x1="' + endX + '" y1="' + (dimY - 5) + '" x2="' + endX + '" y2="' + (dimY + 5) + '" stroke="#64748b" stroke-width="1"/>';
+    var midX = (startX + endX) / 2;
+    svg += '<text x="' + midX + '" y="' + (dimY + 16) + '" font-size="11" fill="#334155" font-family="sans-serif" text-anchor="middle">Total Run</text>';
+
+    // Rise and run labels on one step
+    if (maxStepsToShow >= 2) {
+      var labelStep = 1;
+      var lx1 = startX + labelStep * stepW;
+      var ly1 = startY - labelStep * stepH;
+      var ly2 = startY - (labelStep + 1) * stepH;
+      var lx2 = startX + (labelStep + 1) * stepW;
+
+      // Rise arrow
+      svg += '<line x1="' + (lx1 - 12) + '" y1="' + ly1 + '" x2="' + (lx1 - 12) + '" y2="' + ly2 + '" stroke="#16a34a" stroke-width="1.5"/>';
+      svg += '<text x="' + (lx1 - 16) + '" y="' + ((ly1 + ly2) / 2) + '" font-size="9" fill="#16a34a" font-family="sans-serif" text-anchor="end" dominant-baseline="middle">Rise</text>';
+
+      // Run arrow
+      svg += '<line x1="' + lx1 + '" y1="' + (ly2 + 12) + '" x2="' + lx2 + '" y2="' + (ly2 + 12) + '" stroke="#ea580c" stroke-width="1.5"/>';
+      svg += '<text x="' + ((lx1 + lx2) / 2) + '" y="' + (ly2 + 24) + '" font-size="9" fill="#ea580c" font-family="sans-serif" text-anchor="middle">Run</text>';
+    }
+
+    // Stringer label
+    var sMidX = (startX + endX) / 2 - 20;
+    var sMidY = (startY + endY) / 2 - 10;
+    svg += '<text x="' + sMidX + '" y="' + sMidY + '" font-size="10" fill="#ef4444" font-family="sans-serif" text-anchor="middle" transform="rotate(' + (-Math.atan2(maxStepsToShow * stepH, maxStepsToShow * stepW) * 180 / Math.PI) + ' ' + sMidX + ' ' + sMidY + ')">Stringer</text>';
+
+    // Angle arc
+    var arcR = 30;
+    var angleRad = Math.atan2(maxStepsToShow * stepH, maxStepsToShow * stepW);
+    var arcEndX = startX + arcR * Math.cos(angleRad);
+    var arcEndY = startY - arcR * Math.sin(angleRad);
+    svg += '<path d="M ' + (startX + arcR) + ' ' + startY + ' A ' + arcR + ' ' + arcR + ' 0 0 0 ' + arcEndX.toFixed(1) + ' ' + arcEndY.toFixed(1) + '" fill="none" stroke="#8b5cf6" stroke-width="1.5"/>';
+    svg += '<text x="' + (startX + arcR + 8) + '" y="' + (startY - 8) + '" font-size="10" fill="#8b5cf6" font-family="sans-serif">' + angle.toFixed(1) + '\u00B0</text>';
+
+    svg += '</svg>';
+    container.innerHTML = svg;
+  }
+
+  // Event listeners
+  document.querySelectorAll('.calc-inputs input, .calc-inputs select').forEach(function (el) {
+    el.addEventListener('input', calculate);
+  });
+
+  // Initial calculation
+  calculate();
+</script>

@@ -680,6 +680,49 @@ export const calculators: Calculator[] = [
     categorySlug: 'construction-calculators',
     icon: '🪨',
   },
+  {
+    title: 'Stair Calculator',
+    slug: 'stair-calculator',
+    description: 'Calculate stair dimensions including rise, run, number of steps, and stringer length. Ensures building code compliance for safe stairs.',
+    category: 'Construction Calculators',
+    categorySlug: 'construction-calculators',
+    icon: '🪜',
+  },
+  // Health (new)
+  {
+    title: 'Protein Intake Calculator',
+    slug: 'protein-intake-calculator',
+    description: 'Calculate your daily protein needs based on body weight, activity level, and fitness goals. Includes meal planning breakdown.',
+    category: 'Health Calculators',
+    categorySlug: 'health-calculators',
+    icon: '🥩',
+  },
+  {
+    title: 'BAC Calculator',
+    slug: 'bac-calculator',
+    description: 'Estimate your blood alcohol concentration based on drinks consumed, body weight, gender, and time elapsed.',
+    category: 'Health Calculators',
+    categorySlug: 'health-calculators',
+    icon: '🍺',
+  },
+  // Financial (new)
+  {
+    title: 'Car Lease Calculator',
+    slug: 'car-lease-calculator',
+    description: 'Calculate monthly car lease payments, total lease cost, and compare leasing vs buying with a detailed cost breakdown.',
+    category: 'Financial Calculators',
+    categorySlug: 'financial-calculators',
+    icon: '🚗',
+  },
+  // Math (new)
+  {
+    title: 'Scientific Calculator',
+    slug: 'scientific-calculator',
+    description: 'Free online scientific calculator with trigonometry, logarithms, exponents, square roots, factorial, and more advanced math functions.',
+    category: 'Math Calculators',
+    categorySlug: 'math-calculators',
+    icon: '🔬',
+  },
 ];
 
 export function getCalculatorsByCategory(categorySlug: string): Calculator[] {
@@ -689,7 +732,7 @@ export function getCalculatorsByCategory(categorySlug: string): Calculator[] {
 // Semantic relationship groups for internal linking
 const relatedGroups: Record<string, string[]> = {
   // Financial - Loans & Mortgages
-  'loans-mortgages': ['mortgage-calculator', 'loan-amortization-calculator', 'refinance-calculator', 'home-affordability-calculator', 'down-payment-calculator', 'rent-vs-buy-calculator', 'auto-loan-calculator', 'student-loan-calculator', 'business-loan-calculator', 'mortgage-amortization-calculator'],
+  'loans-mortgages': ['mortgage-calculator', 'loan-amortization-calculator', 'refinance-calculator', 'home-affordability-calculator', 'down-payment-calculator', 'rent-vs-buy-calculator', 'auto-loan-calculator', 'student-loan-calculator', 'business-loan-calculator', 'mortgage-amortization-calculator', 'car-lease-calculator'],
   // Financial - Income & Tax
   'income-tax': ['take-home-pay-calculator', 'paycheck-calculator', 'tax-calculator', 'payroll-tax-calculator', 'capital-gains-tax-calculator', 'estate-tax-calculator'],
   // Financial - Savings & Investment
@@ -697,17 +740,17 @@ const relatedGroups: Record<string, string[]> = {
   // Financial - Business & Wealth
   'business-wealth': ['margin-calculator', 'breakeven-calculator', 'crypto-profit-calculator', 'rental-yield-calculator', 'net-worth-calculator', 'debt-to-income-calculator', 'credit-card-payoff-calculator', 'debt-payoff-calculator'],
   // Health - Body Composition
-  'body-composition': ['bmi-calculator', 'tdee-calculator', 'calorie-calculator', 'body-fat-calculator', 'ideal-weight-calculator', 'macro-calculator', 'water-intake-calculator'],
+  'body-composition': ['bmi-calculator', 'tdee-calculator', 'calorie-calculator', 'body-fat-calculator', 'ideal-weight-calculator', 'macro-calculator', 'water-intake-calculator', 'protein-intake-calculator', 'bac-calculator'],
   // Health - Wellness
   'wellness': ['sleep-calculator', 'pace-calculator', 'pregnancy-due-date-calculator', 'ovulation-calculator', 'pregnancy-weight-gain-calculator'],
   // Math
-  'math-tools': ['percentage-calculator', 'fraction-calculator', 'standard-deviation-calculator', 'area-calculator', 'probability-calculator', 'gpa-calculator', 'random-number-generator'],
+  'math-tools': ['percentage-calculator', 'fraction-calculator', 'standard-deviation-calculator', 'area-calculator', 'probability-calculator', 'gpa-calculator', 'random-number-generator', 'scientific-calculator'],
   // Date & Time
   'date-time': ['age-calculator', 'date-difference-calculator', 'days-until-calculator', 'time-zone-converter'],
   // Everyday
   'everyday': ['tip-calculator', 'discount-calculator', 'hours-calculator', 'square-footage-calculator', 'gas-cost-calculator', 'electricity-cost-calculator', 'word-counter', 'dog-age-calculator'],
   // Construction
-  'construction': ['concrete-calculator', 'paint-calculator', 'roofing-calculator', 'flooring-calculator', 'mulch-calculator', 'fence-calculator', 'drywall-calculator', 'deck-calculator', 'solar-panel-calculator', 'gravel-calculator'],
+  'construction': ['concrete-calculator', 'paint-calculator', 'roofing-calculator', 'flooring-calculator', 'mulch-calculator', 'fence-calculator', 'drywall-calculator', 'deck-calculator', 'solar-panel-calculator', 'gravel-calculator', 'stair-calculator'],
 };
 
 // Cross-category links for broader discovery
