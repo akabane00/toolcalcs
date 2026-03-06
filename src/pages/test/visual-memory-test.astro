@@ -174,16 +174,14 @@ const structuredData = [
     margin: 0 auto;
   }
   :global(.vm-tile) {
-    aspect-ratio: 1;
     border-radius: 6px;
     border: none;
     padding: 0;
     cursor: pointer;
     background: var(--color-border);
     transition: background 0.2s, transform 0.1s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: block;
+    box-sizing: border-box;
   }
   :global(.vm-tile.showing) {
     background: #fff;
@@ -314,42 +312,57 @@ const structuredData = [
  }
 
  function startRound() {
- const { gridSize, tileCount } = getLevelConfig(currentLevel);
- const totalTiles = gridSize * gridSize;
+ var config = getLevelConfig(currentLevel);
+ var gridSize = config.gridSize;
+ var tileCount = config.tileCount;
+ var totalTiles = gridSize * gridSize;
 
  // Pick random tiles to highlight
- const indices = Array.from({ length: totalTiles }, (_, i) => i);
+ var indices = [];
+ for (var k = 0; k < totalTiles; k++) indices.push(k);
  shuffleArray(indices);
  highlightedSet = new Set(indices.slice(0, tileCount));
  foundSet = new Set();
  canClick = false;
 
  // Render grid
- vmGrid.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+ vmGrid.style.gridTemplateColumns = 'repeat(' + gridSize + ', 1fr)';
  vmGrid.innerHTML = '';
 
- for (let i = 0; i < totalTiles; i++) {
- const btn = document.createElement('button');
+ for (var i = 0; i < totalTiles; i++) {
+ var btn = document.createElement('button');
  btn.className = 'vm-tile';
  btn.dataset.index = String(i);
- btn.setAttribute('aria-label', `Tile ${i + 1}`);
+ btn.setAttribute('aria-label', 'Tile ' + (i + 1));
  vmGrid.appendChild(btn);
  }
 
- levelInfo.textContent = `Level ${currentLevel}`;
+ // Force square tiles — set height = width (bulletproof, no CSS aspect-ratio)
+ var firstTile = vmGrid.querySelector('.vm-tile');
+ if (firstTile) {
+ var tileW = firstTile.offsetWidth;
+ if (tileW > 0) {
+ var allTiles = vmGrid.querySelectorAll('.vm-tile');
+ for (var j = 0; j < allTiles.length; j++) {
+ allTiles[j].style.height = tileW + 'px';
+ }
+ }
+ }
+
+ levelInfo.textContent = 'Level ' + currentLevel;
  livesInfo.textContent = '❤️'.repeat(lives);
 
  // Show highlighted tiles
- highlightedSet.forEach(idx => {
- const tile = vmGrid.children[idx];
+ highlightedSet.forEach(function(idx) {
+ var tile = vmGrid.children[idx];
  tile.classList.add('showing');
  });
 
  // Hide after delay (longer for more tiles)
- const showTime = Math.min(2500, 800 + tileCount * 120);
- setTimeout(() => {
- highlightedSet.forEach(idx => {
- const tile = vmGrid.children[idx];
+ var showTime = Math.min(2500, 800 + tileCount * 120);
+ setTimeout(function() {
+ highlightedSet.forEach(function(idx) {
+ var tile = vmGrid.children[idx];
  tile.classList.remove('showing');
  });
  canClick = true;

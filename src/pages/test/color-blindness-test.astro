@@ -184,15 +184,13 @@ const structuredData = [
     margin: 0 auto;
   }
   :global(.color-tile) {
-    aspect-ratio: 1;
     border-radius: 6px;
     cursor: pointer;
     transition: transform 0.1s;
     border: none;
     padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: block;
+    box-sizing: border-box;
   }
   :global(.color-tile:hover) { transform: scale(0.95); }
   :global(.color-tile:active) { transform: scale(0.9); }
@@ -337,22 +335,34 @@ const structuredData = [
  }
 
  function renderGrid() {
- const { gridSize, totalTiles, oddIndex, baseColor, oddColor } = generateRound(currentLevel);
+ var round = generateRound(currentLevel);
 
- tileGrid.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+ tileGrid.style.gridTemplateColumns = 'repeat(' + round.gridSize + ', 1fr)';
  tileGrid.innerHTML = '';
 
- for (let i = 0; i < totalTiles; i++) {
- const btn = document.createElement('button');
+ for (var i = 0; i < round.totalTiles; i++) {
+ var btn = document.createElement('button');
  btn.className = 'color-tile';
- btn.style.background = i === oddIndex ? oddColor : baseColor;
- btn.setAttribute('aria-label', `Tile ${i + 1}`);
+ btn.style.background = i === round.oddIndex ? round.oddColor : round.baseColor;
+ btn.setAttribute('aria-label', 'Tile ' + (i + 1));
  btn.dataset.index = String(i);
- btn.dataset.isOdd = i === oddIndex ? '1' : '0';
+ btn.dataset.isOdd = i === round.oddIndex ? '1' : '0';
  tileGrid.appendChild(btn);
  }
 
- levelInfo.textContent = `Level ${currentLevel}`;
+ // Force square tiles — set height = width (bulletproof, no CSS aspect-ratio needed)
+ var firstTile = tileGrid.querySelector('.color-tile');
+ if (firstTile) {
+ var tileW = firstTile.offsetWidth;
+ if (tileW > 0) {
+ var allTiles = tileGrid.querySelectorAll('.color-tile');
+ for (var j = 0; j < allTiles.length; j++) {
+ allTiles[j].style.height = tileW + 'px';
+ }
+ }
+ }
+
+ levelInfo.textContent = 'Level ' + currentLevel;
  livesInfo.textContent = '❤️'.repeat(lives);
  }
 
