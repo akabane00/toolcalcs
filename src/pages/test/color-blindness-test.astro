@@ -290,6 +290,7 @@ const structuredData = [
  let currentLevel = 1;
  let lives = 3;
  let isPlaying = false;
+ let isProcessing = false;
 
  function showView(view) {
  [instructionsView, playView, resultView].forEach(v => v.style.display = 'none');
@@ -353,15 +354,16 @@ const structuredData = [
  }
 
  function handleTileClick(e) {
- if (!isPlaying) return;
- const target = (e.target).closest('.color-tile');
+ if (!isPlaying || isProcessing) return;
+ var target = e.target && e.target.closest ? e.target.closest('.color-tile') : null;
  if (!target) return;
 
+ isProcessing = true;
  if (target.dataset.isOdd === '1') {
  // Correct
  target.classList.add('correct-flash');
  currentLevel++;
- setTimeout(() => renderGrid(), 350);
+ setTimeout(function() { isProcessing = false; renderGrid(); }, 350);
  } else {
  // Wrong
  target.classList.add('wrong-flash');
@@ -369,13 +371,13 @@ const structuredData = [
  livesInfo.textContent = '❤️'.repeat(Math.max(0, lives));
 
  // Briefly highlight the correct tile
- const correctTile = tileGrid.querySelector('[data-is-odd="1"]');
+ var correctTile = tileGrid.querySelector('[data-is-odd="1"]');
  if (correctTile) correctTile.classList.add('correct-flash');
 
  if (lives <= 0) {
- setTimeout(() => endGame(), 500);
+ setTimeout(function() { endGame(); }, 500);
  } else {
- setTimeout(() => renderGrid(), 600);
+ setTimeout(function() { isProcessing = false; renderGrid(); }, 600);
  }
  }
  }
@@ -384,6 +386,7 @@ const structuredData = [
  currentLevel = 1;
  lives = 3;
  isPlaying = true;
+ isProcessing = false;
  showView(playView);
  renderGrid();
  }
