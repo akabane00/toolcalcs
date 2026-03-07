@@ -1,0 +1,795 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getToolBySlug } from '../../data/tools';
+import '../../styles/tool.css';
+
+const tool = getToolBySlug('unix-timestamp-converter')!;
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Web Tools", "item": "https://toolcalcs.com/tools/" },
+      { "@type": "ListItem", "position": 3, "name": "Unix Timestamp Converter" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Unix Timestamp Converter",
+    "url": "https://toolcalcs.com/tools/unix-timestamp-converter/",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Convert Unix timestamps to dates and dates to timestamps."
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is a Unix timestamp?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A Unix timestamp is the number of seconds elapsed since January 1, 1970 (UTC), known as the Unix epoch. It is widely used in programming and databases to represent points in time as simple integers."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between seconds and milliseconds timestamps?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Standard Unix timestamps count seconds since the epoch (10 digits). JavaScript and some APIs use millisecond timestamps (13 digits). This tool auto-detects which format you enter."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is the Unix timestamp affected by time zones?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. Unix timestamps always represent UTC time. When displaying a timestamp as a human-readable date, the conversion depends on the viewer's timezone, but the underlying timestamp value is timezone-independent."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Unix Timestamp Converter - Convert Epoch Time to Date | ToolCalcs"
+  description={tool.description}
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/tools/">Web Tools</a> &rsaquo;
+    <span>Unix Timestamp Converter</span>
+  </nav>
+
+  <h1>{tool.title}</h1>
+  <p class="page-desc">Convert between Unix timestamps and human-readable dates. See the current epoch time updating live, convert any timestamp to a formatted date, or pick a date to get its timestamp.</p>
+
+  <div class="tool-box">
+    <!-- Live Clock Section -->
+    <div class="ts-section">
+      <label class="tool-label">Current Unix Timestamp</label>
+      <div class="live-clock-row">
+        <div class="live-clock-display">
+          <span class="live-value" id="liveSeconds">---</span>
+          <span class="live-unit">seconds</span>
+        </div>
+        <button type="button" class="copy-btn" id="copyLiveSeconds">Copy</button>
+      </div>
+      <div class="live-clock-row">
+        <div class="live-clock-display">
+          <span class="live-value live-value-ms" id="liveMilliseconds">---</span>
+          <span class="live-unit">milliseconds</span>
+        </div>
+        <button type="button" class="copy-btn" id="copyLiveMs">Copy</button>
+      </div>
+    </div>
+
+    <hr class="ts-divider" />
+
+    <!-- Timestamp to Date Section -->
+    <div class="ts-section">
+      <label class="tool-label" for="tsInput">Timestamp &rarr; Date</label>
+      <div class="ts-input-row">
+        <input type="number" id="tsInput" class="ts-number-input" placeholder="e.g. 1700000000 or 1700000000000" />
+        <button type="button" class="tool-btn primary" id="tsConvertBtn">Convert</button>
+        <button type="button" class="tool-btn secondary" id="tsNowBtn">Now</button>
+      </div>
+      <div class="ts-format-hint" id="tsFormatHint"></div>
+      <div class="tool-error" id="tsError" hidden></div>
+      <div class="ts-results" id="tsResults" hidden>
+        <div class="ts-result-card">
+          <span class="ts-result-label">UTC</span>
+          <span class="ts-result-value" id="tsUtc">--</span>
+          <button type="button" class="copy-btn" data-copy-target="tsUtc">Copy</button>
+        </div>
+        <div class="ts-result-card">
+          <span class="ts-result-label">Local Time</span>
+          <span class="ts-result-value" id="tsLocal">--</span>
+          <button type="button" class="copy-btn" data-copy-target="tsLocal">Copy</button>
+        </div>
+        <div class="ts-result-card">
+          <span class="ts-result-label">ISO 8601</span>
+          <span class="ts-result-value ts-mono" id="tsIso">--</span>
+          <button type="button" class="copy-btn" data-copy-target="tsIso">Copy</button>
+        </div>
+        <div class="ts-result-card">
+          <span class="ts-result-label">Relative</span>
+          <span class="ts-result-value" id="tsRelative">--</span>
+        </div>
+      </div>
+    </div>
+
+    <hr class="ts-divider" />
+
+    <!-- Date to Timestamp Section -->
+    <div class="ts-section">
+      <label class="tool-label">Date &rarr; Timestamp</label>
+      <div class="ts-tz-toggle">
+        <button type="button" class="ts-tz-btn active" id="tzLocal" data-tz="local">Local</button>
+        <button type="button" class="ts-tz-btn" id="tzUtc" data-tz="utc">UTC</button>
+      </div>
+      <div class="ts-date-inputs">
+        <div class="ts-date-field">
+          <label for="dtYear">Year</label>
+          <input type="number" id="dtYear" min="1970" max="2099" />
+        </div>
+        <div class="ts-date-field">
+          <label for="dtMonth">Month</label>
+          <input type="number" id="dtMonth" min="1" max="12" />
+        </div>
+        <div class="ts-date-field">
+          <label for="dtDay">Day</label>
+          <input type="number" id="dtDay" min="1" max="31" />
+        </div>
+        <div class="ts-date-field">
+          <label for="dtHour">Hour</label>
+          <input type="number" id="dtHour" min="0" max="23" />
+        </div>
+        <div class="ts-date-field">
+          <label for="dtMinute">Min</label>
+          <input type="number" id="dtMinute" min="0" max="59" />
+        </div>
+        <div class="ts-date-field">
+          <label for="dtSecond">Sec</label>
+          <input type="number" id="dtSecond" min="0" max="59" />
+        </div>
+      </div>
+      <div class="tool-controls">
+        <button type="button" class="tool-btn primary" id="dtConvertBtn">Convert to Timestamp</button>
+        <button type="button" class="tool-btn secondary" id="dtNowBtn">Now</button>
+      </div>
+      <div class="tool-error" id="dtError" hidden></div>
+      <div class="ts-results" id="dtResults" hidden>
+        <div class="ts-result-card">
+          <span class="ts-result-label">Seconds</span>
+          <span class="ts-result-value ts-mono" id="dtSeconds">--</span>
+          <button type="button" class="copy-btn" data-copy-target="dtSeconds">Copy</button>
+        </div>
+        <div class="ts-result-card">
+          <span class="ts-result-label">Milliseconds</span>
+          <span class="ts-result-value ts-mono" id="dtMilliseconds">--</span>
+          <button type="button" class="copy-btn" data-copy-target="dtMilliseconds">Copy</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="tool-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is a Unix Timestamp?</h2>
+    <p>A Unix timestamp, also called epoch time or POSIX time, is a system for tracking time as a single integer. It represents the number of seconds that have elapsed since midnight on January 1, 1970, Coordinated Universal Time (UTC). That specific moment in time is called the Unix epoch, and every second since then increments the counter by one. For example, the Unix timestamp 1,000,000,000 corresponds to September 9, 2001, at 01:46:40 UTC, meaning exactly one billion seconds had passed since the epoch at that moment.</p>
+    <p>This representation was introduced in the early days of the Unix operating system in the late 1960s and early 1970s. The engineers at Bell Labs needed a simple, universal way to record time that did not depend on any particular calendar system, locale, or timezone. By reducing time to a single number, they created a format that is trivially easy to store, compare, and transmit. If you want to know which of two events happened first, you simply compare their timestamps: the smaller number is the earlier event. If you want to know how much time passed between two events, you subtract one timestamp from the other. No date parsing, no timezone math, no calendar rules -- just integer arithmetic.</p>
+    <p>Unix timestamps are used in virtually every area of software development today. Operating systems use them for file creation and modification times. Databases store them in date columns. Web servers include them in HTTP headers. Authentication systems embed them in tokens to enforce expiration. Logging systems tag every entry with a timestamp for chronological ordering. APIs transmit them as compact, unambiguous time values. The format's simplicity and universality are why it has endured for over fifty years and remains the de facto standard for machine-readable time representation.</p>
+
+    <h2>The Unix Epoch Explained</h2>
+    <p>The Unix epoch is the reference point from which all Unix timestamps are measured: January 1, 1970, at 00:00:00 UTC. This date was chosen somewhat arbitrarily by the developers of early Unix systems. When Ken Thompson and Dennis Ritchie were designing the time system for Unix at Bell Labs, they needed a starting point that was recent enough to be useful (timestamps before the epoch would be negative) but far enough in the past that contemporary dates would produce positive values. January 1, 1970, provided a clean round date that met both requirements.</p>
+    <p>Timestamps before the epoch are represented as negative numbers. For instance, the timestamp -86400 corresponds to December 31, 1969, at 00:00:00 UTC, exactly one day (86,400 seconds) before the epoch. While negative timestamps are mathematically valid and most modern systems handle them correctly, some software and databases do not support them, which can cause problems when working with historical dates before 1970.</p>
+    <p>It is important to understand that the epoch is defined in UTC, not in any local timezone. The timestamp 0 is midnight in London (UTC+0), which means it was 7:00 PM on December 31, 1969, in New York (UTC-5), and 9:00 AM on January 1, 1970, in Tokyo (UTC+9). This distinction is critical: the same timestamp maps to different local times depending on the timezone, but the underlying value is always anchored to UTC.</p>
+
+    <h2>How Timestamp Conversion Works</h2>
+    <p>Converting a Unix timestamp to a human-readable date involves translating a single integer into a combination of year, month, day, hour, minute, and second. The process starts by dividing the total number of seconds by the number of seconds in a day (86,400) to determine how many complete days have passed since the epoch. The remaining seconds give the time of day. The count of days is then mapped to a calendar date by accounting for the variable lengths of months and the occurrence of leap years.</p>
+    <p>The reverse conversion, from a date to a timestamp, works by counting the total number of days from January 1, 1970, to the target date, multiplying by 86,400, and adding the seconds contributed by the hour, minute, and second components. Leap year rules must be applied correctly: a year is a leap year if it is divisible by 4, except for years divisible by 100, unless the year is also divisible by 400. This means 2000 was a leap year, 1900 was not, and 2024 was a leap year.</p>
+    <p>Timezone handling adds another layer of complexity. Because Unix timestamps are inherently UTC, converting to a local date requires adding or subtracting the local timezone's offset from UTC. This offset can vary throughout the year due to daylight saving time (DST) rules, which differ by region and have changed historically. Modern programming languages and libraries handle these complexities through timezone databases (such as the IANA Time Zone Database), but understanding the underlying mechanics is valuable for debugging time-related issues.</p>
+    <p>This tool performs both conversions entirely in your browser using JavaScript's built-in Date object, which relies on the operating system's timezone data. When you enter a timestamp, the tool constructs a Date object from the millisecond value and extracts the formatted date in both UTC and your local timezone. When you enter a date, the tool constructs a Date object from the components and reads back the timestamp value. All processing happens client-side, so no data is sent to any server.</p>
+
+    <h2>Seconds vs Milliseconds</h2>
+    <p>The original Unix timestamp format counts seconds since the epoch, producing a 10-digit number for dates in the current era. For example, March 1, 2025, at noon UTC is represented as 1740830400 in seconds. However, many modern systems use a higher-precision variant that counts milliseconds since the epoch, resulting in a 13-digit number. The same moment in milliseconds is 1740830400000.</p>
+    <p>JavaScript is the most prominent user of millisecond timestamps. The <code>Date.now()</code> function and the <code>Date.getTime()</code> method both return milliseconds. This design choice was made to provide sub-second precision for animations, performance measurements, and event timing without requiring floating-point numbers. Java's <code>System.currentTimeMillis()</code> also returns milliseconds, as do many JavaScript-based APIs and databases like MongoDB (whose ObjectId embeds a creation timestamp in seconds, but the driver often works with millisecond values).</p>
+    <p>The difference between seconds and milliseconds timestamps is a frequent source of bugs. Passing a seconds-based timestamp to a function expecting milliseconds produces a date in January 1970, while passing a milliseconds-based timestamp to a function expecting seconds can produce dates thousands of years in the future. This tool auto-detects the format by checking the number of digits: 10 digits or fewer are treated as seconds, 13 digits are treated as milliseconds. Values between 10 and 13 digits are interpreted based on whether they fall within a reasonable date range.</p>
+    <p>Some systems also use microsecond timestamps (16 digits) or nanosecond timestamps (19 digits). These are less common but appear in high-frequency trading systems, scientific computing, and certain database engines. While this tool focuses on seconds and milliseconds as the two most widely used formats, the same conversion principles apply to any precision -- you simply divide by the appropriate power of 10 to get seconds before applying calendar math.</p>
+
+    <h2>The Year 2038 Problem</h2>
+    <p>The Year 2038 problem, sometimes called the Epochalypse or Y2K38, is a potential computing failure that will affect systems storing Unix timestamps as 32-bit signed integers. A 32-bit signed integer can hold a maximum value of 2,147,483,647, which corresponds to Tuesday, January 19, 2038, at 03:14:07 UTC. One second later, the integer overflows, wrapping around to the minimum negative value (-2,147,483,648), which represents a date in December 1901. Any software that interprets this overflow naively would suddenly believe the current date had jumped backward by over 136 years.</p>
+    <p>The root cause is identical to the Y2K problem: insufficient storage capacity for a growing counter. In the late 1960s and 1970s, a 32-bit integer seemed more than adequate. It could represent over 68 years into the future from 1970, which felt like an eternity to engineers building systems that they expected to be replaced long before 2038. But Unix's success meant that its time format became embedded in hardware, firmware, file formats, network protocols, and databases worldwide, many of which are still in active use today.</p>
+    <p>The fix is straightforward in principle: use 64-bit integers instead of 32-bit integers to store timestamps. A 64-bit signed integer can represent dates up to approximately 292 billion years in the future, which is effectively unlimited for any practical purpose. Most modern operating systems, programming languages, and databases have already made this transition. Linux completed its kernel-level migration to 64-bit time on 32-bit architectures in the 5.6 kernel release (2020). However, embedded systems, legacy firmware, older databases, and file formats that hardcode 32-bit timestamps remain vulnerable. The transition is ongoing and will continue to require attention as 2038 approaches.</p>
+    <p>For web developers and application programmers, the Year 2038 problem is largely a non-issue today. JavaScript uses 64-bit floating-point numbers for timestamps (providing millisecond precision up to approximately the year 287,000), and modern server-side languages use 64-bit integers by default. However, if you work with embedded systems, network protocols, binary file formats, or legacy databases, it is worth auditing your timestamp storage to ensure 64-bit readiness.</p>
+
+    <h2>Common Programming Uses</h2>
+    <p>Unix timestamps appear throughout software development in a wide variety of contexts. Understanding these common use cases helps developers choose the right time representation for each situation and avoid common pitfalls.</p>
+    <p><strong>Database storage.</strong> Many databases offer both timestamp columns and datetime columns. Timestamp columns typically store the value as an integer (seconds or milliseconds since the epoch), while datetime columns store year, month, day, hour, minute, and second as separate components. Integer timestamps are faster to index, compare, and sort because they require only a single integer comparison rather than multi-field calendar math. They also consume less storage. However, datetime columns are more human-readable when querying directly. The choice depends on whether performance or readability is the higher priority for your use case.</p>
+    <p><strong>API communication.</strong> REST and GraphQL APIs frequently transmit timestamps as integers because they are compact and unambiguous. Unlike date strings, which can be formatted in dozens of ways (is "01/02/2025" January 2 or February 1?), an integer timestamp has exactly one interpretation. API documentation should specify whether timestamps are in seconds or milliseconds, and whether they represent UTC or some other timezone. The JSON specification does not define a date type, so timestamps are typically transmitted as numbers or as ISO 8601 strings.</p>
+    <p><strong>Authentication and security.</strong> JSON Web Tokens (JWTs) include <code>iat</code> (issued at), <code>exp</code> (expiration), and <code>nbf</code> (not before) claims, all expressed as Unix timestamps in seconds. OAuth 2.0 access tokens include an <code>expires_in</code> field that specifies the token lifetime in seconds. TOTP (Time-based One-Time Password) algorithms like those used by Google Authenticator divide the current Unix timestamp by a time step (usually 30 seconds) to generate rotating codes. In all these cases, the simplicity and universality of Unix timestamps make them the natural choice for time-based security mechanisms.</p>
+    <p><strong>Logging and observability.</strong> Log entries are typically tagged with timestamps for chronological ordering and correlation. Structured logging formats like JSON logs almost always use Unix timestamps because they sort correctly as numbers and can be parsed without date-formatting libraries. Distributed tracing systems assign timestamps to each span to reconstruct request flows across microservices. Monitoring tools like Prometheus store all metrics with Unix timestamps at millisecond resolution.</p>
+    <p><strong>Caching and expiration.</strong> HTTP caching uses timestamps extensively. The <code>Date</code> header records when a response was generated. The <code>Expires</code> header specifies when a cached response becomes stale. The <code>Last-Modified</code> header records when the resource was last changed. While these HTTP headers use human-readable date strings (RFC 7231 format), the underlying calculations involve comparing timestamps. Cache-Control directives like <code>max-age=3600</code> specify durations in seconds that are added to the current timestamp to determine expiration.</p>
+    <p><strong>Scheduling and cron.</strong> Cron jobs and task schedulers often work with timestamps to determine when the next execution should occur. The scheduler compares the current timestamp against the scheduled timestamp to decide whether to fire a job. Delayed message queues use timestamps to hold messages until a specified delivery time. Rate limiters use timestamps to track request windows and enforce quotas.</p>
+
+    <h2>About This Tool</h2>
+    <p>This Unix Timestamp Converter runs entirely in your browser using JavaScript. No data is sent to any server -- all conversions happen locally on your device. The live clock updates every second to show the current Unix timestamp in both seconds and milliseconds. The timestamp-to-date converter auto-detects whether your input is in seconds or milliseconds and displays the result in UTC, your local timezone, ISO 8601 format, and as a relative time description. The date-to-timestamp converter lets you pick any date and time and get the corresponding timestamp in both seconds and milliseconds, with a toggle to interpret the input as local time or UTC. Copy buttons throughout the tool make it easy to transfer values to your clipboard.</p>
+  </article>
+
+  <AdUnit slot="tool-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .ts-section {
+    margin-bottom: 8px;
+  }
+  .ts-section:last-child {
+    margin-bottom: 0;
+  }
+  .ts-section > .tool-label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+  }
+
+  .ts-divider {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: 20px 0;
+  }
+
+  /* Live Clock */
+  .live-clock-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .live-clock-display {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+  }
+  .live-value {
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--color-text);
+    letter-spacing: 0.5px;
+  }
+  .live-value-ms {
+    font-size: 1.2rem;
+  }
+  .live-unit {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+
+  /* Timestamp to Date */
+  .ts-input-row {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+  }
+  .ts-number-input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    font-family: 'Courier New', Consolas, monospace;
+    background: var(--color-bg);
+    color: var(--color-text);
+    min-width: 0;
+    -moz-appearance: textfield;
+  }
+  .ts-number-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+  .ts-number-input::-webkit-inner-spin-button,
+  .ts-number-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .ts-format-hint {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-top: 6px;
+    min-height: 1.2em;
+  }
+
+  /* Results Cards */
+  .ts-results {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .ts-result-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+  .ts-result-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    min-width: 80px;
+    white-space: nowrap;
+  }
+  .ts-result-value {
+    flex: 1;
+    font-size: 0.9rem;
+    color: var(--color-text);
+    word-break: break-word;
+  }
+  .ts-mono {
+    font-family: 'Courier New', Consolas, monospace;
+  }
+
+  /* Date to Timestamp Inputs */
+  .ts-tz-toggle {
+    display: inline-flex;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .ts-tz-btn {
+    padding: 6px 16px;
+    border: none;
+    background: var(--color-bg);
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .ts-tz-btn.active {
+    background: var(--color-primary);
+    color: #fff;
+  }
+  .ts-tz-btn:not(.active):hover {
+    background: var(--color-surface);
+  }
+
+  .ts-date-inputs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .ts-date-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .ts-date-field label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .ts-date-field input {
+    width: 72px;
+    padding: 8px 8px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    font-family: 'Courier New', Consolas, monospace;
+    background: var(--color-bg);
+    color: var(--color-text);
+    text-align: center;
+    -moz-appearance: textfield;
+  }
+  .ts-date-field input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+  .ts-date-field input::-webkit-inner-spin-button,
+  .ts-date-field input::-webkit-outer-spin-button {
+    opacity: 1;
+  }
+  .ts-date-field:first-child input {
+    width: 80px;
+  }
+
+  @media (max-width: 640px) {
+    .ts-input-row {
+      flex-direction: column;
+    }
+    .live-value {
+      font-size: 1.2rem;
+    }
+    .live-value-ms {
+      font-size: 1rem;
+    }
+    .ts-date-inputs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .ts-date-field input {
+      width: 100%;
+    }
+    .ts-date-field:first-child input {
+      width: 100%;
+    }
+  }
+</style>
+
+<script>
+  // --- DOM Elements ---
+  const liveSecondsEl = document.getElementById('liveSeconds') as HTMLSpanElement;
+  const liveMillisecondsEl = document.getElementById('liveMilliseconds') as HTMLSpanElement;
+  const copyLiveSecondsBtn = document.getElementById('copyLiveSeconds') as HTMLButtonElement;
+  const copyLiveMsBtn = document.getElementById('copyLiveMs') as HTMLButtonElement;
+
+  const tsInput = document.getElementById('tsInput') as HTMLInputElement;
+  const tsConvertBtn = document.getElementById('tsConvertBtn') as HTMLButtonElement;
+  const tsNowBtn = document.getElementById('tsNowBtn') as HTMLButtonElement;
+  const tsFormatHint = document.getElementById('tsFormatHint') as HTMLDivElement;
+  const tsError = document.getElementById('tsError') as HTMLDivElement;
+  const tsResults = document.getElementById('tsResults') as HTMLDivElement;
+  const tsUtcEl = document.getElementById('tsUtc') as HTMLSpanElement;
+  const tsLocalEl = document.getElementById('tsLocal') as HTMLSpanElement;
+  const tsIsoEl = document.getElementById('tsIso') as HTMLSpanElement;
+  const tsRelativeEl = document.getElementById('tsRelative') as HTMLSpanElement;
+
+  const dtYear = document.getElementById('dtYear') as HTMLInputElement;
+  const dtMonth = document.getElementById('dtMonth') as HTMLInputElement;
+  const dtDay = document.getElementById('dtDay') as HTMLInputElement;
+  const dtHour = document.getElementById('dtHour') as HTMLInputElement;
+  const dtMinute = document.getElementById('dtMinute') as HTMLInputElement;
+  const dtSecond = document.getElementById('dtSecond') as HTMLInputElement;
+  const dtConvertBtn = document.getElementById('dtConvertBtn') as HTMLButtonElement;
+  const dtNowBtn = document.getElementById('dtNowBtn') as HTMLButtonElement;
+  const dtError = document.getElementById('dtError') as HTMLDivElement;
+  const dtResults = document.getElementById('dtResults') as HTMLDivElement;
+  const dtSecondsEl = document.getElementById('dtSeconds') as HTMLSpanElement;
+  const dtMillisecondsEl = document.getElementById('dtMilliseconds') as HTMLSpanElement;
+
+  const tzLocalBtn = document.getElementById('tzLocal') as HTMLButtonElement;
+  const tzUtcBtn = document.getElementById('tzUtc') as HTMLButtonElement;
+
+  let selectedTz: 'local' | 'utc' = 'local';
+
+  // --- Utility: Copy to clipboard ---
+  function copyToClipboard(text: string, btn: HTMLButtonElement): void {
+    navigator.clipboard.writeText(text).then(() => {
+      const original = btn.textContent;
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = original;
+        btn.classList.remove('copied');
+      }, 1500);
+    }).catch(() => {
+      // Fallback
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      const original = btn.textContent;
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = original;
+        btn.classList.remove('copied');
+      }, 1500);
+    });
+  }
+
+  // --- Live Clock ---
+  function updateLiveClock(): void {
+    const now = Date.now();
+    const seconds = Math.floor(now / 1000);
+    liveSecondsEl.textContent = seconds.toLocaleString('en-US');
+    liveMillisecondsEl.textContent = now.toLocaleString('en-US');
+  }
+
+  updateLiveClock();
+  setInterval(updateLiveClock, 1000);
+
+  copyLiveSecondsBtn.addEventListener('click', () => {
+    const seconds = String(Math.floor(Date.now() / 1000));
+    copyToClipboard(seconds, copyLiveSecondsBtn);
+  });
+
+  copyLiveMsBtn.addEventListener('click', () => {
+    const ms = String(Date.now());
+    copyToClipboard(ms, copyLiveMsBtn);
+  });
+
+  // --- Relative time ---
+  function getRelativeTime(date: Date): string {
+    const now = Date.now();
+    const diffMs = now - date.getTime();
+    const absDiffMs = Math.abs(diffMs);
+    const isFuture = diffMs < 0;
+
+    const seconds = Math.floor(absDiffMs / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+    const weeks = Math.floor(days / 7);
+    const months = Math.floor(days / 30.44);
+    const years = Math.floor(days / 365.25);
+
+    let text: string;
+    if (seconds < 5) {
+      return 'just now';
+    } else if (seconds < 60) {
+      text = seconds + ' second' + (seconds !== 1 ? 's' : '');
+    } else if (minutes < 60) {
+      text = minutes + ' minute' + (minutes !== 1 ? 's' : '');
+    } else if (hours < 24) {
+      text = hours + ' hour' + (hours !== 1 ? 's' : '');
+    } else if (days < 7) {
+      text = days + ' day' + (days !== 1 ? 's' : '');
+    } else if (weeks < 5) {
+      text = weeks + ' week' + (weeks !== 1 ? 's' : '');
+    } else if (months < 12) {
+      text = months + ' month' + (months !== 1 ? 's' : '');
+    } else {
+      text = years + ' year' + (years !== 1 ? 's' : '');
+    }
+
+    return isFuture ? 'in ' + text : text + ' ago';
+  }
+
+  // --- Format date helpers ---
+  function formatFullDate(date: Date, utc: boolean): string {
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+      timeZoneName: 'short',
+    };
+    if (utc) {
+      options.timeZone = 'UTC';
+    }
+    return date.toLocaleString('en-US', options);
+  }
+
+  // --- Detect timestamp format ---
+  function detectTimestampFormat(value: string): 'seconds' | 'milliseconds' | null {
+    const trimmed = value.trim();
+    if (!/^-?\d+$/.test(trimmed)) return null;
+
+    const num = Number(trimmed);
+    if (!Number.isFinite(num)) return null;
+
+    const absNum = Math.abs(num);
+    // 13+ digits -> milliseconds
+    if (absNum >= 1e12) return 'milliseconds';
+    // 10 digits or fewer -> seconds
+    return 'seconds';
+  }
+
+  // --- Timestamp to date conversion ---
+  function convertTimestampToDate(): void {
+    tsError.hidden = true;
+    tsResults.hidden = true;
+    tsFormatHint.textContent = '';
+
+    const raw = tsInput.value.trim();
+    if (!raw) {
+      tsError.textContent = 'Please enter a Unix timestamp.';
+      tsError.hidden = false;
+      return;
+    }
+
+    const format = detectTimestampFormat(raw);
+    if (!format) {
+      tsError.textContent = 'Invalid timestamp. Please enter a numeric value (e.g. 1700000000).';
+      tsError.hidden = false;
+      return;
+    }
+
+    const num = Number(raw);
+    const ms = format === 'milliseconds' ? num : num * 1000;
+    const date = new Date(ms);
+
+    if (isNaN(date.getTime())) {
+      tsError.textContent = 'The timestamp produces an invalid date. Please check your input.';
+      tsError.hidden = false;
+      return;
+    }
+
+    tsFormatHint.textContent = 'Detected format: ' + format + ' (' + (format === 'seconds' ? '10-digit' : '13-digit') + ')';
+
+    tsUtcEl.textContent = formatFullDate(date, true);
+    tsLocalEl.textContent = formatFullDate(date, false);
+    tsIsoEl.textContent = date.toISOString();
+    tsRelativeEl.textContent = getRelativeTime(date);
+
+    tsResults.hidden = false;
+  }
+
+  tsConvertBtn.addEventListener('click', convertTimestampToDate);
+
+  tsInput.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      convertTimestampToDate();
+    }
+  });
+
+  tsNowBtn.addEventListener('click', () => {
+    tsInput.value = String(Math.floor(Date.now() / 1000));
+    convertTimestampToDate();
+  });
+
+  // --- Auto-detect hint on input ---
+  tsInput.addEventListener('input', () => {
+    const raw = tsInput.value.trim();
+    if (!raw) {
+      tsFormatHint.textContent = '';
+      return;
+    }
+    const format = detectTimestampFormat(raw);
+    if (format) {
+      tsFormatHint.textContent = 'Detected: ' + format + ' (' + (format === 'seconds' ? '10-digit' : '13-digit') + ')';
+    } else {
+      tsFormatHint.textContent = '';
+    }
+  });
+
+  // --- Date to timestamp: populate with current date ---
+  function populateDateFields(date: Date, utc: boolean): void {
+    if (utc) {
+      dtYear.value = String(date.getUTCFullYear());
+      dtMonth.value = String(date.getUTCMonth() + 1);
+      dtDay.value = String(date.getUTCDate());
+      dtHour.value = String(date.getUTCHours());
+      dtMinute.value = String(date.getUTCMinutes());
+      dtSecond.value = String(date.getUTCSeconds());
+    } else {
+      dtYear.value = String(date.getFullYear());
+      dtMonth.value = String(date.getMonth() + 1);
+      dtDay.value = String(date.getDate());
+      dtHour.value = String(date.getHours());
+      dtMinute.value = String(date.getMinutes());
+      dtSecond.value = String(date.getSeconds());
+    }
+  }
+
+  // Initialize date fields with current date
+  populateDateFields(new Date(), selectedTz === 'utc');
+
+  // --- Timezone toggle ---
+  tzLocalBtn.addEventListener('click', () => {
+    if (selectedTz === 'local') return;
+    selectedTz = 'local';
+    tzLocalBtn.classList.add('active');
+    tzUtcBtn.classList.remove('active');
+  });
+
+  tzUtcBtn.addEventListener('click', () => {
+    if (selectedTz === 'utc') return;
+    selectedTz = 'utc';
+    tzUtcBtn.classList.add('active');
+    tzLocalBtn.classList.remove('active');
+  });
+
+  // --- Date to timestamp conversion ---
+  function convertDateToTimestamp(): void {
+    dtError.hidden = true;
+    dtResults.hidden = true;
+
+    const year = parseInt(dtYear.value, 10);
+    const month = parseInt(dtMonth.value, 10);
+    const day = parseInt(dtDay.value, 10);
+    const hour = parseInt(dtHour.value, 10) || 0;
+    const minute = parseInt(dtMinute.value, 10) || 0;
+    const second = parseInt(dtSecond.value, 10) || 0;
+
+    if (isNaN(year) || isNaN(month) || isNaN(day)) {
+      dtError.textContent = 'Please fill in at least the year, month, and day fields.';
+      dtError.hidden = false;
+      return;
+    }
+
+    if (month < 1 || month > 12) {
+      dtError.textContent = 'Month must be between 1 and 12.';
+      dtError.hidden = false;
+      return;
+    }
+
+    if (day < 1 || day > 31) {
+      dtError.textContent = 'Day must be between 1 and 31.';
+      dtError.hidden = false;
+      return;
+    }
+
+    let date: Date;
+    if (selectedTz === 'utc') {
+      date = new Date(Date.UTC(year, month - 1, day, hour, minute, second));
+    } else {
+      date = new Date(year, month - 1, day, hour, minute, second);
+    }
+
+    // Handle years 0-99 explicitly since Date constructor treats them as 1900-1999
+    if (year >= 0 && year < 100) {
+      if (selectedTz === 'utc') {
+        date.setUTCFullYear(year);
+      } else {
+        date.setFullYear(year);
+      }
+    }
+
+    if (isNaN(date.getTime())) {
+      dtError.textContent = 'The entered date is invalid. Please check your values.';
+      dtError.hidden = false;
+      return;
+    }
+
+    const ms = date.getTime();
+    const seconds = Math.floor(ms / 1000);
+
+    dtSecondsEl.textContent = seconds.toLocaleString('en-US');
+    dtMillisecondsEl.textContent = ms.toLocaleString('en-US');
+
+    dtResults.hidden = false;
+  }
+
+  dtConvertBtn.addEventListener('click', convertDateToTimestamp);
+
+  dtNowBtn.addEventListener('click', () => {
+    populateDateFields(new Date(), selectedTz === 'utc');
+    convertDateToTimestamp();
+  });
+
+  // --- Copy buttons for result cards ---
+  document.querySelectorAll<HTMLButtonElement>('.copy-btn[data-copy-target]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.getAttribute('data-copy-target');
+      if (!targetId) return;
+      const targetEl = document.getElementById(targetId);
+      if (!targetEl) return;
+
+      // For numeric values displayed with locale formatting, copy the raw number
+      let text = targetEl.textContent || '';
+      if (targetId === 'dtSeconds' || targetId === 'dtMilliseconds') {
+        text = text.replace(/,/g, '');
+      }
+
+      copyToClipboard(text, btn);
+    });
+  });
+</script>

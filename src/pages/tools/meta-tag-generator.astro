@@ -1,0 +1,815 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getToolBySlug } from '../../data/tools';
+import '../../styles/tool.css';
+
+const tool = getToolBySlug('meta-tag-generator')!;
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Web Tools", "item": "https://toolcalcs.com/tools/" },
+      { "@type": "ListItem", "position": 3, "name": "Meta Tag Generator" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Meta Tag Generator",
+    "url": "https://toolcalcs.com/tools/meta-tag-generator/",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Generate HTML meta tags for SEO, Open Graph, and Twitter Cards."
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What are meta tags?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Meta tags are HTML elements in a page's <head> section that provide metadata about the page. They tell search engines and social media platforms about the page's title, description, author, and other properties. While not visible to users on the page, they significantly impact SEO and social sharing."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What are Open Graph tags?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Open Graph (OG) tags are meta tags developed by Facebook that control how content appears when shared on social media. They define the title, description, image, and URL shown in social media previews. Major platforms including Facebook, LinkedIn, and Pinterest use OG tags."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the ideal meta description length?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Google typically displays 150-160 characters of a meta description in search results. While there is no strict limit, keeping descriptions under 160 characters ensures they are not truncated. For titles, aim for under 60 characters."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Meta Tag Generator - SEO Meta Tags, Open Graph & Twitter Cards | ToolCalcs"
+  description={tool.description}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/tools/">Web Tools</a> &rsaquo;
+    <span>Meta Tag Generator</span>
+  </nav>
+
+  <h1>{tool.title}</h1>
+  <p class="page-desc">Generate HTML meta tags for SEO, Open Graph, and Twitter Cards. Preview how your page will look in Google search results and social media.</p>
+
+  <div class="tool-box">
+    <!-- Basic Meta Tags -->
+    <div class="meta-section">
+      <h3 class="meta-section-title">Basic Meta Tags</h3>
+      <div class="meta-form-grid">
+        <div class="meta-field">
+          <div class="meta-field-header">
+            <label for="pageTitle">Page Title</label>
+            <span class="char-count" id="titleCount">0 / 60</span>
+          </div>
+          <input type="text" id="pageTitle" placeholder="My Awesome Page" />
+        </div>
+        <div class="meta-field meta-field-full">
+          <div class="meta-field-header">
+            <label for="metaDescription">Meta Description</label>
+            <span class="char-count" id="descCount">0 / 160</span>
+          </div>
+          <textarea id="metaDescription" rows="3" placeholder="A brief description of your page for search engine results..."></textarea>
+        </div>
+        <div class="meta-field">
+          <label for="metaKeywords">Keywords</label>
+          <input type="text" id="metaKeywords" placeholder="seo, web tools, meta tags" />
+        </div>
+        <div class="meta-field">
+          <label for="metaAuthor">Author</label>
+          <input type="text" id="metaAuthor" placeholder="John Doe" />
+        </div>
+        <div class="meta-field">
+          <label for="canonicalUrl">Canonical URL</label>
+          <input type="text" id="canonicalUrl" placeholder="https://example.com/page" />
+        </div>
+        <div class="meta-field">
+          <label for="metaRobots">Robots</label>
+          <select id="metaRobots">
+            <option value="index, follow">index, follow</option>
+            <option value="noindex, follow">noindex, follow</option>
+            <option value="index, nofollow">index, nofollow</option>
+            <option value="noindex, nofollow">noindex, nofollow</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Open Graph Tags -->
+    <div class="meta-section">
+      <h3 class="meta-section-title">Open Graph Tags</h3>
+      <div class="meta-form-grid">
+        <div class="meta-field">
+          <label for="ogTitle">OG Title <span class="auto-fill-hint">(auto-filled from page title)</span></label>
+          <input type="text" id="ogTitle" placeholder="Auto-filled from page title" />
+        </div>
+        <div class="meta-field meta-field-full">
+          <label for="ogDescription">OG Description <span class="auto-fill-hint">(auto-filled from description)</span></label>
+          <textarea id="ogDescription" rows="2" placeholder="Auto-filled from meta description"></textarea>
+        </div>
+        <div class="meta-field">
+          <label for="ogImage">OG Image URL</label>
+          <input type="text" id="ogImage" placeholder="https://example.com/image.jpg" />
+        </div>
+        <div class="meta-field">
+          <label for="ogType">OG Type</label>
+          <select id="ogType">
+            <option value="website">website</option>
+            <option value="article">article</option>
+            <option value="product">product</option>
+            <option value="profile">profile</option>
+          </select>
+        </div>
+        <div class="meta-field">
+          <label for="ogUrl">OG URL <span class="auto-fill-hint">(auto-filled from canonical)</span></label>
+          <input type="text" id="ogUrl" placeholder="Auto-filled from canonical URL" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Twitter Card Tags -->
+    <div class="meta-section">
+      <h3 class="meta-section-title">Twitter Card Tags</h3>
+      <div class="meta-form-grid">
+        <div class="meta-field">
+          <label for="twitterCard">Card Type</label>
+          <select id="twitterCard">
+            <option value="summary">summary</option>
+            <option value="summary_large_image">summary_large_image</option>
+          </select>
+        </div>
+        <div class="meta-field">
+          <label for="twitterHandle">Twitter Handle</label>
+          <input type="text" id="twitterHandle" placeholder="@username" />
+        </div>
+        <div class="meta-field">
+          <label for="twitterTitle">Twitter Title <span class="auto-fill-hint">(auto-filled from page title)</span></label>
+          <input type="text" id="twitterTitle" placeholder="Auto-filled from page title" />
+        </div>
+        <div class="meta-field meta-field-full">
+          <label for="twitterDescription">Twitter Description <span class="auto-fill-hint">(auto-filled from description)</span></label>
+          <textarea id="twitterDescription" rows="2" placeholder="Auto-filled from meta description"></textarea>
+        </div>
+        <div class="meta-field">
+          <label for="twitterImage">Twitter Image <span class="auto-fill-hint">(auto-filled from OG image)</span></label>
+          <input type="text" id="twitterImage" placeholder="Auto-filled from OG image" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Generated Output -->
+    <div class="meta-section">
+      <div class="output-header">
+        <h3 class="meta-section-title" style="margin:0;border:none;padding:0;">Generated HTML</h3>
+        <button type="button" class="copy-btn" id="copyBtn">Copy All</button>
+      </div>
+      <textarea id="metaOutput" class="tool-textarea" rows="16" readonly spellcheck="false" placeholder="Your generated meta tags will appear here..."></textarea>
+    </div>
+
+    <!-- Previews -->
+    <div class="meta-section">
+      <h3 class="meta-section-title">Google Search Preview</h3>
+      <div class="google-preview">
+        <div class="gp-url" id="gpUrl">https://example.com</div>
+        <div class="gp-title" id="gpTitle">Page Title</div>
+        <div class="gp-description" id="gpDescription">Your meta description will appear here. It helps search engines understand what your page is about and is displayed in search results below the title.</div>
+      </div>
+    </div>
+
+    <div class="meta-section">
+      <h3 class="meta-section-title">Social Media Preview</h3>
+      <div class="social-preview">
+        <div class="sp-image" id="spImage">
+          <span class="sp-image-placeholder">No image set</span>
+        </div>
+        <div class="sp-content">
+          <div class="sp-url" id="spUrl">example.com</div>
+          <div class="sp-title" id="spTitle">Page Title</div>
+          <div class="sp-description" id="spDescription">Your description will appear here when shared on social media platforms like Facebook, LinkedIn, and Twitter.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="tool-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Are Meta Tags?</h2>
+    <p>
+      Meta tags are snippets of HTML code placed inside the <code>&lt;head&gt;</code> section of a web page. They provide structured metadata about the page to search engines, web browsers, and social media platforms. Unlike the visible content in the <code>&lt;body&gt;</code> of a page, meta tags are invisible to visitors viewing the page in a browser. However, they play a critical role in how a page is indexed, ranked, and displayed across the web.
+    </p>
+    <p>
+      When a search engine crawler visits a page, it reads the meta tags to understand the page's topic, authorship, indexing preferences, and how it should appear in search results. When a user shares a link on Facebook, LinkedIn, or Twitter, those platforms read specific meta tags to determine the title, description, and image shown in the share preview card. Without well-crafted meta tags, search engines may generate their own snippets from page content, and social shares will display generic or missing information, both of which reduce click-through rates and user engagement.
+    </p>
+    <p>
+      The most fundamental meta tags have been part of the HTML specification since the earliest days of the web. The <code>&lt;title&gt;</code> element, while technically not a meta tag, is the single most important piece of metadata on any page. It defines the text that appears in the browser tab, in search engine result pages, and as the default title when a page is bookmarked. The <code>meta description</code> tag provides a brief summary of the page's content, typically 150 to 160 characters, which search engines often display directly below the title in search results. Together, the title and meta description form the primary text snippet that users see before deciding whether to click on a search result.
+    </p>
+    <p>
+      Over the years, additional meta tag standards have emerged to serve the evolving needs of the web. Open Graph tags, introduced by Facebook in 2010, standardized how content appears when shared on social media. Twitter Cards, introduced by Twitter in 2012, added further control over how tweets display linked content. The <code>robots</code> meta tag gives webmasters control over how search engine crawlers index and follow links on a page. The <code>canonical</code> link element, while technically a link tag rather than a meta tag, addresses duplicate content issues by specifying the preferred URL for a page. These tags collectively form the foundation of technical SEO and social media optimization.
+    </p>
+
+    <h2>Essential Meta Tags for Every Page</h2>
+    <p>
+      Every web page should include a core set of meta tags to ensure proper indexing and an appealing appearance in search results. The <code>&lt;title&gt;</code> tag is non-negotiable. It should be unique to each page, concisely describe the page's content, and stay under 60 characters to avoid truncation in Google's search results. A well-written title includes the primary keyword near the beginning and provides enough context for a user to understand what they will find on the page. For example, a title like "Meta Tag Generator - Free SEO Tool" immediately communicates both the tool's purpose and its value.
+    </p>
+    <p>
+      The <code>meta description</code> tag serves as your page's advertising copy in search results. While Google does not always use the provided meta description (it may generate its own snippet from page content if it considers that more relevant to the search query), providing one gives you control over the default display text. Aim for 150 to 160 characters, include a compelling call to action or value proposition, and naturally incorporate relevant keywords. A description like "Generate HTML meta tags for SEO, Open Graph, and Twitter Cards. Preview how your page looks in Google and social media. Free, no signup required." is informative, keyword-rich, and fits within the character limit.
+    </p>
+    <p>
+      The <code>meta robots</code> tag controls search engine crawler behavior. The default value of <code>index, follow</code> instructs crawlers to index the page and follow all links on it. Use <code>noindex</code> to prevent a page from appearing in search results, which is useful for internal pages, staging environments, or thin content. Use <code>nofollow</code> to prevent crawlers from following links on the page, though this is rarely necessary for entire pages. The <code>noindex, nofollow</code> combination is used for pages that should be completely invisible to search engines, such as login pages or admin dashboards.
+    </p>
+    <p>
+      The <code>canonical</code> link tag addresses one of the most common SEO problems: duplicate content. When the same or very similar content is accessible through multiple URLs (for example, with and without trailing slashes, with different query parameters, or across HTTP and HTTPS), search engines may split ranking signals across those URLs, diluting each page's authority. By specifying a canonical URL, you tell search engines which version of the page should receive credit for all ranking signals, consolidating your SEO strength onto a single preferred URL.
+    </p>
+    <p>
+      The <code>meta keywords</code> tag was once a primary ranking factor but has been ignored by Google since 2009. However, some smaller search engines and internal site search tools still read it, so including a handful of relevant comma-separated keywords costs nothing and may provide marginal benefit in certain contexts. The <code>meta author</code> tag identifies the page's author, which can be useful for attribution in news articles, blog posts, and academic content.
+    </p>
+
+    <h2>Open Graph Tags Explained</h2>
+    <p>
+      Open Graph (OG) is a protocol developed by Facebook in 2010 that turns web pages into graph objects with structured properties. When a user shares a URL on Facebook, LinkedIn, Pinterest, or most other social platforms, the platform's crawler fetches the page and reads its Open Graph tags to determine what to display in the share preview card. Without OG tags, the platform will attempt to extract a title and description from the page content, often producing an unattractive or inaccurate preview that discourages engagement.
+    </p>
+    <p>
+      The four required Open Graph properties are <code>og:title</code>, <code>og:type</code>, <code>og:image</code>, and <code>og:url</code>. The <code>og:title</code> defines the title shown in the share card and can differ from the page's HTML title if you want a shorter or more social-friendly version. The <code>og:type</code> categorizes the content as a website, article, product, profile, or other type, which can influence how the platform renders the preview. The <code>og:image</code> specifies the URL of the image displayed in the share card, and it has a significant impact on engagement since social shares with images receive substantially more clicks than text-only shares. Facebook recommends images of at least 1200 by 630 pixels for optimal display. The <code>og:url</code> sets the canonical URL for the shared content.
+    </p>
+    <p>
+      The optional <code>og:description</code> property provides a brief summary displayed below the title in the share card. Like the meta description, it should be concise and compelling, typically under 200 characters. While platforms may truncate longer descriptions, having a well-crafted OG description ensures that the most important information is always visible. Other optional properties include <code>og:site_name</code> (the name of the overall website), <code>og:locale</code> (the language and territory), and various media-specific properties for video and audio content.
+    </p>
+    <p>
+      Testing your Open Graph tags before publishing is essential. Facebook provides the Sharing Debugger tool, LinkedIn has its Post Inspector, and Twitter offers the Card Validator. These tools fetch your page and show exactly how it will appear when shared, allowing you to fix issues before your content goes live. Common problems include missing images (the image URL must be absolute, not relative), cached old metadata (platforms cache OG data aggressively, and you may need to force a re-scrape after updates), and images that are too small or have incorrect aspect ratios.
+    </p>
+
+    <h2>Twitter Card Tags</h2>
+    <p>
+      Twitter Cards are Twitter's proprietary meta tag system for controlling how links appear in tweets. When a user shares a URL on Twitter (now X), the platform's crawler reads the page's Twitter Card meta tags to generate a rich media preview below the tweet text. Without these tags, shared links appear as plain text URLs with no visual enhancement, significantly reducing engagement.
+    </p>
+    <p>
+      The <code>twitter:card</code> tag is the only required Twitter Card property, and it defines the type of card to display. The two most common types are <code>summary</code> and <code>summary_large_image</code>. The <code>summary</code> card displays a small square thumbnail to the left of the title and description, suitable for general content and articles. The <code>summary_large_image</code> card displays a large, prominent image above the title and description, ideal for visual content, product pages, and any content where a compelling image will drive more clicks. Twitter also supports <code>player</code> cards for embedded video and audio and <code>app</code> cards for mobile application deep links, though these require additional approval from Twitter.
+    </p>
+    <p>
+      The <code>twitter:site</code> tag specifies the Twitter handle of the website or organization (for example, <code>@ToolCalcs</code>), while <code>twitter:creator</code> identifies the individual author's handle. These attributes provide attribution and can drive follower growth as users discover your brand through shared content. The <code>twitter:title</code>, <code>twitter:description</code>, and <code>twitter:image</code> tags function similarly to their Open Graph counterparts, and Twitter will fall back to OG tags if the Twitter-specific tags are not present. However, including Twitter-specific tags gives you the flexibility to customize the preview independently of the OG tags, allowing you to optimize the message for each platform's audience and display format.
+    </p>
+    <p>
+      Image requirements for Twitter Cards differ slightly from Open Graph. For <code>summary</code> cards, images should be at least 144 by 144 pixels and no larger than 4096 by 4096 pixels. For <code>summary_large_image</code> cards, images should have a 2:1 aspect ratio with minimum dimensions of 300 by 157 pixels. Images exceeding 5 MB in file size will not be displayed. Twitter crops images to fit the card layout, so keep important visual content centered and away from the edges to prevent cropping issues.
+    </p>
+
+    <h2>Meta Tags and SEO</h2>
+    <p>
+      The relationship between meta tags and search engine optimization is nuanced and often misunderstood. While meta tags alone will not propel a poorly written page to the top of search results, they form the technical foundation that allows search engines to properly understand, index, and present your content. Think of meta tags as the packaging around your content: excellent packaging cannot save a bad product, but poor packaging can prevent a great product from being discovered.
+    </p>
+    <p>
+      The title tag is the most powerful on-page SEO element. It directly influences both rankings and click-through rates. Search engines use the title as a primary signal for understanding the page's topic and relevance to specific queries, and users use it to decide whether a result is worth clicking. A title that includes the target keyword naturally, communicates clear value, and stays within the 60-character display limit will outperform generic or keyword-stuffed alternatives. Every page on your site should have a unique title that accurately describes its specific content.
+    </p>
+    <p>
+      The meta description, while not a direct ranking factor in Google's algorithm, significantly affects click-through rate, which is an indirect ranking signal. A compelling meta description that matches the searcher's intent and includes a clear value proposition can increase clicks by 5 to 10 percent compared to an auto-generated snippet. When Google does use your provided description, it appears as the snippet text in search results, giving you control over the first impression potential visitors receive. Include relevant keywords naturally, as Google bolds query terms that appear in the description, visually drawing the searcher's eye to your result.
+    </p>
+    <p>
+      Canonical tags play a critical role in preserving ranking authority across your site. Without proper canonicalization, search engines may waste crawl budget on duplicate pages, split link equity across multiple URLs pointing to the same content, or even penalize your site for perceived duplicate content manipulation. Setting a canonical URL on every page, even when there is only one version, is a defensive best practice that prevents future issues as your site grows and URL structures become more complex.
+    </p>
+    <p>
+      Social media meta tags impact SEO indirectly through increased visibility, social signals, and referral traffic. Pages that generate attractive social previews receive more shares, which drive more traffic, earn more backlinks, and signal content quality to search engines. While Google has stated that social signals are not a direct ranking factor, the downstream effects of strong social performance, including increased brand searches, more external links, and higher engagement metrics, unquestionably benefit SEO over time.
+    </p>
+
+    <h2>About This Tool</h2>
+    <p>
+      This Meta Tag Generator runs entirely in your browser. No data is sent to any server, and nothing is stored or logged. Enter your page information in the form fields above, and the tool generates the corresponding HTML meta tags in real time. You can copy the complete set of tags and paste them directly into the <code>&lt;head&gt;</code> section of your HTML document.
+    </p>
+    <p>
+      The tool provides instant visual previews of how your page will appear in Google search results and on social media platforms. The Google search preview simulates the standard SERP listing format, showing your title as a blue link, the URL in green, and the description below. The social media preview simulates a share card similar to what Facebook, LinkedIn, and Twitter display when your URL is shared. These previews update in real time as you type, letting you fine-tune the wording and length of your titles and descriptions for maximum impact before publishing.
+    </p>
+    <p>
+      Character counters next to the title and description fields help you stay within the recommended limits. The title counter turns red when you exceed 60 characters, and the description counter turns red above 160 characters. While there is no hard technical limit for either field, staying within these bounds ensures that your text will not be truncated in Google's search results. Fields that auto-fill from other fields (such as OG Title from Page Title) keep your tags consistent while still allowing you to override any value for platform-specific customization.
+    </p>
+    <p>
+      Whether you are launching a new website, optimizing existing pages, or learning about SEO fundamentals, this generator provides a quick and reliable way to create properly formatted meta tags. Bookmark this page and return whenever you need to generate or audit meta tags for any web page. For additional SEO insights, explore our other <a href="/tools/">free web tools</a>.
+    </p>
+  </article>
+
+  <AdUnit slot="tool-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  /* Meta section grouping */
+  .meta-section {
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .meta-section:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+  .meta-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 16px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--color-primary);
+    display: inline-block;
+  }
+
+  /* Form grid */
+  .meta-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .meta-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .meta-field-full {
+    grid-column: 1 / -1;
+  }
+  .meta-field label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+  .meta-field input,
+  .meta-field select,
+  .meta-field textarea {
+    padding: 8px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: inherit;
+  }
+  .meta-field textarea {
+    resize: vertical;
+    line-height: 1.5;
+  }
+  .meta-field input:focus,
+  .meta-field select:focus,
+  .meta-field textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+
+  /* Auto-fill hint */
+  .auto-fill-hint {
+    font-weight: 400;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    opacity: 0.7;
+  }
+
+  /* Character counters */
+  .meta-field-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .char-count {
+    font-size: 0.78rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: #16a34a;
+    transition: color 0.15s;
+  }
+  .char-count.over-limit {
+    color: #dc2626;
+  }
+
+  /* Google search preview */
+  .google-preview {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    max-width: 600px;
+  }
+  .gp-url {
+    font-size: 0.82rem;
+    color: #202124;
+    margin-bottom: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .gp-title {
+    font-size: 1.18rem;
+    color: #1a0dab;
+    font-weight: 400;
+    line-height: 1.3;
+    margin-bottom: 4px;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .gp-title:hover {
+    text-decoration: underline;
+  }
+  .gp-description {
+    font-size: 0.86rem;
+    color: #4d5156;
+    line-height: 1.55;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+  }
+  [data-theme="dark"] .gp-url { color: #bdc1c6; }
+  [data-theme="dark"] .gp-title { color: #8ab4f8; }
+  [data-theme="dark"] .gp-description { color: #bdc1c6; }
+
+  /* Social media preview */
+  .social-preview {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    max-width: 520px;
+    background: var(--color-bg);
+  }
+  .sp-image {
+    width: 100%;
+    height: 260px;
+    background: #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .sp-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .sp-image-placeholder {
+    font-size: 0.9rem;
+    color: #94a3b8;
+    font-weight: 500;
+  }
+  [data-theme="dark"] .sp-image { background: #1e293b; }
+  [data-theme="dark"] .sp-image-placeholder { color: #64748b; }
+  .sp-content {
+    padding: 12px 16px;
+  }
+  .sp-url {
+    font-size: 0.75rem;
+    color: #65676b;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .sp-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text);
+    line-height: 1.3;
+    margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .sp-description {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    line-height: 1.45;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  [data-theme="dark"] .sp-url { color: #8b8d91; }
+
+  /* Output textarea override for code look */
+  #metaOutput {
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    background: #f8fafc;
+    white-space: pre;
+    overflow-x: auto;
+  }
+  [data-theme="dark"] #metaOutput {
+    background: var(--color-bg);
+  }
+
+  @media (max-width: 640px) {
+    .meta-form-grid {
+      grid-template-columns: 1fr;
+    }
+    .meta-field-full {
+      grid-column: auto;
+    }
+    .google-preview {
+      max-width: 100%;
+    }
+    .social-preview {
+      max-width: 100%;
+    }
+    .sp-image {
+      height: 180px;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    'use strict';
+
+    // --- DOM Elements: Basic ---
+    const pageTitle = document.getElementById('pageTitle') as HTMLInputElement;
+    const metaDescription = document.getElementById('metaDescription') as HTMLTextAreaElement;
+    const metaKeywords = document.getElementById('metaKeywords') as HTMLInputElement;
+    const metaAuthor = document.getElementById('metaAuthor') as HTMLInputElement;
+    const canonicalUrl = document.getElementById('canonicalUrl') as HTMLInputElement;
+    const metaRobots = document.getElementById('metaRobots') as HTMLSelectElement;
+
+    // --- DOM Elements: Open Graph ---
+    const ogTitle = document.getElementById('ogTitle') as HTMLInputElement;
+    const ogDescription = document.getElementById('ogDescription') as HTMLTextAreaElement;
+    const ogImage = document.getElementById('ogImage') as HTMLInputElement;
+    const ogType = document.getElementById('ogType') as HTMLSelectElement;
+    const ogUrl = document.getElementById('ogUrl') as HTMLInputElement;
+
+    // --- DOM Elements: Twitter ---
+    const twitterCard = document.getElementById('twitterCard') as HTMLSelectElement;
+    const twitterHandle = document.getElementById('twitterHandle') as HTMLInputElement;
+    const twitterTitle = document.getElementById('twitterTitle') as HTMLInputElement;
+    const twitterDescription = document.getElementById('twitterDescription') as HTMLTextAreaElement;
+    const twitterImage = document.getElementById('twitterImage') as HTMLInputElement;
+
+    // --- DOM Elements: Output & Previews ---
+    const metaOutput = document.getElementById('metaOutput') as HTMLTextAreaElement;
+    const copyBtn = document.getElementById('copyBtn') as HTMLButtonElement;
+    const titleCount = document.getElementById('titleCount') as HTMLElement;
+    const descCount = document.getElementById('descCount') as HTMLElement;
+
+    // Google preview
+    const gpUrl = document.getElementById('gpUrl') as HTMLElement;
+    const gpTitle = document.getElementById('gpTitle') as HTMLElement;
+    const gpDescription = document.getElementById('gpDescription') as HTMLElement;
+
+    // Social preview
+    const spImage = document.getElementById('spImage') as HTMLElement;
+    const spUrl = document.getElementById('spUrl') as HTMLElement;
+    const spTitle = document.getElementById('spTitle') as HTMLElement;
+    const spDescription = document.getElementById('spDescription') as HTMLElement;
+
+    // --- Track which OG/Twitter fields have been manually edited ---
+    const manuallyEdited: Record<string, boolean> = {};
+
+    function markManual(fieldId: string): void {
+      manuallyEdited[fieldId] = true;
+    }
+
+    // --- Auto-fill logic ---
+    function autoFillFromBasic(): void {
+      const title = pageTitle.value;
+      const desc = metaDescription.value;
+      const url = canonicalUrl.value;
+
+      if (!manuallyEdited['ogTitle']) ogTitle.value = title;
+      if (!manuallyEdited['ogDescription']) ogDescription.value = desc;
+      if (!manuallyEdited['ogUrl']) ogUrl.value = url;
+      if (!manuallyEdited['twitterTitle']) twitterTitle.value = title;
+      if (!manuallyEdited['twitterDescription']) twitterDescription.value = desc;
+    }
+
+    function autoFillTwitterImage(): void {
+      if (!manuallyEdited['twitterImage']) {
+        twitterImage.value = ogImage.value;
+      }
+    }
+
+    // --- Character counters ---
+    function updateCharCount(el: HTMLInputElement | HTMLTextAreaElement, countEl: HTMLElement, limit: number): void {
+      const len = el.value.length;
+      countEl.textContent = len + ' / ' + limit;
+      if (len > limit) {
+        countEl.classList.add('over-limit');
+      } else {
+        countEl.classList.remove('over-limit');
+      }
+    }
+
+    // --- Escape HTML for display ---
+    function esc(str: string): string {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // --- Generate meta tags ---
+    function generateTags(): string {
+      const lines: string[] = [];
+      const title = pageTitle.value.trim();
+      const desc = metaDescription.value.trim();
+      const keywords = metaKeywords.value.trim();
+      const author = metaAuthor.value.trim();
+      const canonical = canonicalUrl.value.trim();
+      const robots = metaRobots.value;
+
+      // Charset and viewport (always included)
+      lines.push('<meta charset="UTF-8">');
+      lines.push('<meta name="viewport" content="width=device-width, initial-scale=1.0">');
+      lines.push('');
+
+      // Basic meta tags
+      if (title) lines.push('<title>' + esc(title) + '</title>');
+      if (desc) lines.push('<meta name="description" content="' + esc(desc) + '">');
+      if (keywords) lines.push('<meta name="keywords" content="' + esc(keywords) + '">');
+      if (author) lines.push('<meta name="author" content="' + esc(author) + '">');
+      if (robots !== 'index, follow') lines.push('<meta name="robots" content="' + esc(robots) + '">');
+      if (canonical) lines.push('<link rel="canonical" href="' + esc(canonical) + '">');
+
+      // Open Graph
+      const oTitle = ogTitle.value.trim();
+      const oDesc = ogDescription.value.trim();
+      const oImg = ogImage.value.trim();
+      const oType = ogType.value;
+      const oUrl = ogUrl.value.trim();
+
+      if (oTitle || oDesc || oImg || oUrl) {
+        lines.push('');
+        lines.push('<!-- Open Graph / Facebook -->');
+        if (oType) lines.push('<meta property="og:type" content="' + esc(oType) + '">');
+        if (oTitle) lines.push('<meta property="og:title" content="' + esc(oTitle) + '">');
+        if (oDesc) lines.push('<meta property="og:description" content="' + esc(oDesc) + '">');
+        if (oImg) lines.push('<meta property="og:image" content="' + esc(oImg) + '">');
+        if (oUrl) lines.push('<meta property="og:url" content="' + esc(oUrl) + '">');
+      }
+
+      // Twitter Cards
+      const tCard = twitterCard.value;
+      const tHandle = twitterHandle.value.trim();
+      const tTitle = twitterTitle.value.trim();
+      const tDesc = twitterDescription.value.trim();
+      const tImg = twitterImage.value.trim();
+
+      if (tTitle || tDesc || tImg || tHandle) {
+        lines.push('');
+        lines.push('<!-- Twitter Card -->');
+        lines.push('<meta name="twitter:card" content="' + esc(tCard) + '">');
+        if (tHandle) lines.push('<meta name="twitter:site" content="' + esc(tHandle) + '">');
+        if (tTitle) lines.push('<meta name="twitter:title" content="' + esc(tTitle) + '">');
+        if (tDesc) lines.push('<meta name="twitter:description" content="' + esc(tDesc) + '">');
+        if (tImg) lines.push('<meta name="twitter:image" content="' + esc(tImg) + '">');
+      }
+
+      return lines.join('\n');
+    }
+
+    // --- Update previews ---
+    function updatePreviews(): void {
+      const title = (ogTitle.value || pageTitle.value || 'Page Title').trim();
+      const desc = (ogDescription.value || metaDescription.value || 'Your meta description will appear here.').trim();
+      const url = (ogUrl.value || canonicalUrl.value || 'https://example.com').trim();
+      const img = ogImage.value.trim();
+
+      // Google preview
+      gpTitle.textContent = pageTitle.value.trim() || 'Page Title';
+      gpDescription.textContent = metaDescription.value.trim() || 'Your meta description will appear here. It helps search engines understand what your page is about and is displayed in search results below the title.';
+      gpUrl.textContent = canonicalUrl.value.trim() || 'https://example.com';
+
+      // Social preview
+      spTitle.textContent = title;
+      spDescription.textContent = desc;
+
+      // Extract domain from URL for social preview
+      try {
+        const domain = new URL(url).hostname;
+        spUrl.textContent = domain;
+      } catch {
+        spUrl.textContent = url.replace(/^https?:\/\//, '').split('/')[0] || 'example.com';
+      }
+
+      // Social preview image
+      if (img) {
+        const existingImg = spImage.querySelector('img');
+        const placeholder = spImage.querySelector('.sp-image-placeholder');
+        if (existingImg) {
+          existingImg.src = img;
+          existingImg.alt = title;
+        } else {
+          if (placeholder) placeholder.remove();
+          const imgEl = document.createElement('img');
+          imgEl.src = img;
+          imgEl.alt = title;
+          imgEl.onerror = function () {
+            imgEl.remove();
+            if (!spImage.querySelector('.sp-image-placeholder')) {
+              const ph = document.createElement('span');
+              ph.className = 'sp-image-placeholder';
+              ph.textContent = 'Image failed to load';
+              spImage.appendChild(ph);
+            }
+          };
+          spImage.appendChild(imgEl);
+        }
+      } else {
+        const existingImg = spImage.querySelector('img');
+        if (existingImg) existingImg.remove();
+        if (!spImage.querySelector('.sp-image-placeholder')) {
+          const ph = document.createElement('span');
+          ph.className = 'sp-image-placeholder';
+          ph.textContent = 'No image set';
+          spImage.appendChild(ph);
+        }
+      }
+    }
+
+    // --- Master update function ---
+    function update(): void {
+      autoFillFromBasic();
+      autoFillTwitterImage();
+      updateCharCount(pageTitle, titleCount, 60);
+      updateCharCount(metaDescription, descCount, 160);
+      metaOutput.value = generateTags();
+      updatePreviews();
+    }
+
+    // --- Copy to clipboard ---
+    async function copyOutput(): Promise<void> {
+      const text = metaOutput.value;
+      if (!text) return;
+      try {
+        await navigator.clipboard.writeText(text);
+        copyBtn.textContent = 'Copied!';
+        copyBtn.classList.add('copied');
+        setTimeout(function () {
+          copyBtn.textContent = 'Copy All';
+          copyBtn.classList.remove('copied');
+        }, 2000);
+      } catch {
+        metaOutput.select();
+        document.execCommand('copy');
+        copyBtn.textContent = 'Copied!';
+        copyBtn.classList.add('copied');
+        setTimeout(function () {
+          copyBtn.textContent = 'Copy All';
+          copyBtn.classList.remove('copied');
+        }, 2000);
+      }
+    }
+
+    // --- Event listeners: Basic fields trigger update + auto-fill ---
+    const basicFields = [pageTitle, metaDescription, metaKeywords, metaAuthor, canonicalUrl, metaRobots];
+    basicFields.forEach(function (el) {
+      el.addEventListener('input', update);
+    });
+    metaRobots.addEventListener('change', update);
+
+    // --- Event listeners: OG fields ---
+    ogTitle.addEventListener('input', function () { markManual('ogTitle'); update(); });
+    ogDescription.addEventListener('input', function () { markManual('ogDescription'); update(); });
+    ogImage.addEventListener('input', function () { autoFillTwitterImage(); update(); });
+    ogType.addEventListener('change', update);
+    ogUrl.addEventListener('input', function () { markManual('ogUrl'); update(); });
+
+    // --- Event listeners: Twitter fields ---
+    twitterCard.addEventListener('change', update);
+    twitterHandle.addEventListener('input', update);
+    twitterTitle.addEventListener('input', function () { markManual('twitterTitle'); update(); });
+    twitterDescription.addEventListener('input', function () { markManual('twitterDescription'); update(); });
+    twitterImage.addEventListener('input', function () { markManual('twitterImage'); update(); });
+
+    // --- Copy button ---
+    copyBtn.addEventListener('click', copyOutput);
+
+    // --- Initial render ---
+    update();
+  })();
+</script>

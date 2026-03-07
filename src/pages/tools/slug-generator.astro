@@ -1,0 +1,401 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getToolBySlug } from '../../data/tools';
+import '../../styles/tool.css';
+
+const tool = getToolBySlug('slug-generator')!;
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Web Tools", "item": "https://toolcalcs.com/tools/" },
+      { "@type": "ListItem", "position": 3, "name": "Slug Generator" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Slug Generator",
+    "url": "https://toolcalcs.com/tools/slug-generator/",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Convert text to URL-friendly slugs."
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is a URL slug?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A URL slug is the part of a web address that identifies a specific page in a human-readable format. For example, in 'example.com/blog/how-to-cook-pasta', the slug is 'how-to-cook-pasta'. Slugs use lowercase letters, numbers, and hyphens instead of spaces and special characters."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why are slugs important for SEO?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Search engines use URL slugs to understand page content. A descriptive slug like 'best-running-shoes-2024' tells both users and search engines what the page is about, which can improve click-through rates and rankings."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How are accented characters handled in slugs?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Accented characters are typically transliterated to their ASCII equivalents. For example, 'e with accent' becomes 'e', 'u with umlaut' becomes 'u', and 'n with tilde' becomes 'n'. This ensures the slug is universally readable and compatible with all systems."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Slug Generator - Create URL-Friendly Slugs | ToolCalcs"
+  description={tool.description}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/tools/">Web Tools</a> &rsaquo;
+    <span>Slug Generator</span>
+  </nav>
+
+  <h1>{tool.title}</h1>
+  <p class="page-desc">Convert any text to a clean, URL-friendly slug. Automatically removes accents, special characters, and extra spaces.</p>
+
+  <div class="tool-box">
+    <div class="tool-input-area">
+      <label class="tool-label" for="toolInput">Enter Text</label>
+      <textarea id="toolInput" class="tool-textarea" placeholder="Type or paste your text here..." rows="4"></textarea>
+    </div>
+
+    <div class="tool-options" style="margin-top:16px;">
+      <div class="tool-option">
+        <label for="separator">Separator</label>
+        <select id="separator">
+          <option value="-" selected>Hyphen (-)</option>
+          <option value="_">Underscore (_)</option>
+          <option value=".">Dot (.)</option>
+        </select>
+      </div>
+      <div class="tool-option">
+        <label for="maxLength">Max Length</label>
+        <input type="number" id="maxLength" min="0" max="2000" value="0" style="width:90px;" />
+      </div>
+      <div class="tool-option tool-option-checkbox">
+        <label for="lowercaseOnly">
+          <input type="checkbox" id="lowercaseOnly" checked />
+          Lowercase only
+        </label>
+      </div>
+    </div>
+
+    <div class="tool-output-area" style="margin-top:16px;">
+      <div class="output-header">
+        <label class="tool-label" for="toolOutput">Generated Slug</label>
+        <div class="output-actions">
+          <span class="char-count" id="slugCharCount">0 characters</span>
+          <button class="copy-btn" id="copyBtn" type="button">Copy</button>
+        </div>
+      </div>
+      <input type="text" id="toolOutput" class="slug-output" readonly placeholder="your-slug-appears-here" />
+    </div>
+
+    <div class="tool-controls" style="margin-top:16px;">
+      <button class="tool-btn secondary" id="clearBtn" type="button">Clear</button>
+    </div>
+  </div>
+
+  <AdUnit slot="tool-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is a URL Slug?</h2>
+    <p>
+      A URL slug is the portion of a web address that comes after the domain name and path prefix, uniquely identifying a specific page in a human-readable way. For example, in the URL <code>https://example.com/blog/how-to-bake-sourdough-bread</code>, the slug is <code>how-to-bake-sourdough-bread</code>. Unlike query parameters or numeric identifiers, slugs are designed to be meaningful to both humans and machines. They typically consist of lowercase letters, numbers, and a single type of separator character, most commonly a hyphen.
+    </p>
+    <p>
+      The term "slug" originates from the newspaper industry, where it referred to a short label given to an article during the editing process before the final headline was decided. In the digital world, the concept carries the same purpose: a concise, descriptive identifier for a piece of content. Content management systems like WordPress, Ghost, and Strapi automatically generate slugs from page titles, but the auto-generated version is not always optimal, which is why a dedicated slug generator tool can be invaluable.
+    </p>
+    <p>
+      A well-formed slug strips away everything that does not contribute to readability or identification. Spaces become hyphens (or another chosen separator), accented characters are transliterated to their ASCII equivalents, special characters and punctuation are removed entirely, and the entire string is converted to lowercase. The result is a clean, portable string that works consistently across browsers, servers, file systems, and APIs without requiring percent-encoding or special handling.
+    </p>
+
+    <h2>Why URL Slugs Matter for SEO</h2>
+    <p>
+      Search engine optimization begins with the URL. Search engines like Google use every signal available to understand what a page is about, and the URL slug is one of the first things their crawlers encounter. A descriptive slug such as <code>best-running-shoes-for-flat-feet</code> immediately communicates the page topic, whereas an opaque slug like <code>page?id=48372</code> provides no context at all. Google's own Search Central documentation recommends using descriptive words in URLs rather than long ID numbers or cryptic parameters.
+    </p>
+    <p>
+      Beyond crawlers, URL slugs directly influence click-through rates in search engine results pages. When a user sees a search result, the URL appears beneath the title. A readable, keyword-rich slug reassures the user that the page matches their query, increasing the likelihood of a click. Studies on user behavior show that clean URLs receive measurably higher click-through rates compared to URLs with random strings or excessive parameters. This makes the slug a silent but powerful conversion factor.
+    </p>
+    <p>
+      Slugs also play a role in link sharing. When you paste a URL into an email, a chat message, or a social media post, a clean slug is immediately understandable. Recipients can tell what the link leads to without clicking it, which builds trust and increases engagement. Conversely, a URL full of special characters, session tokens, or tracking parameters looks suspicious and may deter clicks. A well-crafted slug turns every shared link into a miniature advertisement for your content.
+    </p>
+    <p>
+      Additionally, keywords in the URL slug act as a relevance signal for search engines. While the weight of URL keywords has diminished over the years compared to on-page content and backlinks, they still contribute to the overall relevance score. A page about "chocolate cake recipes" will rank marginally better with <code>/chocolate-cake-recipes</code> in the URL than with <code>/article-12345</code>, all else being equal. The benefit is small individually but compounds across an entire site with hundreds or thousands of pages.
+    </p>
+
+    <h2>Best Practices for URL Slugs</h2>
+    <p>
+      Creating effective URL slugs is straightforward when you follow a few proven guidelines. These practices ensure that your slugs are readable, SEO-friendly, and compatible across all platforms.
+    </p>
+    <ul>
+      <li><strong>Keep it short and descriptive.</strong> Aim for three to five words that capture the essence of the page content. Remove filler words like "a," "the," "and," "of," and "in" unless they are essential to the meaning. A slug like <code>install-node-js-ubuntu</code> is better than <code>how-to-install-node-js-on-ubuntu-22-04-lts-server</code>.</li>
+      <li><strong>Use hyphens as separators.</strong> Hyphens are the universally recommended separator for URL slugs. Google treats hyphens as word separators, so <code>web-development</code> is understood as two words. Underscores, on the other hand, are not treated as word separators by Google, meaning <code>web_development</code> might be interpreted as a single token. Dots are technically valid but can cause confusion with file extensions.</li>
+      <li><strong>Always use lowercase.</strong> URLs are case-sensitive on most web servers. Mixing cases (e.g., <code>My-Blog-Post</code>) can lead to duplicate content issues if some links use different capitalizations. Lowercase slugs eliminate this problem entirely and are easier for users to type manually.</li>
+      <li><strong>Remove special characters and punctuation.</strong> Apostrophes, quotation marks, ampersands, parentheses, and other punctuation have no place in slugs. They require percent-encoding in URLs, which makes the address ugly and harder to share. Convert them to nothing or to their word equivalents when appropriate.</li>
+      <li><strong>Transliterate accented characters.</strong> International characters like accents, umlauts, and tildes should be converted to their closest ASCII equivalents. This ensures compatibility across all systems and makes the slug accessible to users whose keyboards lack those characters.</li>
+      <li><strong>Avoid stop words when possible.</strong> Words like "is," "the," "a," "for," and "with" add length without adding meaning. Removing them produces shorter, punchier slugs. However, keep stop words if removing them changes the meaning or makes the slug unreadable.</li>
+      <li><strong>Never change slugs after publication.</strong> Once a page is live and indexed, changing its slug breaks all existing links and bookmarks. If you must change a slug, set up a 301 redirect from the old URL to the new one to preserve link equity and avoid 404 errors.</li>
+      <li><strong>Avoid dates in slugs for evergreen content.</strong> Including a year like <code>best-laptops-2024</code> makes the content appear outdated when the year changes. For evergreen topics, omit the date from the slug even if the title includes it. This gives you the flexibility to update the content and title without needing to change the URL.</li>
+    </ul>
+
+    <h2>How Slug Generation Works</h2>
+    <p>
+      The process of converting arbitrary text into a URL-friendly slug follows a well-defined series of transformations. Understanding these steps helps you appreciate why the output looks the way it does and when you might want to customize the behavior.
+    </p>
+    <p>
+      <strong>Step 1: Unicode normalization.</strong> The input text is decomposed using Unicode NFD (Normalization Form Decomposition). This separates composite characters into their base characters and combining marks. For example, the character "e with acute accent" is split into the base letter "e" and a separate combining acute accent mark. Once decomposed, the combining marks (Unicode range U+0300 to U+036F) are stripped, leaving only the base ASCII characters. This is how accented characters like "cafe with accent" become "cafe" and "uber with umlaut" becomes "uber."
+    </p>
+    <p>
+      <strong>Step 2: Case conversion.</strong> If the lowercase option is enabled, the entire string is converted to lowercase. This is applied after normalization to ensure that any remaining uppercase letters from the base characters are properly handled. Case conversion is almost always desirable for URL slugs because it prevents duplicate URLs caused by capitalization differences.
+    </p>
+    <p>
+      <strong>Step 3: Non-alphanumeric replacement.</strong> Every character that is not a letter (a-z or A-Z) or a digit (0-9) is replaced with the chosen separator character. Spaces, punctuation marks, symbols, and any remaining special characters all become the separator. This step collapses sequences of non-alphanumeric characters into a single separator, so "Hello, World!" becomes "hello-world" rather than "hello--world-."
+    </p>
+    <p>
+      <strong>Step 4: Separator cleanup.</strong> Leading and trailing separators are removed, and any sequence of two or more consecutive separators is collapsed into one. This handles edge cases like input that starts or ends with spaces, or text with multiple consecutive special characters.
+    </p>
+    <p>
+      <strong>Step 5: Length limiting.</strong> If a maximum length is specified, the slug is truncated to fit within that limit. Rather than cutting mid-word, the algorithm looks for the last separator within the allowed length and trims there, producing a clean result. This ensures that truncated slugs still consist of complete words and remain readable.
+    </p>
+
+    <h2>Handling International Characters</h2>
+    <p>
+      One of the most important aspects of slug generation is the proper handling of international characters. The internet is global, and content titles frequently include characters from Latin-extended alphabets, Cyrillic, CJK (Chinese, Japanese, Korean), Arabic, Hebrew, and many other scripts. A robust slug generator must handle all of these gracefully.
+    </p>
+    <p>
+      For Latin-based scripts with diacritical marks, the NFD normalization approach works excellently. French characters like the c-cedilla, German umlauts, Spanish tildes, Portuguese circumflexes, and Scandinavian characters with rings and strokes are all decomposed into base letters plus combining marks, then the marks are removed. The result is perfectly readable ASCII: "creme brulee" from the accented original, "muenchen" from the German city name, and "nino" from the Spanish word with a tilde.
+    </p>
+    <p>
+      For non-Latin scripts, the NFD approach alone is not sufficient because the base characters themselves are not ASCII. In these cases, more sophisticated transliteration is needed. Cyrillic characters can be mapped to their Latin phonetic equivalents, CJK characters can be romanized using systems like Pinyin or Romaji, and Arabic characters can be transliterated using established standards. This tool focuses on the NFD decomposition method, which covers the vast majority of Western languages and produces reliable results for content written in any Latin-script language.
+    </p>
+    <p>
+      It is worth noting that some modern web standards support internationalized domain names (IDN) and IRIs (Internationalized Resource Identifiers), which allow non-ASCII characters in URLs. However, ASCII-only slugs remain the safer and more compatible choice. They work universally across all browsers, servers, email clients, and social media platforms without encoding issues. They are also easier to type, share verbally, and print on physical materials.
+    </p>
+
+    <h2>Choosing the Right Separator</h2>
+    <p>
+      While hyphens are the industry standard for URL slugs, there are situations where other separators make sense. Underscores are common in file systems and database identifiers, making them natural for technical contexts. Some API designs use underscores in endpoint paths, and programming languages that use snake_case may prefer underscores in related URLs for consistency. Dots are occasionally used in versioned URLs or namespace-style paths, such as <code>api.v2.users</code>.
+    </p>
+    <p>
+      The key consideration is consistency. Once you choose a separator for a project or website, use it uniformly across all slugs. Mixing separators within a single site creates confusion and makes URLs harder to predict. For public-facing web pages, hyphens remain the best default choice because of their strong SEO support and universal readability.
+    </p>
+
+    <h2>About This Tool</h2>
+    <p>
+      This slug generator converts any text into a clean, URL-friendly slug entirely in your browser. No data is sent to any server, which means your content titles and text remain completely private. The tool processes input in real time as you type, so you can see the generated slug instantly and experiment with different options.
+    </p>
+    <p>
+      You can customize three aspects of the output. The separator character controls what replaces spaces and special characters, with options for hyphens, underscores, or dots. The maximum length setting truncates the slug at a word boundary if it exceeds the specified character count, which is useful when your CMS or platform imposes URL length limits. The lowercase option converts the entire slug to lowercase, which is recommended for nearly all use cases but can be turned off if you need to preserve the original casing for a specific technical requirement.
+    </p>
+    <p>
+      Common use cases include generating slugs for blog posts, product pages, category URLs, API endpoints, file names, and database keys. The tool handles long titles with many special characters, international text with accents and diacritics, and edge cases like input consisting entirely of special characters or numbers. Simply paste your text, adjust the options if needed, and copy the result with a single click.
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is a URL slug?</h3>
+    <p>A URL slug is the part of a web address that identifies a specific page in a human-readable format. For example, in <code>example.com/blog/how-to-cook-pasta</code>, the slug is <code>how-to-cook-pasta</code>. Slugs use lowercase letters, numbers, and hyphens instead of spaces and special characters, making URLs clean and meaningful for both users and search engines.</p>
+
+    <h3>Why are slugs important for SEO?</h3>
+    <p>Search engines use URL slugs as a relevance signal to understand page content. A descriptive slug like <code>best-running-shoes-2024</code> tells both users and search engines exactly what the page is about, which can improve click-through rates from search results and contribute to better rankings. Clean, keyword-rich URLs also build trust when shared on social media and in emails.</p>
+
+    <h3>How are accented characters handled in slugs?</h3>
+    <p>Accented characters are transliterated to their closest ASCII equivalents using Unicode NFD decomposition. The process separates diacritical marks from their base characters and then removes the marks. This converts characters with accents to their plain equivalents, characters with umlauts to their base forms, and characters with tildes to their unaccented versions. The result is a slug that is universally compatible and easy to type on any keyboard.</p>
+
+    <h2>Related Tools</h2>
+    <ul>
+      <li><a href="/tools/url-encoder-decoder/">URL Encoder/Decoder</a> -- Encode or decode URL components for safe transmission.</li>
+      <li><a href="/tools/text-case-converter/">Text Case Converter</a> -- Convert text between uppercase, lowercase, title case, and more.</li>
+      <li><a href="/tools/meta-tag-generator/">Meta Tag Generator</a> -- Generate SEO meta tags for your pages.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="tool-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .slug-output {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    background: #f1f5f9;
+    color: var(--color-text);
+  }
+  [data-theme="dark"] .slug-output {
+    background: var(--color-bg);
+  }
+  .slug-output:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+  .output-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .char-count {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+  }
+  .tool-option-checkbox {
+    flex-direction: row !important;
+    align-items: center;
+    align-self: flex-end;
+    padding-bottom: 4px;
+  }
+  .tool-option-checkbox label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+    user-select: none;
+  }
+  .tool-option-checkbox input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    cursor: pointer;
+    accent-color: var(--color-primary);
+  }
+  @media (max-width: 640px) {
+    .tool-option-checkbox {
+      align-self: flex-start;
+      padding-bottom: 0;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    'use strict';
+
+    const inputEl = document.getElementById('toolInput') as HTMLTextAreaElement;
+    const outputEl = document.getElementById('toolOutput') as HTMLInputElement;
+    const separatorEl = document.getElementById('separator') as HTMLSelectElement;
+    const maxLengthEl = document.getElementById('maxLength') as HTMLInputElement;
+    const lowercaseEl = document.getElementById('lowercaseOnly') as HTMLInputElement;
+    const copyBtn = document.getElementById('copyBtn') as HTMLButtonElement;
+    const clearBtn = document.getElementById('clearBtn') as HTMLButtonElement;
+    const slugCharCount = document.getElementById('slugCharCount') as HTMLElement;
+
+    function escapeRegex(str: string): string {
+      return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function generateSlug(text: string, separator: string, maxLength: number, lowercase: boolean): string {
+      let slug = text;
+
+      // Normalize unicode: NFD decomposition to separate base chars from diacritics
+      slug = slug.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+      // Convert to lowercase (if option enabled)
+      if (lowercase) slug = slug.toLowerCase();
+
+      // Replace non-alphanumeric characters with separator
+      slug = slug.replace(/[^a-zA-Z0-9]+/g, separator);
+
+      // Remove leading/trailing separators
+      slug = slug.replace(new RegExp(`^${escapeRegex(separator)}+|${escapeRegex(separator)}+$`, 'g'), '');
+
+      // Collapse multiple separators
+      slug = slug.replace(new RegExp(`${escapeRegex(separator)}{2,}`, 'g'), separator);
+
+      // Apply max length (cut at separator boundary if possible)
+      if (maxLength > 0 && slug.length > maxLength) {
+        slug = slug.substring(0, maxLength);
+        const lastSep = slug.lastIndexOf(separator);
+        if (lastSep > maxLength * 0.5) {
+          slug = slug.substring(0, lastSep);
+        }
+      }
+
+      return slug;
+    }
+
+    function update(): void {
+      const text = inputEl.value;
+      const separator = separatorEl.value;
+      const maxLength = parseInt(maxLengthEl.value, 10) || 0;
+      const lowercase = lowercaseEl.checked;
+
+      const slug = generateSlug(text, separator, maxLength, lowercase);
+      outputEl.value = slug;
+
+      const len = slug.length;
+      slugCharCount.textContent = `${len} character${len !== 1 ? 's' : ''}`;
+    }
+
+    // Real-time update on every keystroke and option change
+    inputEl.addEventListener('input', update);
+    separatorEl.addEventListener('change', update);
+    maxLengthEl.addEventListener('input', update);
+    lowercaseEl.addEventListener('change', update);
+
+    // Copy button
+    copyBtn.addEventListener('click', () => {
+      const text = outputEl.value;
+      if (!text) return;
+
+      navigator.clipboard.writeText(text).then(() => {
+        copyBtn.textContent = 'Copied!';
+        copyBtn.classList.add('copied');
+        setTimeout(() => {
+          copyBtn.textContent = 'Copy';
+          copyBtn.classList.remove('copied');
+        }, 2000);
+      }).catch(() => {
+        outputEl.select();
+        document.execCommand('copy');
+        copyBtn.textContent = 'Copied!';
+        copyBtn.classList.add('copied');
+        setTimeout(() => {
+          copyBtn.textContent = 'Copy';
+          copyBtn.classList.remove('copied');
+        }, 2000);
+      });
+    });
+
+    // Clear button
+    clearBtn.addEventListener('click', () => {
+      inputEl.value = '';
+      outputEl.value = '';
+      slugCharCount.textContent = '0 characters';
+      inputEl.focus();
+    });
+
+    // Initialize
+    update();
+  })();
+</script>

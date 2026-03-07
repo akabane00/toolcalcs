@@ -1,0 +1,301 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import AuthorBio from '../../components/AuthorBio.astro';
+import '../../styles/blog.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "A Beginner's Guide to Regular Expressions (Regex)",
+    "description": "Master the fundamentals of regular expressions with this comprehensive beginner's guide covering syntax, character classes, quantifiers, anchors, groups, lookaheads, common patterns, and practical examples.",
+    "datePublished": "2026-03-07",
+    "dateModified": "2026-03-07",
+    "author": { "@type": "Organization", "name": "ToolCalcs", "url": "https://toolcalcs.com" },
+    "publisher": { "@type": "Organization", "name": "ToolCalcs", "url": "https://toolcalcs.com", "logo": { "@type": "ImageObject", "url": "https://toolcalcs.com/logo.png" } },
+    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://toolcalcs.com/blog/guide-to-regular-expressions/" }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the difference between regex and glob patterns?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Glob patterns are a simpler pattern-matching syntax used primarily in shells and file systems, where * matches any characters and ? matches a single character. Regular expressions are far more powerful and expressive, supporting quantifiers, character classes, grouping, alternation, lookaheads, and backreferences. Regex is used for complex text matching and manipulation, while globs are best for simple filename matching."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Are regular expressions the same in every programming language?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Most languages support a common set of regex features based on Perl-compatible regular expressions (PCRE), but there are differences. JavaScript does not support lookbehinds in older engines (though modern engines do), Python uses a slightly different syntax for named groups, and some languages like Go use RE2 which omits backreferences for guaranteed linear-time matching. Always check your language's regex documentation for specifics."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I make a regex case-insensitive?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Use the i flag after the pattern. In JavaScript, write /pattern/i. In Python, pass re.IGNORECASE or re.I as the second argument to re.compile() or re.search(). In most regex testers, you can toggle case insensitivity with a checkbox or by adding (?i) at the beginning of the pattern as an inline flag."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between greedy and lazy quantifiers?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Greedy quantifiers (*, +, {n,m}) match as many characters as possible while still allowing the overall pattern to succeed. Lazy quantifiers (*?, +?, {n,m}?) match as few characters as possible. For example, given the input '<b>bold</b>', the greedy pattern <.*> matches the entire string '<b>bold</b>', while the lazy pattern <.*?> matches just '<b>' and then '</b>' separately."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can regular expressions parse HTML or XML?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Regular expressions are not suitable for parsing full HTML or XML documents because these are nested, recursive structures that require a context-free grammar to parse correctly. However, regex can be useful for simple, well-defined HTML tasks like extracting all href attributes from anchor tags or finding specific patterns within known markup structures. For robust HTML parsing, use a dedicated parser like DOMParser, BeautifulSoup, or Cheerio."
+        }
+      }
+    ]
+  }
+];
+---
+<BaseLayout title="A Beginner's Guide to Regular Expressions (Regex) | ToolCalcs" description="Master the fundamentals of regular expressions with this comprehensive beginner's guide covering syntax, character classes, quantifiers, anchors, groups, lookaheads, common patterns, and practical examples." structuredData={structuredData}>
+  <Breadcrumb items={[
+    { name: 'Home', url: '/' },
+    { name: 'Blog', url: '/blog/' },
+    { name: 'Guide to Regular Expressions' }
+  ]} />
+  <article class="blog-article">
+    <header class="article-header">
+      <p class="article-meta">Published March 7, 2026 · By ToolCalcs Team</p>
+      <h1>A Beginner's Guide to Regular Expressions (Regex)</h1>
+      <p class="article-intro">Regular expressions are one of the most powerful tools in a developer's toolkit for searching, matching, and manipulating text. Despite their cryptic appearance, regex patterns follow a logical set of rules that anyone can learn. This guide walks you through every fundamental concept, from simple character matching to advanced lookaheads, with practical examples you can use right away.</p>
+    </header>
+
+    <section>
+      <h2>What Are Regular Expressions?</h2>
+      <p>A <strong>regular expression</strong> (often abbreviated as <strong>regex</strong> or <strong>regexp</strong>) is a sequence of characters that defines a search pattern. This pattern can be used to match, find, and replace text in strings. Regular expressions are supported in virtually every programming language, text editor, and command-line tool.</p>
+      <p>The concept of regular expressions originated in the 1950s from the work of mathematician Stephen Cole Kleene, who formalized the concept of "regular sets" as part of automata theory. Ken Thompson later implemented regex in the Unix text editor <code>ed</code>, and the feature eventually made its way into <code>grep</code> (which stands for "global regular expression print"), <code>sed</code>, <code>awk</code>, and Perl. Today, most regex implementations are based on or compatible with <strong>Perl-Compatible Regular Expressions (PCRE)</strong>.</p>
+      <p>Common use cases for regular expressions include form validation, log file analysis, search and replace operations, data extraction, syntax highlighting, and URL routing in web frameworks.</p>
+    </section>
+
+    <section>
+      <h2>Literal Characters and Metacharacters</h2>
+      <p>The simplest regex pattern is a literal string. The pattern <code>cat</code> matches the exact sequence "cat" wherever it appears in the text. However, regex becomes powerful through <strong>metacharacters</strong> — characters with special meaning:</p>
+      <ul>
+        <li><code>.</code> — matches any single character except a newline</li>
+        <li><code>^</code> — matches the start of a string (or line in multiline mode)</li>
+        <li><code>$</code> — matches the end of a string (or line in multiline mode)</li>
+        <li><code>*</code> — matches zero or more of the preceding element</li>
+        <li><code>+</code> — matches one or more of the preceding element</li>
+        <li><code>?</code> — matches zero or one of the preceding element</li>
+        <li><code>\</code> — escapes a metacharacter to treat it as a literal</li>
+        <li><code>|</code> — alternation (logical OR)</li>
+        <li><code>()</code> — grouping</li>
+        <li><code>[]</code> — character class</li>
+        <li><code>{"{}"}</code> — quantifier with specific count</li>
+      </ul>
+      <p>If you need to match a literal dot, you must escape it: <code>\.</code>. Similarly, to match a literal asterisk, use <code>\*</code>. This escaping rule applies to all metacharacters.</p>
+    </section>
+
+    <section>
+      <h2>Character Classes</h2>
+      <p>Character classes (also called character sets) allow you to match any one character from a defined set. They are enclosed in square brackets.</p>
+      <ul>
+        <li><code>[abc]</code> — matches "a", "b", or "c"</li>
+        <li><code>[a-z]</code> — matches any lowercase letter from a to z</li>
+        <li><code>[A-Z]</code> — matches any uppercase letter from A to Z</li>
+        <li><code>[0-9]</code> — matches any digit from 0 to 9</li>
+        <li><code>[a-zA-Z0-9]</code> — matches any alphanumeric character</li>
+        <li><code>[^abc]</code> — negated class: matches any character <strong>except</strong> a, b, or c</li>
+      </ul>
+      <p>There are also shorthand character classes that provide convenient aliases:</p>
+      <ul>
+        <li><code>\d</code> — any digit (equivalent to <code>[0-9]</code>)</li>
+        <li><code>\D</code> — any non-digit (equivalent to <code>[^0-9]</code>)</li>
+        <li><code>\w</code> — any word character (equivalent to <code>[a-zA-Z0-9_]</code>)</li>
+        <li><code>\W</code> — any non-word character</li>
+        <li><code>\s</code> — any whitespace character (space, tab, newline, etc.)</li>
+        <li><code>\S</code> — any non-whitespace character</li>
+      </ul>
+      <p>For example, <code>\d&#123;3&#125;-\d&#123;4&#125;</code> matches a pattern like "555-1234" — three digits, a hyphen, and four digits.</p>
+    </section>
+
+    <section>
+      <h2>Quantifiers</h2>
+      <p>Quantifiers specify how many times the preceding element should be matched:</p>
+      <ul>
+        <li><code>*</code> — zero or more times (greedy)</li>
+        <li><code>+</code> — one or more times (greedy)</li>
+        <li><code>?</code> — zero or one time (optional)</li>
+        <li><code>{"{n}"}</code> — exactly n times</li>
+        <li><code>{"{n,}"}</code> — n or more times</li>
+        <li><code>{"{n,m}"}</code> — between n and m times (inclusive)</li>
+      </ul>
+      <p>By default, quantifiers are <strong>greedy</strong> — they match as much text as possible. Adding a <code>?</code> after a quantifier makes it <strong>lazy</strong> (also called reluctant), matching as little text as possible:</p>
+      <ul>
+        <li><code>*?</code> — zero or more, lazy</li>
+        <li><code>+?</code> — one or more, lazy</li>
+        <li><code>??</code> — zero or one, lazy</li>
+      </ul>
+      <p>Consider the string <code>"Hello" and "World"</code>. The greedy pattern <code>".*"</code> matches the entire string <code>"Hello" and "World"</code>, while the lazy pattern <code>".*?"</code> matches <code>"Hello"</code> and <code>"World"</code> separately. Understanding the difference between greedy and lazy matching is critical for writing accurate patterns.</p>
+    </section>
+
+    <section>
+      <h2>Anchors and Boundaries</h2>
+      <p>Anchors do not match characters — they match <strong>positions</strong> in the string:</p>
+      <ul>
+        <li><code>^</code> — matches the start of the string (or line, with the <code>m</code> flag)</li>
+        <li><code>$</code> — matches the end of the string (or line, with the <code>m</code> flag)</li>
+        <li><code>\b</code> — matches a word boundary (the position between a word character and a non-word character)</li>
+        <li><code>\B</code> — matches a non-word boundary</li>
+      </ul>
+      <p>For example, <code>^Hello</code> only matches "Hello" at the very beginning of a string. The pattern <code>\bcat\b</code> matches the word "cat" but not "category" or "concatenate", because the word boundaries ensure "cat" stands alone.</p>
+      <p>Word boundaries are especially useful for whole-word searches. Without <code>\b</code>, searching for <code>log</code> would also match "blog", "catalog", and "logarithm".</p>
+    </section>
+
+    <section>
+      <h2>Groups and Capturing</h2>
+      <p>Parentheses create <strong>groups</strong> that serve two purposes: they group elements for quantifiers and alternation, and they <strong>capture</strong> the matched text for later use.</p>
+      <h3>Capturing Groups</h3>
+      <p>A capturing group saves the matched text so it can be referenced later. Groups are numbered from left to right starting at 1:</p>
+      <p><code>(\d&#123;3&#125;)-(\d&#123;4&#125;)</code> applied to "555-1234" creates group 1 = "555" and group 2 = "1234".</p>
+      <p>In replacement strings, captured groups can be referenced with <code>$1</code>, <code>$2</code>, etc. (or <code>\1</code>, <code>\2</code> in some languages). This is invaluable for reformatting text.</p>
+
+      <h3>Non-Capturing Groups</h3>
+      <p>If you need grouping for logic but do not want to capture the text, use <code>(?:...)</code>:</p>
+      <p><code>(?:https?|ftp)://</code> groups the protocol alternatives without creating a numbered capture. This can improve performance when you have many groups but only need some of them.</p>
+
+      <h3>Named Groups</h3>
+      <p>Named groups make your patterns more readable. The syntax varies slightly by language:</p>
+      <ul>
+        <li>JavaScript / Python: <code>(?&lt;name&gt;...)</code> or <code>(?P&lt;name&gt;...)</code></li>
+        <li>Access in JavaScript: <code>match.groups.name</code></li>
+        <li>Access in Python: <code>match.group('name')</code></li>
+      </ul>
+      <p>Example: <code>(?&lt;area&gt;\d&#123;3&#125;)-(?&lt;number&gt;\d&#123;4&#125;)</code> lets you access the matched parts by name rather than number.</p>
+    </section>
+
+    <section>
+      <h2>Lookaheads and Lookbehinds</h2>
+      <p>Lookarounds are zero-width assertions that match a position based on what comes before or after, without including that text in the match:</p>
+      <ul>
+        <li><code>(?=...)</code> — <strong>positive lookahead</strong>: asserts that what follows matches the pattern</li>
+        <li><code>(?!...)</code> — <strong>negative lookahead</strong>: asserts that what follows does <em>not</em> match the pattern</li>
+        <li><code>(?&lt;=...)</code> — <strong>positive lookbehind</strong>: asserts that what precedes matches the pattern</li>
+        <li><code>(?&lt;!...)</code> — <strong>negative lookbehind</strong>: asserts that what precedes does <em>not</em> match the pattern</li>
+      </ul>
+      <p>For example, <code>\d+(?= dollars)</code> matches "100" in "100 dollars" but not in "100 euros". The word "dollars" is checked but not included in the match result.</p>
+      <p>A practical application: <code>(?&lt;=\$)\d+\.?\d*</code> matches the numeric amount after a dollar sign, like "49.99" in "$49.99", without including the dollar sign in the match.</p>
+    </section>
+
+    <section>
+      <h2>Regex Flags</h2>
+      <p>Flags modify how the regex engine interprets the pattern. The most common flags are:</p>
+      <ul>
+        <li><code>g</code> (global) — find all matches, not just the first one</li>
+        <li><code>i</code> (case-insensitive) — match uppercase and lowercase letters interchangeably</li>
+        <li><code>m</code> (multiline) — make <code>^</code> and <code>$</code> match the start and end of each line, not just the entire string</li>
+        <li><code>s</code> (dotAll) — make <code>.</code> match newline characters as well</li>
+        <li><code>u</code> (unicode) — enable full Unicode support, treating surrogate pairs correctly</li>
+      </ul>
+      <p>In JavaScript, flags are placed after the closing slash: <code>/pattern/gi</code>. In Python, they are passed as arguments: <code>re.search(pattern, string, re.IGNORECASE | re.MULTILINE)</code>.</p>
+    </section>
+
+    <section>
+      <h2>Common Regex Patterns</h2>
+      <p>Here are practical patterns you can use in real-world applications:</p>
+
+      <h3>Email Address (Basic)</h3>
+      <p><code>[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]&#123;2,}</code></p>
+      <p>This matches common email formats. Note that a truly RFC 5322-compliant email regex is extremely complex; for production use, it is better to combine a simple regex check with server-side verification.</p>
+
+      <h3>Phone Number (US)</h3>
+      <p><code>\(?\d&#123;3&#125;\)?[-.\s]?\d&#123;3&#125;[-.\s]?\d&#123;4&#125;</code></p>
+      <p>Matches formats like (555) 123-4567, 555-123-4567, 555.123.4567, and 5551234567.</p>
+
+      <h3>URL</h3>
+      <p><code>https?://[^\s/$.?#].[^\s]*</code></p>
+      <p>A simple pattern that matches most HTTP and HTTPS URLs. For stricter validation, consider a more detailed pattern or use a URL parser.</p>
+
+      <h3>IPv4 Address</h3>
+      <p><code>\b(?:\d&#123;1,3&#125;\.)&#123;3&#125;\d&#123;1,3&#125;\b</code></p>
+      <p>Matches patterns like 192.168.1.1. For strict validation (ensuring each octet is 0-255), a more complex pattern is needed.</p>
+
+      <h3>Date (YYYY-MM-DD)</h3>
+      <p><code>\d&#123;4&#125;-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])</code></p>
+      <p>Matches ISO 8601 date formats with basic month and day validation.</p>
+
+      <h3>HTML Tag</h3>
+      <p><code>&lt;([a-z][a-z0-9]*)\b[^&gt;]*&gt;(.*?)&lt;\/\1&gt;</code></p>
+      <p>Matches simple opening and closing tag pairs with a backreference (<code>\1</code>) to ensure the closing tag matches the opening tag name. Remember: do not use regex for full HTML parsing.</p>
+    </section>
+
+    <section>
+      <h2>Practical Examples</h2>
+      <h3>Validating a Password</h3>
+      <p>A password regex that requires at least 8 characters, one uppercase letter, one lowercase letter, one digit, and one special character:</p>
+      <p><code>^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&amp;])[A-Za-z\d@$!%*?&amp;]&#123;8,}$</code></p>
+      <p>This pattern uses four positive lookaheads at the start to assert the presence of each required character type before matching the overall pattern.</p>
+
+      <h3>Extracting Data from Log Files</h3>
+      <p>Given a log line like <code>2026-03-07 14:23:01 [ERROR] Connection timeout on server-42</code>, you could use:</p>
+      <p><code>(\d&#123;4&#125;-\d&#123;2&#125;-\d&#123;2&#125;) (\d&#123;2&#125;:\d&#123;2&#125;:\d&#123;2&#125;) \[(\w+)\] (.+)</code></p>
+      <p>This captures the date (group 1), time (group 2), log level (group 3), and message (group 4).</p>
+
+      <h3>Search and Replace</h3>
+      <p>To convert dates from MM/DD/YYYY to YYYY-MM-DD format, search for <code>(\d&#123;2&#125;)/(\d&#123;2&#125;)/(\d&#123;4&#125;)</code> and replace with <code>$3-$1-$2</code>. This rearranges the captured groups into the desired order.</p>
+    </section>
+
+    <section>
+      <h2>Tips for Writing Better Regex</h2>
+      <ol>
+        <li><strong>Start simple and build up.</strong> Test each piece of your pattern incrementally rather than writing the entire expression at once.</li>
+        <li><strong>Use a regex tester.</strong> Tools like our <a href="/tools/regex-tester/">Regex Tester</a> let you experiment with patterns in real time and see matches highlighted.</li>
+        <li><strong>Be specific.</strong> Avoid overly broad patterns like <code>.*</code> when a more specific character class would be more accurate and performant.</li>
+        <li><strong>Use non-capturing groups</strong> when you need grouping but not capturing. This keeps your capture indices clean and can improve performance.</li>
+        <li><strong>Comment your patterns.</strong> Many languages support verbose/extended mode (the <code>x</code> flag), which allows you to add comments and whitespace for readability.</li>
+        <li><strong>Watch for catastrophic backtracking.</strong> Patterns with nested quantifiers like <code>(a+)+</code> can cause exponential processing time on certain inputs. Keep your patterns efficient.</li>
+        <li><strong>Consider alternatives.</strong> Sometimes a simple string method (<code>startsWith</code>, <code>includes</code>, <code>split</code>) is clearer and faster than a regex.</li>
+      </ol>
+    </section>
+
+    <section class="faq-section">
+      <h2>Frequently Asked Questions</h2>
+      <details>
+        <summary>What is the difference between regex and glob patterns?</summary>
+        <p>Glob patterns are a simpler pattern-matching syntax used primarily in shells and file systems, where <code>*</code> matches any characters and <code>?</code> matches a single character. Regular expressions are far more powerful and expressive, supporting quantifiers, character classes, grouping, alternation, lookaheads, and backreferences. Regex is used for complex text matching and manipulation, while globs are best for simple filename matching.</p>
+      </details>
+      <details>
+        <summary>Are regular expressions the same in every programming language?</summary>
+        <p>Most languages support a common set of regex features based on Perl-compatible regular expressions (PCRE), but there are differences. JavaScript does not support lookbehinds in older engines (though modern engines do), Python uses a slightly different syntax for named groups, and some languages like Go use RE2 which omits backreferences for guaranteed linear-time matching. Always check your language's regex documentation for specifics.</p>
+      </details>
+      <details>
+        <summary>How do I make a regex case-insensitive?</summary>
+        <p>Use the <code>i</code> flag after the pattern. In JavaScript, write <code>/pattern/i</code>. In Python, pass <code>re.IGNORECASE</code> or <code>re.I</code> as the second argument to <code>re.compile()</code> or <code>re.search()</code>. In most regex testers, you can toggle case insensitivity with a checkbox or by adding <code>(?i)</code> at the beginning of the pattern as an inline flag.</p>
+      </details>
+      <details>
+        <summary>What is the difference between greedy and lazy quantifiers?</summary>
+        <p>Greedy quantifiers (<code>*</code>, <code>+</code>, <code>{"{n,m}"}</code>) match as many characters as possible while still allowing the overall pattern to succeed. Lazy quantifiers (<code>*?</code>, <code>+?</code>, <code>{"{n,m}?"}</code>) match as few characters as possible. For example, given the input "&lt;b&gt;bold&lt;/b&gt;", the greedy pattern <code>&lt;.*&gt;</code> matches the entire string "&lt;b&gt;bold&lt;/b&gt;", while the lazy pattern <code>&lt;.*?&gt;</code> matches just "&lt;b&gt;" and then "&lt;/b&gt;" separately.</p>
+      </details>
+      <details>
+        <summary>Can regular expressions parse HTML or XML?</summary>
+        <p>Regular expressions are not suitable for parsing full HTML or XML documents because these are nested, recursive structures that require a context-free grammar to parse correctly. However, regex can be useful for simple, well-defined HTML tasks like extracting all href attributes from anchor tags or finding specific patterns within known markup structures. For robust HTML parsing, use a dedicated parser like DOMParser, BeautifulSoup, or Cheerio.</p>
+      </details>
+    </section>
+
+    <footer class="article-footer">
+      <h2>Related Tools</h2>
+      <ul>
+        <li><a href="/tools/regex-tester/">Regex Tester</a> — Build, test, and debug regular expressions with real-time matching and highlighting</li>
+        <li><a href="/tools/text-case-converter/">Text Case Converter</a> — Convert text between uppercase, lowercase, title case, and more</li>
+      </ul>
+      <AuthorBio />
+    </footer>
+  </article>
+</BaseLayout>

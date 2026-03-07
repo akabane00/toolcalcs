@@ -1,0 +1,1199 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getToolBySlug } from '../../data/tools';
+import '../../styles/tool.css';
+
+const tool = getToolBySlug('cron-expression-generator')!;
+const structuredData = [
+  { "@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Web Tools", "item": "https://toolcalcs.com/tools/" },
+    { "@type": "ListItem", "position": 3, "name": "Cron Expression Generator" }
+  ]},
+  { "@context": "https://schema.org", "@type": "WebApplication", "name": "Cron Expression Generator", "url": "https://toolcalcs.com/tools/cron-expression-generator/", "applicationCategory": "DeveloperApplication", "operatingSystem": "All", "browserRequirements": "Requires JavaScript", "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }, "description": "Build and validate cron expressions visually." },
+  { "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
+    { "@type": "Question", "name": "What is a cron expression?", "acceptedAnswer": { "@type": "Answer", "text": "A cron expression is a string of five fields separated by spaces that defines a schedule. The fields represent: minute (0-59), hour (0-23), day of month (1-31), month (1-12), and day of week (0-6, where 0 is Sunday). Special characters like * (any), , (list), - (range), and / (step) allow flexible scheduling." }},
+    { "@type": "Question", "name": "What does */5 mean in cron?", "acceptedAnswer": { "@type": "Answer", "text": "The */5 syntax means 'every 5th interval.' For example, */5 in the minute field means every 5 minutes (0, 5, 10, 15...). */2 in the hour field means every 2 hours (0, 2, 4, 6...)." }},
+    { "@type": "Question", "name": "What is the difference between cron and crontab?", "acceptedAnswer": { "@type": "Answer", "text": "Cron is the daemon (background service) that runs scheduled tasks. Crontab (cron table) is the file where you define the schedule and commands. You edit the crontab using the 'crontab -e' command." }}
+  ]}
+];
+---
+
+<BaseLayout
+  title="Cron Expression Generator - Build Cron Schedules Visually | ToolCalcs"
+  description={tool.description}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/tools/">Web Tools</a> &rsaquo; <span>Cron Expression Generator</span>
+  </nav>
+
+  <h1>Cron Expression Generator</h1>
+  <p class="page-desc">Build and validate cron expressions with a visual editor. See a human-readable description and the next scheduled run times. Everything runs in your browser.</p>
+
+  <div class="tool-box">
+    <!-- Quick Presets -->
+    <div class="presets-section">
+      <span class="tool-label">Quick Presets</span>
+      <div class="preset-buttons">
+        <button type="button" class="preset-btn" data-cron="* * * * *">Every minute</button>
+        <button type="button" class="preset-btn" data-cron="0 * * * *">Every hour</button>
+        <button type="button" class="preset-btn" data-cron="0 0 * * *">Every day at midnight</button>
+        <button type="button" class="preset-btn" data-cron="0 9 * * 1">Every Monday at 9am</button>
+        <button type="button" class="preset-btn" data-cron="0 0 1 * *">1st of every month</button>
+        <button type="button" class="preset-btn" data-cron="*/5 * * * *">Every 5 minutes</button>
+        <button type="button" class="preset-btn" data-cron="*/15 * * * *">Every 15 minutes</button>
+        <button type="button" class="preset-btn" data-cron="0 */2 * * *">Every 2 hours</button>
+        <button type="button" class="preset-btn" data-cron="0 9-17 * * 1-5">Hourly during business hours</button>
+        <button type="button" class="preset-btn" data-cron="0 0 * * 0">Every Sunday at midnight</button>
+      </div>
+    </div>
+
+    <!-- Visual Editor -->
+    <div class="cron-editor">
+      <!-- Minute Field -->
+      <div class="cron-field" id="fieldMinute">
+        <div class="field-header">
+          <span class="field-label">Minute</span>
+          <span class="field-value" id="minuteValue">*</span>
+        </div>
+        <div class="mode-selector">
+          <button type="button" class="mode-btn active" data-mode="every">Every</button>
+          <button type="button" class="mode-btn" data-mode="specific">Specific</button>
+          <button type="button" class="mode-btn" data-mode="range">Range</button>
+          <button type="button" class="mode-btn" data-mode="step">Step</button>
+        </div>
+        <div class="mode-inputs">
+          <div class="mode-input active" data-mode="every">
+            <span class="mode-desc">Every minute (*)</span>
+          </div>
+          <div class="mode-input" data-mode="specific">
+            <label>Select minutes (comma-separated):</label>
+            <input type="text" class="specific-input" placeholder="0,15,30,45" data-min="0" data-max="59" />
+          </div>
+          <div class="mode-input" data-mode="range">
+            <label>From</label>
+            <input type="number" class="range-from" min="0" max="59" value="0" />
+            <label>to</label>
+            <input type="number" class="range-to" min="0" max="59" value="30" />
+          </div>
+          <div class="mode-input" data-mode="step">
+            <label>Every</label>
+            <input type="number" class="step-every" min="1" max="59" value="5" />
+            <label>minute(s) starting at minute</label>
+            <input type="number" class="step-start" min="0" max="59" value="0" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Hour Field -->
+      <div class="cron-field" id="fieldHour">
+        <div class="field-header">
+          <span class="field-label">Hour</span>
+          <span class="field-value" id="hourValue">*</span>
+        </div>
+        <div class="mode-selector">
+          <button type="button" class="mode-btn active" data-mode="every">Every</button>
+          <button type="button" class="mode-btn" data-mode="specific">Specific</button>
+          <button type="button" class="mode-btn" data-mode="range">Range</button>
+          <button type="button" class="mode-btn" data-mode="step">Step</button>
+        </div>
+        <div class="mode-inputs">
+          <div class="mode-input active" data-mode="every">
+            <span class="mode-desc">Every hour (*)</span>
+          </div>
+          <div class="mode-input" data-mode="specific">
+            <label>Select hours (comma-separated):</label>
+            <input type="text" class="specific-input" placeholder="0,6,12,18" data-min="0" data-max="23" />
+          </div>
+          <div class="mode-input" data-mode="range">
+            <label>From</label>
+            <input type="number" class="range-from" min="0" max="23" value="9" />
+            <label>to</label>
+            <input type="number" class="range-to" min="0" max="23" value="17" />
+          </div>
+          <div class="mode-input" data-mode="step">
+            <label>Every</label>
+            <input type="number" class="step-every" min="1" max="23" value="2" />
+            <label>hour(s) starting at hour</label>
+            <input type="number" class="step-start" min="0" max="23" value="0" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Day of Month Field -->
+      <div class="cron-field" id="fieldDom">
+        <div class="field-header">
+          <span class="field-label">Day of Month</span>
+          <span class="field-value" id="domValue">*</span>
+        </div>
+        <div class="mode-selector">
+          <button type="button" class="mode-btn active" data-mode="every">Every</button>
+          <button type="button" class="mode-btn" data-mode="specific">Specific</button>
+          <button type="button" class="mode-btn" data-mode="range">Range</button>
+          <button type="button" class="mode-btn" data-mode="step">Step</button>
+        </div>
+        <div class="mode-inputs">
+          <div class="mode-input active" data-mode="every">
+            <span class="mode-desc">Every day of the month (*)</span>
+          </div>
+          <div class="mode-input" data-mode="specific">
+            <label>Select days (comma-separated):</label>
+            <input type="text" class="specific-input" placeholder="1,15" data-min="1" data-max="31" />
+          </div>
+          <div class="mode-input" data-mode="range">
+            <label>From</label>
+            <input type="number" class="range-from" min="1" max="31" value="1" />
+            <label>to</label>
+            <input type="number" class="range-to" min="1" max="31" value="15" />
+          </div>
+          <div class="mode-input" data-mode="step">
+            <label>Every</label>
+            <input type="number" class="step-every" min="1" max="31" value="2" />
+            <label>day(s) starting on day</label>
+            <input type="number" class="step-start" min="1" max="31" value="1" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Month Field -->
+      <div class="cron-field" id="fieldMonth">
+        <div class="field-header">
+          <span class="field-label">Month</span>
+          <span class="field-value" id="monthValue">*</span>
+        </div>
+        <div class="mode-selector">
+          <button type="button" class="mode-btn active" data-mode="every">Every</button>
+          <button type="button" class="mode-btn" data-mode="specific">Specific</button>
+          <button type="button" class="mode-btn" data-mode="range">Range</button>
+          <button type="button" class="mode-btn" data-mode="step">Step</button>
+        </div>
+        <div class="mode-inputs">
+          <div class="mode-input active" data-mode="every">
+            <span class="mode-desc">Every month (*)</span>
+          </div>
+          <div class="mode-input" data-mode="specific">
+            <label>Select months (comma-separated):</label>
+            <input type="text" class="specific-input" placeholder="1,6,12" data-min="1" data-max="12" />
+          </div>
+          <div class="mode-input" data-mode="range">
+            <label>From</label>
+            <input type="number" class="range-from" min="1" max="12" value="1" />
+            <label>to</label>
+            <input type="number" class="range-to" min="1" max="12" value="6" />
+          </div>
+          <div class="mode-input" data-mode="step">
+            <label>Every</label>
+            <input type="number" class="step-every" min="1" max="12" value="2" />
+            <label>month(s) starting in month</label>
+            <input type="number" class="step-start" min="1" max="12" value="1" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Day of Week Field -->
+      <div class="cron-field" id="fieldDow">
+        <div class="field-header">
+          <span class="field-label">Day of Week</span>
+          <span class="field-value" id="dowValue">*</span>
+        </div>
+        <div class="mode-selector">
+          <button type="button" class="mode-btn active" data-mode="every">Every</button>
+          <button type="button" class="mode-btn" data-mode="specific">Specific</button>
+          <button type="button" class="mode-btn" data-mode="range">Range</button>
+          <button type="button" class="mode-btn" data-mode="step">Step</button>
+        </div>
+        <div class="mode-inputs">
+          <div class="mode-input active" data-mode="every">
+            <span class="mode-desc">Every day of the week (*)</span>
+          </div>
+          <div class="mode-input" data-mode="specific">
+            <label>Select days:</label>
+            <div class="dow-checkboxes">
+              <label class="dow-chip"><input type="checkbox" value="0" /> Sun</label>
+              <label class="dow-chip"><input type="checkbox" value="1" /> Mon</label>
+              <label class="dow-chip"><input type="checkbox" value="2" /> Tue</label>
+              <label class="dow-chip"><input type="checkbox" value="3" /> Wed</label>
+              <label class="dow-chip"><input type="checkbox" value="4" /> Thu</label>
+              <label class="dow-chip"><input type="checkbox" value="5" /> Fri</label>
+              <label class="dow-chip"><input type="checkbox" value="6" /> Sat</label>
+            </div>
+          </div>
+          <div class="mode-input" data-mode="range">
+            <label>From</label>
+            <select class="range-from-dow">
+              <option value="0">Sunday</option>
+              <option value="1" selected>Monday</option>
+              <option value="2">Tuesday</option>
+              <option value="3">Wednesday</option>
+              <option value="4">Thursday</option>
+              <option value="5">Friday</option>
+              <option value="6">Saturday</option>
+            </select>
+            <label>to</label>
+            <select class="range-to-dow">
+              <option value="0">Sunday</option>
+              <option value="1">Monday</option>
+              <option value="2">Tuesday</option>
+              <option value="3">Wednesday</option>
+              <option value="4">Thursday</option>
+              <option value="5" selected>Friday</option>
+              <option value="6">Saturday</option>
+            </select>
+          </div>
+          <div class="mode-input" data-mode="step">
+            <label>Every</label>
+            <input type="number" class="step-every" min="1" max="6" value="2" />
+            <label>day(s) starting on</label>
+            <select class="step-start-dow">
+              <option value="0">Sunday</option>
+              <option value="1" selected>Monday</option>
+              <option value="2">Tuesday</option>
+              <option value="3">Wednesday</option>
+              <option value="4">Thursday</option>
+              <option value="5">Friday</option>
+              <option value="6">Saturday</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Result Section -->
+    <div class="cron-result">
+      <span class="tool-label">Generated Expression</span>
+      <div class="cron-display-wrapper">
+        <output class="cron-display" id="cronOutput" aria-live="polite">* * * * *</output>
+        <button class="copy-btn" id="copyCronBtn" type="button" title="Copy cron expression">Copy</button>
+      </div>
+      <div class="cron-description" id="cronDescription">Every minute</div>
+      <div class="next-runs" id="nextRuns">
+        <span class="tool-label">Next 5 Run Times</span>
+        <ul class="run-list" id="runList"></ul>
+      </div>
+    </div>
+
+    <!-- Manual Input -->
+    <div class="manual-input-section">
+      <span class="tool-label">Manual Input</span>
+      <div class="manual-input-row">
+        <input type="text" id="manualInput" class="manual-cron-input" placeholder="e.g. */5 9-17 * * 1-5" />
+        <button type="button" class="tool-btn primary" id="parseBtn">Parse</button>
+      </div>
+    </div>
+
+    <div class="tool-error" id="toolError" hidden></div>
+  </div>
+
+  <AdUnit slot="cron-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is Cron?</h2>
+    <p>Cron is a time-based job scheduler found in Unix and Unix-like operating systems including Linux, macOS, and FreeBSD. The word cron comes from the Greek word chronos, meaning time. The cron daemon runs continuously in the background and executes scheduled commands or scripts at specified intervals. System administrators and developers rely on cron to automate repetitive tasks such as running backups, clearing temporary files, sending scheduled emails, generating reports, rotating log files, and synchronizing data between systems.</p>
+    <p>Cron was originally written by Ken Thompson for Version 7 Unix in the late 1970s and has since evolved through several implementations. The most widely used version today is Vixie cron, written by Paul Vixie in 1987, which forms the basis of the cron implementations shipped with most Linux distributions. Despite being nearly five decades old, cron remains one of the most important and widely used utilities in the Unix ecosystem. Every Linux server, from a Raspberry Pi to a cloud instance running critical infrastructure, typically has the cron daemon running.</p>
+    <p>The power of cron lies in its simplicity. You define when a job should run using a compact five-field expression, and cron takes care of executing it at the right time. There are no complex configuration files, no graphical interfaces to navigate, and no dependencies to install. You write a cron expression, pair it with a command, and the system handles the rest. This simplicity has ensured cron's longevity and made it a foundational tool that every developer and system administrator should understand.</p>
+
+    <h2>Cron Expression Syntax</h2>
+    <p>A standard cron expression consists of five fields separated by spaces. Each field represents a unit of time and defines when the scheduled task should execute. The five fields, from left to right, are:</p>
+    <ul>
+      <li><strong>Minute</strong> (0-59): The minute of the hour when the job runs.</li>
+      <li><strong>Hour</strong> (0-23): The hour of the day in 24-hour format. 0 is midnight, 12 is noon, 23 is 11 PM.</li>
+      <li><strong>Day of Month</strong> (1-31): The day of the month. Note that not all months have 31 days; cron will skip invalid dates.</li>
+      <li><strong>Month</strong> (1-12): The month of the year. January is 1, December is 12. Some cron implementations also accept three-letter abbreviations like JAN, FEB, MAR.</li>
+      <li><strong>Day of Week</strong> (0-6): The day of the week. Sunday is 0, Saturday is 6. Like months, some implementations accept abbreviations like SUN, MON, TUE. In many implementations, 7 is also accepted as Sunday.</li>
+    </ul>
+    <p>A complete cron entry in a crontab file consists of the five-field time specification followed by the command to execute. For example, <code>30 2 * * * /usr/local/bin/backup.sh</code> runs the backup script at 2:30 AM every day. The time specification and the command are separated by one or more spaces or tabs.</p>
+
+    <h2>Special Characters Explained</h2>
+    <p>Cron expressions use several special characters to create flexible schedules. Understanding these characters is essential to writing effective cron expressions.</p>
+    <h3>Asterisk (*) - Any Value</h3>
+    <p>The asterisk matches all possible values for a field. In the minute field, <code>*</code> means every minute (0 through 59). In the hour field, it means every hour. The expression <code>* * * * *</code> runs every single minute of every hour of every day. This is the most permissive wildcard and is the default starting point for building a cron expression.</p>
+    <h3>Comma (,) - Value List</h3>
+    <p>The comma separates individual values within a field. For example, <code>0,15,30,45 * * * *</code> runs at minutes 0, 15, 30, and 45 of every hour. You can combine as many values as needed: <code>1,2,3,4,5</code> in the day-of-week field runs the job Monday through Friday. The values do not need to be in order, though keeping them sorted improves readability.</p>
+    <h3>Hyphen (-) - Range</h3>
+    <p>The hyphen defines a contiguous range of values. Instead of writing <code>1,2,3,4,5</code> you can write <code>1-5</code> in the day-of-week field to represent Monday through Friday. Ranges are inclusive on both ends. In the hour field, <code>9-17</code> means every hour from 9 AM through 5 PM. Ranges can be combined with commas: <code>1-5,15,30</code> in the minute field matches minutes 1, 2, 3, 4, 5, 15, and 30.</p>
+    <h3>Slash (/) - Step Value</h3>
+    <p>The slash defines step values (intervals). The syntax is <code>start/step</code> where start is the beginning value and step is the increment. For example, <code>*/5</code> in the minute field means every 5 minutes starting from 0 (equivalent to 0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55). You can also specify a starting point: <code>2/5</code> means minutes 2, 7, 12, 17, 22, 27, 32, 37, 42, 47, 52, 57. Steps work with ranges too: <code>1-30/5</code> means minutes 1, 6, 11, 16, 21, 26.</p>
+
+    <h2>Common Cron Schedules</h2>
+    <p>Here are some of the most frequently used cron expressions that cover typical scheduling scenarios:</p>
+    <ul>
+      <li><code>* * * * *</code> - Every minute. Useful for monitoring scripts or heartbeat checks, but be cautious about resource usage.</li>
+      <li><code>*/5 * * * *</code> - Every 5 minutes. A popular choice for polling scripts and lightweight status checks.</li>
+      <li><code>0 * * * *</code> - Every hour, at minute 0. Good for hourly reports, cache clearing, or data synchronization.</li>
+      <li><code>0 0 * * *</code> - Once a day at midnight. The standard schedule for daily backups, log rotation, and cleanup tasks.</li>
+      <li><code>0 0 * * 0</code> - Once a week on Sunday at midnight. Common for weekly reports, full backups, and maintenance windows.</li>
+      <li><code>0 0 1 * *</code> - Once a month on the 1st at midnight. Used for monthly reports, billing tasks, and data archival.</li>
+      <li><code>0 0 1 1 *</code> - Once a year on January 1st at midnight. Certificate renewal reminders, annual cleanup jobs.</li>
+      <li><code>0 9 * * 1-5</code> - Every weekday at 9 AM. Perfect for business-hour notifications and daily standup reminders.</li>
+      <li><code>0 9-17 * * 1-5</code> - Every hour during business hours on weekdays. Good for periodic business-hour checks.</li>
+      <li><code>*/15 * * * *</code> - Every 15 minutes. A balanced frequency for monitoring and data synchronization.</li>
+      <li><code>0 0,12 * * *</code> - Twice a day at midnight and noon. Useful for semi-daily reports or data pulls.</li>
+      <li><code>30 4 * * *</code> - Once a day at 4:30 AM. Common for database backups during low-traffic hours.</li>
+    </ul>
+
+    <h2>Cron in Different Systems</h2>
+    <p>While the five-field cron expression is the universal standard, different systems and platforms implement cron with slight variations and extensions. Understanding these differences is important if you work across multiple environments.</p>
+    <h3>Standard Unix/Linux Cron</h3>
+    <p>The traditional Unix cron (Vixie cron) uses the five-field format described above. Crontab files are edited using the <code>crontab -e</code> command, which opens the user's cron table in a text editor. Each line contains a time specification followed by a command. Lines starting with <code>#</code> are comments. The crontab also supports environment variable assignments (like <code>PATH=/usr/local/bin:/usr/bin</code>) at the top of the file. The system crontab (<code>/etc/crontab</code>) includes an additional sixth field between the time specification and the command that specifies which user account should run the job.</p>
+    <h3>Extended Cron (6 or 7 Fields)</h3>
+    <p>Some cron implementations add a seconds field as the first position, creating a six-field expression. Quartz Scheduler (commonly used in Java applications), Spring Framework's @Scheduled annotation, and AWS EventBridge all support a seconds field. Some implementations also add a seventh field for the year. When working with these extended formats, always check the documentation for your specific platform to understand exactly which fields are expected and in what order.</p>
+    <h3>Predefined Schedules</h3>
+    <p>Many cron implementations support shorthand strings that replace the five-field expression. These include: <code>@yearly</code> or <code>@annually</code> (equivalent to <code>0 0 1 1 *</code>), <code>@monthly</code> (equivalent to <code>0 0 1 * *</code>), <code>@weekly</code> (equivalent to <code>0 0 * * 0</code>), <code>@daily</code> or <code>@midnight</code> (equivalent to <code>0 0 * * *</code>), <code>@hourly</code> (equivalent to <code>0 * * * *</code>), and <code>@reboot</code> which runs once when the cron daemon starts.</p>
+    <h3>Cloud Platforms</h3>
+    <p>Cloud providers have adopted cron-like syntax for their scheduling services. AWS CloudWatch Events and EventBridge use a modified cron syntax with six fields (including seconds or year) and support additional characters like <code>?</code> (no specific value) and <code>L</code> (last day). Google Cloud Scheduler uses standard five-field cron syntax. Azure Functions Timer Triggers use NCRONTAB format which adds a seconds field. Kubernetes CronJobs use standard five-field syntax. GitHub Actions uses standard five-field cron for scheduled workflows. When migrating cron jobs to the cloud, always verify that your expression works correctly in the target platform's cron dialect.</p>
+    <h3>Node.js and JavaScript</h3>
+    <p>Libraries like <code>node-cron</code>, <code>cron</code> (npm package), and <code>node-schedule</code> bring cron functionality to JavaScript applications. Most use the standard five-field syntax, though <code>node-cron</code> supports an optional seconds field as the first position. These libraries are commonly used for scheduling background tasks in web servers, running periodic data processing, sending scheduled notifications, and managing queue workers. The <code>croner</code> library is a modern alternative that supports both five-field and six-field expressions with excellent TypeScript support.</p>
+
+    <h2>Cron Best Practices</h2>
+    <p>Writing effective cron jobs goes beyond getting the expression syntax right. Here are some best practices that experienced system administrators follow:</p>
+    <ul>
+      <li><strong>Log output:</strong> Always redirect stdout and stderr to a log file. A cron entry like <code>0 2 * * * /usr/local/bin/backup.sh >> /var/log/backup.log 2>&amp;1</code> captures all output for debugging.</li>
+      <li><strong>Use absolute paths:</strong> Cron runs with a minimal environment. Always use full paths for commands and files to avoid "command not found" errors.</li>
+      <li><strong>Avoid overlapping runs:</strong> If a job takes longer than the interval between runs, you can end up with multiple instances running simultaneously. Use a lock file mechanism (like <code>flock</code>) to prevent overlap.</li>
+      <li><strong>Stagger job times:</strong> Do not schedule all your cron jobs at the same time (like midnight on the hour). Stagger them by a few minutes to spread the load on your server.</li>
+      <li><strong>Test expressions before deploying:</strong> Use a tool like this cron expression generator to verify your expression produces the schedule you intend before putting it into production.</li>
+      <li><strong>Set a MAILTO variable:</strong> Configure <code>MAILTO=your@email.com</code> in your crontab so that cron emails you any output or errors from your jobs.</li>
+      <li><strong>Keep jobs idempotent:</strong> Design your cron jobs so that running them multiple times produces the same result. This makes your system resilient to accidental double-runs or retries after failures.</li>
+    </ul>
+
+    <h2>Troubleshooting Cron Jobs</h2>
+    <p>When a cron job does not run as expected, several common issues might be the cause. First, check that the cron daemon is running with <code>systemctl status cron</code> or <code>service cron status</code>. Verify your crontab is saved correctly with <code>crontab -l</code>. Check the system log (<code>/var/log/syslog</code> or <code>/var/log/cron</code>) for entries showing when cron attempted to run your job. Ensure the script has execute permissions (<code>chmod +x script.sh</code>) and uses the correct shebang line (<code>#!/bin/bash</code>). Remember that cron runs with a minimal PATH; if your script depends on specific commands, set the PATH explicitly or use absolute paths throughout.</p>
+    <p>A common pitfall is editing the crontab file directly in <code>/var/spool/cron/</code> instead of using <code>crontab -e</code>. The <code>crontab -e</code> command validates syntax before saving, while direct editing does not. Another frequent issue is timezone confusion. Cron jobs run in the system's timezone by default. If your server is set to UTC but you expect jobs to run in your local timezone, you will see unexpected timing. Some cron implementations allow setting <code>CRON_TZ=America/New_York</code> in the crontab to override the timezone for specific jobs.</p>
+
+    <h2>About This Tool</h2>
+    <p>This cron expression generator runs entirely in your browser. No data is sent to any server. Use the visual editor to build expressions by selecting the mode (every, specific, range, or step) for each of the five cron fields. The tool generates the corresponding cron expression in real time, provides a human-readable description of the schedule, and calculates the next five scheduled run times from the current date and time.</p>
+    <p>You can also type or paste a cron expression directly into the manual input field and click Parse to populate the visual editor. This is useful for understanding an existing cron expression that you found in a crontab file or configuration. The tool supports the standard five-field cron format used by Unix/Linux cron, Kubernetes CronJobs, GitHub Actions, and most other cron implementations. It does not support seconds fields, year fields, or platform-specific extensions like the <code>?</code> character used by AWS.</p>
+
+    <h2>Related Tools</h2>
+    <ul>
+      <li><a href="/tools/unix-timestamp-converter/">Unix Timestamp Converter</a> -- Convert between Unix timestamps and human-readable dates.</li>
+      <li><a href="/tools/regex-tester/">Regex Tester</a> -- Test regular expressions with real-time matching and highlighting.</li>
+      <li><a href="/tools/json-formatter/">JSON Formatter</a> -- Format, validate, and minify JSON data.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="cron-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  /* Presets */
+  .presets-section {
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .preset-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .preset-btn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-bg);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .preset-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background: var(--color-surface);
+  }
+
+  /* Cron Editor */
+  .cron-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .cron-field {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    background: var(--color-bg);
+  }
+  .field-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .field-label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--color-text);
+  }
+  .field-value {
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    background: var(--color-surface);
+    padding: 2px 10px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+  }
+
+  /* Mode Selector */
+  .mode-selector {
+    display: flex;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .mode-btn {
+    flex: 1;
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border: none;
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .mode-btn + .mode-btn {
+    border-left: 1px solid var(--color-border);
+  }
+  .mode-btn.active {
+    background: var(--color-primary);
+    color: #fff;
+  }
+  .mode-btn:hover:not(.active) {
+    background: var(--color-bg);
+  }
+
+  /* Mode Inputs */
+  .mode-input {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+  }
+  .mode-input.active {
+    display: flex;
+  }
+  .mode-desc {
+    font-style: italic;
+    color: var(--color-text-muted);
+  }
+  .mode-input input[type="number"],
+  .mode-input input[type="text"] {
+    padding: 6px 10px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 0.85rem;
+    background: var(--color-surface);
+    color: var(--color-text);
+    width: auto;
+  }
+  .mode-input input[type="number"] {
+    width: 70px;
+  }
+  .mode-input input[type="text"] {
+    width: 180px;
+  }
+  .mode-input select {
+    padding: 6px 10px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 0.85rem;
+    background: var(--color-surface);
+    color: var(--color-text);
+  }
+  .mode-input input:focus,
+  .mode-input select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+
+  /* Day of Week checkboxes */
+  .dow-checkboxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .dow-chip {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--color-text-muted);
+    user-select: none;
+  }
+  .dow-chip:has(input:checked) {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background: rgba(37, 99, 235, 0.05);
+  }
+  .dow-chip input {
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    accent-color: var(--color-primary);
+  }
+
+  /* Result */
+  .cron-result {
+    padding: 16px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+  }
+  .cron-display-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+    margin-bottom: 12px;
+  }
+  .cron-display {
+    flex: 1;
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--color-text);
+    letter-spacing: 0.06em;
+    word-break: break-all;
+    line-height: 1.4;
+  }
+  .cron-description {
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    padding: 10px 14px;
+    background: var(--color-surface);
+    border-radius: var(--radius);
+    border-left: 3px solid var(--color-primary);
+    margin-bottom: 16px;
+  }
+  .next-runs {
+    padding-top: 12px;
+    border-top: 1px solid var(--color-border);
+  }
+  .run-list {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .run-list li {
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 0.85rem;
+    color: var(--color-text);
+    padding: 4px 8px;
+    background: var(--color-surface);
+    border-radius: 4px;
+  }
+
+  /* Manual Input */
+  .manual-input-section {
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border);
+  }
+  .manual-input-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .manual-cron-input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 1rem;
+    background: var(--color-bg);
+    color: var(--color-text);
+  }
+  .manual-cron-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+
+  @media (max-width: 640px) {
+    .cron-display {
+      font-size: 1.2rem;
+    }
+    .cron-display-wrapper {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .cron-display-wrapper .copy-btn {
+      align-self: flex-end;
+    }
+    .mode-input input[type="text"] {
+      width: 140px;
+    }
+    .manual-input-row {
+      flex-direction: column;
+    }
+    .preset-btn {
+      font-size: 0.75rem;
+      padding: 5px 10px;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    'use strict';
+
+    // --- Types ---
+    interface FieldConfig {
+      id: string;
+      name: string;
+      min: number;
+      max: number;
+      valueEl: HTMLElement;
+      fieldEl: HTMLElement;
+      names?: string[];
+    }
+
+    // --- Constants ---
+    const MONTH_NAMES = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const DOW_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const DOW_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+    // --- DOM ---
+    const cronOutput = document.getElementById('cronOutput') as HTMLElement;
+    const cronDescription = document.getElementById('cronDescription') as HTMLElement;
+    const runList = document.getElementById('runList') as HTMLUListElement;
+    const copyCronBtn = document.getElementById('copyCronBtn') as HTMLButtonElement;
+    const manualInput = document.getElementById('manualInput') as HTMLInputElement;
+    const parseBtn = document.getElementById('parseBtn') as HTMLButtonElement;
+    const errorEl = document.getElementById('toolError') as HTMLDivElement;
+
+    // --- Field Configurations ---
+    const fields: FieldConfig[] = [
+      { id: 'fieldMinute', name: 'minute', min: 0, max: 59, valueEl: document.getElementById('minuteValue')!, fieldEl: document.getElementById('fieldMinute')! },
+      { id: 'fieldHour', name: 'hour', min: 0, max: 23, valueEl: document.getElementById('hourValue')!, fieldEl: document.getElementById('fieldHour')! },
+      { id: 'fieldDom', name: 'dom', min: 1, max: 31, valueEl: document.getElementById('domValue')!, fieldEl: document.getElementById('fieldDom')! },
+      { id: 'fieldMonth', name: 'month', min: 1, max: 12, valueEl: document.getElementById('monthValue')!, fieldEl: document.getElementById('fieldMonth')! },
+      { id: 'fieldDow', name: 'dow', min: 0, max: 6, valueEl: document.getElementById('dowValue')!, fieldEl: document.getElementById('fieldDow')! },
+    ];
+
+    // --- Helpers ---
+    function showError(msg: string): void {
+      errorEl.textContent = msg;
+      errorEl.hidden = false;
+    }
+
+    function clearError(): void {
+      errorEl.textContent = '';
+      errorEl.hidden = true;
+    }
+
+    function showCopyFeedback(btn: HTMLButtonElement): void {
+      const original = btn.textContent;
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = original;
+        btn.classList.remove('copied');
+      }, 1500);
+    }
+
+    async function copyToClipboard(text: string, btn: HTMLButtonElement): Promise<void> {
+      if (!text) return;
+      try {
+        await navigator.clipboard.writeText(text);
+        showCopyFeedback(btn);
+      } catch {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showCopyFeedback(btn);
+      }
+    }
+
+    // --- Get active mode for a field ---
+    function getActiveMode(fieldEl: HTMLElement): string {
+      const activeBtn = fieldEl.querySelector('.mode-btn.active') as HTMLButtonElement;
+      return activeBtn ? activeBtn.dataset.mode || 'every' : 'every';
+    }
+
+    // --- Build field value from UI ---
+    function getFieldValue(field: FieldConfig): string {
+      const el = field.fieldEl;
+      const mode = getActiveMode(el);
+
+      if (mode === 'every') {
+        return '*';
+      }
+
+      if (mode === 'specific') {
+        if (field.name === 'dow') {
+          const checked = el.querySelectorAll('.dow-checkboxes input:checked') as NodeListOf<HTMLInputElement>;
+          if (checked.length === 0) return '*';
+          const vals = Array.from(checked).map(cb => cb.value);
+          return vals.join(',');
+        }
+        const input = el.querySelector('.mode-input[data-mode="specific"] .specific-input') as HTMLInputElement;
+        const val = input.value.trim();
+        if (!val) return '*';
+        // Validate comma-separated numbers
+        const nums = val.split(',').map(s => s.trim()).filter(s => s !== '');
+        const validNums = nums.filter(s => {
+          const n = parseInt(s, 10);
+          return !isNaN(n) && n >= field.min && n <= field.max;
+        });
+        return validNums.length > 0 ? validNums.join(',') : '*';
+      }
+
+      if (mode === 'range') {
+        if (field.name === 'dow') {
+          const from = (el.querySelector('.range-from-dow') as HTMLSelectElement).value;
+          const to = (el.querySelector('.range-to-dow') as HTMLSelectElement).value;
+          return `${from}-${to}`;
+        }
+        const from = (el.querySelector('.range-from') as HTMLInputElement).value;
+        const to = (el.querySelector('.range-to') as HTMLInputElement).value;
+        return `${from}-${to}`;
+      }
+
+      if (mode === 'step') {
+        const every = (el.querySelector('.mode-input[data-mode="step"] .step-every') as HTMLInputElement).value;
+        let start: string;
+        if (field.name === 'dow') {
+          start = (el.querySelector('.step-start-dow') as HTMLSelectElement).value;
+        } else {
+          start = (el.querySelector('.mode-input[data-mode="step"] .step-start') as HTMLInputElement).value;
+        }
+        return `${start}/${every}`;
+      }
+
+      return '*';
+    }
+
+    // --- Build cron expression from UI ---
+    function buildExpression(): string {
+      return fields.map(f => getFieldValue(f)).join(' ');
+    }
+
+    // --- Describe a cron expression in human-readable form ---
+    function describeCron(expr: string): string {
+      const parts = expr.split(/\s+/);
+      if (parts.length !== 5) return 'Invalid expression';
+
+      const [minute, hour, dom, month, dow] = parts;
+      const segments: string[] = [];
+
+      // Minute
+      if (minute === '*') {
+        segments.push('every minute');
+      } else if (minute.includes('/')) {
+        const [start, step] = minute.split('/');
+        if (start === '*' || start === '0') {
+          segments.push(`every ${step} minute(s)`);
+        } else {
+          segments.push(`every ${step} minute(s) starting at minute ${start}`);
+        }
+      } else if (minute.includes('-')) {
+        segments.push(`at minutes ${minute}`);
+      } else if (minute.includes(',')) {
+        segments.push(`at minutes ${minute}`);
+      } else {
+        segments.push(`at minute ${minute}`);
+      }
+
+      // Hour
+      if (hour === '*') {
+        // If minute is specific but hour is every, keep the "of every hour" implicit
+        if (minute !== '*') {
+          segments.push('of every hour');
+        }
+      } else if (hour.includes('/')) {
+        const [start, step] = hour.split('/');
+        if (start === '*' || start === '0') {
+          segments.push(`every ${step} hour(s)`);
+        } else {
+          segments.push(`every ${step} hour(s) starting at hour ${start}`);
+        }
+      } else if (hour.includes('-')) {
+        const [from, to] = hour.split('-');
+        segments.push(`between ${formatHour(parseInt(from))} and ${formatHour(parseInt(to))}`);
+      } else if (hour.includes(',')) {
+        const hours = hour.split(',').map(h => formatHour(parseInt(h)));
+        segments.push(`at ${hours.join(', ')}`);
+      } else {
+        // Replace "at minute X" with "at HH:MM"
+        const h = parseInt(hour);
+        const m = minute === '*' ? 0 : parseInt(minute);
+        if (!minute.includes('/') && !minute.includes('-') && !minute.includes(',') && minute !== '*') {
+          segments.length = 0;
+          segments.push(`at ${formatHour(h)}:${String(m).padStart(2, '0')}`);
+        } else {
+          segments.push(`during the ${formatHour(h)} hour`);
+        }
+      }
+
+      // Day of Month
+      if (dom !== '*') {
+        if (dom.includes('/')) {
+          const [start, step] = dom.split('/');
+          segments.push(`every ${step} day(s) starting on day ${start}`);
+        } else if (dom.includes('-')) {
+          segments.push(`on days ${dom} of the month`);
+        } else if (dom.includes(',')) {
+          segments.push(`on days ${dom} of the month`);
+        } else {
+          segments.push(`on day ${dom} of the month`);
+        }
+      }
+
+      // Month
+      if (month !== '*') {
+        if (month.includes('/')) {
+          const [start, step] = month.split('/');
+          segments.push(`every ${step} month(s) starting in ${MONTH_NAMES[parseInt(start)] || 'month ' + start}`);
+        } else if (month.includes('-')) {
+          const [from, to] = month.split('-');
+          segments.push(`in ${MONTH_NAMES[parseInt(from)] || from} through ${MONTH_NAMES[parseInt(to)] || to}`);
+        } else if (month.includes(',')) {
+          const months = month.split(',').map(m => MONTH_NAMES[parseInt(m)] || m);
+          segments.push(`in ${months.join(', ')}`);
+        } else {
+          segments.push(`in ${MONTH_NAMES[parseInt(month)] || month}`);
+        }
+      }
+
+      // Day of Week
+      if (dow !== '*') {
+        if (dow.includes('/')) {
+          const [start, step] = dow.split('/');
+          segments.push(`every ${step} day(s) of the week starting on ${DOW_NAMES[parseInt(start)] || start}`);
+        } else if (dow.includes('-')) {
+          const [from, to] = dow.split('-');
+          segments.push(`on ${DOW_NAMES[parseInt(from)] || from} through ${DOW_NAMES[parseInt(to)] || to}`);
+        } else if (dow.includes(',')) {
+          const days = dow.split(',').map(d => DOW_SHORT[parseInt(d)] || d);
+          segments.push(`on ${days.join(', ')}`);
+        } else {
+          segments.push(`on ${DOW_NAMES[parseInt(dow)] || dow}`);
+        }
+      }
+
+      const desc = segments.join(', ');
+      return desc.charAt(0).toUpperCase() + desc.slice(1);
+    }
+
+    function formatHour(h: number): string {
+      if (h === 0) return '12 AM';
+      if (h === 12) return '12 PM';
+      if (h < 12) return `${h} AM`;
+      return `${h - 12} PM`;
+    }
+
+    // --- Calculate next N run times ---
+    function getNextRuns(expr: string, count: number): Date[] {
+      const parts = expr.split(/\s+/);
+      if (parts.length !== 5) return [];
+
+      const [minExpr, hourExpr, domExpr, monthExpr, dowExpr] = parts;
+      const results: Date[] = [];
+      const now = new Date();
+      // Start checking from the next minute
+      const check = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes() + 1, 0, 0);
+
+      // Expand a cron field into a set of matching values
+      function expandField(expr: string, min: number, max: number): Set<number> {
+        const values = new Set<number>();
+        const parts = expr.split(',');
+        for (const part of parts) {
+          if (part === '*') {
+            for (let i = min; i <= max; i++) values.add(i);
+          } else if (part.includes('/')) {
+            const [rangeStr, stepStr] = part.split('/');
+            const step = parseInt(stepStr, 10);
+            let start = min;
+            let end = max;
+            if (rangeStr !== '*') {
+              if (rangeStr.includes('-')) {
+                const [fromStr, toStr] = rangeStr.split('-');
+                start = parseInt(fromStr, 10);
+                end = parseInt(toStr, 10);
+              } else {
+                start = parseInt(rangeStr, 10);
+              }
+            }
+            for (let i = start; i <= end; i += step) {
+              values.add(i);
+            }
+          } else if (part.includes('-')) {
+            const [fromStr, toStr] = part.split('-');
+            const from = parseInt(fromStr, 10);
+            const to = parseInt(toStr, 10);
+            if (from <= to) {
+              for (let i = from; i <= to; i++) values.add(i);
+            } else {
+              // Wrap-around range (e.g. 5-2 in dow = Fri through Tue)
+              for (let i = from; i <= max; i++) values.add(i);
+              for (let i = min; i <= to; i++) values.add(i);
+            }
+          } else {
+            const val = parseInt(part, 10);
+            if (!isNaN(val)) values.add(val);
+          }
+        }
+        return values;
+      }
+
+      const validMinutes = expandField(minExpr, 0, 59);
+      const validHours = expandField(hourExpr, 0, 23);
+      const validDom = expandField(domExpr, 1, 31);
+      const validMonths = expandField(monthExpr, 1, 12);
+      const validDow = expandField(dowExpr, 0, 6);
+
+      // Limit iterations to prevent infinite loops (scan up to 2 years)
+      const maxIterations = 2 * 366 * 24 * 60;
+      let iterations = 0;
+
+      while (results.length < count && iterations < maxIterations) {
+        const min = check.getMinutes();
+        const hr = check.getHours();
+        const dayOfMonth = check.getDate();
+        const month = check.getMonth() + 1;
+        const dayOfWeek = check.getDay();
+
+        // Check if the current minute matches
+        if (
+          validMinutes.has(min) &&
+          validHours.has(hr) &&
+          validDom.has(dayOfMonth) &&
+          validMonths.has(month) &&
+          validDow.has(dayOfWeek)
+        ) {
+          results.push(new Date(check));
+        }
+
+        // Advance by 1 minute
+        check.setMinutes(check.getMinutes() + 1);
+
+        // Optimization: if the current hour is not valid, skip to the next valid hour
+        if (!validHours.has(check.getHours()) && validMinutes.size < 60) {
+          // Skip ahead to the start of the next hour
+          check.setMinutes(0);
+          check.setHours(check.getHours() + 1);
+        }
+
+        // Optimization: if the current month is not valid, skip to the first day of the next valid month
+        if (!validMonths.has(check.getMonth() + 1)) {
+          check.setDate(1);
+          check.setHours(0);
+          check.setMinutes(0);
+          check.setMonth(check.getMonth() + 1);
+        }
+
+        iterations++;
+      }
+
+      return results;
+    }
+
+    // --- Update the display ---
+    function updateDisplay(): void {
+      clearError();
+      const expr = buildExpression();
+
+      // Update field value badges
+      fields.forEach(f => {
+        f.valueEl.textContent = getFieldValue(f);
+      });
+
+      // Update output
+      cronOutput.textContent = expr;
+      manualInput.value = expr;
+
+      // Description
+      cronDescription.textContent = describeCron(expr);
+
+      // Next runs
+      const runs = getNextRuns(expr, 5);
+      if (runs.length === 0) {
+        runList.innerHTML = '<li>No upcoming runs found within the next 2 years</li>';
+      } else {
+        runList.innerHTML = runs.map(d => {
+          const options: Intl.DateTimeFormatOptions = {
+            weekday: 'short',
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true,
+          };
+          return `<li>${d.toLocaleString(undefined, options)}</li>`;
+        }).join('');
+      }
+    }
+
+    // --- Parse a cron expression into the UI ---
+    function parseExpression(expr: string): void {
+      const parts = expr.trim().split(/\s+/);
+      if (parts.length !== 5) {
+        showError('Invalid cron expression. Expected 5 fields separated by spaces (minute hour day-of-month month day-of-week).');
+        return;
+      }
+
+      clearError();
+      const fieldValues = parts;
+
+      fields.forEach((field, i) => {
+        const val = fieldValues[i];
+        const el = field.fieldEl;
+
+        // Determine which mode this value represents
+        let mode = 'every';
+        if (val === '*') {
+          mode = 'every';
+        } else if (val.includes('/')) {
+          mode = 'step';
+        } else if (val.includes('-') && !val.includes(',')) {
+          mode = 'range';
+        } else {
+          mode = 'specific';
+        }
+
+        // Activate the mode button
+        const modeButtons = el.querySelectorAll('.mode-btn') as NodeListOf<HTMLButtonElement>;
+        modeButtons.forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.mode === mode);
+        });
+
+        // Show correct mode input
+        const modeInputs = el.querySelectorAll('.mode-input') as NodeListOf<HTMLElement>;
+        modeInputs.forEach(mi => {
+          mi.classList.toggle('active', mi.dataset.mode === mode);
+        });
+
+        // Populate inputs based on mode
+        if (mode === 'specific') {
+          if (field.name === 'dow') {
+            const checkboxes = el.querySelectorAll('.dow-checkboxes input') as NodeListOf<HTMLInputElement>;
+            const selectedVals = val.split(',');
+            checkboxes.forEach(cb => {
+              cb.checked = selectedVals.includes(cb.value);
+            });
+          } else {
+            const input = el.querySelector('.mode-input[data-mode="specific"] .specific-input') as HTMLInputElement;
+            input.value = val;
+          }
+        } else if (mode === 'range') {
+          const [from, to] = val.split('-');
+          if (field.name === 'dow') {
+            (el.querySelector('.range-from-dow') as HTMLSelectElement).value = from;
+            (el.querySelector('.range-to-dow') as HTMLSelectElement).value = to;
+          } else {
+            (el.querySelector('.range-from') as HTMLInputElement).value = from;
+            (el.querySelector('.range-to') as HTMLInputElement).value = to;
+          }
+        } else if (mode === 'step') {
+          const [startPart, everyPart] = val.split('/');
+          (el.querySelector('.mode-input[data-mode="step"] .step-every') as HTMLInputElement).value = everyPart;
+          if (field.name === 'dow') {
+            (el.querySelector('.step-start-dow') as HTMLSelectElement).value = startPart === '*' ? '0' : startPart;
+          } else {
+            (el.querySelector('.mode-input[data-mode="step"] .step-start') as HTMLInputElement).value = startPart === '*' ? String(field.min) : startPart;
+          }
+        }
+      });
+
+      updateDisplay();
+    }
+
+    // --- Wire up mode switching ---
+    fields.forEach(field => {
+      const el = field.fieldEl;
+
+      // Mode button clicks
+      const modeButtons = el.querySelectorAll('.mode-btn') as NodeListOf<HTMLButtonElement>;
+      modeButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          modeButtons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const modeInputs = el.querySelectorAll('.mode-input') as NodeListOf<HTMLElement>;
+          modeInputs.forEach(mi => {
+            mi.classList.toggle('active', mi.dataset.mode === btn.dataset.mode);
+          });
+          updateDisplay();
+        });
+      });
+
+      // Input change events
+      el.querySelectorAll('input, select').forEach(input => {
+        input.addEventListener('input', updateDisplay);
+        input.addEventListener('change', updateDisplay);
+      });
+    });
+
+    // --- Preset buttons ---
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const cron = (btn as HTMLElement).dataset.cron;
+        if (cron) {
+          parseExpression(cron);
+        }
+      });
+    });
+
+    // --- Copy button ---
+    copyCronBtn.addEventListener('click', () => {
+      const text = cronOutput.textContent || '';
+      if (text) {
+        copyToClipboard(text, copyCronBtn);
+      }
+    });
+
+    // --- Parse button ---
+    parseBtn.addEventListener('click', () => {
+      const val = manualInput.value.trim();
+      if (val) {
+        parseExpression(val);
+      }
+    });
+
+    // Allow Enter key to parse
+    manualInput.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const val = manualInput.value.trim();
+        if (val) {
+          parseExpression(val);
+        }
+      }
+    });
+
+    // --- Initial render ---
+    updateDisplay();
+  })();
+</script>

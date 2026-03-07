@@ -1,0 +1,394 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getToolBySlug } from '../../data/tools';
+import '../../styles/tool.css';
+
+const tool = getToolBySlug('url-encoder-decoder')!;
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Web Tools", "item": "https://toolcalcs.com/tools/" },
+      { "@type": "ListItem", "position": 3, "name": "URL Encoder/Decoder" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "URL Encoder & Decoder",
+    "url": "https://toolcalcs.com/tools/url-encoder-decoder/",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Encode and decode URL components instantly. Free online URL encoder/decoder."
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is URL encoding?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'URL encoding (also called percent-encoding) is a mechanism for converting characters that are not allowed in a URL into a safe format. Each unsafe character is replaced with a percent sign (%) followed by two hexadecimal digits representing its UTF-8 byte value. For example, a space becomes %20 and an ampersand becomes %26.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is the difference between encodeURI and encodeURIComponent?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'encodeURI encodes a full URI but preserves characters that have special meaning in URLs such as :, /, ?, #, and &. encodeURIComponent encodes everything except unreserved characters (letters, digits, -, _, ., ~), making it suitable for encoding individual query parameter values or path segments where those special characters should be escaped.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why do I need to URL-encode query parameters?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Query parameters must be URL-encoded because characters like &, =, and # have special meaning in URLs. If a parameter value contains an ampersand, the browser would interpret it as a separator between parameters rather than part of the value. Encoding ensures the server receives the exact data you intended to send.',
+        },
+      },
+    ],
+  }
+];
+---
+
+<BaseLayout
+  title="URL Encoder/Decoder - Encode & Decode URLs Online | ToolCalcs"
+  description={tool.description}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/tools/">Web Tools</a> &rsaquo; <span>URL Encoder/Decoder</span>
+  </nav>
+
+  <h1>URL Encoder/Decoder</h1>
+  <p class="page-desc">Encode special characters for safe URLs or decode percent-encoded strings back to readable text. Runs entirely in your browser -- your data never leaves your device.</p>
+
+  <div class="tool-box">
+    <div class="tool-options">
+      <label class="encode-mode-label">
+        <input type="checkbox" id="fullUriMode" />
+        <span>Encode full URL</span>
+        <small class="mode-hint" id="modeHint">(using encodeURIComponent)</small>
+      </label>
+    </div>
+
+    <div class="tool-io">
+      <div class="tool-input-area">
+        <label class="tool-label" for="toolInput">Plain Text</label>
+        <textarea id="toolInput" class="tool-textarea" placeholder="Enter text to encode or paste a URL-encoded string to decode..." spellcheck="false"></textarea>
+      </div>
+      <div class="tool-output-area">
+        <div class="output-header">
+          <label class="tool-label" for="toolOutput">URL Encoded</label>
+          <button type="button" class="copy-btn" id="copyBtn">Copy</button>
+        </div>
+        <textarea id="toolOutput" class="tool-textarea" placeholder="Encoded or decoded result will appear here..." spellcheck="false" readonly></textarea>
+      </div>
+    </div>
+
+    <div class="tool-controls">
+      <button type="button" class="tool-btn primary" id="encodeBtn">Encode &rarr;</button>
+      <button type="button" class="tool-btn primary" id="decodeBtn">&larr; Decode</button>
+      <button type="button" class="tool-btn secondary" id="swapBtn">Swap</button>
+      <button type="button" class="tool-btn secondary" id="clearBtn">Clear</button>
+    </div>
+
+    <div class="tool-error" id="toolError" hidden></div>
+  </div>
+
+  <div id="pasteHint" class="paste-hint" hidden>
+    This looks like a URL-encoded string. <button type="button" class="paste-hint-btn" id="autoDecodeBtn">Decode it?</button>
+  </div>
+
+  <AdUnit slot="tool-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is URL Encoding?</h2>
+    <p>URL encoding, formally known as percent-encoding, is a standardized mechanism defined in RFC 3986 for representing characters within a Uniform Resource Identifier (URI) that would otherwise be misinterpreted by browsers, servers, or network intermediaries. The core idea is simple: any character that is not part of the unreserved character set -- letters, digits, hyphens, underscores, periods, and tildes -- can be replaced with a percent sign followed by two hexadecimal digits that represent the character's byte value in UTF-8.</p>
+    <p>For example, a space character (ASCII code 32, or 0x20 in hexadecimal) becomes <code>%20</code>. An ampersand (<code>&amp;</code>), which normally separates query parameters in a URL, becomes <code>%26</code> when it appears inside a parameter value. Without this encoding, the browser would misinterpret the ampersand as the start of a new query parameter rather than part of the current one.</p>
+    <p>URL encoding is not encryption and provides no security. It is purely a transport-safety mechanism that ensures every character in a URL is unambiguous. Any percent-encoded string can be decoded instantly by replacing each <code>%XX</code> sequence with its corresponding character. This tool performs that encoding and decoding in your browser using standard JavaScript functions, meaning your data never leaves your device.</p>
+
+    <h2>How URL Encoding Works</h2>
+    <p>The percent-encoding algorithm operates on the raw bytes of a character's UTF-8 representation. For characters in the ASCII range (U+0000 to U+007F), each character maps to a single byte, so a single <code>%XX</code> token is produced. For characters outside the ASCII range -- such as accented letters, CJK ideographs, or emoji -- the UTF-8 encoding may produce two, three, or even four bytes, resulting in multiple percent-encoded tokens for a single character.</p>
+    <p>Consider the Japanese character (mountain). Its Unicode code point is U+5C71. In UTF-8, this is encoded as three bytes: <code>0xE5</code>, <code>0xB1</code>, <code>0xB1</code>. The percent-encoded form is therefore <code>%E5%B1%B1</code>. When a server or browser decodes this, it reassembles the three bytes and recovers the original character.</p>
+    <p>The algorithm follows these steps:</p>
+    <ol>
+      <li>Convert the input text to a sequence of bytes using UTF-8 encoding.</li>
+      <li>For each byte, check whether it belongs to the unreserved set (A-Z, a-z, 0-9, <code>-</code>, <code>_</code>, <code>.</code>, <code>~</code>).</li>
+      <li>If the byte is unreserved, output it as-is.</li>
+      <li>If the byte is reserved or otherwise unsafe, output a percent sign followed by the byte's value as two uppercase hexadecimal digits.</li>
+    </ol>
+    <p>The decoding process is the reverse: scan the string for percent signs, read the next two hexadecimal digits, convert them to a byte, and reassemble the UTF-8 byte sequence into the original characters.</p>
+
+    <h2>encodeURI vs encodeURIComponent</h2>
+    <p>JavaScript provides two built-in functions for URL encoding, and understanding the difference between them is critical for building correct URLs programmatically.</p>
+    <p><strong><code>encodeURIComponent()</code></strong> encodes virtually every character that is not an unreserved character (letter, digit, hyphen, underscore, period, tilde). This means it also encodes characters that have special structural meaning in URLs, such as <code>:</code>, <code>/</code>, <code>?</code>, <code>#</code>, <code>&amp;</code>, and <code>=</code>. It is designed for encoding individual values -- such as a single query parameter, a path segment, or a fragment identifier -- before inserting them into a URL string. If you use <code>encodeURIComponent()</code> on a complete URL, it will break the URL by encoding the <code>://</code> after the protocol and the slashes in the path.</p>
+    <p><strong><code>encodeURI()</code></strong> is designed to encode a full URI while preserving the characters that are structurally significant. It leaves <code>:</code>, <code>/</code>, <code>?</code>, <code>#</code>, <code>[</code>, <code>]</code>, <code>@</code>, <code>!</code>, <code>$</code>, <code>&amp;</code>, <code>'</code>, <code>(</code>, <code>)</code>, <code>*</code>, <code>+</code>, <code>,</code>, <code>;</code>, and <code>=</code> unencoded. This makes it appropriate when you have a complete URL that may contain Unicode characters in the path or query and you want to make it safe for transmission without altering its structure.</p>
+    <p>In practice, <code>encodeURIComponent()</code> is used far more frequently because developers typically build URLs by concatenating a base URL with individually encoded parameter names and values. Using <code>encodeURI()</code> on parameter values is a common bug that causes subtle issues -- for instance, an ampersand in a parameter value would not be encoded, causing the server to misparse the query string.</p>
+    <p>This tool defaults to <code>encodeURIComponent</code> mode because it is the correct choice for the most common use case: encoding a value that will be placed inside a URL. Check the "Encode full URL" option to switch to <code>encodeURI</code> mode when you need to encode an entire URL while preserving its structure.</p>
+
+    <h2>Common URL-Encoded Characters</h2>
+    <p>Below is a reference table of frequently encountered characters and their percent-encoded equivalents. Memorizing a few of these can help you quickly recognize and debug encoded URLs.</p>
+    <ul>
+      <li><strong>Space</strong> -- <code>%20</code> (or <code>+</code> in form data)</li>
+      <li><strong>!</strong> (exclamation mark) -- <code>%21</code></li>
+      <li><strong>#</strong> (hash / fragment) -- <code>%23</code></li>
+      <li><strong>$</strong> (dollar sign) -- <code>%24</code></li>
+      <li><strong>&amp;</strong> (ampersand) -- <code>%26</code></li>
+      <li><strong>'</strong> (single quote) -- <code>%27</code></li>
+      <li><strong>(</strong> and <strong>)</strong> (parentheses) -- <code>%28</code>, <code>%29</code></li>
+      <li><strong>+</strong> (plus sign) -- <code>%2B</code></li>
+      <li><strong>,</strong> (comma) -- <code>%2C</code></li>
+      <li><strong>/</strong> (forward slash) -- <code>%2F</code></li>
+      <li><strong>:</strong> (colon) -- <code>%3A</code></li>
+      <li><strong>;</strong> (semicolon) -- <code>%3B</code></li>
+      <li><strong>=</strong> (equals sign) -- <code>%3D</code></li>
+      <li><strong>?</strong> (question mark) -- <code>%3F</code></li>
+      <li><strong>@</strong> (at sign) -- <code>%40</code></li>
+    </ul>
+    <p>Note that the space character has two encodings in common use: <code>%20</code> in standard percent-encoding (as produced by <code>encodeURIComponent</code>) and <code>+</code> in HTML form submissions (<code>application/x-www-form-urlencoded</code>). These two conventions often cause confusion. The <code>+</code> notation is a legacy of HTML forms and is not part of the RFC 3986 standard. This tool uses the standard <code>%20</code> form for spaces.</p>
+
+    <h2>When to Use URL Encoding</h2>
+    <p>URL encoding is necessary in a wide range of web development scenarios. Understanding when and where to apply it helps you avoid broken links, malformed API requests, and security vulnerabilities.</p>
+    <p><strong>Building query strings.</strong> Whenever you construct a URL with query parameters in JavaScript, each parameter name and value should be individually encoded with <code>encodeURIComponent()</code>. For example, if a user searches for "rock & roll", the query parameter should be <code>q=rock%20%26%20roll</code>, not <code>q=rock & roll</code>. Failing to encode the ampersand would cause the server to interpret <code>roll</code> as a new parameter name.</p>
+    <p><strong>Constructing REST API requests.</strong> When sending data to an API via URL parameters, encoding ensures that values containing reserved characters (such as <code>=</code>, <code>&amp;</code>, or <code>/</code>) do not break the URL structure. This is especially important when parameter values come from user input, which can contain any character.</p>
+    <p><strong>Path segments with special characters.</strong> If a URL path segment contains spaces, accented characters, or other non-ASCII characters, it must be percent-encoded. For instance, a file named "my report (final).pdf" in a URL would become <code>my%20report%20%28final%29.pdf</code>.</p>
+    <p><strong>Redirecting users.</strong> When constructing redirect URLs that include a return-to URL as a parameter (e.g., <code>login?redirect=https://example.com/path?key=value</code>), the inner URL must be fully encoded to prevent the outer URL from being misinterpreted.</p>
+    <p><strong>Form submissions.</strong> HTML forms with <code>method="GET"</code> automatically encode form values using the <code>application/x-www-form-urlencoded</code> format. However, when you submit form data programmatically using <code>fetch()</code> or <code>XMLHttpRequest</code>, you are responsible for encoding the values yourself.</p>
+    <p><strong>Email links (mailto).</strong> Special characters in subject lines or body text of <code>mailto:</code> links need to be percent-encoded. For example, <code>mailto:user@example.com?subject=Hello%20World&amp;body=Line%201%0ALine%202</code> encodes spaces and newlines in the subject and body fields.</p>
+    <p><strong>Avoiding injection attacks.</strong> Properly encoding user-supplied values before inserting them into URLs is a defense-in-depth measure against URL injection and open redirect vulnerabilities. While URL encoding alone is not a complete security solution, it helps prevent unintended interpretation of special characters in URLs.</p>
+
+    <h2>About This Tool</h2>
+    <p>This URL encoder/decoder runs entirely in your browser using JavaScript. No data is transmitted to any server -- everything happens on your device. It supports full Unicode input including emoji and characters from any language. The tool defaults to <code>encodeURIComponent</code> mode, which is the correct choice for encoding individual query parameters, path segments, or form values. Switch to <code>encodeURI</code> mode using the checkbox when you need to encode a complete URL while preserving its structural characters.</p>
+    <p>The tool automatically detects URL-encoded text when you paste it, offering a one-click decode option. It provides clear error messages when you attempt to decode a malformed percent-encoded string -- for example, a <code>%</code> sign followed by non-hexadecimal characters. Swap, copy, and clear buttons make it easy to work with your data quickly and efficiently.</p>
+  </article>
+
+  <AdUnit slot="tool-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .encode-mode-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--color-text);
+    cursor: pointer;
+  }
+  .encode-mode-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--color-primary);
+    cursor: pointer;
+  }
+  .mode-hint {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    font-weight: 400;
+  }
+  .paste-hint {
+    padding: 10px 16px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: var(--radius);
+    color: #1e40af;
+    font-size: 0.85rem;
+    margin: -20px 0 24px;
+  }
+  .paste-hint-btn {
+    background: none;
+    border: none;
+    color: #2563eb;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 0.85rem;
+    padding: 0;
+  }
+  .paste-hint-btn:hover {
+    color: #1d4ed8;
+  }
+</style>
+
+<script>
+  const inputEl = document.getElementById('toolInput') as HTMLTextAreaElement;
+  const outputEl = document.getElementById('toolOutput') as HTMLTextAreaElement;
+  const encodeBtn = document.getElementById('encodeBtn') as HTMLButtonElement;
+  const decodeBtn = document.getElementById('decodeBtn') as HTMLButtonElement;
+  const swapBtn = document.getElementById('swapBtn') as HTMLButtonElement;
+  const clearBtn = document.getElementById('clearBtn') as HTMLButtonElement;
+  const copyBtn = document.getElementById('copyBtn') as HTMLButtonElement;
+  const errorEl = document.getElementById('toolError') as HTMLDivElement;
+  const pasteHint = document.getElementById('pasteHint') as HTMLDivElement;
+  const autoDecodeBtn = document.getElementById('autoDecodeBtn') as HTMLButtonElement;
+  const fullUriMode = document.getElementById('fullUriMode') as HTMLInputElement;
+  const modeHint = document.getElementById('modeHint') as HTMLElement;
+
+  function showError(message: string): void {
+    errorEl.textContent = message;
+    errorEl.hidden = false;
+  }
+
+  function clearError(): void {
+    errorEl.textContent = '';
+    errorEl.hidden = true;
+  }
+
+  function hidePasteHint(): void {
+    pasteHint.hidden = true;
+  }
+
+  /**
+   * Update the mode hint text when the checkbox changes.
+   */
+  fullUriMode.addEventListener('change', () => {
+    modeHint.textContent = fullUriMode.checked
+      ? '(using encodeURI)'
+      : '(using encodeURIComponent)';
+  });
+
+  /**
+   * Encode text using the selected mode.
+   */
+  function encodeUrl(text: string): string {
+    return fullUriMode.checked ? encodeURI(text) : encodeURIComponent(text);
+  }
+
+  /**
+   * Decode text using the selected mode.
+   */
+  function decodeUrl(text: string): string {
+    return fullUriMode.checked ? decodeURI(text) : decodeURIComponent(text);
+  }
+
+  /**
+   * Test whether a string looks like it contains URL-encoded sequences.
+   * Checks for common percent-encoded patterns like %20, %3A, %2F, etc.
+   */
+  function looksLikeUrlEncoded(str: string): boolean {
+    const trimmed = str.trim();
+    if (trimmed.length < 3) return false;
+    // Must contain at least one valid percent-encoded sequence
+    return /%[0-9A-Fa-f]{2}/.test(trimmed);
+  }
+
+  // --- Encode ---
+  encodeBtn.addEventListener('click', () => {
+    clearError();
+    hidePasteHint();
+    const text = inputEl.value;
+    if (!text) {
+      outputEl.value = '';
+      return;
+    }
+    try {
+      outputEl.value = encodeUrl(text);
+    } catch (e) {
+      showError('Encoding failed. Please check your input text.');
+    }
+  });
+
+  // --- Decode ---
+  decodeBtn.addEventListener('click', () => {
+    clearError();
+    hidePasteHint();
+    const text = inputEl.value.trim();
+    if (!text) {
+      outputEl.value = '';
+      return;
+    }
+    try {
+      outputEl.value = decodeUrl(text);
+    } catch (e) {
+      showError('Invalid URL-encoded input. The string contains a malformed percent-encoded sequence (e.g., a "%" not followed by two valid hexadecimal digits).');
+    }
+  });
+
+  // --- Swap ---
+  swapBtn.addEventListener('click', () => {
+    clearError();
+    hidePasteHint();
+    const temp = inputEl.value;
+    inputEl.value = outputEl.value;
+    outputEl.value = temp;
+  });
+
+  // --- Clear ---
+  clearBtn.addEventListener('click', () => {
+    inputEl.value = '';
+    outputEl.value = '';
+    clearError();
+    hidePasteHint();
+  });
+
+  // --- Copy ---
+  copyBtn.addEventListener('click', async () => {
+    const text = outputEl.value;
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      copyBtn.textContent = 'Copied!';
+      copyBtn.classList.add('copied');
+      setTimeout(() => {
+        copyBtn.textContent = 'Copy';
+        copyBtn.classList.remove('copied');
+      }, 1500);
+    } catch {
+      // Fallback for older browsers or non-secure contexts
+      outputEl.select();
+      document.execCommand('copy');
+      copyBtn.textContent = 'Copied!';
+      copyBtn.classList.add('copied');
+      setTimeout(() => {
+        copyBtn.textContent = 'Copy';
+        copyBtn.classList.remove('copied');
+      }, 1500);
+    }
+  });
+
+  // --- Auto-detect URL-encoded text on paste ---
+  inputEl.addEventListener('paste', (e) => {
+    clearError();
+    // Use setTimeout to read the value after the paste event updates the textarea
+    setTimeout(() => {
+      const pasted = inputEl.value.trim();
+      if (looksLikeUrlEncoded(pasted)) {
+        try {
+          // Verify it actually decodes without error
+          decodeUrl(pasted);
+          pasteHint.hidden = false;
+        } catch {
+          pasteHint.hidden = true;
+        }
+      } else {
+        pasteHint.hidden = true;
+      }
+    }, 0);
+  });
+
+  // --- Auto-decode button in paste hint ---
+  autoDecodeBtn.addEventListener('click', () => {
+    clearError();
+    hidePasteHint();
+    const text = inputEl.value.trim();
+    try {
+      outputEl.value = decodeUrl(text);
+    } catch (e) {
+      showError('Failed to decode the pasted URL-encoded string.');
+    }
+  });
+</script>

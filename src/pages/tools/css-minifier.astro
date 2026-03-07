@@ -1,0 +1,329 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getToolBySlug } from '../../data/tools';
+import '../../styles/tool.css';
+
+const tool = getToolBySlug('css-minifier')!;
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Web Tools", "item": "https://toolcalcs.com/tools/" },
+      { "@type": "ListItem", "position": 3, "name": "CSS Minifier" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "CSS Minifier",
+    "url": "https://toolcalcs.com/tools/css-minifier/",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Minify CSS code online. Remove comments, whitespace, and reduce file size."
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What does CSS minification do?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "CSS minification removes unnecessary characters from CSS code — including whitespace, line breaks, comments, and redundant semicolons — without changing the code's functionality. This reduces file size and improves page load speed."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does minification change how CSS works?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. Minified CSS is functionally identical to the original. Only cosmetic characters (spaces, comments, formatting) are removed. The browser interprets both versions exactly the same way."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How much can CSS minification save?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Typically 15-30% depending on the original code's formatting and comment density. Well-commented, nicely formatted CSS will see larger savings, while already-compact CSS may only save a few percent."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="CSS Minifier - Minify CSS Online | ToolCalcs"
+  description={tool.description}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/tools/">Web Tools</a> &rsaquo; <span>CSS Minifier</span>
+  </nav>
+
+  <h1>{tool.title}</h1>
+  <p class="page-desc">Minify your CSS code by removing whitespace, comments, and unnecessary characters. See the compression ratio instantly.</p>
+
+  <div class="tool-box">
+    <div class="tool-io">
+      <div class="tool-input-area">
+        <label class="tool-label" for="toolInput">Input CSS</label>
+        <textarea id="toolInput" class="tool-textarea" placeholder="Paste your CSS here..." spellcheck="false"></textarea>
+      </div>
+      <div class="tool-output-area">
+        <div class="output-header">
+          <label class="tool-label" for="toolOutput">Minified CSS</label>
+          <button type="button" class="copy-btn" id="copyBtn">Copy</button>
+        </div>
+        <textarea id="toolOutput" class="tool-textarea" placeholder="Minified output..." spellcheck="false" readonly></textarea>
+      </div>
+    </div>
+
+    <div class="tool-controls">
+      <button type="button" class="tool-btn primary" id="minifyBtn">Minify</button>
+      <button type="button" class="tool-btn secondary" id="clearBtn">Clear</button>
+    </div>
+
+    <div id="statsBar" class="stats-bar" hidden>
+      <span>Original: <strong id="origSize">0</strong> bytes</span>
+      <span>Minified: <strong id="minSize">0</strong> bytes</span>
+      <span>Saved: <strong id="savedPct">0%</strong></span>
+    </div>
+
+    <div class="tool-error" id="toolError" hidden></div>
+  </div>
+
+  <AdUnit slot="tool-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is CSS Minification?</h2>
+    <p>
+      CSS minification is the process of removing all unnecessary characters from Cascading Style Sheets source code without altering the way the browser interprets and applies those styles. The characters that get stripped during minification include whitespace (spaces, tabs, and newlines), block comments, trailing semicolons before closing braces, and any other formatting tokens that exist solely to make the code readable by humans. The result is a single, densely packed string of CSS that is functionally identical to the original but occupies significantly fewer bytes on disk and over the network.
+    </p>
+    <p>
+      Every byte saved in a CSS file translates directly into faster page load times. When a browser requests a web page, it must download, parse, and apply every stylesheet before it can render the first pixel of content. This behavior is known as render-blocking: the browser cannot display anything until all CSS in the critical rendering path has been fully processed. By reducing the size of your stylesheets through minification, you shorten the download time and give the browser less text to parse, which means your visitors see content sooner.
+    </p>
+    <p>
+      Minification is considered a standard best practice in modern web development. Tools like Google Lighthouse, PageSpeed Insights, and WebPageTest all flag unminified CSS as a performance issue and recommend minifying stylesheets for production. The technique has been in widespread use since the mid-2000s and remains one of the simplest, lowest-risk optimizations you can apply to any website regardless of its technology stack.
+    </p>
+
+    <h2>How CSS Minifiers Work</h2>
+    <p>
+      A CSS minifier operates by applying a series of text transformations to the source code. Each transformation targets a specific category of removable characters. When applied in sequence, these transformations strip away everything the browser does not need while preserving the syntactic structure that determines how styles are applied to HTML elements.
+    </p>
+    <p>
+      The first and most impactful step is comment removal. CSS comments are delimited by <code>/*</code> and <code>*/</code> and can span multiple lines. They are completely ignored by the browser's CSS parser, so removing them has zero effect on rendering. In well-documented codebases, comments can account for a substantial portion of the file size, sometimes 10 to 20 percent or more, especially when developers include license headers, section dividers, and inline explanations.
+    </p>
+    <p>
+      The second step is whitespace normalization. CSS uses whitespace to separate tokens, but only a single space is ever required between any two tokens, and in many cases even that single space is unnecessary. For example, the space between a property name and its colon, or between a colon and its value, is optional. Likewise, the spaces surrounding combinators like the greater-than sign in child selectors, the tilde in sibling selectors, and the plus sign in adjacent sibling selectors can be safely removed. A minifier collapses all runs of whitespace (including tabs and newlines) into a single space and then removes spaces adjacent to syntactic characters like braces, colons, semicolons, and commas.
+    </p>
+    <p>
+      The third step targets redundant semicolons. In CSS, the last declaration in a rule block does not need a trailing semicolon before the closing brace. While it is good practice to include this semicolon in source code (to prevent errors when adding new declarations later), the minifier can safely strip it to save one byte per rule block. Across a stylesheet with hundreds of rules, these single-byte savings add up.
+    </p>
+    <p>
+      Finally, the minifier trims any remaining leading or trailing whitespace from the entire output string. The result is a compact, single-line CSS string that the browser can parse and apply just as efficiently as the original formatted version, but at a fraction of the file size.
+    </p>
+
+    <h2>Benefits of Minifying CSS</h2>
+    <p>
+      The primary benefit of CSS minification is reduced file size, which leads to faster downloads over the network. On high-latency connections such as mobile networks in developing regions, even small reductions in file size can shave hundreds of milliseconds off load times. Since CSS is render-blocking, these milliseconds directly affect the time to first paint and the time to first contentful paint, two of the most important performance metrics for user experience and search engine ranking.
+    </p>
+    <p>
+      Minification also reduces bandwidth consumption. For high-traffic websites serving millions of page views per month, the cumulative bandwidth savings from minified CSS can translate into meaningful cost reductions on hosting and content delivery network (CDN) bills. A stylesheet that shrinks from 50 kilobytes to 38 kilobytes saves 12 kilobytes per request. At one million requests per day, that is nearly 12 gigabytes of bandwidth saved every single day.
+    </p>
+    <p>
+      From a performance scoring perspective, minified CSS helps improve scores on Google Lighthouse, PageSpeed Insights, and Core Web Vitals assessments. These tools specifically check for unminified resources and flag them as opportunities for improvement. A higher Lighthouse score does not guarantee better search rankings, but Google has confirmed that page experience signals, including loading performance, are factored into search ranking algorithms. Minification is one of the easiest ways to earn those points.
+    </p>
+    <p>
+      Beyond performance, minification provides a modest layer of obfuscation. While minified CSS is not encrypted or truly hidden, the removal of comments, meaningful whitespace, and formatting makes the code harder for casual observers to read and understand. This is not a security measure, but it can discourage trivial copying of your stylesheet by making reverse engineering slightly more tedious.
+    </p>
+    <p>
+      Minification also plays well with caching strategies. Because minified files are smaller, they consume less cache storage on the client and in CDN edge nodes. Smaller cache entries mean more resources can be cached simultaneously, improving cache hit rates and further reducing load times for repeat visitors.
+    </p>
+
+    <h2>Minification vs Compression (Gzip)</h2>
+    <p>
+      Developers sometimes ask whether minification is still necessary when the server already applies Gzip or Brotli compression to HTTP responses. The answer is a definitive yes: minification and compression are complementary techniques that work at different levels, and combining them yields better results than using either alone.
+    </p>
+    <p>
+      Minification operates at the source code level. It removes characters that are syntactically unnecessary, producing a smaller input file. Compression operates at the binary level: it identifies repeating patterns in the byte stream and replaces them with shorter references using algorithms like DEFLATE (Gzip) or the more efficient Brotli. Because compression works on patterns, it is most effective when the input is already as small and pattern-dense as possible, which is exactly what minification achieves.
+    </p>
+    <p>
+      When you minify CSS and then compress it, the compression algorithm has less data to process and the resulting compressed payload is smaller than if you compressed the unminified original. In practice, minification typically reduces CSS file size by 15 to 30 percent, Gzip compression reduces it by an additional 60 to 80 percent, and the combination of both yields the smallest possible transfer size. Skipping minification and relying solely on compression leaves 5 to 15 percent of potential savings on the table.
+    </p>
+    <p>
+      There is another practical reason to minify even when compression is available: not all environments support compression. Some older proxy servers strip compression headers, certain embedded browsers do not support it, and local development servers may not have compression enabled by default. Minified files are smaller regardless of whether the transport layer compresses them, providing a reliable baseline optimization that does not depend on server configuration.
+    </p>
+
+    <h2>Build Tool Integration (PostCSS, cssnano)</h2>
+    <p>
+      While an online CSS minifier is perfect for quick one-off tasks, production websites should integrate minification into their build pipeline so that every deployment automatically produces optimized stylesheets. The most popular tools for this purpose are PostCSS with the cssnano plugin, the CSS minifier built into esbuild, and the minification features in bundlers like webpack, Vite, and Rollup.
+    </p>
+    <p>
+      PostCSS is a CSS transformation framework that processes stylesheets through a chain of plugins. The cssnano plugin applies a comprehensive suite of optimizations that go beyond simple whitespace and comment removal. It normalizes values (converting <code>rgb(255, 0, 0)</code> to <code>red</code>), merges duplicate rules, removes overridden properties within the same rule block, collapses longhand properties into shorthand where possible, and minimizes color values (converting <code>#ffffff</code> to <code>#fff</code>). These advanced optimizations can yield additional savings of 5 to 10 percent beyond what basic minification achieves.
+    </p>
+    <p>
+      If you are using Vite or another esbuild-based bundler, CSS minification is enabled by default in production builds. Esbuild's minifier is extremely fast because it is written in Go and compiles to native code, processing large stylesheets in milliseconds rather than seconds. For most projects, the built-in minification is sufficient and requires zero configuration.
+    </p>
+    <p>
+      Webpack users can enable CSS minification through the CssMinimizerWebpackPlugin, which supports multiple underlying engines including cssnano, esbuild, and clean-css. The plugin integrates seamlessly with webpack's optimization pipeline and runs automatically in production mode. For projects that need fine-grained control over which optimizations are applied, cssnano offers preset configurations ranging from a lightweight default preset to an aggressive advanced preset that applies every available transformation.
+    </p>
+    <p>
+      Regardless of which build tool you use, the principle is the same: author your CSS in a readable, well-commented format during development, and let the build pipeline handle minification when preparing assets for production. This approach gives you the best of both worlds: maintainable source code and optimized production output.
+    </p>
+
+    <h2>About This Tool</h2>
+    <p>
+      This CSS minifier runs entirely in your browser using JavaScript. Your CSS code is never uploaded to any server, which means proprietary stylesheets, internal design system tokens, and unreleased feature styles remain completely private. There is no file-size limit, no account required, and no rate limiting. Paste your CSS, click Minify, and copy the result.
+    </p>
+    <p>
+      The minification algorithm removes block comments, normalizes whitespace around syntactic characters (braces, colons, semicolons, commas, and combinators), strips trailing semicolons before closing braces, and collapses all remaining whitespace into single spaces. The stats bar displays the original size in bytes, the minified size in bytes, and the percentage saved, so you can immediately see the impact of minification on your stylesheet.
+    </p>
+    <p>
+      For production use, we recommend integrating a build-tool-based minifier such as cssnano or esbuild into your deployment pipeline. However, this online tool is ideal for quick checks, one-off minification tasks, and situations where you need to minify a CSS snippet without setting up a local development environment. Bookmark this page and use it whenever you need to compress CSS quickly and securely.
+    </p>
+  </article>
+
+  <AdUnit slot="tool-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .stats-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 12px 16px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 0.88rem;
+    color: var(--color-text);
+    margin-top: 8px;
+  }
+  .stats-bar strong {
+    color: var(--color-primary);
+    font-variant-numeric: tabular-nums;
+  }
+</style>
+
+<script>
+  const inputEl = document.getElementById('toolInput') as HTMLTextAreaElement;
+  const outputEl = document.getElementById('toolOutput') as HTMLTextAreaElement;
+  const minifyBtn = document.getElementById('minifyBtn') as HTMLButtonElement;
+  const clearBtn = document.getElementById('clearBtn') as HTMLButtonElement;
+  const copyBtn = document.getElementById('copyBtn') as HTMLButtonElement;
+  const errorDiv = document.getElementById('toolError') as HTMLDivElement;
+  const statsBar = document.getElementById('statsBar') as HTMLDivElement;
+  const origSizeEl = document.getElementById('origSize') as HTMLElement;
+  const minSizeEl = document.getElementById('minSize') as HTMLElement;
+  const savedPctEl = document.getElementById('savedPct') as HTMLElement;
+
+  function minifyCSS(css: string): string {
+    let result = css;
+    // Remove comments (/* ... */)
+    result = result.replace(/\/\*[\s\S]*?\*\//g, '');
+    // Remove whitespace around special characters
+    result = result.replace(/\s*([{}:;,>~+])\s*/g, '$1');
+    // Remove last semicolon before closing brace
+    result = result.replace(/;}/g, '}');
+    // Collapse multiple whitespace to single space
+    result = result.replace(/\s+/g, ' ');
+    // Remove leading/trailing whitespace
+    result = result.trim();
+    return result;
+  }
+
+  function byteSize(str: string): number {
+    return new Blob([str]).size;
+  }
+
+  function showError(message: string): void {
+    errorDiv.textContent = message;
+    errorDiv.hidden = false;
+  }
+
+  function hideError(): void {
+    errorDiv.textContent = '';
+    errorDiv.hidden = true;
+  }
+
+  function updateStats(original: string, minified: string): void {
+    const origBytes = byteSize(original);
+    const minBytes = byteSize(minified);
+    const saved = origBytes > 0 ? ((origBytes - minBytes) / origBytes) * 100 : 0;
+
+    origSizeEl.textContent = origBytes.toLocaleString();
+    minSizeEl.textContent = minBytes.toLocaleString();
+    savedPctEl.textContent = saved.toFixed(1) + '%';
+    statsBar.hidden = false;
+  }
+
+  function handleMinify(): void {
+    const raw = inputEl.value;
+    hideError();
+
+    if (!raw.trim()) {
+      outputEl.value = '';
+      statsBar.hidden = true;
+      return;
+    }
+
+    try {
+      const minified = minifyCSS(raw);
+      outputEl.value = minified;
+      updateStats(raw, minified);
+    } catch (err) {
+      outputEl.value = '';
+      statsBar.hidden = true;
+      showError('An error occurred during minification: ' + String(err));
+    }
+  }
+
+  function clearAll(): void {
+    inputEl.value = '';
+    outputEl.value = '';
+    statsBar.hidden = true;
+    hideError();
+    inputEl.focus();
+  }
+
+  async function copyOutput(): Promise<void> {
+    const text = outputEl.value;
+    if (!text) return;
+
+    try {
+      await navigator.clipboard.writeText(text);
+      copyBtn.textContent = 'Copied!';
+      copyBtn.classList.add('copied');
+      setTimeout(() => {
+        copyBtn.textContent = 'Copy';
+        copyBtn.classList.remove('copied');
+      }, 2000);
+    } catch {
+      outputEl.select();
+      document.execCommand('copy');
+      copyBtn.textContent = 'Copied!';
+      copyBtn.classList.add('copied');
+      setTimeout(() => {
+        copyBtn.textContent = 'Copy';
+        copyBtn.classList.remove('copied');
+      }, 2000);
+    }
+  }
+
+  minifyBtn.addEventListener('click', handleMinify);
+  clearBtn.addEventListener('click', clearAll);
+  copyBtn.addEventListener('click', copyOutput);
+</script>

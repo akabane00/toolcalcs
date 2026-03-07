@@ -1,0 +1,829 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getToolBySlug } from '../../data/tools';
+import '../../styles/tool.css';
+
+const tool = getToolBySlug('markdown-preview')!;
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Web Tools", "item": "https://toolcalcs.com/tools/" },
+      { "@type": "ListItem", "position": 3, "name": "Markdown Preview" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Markdown Preview",
+    "url": "https://toolcalcs.com/tools/markdown-preview/",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Write Markdown and see the rendered HTML preview in real time. Supports headings, lists, code blocks, tables, and more."
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is Markdown and what is it used for?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Markdown is a lightweight markup language created by John Gruber in 2004. It lets you write formatted text using a plain-text editor with simple syntax like # for headings, ** for bold, and - for lists. Markdown is widely used on GitHub, Stack Overflow, Reddit, documentation sites, blogs, and note-taking apps because it is easy to read and write without any special tools."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What Markdown features does this preview tool support?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "This Markdown preview tool supports headings (H1 through H6), bold, italic, bold-italic, strikethrough, links, images, inline code, fenced code blocks with language labels, unordered and ordered lists with nesting, blockquotes, horizontal rules, tables with alignment, and paragraph breaks. The preview updates in real time as you type."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is this Markdown editor safe to use with private content?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. This Markdown preview tool runs entirely in your browser. Your text is never sent to any server or stored anywhere. All parsing and rendering happen locally on your device using JavaScript, so your content remains completely private."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Markdown Preview - Live Markdown Editor | ToolCalcs"
+  description={tool.description}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/tools/">Web Tools</a> &rsaquo;
+    <span>Markdown Preview</span>
+  </nav>
+
+  <h1>{tool.title}</h1>
+  <p class="page-desc">{tool.description}</p>
+
+  <div class="tool-box">
+    <div class="tool-io">
+      <div class="tool-input-area">
+        <div class="output-header">
+          <label class="tool-label" for="mdInput">Markdown</label>
+        </div>
+        <textarea
+          id="mdInput"
+          class="tool-textarea md-textarea"
+          placeholder="Type your Markdown here..."
+          spellcheck="false"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+        >{`# Hello, Markdown!
+
+This is a **live preview** of your Markdown text. Edit the left panel and see the result here in *real time*.
+
+## Features Supported
+
+### Text Formatting
+You can write **bold text**, *italic text*, ***bold and italic***, and ~~strikethrough~~.
+
+### Links and Images
+[Visit ToolCalcs](https://toolcalcs.com) for more free tools.
+
+![Placeholder image](https://via.placeholder.com/200x100)
+
+### Code
+Inline code: \`const x = 42;\`
+
+\`\`\`javascript
+function greet(name) {
+  return \`Hello, \${name}!\`;
+}
+console.log(greet("World"));
+\`\`\`
+
+### Lists
+
+**Unordered list:**
+- First item
+- Second item
+  - Nested item
+  - Another nested item
+- Third item
+
+**Ordered list:**
+1. Step one
+2. Step two
+3. Step three
+
+### Blockquote
+
+> Markdown is intended to be as easy-to-read and easy-to-write as is feasible.
+> — John Gruber
+
+### Table
+
+| Feature | Syntax | Result |
+|---------|--------|--------|
+| Bold | \`**text**\` | **text** |
+| Italic | \`*text*\` | *text* |
+| Code | \`\\\`code\\\`\` | \`code\` |
+| Link | \`[text](url)\` | [text](url) |
+
+### Horizontal Rule
+
+---
+
+That's it! Start editing to see your Markdown rendered instantly.`}</textarea>
+      </div>
+      <div class="tool-output-area">
+        <div class="output-header">
+          <label class="tool-label">Preview</label>
+          <button type="button" class="copy-btn" id="copyHtmlBtn">Copy HTML</button>
+        </div>
+        <div id="mdPreview" class="md-preview"></div>
+      </div>
+    </div>
+
+    <div class="tool-controls">
+      <button type="button" class="tool-btn secondary" id="clearBtn">Clear</button>
+    </div>
+  </div>
+
+  <AdUnit slot="md-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is Markdown?</h2>
+    <p>
+      Markdown is a lightweight markup language created by John Gruber and Aaron Swartz in 2004. Its primary design goal was readability: a Markdown-formatted document should be publishable as-is, as plain text, without looking like it has been tagged with formatting instructions or special characters. Unlike HTML, where you wrap text in angle-bracket tags, Markdown uses intuitive punctuation characters that suggest the formatting they represent. A line starting with <code>#</code> becomes a heading, text wrapped in <code>**</code> becomes bold, and a line starting with <code>-</code> becomes a list item.
+    </p>
+    <p>
+      Since its introduction, Markdown has become one of the most widely adopted writing formats on the internet. Platforms like GitHub, GitLab, Bitbucket, Stack Overflow, Reddit, Discord, Notion, Obsidian, and countless documentation frameworks all support Markdown natively. Its popularity stems from the fact that it is simple enough for non-technical writers yet powerful enough for software documentation, technical specifications, and even entire book manuscripts.
+    </p>
+
+    <h2>How to Use This Markdown Preview Tool</h2>
+    <p>
+      Type or paste your Markdown text into the left panel. The right panel instantly renders the formatted output as you type, giving you a live side-by-side preview. There is no need to click a button or wait for processing. Every keystroke triggers a fresh parse and render cycle, so the preview always reflects the current state of your input.
+    </p>
+    <p>
+      When you are satisfied with the result, click the <strong>Copy HTML</strong> button to copy the generated HTML source code to your clipboard. You can then paste that HTML directly into an email editor, CMS, or any platform that accepts raw HTML. The <strong>Clear</strong> button resets both panels so you can start fresh.
+    </p>
+
+    <h2>Markdown Syntax Reference</h2>
+
+    <h3>Headings</h3>
+    <p>
+      Markdown supports six levels of headings, corresponding to HTML <code>&lt;h1&gt;</code> through <code>&lt;h6&gt;</code>. Prefix the line with one to six hash characters followed by a space. For example, <code># Heading 1</code> produces the largest heading, while <code>###### Heading 6</code> produces the smallest. Most documents use H1 for the page title, H2 for major sections, and H3 for subsections. Skipping heading levels (jumping from H1 to H4) is considered bad practice for both readability and accessibility.
+    </p>
+
+    <h3>Emphasis: Bold and Italic</h3>
+    <p>
+      Surround text with single asterisks or underscores for italic emphasis: <code>*italic*</code> or <code>_italic_</code>. Use double asterisks or underscores for bold: <code>**bold**</code> or <code>__bold__</code>. Combine three asterisks for bold and italic simultaneously: <code>***bold italic***</code>. Strikethrough text uses double tildes: <code>~~deleted~~</code>. These inline formatting markers can appear anywhere within a paragraph and can be nested within each other.
+    </p>
+
+    <h3>Links and Images</h3>
+    <p>
+      Links follow the pattern <code>[link text](URL)</code>. The text inside the square brackets is what the reader sees, and the URL inside the parentheses is the destination. Images use the same pattern with an exclamation mark prefix: <code>![alt text](image URL)</code>. The alt text describes the image for screen readers and appears if the image fails to load. You can also use reference-style links for cleaner documents when the same URL appears multiple times.
+    </p>
+
+    <h3>Code: Inline and Block</h3>
+    <p>
+      Wrap inline code in single backticks: <code>`variable`</code>. For multi-line code blocks, use three backticks (a fenced code block) on their own lines before and after the code. You can optionally specify a language identifier after the opening backticks (for example, <code>```javascript</code>) to enable syntax highlighting on platforms that support it. Code blocks preserve whitespace exactly as typed, making them ideal for sharing code snippets, terminal output, or configuration files.
+    </p>
+
+    <h3>Lists</h3>
+    <p>
+      Unordered lists use a hyphen, asterisk, or plus sign followed by a space: <code>- Item</code>. Ordered lists use a number followed by a period and a space: <code>1. Item</code>. Nested lists are created by indenting child items with two or more spaces. You can mix ordered and unordered lists at different nesting levels. Lists are one of the most frequently used Markdown features because they make information scannable and easy to digest.
+    </p>
+
+    <h3>Blockquotes</h3>
+    <p>
+      Prefix a line with a greater-than sign and a space to create a blockquote: <code>&gt; quoted text</code>. Blockquotes can span multiple lines and can be nested by adding additional <code>&gt;</code> characters. They are commonly used for quoting external sources, highlighting important notes, or setting off introductory passages.
+    </p>
+
+    <h3>Tables</h3>
+    <p>
+      Markdown tables use pipes and hyphens to define columns and rows. The first row is the header, separated from the body by a divider row of hyphens. Each column is separated by a pipe character. For example:
+    </p>
+    <pre><code>| Name  | Age |
+|-------|-----|
+| Alice |  30 |
+| Bob   |  25 |</code></pre>
+    <p>
+      Tables are useful for comparing data, listing specifications, or presenting any information that fits a grid layout. Column alignment can be set using colons in the divider row.
+    </p>
+
+    <h3>Horizontal Rules</h3>
+    <p>
+      Three or more hyphens (<code>---</code>), asterisks (<code>***</code>), or underscores (<code>___</code>) on their own line create a horizontal rule, which renders as a visible divider line across the page. Horizontal rules are often used to separate major sections of a document or to visually break up long passages of text.
+    </p>
+
+    <h2>Markdown vs. HTML</h2>
+    <p>
+      Markdown and HTML serve related but distinct purposes. HTML is a full markup language capable of describing virtually any web content, from paragraphs and headings to interactive forms and embedded media. It is powerful but verbose. Markdown is intentionally limited in scope, covering only the most common formatting needs: headings, emphasis, links, images, lists, code, and tables. This constraint is also its strength. A Markdown document is dramatically more readable as plain text than the equivalent HTML document.
+    </p>
+    <p>
+      In practice, Markdown is converted to HTML before it is displayed in a browser. Every Markdown parser, including the one powering this tool, takes Markdown syntax as input and produces HTML as output. The <code># Heading</code> line becomes <code>&lt;h1&gt;Heading&lt;/h1&gt;</code>, the <code>**bold**</code> text becomes <code>&lt;strong&gt;bold&lt;/strong&gt;</code>, and so on. Because Markdown is a subset of what HTML can express, you can always drop down to raw HTML within a Markdown document when you need features that Markdown does not support, such as custom classes, embedded videos, or complex layouts.
+    </p>
+    <p>
+      For most content-focused writing — blog posts, documentation, README files, personal notes — Markdown is faster and easier to use than HTML. For highly structured web pages with custom styling and interactivity, HTML (combined with CSS and JavaScript) remains the right choice.
+    </p>
+
+    <h2>Common Use Cases for Markdown</h2>
+
+    <h3>GitHub and Software Documentation</h3>
+    <p>
+      GitHub renders Markdown files automatically. Every repository's <code>README.md</code> file is displayed on the repository home page. Pull request descriptions, issue comments, and wiki pages all support Markdown. GitLab, Bitbucket, and other code hosting platforms follow the same convention. Learning Markdown is effectively a prerequisite for contributing to open-source software because all communication happens in Markdown format.
+    </p>
+
+    <h3>Technical Writing and Documentation Sites</h3>
+    <p>
+      Static site generators like Jekyll, Hugo, Gatsby, Astro, MkDocs, and Docusaurus use Markdown files as the primary content source. Authors write documentation in Markdown, and the build system converts it to a fully styled website. This workflow keeps content separate from presentation, making it easy for writers to focus on the text while designers and developers handle the theme and layout independently.
+    </p>
+
+    <h3>Note-Taking and Knowledge Management</h3>
+    <p>
+      Applications like Obsidian, Notion, Bear, Typora, and Logseq use Markdown as their native format or support it as an import/export option. Markdown's plain-text nature means your notes are future-proof: they can be opened in any text editor, version-controlled with Git, and migrated between applications without format lock-in. Many writers and researchers maintain entire knowledge bases in Markdown, linking notes together to form personal wikis.
+    </p>
+
+    <h3>Blogging and Content Creation</h3>
+    <p>
+      Many blogging platforms support Markdown, including Ghost, WordPress (with plugins), DEV.to, Hashnode, and Medium (through import). Writers appreciate that Markdown lets them focus on content without being distracted by formatting toolbars or rich-text editor quirks. The plain-text format also makes content portable across platforms. A blog post written in Markdown can be published on multiple sites without reformatting.
+    </p>
+
+    <h3>Chat and Collaboration Platforms</h3>
+    <p>
+      Slack, Discord, Microsoft Teams, and many other messaging platforms support a subset of Markdown for message formatting. You can bold text with asterisks, create inline code with backticks, and share code blocks with triple backticks. This makes technical conversations clearer and more readable without requiring users to learn a platform-specific formatting system.
+    </p>
+
+    <h2>Tips for Writing Better Markdown</h2>
+    <ul>
+      <li>
+        <strong>Use blank lines generously.</strong> A blank line before and after headings, lists, and code blocks makes the raw Markdown easier to read and ensures parsers interpret the structure correctly.
+      </li>
+      <li>
+        <strong>Keep lines reasonably short.</strong> While Markdown does not enforce a line length limit, wrapping lines at 80 to 120 characters makes the source more readable in text editors and produces cleaner diffs in version control.
+      </li>
+      <li>
+        <strong>Use ATX-style headings consistently.</strong> Always use the <code>#</code> prefix style rather than mixing with underline-style headings. ATX headings are more widely supported and easier to scan.
+      </li>
+      <li>
+        <strong>Preview before publishing.</strong> Use a live preview tool like this one to catch formatting errors before pushing documentation to GitHub or publishing a blog post. Even experienced Markdown writers occasionally misplace a backtick or forget a blank line.
+      </li>
+      <li>
+        <strong>Add alt text to images.</strong> Always provide meaningful alternative text inside the square brackets of image syntax. This improves accessibility for screen reader users and serves as a fallback when images fail to load.
+      </li>
+    </ul>
+
+    <h2>Markdown Flavors and Extensions</h2>
+    <p>
+      The original Markdown specification left several edge cases undefined, which led to different parsers handling them in different ways. To address this, the CommonMark specification was created in 2014 as an unambiguous, standardized definition of Markdown syntax. GitHub Flavored Markdown (GFM) extends CommonMark with additional features including tables, strikethrough, autolinks, and task lists. Other flavors like MultiMarkdown and PHP Markdown Extra add footnotes, definition lists, and abbreviations.
+    </p>
+    <p>
+      This preview tool supports the most commonly used Markdown features found across all major flavors: headings, emphasis, links, images, code, lists, blockquotes, horizontal rules, and tables. This covers the vast majority of what you will encounter in real-world Markdown documents.
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is Markdown and what is it used for?</h3>
+    <p>
+      Markdown is a lightweight markup language that converts plain text with simple formatting characters into HTML. It was created by John Gruber in 2004 to make writing for the web easier. Markdown is used on GitHub for README files and documentation, on Stack Overflow and Reddit for formatted posts, in note-taking apps like Obsidian and Notion, and by static site generators like Jekyll, Hugo, and Astro to power documentation sites and blogs.
+    </p>
+
+    <h3>What Markdown features does this preview tool support?</h3>
+    <p>
+      This tool supports headings (H1 through H6), bold, italic, bold-italic, strikethrough, links, images, inline code, fenced code blocks with language labels, unordered and ordered lists with nesting, blockquotes, horizontal rules, tables, and paragraph breaks. The preview updates instantly as you type.
+    </p>
+
+    <h3>Is this Markdown editor safe to use with private content?</h3>
+    <p>
+      Yes. Everything runs in your browser. No data is sent to any server or stored anywhere. The Markdown parser is implemented entirely in client-side JavaScript, so your content remains completely private on your device.
+    </p>
+
+    <h2>Related Tools</h2>
+    <ul>
+      <li><a href="/tools/json-formatter/">JSON Formatter</a> — Format and validate JSON data.</li>
+      <li><a href="/tools/diff-checker/">Diff Checker</a> — Compare two texts and highlight differences.</li>
+      <li><a href="/tools/html-entity-encoder/">HTML Entity Encoder</a> — Encode special characters to HTML entities.</li>
+      <li><a href="/tools/word-counter/">Word Counter</a> — Count words, characters, and reading time.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="md-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .md-textarea {
+    min-height: 500px;
+    tab-size: 2;
+  }
+
+  .md-preview {
+    min-height: 500px;
+    padding: 16px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-bg);
+    overflow-y: auto;
+    line-height: 1.7;
+    word-wrap: break-word;
+  }
+
+  /* --- Preview heading styles --- */
+  .md-preview :global(h1) {
+    font-size: 1.8rem;
+    margin: 24px 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--color-border);
+  }
+  .md-preview :global(h1:first-child) { margin-top: 0; }
+  .md-preview :global(h2) {
+    font-size: 1.45rem;
+    margin: 20px 0 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .md-preview :global(h3) { font-size: 1.2rem; margin: 18px 0 8px; }
+  .md-preview :global(h4) { font-size: 1.05rem; margin: 16px 0 8px; }
+  .md-preview :global(h5) { font-size: 0.95rem; margin: 14px 0 6px; }
+  .md-preview :global(h6) { font-size: 0.85rem; margin: 12px 0 6px; color: var(--color-text-muted); }
+
+  /* --- Paragraph --- */
+  .md-preview :global(p) { margin: 0 0 12px; }
+
+  /* --- Bold, italic, strike --- */
+  .md-preview :global(strong) { font-weight: 700; }
+  .md-preview :global(em) { font-style: italic; }
+  .md-preview :global(del) { text-decoration: line-through; color: var(--color-text-muted); }
+
+  /* --- Links --- */
+  .md-preview :global(a) {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+  .md-preview :global(a:hover) { text-decoration-thickness: 2px; }
+
+  /* --- Images --- */
+  .md-preview :global(img) {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius);
+    margin: 8px 0;
+  }
+
+  /* --- Inline code --- */
+  .md-preview :global(code) {
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 0.85em;
+    background: rgba(0, 0, 0, 0.06);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  [data-theme="dark"] .md-preview :global(code) {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  /* --- Code blocks --- */
+  .md-preview :global(pre) {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 16px;
+    border-radius: var(--radius);
+    overflow-x: auto;
+    margin: 12px 0;
+    line-height: 1.5;
+  }
+  .md-preview :global(pre code) {
+    background: none;
+    padding: 0;
+    border-radius: 0;
+    font-size: 0.85rem;
+    color: inherit;
+  }
+
+  /* --- Blockquotes --- */
+  .md-preview :global(blockquote) {
+    border-left: 4px solid var(--color-primary);
+    padding: 8px 16px;
+    margin: 12px 0;
+    color: var(--color-text-muted);
+    background: rgba(37, 99, 235, 0.04);
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+  [data-theme="dark"] .md-preview :global(blockquote) {
+    background: rgba(96, 165, 250, 0.06);
+  }
+  .md-preview :global(blockquote p) { margin: 0 0 8px; }
+  .md-preview :global(blockquote p:last-child) { margin-bottom: 0; }
+
+  /* --- Lists --- */
+  .md-preview :global(ul),
+  .md-preview :global(ol) {
+    margin: 8px 0 12px 24px;
+  }
+  .md-preview :global(li) { margin-bottom: 4px; }
+  .md-preview :global(li ul),
+  .md-preview :global(li ol) { margin-top: 4px; margin-bottom: 4px; }
+
+  /* --- Tables --- */
+  .md-preview :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 0.9rem;
+  }
+  .md-preview :global(th),
+  .md-preview :global(td) {
+    border: 1px solid var(--color-border);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  .md-preview :global(th) {
+    background: rgba(0, 0, 0, 0.04);
+    font-weight: 600;
+  }
+  [data-theme="dark"] .md-preview :global(th) {
+    background: rgba(255, 255, 255, 0.06);
+  }
+  .md-preview :global(tr:nth-child(even) td) {
+    background: rgba(0, 0, 0, 0.02);
+  }
+  [data-theme="dark"] .md-preview :global(tr:nth-child(even) td) {
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  /* --- Horizontal rule --- */
+  .md-preview :global(hr) {
+    border: none;
+    border-top: 2px solid var(--color-border);
+    margin: 24px 0;
+  }
+
+  /* --- Code block language label --- */
+  .md-preview :global(.code-lang) {
+    display: block;
+    font-size: 0.7rem;
+    color: #94a3b8;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  @media (max-width: 640px) {
+    .md-textarea,
+    .md-preview {
+      min-height: 300px;
+    }
+  }
+</style>
+
+<script>
+  const inputEl = document.getElementById('mdInput') as HTMLTextAreaElement;
+  const previewEl = document.getElementById('mdPreview') as HTMLDivElement;
+  const copyHtmlBtn = document.getElementById('copyHtmlBtn') as HTMLButtonElement;
+  const clearBtn = document.getElementById('clearBtn') as HTMLButtonElement;
+
+  function escapeHtml(text: string): string {
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function parseMarkdown(md: string): string {
+    let html = md;
+
+    // Store code blocks and inline code to protect from other transformations
+    const codeBlocks: string[] = [];
+    const inlineCodes: string[] = [];
+
+    // 1. Fenced code blocks: ```lang\ncode\n```
+    html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_match, lang: string, code: string) => {
+      const langLabel = lang ? `<span class="code-lang">${escapeHtml(lang)}</span>` : '';
+      const escaped = escapeHtml(code.replace(/\n$/, ''));
+      const placeholder = `%%CODEBLOCK_${codeBlocks.length}%%`;
+      codeBlocks.push(`<pre>${langLabel}<code>${escaped}</code></pre>`);
+      return placeholder;
+    });
+
+    // 2. Inline code: `code`
+    html = html.replace(/`([^`\n]+)`/g, (_match, code: string) => {
+      const placeholder = `%%INLINECODE_${inlineCodes.length}%%`;
+      inlineCodes.push(`<code>${escapeHtml(code)}</code>`);
+      return placeholder;
+    });
+
+    // Split into lines for block-level processing
+    const lines = html.split('\n');
+    const outputLines: string[] = [];
+    let i = 0;
+
+    while (i < lines.length) {
+      const line = lines[i];
+
+      // Blockquotes
+      if (/^>\s?/.test(line)) {
+        const quoteLines: string[] = [];
+        while (i < lines.length && /^>\s?/.test(lines[i])) {
+          quoteLines.push(lines[i].replace(/^>\s?/, ''));
+          i++;
+        }
+        const innerHtml = parseInline(quoteLines.join('\n').replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>'));
+        outputLines.push(`<blockquote><p>${innerHtml}</p></blockquote>`);
+        continue;
+      }
+
+      // Headings: # through ######
+      const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
+      if (headingMatch) {
+        const level = headingMatch[1].length;
+        const text = parseInline(headingMatch[2]);
+        outputLines.push(`<h${level}>${text}</h${level}>`);
+        i++;
+        continue;
+      }
+
+      // Horizontal rules: --- or *** or ___
+      if (/^(\*{3,}|-{3,}|_{3,})\s*$/.test(line.trim())) {
+        outputLines.push('<hr>');
+        i++;
+        continue;
+      }
+
+      // Tables: | header | header |
+      if (/^\|.+\|/.test(line) && i + 1 < lines.length && /^\|[\s:]*-+[\s:]*/.test(lines[i + 1])) {
+        const tableLines: string[] = [];
+        while (i < lines.length && /^\|.+\|/.test(lines[i])) {
+          tableLines.push(lines[i]);
+          i++;
+        }
+        outputLines.push(parseTable(tableLines));
+        continue;
+      }
+
+      // Unordered list: - or * at start
+      if (/^(\s*)([-*+])\s+/.test(line)) {
+        const listResult = parseUnorderedList(lines, i);
+        outputLines.push(listResult.html);
+        i = listResult.nextIndex;
+        continue;
+      }
+
+      // Ordered list: 1. at start
+      if (/^(\s*)\d+\.\s+/.test(line)) {
+        const listResult = parseOrderedList(lines, i);
+        outputLines.push(listResult.html);
+        i = listResult.nextIndex;
+        continue;
+      }
+
+      // Empty line
+      if (line.trim() === '') {
+        outputLines.push('');
+        i++;
+        continue;
+      }
+
+      // Paragraph: collect consecutive non-empty lines
+      const paraLines: string[] = [];
+      while (
+        i < lines.length &&
+        lines[i].trim() !== '' &&
+        !/^#{1,6}\s/.test(lines[i]) &&
+        !/^(\*{3,}|-{3,}|_{3,})\s*$/.test(lines[i].trim()) &&
+        !/^>\s?/.test(lines[i]) &&
+        !/^\|.+\|/.test(lines[i]) &&
+        !/^(\s*)([-*+])\s+/.test(lines[i]) &&
+        !/^(\s*)\d+\.\s+/.test(lines[i]) &&
+        !lines[i].startsWith('%%CODEBLOCK_')
+      ) {
+        paraLines.push(lines[i]);
+        i++;
+      }
+      if (paraLines.length > 0) {
+        const text = parseInline(paraLines.join('<br>'));
+        outputLines.push(`<p>${text}</p>`);
+        continue;
+      }
+
+      // Fallback: code block placeholders or anything else
+      outputLines.push(line);
+      i++;
+    }
+
+    html = outputLines.filter((line, idx) => {
+      // Remove consecutive empty strings to avoid excessive whitespace
+      if (line === '' && idx > 0 && outputLines[idx - 1] === '') return false;
+      return true;
+    }).join('\n');
+
+    // Restore code blocks
+    for (let j = 0; j < codeBlocks.length; j++) {
+      html = html.replace(`<p>%%CODEBLOCK_${j}%%</p>`, codeBlocks[j]);
+      html = html.replace(`%%CODEBLOCK_${j}%%`, codeBlocks[j]);
+    }
+
+    // Restore inline codes
+    for (let j = 0; j < inlineCodes.length; j++) {
+      html = html.replace(`%%INLINECODE_${j}%%`, inlineCodes[j]);
+    }
+
+    return html.trim();
+  }
+
+  function parseInline(text: string): string {
+    // Bold + Italic: ***text***
+    text = text.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+
+    // Bold: **text** or __text__
+    text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    text = text.replace(/__(.+?)__/g, '<strong>$1</strong>');
+
+    // Italic: *text* or _text_
+    text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    text = text.replace(/(?<![a-zA-Z0-9])_(.+?)_(?![a-zA-Z0-9])/g, '<em>$1</em>');
+
+    // Strikethrough: ~~text~~
+    text = text.replace(/~~(.+?)~~/g, '<del>$1</del>');
+
+    // Images: ![alt](url)
+    text = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" loading="lazy">');
+
+    // Links: [text](url)
+    text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+
+    return text;
+  }
+
+  function parseUnorderedList(lines: string[], startIdx: number): { html: string; nextIndex: number } {
+    const items: { indent: number; text: string }[] = [];
+    let i = startIdx;
+
+    while (i < lines.length) {
+      const match = lines[i].match(/^(\s*)([-*+])\s+(.*)/);
+      if (!match) break;
+      items.push({ indent: match[1].length, text: match[3] });
+      i++;
+    }
+
+    return { html: buildNestedList(items, 'ul'), nextIndex: i };
+  }
+
+  function parseOrderedList(lines: string[], startIdx: number): { html: string; nextIndex: number } {
+    const items: { indent: number; text: string }[] = [];
+    let i = startIdx;
+
+    while (i < lines.length) {
+      const match = lines[i].match(/^(\s*)\d+\.\s+(.*)/);
+      if (!match) break;
+      items.push({ indent: match[1].length, text: match[2] });
+      i++;
+    }
+
+    return { html: buildNestedList(items, 'ol'), nextIndex: i };
+  }
+
+  function buildNestedList(items: { indent: number; text: string }[], tag: 'ul' | 'ol'): string {
+    if (items.length === 0) return '';
+
+    const baseIndent = items[0].indent;
+    let html = `<${tag}>`;
+    let i = 0;
+
+    while (i < items.length) {
+      const item = items[i];
+
+      if (item.indent === baseIndent) {
+        html += `<li>${parseInline(item.text)}`;
+        // Check if next items are nested
+        const nested: { indent: number; text: string }[] = [];
+        let j = i + 1;
+        while (j < items.length && items[j].indent > baseIndent) {
+          nested.push(items[j]);
+          j++;
+        }
+        if (nested.length > 0) {
+          html += buildNestedList(nested, tag);
+        }
+        html += '</li>';
+        i = j;
+      } else {
+        i++;
+      }
+    }
+
+    html += `</${tag}>`;
+    return html;
+  }
+
+  function parseTable(lines: string[]): string {
+    if (lines.length < 2) return '';
+
+    function parseCells(row: string): string[] {
+      return row
+        .replace(/^\|/, '')
+        .replace(/\|$/, '')
+        .split('|')
+        .map(cell => cell.trim());
+    }
+
+    const headers = parseCells(lines[0]);
+    // Parse alignment from divider row
+    const dividerCells = parseCells(lines[1]);
+    const alignments: string[] = dividerCells.map(cell => {
+      const trimmed = cell.trim();
+      if (trimmed.startsWith(':') && trimmed.endsWith(':')) return 'center';
+      if (trimmed.endsWith(':')) return 'right';
+      return 'left';
+    });
+
+    let html = '<table><thead><tr>';
+    for (let c = 0; c < headers.length; c++) {
+      const align = alignments[c] ? ` style="text-align:${alignments[c]}"` : '';
+      html += `<th${align}>${parseInline(headers[c])}</th>`;
+    }
+    html += '</tr></thead><tbody>';
+
+    for (let r = 2; r < lines.length; r++) {
+      const cells = parseCells(lines[r]);
+      html += '<tr>';
+      for (let c = 0; c < headers.length; c++) {
+        const align = alignments[c] ? ` style="text-align:${alignments[c]}"` : '';
+        html += `<td${align}>${parseInline(cells[c] || '')}</td>`;
+      }
+      html += '</tr>';
+    }
+
+    html += '</tbody></table>';
+    return html;
+  }
+
+  function updatePreview(): void {
+    const md = inputEl.value;
+    if (!md.trim()) {
+      previewEl.innerHTML = '<p style="color:var(--color-text-muted);">Start typing Markdown to see the preview...</p>';
+      return;
+    }
+    previewEl.innerHTML = parseMarkdown(md);
+  }
+
+  async function copyHtml(): Promise<void> {
+    const md = inputEl.value;
+    if (!md.trim()) return;
+
+    const html = parseMarkdown(md);
+    try {
+      await navigator.clipboard.writeText(html);
+      copyHtmlBtn.textContent = 'Copied!';
+      copyHtmlBtn.classList.add('copied');
+      setTimeout(() => {
+        copyHtmlBtn.textContent = 'Copy HTML';
+        copyHtmlBtn.classList.remove('copied');
+      }, 2000);
+    } catch {
+      const tempArea = document.createElement('textarea');
+      tempArea.value = html;
+      document.body.appendChild(tempArea);
+      tempArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempArea);
+      copyHtmlBtn.textContent = 'Copied!';
+      copyHtmlBtn.classList.add('copied');
+      setTimeout(() => {
+        copyHtmlBtn.textContent = 'Copy HTML';
+        copyHtmlBtn.classList.remove('copied');
+      }, 2000);
+    }
+  }
+
+  function clearAll(): void {
+    inputEl.value = '';
+    previewEl.innerHTML = '<p style="color:var(--color-text-muted);">Start typing Markdown to see the preview...</p>';
+    inputEl.focus();
+  }
+
+  // Events
+  inputEl.addEventListener('input', updatePreview);
+  copyHtmlBtn.addEventListener('click', copyHtml);
+  clearBtn.addEventListener('click', clearAll);
+
+  // Initial render
+  updatePreview();
+</script>

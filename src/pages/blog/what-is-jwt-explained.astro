@@ -1,0 +1,265 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import AuthorBio from '../../components/AuthorBio.astro';
+import '../../styles/blog.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "What Is a JSON Web Token (JWT) and How Does It Work?",
+    "description": "Learn everything about JSON Web Tokens (JWTs) — their three-part structure, common claims, base64url encoding, use cases like API authentication and SSO, and important security considerations.",
+    "datePublished": "2026-03-07",
+    "dateModified": "2026-03-07",
+    "author": { "@type": "Organization", "name": "ToolCalcs", "url": "https://toolcalcs.com" },
+    "publisher": { "@type": "Organization", "name": "ToolCalcs", "url": "https://toolcalcs.com", "logo": { "@type": "ImageObject", "url": "https://toolcalcs.com/logo.png" } },
+    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://toolcalcs.com/blog/what-is-jwt-explained/" }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is a JWT encrypted?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Standard JWTs (JWS) are signed but not encrypted. The payload is base64url-encoded, which means anyone can decode and read its contents. If you need to hide the payload data, you should use a JSON Web Encryption (JWE) token or avoid putting sensitive information in the JWT payload altogether."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What happens when a JWT expires?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "When a JWT's exp (expiration) claim timestamp is in the past, the server should reject the token and return a 401 Unauthorized response. The client must then obtain a new token, typically by re-authenticating or using a refresh token to get a fresh access token without requiring the user to log in again."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I revoke a JWT before it expires?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "JWTs are stateless by design, so there is no built-in revocation mechanism. However, you can implement revocation by maintaining a server-side blocklist (deny list) of invalidated token identifiers, using short expiration times combined with refresh tokens, or storing a per-user token version that must match for the JWT to be accepted."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between a JWT and a session cookie?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Session cookies store a session ID on the client while the actual session data lives on the server, making them stateful. JWTs are self-contained and carry all necessary data within the token itself, making them stateless. JWTs are ideal for distributed systems and APIs, while session cookies are simpler to manage and easier to revoke for traditional web applications."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which signing algorithm should I use for JWTs?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "For most applications, HS256 (HMAC with SHA-256) is sufficient when the same server both creates and validates tokens. For microservices or scenarios where different services need to verify tokens without possessing the signing key, use RS256 (RSA with SHA-256) or ES256 (ECDSA with SHA-256), which use asymmetric key pairs so the private key stays with the issuer."
+        }
+      }
+    ]
+  }
+];
+---
+<BaseLayout title="What Is a JSON Web Token (JWT) and How Does It Work? | ToolCalcs" description="Learn everything about JSON Web Tokens (JWTs) — their three-part structure, common claims, base64url encoding, use cases like API authentication and SSO, and important security considerations." structuredData={structuredData}>
+  <Breadcrumb items={[
+    { name: 'Home', url: '/' },
+    { name: 'Blog', url: '/blog/' },
+    { name: 'What Is a JWT?' }
+  ]} />
+  <article class="blog-article">
+    <header class="article-header">
+      <p class="article-meta">Published March 7, 2026 · By ToolCalcs Team</p>
+      <h1>What Is a JSON Web Token (JWT) and How Does It Work?</h1>
+      <p class="article-intro">JSON Web Tokens have become the de facto standard for handling authentication in modern web applications and APIs. Whether you are building a single-page app, a mobile backend, or a microservices architecture, understanding how JWTs work is essential for securing your systems. In this comprehensive guide we break down the structure of a JWT, explain every standard claim, walk through encoding and signing, and discuss when to use JWTs versus traditional session cookies.</p>
+    </header>
+
+    <section>
+      <h2>A Brief History of JWTs</h2>
+      <p>Before JWTs became popular, most web applications relied on server-side sessions. A user would log in, the server would create a session object stored in memory or a database, and a session ID cookie would be sent back to the browser. While this approach works well for monolithic applications, it creates challenges in distributed environments where multiple servers need to share session state.</p>
+      <p>JSON Web Tokens were introduced as part of the <strong>JOSE (JSON Object Signing and Encryption)</strong> framework, formally specified in <strong>RFC 7519</strong> (published in May 2015). The specification was authored by Michael Jones, John Bradley, and Nat Sakimura, building on earlier work in the OAuth 2.0 and OpenID Connect ecosystems. The goal was to provide a compact, URL-safe token format that could carry claims between two parties without requiring server-side storage.</p>
+      <p>Today, JWTs are used in virtually every modern authentication library and framework, from Auth0 and Firebase Authentication to Spring Security and Passport.js. Understanding their internals helps developers make informed decisions about token lifetimes, claim selection, and overall security posture.</p>
+    </section>
+
+    <section>
+      <h2>The Three-Part Structure of a JWT</h2>
+      <p>Every JWT consists of three parts separated by dots (<code>.</code>):</p>
+      <p><code>header.payload.signature</code></p>
+      <p>When you see a real token, it looks something like this:</p>
+      <p><code>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</code></p>
+      <p>Each of those three segments is a base64url-encoded JSON string. Let us examine them one at a time.</p>
+
+      <h3>1. The Header</h3>
+      <p>The header is a small JSON object that describes the token type and the signing algorithm being used. A typical header looks like this:</p>
+      <p><code>&#123;"alg": "HS256", "typ": "JWT"&#125;</code></p>
+      <ul>
+        <li><strong>alg</strong> — the signing algorithm, such as <code>HS256</code> (HMAC-SHA256), <code>RS256</code> (RSA-SHA256), or <code>ES256</code> (ECDSA-SHA256).</li>
+        <li><strong>typ</strong> — the token type, almost always <code>"JWT"</code>.</li>
+      </ul>
+      <p>Some headers also include a <code>kid</code> (key ID) field, which tells the verifier which key from a key set should be used to validate the signature. This is common in systems that rotate signing keys.</p>
+
+      <h3>2. The Payload (Claims)</h3>
+      <p>The payload is the heart of the JWT. It contains <strong>claims</strong> — statements about the user and additional metadata. Claims are categorized into three types:</p>
+      <ul>
+        <li><strong>Registered claims</strong> — predefined by the JWT specification (RFC 7519) and recommended for interoperability.</li>
+        <li><strong>Public claims</strong> — defined by the application but registered in the IANA JSON Web Token Claims Registry to avoid collisions.</li>
+        <li><strong>Private claims</strong> — custom claims agreed upon between the producer and consumer of the token.</li>
+      </ul>
+
+      <h3>3. The Signature</h3>
+      <p>The signature ensures that the token has not been tampered with. To create it, the server takes the encoded header and encoded payload, concatenates them with a dot, and signs the result using the algorithm specified in the header along with a secret key (for symmetric algorithms) or a private key (for asymmetric algorithms).</p>
+      <p>For example, using HMAC-SHA256:</p>
+      <p><code>HMACSHA256(base64urlEncode(header) + "." + base64urlEncode(payload), secret)</code></p>
+      <p>When a server receives a JWT, it recomputes this signature and compares it to the one in the token. If they match, the token is valid and has not been altered.</p>
+    </section>
+
+    <section>
+      <h2>Understanding JWT Claims in Detail</h2>
+      <p>The registered claims defined in RFC 7519 provide a standardized vocabulary. Here are the most important ones:</p>
+      <ul>
+        <li><strong>iss (Issuer)</strong> — identifies the principal that issued the JWT. For example, <code>"iss": "https://auth.example.com"</code>. The receiving server should verify this matches the expected issuer.</li>
+        <li><strong>sub (Subject)</strong> — identifies the principal that is the subject of the JWT. This is typically a user ID, such as <code>"sub": "user_42"</code>.</li>
+        <li><strong>aud (Audience)</strong> — identifies the recipients the JWT is intended for. This can be a single string or an array: <code>"aud": ["https://api.example.com", "https://admin.example.com"]</code>. Servers must reject tokens not intended for them.</li>
+        <li><strong>exp (Expiration Time)</strong> — a Unix timestamp after which the token must be rejected. For example, <code>"exp": 1772006400</code> means the token expires at a specific date and time.</li>
+        <li><strong>nbf (Not Before)</strong> — a Unix timestamp before which the token must not be accepted. Useful for tokens issued in advance.</li>
+        <li><strong>iat (Issued At)</strong> — a Unix timestamp indicating when the token was created. This helps servers determine the token's age.</li>
+        <li><strong>jti (JWT ID)</strong> — a unique identifier for the token. This can be used to prevent replay attacks by ensuring the same token is not used twice.</li>
+      </ul>
+      <p>In addition to registered claims, applications commonly include custom claims like <code>roles</code>, <code>permissions</code>, <code>email</code>, or <code>tenant_id</code>. Keep the payload lean — every extra byte increases the size of every HTTP request that carries the token.</p>
+    </section>
+
+    <section>
+      <h2>Base64url Encoding Explained</h2>
+      <p>JWTs use <strong>base64url</strong> encoding, which is a URL-safe variant of standard base64. The key differences are:</p>
+      <ul>
+        <li>The <code>+</code> character is replaced with <code>-</code> (minus).</li>
+        <li>The <code>/</code> character is replaced with <code>_</code> (underscore).</li>
+        <li>Padding characters (<code>=</code>) are stripped.</li>
+      </ul>
+      <p>This matters because JWTs are frequently transmitted in URL query parameters and HTTP headers, where standard base64 characters like <code>+</code>, <code>/</code>, and <code>=</code> can cause problems. Base64url encoding ensures the token is safe to include in any part of an HTTP message without additional escaping.</p>
+      <p>It is important to understand that base64url encoding is <strong>not encryption</strong>. Anyone who receives a JWT can decode the header and payload and read the claims. Never store sensitive information like passwords, credit card numbers, or private keys in a JWT payload.</p>
+    </section>
+
+    <section>
+      <h2>Common Use Cases for JWTs</h2>
+      <h3>API Authentication</h3>
+      <p>The most common use case for JWTs is API authentication. After a user logs in, the server issues a JWT that the client includes in the <code>Authorization</code> header of subsequent requests:</p>
+      <p><code>Authorization: Bearer eyJhbGciOiJIUzI1NiIs...</code></p>
+      <p>The server validates the token's signature and expiration on every request, extracts the user identity from the claims, and processes the request accordingly. Because the token is self-contained, the server does not need to look up a session in a database, making this approach highly scalable.</p>
+
+      <h3>Single Sign-On (SSO)</h3>
+      <p>JWTs are widely used in SSO implementations, particularly with protocols like <strong>OpenID Connect (OIDC)</strong>. When a user authenticates with a central identity provider, the provider issues an ID token (which is a JWT) containing the user's identity claims. Relying party applications can verify this token and grant access without requiring the user to log in again.</p>
+      <p>The self-contained nature of JWTs makes them ideal for SSO across different domains and services, because the relying party only needs the issuer's public key to validate the token — no back-channel communication is required.</p>
+
+      <h3>Information Exchange</h3>
+      <p>Beyond authentication, JWTs can be used to securely transmit information between services. Because the token is signed, the receiver can trust that the content has not been modified in transit. This is useful in event-driven architectures, webhook payloads, and inter-service communication within microservices systems.</p>
+
+      <h3>Password Reset and Email Verification</h3>
+      <p>Many applications use JWTs as short-lived tokens for password reset links and email verification URLs. The token can contain the user's ID and an expiration time, eliminating the need to store reset tokens in the database. When the user clicks the link, the server verifies the token and processes the request.</p>
+    </section>
+
+    <section>
+      <h2>JWT vs. Session Cookies: When to Use Which</h2>
+      <p>The choice between JWTs and session cookies depends on your application architecture and requirements. Here is a comparison to help you decide:</p>
+      <ul>
+        <li><strong>Statefulness:</strong> Session cookies are stateful — the server must store session data. JWTs are stateless — all data is in the token itself.</li>
+        <li><strong>Scalability:</strong> JWTs scale better in distributed systems because any server with the signing key can validate the token. Session cookies require shared session storage (Redis, database) across servers.</li>
+        <li><strong>Revocation:</strong> Session cookies are trivially revocable — just delete the session from the store. JWTs require additional infrastructure like blocklists for revocation.</li>
+        <li><strong>Size:</strong> Session cookies are small (just an ID). JWTs can grow large if many claims are included, adding bandwidth overhead to every request.</li>
+        <li><strong>Cross-domain:</strong> JWTs work easily across different domains and services. Cookies are bound to specific domains by default and require CORS configuration for cross-domain use.</li>
+        <li><strong>Mobile and API clients:</strong> JWTs are a natural fit for mobile apps and third-party API consumers that do not use cookies. Session cookies are tied to the browser's cookie jar.</li>
+      </ul>
+      <p>For traditional server-rendered web applications with a single backend, session cookies are often simpler and more secure. For SPAs, mobile apps, microservices, and third-party API access, JWTs are typically the better choice.</p>
+    </section>
+
+    <section>
+      <h2>Security Best Practices for JWTs</h2>
+      <p>JWTs are only as secure as their implementation. Follow these best practices to avoid common pitfalls:</p>
+      <ol>
+        <li><strong>Always validate the signature.</strong> Never trust a JWT without verifying its signature against the expected key and algorithm. Reject tokens with <code>"alg": "none"</code> — this was a notorious vulnerability in early JWT libraries.</li>
+        <li><strong>Use short expiration times.</strong> Access tokens should expire in minutes, not hours or days. Combine short-lived access tokens with longer-lived refresh tokens for a good balance of security and usability.</li>
+        <li><strong>Validate all claims.</strong> Check <code>iss</code>, <code>aud</code>, <code>exp</code>, and <code>nbf</code> on every request. Do not skip claim validation just because the signature is valid.</li>
+        <li><strong>Use strong signing keys.</strong> For HMAC algorithms, use a key that is at least 256 bits long and generated with a cryptographically secure random number generator. Never use simple strings like <code>"secret"</code> in production.</li>
+        <li><strong>Store tokens securely on the client.</strong> In browsers, store JWTs in <code>httpOnly</code> cookies rather than <code>localStorage</code> to prevent XSS attacks from accessing the token. If you must use localStorage, implement strict Content Security Policies.</li>
+        <li><strong>Protect against CSRF.</strong> If you store JWTs in cookies, implement CSRF protection such as the SameSite cookie attribute or anti-CSRF tokens.</li>
+        <li><strong>Keep the payload small.</strong> Only include necessary claims. Large JWTs increase bandwidth usage and can exceed header size limits on some servers.</li>
+        <li><strong>Rotate signing keys periodically.</strong> Use key rotation with the <code>kid</code> header to allow graceful migration between old and new keys.</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Signing Algorithms Compared</h2>
+      <p>Choosing the right signing algorithm depends on your architecture:</p>
+      <ul>
+        <li><strong>HS256 (HMAC-SHA256):</strong> Symmetric — the same secret is used to sign and verify. Fast and simple. Best when the same server (or a tightly coupled set of servers that share a secret) both issues and validates tokens.</li>
+        <li><strong>RS256 (RSA-SHA256):</strong> Asymmetric — a private key signs and a public key verifies. More computationally expensive but allows token verification without exposing the signing key. Ideal for microservices and third-party integrations.</li>
+        <li><strong>ES256 (ECDSA-SHA256):</strong> Asymmetric with elliptic curves. Produces smaller signatures than RSA with equivalent security strength. Great for bandwidth-constrained environments and modern systems.</li>
+        <li><strong>PS256 (RSASSA-PSS with SHA-256):</strong> A more secure padding scheme for RSA. Recommended over RS256 for new implementations when RSA is required.</li>
+      </ul>
+      <p>Avoid the <code>"none"</code> algorithm entirely. Always explicitly specify which algorithms your server accepts and reject any tokens that do not match.</p>
+    </section>
+
+    <section>
+      <h2>Decoding a JWT Step by Step</h2>
+      <p>Let us walk through decoding a sample JWT manually. Consider this token:</p>
+      <p><code>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzA5ODU2MDAwLCJleHAiOjE3MDk4NTk2MDB9.signature_here</code></p>
+      <ol>
+        <li><strong>Split on dots</strong> to get the three parts: header, payload, and signature.</li>
+        <li><strong>Decode the header</strong> from base64url: <code>&#123;"alg":"HS256","typ":"JWT"&#125;</code></li>
+        <li><strong>Decode the payload</strong> from base64url: <code>&#123;"sub":"1234567890","name":"John Doe","role":"admin","iat":1709856000,"exp":1709859600&#125;</code></li>
+        <li><strong>Verify the signature</strong> using the algorithm from the header and your secret key.</li>
+        <li><strong>Check expiration</strong>: compare the <code>exp</code> value to the current Unix timestamp.</li>
+      </ol>
+      <p>You can use our <a href="/tools/jwt-decoder/">JWT Decoder tool</a> to instantly decode and inspect any JWT without writing code.</p>
+    </section>
+
+    <section>
+      <h2>The Access Token and Refresh Token Pattern</h2>
+      <p>In production systems, JWTs are typically used as part of an access token / refresh token pattern:</p>
+      <ol>
+        <li>The user authenticates with credentials (username/password, OAuth, etc.).</li>
+        <li>The server issues a <strong>short-lived access token</strong> (e.g., 15 minutes) and a <strong>long-lived refresh token</strong> (e.g., 7 days).</li>
+        <li>The client uses the access token for API requests.</li>
+        <li>When the access token expires, the client sends the refresh token to a dedicated endpoint to obtain a new access token.</li>
+        <li>If the refresh token is expired or revoked, the user must log in again.</li>
+      </ol>
+      <p>This pattern provides a good balance: short-lived access tokens limit the window of exposure if a token is compromised, while refresh tokens provide a smooth user experience without requiring frequent re-authentication.</p>
+    </section>
+
+    <section class="faq-section">
+      <h2>Frequently Asked Questions</h2>
+      <details>
+        <summary>Is a JWT encrypted?</summary>
+        <p>Standard JWTs (JWS) are signed but not encrypted. The payload is base64url-encoded, which means anyone can decode and read its contents. If you need to hide the payload data, you should use a JSON Web Encryption (JWE) token or avoid putting sensitive information in the JWT payload altogether.</p>
+      </details>
+      <details>
+        <summary>What happens when a JWT expires?</summary>
+        <p>When a JWT's <code>exp</code> (expiration) claim timestamp is in the past, the server should reject the token and return a 401 Unauthorized response. The client must then obtain a new token, typically by re-authenticating or using a refresh token to get a fresh access token without requiring the user to log in again.</p>
+      </details>
+      <details>
+        <summary>Can I revoke a JWT before it expires?</summary>
+        <p>JWTs are stateless by design, so there is no built-in revocation mechanism. However, you can implement revocation by maintaining a server-side blocklist (deny list) of invalidated token identifiers, using short expiration times combined with refresh tokens, or storing a per-user token version that must match for the JWT to be accepted.</p>
+      </details>
+      <details>
+        <summary>What is the difference between a JWT and a session cookie?</summary>
+        <p>Session cookies store a session ID on the client while the actual session data lives on the server, making them stateful. JWTs are self-contained and carry all necessary data within the token itself, making them stateless. JWTs are ideal for distributed systems and APIs, while session cookies are simpler to manage and easier to revoke for traditional web applications.</p>
+      </details>
+      <details>
+        <summary>Which signing algorithm should I use for JWTs?</summary>
+        <p>For most applications, HS256 (HMAC with SHA-256) is sufficient when the same server both creates and validates tokens. For microservices or scenarios where different services need to verify tokens without possessing the signing key, use RS256 (RSA with SHA-256) or ES256 (ECDSA with SHA-256), which use asymmetric key pairs so the private key stays with the issuer.</p>
+      </details>
+    </section>
+
+    <footer class="article-footer">
+      <h2>Related Tools</h2>
+      <ul>
+        <li><a href="/tools/jwt-decoder/">JWT Decoder</a> — Decode, inspect, and verify JSON Web Tokens instantly in your browser</li>
+        <li><a href="/tools/base64-encoder-decoder/">Base64 Encoder/Decoder</a> — Encode and decode Base64 strings, including the base64url variant used in JWTs</li>
+      </ul>
+      <AuthorBio />
+    </footer>
+  </article>
+</BaseLayout>

@@ -1,0 +1,673 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getToolBySlug } from '../../data/tools';
+import '../../styles/tool.css';
+
+const tool = getToolBySlug('diff-checker')!;
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Web Tools", "item": "https://toolcalcs.com/tools/" },
+      { "@type": "ListItem", "position": 3, "name": "Diff Checker" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Diff Checker",
+    "url": "https://toolcalcs.com/tools/diff-checker/",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Compare two texts side by side and highlight the differences line by line. See additions, deletions, and changes."
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is a diff checker and how does it work?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A diff checker compares two blocks of text and identifies the differences between them. It uses algorithms like the Longest Common Subsequence (LCS) to find matching lines and then highlights additions, deletions, and changes. This is the same principle used by version control systems like Git."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is my data safe when using this online diff checker?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. This diff checker runs entirely in your browser using JavaScript. Your text is never sent to any server. All comparison and processing happens locally on your device, so sensitive content like source code, configuration files, and documents remain completely private."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What types of content can I compare with this tool?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "You can compare any plain text content including source code, configuration files, CSV data, log files, legal documents, essays, and more. The tool works on a line-by-line basis, making it ideal for structured text where each line represents a meaningful unit of content."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Diff Checker - Compare Text Online | ToolCalcs"
+  description={tool.description}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/tools/">Web Tools</a> &rsaquo; <span>Diff Checker</span>
+  </nav>
+
+  <h1>{tool.title}</h1>
+  <p class="page-desc">Compare two texts and see the differences highlighted. Find additions, deletions, and changes instantly.</p>
+
+  <div class="tool-box">
+    <div class="tool-io">
+      <div class="tool-input-area">
+        <div class="output-header">
+          <label class="tool-label" for="originalText">Original Text</label>
+          <span class="char-count" id="originalStats">0 lines</span>
+        </div>
+        <textarea
+          id="originalText"
+          class="tool-textarea"
+          placeholder="Paste or type the original text here..."
+          spellcheck="false"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+        ></textarea>
+      </div>
+      <div class="tool-input-area">
+        <div class="output-header">
+          <label class="tool-label" for="modifiedText">Modified Text</label>
+          <span class="char-count" id="modifiedStats">0 lines</span>
+        </div>
+        <textarea
+          id="modifiedText"
+          class="tool-textarea"
+          placeholder="Paste or type the modified text here..."
+          spellcheck="false"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="diff-options">
+      <label class="diff-option-check">
+        <input type="checkbox" id="ignoreWhitespace" />
+        <span>Ignore whitespace</span>
+      </label>
+      <label class="diff-option-check">
+        <input type="checkbox" id="caseInsensitive" />
+        <span>Case insensitive</span>
+      </label>
+    </div>
+
+    <div class="tool-controls">
+      <button type="button" class="tool-btn primary" id="diffBtn">Find Differences</button>
+      <button type="button" class="tool-btn secondary" id="swapBtn">Swap</button>
+      <button type="button" class="tool-btn secondary" id="clearBtn">Clear</button>
+    </div>
+
+    <div class="diff-stats" id="diffStats" hidden>
+      <span class="stat-added" id="statAdded">0 lines added</span>
+      <span class="stat-removed" id="statRemoved">0 lines removed</span>
+      <span class="stat-unchanged" id="statUnchanged">0 lines unchanged</span>
+    </div>
+
+    <div class="diff-result" id="diffResult" hidden>
+      <div class="diff-side" id="diffLeft">
+        <div class="diff-side-header">Original</div>
+        <div class="diff-side-body" id="diffLeftBody"></div>
+      </div>
+      <div class="diff-side" id="diffRight">
+        <div class="diff-side-header">Modified</div>
+        <div class="diff-side-body" id="diffRightBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="tool-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is a Diff Checker?</h2>
+    <p>
+      A diff checker is a tool that compares two pieces of text and identifies the differences between them. The term "diff" originates from the Unix <code>diff</code> command, first released in the early 1970s as part of the Unix operating system. Since then, diff algorithms have become fundamental building blocks in software development, powering version control systems like Git, Subversion, and Mercurial.
+    </p>
+    <p>
+      At its core, a diff checker takes two inputs -- an original text and a modified text -- and produces a structured output showing exactly what changed. Lines that exist only in the original are marked as <strong>deletions</strong>. Lines that exist only in the modified version are marked as <strong>additions</strong>. Lines that appear in both versions unchanged are marked as <strong>equal</strong>. This simple three-way classification lets you scan changes quickly without reading every single line.
+    </p>
+    <p>
+      Diff checking is not limited to source code. Writers use it to compare draft revisions of essays and articles. Legal professionals compare contract versions to find clause modifications. System administrators diff configuration files after updates. Data analysts compare CSV exports to spot changes in datasets. Any time you need to understand what changed between two versions of a text, a diff checker is the right tool.
+    </p>
+
+    <h2>How Diff Algorithms Work</h2>
+    <p>
+      The most widely used diff algorithm is based on the <strong>Longest Common Subsequence (LCS)</strong> problem, a classic problem in computer science. Given two sequences, the LCS algorithm finds the longest subsequence that appears in both sequences in the same relative order, though not necessarily contiguously. The elements not in the LCS represent the differences.
+    </p>
+    <p>
+      For a line-by-line diff, each line of text is treated as a single element. The algorithm builds a two-dimensional table where each cell represents the length of the LCS up to that point in both sequences. By working through the table from the bottom-right corner back to the top-left, the algorithm reconstructs which lines are common to both texts and which are unique to one side.
+    </p>
+    <p>
+      The time complexity of the basic LCS algorithm is O(n * m), where n and m are the number of lines in the two texts. For very large files, optimized algorithms like the Myers diff algorithm (published by Eugene Myers in 1986) reduce the average-case complexity significantly. The Myers algorithm is what Git uses internally to compute diffs. It works by finding the shortest edit script -- the smallest number of insertions and deletions needed to transform one text into the other.
+    </p>
+    <p>
+      Our diff checker uses an LCS-based approach that works well for typical use cases. It compares texts line by line, identifies matching lines using dynamic programming, and then classifies each line as added, removed, or unchanged. The result is displayed side by side with color coding so you can instantly see what changed.
+    </p>
+
+    <h2>Understanding Diff Output</h2>
+    <p>
+      The diff output in this tool uses a side-by-side layout with color coding. On the left side, you see the original text with line numbers. On the right side, you see the modified text with its own line numbers. Lines are aligned so that matching content appears on the same row, making it easy to follow the flow of changes.
+    </p>
+    <p>
+      <strong>Green lines</strong> represent additions -- lines that appear in the modified text but not in the original. These are new content that was inserted. <strong>Red lines</strong> represent deletions -- lines that were in the original but are missing from the modified text. These are content that was removed. Lines shown in the default color are <strong>unchanged</strong> -- they appear identically in both versions.
+    </p>
+    <p>
+      The statistics bar above the diff output gives you a quick summary: how many lines were added, how many were removed, and how many remained unchanged. This overview helps you gauge the magnitude of changes at a glance before diving into the details.
+    </p>
+
+    <h2>Common Use Cases for Diff Checking</h2>
+    <h3>Code Review</h3>
+    <p>
+      Code review is perhaps the most common use case for diff tools. When a developer submits a pull request, reviewers look at the diff to understand what code was added, modified, or removed. A clear, well-formatted diff makes code review faster and more effective. Reviewers can focus on the actual changes rather than re-reading the entire file.
+    </p>
+    <p>
+      Even outside formal code review processes, developers frequently diff their own code to verify changes before committing. Comparing the current state of a file against the last committed version helps catch unintended modifications, debug regressions, and ensure that only the intended changes are included in a commit.
+    </p>
+
+    <h3>Document Comparison</h3>
+    <p>
+      Writers, editors, and legal professionals regularly compare document revisions. When an editor returns a manuscript with changes, the author can diff the original against the edited version to see exactly what was modified. Contract negotiations involve comparing successive draft versions to identify which clauses were added, removed, or reworded. A diff checker provides an objective, comprehensive view of all changes.
+    </p>
+
+    <h3>Configuration Management</h3>
+    <p>
+      System administrators and DevOps engineers frequently compare configuration files. When a server behaves unexpectedly after an update, diffing the current configuration against the previous version reveals what changed. This is especially valuable for configuration files that are hundreds or thousands of lines long, where manual comparison would be impractical.
+    </p>
+
+    <h3>Data Validation</h3>
+    <p>
+      Data analysts use diff tools to compare data exports from different time periods or different systems. Diffing two CSV files can reveal new records, deleted entries, and changed values. This is a quick sanity check before importing data or running analyses, ensuring that the data matches expectations.
+    </p>
+
+    <h2>Options Explained</h2>
+    <h3>Ignore Whitespace</h3>
+    <p>
+      When the "Ignore whitespace" option is enabled, the diff algorithm treats lines as identical even if they differ only in spaces, tabs, or trailing whitespace. This is useful when comparing code that may have been reformatted or when indentation styles differ between two versions. Without this option, a line with four spaces of indentation and the same line with a tab would be flagged as different.
+    </p>
+
+    <h3>Case Insensitive</h3>
+    <p>
+      The "Case insensitive" option ignores differences in letter casing. A line reading "Hello World" and another reading "hello world" would be treated as identical when this option is active. This is helpful when comparing content where casing is inconsistent or irrelevant, such as SQL queries (where keywords are case-insensitive) or certain configuration files.
+    </p>
+
+    <h2>How to Use This Tool</h2>
+    <p>
+      Using the diff checker is straightforward. Paste or type your original text in the left textarea and the modified text in the right textarea. Optionally, check the "Ignore whitespace" or "Case insensitive" boxes if you want to filter out those kinds of differences. Then click <strong>Find Differences</strong> to compute and display the diff.
+    </p>
+    <p>
+      The results appear below the buttons in a side-by-side layout. Each line shows its line number and is color-coded: green for additions, red for deletions, and the default background for unchanged lines. A statistics summary above the diff tells you how many lines fall into each category.
+    </p>
+    <p>
+      Use the <strong>Swap</strong> button to quickly exchange the contents of the two textareas. This is handy if you pasted the texts in the wrong order. The <strong>Clear</strong> button resets both textareas and hides the diff results, letting you start fresh.
+    </p>
+
+    <h2>Tips for Effective Diff Comparison</h2>
+    <ul>
+      <li>
+        <strong>Normalize line endings first.</strong> If one text uses Windows line endings (CRLF) and the other uses Unix line endings (LF), every line may appear as changed. Paste both texts into a plain text editor to normalize line endings before comparing.
+      </li>
+      <li>
+        <strong>Use "Ignore whitespace" for reformatted code.</strong> When comparing code that has been run through a formatter like Prettier or Black, enable the whitespace option to focus on actual content changes rather than indentation differences.
+      </li>
+      <li>
+        <strong>Compare smaller sections for large files.</strong> If you are comparing very large texts (thousands of lines), consider breaking them into smaller sections and comparing each section individually. This makes the diff output more manageable.
+      </li>
+      <li>
+        <strong>Look at the statistics first.</strong> Before reading the full diff, check the summary line. If it says "0 lines added, 0 lines removed," the texts are identical (or differ only in filtered-out whitespace or casing).
+      </li>
+    </ul>
+
+    <h2>Diff Checking in Version Control</h2>
+    <p>
+      Version control systems like Git rely heavily on diff algorithms. When you run <code>git diff</code>, Git computes the differences between two versions of your files using the Myers diff algorithm. The output uses a unified diff format with <code>+</code> for additions and <code>-</code> for deletions. Understanding how diffs work helps you read Git output more effectively and write cleaner commits.
+    </p>
+    <p>
+      Pull requests on platforms like GitHub, GitLab, and Bitbucket display diffs in a visual format similar to this tool. The side-by-side view with color coding is the standard way to review code changes. Familiarity with reading diffs is an essential skill for any developer working in a team.
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is a diff checker and how does it work?</h3>
+    <p>
+      A diff checker compares two blocks of text and identifies the differences between them. It uses algorithms like the Longest Common Subsequence (LCS) to find matching lines and then highlights additions, deletions, and unchanged lines. This is the same fundamental approach used by version control systems like Git to track changes in source code.
+    </p>
+
+    <h3>Is my data safe when using this online diff checker?</h3>
+    <p>
+      Yes, completely. This diff checker runs entirely in your browser using JavaScript. Your text is never uploaded to any server. All comparison and processing happens locally on your device, so sensitive content such as proprietary source code, confidential documents, and private configuration files remain completely private.
+    </p>
+
+    <h3>What types of content can I compare with this tool?</h3>
+    <p>
+      You can compare any plain text content: source code in any programming language, configuration files (JSON, YAML, TOML, INI), CSV and TSV data, log files, legal documents, essays, articles, and more. The tool works on a line-by-line basis, so it is best suited for structured text where each line is a meaningful unit.
+    </p>
+
+    <h2>Related Tools</h2>
+    <ul>
+      <li><a href="/tools/json-formatter/">JSON Formatter</a> -- Format and validate JSON data before comparing.</li>
+      <li><a href="/tools/text-case-converter/">Text Case Converter</a> -- Normalize text casing before running a diff.</li>
+      <li><a href="/tools/hash-generator/">Hash Generator</a> -- Quickly check if two texts are identical by comparing their hashes.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="tool-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .diff-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin: 12px 0 0;
+  }
+  .diff-option-check {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: var(--color-text);
+    cursor: pointer;
+  }
+  .diff-option-check input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--color-primary);
+    margin: 0;
+  }
+
+  .diff-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 10px 14px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    margin-top: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-added { color: #16a34a; }
+  .stat-removed { color: #dc2626; }
+  .stat-unchanged { color: var(--color-text-muted); }
+  [data-theme="dark"] .stat-added { color: #4ade80; }
+  [data-theme="dark"] .stat-removed { color: #f87171; }
+
+  .diff-result {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    margin-top: 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .diff-side {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .diff-side:first-child {
+    border-right: 1px solid var(--color-border);
+  }
+  .diff-side-header {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .diff-side-body {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 500px;
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 0.82rem;
+    line-height: 1.55;
+  }
+
+  :global(.diff-line) {
+    display: flex;
+    min-height: 1.55em;
+    white-space: pre;
+  }
+  :global(.diff-line-num) {
+    flex-shrink: 0;
+    width: 44px;
+    padding: 0 8px 0 4px;
+    text-align: right;
+    color: var(--color-text-muted);
+    user-select: none;
+    font-size: 0.75rem;
+    line-height: 1.55;
+    opacity: 0.7;
+  }
+  :global(.diff-line-content) {
+    flex: 1;
+    padding: 0 8px;
+    min-width: 0;
+  }
+
+  :global(.diff-line.added) {
+    background: #dcfce7;
+  }
+  :global(.diff-line.added .diff-line-num) {
+    background: #bbf7d0;
+  }
+  :global(.diff-line.removed) {
+    background: #fef2f2;
+  }
+  :global(.diff-line.removed .diff-line-num) {
+    background: #fecaca;
+  }
+  :global(.diff-line.empty) {
+    background: var(--color-bg);
+    opacity: 0.5;
+  }
+
+  [data-theme="dark"] :global(.diff-line.added) {
+    background: #052e16;
+  }
+  [data-theme="dark"] :global(.diff-line.added .diff-line-num) {
+    background: #064e3b;
+  }
+  [data-theme="dark"] :global(.diff-line.removed) {
+    background: #450a0a;
+  }
+  [data-theme="dark"] :global(.diff-line.removed .diff-line-num) {
+    background: #7f1d1d;
+  }
+
+  .char-count {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 640px) {
+    .diff-result {
+      grid-template-columns: 1fr;
+    }
+    .diff-side:first-child {
+      border-right: none;
+      border-bottom: 1px solid var(--color-border);
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    'use strict';
+
+    const originalEl = document.getElementById('originalText') as HTMLTextAreaElement;
+    const modifiedEl = document.getElementById('modifiedText') as HTMLTextAreaElement;
+    const diffBtn = document.getElementById('diffBtn') as HTMLButtonElement;
+    const swapBtn = document.getElementById('swapBtn') as HTMLButtonElement;
+    const clearBtn = document.getElementById('clearBtn') as HTMLButtonElement;
+    const ignoreWhitespaceEl = document.getElementById('ignoreWhitespace') as HTMLInputElement;
+    const caseInsensitiveEl = document.getElementById('caseInsensitive') as HTMLInputElement;
+    const diffStats = document.getElementById('diffStats') as HTMLDivElement;
+    const statAdded = document.getElementById('statAdded') as HTMLSpanElement;
+    const statRemoved = document.getElementById('statRemoved') as HTMLSpanElement;
+    const statUnchanged = document.getElementById('statUnchanged') as HTMLSpanElement;
+    const diffResult = document.getElementById('diffResult') as HTMLDivElement;
+    const diffLeftBody = document.getElementById('diffLeftBody') as HTMLDivElement;
+    const diffRightBody = document.getElementById('diffRightBody') as HTMLDivElement;
+    const originalStats = document.getElementById('originalStats') as HTMLSpanElement;
+    const modifiedStats = document.getElementById('modifiedStats') as HTMLSpanElement;
+
+    interface DiffEntry {
+      type: 'add' | 'remove' | 'equal';
+      line: string;
+      oldLineNum?: number;
+      newLineNum?: number;
+    }
+
+    function normalizeLine(line: string, ignoreWs: boolean, caseIns: boolean): string {
+      let s = line;
+      if (ignoreWs) {
+        s = s.replace(/\s+/g, ' ').trim();
+      }
+      if (caseIns) {
+        s = s.toLowerCase();
+      }
+      return s;
+    }
+
+    function computeLCSTable(oldLines: string[], newLines: string[]): number[][] {
+      const n = oldLines.length;
+      const m = newLines.length;
+      // Build DP table
+      const dp: number[][] = [];
+      for (let i = 0; i <= n; i++) {
+        dp[i] = new Array(m + 1).fill(0);
+      }
+      for (let i = 1; i <= n; i++) {
+        for (let j = 1; j <= m; j++) {
+          if (oldLines[i - 1] === newLines[j - 1]) {
+            dp[i][j] = dp[i - 1][j - 1] + 1;
+          } else {
+            dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+          }
+        }
+      }
+      return dp;
+    }
+
+    function computeDiff(oldText: string, newText: string, ignoreWs: boolean, caseIns: boolean): DiffEntry[] {
+      const oldRaw = oldText.split('\n');
+      const newRaw = newText.split('\n');
+
+      const oldNorm = oldRaw.map(l => normalizeLine(l, ignoreWs, caseIns));
+      const newNorm = newRaw.map(l => normalizeLine(l, ignoreWs, caseIns));
+
+      const dp = computeLCSTable(oldNorm, newNorm);
+
+      // Backtrack
+      const result: DiffEntry[] = [];
+      let i = oldRaw.length;
+      let j = newRaw.length;
+
+      while (i > 0 || j > 0) {
+        if (i > 0 && j > 0 && oldNorm[i - 1] === newNorm[j - 1]) {
+          result.push({ type: 'equal', line: oldRaw[i - 1], oldLineNum: i, newLineNum: j });
+          i--;
+          j--;
+        } else if (j > 0 && (i === 0 || dp[i][j - 1] >= dp[i - 1][j])) {
+          result.push({ type: 'add', line: newRaw[j - 1], newLineNum: j });
+          j--;
+        } else if (i > 0) {
+          result.push({ type: 'remove', line: oldRaw[i - 1], oldLineNum: i });
+          i--;
+        }
+      }
+
+      result.reverse();
+      return result;
+    }
+
+    function escapeHtml(s: string): string {
+      return s
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function buildDiffLine(lineNum: number | undefined, content: string, type: string): string {
+      const numStr = lineNum != null ? String(lineNum) : '';
+      const escaped = escapeHtml(content);
+      // Show at least an empty space for blank lines
+      const display = escaped || ' ';
+      return `<div class="diff-line ${type}"><span class="diff-line-num">${numStr}</span><span class="diff-line-content">${display}</span></div>`;
+    }
+
+    function updateLineStats(): void {
+      const origLines = originalEl.value ? originalEl.value.split('\n').length : 0;
+      const modLines = modifiedEl.value ? modifiedEl.value.split('\n').length : 0;
+      originalStats.textContent = `${origLines} line${origLines !== 1 ? 's' : ''}`;
+      modifiedStats.textContent = `${modLines} line${modLines !== 1 ? 's' : ''}`;
+    }
+
+    function runDiff(): void {
+      const oldText = originalEl.value;
+      const newText = modifiedEl.value;
+      const ignoreWs = ignoreWhitespaceEl.checked;
+      const caseIns = caseInsensitiveEl.checked;
+
+      if (!oldText && !newText) {
+        diffStats.hidden = true;
+        diffResult.hidden = true;
+        return;
+      }
+
+      const entries = computeDiff(oldText, newText, ignoreWs, caseIns);
+
+      let addCount = 0;
+      let removeCount = 0;
+      let equalCount = 0;
+
+      let leftHtml = '';
+      let rightHtml = '';
+
+      for (const entry of entries) {
+        switch (entry.type) {
+          case 'equal':
+            equalCount++;
+            leftHtml += buildDiffLine(entry.oldLineNum, entry.line, 'equal');
+            rightHtml += buildDiffLine(entry.newLineNum, entry.line, 'equal');
+            break;
+          case 'add':
+            addCount++;
+            leftHtml += buildDiffLine(undefined, '', 'empty');
+            rightHtml += buildDiffLine(entry.newLineNum, entry.line, 'added');
+            break;
+          case 'remove':
+            removeCount++;
+            leftHtml += buildDiffLine(entry.oldLineNum, entry.line, 'removed');
+            rightHtml += buildDiffLine(undefined, '', 'empty');
+            break;
+        }
+      }
+
+      statAdded.textContent = `${addCount} line${addCount !== 1 ? 's' : ''} added`;
+      statRemoved.textContent = `${removeCount} line${removeCount !== 1 ? 's' : ''} removed`;
+      statUnchanged.textContent = `${equalCount} line${equalCount !== 1 ? 's' : ''} unchanged`;
+
+      diffLeftBody.innerHTML = leftHtml;
+      diffRightBody.innerHTML = rightHtml;
+
+      diffStats.hidden = false;
+      diffResult.hidden = false;
+
+      // Sync scrolling between the two sides
+      syncScroll();
+    }
+
+    function syncScroll(): void {
+      // Remove any previous listeners to avoid duplicates
+      const leftBody = diffLeftBody;
+      const rightBody = diffRightBody;
+
+      let isSyncing = false;
+
+      function onLeftScroll(): void {
+        if (isSyncing) return;
+        isSyncing = true;
+        rightBody.scrollTop = leftBody.scrollTop;
+        rightBody.scrollLeft = leftBody.scrollLeft;
+        isSyncing = false;
+      }
+
+      function onRightScroll(): void {
+        if (isSyncing) return;
+        isSyncing = true;
+        leftBody.scrollTop = rightBody.scrollTop;
+        leftBody.scrollLeft = rightBody.scrollLeft;
+        isSyncing = false;
+      }
+
+      // Clone and replace to remove old listeners
+      const newLeft = leftBody.cloneNode(true) as HTMLDivElement;
+      const newRight = rightBody.cloneNode(true) as HTMLDivElement;
+      leftBody.parentNode!.replaceChild(newLeft, leftBody);
+      rightBody.parentNode!.replaceChild(newRight, rightBody);
+
+      newLeft.addEventListener('scroll', function () {
+        if (isSyncing) return;
+        isSyncing = true;
+        newRight.scrollTop = newLeft.scrollTop;
+        newRight.scrollLeft = newLeft.scrollLeft;
+        isSyncing = false;
+      });
+      newRight.addEventListener('scroll', function () {
+        if (isSyncing) return;
+        isSyncing = true;
+        newLeft.scrollTop = newRight.scrollTop;
+        newLeft.scrollLeft = newRight.scrollLeft;
+        isSyncing = false;
+      });
+    }
+
+    function swapTexts(): void {
+      const temp = originalEl.value;
+      originalEl.value = modifiedEl.value;
+      modifiedEl.value = temp;
+      updateLineStats();
+    }
+
+    function clearAll(): void {
+      originalEl.value = '';
+      modifiedEl.value = '';
+      diffStats.hidden = true;
+      diffResult.hidden = true;
+      diffLeftBody.innerHTML = '';
+      diffRightBody.innerHTML = '';
+      updateLineStats();
+      originalEl.focus();
+    }
+
+    // Event listeners
+    diffBtn.addEventListener('click', runDiff);
+    swapBtn.addEventListener('click', swapTexts);
+    clearBtn.addEventListener('click', clearAll);
+    originalEl.addEventListener('input', updateLineStats);
+    modifiedEl.addEventListener('input', updateLineStats);
+
+    // Initialize
+    updateLineStats();
+  })();
+</script>

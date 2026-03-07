@@ -1,0 +1,602 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getToolBySlug } from '../../data/tools';
+import '../../styles/tool.css';
+
+const tool = getToolBySlug('javascript-minifier')!;
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Web Tools", "item": "https://toolcalcs.com/tools/" },
+      { "@type": "ListItem", "position": 3, "name": "JavaScript Minifier" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "JavaScript Minifier",
+    "url": "https://toolcalcs.com/tools/javascript-minifier/",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Minify JavaScript code online for free."
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What does JavaScript minification do?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "JavaScript minification removes unnecessary characters — whitespace, line breaks, and comments — from source code without changing its functionality. This reduces file size and improves page load times."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does minification break my JavaScript?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. A proper minifier only removes characters that have no effect on execution. The minified code behaves identically to the original. However, it becomes harder to read and debug."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How is minification different from obfuscation?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Minification removes formatting and comments while keeping variable names intact. Obfuscation goes further by renaming variables to short meaningless names and restructuring code to make it harder to understand. This tool performs minification only."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="JavaScript Minifier - Minify JS Online | ToolCalcs"
+  description={tool.description}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/tools/">Web Tools</a> &rsaquo; <span>JavaScript Minifier</span>
+  </nav>
+
+  <h1>{tool.title}</h1>
+  <p class="page-desc">Minify your JavaScript code by removing whitespace, comments, and unnecessary characters. Compare file sizes instantly.</p>
+
+  <div class="tool-box">
+    <div class="tool-io">
+      <div class="tool-input-area">
+        <label class="tool-label" for="toolInput">Input JavaScript</label>
+        <textarea id="toolInput" class="tool-textarea" placeholder="Paste your JavaScript here..." spellcheck="false"></textarea>
+      </div>
+      <div class="tool-output-area">
+        <div class="output-header">
+          <label class="tool-label" for="toolOutput">Minified JavaScript</label>
+          <button type="button" class="copy-btn" id="copyBtn">Copy</button>
+        </div>
+        <textarea id="toolOutput" class="tool-textarea" placeholder="Minified output..." spellcheck="false" readonly></textarea>
+      </div>
+    </div>
+
+    <div class="tool-controls">
+      <button type="button" class="tool-btn primary" id="minifyBtn">Minify</button>
+      <button type="button" class="tool-btn secondary" id="clearBtn">Clear</button>
+    </div>
+
+    <div id="statsBar" class="stats-bar" hidden>
+      <span>Original: <strong id="origSize">0</strong> bytes</span>
+      <span>Minified: <strong id="minSize">0</strong> bytes</span>
+      <span>Saved: <strong id="savedPct">0%</strong></span>
+    </div>
+
+    <div class="tool-error" id="toolError" hidden></div>
+  </div>
+
+  <AdUnit slot="tool-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is JavaScript Minification?</h2>
+    <p>
+      JavaScript minification is the process of removing all unnecessary characters from JavaScript source code without
+      altering its functionality. These unnecessary characters include whitespace, line breaks, comments, and sometimes
+      redundant semicolons or brackets. The result is a much smaller file that the browser can download and parse faster,
+      directly improving page load performance.
+    </p>
+    <p>
+      When developers write JavaScript, they use indentation, descriptive variable names, blank lines, and inline comments
+      to make the code readable and maintainable. This formatting is essential during development but serves no purpose at
+      runtime. The JavaScript engine in a browser ignores whitespace and comments entirely. Minification exploits this by
+      stripping away everything the engine does not need, producing a compact version of the same program.
+    </p>
+    <p>
+      A typical JavaScript file can shrink by 20 to 60 percent after minification, depending on how heavily commented and
+      formatted the original source is. For large applications with hundreds of kilobytes of JavaScript, this translates
+      into noticeably faster page loads, especially on slower mobile connections. Every byte saved is a byte that does not
+      need to travel over the network, decompress on the client, or occupy memory in the browser.
+    </p>
+
+    <h2>How JavaScript Minifiers Work</h2>
+    <p>
+      At the most basic level, a JavaScript minifier reads the source code character by character and decides what to keep
+      and what to discard. The process involves several distinct steps that must be performed carefully to avoid breaking
+      the code.
+    </p>
+    <h3>Comment Removal</h3>
+    <p>
+      JavaScript supports two types of comments: single-line comments that begin with <code>//</code> and continue to the
+      end of the line, and multi-line comments that start with <code>/*</code> and end with <code>*/</code>. A minifier
+      must remove both types, but it cannot blindly search for these character sequences. The characters <code>//</code>
+      and <code>/*</code> can also appear inside string literals, template literals, and regular expression literals. A
+      correct minifier tracks whether it is currently inside a string or regex and only treats comment markers outside of
+      those contexts as actual comments.
+    </p>
+    <h3>Whitespace Collapsing</h3>
+    <p>
+      After comments are removed, the minifier collapses whitespace. Multiple consecutive spaces, tabs, and newlines are
+      replaced with a single space or removed entirely. Whitespace around operators like <code>=</code>, <code>+</code>,
+      <code>{</code>, and <code>;</code> is generally safe to remove because the JavaScript parser does not require it in
+      most contexts. However, whitespace between identifiers and keywords must be preserved. For example,
+      <code>return value</code> cannot become <code>returnvalue</code> because that changes the meaning of the code. The
+      minifier must understand where a space is syntactically meaningful and where it is purely cosmetic.
+    </p>
+    <h3>String Literal Preservation</h3>
+    <p>
+      The contents of string literals must never be modified. A string enclosed in single quotes, double quotes, or
+      backticks (template literals) may contain any characters, including sequences that look like comments or extra
+      whitespace. A minifier that strips <code>//</code> from inside a string would corrupt the data. Proper minifiers
+      use a state machine to track whether they are inside a string, and they pass string contents through unmodified.
+      Escaped characters within strings, such as <code>\"</code> or <code>\\</code>, must also be handled correctly so the
+      minifier does not mistakenly interpret an escaped quote as the end of the string.
+    </p>
+    <h3>Line Break Handling</h3>
+    <p>
+      JavaScript has a feature called Automatic Semicolon Insertion (ASI). In certain situations the parser inserts a
+      semicolon at the end of a line if one is missing. This means that removing a line break can change the meaning of
+      code. For example, a <code>return</code> statement followed by a newline and then a value will return
+      <code>undefined</code> instead of the value, because ASI inserts a semicolon after <code>return</code>. Advanced
+      minifiers are aware of ASI rules and insert semicolons explicitly where needed before removing line breaks. Simpler
+      minifiers may leave certain line breaks in place to avoid this class of bugs.
+    </p>
+
+    <h2>Benefits of Minifying JavaScript</h2>
+    <p>
+      The primary benefit of minification is reduced file size, but the downstream effects touch many aspects of web
+      performance and user experience.
+    </p>
+    <h3>Faster Page Loads</h3>
+    <p>
+      Smaller files download faster. On a 3G mobile connection, saving 50 KB of JavaScript can shave hundreds of
+      milliseconds off the load time. Because JavaScript is render-blocking by default, every millisecond spent
+      downloading and parsing scripts is a millisecond the user spends staring at a blank or incomplete page. Minification
+      is one of the simplest and most effective optimizations you can apply.
+    </p>
+    <h3>Lower Bandwidth Costs</h3>
+    <p>
+      If your site serves millions of requests per month, the cumulative bandwidth savings from minification add up
+      significantly. Hosting providers and CDNs charge by the gigabyte. Reducing every JavaScript response by 30 to 50
+      percent directly reduces your infrastructure costs without requiring any changes to your application logic.
+    </p>
+    <h3>Improved Core Web Vitals</h3>
+    <p>
+      Google's Core Web Vitals, particularly Largest Contentful Paint (LCP) and First Input Delay (FID), are influenced
+      by how quickly the browser can download, parse, and execute JavaScript. Minified JavaScript contributes to better
+      scores on these metrics, which in turn can improve search engine rankings. The performance gains are modest compared
+      to code splitting or lazy loading, but minification is a zero-effort win that every production site should use.
+    </p>
+    <h3>Reduced Parse Time</h3>
+    <p>
+      Browsers must parse every byte of JavaScript before executing it. Fewer bytes mean less work for the parser. On
+      low-powered devices such as budget smartphones, the parsing phase can account for a significant portion of the total
+      script execution time. Minification reduces this overhead directly.
+    </p>
+
+    <h2>Minification vs Uglification vs Compression</h2>
+    <p>
+      These three terms are frequently confused, but they refer to distinct processes that can be used together for
+      maximum size reduction.
+    </p>
+    <h3>Minification</h3>
+    <p>
+      Minification removes formatting characters (whitespace, line breaks, comments) without renaming anything. The
+      output is still valid JavaScript with the same variable names, function names, and structure. It is the safest
+      transformation because it only discards characters that the runtime ignores. This tool performs minification.
+    </p>
+    <h3>Uglification (Mangling)</h3>
+    <p>
+      Uglification goes a step further by renaming local variables and function parameters to shorter names. A variable
+      called <code>userAccountBalance</code> might become <code>a</code>. This produces smaller files than minification
+      alone but makes the output nearly impossible to read. Tools like Terser and UglifyJS perform both minification and
+      uglification. Mangling is generally safe for local variables but can cause issues with code that relies on
+      <code>Function.name</code> or dynamic property access patterns.
+    </p>
+    <h3>Compression (Gzip / Brotli)</h3>
+    <p>
+      Compression is a server-side process that encodes the response body using algorithms like Gzip or Brotli. It works
+      on any text content, not just JavaScript, and achieves typical compression ratios of 60 to 80 percent. Compression
+      and minification are complementary: minified code compresses slightly less efficiently than formatted code (because
+      there is less redundancy), but the total size after both steps is always smaller than either alone. Most production
+      deployments use minification at build time and compression at serve time for the best results.
+    </p>
+
+    <h2>Popular Build Tool Integrations</h2>
+    <p>
+      While online tools like this one are convenient for quick one-off tasks, production applications typically integrate
+      minification into their build pipeline so it happens automatically on every deploy.
+    </p>
+    <h3>Webpack</h3>
+    <p>
+      Webpack uses <strong>TerserPlugin</strong> by default in production mode. When you run <code>webpack --mode
+      production</code>, all JavaScript bundles are automatically minified and mangled. You can customize the Terser
+      configuration to preserve certain comments (such as license headers) or disable specific transformations. Webpack 5
+      also supports parallel minification across multiple CPU cores for faster build times on large projects.
+    </p>
+    <h3>Vite and Rollup</h3>
+    <p>
+      Vite uses <strong>esbuild</strong> for development builds and <strong>Rollup</strong> with Terser for production
+      builds. The <code>vite build</code> command produces minified output by default. Because esbuild is written in Go,
+      it is extremely fast, handling minification in milliseconds even for large bundles. Rollup's tree-shaking also
+      removes unused code before minification, further reducing output size.
+    </p>
+    <h3>esbuild</h3>
+    <p>
+      esbuild is a standalone bundler and minifier that is orders of magnitude faster than JavaScript-based tools. Running
+      <code>esbuild --minify</code> performs whitespace removal, comment stripping, and identifier mangling in a single
+      pass. It has become the preferred choice for projects that prioritize build speed, and many frameworks use it
+      internally.
+    </p>
+    <h3>SWC</h3>
+    <p>
+      SWC is a Rust-based compiler that also includes a minifier. Next.js uses SWC by default for both compilation and
+      minification. Like esbuild, SWC achieves its speed advantage by being written in a compiled language rather than
+      JavaScript. Its minifier supports the same configuration options as Terser, making migration straightforward.
+    </p>
+    <h3>Terser (Standalone)</h3>
+    <p>
+      Terser is the successor to UglifyJS and the most widely used JavaScript minifier in the ecosystem. It can be
+      invoked from the command line with <code>npx terser input.js -o output.min.js -c -m</code>. The <code>-c</code>
+      flag enables compression (dead code elimination, constant folding), and <code>-m</code> enables mangling. Terser
+      understands modern ES2015+ syntax, including arrow functions, destructuring, template literals, and async/await.
+    </p>
+    <h3>Closure Compiler</h3>
+    <p>
+      Google's Closure Compiler is the most aggressive JavaScript optimizer available. In its advanced mode, it performs
+      whole-program analysis, renames both local and global variables, inlines functions, and removes unreachable code.
+      The output can be dramatically smaller than what other tools produce, but advanced mode requires code to be annotated
+      with JSDoc type information and follow specific coding conventions. Simple mode behaves more like Terser and is
+      safer for general use.
+    </p>
+
+    <h2>About This Tool</h2>
+    <p>
+      This JavaScript minifier runs entirely in your browser. Your code is never sent to a server, making it safe to use
+      with proprietary or sensitive source code. The minifier processes the input character by character, correctly
+      handling string literals (single-quoted, double-quoted, and template literals) so that comment-like sequences
+      inside strings are preserved. It removes single-line and multi-line comments, collapses redundant whitespace, and
+      strips blank lines to produce compact output.
+    </p>
+    <p>
+      After minification, the stats bar shows the original size in bytes, the minified size in bytes, and the percentage
+      reduction. This gives you an immediate sense of how much bandwidth you will save by serving the minified version.
+      For production use, we recommend combining this with Gzip or Brotli compression on your server for maximum savings.
+    </p>
+    <p>
+      This tool performs whitespace and comment removal only. It does not rename variables (mangle), inline constants,
+      or perform dead-code elimination. For those advanced optimizations, use a build tool like Terser, esbuild, or SWC
+      as part of your automated build pipeline. However, for quick prototyping, reviewing compression potential, or
+      minifying small scripts and bookmarklets, this browser-based tool is fast and convenient.
+    </p>
+    <p>
+      Paste your JavaScript into the input area, click <strong>Minify</strong>, and copy the result. You can also use
+      the <strong>Clear</strong> button to reset both fields and start over. The tool accepts any valid JavaScript,
+      including ES2015+ syntax with arrow functions, template literals, destructuring, and async/await.
+    </p>
+  </article>
+
+  <AdUnit slot="tool-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .stats-bar {
+    display: flex;
+    gap: 20px;
+    padding: 10px 16px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 0.85rem;
+    margin-top: 8px;
+  }
+</style>
+
+<script>
+  const inputEl = document.getElementById('toolInput') as HTMLTextAreaElement;
+  const outputEl = document.getElementById('toolOutput') as HTMLTextAreaElement;
+  const minifyBtn = document.getElementById('minifyBtn') as HTMLButtonElement;
+  const clearBtn = document.getElementById('clearBtn') as HTMLButtonElement;
+  const copyBtn = document.getElementById('copyBtn') as HTMLButtonElement;
+  const errorDiv = document.getElementById('toolError') as HTMLDivElement;
+  const statsBar = document.getElementById('statsBar') as HTMLDivElement;
+  const origSizeEl = document.getElementById('origSize') as HTMLElement;
+  const minSizeEl = document.getElementById('minSize') as HTMLElement;
+  const savedPctEl = document.getElementById('savedPct') as HTMLElement;
+
+  function showError(message: string): void {
+    errorDiv.textContent = message;
+    errorDiv.hidden = false;
+  }
+
+  function hideError(): void {
+    errorDiv.textContent = '';
+    errorDiv.hidden = true;
+  }
+
+  function byteSize(str: string): number {
+    return new TextEncoder().encode(str).length;
+  }
+
+  function updateStats(original: string, minified: string): void {
+    const origBytes = byteSize(original);
+    const minBytes = byteSize(minified);
+    const saved = origBytes === 0 ? 0 : ((origBytes - minBytes) / origBytes) * 100;
+
+    origSizeEl.textContent = origBytes.toLocaleString();
+    minSizeEl.textContent = minBytes.toLocaleString();
+    savedPctEl.textContent = saved.toFixed(1) + '%';
+    statsBar.hidden = false;
+  }
+
+  function minifyJS(code: string): string {
+    let output = '';
+    let i = 0;
+    const len = code.length;
+
+    // Track whether the last character we wrote was a space
+    let lastWritten = '';
+
+    while (i < len) {
+      const ch = code[i];
+      const next = i + 1 < len ? code[i + 1] : '';
+
+      // --- Handle single-quoted strings ---
+      if (ch === "'") {
+        let str = "'";
+        i++;
+        while (i < len) {
+          if (code[i] === '\\' && i + 1 < len) {
+            str += code[i] + code[i + 1];
+            i += 2;
+          } else if (code[i] === "'") {
+            str += "'";
+            i++;
+            break;
+          } else {
+            str += code[i];
+            i++;
+          }
+        }
+        output += str;
+        lastWritten = str[str.length - 1];
+        continue;
+      }
+
+      // --- Handle double-quoted strings ---
+      if (ch === '"') {
+        let str = '"';
+        i++;
+        while (i < len) {
+          if (code[i] === '\\' && i + 1 < len) {
+            str += code[i] + code[i + 1];
+            i += 2;
+          } else if (code[i] === '"') {
+            str += '"';
+            i++;
+            break;
+          } else {
+            str += code[i];
+            i++;
+          }
+        }
+        output += str;
+        lastWritten = str[str.length - 1];
+        continue;
+      }
+
+      // --- Handle template literals ---
+      if (ch === '`') {
+        let str = '`';
+        i++;
+        while (i < len) {
+          if (code[i] === '\\' && i + 1 < len) {
+            str += code[i] + code[i + 1];
+            i += 2;
+          } else if (code[i] === '`') {
+            str += '`';
+            i++;
+            break;
+          } else {
+            str += code[i];
+            i++;
+          }
+        }
+        output += str;
+        lastWritten = str[str.length - 1];
+        continue;
+      }
+
+      // --- Handle single-line comments ---
+      if (ch === '/' && next === '/') {
+        // Skip until end of line
+        i += 2;
+        while (i < len && code[i] !== '\n') {
+          i++;
+        }
+        // Skip the newline itself
+        if (i < len) i++;
+        continue;
+      }
+
+      // --- Handle multi-line comments ---
+      if (ch === '/' && next === '*') {
+        i += 2;
+        while (i < len) {
+          if (code[i] === '*' && i + 1 < len && code[i + 1] === '/') {
+            i += 2;
+            break;
+          }
+          i++;
+        }
+        continue;
+      }
+
+      // --- Handle regex literals ---
+      // A / is a regex start if the previous non-whitespace token is one of:
+      // ( , ; = [ ! & | ? : ~ ^ % { } + - * / return typeof void delete
+      // Simplified: if lastWritten is one of these punctuation chars or output ends right after a keyword
+      if (ch === '/' && next !== '/' && next !== '*') {
+        const canBeRegex = /[=(:,;[!&|?+\-~^%{<>]/.test(lastWritten) || lastWritten === '' || lastWritten === '\n';
+        if (canBeRegex) {
+          let str = '/';
+          i++;
+          while (i < len) {
+            if (code[i] === '\\' && i + 1 < len) {
+              str += code[i] + code[i + 1];
+              i += 2;
+            } else if (code[i] === '/') {
+              str += '/';
+              i++;
+              // Consume flags (g, i, m, s, u, y, d)
+              while (i < len && /[gimsuyDd]/.test(code[i])) {
+                str += code[i];
+                i++;
+              }
+              break;
+            } else if (code[i] === '[') {
+              // Character class - / inside does not end regex
+              str += code[i];
+              i++;
+              while (i < len && code[i] !== ']') {
+                if (code[i] === '\\' && i + 1 < len) {
+                  str += code[i] + code[i + 1];
+                  i += 2;
+                } else {
+                  str += code[i];
+                  i++;
+                }
+              }
+              if (i < len) {
+                str += code[i]; // the ]
+                i++;
+              }
+            } else {
+              str += code[i];
+              i++;
+            }
+          }
+          output += str;
+          lastWritten = str[str.length - 1];
+          continue;
+        }
+      }
+
+      // --- Handle whitespace ---
+      if (ch === ' ' || ch === '\t' || ch === '\n' || ch === '\r') {
+        // Collapse all consecutive whitespace
+        while (i < len && (code[i] === ' ' || code[i] === '\t' || code[i] === '\n' || code[i] === '\r')) {
+          i++;
+        }
+
+        // Decide whether to emit a single space.
+        // A space is needed between two identifier/keyword characters or between
+        // a keyword and a non-punctuation token to prevent them from merging.
+        if (output.length > 0 && i < len) {
+          const prev = output[output.length - 1];
+          const nextCh = code[i];
+          const isIdentPrev = /[a-zA-Z0-9_$]/.test(prev);
+          const isIdentNext = /[a-zA-Z0-9_$]/.test(nextCh);
+          if (isIdentPrev && isIdentNext) {
+            output += ' ';
+            lastWritten = ' ';
+          }
+        }
+        continue;
+      }
+
+      // --- Everything else: keep as-is ---
+      output += ch;
+      lastWritten = ch;
+      i++;
+    }
+
+    return output.trim();
+  }
+
+  function handleMinify(): void {
+    const raw = inputEl.value;
+    hideError();
+
+    if (!raw.trim()) {
+      outputEl.value = '';
+      statsBar.hidden = true;
+      return;
+    }
+
+    try {
+      const minified = minifyJS(raw);
+      outputEl.value = minified;
+      updateStats(raw, minified);
+    } catch (err) {
+      outputEl.value = '';
+      statsBar.hidden = true;
+      showError('Minification failed: ' + (err instanceof Error ? err.message : String(err)));
+    }
+  }
+
+  function clearAll(): void {
+    inputEl.value = '';
+    outputEl.value = '';
+    statsBar.hidden = true;
+    hideError();
+    inputEl.focus();
+  }
+
+  async function copyOutput(): Promise<void> {
+    const text = outputEl.value;
+    if (!text) return;
+
+    try {
+      await navigator.clipboard.writeText(text);
+      copyBtn.textContent = 'Copied!';
+      copyBtn.classList.add('copied');
+      setTimeout(() => {
+        copyBtn.textContent = 'Copy';
+        copyBtn.classList.remove('copied');
+      }, 1500);
+    } catch {
+      outputEl.select();
+      document.execCommand('copy');
+      copyBtn.textContent = 'Copied!';
+      copyBtn.classList.add('copied');
+      setTimeout(() => {
+        copyBtn.textContent = 'Copy';
+        copyBtn.classList.remove('copied');
+      }, 1500);
+    }
+  }
+
+  minifyBtn.addEventListener('click', handleMinify);
+  clearBtn.addEventListener('click', clearAll);
+  copyBtn.addEventListener('click', copyOutput);
+</script>

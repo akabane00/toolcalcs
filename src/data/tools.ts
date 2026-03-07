@@ -66,6 +66,96 @@ export const tools: WebTool[] = [
     description: 'Compress and resize images in your browser. Reduce file size while maintaining quality. No upload needed.',
     icon: '🖼️',
   },
+  {
+    title: 'Word Counter',
+    slug: 'word-counter',
+    description: 'Count words, characters, sentences, and paragraphs in your text instantly. See reading time and keyword density.',
+    icon: '📝',
+  },
+  {
+    title: 'Random Number Generator',
+    slug: 'random-number-generator',
+    description: 'Generate random numbers, pick from ranges, roll dice, or shuffle lists. Cryptographically secure randomness.',
+    icon: '🎲',
+  },
+  {
+    title: 'Pomodoro Timer',
+    slug: 'pomodoro-timer',
+    description: 'Focus timer using the Pomodoro Technique. Work 25 min, break 5 min. Track your productivity sessions.',
+    icon: '🍅',
+  },
+  {
+    title: 'URL Encoder/Decoder',
+    slug: 'url-encoder-decoder',
+    description: 'Encode or decode URL components. Handle special characters for safe URLs. Supports full Unicode.',
+    icon: '🔗',
+  },
+  {
+    title: 'UUID Generator',
+    slug: 'uuid-generator',
+    description: 'Generate UUID v4 identifiers. Create single or bulk unique IDs instantly with copy support.',
+    icon: '🆔',
+  },
+  {
+    title: 'Unix Timestamp Converter',
+    slug: 'unix-timestamp-converter',
+    description: 'Convert between Unix timestamps and human-readable dates. Live clock with seconds and milliseconds.',
+    icon: '🕐',
+  },
+  {
+    title: 'JWT Decoder',
+    slug: 'jwt-decoder',
+    description: 'Decode and inspect JSON Web Tokens. View header, payload, expiration status, and claim details.',
+    icon: '🔓',
+  },
+  {
+    title: 'Diff Checker',
+    slug: 'diff-checker',
+    description: 'Compare two texts side by side and highlight the differences line by line. See additions, deletions, and changes.',
+    icon: '🔀',
+  },
+  {
+    title: 'Markdown Preview',
+    slug: 'markdown-preview',
+    description: 'Write Markdown and see the rendered HTML preview in real time. Supports headings, lists, code, tables, and more.',
+    icon: '📑',
+  },
+  {
+    title: 'CSS Minifier',
+    slug: 'css-minifier',
+    description: 'Minify CSS code by removing whitespace, comments, and redundant rules. See compression ratio instantly.',
+    icon: '🎯',
+  },
+  {
+    title: 'JavaScript Minifier',
+    slug: 'javascript-minifier',
+    description: 'Minify JavaScript by removing whitespace, comments, and unnecessary characters. Compare file sizes.',
+    icon: '⚡',
+  },
+  {
+    title: 'HTML Entity Encoder/Decoder',
+    slug: 'html-entity-encoder',
+    description: 'Encode special characters to HTML entities or decode them back to text. Supports named and numeric references.',
+    icon: '🏷️',
+  },
+  {
+    title: 'Cron Expression Generator',
+    slug: 'cron-expression-generator',
+    description: 'Build and validate cron expressions with a visual editor. See human-readable descriptions and next run times.',
+    icon: '⏰',
+  },
+  {
+    title: 'Slug Generator',
+    slug: 'slug-generator',
+    description: 'Convert text to URL-friendly slugs. Remove accents, special characters, and spaces automatically.',
+    icon: '🔤',
+  },
+  {
+    title: 'Meta Tag Generator',
+    slug: 'meta-tag-generator',
+    description: 'Generate HTML meta tags for SEO, Open Graph, and Twitter Cards. Preview how your page looks in search results.',
+    icon: '🏗️',
+  },
 ];
 
 export function getToolBySlug(slug: string): WebTool | undefined {

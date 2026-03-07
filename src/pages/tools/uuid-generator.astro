@@ -1,0 +1,460 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getToolBySlug } from '../../data/tools';
+import '../../styles/tool.css';
+
+const tool = getToolBySlug('uuid-generator')!;
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Web Tools", "item": "https://toolcalcs.com/tools/" },
+      { "@type": "ListItem", "position": 3, "name": "UUID Generator" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "UUID Generator",
+    "url": "https://toolcalcs.com/tools/uuid-generator/",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Generate UUID v4 identifiers instantly. Create single or bulk unique IDs with copy support."
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is a UUID and what does it stand for?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'UUID stands for Universally Unique Identifier. It is a 128-bit label used to uniquely identify information in computer systems without requiring a central coordinating authority. UUIDs are standardized by RFC 4122 and are represented as 32 hexadecimal digits displayed in five groups separated by hyphens, following the pattern 8-4-4-4-12 (e.g., 550e8400-e29b-41d4-a716-446655440000).',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How unique is a UUID v4?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'A UUID v4 has 122 random bits, producing approximately 5.3 undecillion (5.3 x 10^36) possible values. The probability of generating two identical UUIDs is astronomically low. You would need to generate about 2.71 quintillion UUIDs to have a 50% chance of a single collision. In practical terms, if you generated one billion UUIDs per second, it would take about 85 years to reach a 50% collision probability.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'When should I use UUIDs instead of auto-incrementing IDs?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Use UUIDs when you need to generate IDs across distributed systems without coordination, when you want to prevent sequential ID enumeration for security, when merging data from multiple databases, or when creating IDs on the client side before inserting into a database. Auto-incrementing IDs are better when you need compact storage, human-readable identifiers, or guaranteed ordering without additional timestamp columns.',
+        },
+      },
+    ],
+  }
+];
+---
+
+<BaseLayout
+  title="UUID Generator - Generate UUIDs Online | ToolCalcs"
+  description={tool.description}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/tools/">Web Tools</a> &rsaquo; <span>UUID Generator</span>
+  </nav>
+
+  <h1>UUID Generator</h1>
+  <p class="page-desc">Generate version 4 UUIDs (universally unique identifiers) instantly. Create single or bulk UUIDs with options for uppercase, lowercase, and hyphen formatting. Everything runs in your browser.</p>
+
+  <div class="tool-box">
+    <div class="uuid-display-wrapper">
+      <output class="uuid-display" id="uuidOutput" aria-live="polite">Generating...</output>
+      <button class="copy-btn" id="copyInlineBtn" type="button" title="Copy UUID to clipboard">Copy</button>
+    </div>
+
+    <div class="tool-controls">
+      <button class="tool-btn primary" id="generateBtn" type="button">Generate New</button>
+    </div>
+
+    <div class="tool-options">
+      <div class="tool-option">
+        <label for="quantityInput">Quantity</label>
+        <input type="number" id="quantityInput" min="1" max="100" value="1" />
+      </div>
+      <div class="tool-option toggle-option">
+        <label>Format</label>
+        <div class="toggle-group">
+          <button type="button" class="toggle-btn active" id="lowercaseBtn" data-format="lowercase">lowercase</button>
+          <button type="button" class="toggle-btn" id="uppercaseBtn" data-format="uppercase">UPPERCASE</button>
+        </div>
+      </div>
+      <div class="tool-option toggle-option">
+        <label>Hyphens</label>
+        <div class="toggle-group">
+          <button type="button" class="toggle-btn active" id="hyphensOnBtn" data-hyphens="on">Include</button>
+          <button type="button" class="toggle-btn" id="hyphensOffBtn" data-hyphens="off">Exclude</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bulk-area" id="bulkArea" hidden>
+      <div class="output-header">
+        <label class="tool-label" for="bulkOutput">Bulk UUIDs</label>
+        <button type="button" class="copy-btn" id="copyAllBtn">Copy All</button>
+      </div>
+      <textarea id="bulkOutput" class="tool-textarea" readonly spellcheck="false"></textarea>
+    </div>
+
+    <div class="tool-error" id="toolError" hidden></div>
+  </div>
+
+  <AdUnit slot="tool-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is a UUID?</h2>
+    <p>A UUID, or Universally Unique Identifier, is a 128-bit label used to uniquely identify information in computer systems. Unlike sequential identifiers assigned by a central authority, UUIDs can be generated independently by any machine or process with an extremely high guarantee that the resulting value is unique across all systems, all time, and all space. The standard is formally defined in RFC 4122 and has become one of the most widely used identification schemes in modern software development.</p>
+    <p>A UUID is represented as 32 hexadecimal digits organized into five groups separated by hyphens, following the pattern <code>8-4-4-4-12</code>. A typical UUID looks like <code>550e8400-e29b-41d4-a716-446655440000</code>. The total string length is 36 characters including the four hyphens. Despite their seemingly random appearance, UUIDs follow a well-defined internal structure: certain bits encode the version (which generation algorithm was used) and the variant (which UUID specification the identifier conforms to).</p>
+    <p>UUIDs were originally created by the Open Software Foundation as part of the Distributed Computing Environment. They were designed to solve a specific problem: how do you create a unique identifier without consulting a central naming authority? In a world of distributed systems, microservices, and offline-capable applications, this requirement is more relevant than ever. UUIDs allow any node in a distributed system to generate identifiers independently, with virtual certainty that no two nodes will ever produce the same value.</p>
+
+    <h2>UUID Versions Explained</h2>
+    <p>The UUID specification defines five versions, each using a different algorithm to generate the 128-bit value. Understanding the differences helps you choose the right version for your use case.</p>
+    <h3>Version 1: Time-Based UUID</h3>
+    <p>UUID v1 combines the current timestamp (measured in 100-nanosecond intervals since October 15, 1582) with the MAC address of the generating machine. This guarantees uniqueness as long as the clock does not go backward and the MAC address is unique. The downside is that v1 UUIDs expose both the time of creation and the hardware address of the generating machine, which can be a privacy and security concern. The timestamp is encoded in a specific layout across the first three groups of the UUID, with the version nibble (0001) embedded in the third group.</p>
+    <h3>Version 2: DCE Security UUID</h3>
+    <p>UUID v2 is a variant of v1 used in the Distributed Computing Environment (DCE) for security purposes. It replaces part of the timestamp with a local domain identifier (such as a POSIX UID or GID). Version 2 UUIDs are rarely used in modern systems because their specification is not fully documented in RFC 4122 and they have a much higher collision risk due to the reduced timestamp precision.</p>
+    <h3>Version 3: Name-Based UUID (MD5)</h3>
+    <p>UUID v3 generates a deterministic identifier by hashing a namespace identifier and a name using the MD5 algorithm. Given the same namespace and name, the resulting UUID is always identical. This is useful when you need reproducible identifiers derived from existing data, such as generating a UUID from a URL or a domain name. The namespace is itself a UUID (several standard namespaces are predefined for DNS, URLs, OIDs, and X.500 names). Because MD5 is considered cryptographically broken, UUID v5 is generally preferred for new applications.</p>
+    <h3>Version 4: Random UUID</h3>
+    <p>UUID v4 is the most widely used version today. It generates identifiers using random or pseudo-random numbers. Of the 128 bits, 6 are fixed (4 bits for the version number 0100 and 2 bits for the variant 10), leaving 122 bits of randomness. This produces approximately 5.3 undecillion (5.3 times 10 to the 36th power) possible values. UUID v4 is the version generated by this tool, using the Web Crypto API for cryptographically secure randomness.</p>
+    <h3>Version 5: Name-Based UUID (SHA-1)</h3>
+    <p>UUID v5 works identically to v3 but uses the SHA-1 hash function instead of MD5. Like v3, it produces deterministic UUIDs from a namespace and name pair. Since SHA-1 provides a stronger hash than MD5 (though SHA-1 itself is no longer considered collision-resistant for cryptographic purposes), v5 is the recommended choice for name-based UUID generation. The first 128 bits of the SHA-1 digest are used, with the version and variant bits overwritten.</p>
+
+    <h2>UUID v4 Format and Structure</h2>
+    <p>A UUID v4 follows the standard 8-4-4-4-12 hexadecimal format. The string representation consists of 32 hexadecimal characters and 4 hyphens for a total length of 36 characters. Here is how the structure breaks down:</p>
+    <ul>
+      <li><strong>Positions 1-8:</strong> Eight random hexadecimal digits forming the time_low field.</li>
+      <li><strong>Positions 10-13:</strong> Four random hexadecimal digits forming the time_mid field.</li>
+      <li><strong>Positions 15-18:</strong> The version nibble (always 4 for v4) followed by three random hexadecimal digits, forming the time_hi_and_version field.</li>
+      <li><strong>Positions 20-23:</strong> The variant bits (10 in binary) in the first two bits of the first digit, followed by random bits for the remaining digits, forming the clock_seq_hi_and_reserved and clock_seq_low fields.</li>
+      <li><strong>Positions 25-36:</strong> Twelve random hexadecimal digits forming the node field.</li>
+    </ul>
+    <p>In a v4 UUID like <code>f47ac10b-58cc-<strong>4</strong>372-<strong>a</strong>567-0e02b2c3d479</code>, the bold digit 4 indicates version 4, and the bold letter a (binary 1010) indicates the variant. The first two bits of the variant octet are always 10, meaning the first hex digit of the fourth group will always be 8, 9, a, or b.</p>
+
+    <h2>When to Use UUIDs</h2>
+    <p>UUIDs are the right choice in several common scenarios. In distributed systems where multiple servers or services need to create records independently, UUIDs eliminate the need for a centralized ID-generation service. Each node can generate identifiers autonomously without any risk of collision, which simplifies architecture and removes a single point of failure.</p>
+    <p>UUIDs are also valuable for security. Sequential auto-incrementing IDs reveal information about your system: they expose how many records exist, allow attackers to enumerate resources by incrementing the ID, and can leak creation order. UUIDs, being random and unpredictable, make it much harder for unauthorized users to guess valid resource identifiers. This is particularly important for public-facing APIs where resource IDs appear in URLs.</p>
+    <p>Database merging and data migration are another strong use case. When combining records from multiple databases that each use auto-incrementing primary keys, ID conflicts are inevitable. If every record already has a UUID, merging is trivial because no two records will share the same identifier regardless of which database they originated from.</p>
+    <p>Client-side ID generation is increasingly common in modern web and mobile applications. With UUIDs, the client can assign an identifier to a new record before it is sent to the server. This enables optimistic UI updates, offline-first architectures, and idempotent API requests. If a network request fails and is retried, the server can detect the duplicate UUID and avoid creating a duplicate record.</p>
+
+    <h2>UUID vs Auto-Increment IDs</h2>
+    <p>Auto-incrementing integer IDs have been the default primary key strategy in relational databases for decades, and they still have legitimate advantages. They are compact (typically 4 or 8 bytes compared to 16 bytes for a UUID), human-readable, naturally ordered by creation time, and produce sequential values that are friendly to B-tree indexes. For a single-database application with no distributed components, auto-incrementing IDs are often the simpler and more performant choice.</p>
+    <p>However, UUIDs offer advantages that auto-incrementing IDs cannot match. They are globally unique without requiring database coordination, making them ideal for microservices, event sourcing, and distributed architectures. They do not expose record counts or creation order, improving security. They allow client-side generation, enabling offline-capable applications. And they make database sharding and merging straightforward because there are no ID collisions to resolve.</p>
+    <p>The performance trade-off is worth considering. Random UUIDs can cause index fragmentation in databases that use clustered indexes on the primary key, because new records are inserted at random positions rather than appended to the end. Some databases mitigate this with UUID-specific optimizations, and newer UUID formats like UUIDv7 (which includes a timestamp prefix) are designed to be naturally sortable while retaining the benefits of global uniqueness.</p>
+
+    <h2>Collision Probability</h2>
+    <p>One of the most common questions about UUIDs is whether two independently generated values could ever be the same. The answer is: theoretically yes, but practically no. UUID v4 has 122 random bits, yielding approximately 5.3 times 10 to the 36th power possible values. To put this number in perspective, there are roughly 10 to the 80th power atoms in the observable universe, and the number of possible UUID v4 values is on a comparable scale of magnitude.</p>
+    <p>The birthday problem from probability theory gives us the collision threshold. You would need to generate approximately 2.71 quintillion (2.71 times 10 to the 18th power) UUIDs before the probability of at least one collision reaches 50%. If you generated one billion UUIDs per second continuously, it would take approximately 85 years to reach this 50% threshold. For most practical applications, which generate millions or even billions of UUIDs over their lifetime, the collision probability is so small that it is effectively zero.</p>
+    <p>That said, the collision guarantee depends entirely on the quality of the random number generator. A flawed or poorly seeded random number generator can produce predictable output, dramatically increasing collision probability. This tool uses <code>crypto.randomUUID()</code> when available, falling back to <code>crypto.getRandomValues()</code>, both of which provide cryptographically secure randomness drawn from the operating system's entropy pool.</p>
+
+    <h2>About This Tool</h2>
+    <p>This UUID generator runs entirely in your browser using JavaScript. No data is sent to any server. It uses the native <code>crypto.randomUUID()</code> API when available in your browser, with a polyfill that uses <code>crypto.getRandomValues()</code> for older browsers. You can generate single UUIDs or bulk generate up to 100 at once, with options to switch between uppercase and lowercase formatting and to include or exclude hyphens. All generated UUIDs conform to the UUID v4 specification as defined in RFC 4122.</p>
+
+    <h2>Related Tools</h2>
+    <ul>
+      <li><a href="/tools/hash-generator/">Hash Generator</a> -- Generate MD5, SHA-1, SHA-256, and other hashes from text.</li>
+      <li><a href="/tools/password-generator/">Password Generator</a> -- Create strong, random passwords with customizable options.</li>
+      <li><a href="/tools/base64-encoder-decoder/">Base64 Encoder/Decoder</a> -- Encode and decode Base64 strings.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="tool-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .uuid-display-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+  }
+  .uuid-display {
+    flex: 1;
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 1.35rem;
+    font-weight: 600;
+    word-break: break-all;
+    line-height: 1.5;
+    color: var(--color-text);
+    user-select: all;
+    -webkit-user-select: all;
+    min-height: 1.5em;
+    letter-spacing: 0.02em;
+  }
+
+  .tool-options {
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .toggle-option {
+    flex-direction: column !important;
+  }
+  .toggle-group {
+    display: flex;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .toggle-btn {
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: none;
+    background: var(--color-bg);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .toggle-btn + .toggle-btn {
+    border-left: 1px solid var(--color-border);
+  }
+  .toggle-btn.active {
+    background: var(--color-primary);
+    color: #fff;
+  }
+  .toggle-btn:hover:not(.active) {
+    background: var(--color-surface);
+  }
+
+  .bulk-area {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border);
+  }
+  .bulk-area .tool-textarea {
+    min-height: 160px;
+    margin-top: 8px;
+  }
+
+  #quantityInput {
+    width: 80px;
+  }
+
+  @media (max-width: 640px) {
+    .uuid-display {
+      font-size: 1rem;
+    }
+    .uuid-display-wrapper {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .uuid-display-wrapper .copy-btn {
+      align-self: flex-end;
+    }
+  }
+</style>
+
+<script>
+  // --- UUID Generation ---
+  function generateUUID(): string {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID();
+    }
+    // Polyfill using crypto.getRandomValues
+    const bytes = new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+    bytes[6] = (bytes[6] & 0x0f) | 0x40; // version 4
+    bytes[8] = (bytes[8] & 0x3f) | 0x80; // variant 10
+    const hex = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+  }
+
+  // --- DOM References ---
+  const uuidOutput = document.getElementById('uuidOutput') as HTMLElement;
+  const generateBtn = document.getElementById('generateBtn') as HTMLButtonElement;
+  const copyInlineBtn = document.getElementById('copyInlineBtn') as HTMLButtonElement;
+  const quantityInput = document.getElementById('quantityInput') as HTMLInputElement;
+  const lowercaseBtn = document.getElementById('lowercaseBtn') as HTMLButtonElement;
+  const uppercaseBtn = document.getElementById('uppercaseBtn') as HTMLButtonElement;
+  const hyphensOnBtn = document.getElementById('hyphensOnBtn') as HTMLButtonElement;
+  const hyphensOffBtn = document.getElementById('hyphensOffBtn') as HTMLButtonElement;
+  const bulkArea = document.getElementById('bulkArea') as HTMLDivElement;
+  const bulkOutput = document.getElementById('bulkOutput') as HTMLTextAreaElement;
+  const copyAllBtn = document.getElementById('copyAllBtn') as HTMLButtonElement;
+  const errorEl = document.getElementById('toolError') as HTMLDivElement;
+
+  // --- State ---
+  let useUppercase = false;
+  let includeHyphens = true;
+
+  // --- Helpers ---
+  function formatUUID(uuid: string): string {
+    let result = uuid;
+    if (!includeHyphens) {
+      result = result.replace(/-/g, '');
+    }
+    if (useUppercase) {
+      result = result.toUpperCase();
+    }
+    return result;
+  }
+
+  function showError(message: string): void {
+    errorEl.textContent = message;
+    errorEl.hidden = false;
+  }
+
+  function clearError(): void {
+    errorEl.textContent = '';
+    errorEl.hidden = true;
+  }
+
+  function showCopyFeedback(btn: HTMLButtonElement): void {
+    const original = btn.textContent;
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = original;
+      btn.classList.remove('copied');
+    }, 1500);
+  }
+
+  async function copyToClipboard(text: string, btn: HTMLButtonElement): Promise<void> {
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      showCopyFeedback(btn);
+    } catch {
+      // Fallback for older browsers or non-secure contexts
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      showCopyFeedback(btn);
+    }
+  }
+
+  // --- Core Generate Function ---
+  function generate(): void {
+    clearError();
+
+    const quantity = Math.min(100, Math.max(1, parseInt(quantityInput.value) || 1));
+    quantityInput.value = String(quantity);
+
+    if (quantity === 1) {
+      const uuid = formatUUID(generateUUID());
+      uuidOutput.textContent = uuid;
+      bulkArea.hidden = true;
+      bulkOutput.value = '';
+    } else {
+      const uuids: string[] = [];
+      for (let i = 0; i < quantity; i++) {
+        uuids.push(formatUUID(generateUUID()));
+      }
+      uuidOutput.textContent = uuids[0];
+      bulkOutput.value = uuids.join('\n');
+      bulkArea.hidden = false;
+    }
+  }
+
+  // --- Toggle Handlers ---
+  function setFormatToggle(uppercase: boolean): void {
+    useUppercase = uppercase;
+    if (uppercase) {
+      uppercaseBtn.classList.add('active');
+      lowercaseBtn.classList.remove('active');
+    } else {
+      lowercaseBtn.classList.add('active');
+      uppercaseBtn.classList.remove('active');
+    }
+    // Re-format existing output
+    reformat();
+  }
+
+  function setHyphensToggle(hyphens: boolean): void {
+    includeHyphens = hyphens;
+    if (hyphens) {
+      hyphensOnBtn.classList.add('active');
+      hyphensOffBtn.classList.remove('active');
+    } else {
+      hyphensOffBtn.classList.add('active');
+      hyphensOnBtn.classList.remove('active');
+    }
+    // Re-format existing output
+    reformat();
+  }
+
+  function reformat(): void {
+    // Re-format the single UUID display
+    const current = uuidOutput.textContent || '';
+    if (current && current !== 'Generating...') {
+      // Normalize back to lowercase with hyphens, then re-format
+      let normalized = current.toLowerCase();
+      // If it has no hyphens, add them back for re-formatting
+      if (normalized.length === 32 && !normalized.includes('-')) {
+        normalized = `${normalized.slice(0, 8)}-${normalized.slice(8, 12)}-${normalized.slice(12, 16)}-${normalized.slice(16, 20)}-${normalized.slice(20)}`;
+      }
+      uuidOutput.textContent = formatUUID(normalized);
+    }
+
+    // Re-format bulk output
+    if (!bulkArea.hidden && bulkOutput.value) {
+      const lines = bulkOutput.value.split('\n').filter(l => l.trim());
+      const reformatted = lines.map(line => {
+        let normalized = line.toLowerCase().replace(/-/g, '');
+        const withHyphens = `${normalized.slice(0, 8)}-${normalized.slice(8, 12)}-${normalized.slice(12, 16)}-${normalized.slice(16, 20)}-${normalized.slice(20)}`;
+        return formatUUID(withHyphens);
+      });
+      bulkOutput.value = reformatted.join('\n');
+    }
+  }
+
+  // --- Event Listeners ---
+  generateBtn.addEventListener('click', generate);
+
+  copyInlineBtn.addEventListener('click', () => {
+    const text = uuidOutput.textContent || '';
+    if (text && text !== 'Generating...') {
+      copyToClipboard(text, copyInlineBtn);
+    }
+  });
+
+  copyAllBtn.addEventListener('click', () => {
+    const text = bulkOutput.value;
+    if (text) {
+      copyToClipboard(text, copyAllBtn);
+    }
+  });
+
+  lowercaseBtn.addEventListener('click', () => setFormatToggle(false));
+  uppercaseBtn.addEventListener('click', () => setFormatToggle(true));
+  hyphensOnBtn.addEventListener('click', () => setHyphensToggle(true));
+  hyphensOffBtn.addEventListener('click', () => setHyphensToggle(false));
+
+  quantityInput.addEventListener('change', () => {
+    const val = parseInt(quantityInput.value) || 1;
+    quantityInput.value = String(Math.min(100, Math.max(1, val)));
+  });
+
+  // --- Generate on Load ---
+  generate();
+</script>
