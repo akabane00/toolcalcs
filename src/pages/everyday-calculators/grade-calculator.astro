@@ -1,0 +1,408 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Everyday Calculators",
+        "item": "https://toolcalcs.com/everyday-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Grade Calculator"
+      }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How do you calculate a weighted grade?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'To calculate a weighted grade, multiply each assignment score (as a percentage) by its weight, sum all the weighted values, and divide by the total weight. For example, if a test worth 40% of your grade earned 85% and homework worth 60% earned 92%, the weighted grade is (85 times 0.40 plus 92 times 0.60) divided by 1.0, which equals 34 plus 55.2 equals 89.2%.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What GPA is a B+?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'On the standard 4.0 GPA scale used by most US colleges and universities, a B+ corresponds to a GPA of 3.3. This grade typically falls in the 87% to 89% range, though the exact cutoffs vary by institution. An A is 4.0, a B is 3.0, a C is 2.0, a D is 1.0, and an F is 0.0.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How do you calculate the grade needed on a final exam?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Use the formula: Needed Score = (Desired Grade - Current Grade times (1 - Final Weight)) divided by Final Weight. For example, if you have a 78% and the final is worth 30% of the grade and you want a B (83%), you need (83 - 78 times 0.70) / 0.30 = (83 - 54.6) / 0.30 = 94.7% on the final.',
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Grade Calculator - Calculate Weighted & Simple Average Grades | ToolCalcs"
+  description="Free grade calculator. Calculate your overall course grade using simple or weighted averages. See letter grade, GPA equivalent, and what you need on your final exam."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/everyday-calculators/">Everyday Calculators</a> &rsaquo;
+    <span>Grade Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Grade Calculator</h1>
+  <p class="page-desc">Calculate your overall course grade with simple or weighted averages. Add assignments, see your letter grade and GPA, and find out what you need on your final.</p>
+
+  <div class="calculator-box">
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="simpleBtn" data-mode="simple">Simple Average</button>
+      <button class="mode-btn" id="weightedBtn" data-mode="weighted">Weighted Average</button>
+    </div>
+
+    <div class="grade-table-wrapper">
+      <table class="grade-table" id="gradeTable">
+        <thead>
+          <tr>
+            <th>Assignment</th>
+            <th>Score</th>
+            <th>Max Score</th>
+            <th class="weight-col hidden">Weight (%)</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="gradeBody">
+        </tbody>
+      </table>
+    </div>
+    <button class="add-row-btn" id="addRowBtn">+ Add Assignment</button>
+
+    <div class="calc-results" style="margin-top: 20px;">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Overall Percentage</span>
+          <span class="result-value" id="overallPct">--</span>
+        </div>
+        <div class="result-card primary">
+          <span class="result-label">Letter Grade</span>
+          <span class="result-value" id="letterGrade">--</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">GPA Equivalent</span>
+          <span class="result-value" id="gpaValue">--</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="final-grade-section">
+      <h3>What do I need on my final?</h3>
+      <div class="calc-inputs" style="margin-bottom: 12px;">
+        <div class="input-group">
+          <label for="desiredGrade">Desired Grade (%)</label>
+          <input type="number" id="desiredGrade" value="90" min="0" max="100" step="0.1" />
+        </div>
+        <div class="input-group">
+          <label for="finalWeight">Final Exam Weight (%)</label>
+          <input type="number" id="finalWeight" value="30" min="0" max="100" step="0.1" />
+        </div>
+      </div>
+      <div class="result-card" style="text-align: center;">
+        <span class="result-label">Score Needed on Final</span>
+        <span class="result-value" id="neededScore">--</span>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>How to Calculate Your Grade</h2>
+    <p>Understanding how your grade is calculated is essential for academic success. Most courses use one of two methods: simple averaging or weighted averaging. Knowing which method your instructor uses and how to calculate your standing allows you to plan your study time effectively, prioritize assignments, and determine exactly what score you need on upcoming tests to achieve your target grade.</p>
+    <p>A simple average treats all assignments equally. Each assignment contributes the same amount to your overall grade, regardless of whether it is a quiz, homework, or major exam. To calculate a simple average, divide each assignment's score by its maximum score to get a percentage, add all the percentages together, and divide by the number of assignments.</p>
+    <div class="formula-box">
+      <code>Simple Average = (&sum; Score/MaxScore) / Number of Assignments &times; 100</code>
+    </div>
+    <p>A weighted average assigns different importance to different categories of assignments. For example, exams might be worth 50% of your grade, homework 30%, and participation 20%. To calculate a weighted average, multiply each assignment's percentage score by its weight, sum the weighted values, and divide by the total weight.</p>
+    <div class="formula-box">
+      <code>Weighted Average = &sum;(Score/MaxScore &times; Weight) / &sum;Weights &times; 100</code>
+    </div>
+    <p><strong>Example (Simple):</strong> You earned 85/100 on Test 1, 92/100 on Test 2, and 78/100 on Test 3. Your average is (0.85 + 0.92 + 0.78) / 3 &times; 100 = 85.0%.</p>
+    <p><strong>Example (Weighted):</strong> You earned 88% on Exams (worth 50%), 95% on Homework (worth 30%), and 80% on Participation (worth 20%). Your weighted average is (88 &times; 0.50 + 95 &times; 0.30 + 80 &times; 0.20) / 1.0 = 44 + 28.5 + 16 = 88.5%.</p>
+
+    <h2>The Standard Letter Grade Scale</h2>
+    <p>Most American schools and universities use a letter grade system tied to percentage ranges. While the exact cutoffs can vary by institution and instructor, the most common scale is:</p>
+    <div class="table-responsive">
+      <table class="info-table">
+        <thead>
+          <tr><th>Letter Grade</th><th>Percentage Range</th><th>GPA (4.0 Scale)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>A+</td><td>97&ndash;100%</td><td>4.0</td></tr>
+          <tr><td>A</td><td>93&ndash;96%</td><td>4.0</td></tr>
+          <tr><td>A&ndash;</td><td>90&ndash;92%</td><td>3.7</td></tr>
+          <tr><td>B+</td><td>87&ndash;89%</td><td>3.3</td></tr>
+          <tr><td>B</td><td>83&ndash;86%</td><td>3.0</td></tr>
+          <tr><td>B&ndash;</td><td>80&ndash;82%</td><td>2.7</td></tr>
+          <tr><td>C+</td><td>77&ndash;79%</td><td>2.3</td></tr>
+          <tr><td>C</td><td>73&ndash;76%</td><td>2.0</td></tr>
+          <tr><td>C&ndash;</td><td>70&ndash;72%</td><td>1.7</td></tr>
+          <tr><td>D+</td><td>67&ndash;69%</td><td>1.3</td></tr>
+          <tr><td>D</td><td>63&ndash;66%</td><td>1.0</td></tr>
+          <tr><td>D&ndash;</td><td>60&ndash;62%</td><td>0.7</td></tr>
+          <tr><td>F</td><td>Below 60%</td><td>0.0</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Some schools do not use plus/minus grading and have simpler scales (A: 90-100, B: 80-89, C: 70-79, D: 60-69, F: below 60). Always check your institution's specific grading policy, as it may differ from the standard scale.</p>
+
+    <h2>Understanding Weighted Grades</h2>
+    <p>Weighted grading is the most common system in college and university courses. It reflects the idea that different types of assessments should carry different levels of importance in determining your final grade. Here is how it typically works:</p>
+    <p>An instructor might set up a course with the following weight distribution: Exams 40%, Homework 25%, Labs 20%, Participation 10%, and a Final Project 5%. These weights add up to 100%. Your performance in each category is multiplied by its weight to determine its contribution to your overall grade.</p>
+    <p>The critical insight about weighted grades is that not all points are created equal. A 10-point homework assignment in a category worth 25% of your grade has much less impact than a 100-point exam in a category worth 40%. This means you should allocate your study time proportionally to the weight of each assessment category. Spending days perfecting a 2% participation assignment at the expense of preparing for a 40% exam is a poor strategic choice.</p>
+    <p>To track your standing during the semester, you can calculate your grade using only the assignments completed so far. Sum the weighted scores and divide by the sum of the weights for completed categories. As more assignments are graded, your calculated grade will become increasingly accurate.</p>
+
+    <h2>How to Calculate the Grade You Need on a Final</h2>
+    <p>One of the most common questions students ask is "What do I need on the final to get a B?" The formula for calculating the required score depends on your current grade, the final exam weight, and your desired overall grade:</p>
+    <div class="formula-box">
+      <code>Needed Score = (Desired &ndash; Current &times; (1 &ndash; FinalWeight)) / FinalWeight</code>
+    </div>
+    <p><strong>Example:</strong> Your current grade is 82% and the final exam is worth 25% of your overall grade. You want to earn a B (83% minimum). Needed = (83 &ndash; 82 &times; 0.75) / 0.25 = (83 &ndash; 61.5) / 0.25 = 86%. You need an 86% on the final to get a B.</p>
+    <p>If the needed score comes out to over 100%, achieving that grade is mathematically impossible without extra credit. If it comes out negative or very low, you are in excellent shape and could even skip the final (though that is rarely advisable). This calculator computes this automatically in the "What do I need on my final?" section.</p>
+
+    <h2>GPA Scales Explained</h2>
+    <p>The Grade Point Average (GPA) is a standardized way to summarize academic performance across multiple courses. The most common scale in the United States is the 4.0 scale, where an A equals 4.0 points and an F equals 0.0 points. Your cumulative GPA is calculated by multiplying each course's grade points by its credit hours, summing the products, and dividing by total credit hours.</p>
+    <p>Some institutions use variations of the standard 4.0 scale. Weighted GPAs in high school may go up to 5.0 or even 6.0, giving extra points for honors, AP, or IB courses. For example, an A in a regular course might earn 4.0 points, while an A in an AP course earns 5.0 points. This rewards students who take more challenging coursework.</p>
+    <p>International grading systems vary widely. The UK uses a first, upper second, lower second, third, and fail system. Germany uses a 1.0 (best) to 5.0 (fail) scale. Japan uses a 0-100 point system similar to the US percentage system. When applying to international institutions, grade conversion tables help translate between systems.</p>
+    <p>Your GPA matters for many academic and career milestones. Most colleges require a minimum cumulative GPA of 2.0 to remain in good academic standing. Graduate school admissions often require a 3.0 or higher. Scholarships frequently have GPA requirements, and some employers ask about GPA during recruitment, particularly for recent graduates.</p>
+
+    <h2>Tips for Improving Your Grades</h2>
+    <p>Improving academic performance requires a combination of effective study habits, strategic planning, and self-awareness. Here are evidence-based strategies that can help raise your grades:</p>
+    <ul>
+      <li><strong>Prioritize high-weight assignments:</strong> Since weighted grades mean not all assignments are equal, focus your energy on the categories that carry the most weight. A 5% improvement on a final exam worth 30% of your grade has far more impact than a 5% improvement on homework worth 10%.</li>
+      <li><strong>Use active recall and spaced repetition:</strong> Research in cognitive science consistently shows that testing yourself on material (active recall) and spreading study sessions over time (spaced repetition) are far more effective than rereading notes or passive review. Use flashcards, practice problems, and self-quizzing.</li>
+      <li><strong>Attend office hours:</strong> Visiting your professor or teaching assistant during office hours is one of the most underutilized resources in education. You can clarify confusing concepts, get feedback on your work, and demonstrate engagement that may benefit you when grades are borderline.</li>
+      <li><strong>Track your grades throughout the semester:</strong> Do not wait until the end of the semester to calculate your grade. Use this calculator regularly to monitor your standing and identify areas where you need to improve before it is too late.</li>
+      <li><strong>Form study groups:</strong> Collaborative learning helps reinforce material through discussion and explanation. Teaching a concept to someone else is one of the most effective ways to solidify your own understanding.</li>
+      <li><strong>Manage your time effectively:</strong> Use a planner or digital calendar to track assignment due dates and exam schedules. Break large projects into smaller tasks with intermediate deadlines to avoid last-minute cramming.</li>
+    </ul>
+
+    <h2>Common Grading Systems Compared</h2>
+    <p>Different educational contexts use different grading approaches. Understanding these systems helps when transferring credits, applying to schools, or interpreting transcripts from other institutions.</p>
+    <p><strong>Points-based grading:</strong> Each assignment has a point value, and your grade is the total points earned divided by total points possible. A student who earns 450 out of 500 points has a 90%. This system is transparent but can be misleading if a single high-point assignment dominates the grade.</p>
+    <p><strong>Category-weighted grading:</strong> Assignments are grouped into categories (exams, homework, projects) with each category worth a percentage of the final grade. This is the most common system in college courses and is what this calculator supports in weighted mode.</p>
+    <p><strong>Standards-based grading:</strong> Increasingly used in K-12 education, this system evaluates students against specific learning objectives rather than averaging scores. Students receive marks like "meets standard," "approaching standard," or "exceeds standard" for each skill or concept.</p>
+    <p><strong>Pass/fail grading:</strong> Some courses offer only pass or fail grades, with no letter grade or GPA impact. A passing grade typically requires earning at least a C or 70%. This system reduces grade pressure but provides less information about performance quality.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>How do you calculate a weighted grade?</summary>
+        <p>Multiply each assignment's percentage score by its weight (expressed as a decimal), sum the weighted values, and divide by the total weight. For example, if exams (40% weight) average 88% and homework (60% weight) averages 95%, the weighted grade is (88 &times; 0.40 + 95 &times; 0.60) / 1.0 = 35.2 + 57.0 = 92.2%. If weights do not add to 100%, divide by the actual sum of weights used.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What GPA is a B+?</summary>
+        <p>On the standard 4.0 scale, a B+ equals a 3.3 GPA. This typically corresponds to a percentage grade between 87% and 89%. Other common conversions: A = 4.0, A&ndash; = 3.7, B = 3.0, B&ndash; = 2.7, C+ = 2.3, C = 2.0. Some schools do not use plus/minus grades, in which case a B is simply 3.0 for any grade in the 80-89% range.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How do I calculate the grade I need on my final exam?</summary>
+        <p>Use the formula: Needed Score = (Desired Grade &ndash; Current Grade &times; (1 &ndash; Final Weight)) &divide; Final Weight. All values should be expressed as percentages. For example, if your current grade is 85%, you want a 90%, and the final is worth 25%: (90 &ndash; 85 &times; 0.75) / 0.25 = (90 &ndash; 63.75) / 0.25 = 105%. In this case, you would need over 100%, so achieving a 90% is not possible without extra credit.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is the difference between simple and weighted averages?</summary>
+        <p>A simple average treats every assignment equally: your grade is the sum of all percentage scores divided by the number of assignments. A weighted average assigns different importance (weights) to different assignments or categories. In a weighted system, a final exam worth 40% of your grade counts much more than a homework assignment worth 5%. Most college courses use weighted averaging.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How do I convert a percentage to a letter grade?</summary>
+        <p>The most common US scale is: A+ (97-100%), A (93-96%), A&ndash; (90-92%), B+ (87-89%), B (83-86%), B&ndash; (80-82%), C+ (77-79%), C (73-76%), C&ndash; (70-72%), D+ (67-69%), D (63-66%), D&ndash; (60-62%), F (below 60%). However, grading scales vary by school. Some use a 10-point scale (A: 90-100, B: 80-89, etc.) without plus/minus distinctions. Always check your syllabus for the specific scale used in your course.</p>
+      </details>
+    </div>
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/math-calculators/gpa-calculator/">GPA Calculator</a> &ndash; Calculate your cumulative GPA from courses, credits, and grades.</li>
+      <li><a href="/math-calculators/percentage-calculator/">Percentage Calculator</a> &ndash; Quick percentage calculations for grades and everyday math.</li>
+      <li><a href="/math-calculators/standard-deviation-calculator/">Standard Deviation Calculator</a> &ndash; Calculate mean, variance, and standard deviation for data sets.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+  <RelatedArticles calculatorSlug="grade-calculator" />
+  <RelatedCalculators currentSlug="grade-calculator" />
+</BaseLayout>
+
+<style>
+  .last-updated { font-size: 0.75rem; color: var(--color-text-muted); margin: 4px 0 0; }
+  .mode-toggle { display: flex; gap: 4px; margin-bottom: 20px; background: var(--color-bg); border-radius: var(--radius); padding: 4px; }
+  .mode-btn { flex: 1; padding: 8px 16px; border: none; border-radius: 6px; background: transparent; font-size: 0.85rem; font-weight: 500; cursor: pointer; color: var(--color-text-muted); transition: all 0.15s; }
+  .mode-btn.active { background: var(--color-surface); color: var(--color-primary); box-shadow: var(--shadow-sm); }
+  .mode-btn:hover:not(.active) { color: var(--color-text); }
+  .grade-table-wrapper { overflow-x: auto; margin-bottom: 12px; }
+  .grade-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  .grade-table th, .grade-table td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--color-border); }
+  .grade-table th { font-size: 0.8rem; font-weight: 600; color: var(--color-text-muted); }
+  .grade-table input { width: 100%; padding: 6px 8px; border: 1px solid var(--color-border); border-radius: var(--radius); font-size: 0.85rem; background: var(--color-bg); color: var(--color-text); }
+  .grade-table input[type="text"] { min-width: 100px; }
+  .grade-table input[type="number"] { min-width: 60px; }
+  .remove-btn { background: none; border: none; color: var(--color-text-muted); cursor: pointer; font-size: 1.1rem; padding: 4px 8px; border-radius: var(--radius); transition: all 0.15s; }
+  .remove-btn:hover { color: #dc2626; background: #fee2e2; }
+  .add-row-btn { background: transparent; border: 1px dashed var(--color-border); color: var(--color-primary); padding: 8px 16px; border-radius: var(--radius); cursor: pointer; font-size: 0.85rem; font-weight: 500; width: 100%; transition: all 0.15s; }
+  .add-row-btn:hover { border-color: var(--color-primary); background: #eff6ff; }
+  .weight-col.hidden { display: none; }
+  .final-grade-section { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--color-border); }
+  .final-grade-section h3 { font-size: 1rem; margin-bottom: 12px; color: var(--color-text); }
+</style>
+
+<script is:inline>
+  var GRADE_SCALE = [
+    {min: 97, grade: 'A+', gpa: '4.0'}, {min: 93, grade: 'A', gpa: '4.0'},
+    {min: 90, grade: 'A-', gpa: '3.7'}, {min: 87, grade: 'B+', gpa: '3.3'},
+    {min: 83, grade: 'B', gpa: '3.0'},  {min: 80, grade: 'B-', gpa: '2.7'},
+    {min: 77, grade: 'C+', gpa: '2.3'}, {min: 73, grade: 'C', gpa: '2.0'},
+    {min: 70, grade: 'C-', gpa: '1.7'}, {min: 67, grade: 'D+', gpa: '1.3'},
+    {min: 63, grade: 'D', gpa: '1.0'},  {min: 60, grade: 'D-', gpa: '0.7'},
+    {min: 0,  grade: 'F',  gpa: '0.0'}
+  ];
+
+  var mode = 'simple';
+  var rowCounter = 0;
+
+  function getGradeInfo(pct) {
+    for (var i = 0; i < GRADE_SCALE.length; i++) {
+      if (pct >= GRADE_SCALE[i].min) return GRADE_SCALE[i];
+    }
+    return GRADE_SCALE[GRADE_SCALE.length - 1];
+  }
+
+  function addRow(name, score, max, weight) {
+    rowCounter++;
+    var id = rowCounter;
+    var tbody = document.getElementById('gradeBody');
+    var tr = document.createElement('tr');
+    tr.setAttribute('data-row-id', id);
+    var weightHidden = mode === 'simple' ? ' hidden' : '';
+    tr.innerHTML = '<td><input type="text" value="' + (name || 'Assignment ' + id) + '" /></td>' +
+      '<td><input type="number" class="score-input" value="' + (score || '') + '" min="0" step="any" placeholder="Score" /></td>' +
+      '<td><input type="number" class="max-input" value="' + (max || '100') + '" min="0" step="any" placeholder="Max" /></td>' +
+      '<td class="weight-col' + weightHidden + '"><input type="number" class="weight-input" value="' + (weight || '') + '" min="0" step="any" placeholder="%" /></td>' +
+      '<td><button class="remove-btn" title="Remove">&times;</button></td>';
+    tbody.appendChild(tr);
+
+    tr.querySelector('.remove-btn').addEventListener('click', function() {
+      tr.remove();
+      calculate();
+    });
+    tr.querySelectorAll('input').forEach(function(inp) {
+      inp.addEventListener('input', calculate);
+    });
+    calculate();
+  }
+
+  function toggleMode(newMode) {
+    mode = newMode;
+    document.querySelectorAll('.mode-btn').forEach(function(b) { b.classList.remove('active'); });
+    document.querySelector('[data-mode="' + mode + '"]').classList.add('active');
+    document.querySelectorAll('.weight-col').forEach(function(el) {
+      if (mode === 'weighted') {
+        el.classList.remove('hidden');
+      } else {
+        el.classList.add('hidden');
+      }
+    });
+    calculate();
+  }
+
+  function calculate() {
+    var rows = document.querySelectorAll('#gradeBody tr');
+    var totalWeightedScore = 0;
+    var totalWeight = 0;
+    var count = 0;
+    var sumPct = 0;
+
+    rows.forEach(function(row) {
+      var score = parseFloat(row.querySelector('.score-input').value);
+      var max = parseFloat(row.querySelector('.max-input').value);
+      if (isNaN(score) || isNaN(max) || max <= 0) return;
+      var pct = score / max;
+
+      if (mode === 'weighted') {
+        var weight = parseFloat(row.querySelector('.weight-input').value);
+        if (isNaN(weight) || weight <= 0) return;
+        totalWeightedScore += pct * weight;
+        totalWeight += weight;
+      } else {
+        sumPct += pct;
+        count++;
+      }
+    });
+
+    var overallPct;
+    if (mode === 'weighted') {
+      overallPct = totalWeight > 0 ? (totalWeightedScore / totalWeight) * 100 : 0;
+    } else {
+      overallPct = count > 0 ? (sumPct / count) * 100 : 0;
+    }
+
+    if ((mode === 'weighted' && totalWeight === 0) || (mode === 'simple' && count === 0)) {
+      document.getElementById('overallPct').textContent = '--';
+      document.getElementById('letterGrade').textContent = '--';
+      document.getElementById('gpaValue').textContent = '--';
+      document.getElementById('neededScore').textContent = '--';
+      return;
+    }
+
+    var gradeInfo = getGradeInfo(overallPct);
+    document.getElementById('overallPct').textContent = overallPct.toFixed(2) + '%';
+    document.getElementById('letterGrade').textContent = gradeInfo.grade;
+    document.getElementById('gpaValue').textContent = gradeInfo.gpa;
+
+    // Final exam calculation
+    var desired = parseFloat(document.getElementById('desiredGrade').value) || 0;
+    var finalWeight = parseFloat(document.getElementById('finalWeight').value) || 0;
+    if (finalWeight > 0 && finalWeight <= 100) {
+      var fw = finalWeight / 100;
+      var needed = (desired - overallPct * (1 - fw)) / fw;
+      if (needed > 100) {
+        document.getElementById('neededScore').textContent = needed.toFixed(1) + '% (not possible without extra credit)';
+      } else if (needed < 0) {
+        document.getElementById('neededScore').textContent = '0% (already achieved!)';
+      } else {
+        document.getElementById('neededScore').textContent = needed.toFixed(1) + '%';
+      }
+    } else {
+      document.getElementById('neededScore').textContent = '--';
+    }
+  }
+
+  document.getElementById('simpleBtn').addEventListener('click', function() { toggleMode('simple'); });
+  document.getElementById('weightedBtn').addEventListener('click', function() { toggleMode('weighted'); });
+  document.getElementById('addRowBtn').addEventListener('click', function() { addRow('', '', '100', ''); });
+  document.getElementById('desiredGrade').addEventListener('input', calculate);
+  document.getElementById('finalWeight').addEventListener('input', calculate);
+
+  // Initialize with 3 rows
+  addRow('Test 1', '85', '100', '30');
+  addRow('Test 2', '92', '100', '30');
+  addRow('Homework', '78', '100', '40');
+</script>

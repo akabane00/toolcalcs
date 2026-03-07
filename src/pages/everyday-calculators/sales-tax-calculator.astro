@@ -1,0 +1,316 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Everyday Calculators",
+        "item": "https://toolcalcs.com/everyday-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Sales Tax Calculator"
+      }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How do you calculate sales tax?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'To calculate sales tax, multiply the price of the item by the tax rate expressed as a decimal. For example, if an item costs $50 and the tax rate is 8%, the sales tax is $50 times 0.08, which equals $4. The total price including tax would be $54. If buying multiple items, add their prices first, then apply the tax to the subtotal.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Which US states have no sales tax?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Five US states have no state-level sales tax: Alaska, Delaware, Montana, New Hampshire, and Oregon. However, Alaska allows local municipalities to impose their own sales taxes, so some areas within Alaska do have a local sales tax. The remaining 45 states and the District of Columbia all charge state sales tax.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Is sales tax applied before or after a discount?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'In the United States, sales tax is calculated on the actual amount you pay after any discounts, coupons, or markdowns are applied. If a $100 item is 20% off, you pay $80 and the sales tax is calculated on $80, not on the original $100 price. However, manufacturer rebates may be treated differently depending on the state.',
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Sales Tax Calculator - Calculate Tax Amount & Total Price | ToolCalcs"
+  description="Free sales tax calculator. Instantly calculate tax amount, total price, and per-item cost. Quick-select buttons for common US tax rates. Includes state tax rate reference."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/everyday-calculators/">Everyday Calculators</a> &rsaquo;
+    <span>Sales Tax Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Sales Tax Calculator</h1>
+  <p class="page-desc">Calculate the sales tax amount, total price, and per-item cost for any purchase. Select a common rate or enter your own.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="priceInput">Price ($)</label>
+        <input type="number" id="priceInput" value="49.99" min="0" step="0.01" />
+      </div>
+      <div class="input-group">
+        <label for="taxRate">Tax Rate (%)</label>
+        <input type="number" id="taxRate" value="8" min="0" max="100" step="0.01" />
+        <div class="quick-btns" id="quickBtns">
+          <button class="quick-btn" data-rate="5">5%</button>
+          <button class="quick-btn" data-rate="6">6%</button>
+          <button class="quick-btn" data-rate="7">7%</button>
+          <button class="quick-btn active" data-rate="8">8%</button>
+          <button class="quick-btn" data-rate="8.5">8.5%</button>
+          <button class="quick-btn" data-rate="10">10%</button>
+        </div>
+      </div>
+      <div class="input-group">
+        <label for="quantityInput">Quantity</label>
+        <input type="number" id="quantityInput" value="1" min="1" step="1" />
+      </div>
+    </div>
+
+    <div class="calc-results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Tax Amount</span>
+          <span class="result-value" id="taxAmount">--</span>
+        </div>
+        <div class="result-card primary">
+          <span class="result-label">Total Price</span>
+          <span class="result-value" id="totalPrice">--</span>
+        </div>
+      </div>
+      <div class="result-cards" style="margin-top: 12px;">
+        <div class="result-card">
+          <span class="result-label">Effective Tax Rate</span>
+          <span class="result-value" id="effectiveRate">--</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Per-Item Tax</span>
+          <span class="result-value" id="perItemTax">--</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>How Sales Tax Works</h2>
+    <p>Sales tax is a consumption tax imposed by state and local governments on the sale of goods and, in many cases, services. When you buy something at a store, the listed price typically does not include sales tax. The tax is added at the register, and the merchant collects it on behalf of the government. The basic formula for calculating sales tax is straightforward:</p>
+    <div class="formula-box">
+      <code>Sales Tax = Price &times; (Tax Rate / 100)</code>
+    </div>
+    <div class="formula-box">
+      <code>Total Price = Price + Sales Tax</code>
+    </div>
+    <p>For example, if you buy a pair of shoes priced at $80 in a state with a 7.5% sales tax, the tax is $80 &times; 0.075 = $6.00, and the total you pay is $86.00. If you are buying multiple identical items, multiply the price by the quantity first, then apply the tax: 3 pairs at $80 each = $240 subtotal, tax = $240 &times; 0.075 = $18.00, total = $258.00.</p>
+    <p>Sales tax rates vary significantly across the United States. They are determined at two levels: the state level and the local level (county, city, and special district). The total rate you pay is the sum of these components. Some areas within the same state can have very different total tax rates depending on local levies for transportation, schools, or infrastructure projects.</p>
+    <p>Unlike a value-added tax (VAT) used in most other countries, US sales tax is only collected at the final point of sale to the consumer, not at each stage of production and distribution. VAT is built into the listed price in countries that use it, which is why prices in Europe and many other countries already include tax. In the US, the price on the shelf is the pre-tax price, and the tax is added at checkout.</p>
+
+    <h2>US State Sales Tax Rates</h2>
+    <p>The following table shows the base state-level sales tax rate for all 50 states and the District of Columbia. Keep in mind that local taxes can add 1% to 5% or more on top of the state rate, so the total rate you pay may be higher than shown here.</p>
+    <div class="table-responsive">
+      <table class="info-table">
+        <thead>
+          <tr><th>State</th><th>State Rate</th><th>State</th><th>State Rate</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Alabama</td><td>4.00%</td><td>Montana</td><td>0% (no sales tax)</td></tr>
+          <tr><td>Alaska</td><td>0% (no state tax)</td><td>Nebraska</td><td>5.50%</td></tr>
+          <tr><td>Arizona</td><td>5.60%</td><td>Nevada</td><td>6.85%</td></tr>
+          <tr><td>Arkansas</td><td>6.50%</td><td>New Hampshire</td><td>0% (no sales tax)</td></tr>
+          <tr><td>California</td><td>7.25%</td><td>New Jersey</td><td>6.625%</td></tr>
+          <tr><td>Colorado</td><td>2.90%</td><td>New Mexico</td><td>4.875%</td></tr>
+          <tr><td>Connecticut</td><td>6.35%</td><td>New York</td><td>4.00%</td></tr>
+          <tr><td>Delaware</td><td>0% (no sales tax)</td><td>North Carolina</td><td>4.75%</td></tr>
+          <tr><td>D.C.</td><td>6.00%</td><td>North Dakota</td><td>5.00%</td></tr>
+          <tr><td>Florida</td><td>6.00%</td><td>Ohio</td><td>5.75%</td></tr>
+          <tr><td>Georgia</td><td>4.00%</td><td>Oklahoma</td><td>4.50%</td></tr>
+          <tr><td>Hawaii</td><td>4.00%</td><td>Oregon</td><td>0% (no sales tax)</td></tr>
+          <tr><td>Idaho</td><td>6.00%</td><td>Pennsylvania</td><td>6.00%</td></tr>
+          <tr><td>Illinois</td><td>6.25%</td><td>Rhode Island</td><td>7.00%</td></tr>
+          <tr><td>Indiana</td><td>7.00%</td><td>South Carolina</td><td>6.00%</td></tr>
+          <tr><td>Iowa</td><td>6.00%</td><td>South Dakota</td><td>4.20%</td></tr>
+          <tr><td>Kansas</td><td>6.50%</td><td>Tennessee</td><td>7.00%</td></tr>
+          <tr><td>Kentucky</td><td>6.00%</td><td>Texas</td><td>6.25%</td></tr>
+          <tr><td>Louisiana</td><td>4.45%</td><td>Utah</td><td>6.10%</td></tr>
+          <tr><td>Maine</td><td>5.50%</td><td>Vermont</td><td>6.00%</td></tr>
+          <tr><td>Maryland</td><td>6.00%</td><td>Virginia</td><td>5.30%</td></tr>
+          <tr><td>Massachusetts</td><td>6.25%</td><td>Washington</td><td>6.50%</td></tr>
+          <tr><td>Michigan</td><td>6.00%</td><td>West Virginia</td><td>6.00%</td></tr>
+          <tr><td>Minnesota</td><td>6.875%</td><td>Wisconsin</td><td>5.00%</td></tr>
+          <tr><td>Mississippi</td><td>7.00%</td><td>Wyoming</td><td>4.00%</td></tr>
+          <tr><td>Missouri</td><td>4.225%</td><td></td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Five states have no state-level sales tax: Alaska, Delaware, Montana, New Hampshire, and Oregon. However, Alaska is unique in that it allows local jurisdictions to impose their own sales taxes, so some towns in Alaska do charge sales tax despite the absence of a state-level rate. The highest combined state and local rates in the country are found in parts of Louisiana, Tennessee, Arkansas, Washington, and Alabama, where combined rates can exceed 10%.</p>
+
+    <h2>Sales Tax on Online Purchases</h2>
+    <p>The rules for sales tax on online purchases changed significantly after the US Supreme Court's 2018 decision in South Dakota v. Wayfair. Before that ruling, online retailers were only required to collect sales tax in states where they had a physical presence (a warehouse, office, or store). After Wayfair, states gained the authority to require online sellers to collect sales tax even if they have no physical presence in the state, provided the seller exceeds certain economic thresholds (typically $100,000 in annual sales or 200 transactions within the state).</p>
+    <p>Today, nearly all states with a sales tax require online retailers to collect and remit tax on purchases shipped to their state. This means that when you buy something on Amazon, eBay, or any major e-commerce site, sales tax is typically applied at checkout based on the shipping destination. Small sellers on marketplaces like Etsy or eBay may have the marketplace collect tax on their behalf under marketplace facilitator laws that most states have enacted.</p>
+    <p>If you purchased an item online and no sales tax was charged, you may owe use tax. Use tax is the companion to sales tax and is legally owed by the buyer at the same rate as the state's sales tax. Most states include a line on their income tax return where you can report and pay use tax on untaxed out-of-state purchases, though compliance by individual consumers has historically been low.</p>
+
+    <h2>Sales Tax Before or After Discounts?</h2>
+    <p>A common question is whether sales tax is calculated on the original price or the discounted price. In most US states, sales tax is applied to the actual amount the consumer pays after discounts, coupons, and markdowns. This is because the tax is based on the transaction price, not the list price.</p>
+    <p><strong>Example:</strong> You buy a $120 jacket that is 25% off. The sale price is $120 &ndash; $30 = $90. Sales tax at 8% is calculated on $90: $90 &times; 0.08 = $7.20. Total = $97.20. The tax is not calculated on the original $120.</p>
+    <p>However, there are exceptions. Manufacturer rebates are treated differently in some states. If you receive a rebate from the manufacturer (not the retailer), the tax may be calculated on the full price before the rebate, because the retailer received the full payment and the rebate comes from a third party. Store coupons and instant discounts, on the other hand, reduce the taxable amount in virtually all states.</p>
+    <p>Buy-one-get-one-free (BOGO) promotions can also vary by state. Some states tax BOGO as if you paid full price for one item and received the second free (tax only on one item). Others may calculate tax on the average price of the two items. Check your state's specific rules for how promotional offers affect the tax calculation.</p>
+
+    <h2>Tax-Exempt Items and Exemptions</h2>
+    <p>Not everything is subject to sales tax. Most states exempt certain categories of items, though the specific exemptions vary from state to state:</p>
+    <ul>
+      <li><strong>Groceries:</strong> Most states exempt or reduce the tax rate on unprepared food and grocery items. States like Texas, New York, and Pennsylvania do not tax most groceries. However, prepared food (restaurant meals, deli items) is typically taxed at the full rate.</li>
+      <li><strong>Prescription medications:</strong> Nearly all states exempt prescription drugs from sales tax. Many also exempt over-the-counter medications, though this varies.</li>
+      <li><strong>Clothing:</strong> Several states, including New Jersey, New York (for items under $110), Pennsylvania, and Minnesota, exempt most clothing from sales tax. Most other states tax clothing at the standard rate.</li>
+      <li><strong>Sales tax holidays:</strong> Many states hold annual tax-free weekends, typically in August before the school year, when certain items like clothing, school supplies, and computers are exempt from sales tax up to certain price thresholds.</li>
+      <li><strong>Nonprofit and resale exemptions:</strong> Registered nonprofits and businesses purchasing items for resale can often obtain exemption certificates that allow them to make tax-free purchases.</li>
+    </ul>
+
+    <h2>Calculating Reverse Sales Tax</h2>
+    <p>Sometimes you know the total price (with tax included) and need to figure out the pre-tax price and the tax amount. This is called a reverse sales tax calculation. The formula is:</p>
+    <div class="formula-box">
+      <code>Pre-tax Price = Total / (1 + Tax Rate / 100)</code>
+    </div>
+    <p><strong>Example:</strong> You paid $54.00 total and the tax rate is 8%. The pre-tax price is $54.00 / 1.08 = $50.00. The tax amount is $54.00 &ndash; $50.00 = $4.00. This calculation is useful when reviewing receipts, budgeting, or when a price is quoted as "tax included."</p>
+    <p>You can also use the reverse formula to determine the effective tax rate from a receipt: Effective Rate = (Tax Amount / Pre-tax Subtotal) &times; 100. This can help you verify that the correct tax rate was applied to your purchase.</p>
+
+    <h2>Sales Tax vs. Other Taxes</h2>
+    <p>Sales tax is just one of many types of taxes consumers encounter. Understanding the differences helps with financial planning:</p>
+    <ul>
+      <li><strong>Sales tax vs. income tax:</strong> Sales tax is a consumption tax paid when you buy goods or services. Income tax is paid on your earnings. Some states rely more heavily on one type than the other. States with no income tax (like Texas, Florida, Washington, and Tennessee) tend to have higher sales tax rates to make up the revenue.</li>
+      <li><strong>Sales tax vs. VAT:</strong> Both are consumption taxes, but they work differently. Sales tax is collected only at the final sale to the consumer. VAT is collected at every stage of production and distribution, with each business paying tax on the value it adds. VAT is used in most countries outside the US and is typically included in the listed price.</li>
+      <li><strong>Sales tax vs. excise tax:</strong> Excise taxes are levied on specific products like gasoline, alcohol, tobacco, and airline tickets. They are often included in the price and charged per unit (per gallon, per pack) rather than as a percentage of the price. You may pay both sales tax and excise tax on the same purchase.</li>
+      <li><strong>Sales tax vs. use tax:</strong> Use tax applies to items purchased out of state (or online) where no sales tax was collected. The rate is the same as the buyer's local sales tax rate. It is legally owed but difficult to enforce on individual consumers.</li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>How do you calculate sales tax?</summary>
+        <p>Multiply the price of the item by the tax rate expressed as a decimal. For example, an item priced at $75 with a 6.5% tax rate: $75 &times; 0.065 = $4.875, which rounds to $4.88 in sales tax. The total price is $75 + $4.88 = $79.88. For multiple items, add their prices first to get the subtotal, then multiply the subtotal by the tax rate.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Which US states have no sales tax?</summary>
+        <p>Five states have no state-level sales tax: Alaska, Delaware, Montana, New Hampshire, and Oregon. Alaska is a special case because while it has no state sales tax, individual municipalities can impose local sales taxes up to 7.5%, so some areas within Alaska do charge sales tax. The other four states have no sales tax at any level of government.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Is sales tax applied before or after a discount?</summary>
+        <p>In nearly all US states, sales tax is calculated on the discounted price, not the original price. If a $100 item is on sale for $80, the sales tax applies to $80. The same is true for store coupons and markdown sales. However, manufacturer rebates may be treated differently in some states, where tax could be charged on the pre-rebate price since the rebate comes from a third party rather than the retailer.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Do you pay sales tax on online purchases?</summary>
+        <p>In most cases, yes. Since the 2018 Supreme Court ruling in South Dakota v. Wayfair, states can require online retailers to collect sales tax even without a physical presence in the state. Major retailers like Amazon collect sales tax for all states that have one. Smaller sellers on marketplaces like Etsy and eBay also have tax collected on their behalf through marketplace facilitator laws in most states.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What items are exempt from sales tax?</summary>
+        <p>Exemptions vary by state, but common tax-exempt items include unprepared groceries (in most states), prescription medications, and, in some states, clothing and school supplies. Many states also hold annual sales tax holidays when specific categories of items can be purchased tax-free. Businesses purchasing items for resale and registered nonprofit organizations can often obtain exemption certificates to avoid paying sales tax on qualifying purchases.</p>
+      </details>
+    </div>
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/everyday-calculators/tip-calculator/">Tip Calculator</a> &ndash; Calculate tips and split bills for restaurants and services.</li>
+      <li><a href="/everyday-calculators/discount-calculator/">Discount Calculator</a> &ndash; Calculate sale prices, savings, and final costs after discounts.</li>
+      <li><a href="/math-calculators/percentage-calculator/">Percentage Calculator</a> &ndash; Calculate percentages for math, finance, and everyday problems.</li>
+      <li><a href="/financial-calculators/tax-calculator/">Tax Calculator</a> &ndash; Estimate your federal and state income tax liability.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+  <RelatedArticles calculatorSlug="sales-tax-calculator" />
+  <RelatedCalculators currentSlug="sales-tax-calculator" />
+</BaseLayout>
+
+<style>
+  .last-updated { font-size: 0.75rem; color: var(--color-text-muted); margin: 4px 0 0; }
+  .quick-btns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .quick-btn { padding: 4px 12px; border: 1px solid var(--color-border); border-radius: var(--radius); background: transparent; cursor: pointer; font-size: 0.85rem; color: var(--color-text); transition: all 0.15s; }
+  .quick-btn:hover, .quick-btn.active { border-color: var(--color-primary); color: var(--color-primary); background: #eff6ff; }
+</style>
+
+<script is:inline>
+  function formatCurrency(n) {
+    return '$' + n.toFixed(2);
+  }
+
+  function calculate() {
+    var price = parseFloat(document.getElementById('priceInput').value) || 0;
+    var rate = parseFloat(document.getElementById('taxRate').value) || 0;
+    var qty = parseInt(document.getElementById('quantityInput').value) || 1;
+
+    if (price < 0) price = 0;
+    if (rate < 0) rate = 0;
+    if (qty < 1) qty = 1;
+
+    var perItemTax = price * (rate / 100);
+    var taxAmount = perItemTax * qty;
+    var subtotal = price * qty;
+    var totalPrice = subtotal + taxAmount;
+    var effectiveRate = subtotal > 0 ? (taxAmount / subtotal * 100).toFixed(2) + '%' : '0%';
+
+    document.getElementById('taxAmount').textContent = formatCurrency(taxAmount);
+    document.getElementById('totalPrice').textContent = formatCurrency(totalPrice);
+    document.getElementById('effectiveRate').textContent = effectiveRate;
+    document.getElementById('perItemTax').textContent = formatCurrency(perItemTax);
+  }
+
+  document.getElementById('priceInput').addEventListener('input', calculate);
+  document.getElementById('taxRate').addEventListener('input', function() {
+    var val = parseFloat(this.value) || 0;
+    document.querySelectorAll('.quick-btn').forEach(function(btn) {
+      var btnRate = parseFloat(btn.getAttribute('data-rate'));
+      if (btnRate === val) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+    calculate();
+  });
+  document.getElementById('quantityInput').addEventListener('input', calculate);
+
+  document.querySelectorAll('.quick-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var rateVal = parseFloat(this.getAttribute('data-rate'));
+      document.getElementById('taxRate').value = rateVal;
+      document.querySelectorAll('.quick-btn').forEach(function(b) { b.classList.remove('active'); });
+      this.classList.add('active');
+      calculate();
+    });
+  });
+
+  calculate();
+</script>

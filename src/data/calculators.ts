@@ -42,7 +42,7 @@ export const categories: Category[] = [
   {
     name: 'Conversion Calculators',
     slug: 'conversion-calculators',
-    description: 'Unit converter, currency converter, and other measurement conversion tools.',
+    description: 'Unit, currency, temperature, cooking, length, weight, and speed conversion tools.',
     icon: '🔄',
   },
   {
@@ -438,6 +438,38 @@ export const calculators: Calculator[] = [
     categorySlug: 'date-time-calculators',
     icon: '🌍',
   },
+  {
+    title: 'Business Days Calculator',
+    slug: 'business-days-calculator',
+    description: 'Count working days between two dates, excluding weekends and US federal holidays for accurate project planning.',
+    category: 'Date & Time Calculators',
+    categorySlug: 'date-time-calculators',
+    icon: '💼',
+  },
+  {
+    title: 'Time Duration Calculator',
+    slug: 'time-duration-calculator',
+    description: 'Add or subtract hours and minutes, or find the exact duration between two clock times with midnight crossing support.',
+    category: 'Date & Time Calculators',
+    categorySlug: 'date-time-calculators',
+    icon: '⏱️',
+  },
+  {
+    title: 'Timestamp Calculator',
+    slug: 'timestamp-calculator',
+    description: 'Convert Unix timestamps to human-readable dates and vice versa. See the current epoch time updating live.',
+    category: 'Date & Time Calculators',
+    categorySlug: 'date-time-calculators',
+    icon: '🔢',
+  },
+  {
+    title: 'Day of Week Calculator',
+    slug: 'day-of-week-calculator',
+    description: 'Find what day of the week any date falls on, plus day of year, ISO week number, and calendar facts.',
+    category: 'Date & Time Calculators',
+    categorySlug: 'date-time-calculators',
+    icon: '📅',
+  },
   // Conversion
   {
     title: 'Unit Converter',
@@ -454,6 +486,46 @@ export const calculators: Calculator[] = [
     category: 'Conversion Calculators',
     categorySlug: 'conversion-calculators',
     icon: '💱',
+  },
+  {
+    title: 'Temperature Converter',
+    slug: 'temperature-converter',
+    description: 'Convert between Celsius, Fahrenheit, and Kelvin instantly. Includes cooking temperature charts and reference tables.',
+    category: 'Conversion Calculators',
+    categorySlug: 'conversion-calculators',
+    icon: '🌡️',
+  },
+  {
+    title: 'Cooking Measurement Converter',
+    slug: 'cooking-measurement-converter',
+    description: 'Convert between cups, tablespoons, teaspoons, fluid ounces, milliliters, liters, pints, quarts, and gallons for any recipe.',
+    category: 'Conversion Calculators',
+    categorySlug: 'conversion-calculators',
+    icon: '🍳',
+  },
+  {
+    title: 'Length Converter',
+    slug: 'length-converter',
+    description: 'Convert between millimeters, centimeters, meters, kilometers, inches, feet, yards, and miles instantly.',
+    category: 'Conversion Calculators',
+    categorySlug: 'conversion-calculators',
+    icon: '📏',
+  },
+  {
+    title: 'Weight Converter',
+    slug: 'weight-converter',
+    description: 'Convert between milligrams, grams, kilograms, metric tons, ounces, pounds, and stones instantly.',
+    category: 'Conversion Calculators',
+    categorySlug: 'conversion-calculators',
+    icon: '⚖️',
+  },
+  {
+    title: 'Speed Converter',
+    slug: 'speed-converter',
+    description: 'Convert between miles per hour, kilometers per hour, meters per second, feet per second, knots, and Mach.',
+    category: 'Conversion Calculators',
+    categorySlug: 'conversion-calculators',
+    icon: '💨',
   },
   // Everyday
   {
@@ -729,6 +801,81 @@ export const calculators: Calculator[] = [
     categorySlug: 'math-calculators',
     icon: '🔬',
   },
+  // Math (Batch C - Sprint 12)
+  {
+    title: 'Average Calculator',
+    slug: 'average-calculator',
+    description: 'Calculate mean, median, mode, and range for any set of numbers. Paste or type your data for instant descriptive statistics.',
+    category: 'Math Calculators',
+    categorySlug: 'math-calculators',
+    icon: '📊',
+  },
+  {
+    title: 'Triangle Calculator',
+    slug: 'triangle-calculator',
+    description: 'Solve any triangle using SSS, SAS, or right triangle mode. Calculate all sides, angles, area, and perimeter with step-by-step formulas.',
+    category: 'Math Calculators',
+    categorySlug: 'math-calculators',
+    icon: '📐',
+  },
+  {
+    title: 'LCM & GCF Calculator',
+    slug: 'lcm-gcf-calculator',
+    description: 'Find the Least Common Multiple and Greatest Common Factor of two or more numbers. Shows prime factorization and step-by-step work.',
+    category: 'Math Calculators',
+    categorySlug: 'math-calculators',
+    icon: '🔢',
+  },
+  // Math (Batch D - Sprint 12)
+  {
+    title: 'Prime Number Checker',
+    slug: 'prime-number-checker',
+    description: 'Check if any number is prime. See prime factorization, all factors, and nearest primes instantly.',
+    category: 'Math Calculators',
+    categorySlug: 'math-calculators',
+    icon: '🔢',
+  },
+  {
+    title: 'Quadratic Formula Calculator',
+    slug: 'quadratic-formula-calculator',
+    description: 'Solve any quadratic equation. See discriminant, roots (real or complex), vertex, and axis of symmetry.',
+    category: 'Math Calculators',
+    categorySlug: 'math-calculators',
+    icon: '📐',
+  },
+  {
+    title: 'Volume Calculator',
+    slug: 'volume-calculator',
+    description: 'Calculate volume and surface area of sphere, cube, cylinder, cone, and rectangular prism with formulas.',
+    category: 'Math Calculators',
+    categorySlug: 'math-calculators',
+    icon: '📦',
+  },
+  // Everyday (new batch)
+  {
+    title: 'Sales Tax Calculator',
+    slug: 'sales-tax-calculator',
+    description: 'Calculate sales tax amount, total price, and per-item cost. Quick-select buttons for common US tax rates.',
+    category: 'Everyday Calculators',
+    categorySlug: 'everyday-calculators',
+    icon: '🧾',
+  },
+  {
+    title: 'Grade Calculator',
+    slug: 'grade-calculator',
+    description: 'Calculate your overall course grade using simple or weighted averages. See letter grade, GPA, and what you need on the final.',
+    category: 'Everyday Calculators',
+    categorySlug: 'everyday-calculators',
+    icon: '📝',
+  },
+  {
+    title: 'Cat Age Calculator',
+    slug: 'cat-age-calculator',
+    description: 'Convert your cat\'s age to human years using veterinary guidelines. Includes life stage and indoor vs outdoor lifespan data.',
+    category: 'Everyday Calculators',
+    categorySlug: 'everyday-calculators',
+    icon: '🐱',
+  },
   // Astrology
   {
     title: 'Zodiac Sign Calculator',
@@ -799,13 +946,15 @@ const relatedGroups: Record<string, string[]> = {
   // Health - Wellness
   'wellness': ['sleep-calculator', 'pace-calculator', 'pregnancy-due-date-calculator', 'ovulation-calculator', 'pregnancy-weight-gain-calculator'],
   // Math
-  'math-tools': ['percentage-calculator', 'fraction-calculator', 'standard-deviation-calculator', 'area-calculator', 'probability-calculator', 'gpa-calculator', 'random-number-generator', 'scientific-calculator'],
+  'math-tools': ['percentage-calculator', 'fraction-calculator', 'standard-deviation-calculator', 'area-calculator', 'probability-calculator', 'gpa-calculator', 'random-number-generator', 'scientific-calculator', 'average-calculator', 'triangle-calculator', 'lcm-gcf-calculator', 'prime-number-checker', 'quadratic-formula-calculator', 'volume-calculator'],
   // Date & Time
-  'date-time': ['age-calculator', 'date-difference-calculator', 'days-until-calculator', 'time-zone-converter'],
+  'date-time': ['age-calculator', 'date-difference-calculator', 'days-until-calculator', 'time-zone-converter', 'business-days-calculator', 'time-duration-calculator', 'timestamp-calculator', 'day-of-week-calculator'],
   // Everyday
-  'everyday': ['tip-calculator', 'discount-calculator', 'hours-calculator', 'square-footage-calculator', 'gas-cost-calculator', 'electricity-cost-calculator', 'word-counter', 'dog-age-calculator'],
+  'everyday': ['tip-calculator', 'discount-calculator', 'hours-calculator', 'square-footage-calculator', 'gas-cost-calculator', 'electricity-cost-calculator', 'word-counter', 'dog-age-calculator', 'sales-tax-calculator', 'grade-calculator', 'cat-age-calculator'],
   // Construction
   'construction': ['concrete-calculator', 'paint-calculator', 'roofing-calculator', 'flooring-calculator', 'mulch-calculator', 'fence-calculator', 'drywall-calculator', 'deck-calculator', 'solar-panel-calculator', 'gravel-calculator', 'stair-calculator'],
+  // Conversion
+  'conversion': ['unit-converter', 'currency-converter', 'temperature-converter', 'cooking-measurement-converter', 'length-converter', 'weight-converter', 'speed-converter'],
   // Astrology
   'astrology': ['zodiac-sign-calculator', 'zodiac-compatibility-calculator', 'numerology-calculator', 'angel-number-calculator', 'tarot-reading', 'chinese-zodiac-calculator'],
 };

@@ -1,0 +1,467 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Date & Time Calculators", "item": "https://toolcalcs.com/date-time-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Business Days Calculator" }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What are business days?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Business days, also called working days, are Monday through Friday, excluding Saturday and Sunday. In many contexts, US federal holidays are also excluded from business day counts. A typical week has 5 business days and 2 weekend days.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How many business days are in a year?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'A typical year has 260 to 262 business days (weekdays), depending on how the days of the week align with the calendar. When US federal holidays are excluded, the number drops to about 249 to 251 working days. Leap years may add one additional weekday.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Does this calculator account for US federal holidays?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes. When the "Exclude US Federal Holidays" checkbox is enabled, the calculator removes 11 federally recognized holidays from the business day count, including observed dates when a holiday falls on a weekend. Holiday data covers 2024 through 2027.',
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Business Days Calculator - Count Working Days Between Dates | ToolCalcs"
+  description="Free business days calculator. Count working days between two dates, exclude weekends and US federal holidays. Plan project timelines and shipping estimates."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/date-time-calculators/">Date &amp; Time Calculators</a> &rsaquo;
+    <span>Business Days Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Business Days Calculator</h1>
+  <p class="page-desc">Count working days between two dates, with the option to exclude US federal holidays.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="startDate">Start Date</label>
+        <input type="date" id="startDate" />
+      </div>
+      <div class="input-group">
+        <label for="endDate">End Date</label>
+        <input type="date" id="endDate" />
+      </div>
+    </div>
+    <div class="checkbox-row">
+      <label class="checkbox-label">
+        <input type="checkbox" id="excludeHolidays" checked />
+        <span>Exclude US Federal Holidays</span>
+      </label>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Business Days</span>
+          <span class="result-value" id="businessDays">--</span>
+          <span class="result-detail">Mon &ndash; Fri, excl. holidays</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Calendar Days</span>
+          <span class="result-value" id="calendarDays">--</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Weekend Days</span>
+          <span class="result-value" id="weekendDays">--</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Holidays Excluded</span>
+          <span class="result-value" id="holidaysExcluded">--</span>
+        </div>
+      </div>
+    </div>
+    <div id="holidayList" class="holiday-list" style="display:none;">
+      <h3>Holidays Excluded</h3>
+      <ul id="holidayItems"></ul>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>What Are Business Days?</h2>
+    <p>Business days, also referred to as working days or weekdays, are the days of the week when most commercial and government operations take place. In the United States and most Western countries, business days run from Monday through Friday, excluding Saturday and Sunday. Many industries, legal frameworks, and government agencies further exclude public holidays from business day counts, which reduces the effective number of working days in a given period.</p>
+    <p>The concept of business days is deeply embedded in contracts, regulations, shipping timelines, and project planning. When a contract specifies a deadline of "10 business days," it means 10 weekdays, not 10 calendar days. This distinction is critical because 10 business days translates to 14 calendar days (two full weeks) at minimum, and potentially more if holidays fall within that window. Misunderstanding this difference can lead to missed deadlines, late filings, and financial penalties.</p>
+    <p>Business days matter in virtually every professional domain. Banks process transactions on business days only. Courts require filings within a specified number of business days. Insurance claims have business-day processing windows. Shipping carriers quote delivery times in business days. Even government agencies such as the IRS and Social Security Administration measure processing times in business days. Understanding how to count them accurately is an essential skill for professionals across all fields.</p>
+
+    <h2>US Federal Holidays</h2>
+    <p>The United States recognizes 11 federal holidays each year. On these days, federal government offices are closed, mail delivery is suspended, and the stock market does not operate. Many private businesses also close or operate with reduced hours. The 11 US federal holidays are:</p>
+    <ul>
+      <li><strong>New Year's Day</strong> &ndash; January 1</li>
+      <li><strong>Martin Luther King Jr. Day</strong> &ndash; Third Monday in January</li>
+      <li><strong>Presidents' Day</strong> &ndash; Third Monday in February</li>
+      <li><strong>Memorial Day</strong> &ndash; Last Monday in May</li>
+      <li><strong>Juneteenth National Independence Day</strong> &ndash; June 19</li>
+      <li><strong>Independence Day</strong> &ndash; July 4</li>
+      <li><strong>Labor Day</strong> &ndash; First Monday in September</li>
+      <li><strong>Columbus Day</strong> &ndash; Second Monday in October</li>
+      <li><strong>Veterans Day</strong> &ndash; November 11</li>
+      <li><strong>Thanksgiving Day</strong> &ndash; Fourth Thursday in November</li>
+      <li><strong>Christmas Day</strong> &ndash; December 25</li>
+    </ul>
+    <p>When a federal holiday falls on a Saturday, the preceding Friday is the observed holiday. When it falls on a Sunday, the following Monday is the observed holiday. This "observed date" rule ensures that federal workers always receive a day off for each holiday, even when the actual date falls on a weekend. This calculator uses observed dates for all holiday calculations, matching the official federal government schedule.</p>
+    <p>It is worth noting that not all businesses observe all 11 federal holidays. Some companies observe only the "big six" (New Year's Day, Memorial Day, Independence Day, Labor Day, Thanksgiving, and Christmas) while treating Columbus Day, Veterans Day, and others as regular working days. The federal holiday list used by this calculator represents the official government schedule. If your organization observes a different set of holidays, you may need to adjust the results accordingly.</p>
+
+    <h2>How to Count Business Days Between Two Dates</h2>
+    <p>Counting business days manually is straightforward for short periods but becomes error-prone for longer ranges. The basic method involves iterating through each day in the date range and checking two conditions: whether the day falls on a weekday (Monday through Friday) and, optionally, whether the day is a federal holiday.</p>
+    <p>Here is the general process for counting business days:</p>
+    <ol>
+      <li>Identify the start date and end date of the range.</li>
+      <li>Move through the range one day at a time, starting the count from the day after the start date.</li>
+      <li>For each day, check whether it is a Saturday or Sunday. If so, skip it.</li>
+      <li>If you are excluding holidays, check whether the current day matches any observed federal holiday date. If so, skip it.</li>
+      <li>Count all remaining days as business days.</li>
+    </ol>
+    <p>For example, consider the period from Monday, January 13, 2025, to Friday, January 24, 2025. There are 11 calendar days in this range. Saturday January 18 and Sunday January 19 are weekend days (2 days), and Monday January 20, 2025, is Martin Luther King Jr. Day (1 holiday). That leaves 11 &minus; 2 &minus; 1 = 8 business days.</p>
+    <p>This calculator automates the entire process. Enter your start and end dates, decide whether to exclude federal holidays, and the result appears instantly. The calculator handles all observed-date adjustments, leap years, and multi-year ranges without any additional input from you.</p>
+
+    <h2>Project Timeline Planning</h2>
+    <p>One of the most important applications of business day counting is project management. When a project manager estimates that a task will take 20 business days to complete, the actual calendar duration depends heavily on how many weekends and holidays fall within that period. Twenty business days could span anywhere from 28 to 32 calendar days, depending on the month.</p>
+    <p>Consider a project that starts on November 1 and needs to be delivered in 30 business days. If you count 30 calendar days, you would arrive at December 1. But the actual delivery date is later than that, because you need to subtract weekends (typically 8 to 10 days) and holidays (Thanksgiving, possibly Veterans Day, possibly the day after Thanksgiving in some organizations). The true delivery date in this scenario would fall around December 15 or later.</p>
+    <p>Project managers in software development, construction, legal, and marketing fields all rely on accurate business day counts for scheduling. Agile sprints are typically measured in two-week blocks, which correspond to 10 business days. Gantt charts and critical path calculations use business days to model task dependencies and resource allocation. When a client asks, "How long will this take?" the answer should always be given in business days with an explicit calendar date, leaving no room for ambiguity.</p>
+    <p>Shipping and logistics companies also use business day counts extensively. When an e-commerce retailer promises "5 to 7 business days" for delivery, the customer needs to understand that this means 7 to 11 calendar days at minimum. Orders placed on a Friday afternoon will not begin processing until Monday, which effectively adds two extra days to the delivery window from the customer's perspective.</p>
+
+    <h2>Legal and Financial Deadlines</h2>
+    <p>In legal and financial contexts, the distinction between business days and calendar days is not just important &mdash; it is legally binding. Missing a deadline by even one day can have severe consequences, including dismissed cases, default judgments, financial penalties, and lost rights.</p>
+    <p><strong>Court filings.</strong> Many court deadlines are specified in business days. For example, a court may require a response to a motion within 14 business days of service. Counting calendar days instead of business days would cause you to file two to four days early, which is harmless, or to miss the deadline entirely if you miscounted in the opposite direction, which could be catastrophic.</p>
+    <p><strong>Financial regulations.</strong> The Securities and Exchange Commission (SEC) requires companies to file quarterly reports (10-Q) within 40 calendar days and annual reports (10-K) within 60 calendar days of the fiscal period end. However, many internal compliance processes operate on business day timelines. Stock trades in the US settle on T+1 (one business day after the trade date). Wire transfers between banks are processed on business days only.</p>
+    <p><strong>Insurance claims.</strong> Many states require insurance companies to acknowledge claims within 15 business days and to make a decision within 30 to 45 business days. Consumers who file complaints should track these timelines carefully to ensure the insurer is meeting its obligations.</p>
+    <p><strong>Real estate transactions.</strong> Mortgage commitments, inspection contingencies, and closing deadlines are often specified in business days. A home inspection contingency of "10 business days" gives the buyer 14 calendar days (plus any holidays) to complete the inspection and negotiate repairs. Miscounting could cost the buyer their contingency rights.</p>
+
+    <h2>Shipping Estimates and Delivery Windows</h2>
+    <p>Most major shipping carriers &mdash; including USPS, UPS, FedEx, and DHL &mdash; quote delivery times in business days. A "3 business day" shipping option means the package will arrive within three weekdays after it ships, not three calendar days. If a package ships on Thursday, three business days later is the following Tuesday (skipping Saturday and Sunday).</p>
+    <p>For holiday shipping, the calculation becomes even more complex. During the period from Thanksgiving through New Year's Day, multiple federal holidays can extend delivery windows significantly. A package shipped via "5 business day" service on Wednesday, December 20, would not arrive until after Christmas if Christmas Day and the surrounding weekend are factored in. Retailers and consumers alike need to account for these delays when planning holiday orders.</p>
+    <p>International shipping adds another layer of complexity. Different countries observe different holidays, so the business day count may vary depending on the origin and destination countries. This calculator focuses on US federal holidays, but the core business day count (weekdays only) applies universally.</p>
+
+    <h2>How Many Business Days Are in Each Month?</h2>
+    <p>The number of business days in a month varies from 20 to 23, depending on the month and year. Most months have 21 or 22 business days. Here are the typical ranges:</p>
+    <ul>
+      <li><strong>28-day months (February in non-leap years):</strong> 20 business days</li>
+      <li><strong>29-day months (February in leap years):</strong> 20 or 21 business days</li>
+      <li><strong>30-day months:</strong> 21 or 22 business days</li>
+      <li><strong>31-day months:</strong> 21, 22, or 23 business days</li>
+    </ul>
+    <p>When federal holidays are excluded, the count drops further. January typically loses one day (New Year's Day) and possibly a second (MLK Day). November typically loses two days (Veterans Day and Thanksgiving). December loses at least one day (Christmas). The net result is that the average number of working days per month, after holidays, is approximately 20.75.</p>
+
+    <h2>Business Days in Common Time Frames</h2>
+    <p>Certain business-day periods come up repeatedly in professional contexts. Here are the most common ones and their approximate calendar-day equivalents:</p>
+    <ul>
+      <li><strong>5 business days</strong> = 1 calendar week (7 days)</li>
+      <li><strong>10 business days</strong> = 2 calendar weeks (14 days)</li>
+      <li><strong>15 business days</strong> = 3 calendar weeks (21 days)</li>
+      <li><strong>20 business days</strong> = 4 calendar weeks (28 days)</li>
+      <li><strong>30 business days</strong> = 6 calendar weeks (42 days)</li>
+      <li><strong>60 business days</strong> = approximately 12 weeks (84 days)</li>
+      <li><strong>90 business days</strong> = approximately 18 weeks (126 days)</li>
+    </ul>
+    <p>These equivalences are approximate. If holidays fall within the range, add one calendar day for each holiday. If the start date falls mid-week, the calendar-day count shifts slightly because partial weeks contain fewer business days than complete weeks.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>What are business days?</summary>
+        <p>Business days are Monday through Friday, excluding weekends (Saturday and Sunday). In many professional and legal contexts, US federal holidays are also excluded from business day counts. A standard week contains 5 business days and 2 weekend days. This calculator counts weekdays and optionally subtracts the 11 US federal holidays that fall within your date range.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How many business days are in a year?</summary>
+        <p>A standard year has 260 to 262 weekdays (business days), depending on how the days of the week fall on the calendar. When you exclude the 11 US federal holidays, the number drops to approximately 249 to 251 working days per year. Leap years may add one additional weekday. The exact count varies each year because of how January 1 and December 31 align with the weekly cycle.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Does this calculator account for US federal holidays?</summary>
+        <p>Yes. When the "Exclude US Federal Holidays" checkbox is enabled, the calculator removes all 11 federally recognized holidays that fall within your date range. It uses observed dates, meaning if a holiday falls on Saturday, the preceding Friday is excluded, and if it falls on Sunday, the following Monday is excluded. Holiday data is available for 2024 through 2027.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is the difference between business days and calendar days?</summary>
+        <p>Calendar days include every day in a date range, including weekends and holidays. Business days include only weekdays (Monday through Friday), optionally excluding public holidays. For example, a 14-day calendar span contains exactly 10 business days if no holidays fall within it. The distinction matters for contracts, legal deadlines, shipping estimates, and financial processing times.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How do I calculate a deadline in business days from today?</summary>
+        <p>To find a deadline that is a certain number of business days from today, start counting from the next business day after today. Skip each Saturday, Sunday, and federal holiday you encounter. For instance, if today is Friday and your deadline is 5 business days away, you would count Monday through Friday of the following week, arriving at the next Friday. If a holiday falls on one of those days, extend by one additional calendar day. This calculator makes this process automatic by allowing you to set a start date and see the business day count to any end date.</p>
+      </details>
+    </div>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/date-time-calculators/date-difference-calculator/">Date Difference Calculator</a> &ndash; Find the exact number of days, weeks, and months between two dates.</li>
+      <li><a href="/date-time-calculators/days-until-calculator/">Days Until Calculator</a> &ndash; Count down to any future date.</li>
+      <li><a href="/date-time-calculators/time-duration-calculator/">Time Duration Calculator</a> &ndash; Add or subtract hours and minutes, or find the duration between two times.</li>
+      <li><a href="/everyday-calculators/hours-calculator/">Hours Calculator</a> &ndash; Calculate total work hours from time entries.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+  <RelatedArticles calculatorSlug="business-days-calculator" />
+  <RelatedCalculators currentSlug="business-days-calculator" />
+</BaseLayout>
+
+<style>
+  .last-updated { font-size: 0.75rem; color: var(--color-text-muted); margin: 4px 0 0; }
+  .checkbox-row {
+    margin-bottom: 20px;
+  }
+  .checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    color: var(--color-text);
+  }
+  .checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--color-primary);
+  }
+  .result-card.primary {
+    background: #eff6ff;
+    grid-column: 1 / -1;
+  }
+  .result-card.primary .result-value {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: var(--color-primary);
+  }
+  .result-detail {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+  }
+  .holiday-list {
+    margin-top: 16px;
+    padding: 16px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+  }
+  .holiday-list h3 {
+    font-size: 0.95rem;
+    margin: 0 0 8px;
+    color: var(--color-text);
+  }
+  .holiday-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .holiday-list li {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    padding: 4px 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .holiday-list li:last-child {
+    border-bottom: none;
+  }
+
+  [data-theme="dark"] .result-card.primary { background: #1e3a5f; }
+
+  @media (max-width: 640px) {
+    .calc-inputs { grid-template-columns: 1fr; }
+    .result-cards { grid-template-columns: 1fr; }
+    .result-card.primary { grid-column: auto; }
+  }
+</style>
+
+<script is:inline>
+  var startDateInput = document.getElementById('startDate');
+  var endDateInput = document.getElementById('endDate');
+  var excludeHolidaysCheckbox = document.getElementById('excludeHolidays');
+
+  // Set default dates
+  var today = new Date();
+  endDateInput.value = formatDate(today);
+  var thirtyAgo = new Date(today);
+  thirtyAgo.setDate(thirtyAgo.getDate() - 30);
+  startDateInput.value = formatDate(thirtyAgo);
+
+  function formatDate(d) {
+    var y = d.getFullYear();
+    var m = String(d.getMonth() + 1).padStart(2, '0');
+    var day = String(d.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + day;
+  }
+
+  // US Federal Holidays with observed dates 2024-2027
+  function getObservedHolidays(year) {
+    var holidays = [];
+
+    function observe(month, day, name) {
+      var d = new Date(year, month, day);
+      var dow = d.getDay();
+      if (dow === 6) { d.setDate(d.getDate() - 1); }
+      else if (dow === 0) { d.setDate(d.getDate() + 1); }
+      holidays.push({ date: formatDate(d), name: name });
+    }
+
+    function nthDayOfMonth(month, dayOfWeek, n) {
+      var d = new Date(year, month, 1);
+      var count = 0;
+      while (count < n) {
+        if (d.getDay() === dayOfWeek) { count++; }
+        if (count < n) { d.setDate(d.getDate() + 1); }
+      }
+      return d;
+    }
+
+    function lastDayOfMonth(month, dayOfWeek) {
+      var d = new Date(year, month + 1, 0);
+      while (d.getDay() !== dayOfWeek) {
+        d.setDate(d.getDate() - 1);
+      }
+      return d;
+    }
+
+    // New Year's Day - Jan 1
+    observe(0, 1, "New Year's Day");
+
+    // MLK Day - 3rd Monday in January
+    var mlk = nthDayOfMonth(0, 1, 3);
+    holidays.push({ date: formatDate(mlk), name: 'Martin Luther King Jr. Day' });
+
+    // Presidents' Day - 3rd Monday in February
+    var pres = nthDayOfMonth(1, 1, 3);
+    holidays.push({ date: formatDate(pres), name: "Presidents' Day" });
+
+    // Memorial Day - Last Monday in May
+    var mem = lastDayOfMonth(4, 1);
+    holidays.push({ date: formatDate(mem), name: 'Memorial Day' });
+
+    // Juneteenth - June 19
+    observe(5, 19, 'Juneteenth');
+
+    // Independence Day - July 4
+    observe(6, 4, 'Independence Day');
+
+    // Labor Day - 1st Monday in September
+    var lab = nthDayOfMonth(8, 1, 1);
+    holidays.push({ date: formatDate(lab), name: 'Labor Day' });
+
+    // Columbus Day - 2nd Monday in October
+    var col = nthDayOfMonth(9, 1, 2);
+    holidays.push({ date: formatDate(col), name: 'Columbus Day' });
+
+    // Veterans Day - Nov 11
+    observe(10, 11, "Veterans Day");
+
+    // Thanksgiving - 4th Thursday in November
+    var thanks = nthDayOfMonth(10, 4, 4);
+    holidays.push({ date: formatDate(thanks), name: 'Thanksgiving Day' });
+
+    // Christmas - Dec 25
+    observe(11, 25, 'Christmas Day');
+
+    return holidays;
+  }
+
+  function getAllHolidays(startYear, endYear) {
+    var all = [];
+    for (var y = startYear; y <= endYear; y++) {
+      all = all.concat(getObservedHolidays(y));
+    }
+    return all;
+  }
+
+  function calculate() {
+    var startVal = startDateInput.value;
+    var endVal = endDateInput.value;
+    if (!startVal || !endVal) return;
+
+    var start = new Date(startVal + 'T00:00:00');
+    var end = new Date(endVal + 'T00:00:00');
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) return;
+
+    var earlier = start < end ? start : end;
+    var later = start < end ? end : start;
+
+    var msPerDay = 86400000;
+    var calendarDays = Math.round((later.getTime() - earlier.getTime()) / msPerDay);
+
+    var excludeH = excludeHolidaysCheckbox.checked;
+    var startYear = earlier.getFullYear();
+    var endYear = later.getFullYear();
+    var holidays = excludeH ? getAllHolidays(startYear, endYear) : [];
+    var holidayDates = {};
+    for (var i = 0; i < holidays.length; i++) {
+      holidayDates[holidays[i].date] = holidays[i].name;
+    }
+
+    var businessDays = 0;
+    var weekendDays = 0;
+    var excludedHolidays = [];
+    var current = new Date(earlier.getTime());
+    current.setDate(current.getDate() + 1);
+
+    for (var d = 0; d < calendarDays; d++) {
+      var dow = current.getDay();
+      var dateStr = formatDate(current);
+      if (dow === 0 || dow === 6) {
+        weekendDays++;
+      } else if (excludeH && holidayDates[dateStr]) {
+        excludedHolidays.push({ date: dateStr, name: holidayDates[dateStr] });
+      } else {
+        businessDays++;
+      }
+      current.setDate(current.getDate() + 1);
+    }
+
+    document.getElementById('businessDays').textContent = businessDays.toLocaleString();
+    document.getElementById('calendarDays').textContent = calendarDays.toLocaleString();
+    document.getElementById('weekendDays').textContent = weekendDays.toLocaleString();
+    document.getElementById('holidaysExcluded').textContent = excludedHolidays.length.toString();
+
+    var holidayListEl = document.getElementById('holidayList');
+    var holidayItemsEl = document.getElementById('holidayItems');
+    if (excludedHolidays.length > 0) {
+      holidayListEl.style.display = 'block';
+      var html = '';
+      for (var h = 0; h < excludedHolidays.length; h++) {
+        var parts = excludedHolidays[h].date.split('-');
+        var dispDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+        var options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+        html += '<li>' + excludedHolidays[h].name + ' &mdash; ' + dispDate.toLocaleDateString('en-US', options) + '</li>';
+      }
+      holidayItemsEl.innerHTML = html;
+    } else {
+      holidayListEl.style.display = 'none';
+      holidayItemsEl.innerHTML = '';
+    }
+  }
+
+  startDateInput.addEventListener('change', calculate);
+  endDateInput.addEventListener('change', calculate);
+  excludeHolidaysCheckbox.addEventListener('change', calculate);
+
+  calculate();
+</script>

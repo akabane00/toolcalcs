@@ -1,0 +1,298 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Math Calculators", "item": "https://toolcalcs.com/math-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Average Calculator" }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      { '@type': 'Question', name: 'What is the difference between mean, median, and mode?', acceptedAnswer: { '@type': 'Answer', text: 'The mean is the arithmetic average found by adding all values and dividing by the count. The median is the middle value when data is sorted in order. The mode is the value that appears most frequently. Each measure describes central tendency differently and is suited to different types of data and distributions.' } },
+      { '@type': 'Question', name: 'When should I use the median instead of the mean?', acceptedAnswer: { '@type': 'Answer', text: 'Use the median when your data contains outliers or is heavily skewed. For example, median household income is more representative than mean income because a few extremely wealthy individuals can pull the mean far above what most people actually earn. The median is not affected by extreme values.' } },
+      { '@type': 'Question', name: 'Can a data set have more than one mode?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. A data set with two modes is called bimodal, and a data set with more than two modes is called multimodal. If every value appears with equal frequency, the data set has no mode. Multimodal distributions often indicate that the data comes from two or more distinct groups.' } },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Average Calculator - Mean, Median, Mode & Range | ToolCalcs"
+  description="Free average calculator. Enter numbers to instantly calculate mean, median, mode, range, count, and sum. Supports comma, space, or newline separated values."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/math-calculators/">Math Calculators</a> &rsaquo;
+    <span>Average Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Average Calculator</h1>
+  <p class="page-desc">Enter a set of numbers to calculate the mean, median, mode, range, count, and sum instantly.</p>
+
+  <div class="calculator-box">
+    <div class="input-group">
+      <label for="numbersInput">Enter Numbers (separated by commas, spaces, or newlines)</label>
+      <textarea id="numbersInput" class="data-textarea" rows="4" placeholder="e.g. 10, 20, 30, 40, 50&#10;or one number per line">12, 15, 20, 22, 25, 30, 35, 18, 22, 28</textarea>
+    </div>
+
+    <button class="calc-btn" id="calculateBtn">Calculate</button>
+
+    <div class="result-cards" id="resultCards" style="display:none;">
+      <div class="result-card primary">
+        <span class="result-label">Mean (Average)</span>
+        <span class="result-value" id="resMean">&mdash;</span>
+      </div>
+      <div class="result-card primary">
+        <span class="result-label">Median</span>
+        <span class="result-value" id="resMedian">&mdash;</span>
+      </div>
+      <div class="result-card">
+        <span class="result-label">Mode</span>
+        <span class="result-value" id="resMode">&mdash;</span>
+      </div>
+      <div class="result-card">
+        <span class="result-label">Range</span>
+        <span class="result-value" id="resRange">&mdash;</span>
+      </div>
+      <div class="result-card">
+        <span class="result-label">Count</span>
+        <span class="result-value" id="resCount">&mdash;</span>
+      </div>
+      <div class="result-card">
+        <span class="result-label">Sum</span>
+        <span class="result-value" id="resSum">&mdash;</span>
+      </div>
+    </div>
+
+    <div class="sorted-data" id="sortedData" style="display:none;">
+      <span class="sorted-title">Sorted Data</span>
+      <code id="sortedList"></code>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>What Is an Average?</h2>
+    <p>An average is a single number that represents the central or typical value of a data set. In everyday language, "average" usually refers to the arithmetic mean, but statisticians recognize several different types of averages, each suited to different situations. The three most common measures of central tendency are the mean, median, and mode. Together with the range, these statistics give you a comprehensive picture of where your data is centered and how spread out it is.</p>
+    <p>Averages are used everywhere: in school grade reports, sports statistics, weather forecasts, financial analysis, scientific research, and public policy. Understanding what each type of average tells you, and when to use each one, is a fundamental skill in data literacy. A teacher calculating class performance, an investor evaluating stock returns, or a doctor reviewing patient test results all rely on averages to make informed decisions.</p>
+
+    <h2>Mean (Arithmetic Average)</h2>
+    <p>The arithmetic mean is the most commonly used average. It is calculated by adding all the values in a data set and dividing by the number of values. The formula is:</p>
+    <div class="formula-box"><code>Mean = (Sum of all values) / (Number of values)</code></div>
+    <p>For example, given the data set 12, 15, 20, 22, 25, the mean is (12 + 15 + 20 + 22 + 25) / 5 = 94 / 5 = 18.8. The mean takes every value into account, which makes it a comprehensive measure of central tendency. However, this also makes it sensitive to outliers. If one student in a class of 20 scored 100 while the rest scored around 50, the mean would be pulled significantly upward, potentially misrepresenting the typical performance.</p>
+    <p>The mean is most useful when the data is roughly symmetric and does not contain extreme outliers. It works well for normally distributed data such as heights, weights, standardized test scores, and measurement errors. In finance, the mean return of an investment over time gives you the expected average performance, although it does not capture the risk or variability of those returns.</p>
+    <p>There are also other types of means beyond the arithmetic mean. The <strong>weighted mean</strong> assigns different weights to different values, which is useful when some data points are more important than others. For example, your GPA is a weighted mean where courses with more credit hours count more. The <strong>geometric mean</strong> multiplies all values and takes the nth root, and it is used for growth rates and ratios. The <strong>harmonic mean</strong> is the reciprocal of the arithmetic mean of the reciprocals, and it is used for rates and ratios where the denominator varies, such as average speed over different distances.</p>
+
+    <h2>Median</h2>
+    <p>The median is the middle value of a data set when the values are arranged in ascending or descending order. If the data set has an odd number of values, the median is the single middle value. If the data set has an even number of values, the median is the average of the two middle values.</p>
+    <div class="formula-box"><code>Median (odd n) = value at position (n + 1) / 2<br/>Median (even n) = average of values at positions n/2 and n/2 + 1</code></div>
+    <p>For the data set 3, 7, 9, 15, 22, the median is 9 (the third value out of five). For the data set 3, 7, 9, 15, the median is (7 + 9) / 2 = 8. Unlike the mean, the median is resistant to outliers. Adding the value 1,000 to the first data set (making it 3, 7, 9, 15, 22, 1000) changes the mean dramatically from 11.2 to 176, but the median only shifts from 9 to 12.</p>
+    <p>The median is the preferred measure of central tendency for skewed distributions. Household income is a classic example: because a small number of very high earners skew the distribution to the right, the median income is typically 20% to 40% lower than the mean income and gives a more accurate picture of what a typical household earns. Real estate prices, hospital costs, and wealth distributions all share this pattern, which is why journalists and economists usually report the median rather than the mean for these topics.</p>
+    <p>The median also divides a data set into two equal halves. This property makes it the foundation for percentiles and quartiles. The 25th percentile (first quartile Q1) is the median of the lower half, the 50th percentile is the median itself, and the 75th percentile (third quartile Q3) is the median of the upper half. The interquartile range (IQR = Q3 &ndash; Q1) is a robust measure of spread that, like the median, is not affected by extreme values.</p>
+
+    <h2>Mode</h2>
+    <p>The mode is the value that occurs most frequently in a data set. A data set can have one mode (unimodal), two modes (bimodal), or more than two modes (multimodal). If no value repeats, the data set has no mode.</p>
+    <p>For the data set 2, 3, 3, 5, 7, 7, 7, 9, the mode is 7 because it appears three times, more than any other value. For the data set 1, 2, 3, 4, 5, there is no mode because every value appears exactly once. For the data set 4, 4, 6, 6, 8, both 4 and 6 are modes, making it bimodal.</p>
+    <p>The mode is the only measure of central tendency that can be used with categorical (non-numeric) data. For example, if you survey people about their favorite color and the most common answer is blue, then blue is the mode. The mode is also useful for identifying the most common shoe size in a store's inventory, the most popular product in a catalog, or the peak hour for website traffic.</p>
+    <p>In practice, the mode is less commonly used than the mean or median for continuous numerical data because many data sets either have no mode or have modes that do not provide meaningful insight. However, in quality control and manufacturing, the mode of defect types helps identify the most common failure pattern. In retail, the modal price point or modal transaction amount informs pricing strategy. And in healthcare, the modal symptom or modal diagnosis in a patient population guides resource allocation.</p>
+
+    <h2>Range</h2>
+    <p>The range is the simplest measure of spread or dispersion in a data set. It is calculated by subtracting the smallest value from the largest value:</p>
+    <div class="formula-box"><code>Range = Maximum value &ndash; Minimum value</code></div>
+    <p>For the data set 5, 12, 8, 20, 3, the range is 20 &ndash; 3 = 17. The range gives you a quick sense of how spread out your data is, but it has an important limitation: it depends entirely on the two most extreme values and tells you nothing about the distribution of values in between. Two data sets can have the same range but very different distributions. For example, &#123;1, 50, 50, 50, 100&#125; and &#123;1, 10, 50, 90, 100&#125; both have a range of 99, but the first set is clustered at the center while the second is more evenly spread.</p>
+    <p>Because the range is so sensitive to outliers, statisticians often prefer more robust measures of spread such as the interquartile range (IQR), standard deviation, or variance. However, the range remains useful as a quick preliminary check and in certain applied contexts. In quality control, the range of a small sample is used in control charts (R-charts) to monitor process variation. In weather reporting, the daily temperature range (high minus low) is a standard metric. And in sports, the scoring range across games indicates how consistent a team's performance is.</p>
+
+    <h2>Mean vs. Median: When to Use Each</h2>
+    <p>Choosing between the mean and median depends on the shape of your data distribution and the presence of outliers. Here are practical guidelines:</p>
+    <ul>
+      <li><strong>Use the mean</strong> when data is roughly symmetric (bell-shaped), has no extreme outliers, and you want to account for every data point. Examples include test scores in a large class, daily temperatures over a month, and manufacturing measurements from a stable process.</li>
+      <li><strong>Use the median</strong> when data is skewed (has a long tail in one direction), contains outliers, or represents ordinal data. Examples include household incomes, home prices, hospital wait times, and customer satisfaction ratings on a 1&ndash;10 scale.</li>
+      <li><strong>Report both</strong> when the difference between the mean and median is informative. If the mean is significantly higher than the median, the distribution is right-skewed (pulled upward by high values). If the mean is lower than the median, the distribution is left-skewed. The gap between the two measures quantifies the degree of skewness.</li>
+    </ul>
+    <p>As a rule of thumb, if the mean and median are close together, the distribution is roughly symmetric, and either measure works well. If they differ substantially, the median is usually the better representative of a "typical" value, and you should investigate the cause of the skewness (such as outliers or a natural upper or lower bound).</p>
+
+    <h2>Common Mistakes When Calculating Averages</h2>
+    <p>Even experienced analysts make errors when working with averages. Here are the most common pitfalls to avoid:</p>
+    <ul>
+      <li><strong>Averaging percentages or rates directly:</strong> You cannot simply average two percentages unless they represent the same sample size. If 90% of 100 students passed one test and 80% of 200 students passed another, the overall pass rate is not (90 + 80) / 2 = 85%, but rather (90 + 160) / 300 = 83.3%. This is known as Simpson's paradox in extreme cases.</li>
+      <li><strong>Ignoring outliers:</strong> A single extreme value can distort the mean dramatically. Always check for outliers before reporting the mean, and consider whether the median is more appropriate.</li>
+      <li><strong>Confusing the mean with the most likely outcome:</strong> In a right-skewed distribution, more than half of the values are below the mean. The mean is not the most probable value; the mode is. And the median, not the mean, divides the data into two equal halves.</li>
+      <li><strong>Averaging averages incorrectly:</strong> If Class A has a mean of 75 (30 students) and Class B has a mean of 85 (10 students), the combined mean is not (75 + 85) / 2 = 80. The correct combined mean is (75 &times; 30 + 85 &times; 10) / (30 + 10) = (2250 + 850) / 40 = 77.5. You must weight by sample size.</li>
+      <li><strong>Forgetting about data types:</strong> You can calculate a mean for numerical data but not for categorical data. The average of "red," "blue," and "green" is meaningless. For categorical data, use the mode to find the most common category.</li>
+    </ul>
+
+    <h2>Averages in Everyday Life</h2>
+    <p>Averages are woven into daily life in ways you may not always notice. Your grade point average (GPA) is a weighted mean of your course grades, where each grade is weighted by the number of credit hours. The batting average in baseball is the number of hits divided by the number of at-bats, expressed as a three-digit decimal. Your credit score is influenced by the average age of your credit accounts. Weather forecasts use historical averages to determine whether today's temperature is above or below normal. Economic indicators such as GDP per capita, average hourly earnings, and the Consumer Price Index (CPI) are all forms of averages that drive policy decisions.</p>
+    <p>In personal finance, understanding averages helps you budget and plan. The average monthly electricity bill over a year smooths out seasonal variation and tells you what to expect. The average return on your retirement portfolio helps you project future growth (though the geometric mean is more accurate than the arithmetic mean for compounded returns). When comparing job offers, the average salary in a field and location helps you assess whether an offer is competitive.</p>
+    <p>In sports analytics, advanced statistics go far beyond simple averages. Earned run average (ERA) in baseball, points per game (PPG) in basketball, and average time per kilometer in running are all means that let you compare performance across players, teams, and seasons. Rolling averages smooth out game-to-game fluctuations and reveal trends. Weighted averages let coaches emphasize recent performance over older results.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>What is the difference between mean, median, and mode?</summary>
+        <p>The mean (arithmetic average) is calculated by adding all values and dividing by the count. It accounts for every data point but is sensitive to outliers. The median is the middle value when data is sorted, making it resistant to extreme values and ideal for skewed distributions. The mode is the most frequently occurring value and is the only average that works with categorical data. For symmetric data, all three measures are approximately equal. For skewed data, they diverge, and the median is typically the most representative measure of a "typical" value.</p>
+      </details>
+      <details class="faq-item">
+        <summary>When should I use the median instead of the mean?</summary>
+        <p>Use the median when your data contains outliers, is skewed, or has extreme values that would distort the mean. Common examples include household income, home prices, hospital costs, and executive compensation data. If a few very high or very low values pull the mean away from the center of the distribution, the median gives a more accurate picture of the typical value. As a quick test, if the mean and median differ by more than about 10%, the data is likely skewed and the median may be more informative.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can a data set have more than one mode?</summary>
+        <p>Yes. A data set with two modes is called bimodal, and one with more than two modes is called multimodal. For example, the data set 2, 2, 5, 7, 7 has two modes: 2 and 7. If every value appears with equal frequency, the data set is said to have no mode. Bimodal or multimodal distributions often suggest that the data comes from two or more distinct groups or populations, and further investigation is usually warranted.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How does the range differ from standard deviation?</summary>
+        <p>The range is the difference between the largest and smallest values, making it simple but dependent on only two data points. Standard deviation measures the average distance of all data points from the mean, providing a more comprehensive picture of data spread. The range can be misleading when outliers are present because a single extreme value inflates it. Standard deviation is less affected by individual outliers relative to the data size and is the standard measure of variability in statistics, finance, and science.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Why is my mean different from what I expected?</summary>
+        <p>The most common reasons are: outliers pulling the mean in one direction, accidentally including or excluding data points, or confusing the arithmetic mean with a weighted or geometric mean. Double-check your data for typos or duplicate entries, verify that all values have been included, and consider whether a weighted mean or geometric mean is more appropriate for your situation. If the mean seems unrepresentative, calculate the median to see whether it gives a better picture of the typical value.</p>
+      </details>
+    </div>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/math-calculators/standard-deviation-calculator/">Standard Deviation Calculator</a> &ndash; Calculate standard deviation, variance, and other descriptive statistics.</li>
+      <li><a href="/math-calculators/percentage-calculator/">Percentage Calculator</a> &ndash; Quick percentage calculations for everyday use.</li>
+      <li><a href="/math-calculators/gpa-calculator/">GPA Calculator</a> &ndash; Calculate your weighted grade point average.</li>
+      <li><a href="/math-calculators/scientific-calculator/">Scientific Calculator</a> &ndash; Full-featured scientific calculator with advanced functions.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+  <RelatedArticles calculatorSlug="average-calculator" />
+  <RelatedCalculators currentSlug="average-calculator" />
+</BaseLayout>
+
+<style>
+  .data-textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-family: inherit;
+    background: var(--color-bg);
+    color: var(--color-text);
+    resize: vertical;
+    box-sizing: border-box;
+    line-height: 1.6;
+  }
+  .data-textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+
+  .result-cards {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .sorted-data {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    text-align: center;
+  }
+  .sorted-title {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-bottom: 6px;
+  }
+  .sorted-data code {
+    font-size: 0.95rem;
+    color: var(--color-text);
+    word-break: break-all;
+  }
+
+  .last-updated { font-size: 0.75rem; color: var(--color-text-muted); margin: 4px 0 0; }
+</style>
+
+<script is:inline>
+  function calculate() {
+    var rawInput = document.getElementById('numbersInput').value;
+    var nums = rawInput.split(/[\s,\n]+/).map(function(s) { return parseFloat(s.trim()); }).filter(function(n) { return !isNaN(n); });
+    var cards = document.getElementById('resultCards');
+    var sortedDiv = document.getElementById('sortedData');
+
+    if (nums.length === 0) {
+      cards.style.display = 'none';
+      sortedDiv.style.display = 'none';
+      return;
+    }
+
+    // Mean
+    var sum = nums.reduce(function(a, b) { return a + b; }, 0);
+    var mean = sum / nums.length;
+
+    // Median
+    var sorted = nums.slice().sort(function(a, b) { return a - b; });
+    var median;
+    var mid = Math.floor(sorted.length / 2);
+    if (sorted.length % 2 === 0) {
+      median = (sorted[mid - 1] + sorted[mid]) / 2;
+    } else {
+      median = sorted[mid];
+    }
+
+    // Mode
+    var freq = {};
+    var maxFreq = 0;
+    nums.forEach(function(n) {
+      freq[n] = (freq[n] || 0) + 1;
+      if (freq[n] > maxFreq) maxFreq = freq[n];
+    });
+    var modes = Object.keys(freq).filter(function(k) { return freq[k] === maxFreq; });
+    var modeStr;
+    if (maxFreq === 1) {
+      modeStr = 'No mode';
+    } else if (modes.length === Object.keys(freq).length) {
+      modeStr = 'No mode';
+    } else {
+      modeStr = modes.join(', ');
+    }
+
+    // Range
+    var range = sorted[sorted.length - 1] - sorted[0];
+
+    // Display results
+    var fmt = function(n) {
+      return parseFloat(n.toFixed(6)).toLocaleString('en-US', { maximumFractionDigits: 6 });
+    };
+
+    document.getElementById('resMean').textContent = fmt(mean);
+    document.getElementById('resMedian').textContent = fmt(median);
+    document.getElementById('resMode').textContent = modeStr;
+    document.getElementById('resRange').textContent = fmt(range);
+    document.getElementById('resCount').textContent = nums.length.toString();
+    document.getElementById('resSum').textContent = fmt(sum);
+
+    cards.style.display = 'grid';
+
+    // Sorted data display
+    document.getElementById('sortedList').textContent = sorted.map(function(n) { return fmt(n); }).join(', ');
+    sortedDiv.style.display = 'block';
+  }
+
+  document.getElementById('calculateBtn').addEventListener('click', calculate);
+  calculate();
+</script>

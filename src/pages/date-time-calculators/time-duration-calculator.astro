@@ -1,0 +1,453 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Date & Time Calculators", "item": "https://toolcalcs.com/date-time-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Time Duration Calculator" }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How do you add hours and minutes together?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'To add hours and minutes, first add the minutes together. If the total minutes equal 60 or more, divide by 60 to get additional hours and the remaining minutes. Then add the extra hours to the hour total. For example, 2 hours 45 minutes plus 1 hour 30 minutes equals 3 hours 75 minutes, which simplifies to 4 hours 15 minutes.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How do you calculate time between two clock times?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Convert both times to minutes since midnight (hours times 60 plus minutes), subtract the earlier time from the later time, then convert back to hours and minutes. If the end time is earlier than the start time, add 1440 (24 hours in minutes) to handle crossing midnight. For example, from 9:30 AM to 2:15 PM is from 570 to 855 minutes, a difference of 285 minutes or 4 hours 45 minutes.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What happens when adding time crosses midnight?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'When a time addition crosses midnight, the result wraps around to the next day. For example, 11:00 PM plus 3 hours equals 2:00 AM the next day. This calculator handles midnight crossings automatically and indicates when the result falls on the next day with a "next day" label.',
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Time Duration Calculator - Add, Subtract & Find Time Between | ToolCalcs"
+  description="Free time duration calculator. Add or subtract hours and minutes, or find the exact duration between two clock times. Handles midnight crossings automatically."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/date-time-calculators/">Date &amp; Time Calculators</a> &rsaquo;
+    <span>Time Duration Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Time Duration Calculator</h1>
+  <p class="page-desc">Add or subtract hours and minutes, or find the exact duration between two times.</p>
+
+  <div class="calculator-box">
+    <div class="tab-bar">
+      <button type="button" class="tab-btn active" id="tabAddSub" data-tab="addSub">Add / Subtract Time</button>
+      <button type="button" class="tab-btn" id="tabBetween" data-tab="between">Time Between</button>
+    </div>
+
+    <!-- Tab 1: Add/Subtract -->
+    <div class="tab-panel active" id="panelAddSub">
+      <div class="calc-inputs">
+        <div class="input-group">
+          <label for="asHours">Hours</label>
+          <input type="number" id="asHours" min="0" max="999" value="9" />
+        </div>
+        <div class="input-group">
+          <label for="asMinutes">Minutes</label>
+          <input type="number" id="asMinutes" min="0" max="59" value="30" />
+        </div>
+        <div class="input-group">
+          <label for="asOp">Operation</label>
+          <select id="asOp">
+            <option value="add">+ Add</option>
+            <option value="sub">&minus; Subtract</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="asDurHours">Duration Hours</label>
+          <input type="number" id="asDurHours" min="0" max="999" value="3" />
+        </div>
+        <div class="input-group">
+          <label for="asDurMinutes">Duration Minutes</label>
+          <input type="number" id="asDurMinutes" min="0" max="59" value="45" />
+        </div>
+      </div>
+      <div class="calc-results">
+        <div class="result-cards">
+          <div class="result-card primary">
+            <span class="result-label">Result</span>
+            <span class="result-value" id="asResult">--</span>
+            <span class="result-detail" id="asDetail"></span>
+          </div>
+          <div class="result-card">
+            <span class="result-label">Total Minutes</span>
+            <span class="result-value small" id="asTotalMin">--</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Time Between -->
+    <div class="tab-panel" id="panelBetween">
+      <div class="calc-inputs">
+        <div class="input-group">
+          <label for="tbStartH">Start Hour</label>
+          <input type="number" id="tbStartH" min="1" max="12" value="9" />
+        </div>
+        <div class="input-group">
+          <label for="tbStartM">Start Minute</label>
+          <input type="number" id="tbStartM" min="0" max="59" value="0" />
+        </div>
+        <div class="input-group">
+          <label for="tbStartAP">AM/PM</label>
+          <select id="tbStartAP">
+            <option value="AM">AM</option>
+            <option value="PM">PM</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="tbEndH">End Hour</label>
+          <input type="number" id="tbEndH" min="1" max="12" value="5" />
+        </div>
+        <div class="input-group">
+          <label for="tbEndM">End Minute</label>
+          <input type="number" id="tbEndM" min="0" max="59" value="30" />
+        </div>
+        <div class="input-group">
+          <label for="tbEndAP">AM/PM</label>
+          <select id="tbEndAP">
+            <option value="AM">AM</option>
+            <option value="PM" selected>PM</option>
+          </select>
+        </div>
+      </div>
+      <div class="calc-results">
+        <div class="result-cards">
+          <div class="result-card primary">
+            <span class="result-label">Duration</span>
+            <span class="result-value" id="tbResult">--</span>
+            <span class="result-detail" id="tbDetail"></span>
+          </div>
+          <div class="result-card">
+            <span class="result-label">Total Minutes</span>
+            <span class="result-value small" id="tbTotalMin">--</span>
+          </div>
+          <div class="result-card">
+            <span class="result-label">Decimal Hours</span>
+            <span class="result-value small" id="tbDecimal">--</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>Why Time Math Is Tricky</h2>
+    <p>Time arithmetic is one of those tasks that seems simple on the surface but quickly becomes confusing in practice. Unlike the base-10 number system we use for most calculations, time operates on a base-60 system for minutes and seconds and a base-24 system for hours. This means that adding 45 minutes to 30 minutes does not give you 75 minutes in the usual sense &mdash; it gives you 1 hour and 15 minutes. And adding 8 hours to 6 PM does not give you 14 PM; it gives you 2 AM the next day.</p>
+    <p>The source of most errors in time math is the carry operation. In regular arithmetic, you carry when a digit reaches 10. In time arithmetic, you carry when minutes reach 60 and when hours reach 24 (or 12 in the 12-hour clock system). Mixing up these carrying rules leads to incorrect results, especially when people try to do the math in their heads while stressed or tired.</p>
+    <p>Consider a nurse who finishes a shift at 7:00 AM and needs to return 9 hours and 45 minutes later. Many people would start by adding 9 hours to 7:00 AM to get 4:00 PM, then add 45 minutes to get 4:45 PM. This approach works, but it requires two separate calculations and an understanding of how the 12-hour clock wraps. Now consider that the nurse's shift ends at 11:30 PM and she needs to return 10 hours later. Adding 10 hours to 11:30 PM requires crossing midnight, resulting in 9:30 AM the next day. This is where most people make mistakes, and where a calculator becomes invaluable.</p>
+    <p>This time duration calculator eliminates these headaches by converting all times to a common unit (total minutes), performing the arithmetic in that unit, and converting back to the familiar hours-and-minutes format. It handles midnight crossings, AM/PM transitions, and multi-hour additions or subtractions without error.</p>
+
+    <h2>How to Add and Subtract Time</h2>
+    <p>The fundamental principle behind time addition and subtraction is unit conversion. Convert everything to a single unit (usually total minutes), perform the arithmetic, then convert back. Here is the step-by-step process:</p>
+    <h3>Adding Time</h3>
+    <ol>
+      <li>Convert the starting time to total minutes: multiply the hours by 60 and add the minutes. For example, 3 hours 20 minutes = (3 &times; 60) + 20 = 200 minutes.</li>
+      <li>Convert the duration to total minutes using the same method. For example, 1 hour 50 minutes = (1 &times; 60) + 50 = 110 minutes.</li>
+      <li>Add the two totals: 200 + 110 = 310 minutes.</li>
+      <li>Convert back: 310 &divide; 60 = 5 hours with a remainder of 10 minutes. The result is 5 hours 10 minutes.</li>
+    </ol>
+    <h3>Subtracting Time</h3>
+    <ol>
+      <li>Convert both values to total minutes.</li>
+      <li>Subtract the duration from the starting time.</li>
+      <li>If the result is negative, add 1440 (the number of minutes in 24 hours) to get the correct time on the previous day.</li>
+      <li>Convert the result back to hours and minutes.</li>
+    </ol>
+    <p>For example, subtracting 2 hours 30 minutes from 1 hour 15 minutes: 75 &minus; 150 = &minus;75 minutes. Since the result is negative, this means the duration exceeds the starting time by 1 hour and 15 minutes. If we are working with clock times, we would add 1440 to get 1365 minutes, which converts to 22 hours 45 minutes (10:45 PM the previous day).</p>
+
+    <h2>Calculating the Duration Between Two Times</h2>
+    <p>Finding the time between two clock times requires converting both times to minutes past midnight, then subtracting. The steps are:</p>
+    <ol>
+      <li>Convert the start time to 24-hour format. For AM times, the hours stay the same (except 12 AM, which is 0). For PM times, add 12 to the hours (except 12 PM, which stays as 12).</li>
+      <li>Convert to total minutes: hours &times; 60 + minutes.</li>
+      <li>Do the same for the end time.</li>
+      <li>Subtract start minutes from end minutes. If the result is negative, the time range crosses midnight. Add 1440 to get the correct positive duration.</li>
+      <li>Convert the result back to hours and minutes.</li>
+    </ol>
+    <p>For example, from 9:30 AM to 2:15 PM: Start = (9 &times; 60) + 30 = 570 minutes. End = (14 &times; 60) + 15 = 855 minutes. Difference = 855 &minus; 570 = 285 minutes = 4 hours 45 minutes.</p>
+    <p>For a cross-midnight example, from 10:00 PM to 6:30 AM: Start = (22 &times; 60) + 0 = 1320 minutes. End = (6 &times; 60) + 30 = 390 minutes. Difference = 390 &minus; 1320 = &minus;930. Add 1440: &minus;930 + 1440 = 510 minutes = 8 hours 30 minutes.</p>
+
+    <h2>Cross-Midnight Calculations</h2>
+    <p>Crossing midnight is the single most common source of error in time calculations. When adding time to an evening hour pushes the result past 12:00 AM, the result wraps into the next day. When subtracting time from an early morning hour pushes the result before 12:00 AM, the result wraps into the previous day.</p>
+    <p>This calculator handles midnight crossings automatically. When the "Add/Subtract" tab produces a result that crosses midnight, it displays a "next day" or "previous day" indicator so you know the result is not on the same day as the starting time. Similarly, when the "Time Between" tab detects that the end time is earlier in the day than the start time, it assumes the end time is on the following day and calculates accordingly.</p>
+    <p>Real-world scenarios where midnight crossings occur frequently include overnight shifts (healthcare, manufacturing, hospitality), international travel itineraries, overnight delivery schedules, and astronomical observations. Anyone who works with times spanning the midnight boundary needs a reliable method for performing the calculation, and mental arithmetic is simply not reliable enough when the stakes are high.</p>
+
+    <h2>Work Hours Tracking</h2>
+    <p>Tracking work hours accurately is essential for payroll, project billing, and labor law compliance. Many workers need to calculate the duration of their shifts, subtract break times, and total hours across a week or pay period. Time duration calculations are at the heart of this process.</p>
+    <p>A typical hourly employee might clock in at 8:15 AM, take a 30-minute lunch at 12:00 PM, and clock out at 4:45 PM. To calculate the total work hours, find the duration from 8:15 AM to 4:45 PM (8 hours 30 minutes) and subtract the 30-minute lunch break. The result is 8 hours of paid time. If the employee worked overtime past 5:00 PM until 6:30 PM, you would add another 1 hour 30 minutes, for a total of 9 hours 30 minutes.</p>
+    <p>Salaried employees who bill by the hour (lawyers, consultants, freelancers) must track time in even more granular detail. A consultant might log 2 hours 15 minutes for one client meeting, 45 minutes for email correspondence, and 3 hours 30 minutes for a project deliverable. Adding these durations gives a total of 6 hours 30 minutes for the day. This calculator makes it easy to add multiple durations together or to find the exact time between start and end points for each activity.</p>
+
+    <h2>Common Time Duration Questions</h2>
+    <p>Certain time calculations come up so frequently that it is worth understanding the patterns:</p>
+    <ul>
+      <li><strong>How many hours from 9 AM to 5 PM?</strong> 8 hours exactly. This is the standard full-time workday in the United States.</li>
+      <li><strong>How many hours from 8:30 AM to 5:00 PM with a 30-minute lunch?</strong> 8 hours total, but 7 hours 30 minutes of working time after subtracting lunch.</li>
+      <li><strong>How many hours from 11 PM to 7 AM?</strong> 8 hours. This is a typical overnight shift.</li>
+      <li><strong>What time is it 90 minutes from now?</strong> Add 1 hour and 30 minutes to the current time. If it is currently 3:45 PM, the answer is 5:15 PM.</li>
+      <li><strong>What time was it 4 hours and 20 minutes ago?</strong> Subtract from the current time. If it is currently 2:10 PM, the answer is 9:50 AM.</li>
+    </ul>
+
+    <h2>Time in Decimal Format</h2>
+    <p>Many payroll systems and time-tracking applications require time to be entered in decimal format rather than hours and minutes. In decimal format, partial hours are expressed as a fraction of 60 minutes. To convert, divide the minutes by 60 and append to the hour count.</p>
+    <p>Common conversions include: 15 minutes = 0.25 hours, 30 minutes = 0.50 hours, 45 minutes = 0.75 hours, and 20 minutes = 0.33 hours. For less common values, use the formula: decimal hours = hours + (minutes &divide; 60). For example, 7 hours 42 minutes = 7 + (42 &divide; 60) = 7.70 hours.</p>
+    <p>The "Time Between" tab in this calculator displays the result in both standard (hours:minutes) and decimal formats, so you can directly enter the value into timesheets, invoicing systems, or project management tools without performing additional conversions.</p>
+
+    <h2>Military Time and 24-Hour Clock</h2>
+    <p>The 24-hour clock, sometimes called military time in the United States, eliminates the ambiguity of AM and PM by counting hours from 0 (midnight) to 23 (11 PM). In this system, 1:00 PM is 13:00, 5:30 PM is 17:30, and midnight is 00:00. The 24-hour format is standard in most countries outside the United States and is used universally in aviation, military operations, emergency services, and healthcare.</p>
+    <p>Time arithmetic is actually easier in the 24-hour format because there is no need to handle AM/PM conversions. When converting from the 12-hour format to 24-hour, leave AM hours as they are (except 12 AM, which becomes 00), and add 12 to PM hours (except 12 PM, which stays as 12). This calculator accepts input in the 12-hour AM/PM format for convenience, but internally performs all calculations using total minutes, which is equivalent to working in 24-hour time.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>How do you add hours and minutes together?</summary>
+        <p>Convert both times to total minutes by multiplying hours by 60 and adding the minutes. Add the totals together, then divide by 60 to get the hours and use the remainder for minutes. For example, 2:45 + 1:30 = 165 + 90 = 255 minutes = 4 hours 15 minutes. This calculator performs the conversion and arithmetic automatically.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How do you calculate time between two clock times?</summary>
+        <p>Convert both times to minutes past midnight using the 24-hour clock. Subtract the start time from the end time. If the result is negative (meaning the time range crosses midnight), add 1440 minutes (24 hours). Then convert the result back to hours and minutes. For example, from 9:30 AM to 2:15 PM: 855 &minus; 570 = 285 minutes = 4 hours 45 minutes.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What happens when adding time crosses midnight?</summary>
+        <p>When a time addition crosses midnight, the result wraps to the next day. For example, 10:30 PM + 4 hours = 2:30 AM the next day. This calculator detects midnight crossings automatically and labels the result with a "next day" indicator so you always know when the result falls on a different day than the starting time.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How do I convert time to decimal hours?</summary>
+        <p>Divide the minutes by 60 and add to the whole hours. For example, 3 hours 45 minutes = 3 + (45 &divide; 60) = 3.75 decimal hours. Common conversions: 15 min = 0.25, 30 min = 0.50, 45 min = 0.75. The "Time Between" tab in this calculator displays results in both standard and decimal formats for easy entry into timesheets and payroll systems.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can I subtract a larger duration from a smaller one?</summary>
+        <p>Yes. If you subtract a larger duration from a smaller starting time, the result will be negative. In the context of clock times, a negative result means the time falls on the previous day. For example, 2:00 AM minus 5 hours gives 9:00 PM the previous day. This calculator handles negative results correctly and indicates when the result crosses into a different day.</p>
+      </details>
+    </div>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/date-time-calculators/date-difference-calculator/">Date Difference Calculator</a> &ndash; Find days, weeks, and months between two dates.</li>
+      <li><a href="/date-time-calculators/business-days-calculator/">Business Days Calculator</a> &ndash; Count working days between two dates.</li>
+      <li><a href="/date-time-calculators/timestamp-calculator/">Timestamp Calculator</a> &ndash; Convert between Unix timestamps and human-readable dates.</li>
+      <li><a href="/everyday-calculators/hours-calculator/">Hours Calculator</a> &ndash; Calculate total work hours from time entries.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+  <RelatedArticles calculatorSlug="time-duration-calculator" />
+  <RelatedCalculators currentSlug="time-duration-calculator" />
+</BaseLayout>
+
+<style>
+  .last-updated { font-size: 0.75rem; color: var(--color-text-muted); margin: 4px 0 0; }
+  .tab-bar {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid var(--color-border);
+    margin-bottom: 20px;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 10px 16px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: none;
+    background: none;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .tab-btn:hover {
+    color: var(--color-text);
+  }
+  .tab-btn.active {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+  }
+  .tab-panel {
+    display: none;
+  }
+  .tab-panel.active {
+    display: block;
+  }
+  .result-card.primary {
+    background: #eff6ff;
+    grid-column: 1 / -1;
+  }
+  .result-card.primary .result-value {
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: var(--color-primary);
+  }
+  .result-value.small {
+    font-size: 1.1rem;
+  }
+  .result-detail {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+  }
+
+  [data-theme="dark"] .result-card.primary { background: #1e3a5f; }
+
+  @media (max-width: 640px) {
+    .calc-inputs { grid-template-columns: 1fr 1fr; }
+    .result-cards { grid-template-columns: 1fr; }
+    .result-card.primary { grid-column: auto; }
+  }
+</style>
+
+<script is:inline>
+  // Tab switching
+  var tabs = document.querySelectorAll('.tab-btn');
+  var panels = document.querySelectorAll('.tab-panel');
+  for (var i = 0; i < tabs.length; i++) {
+    tabs[i].addEventListener('click', function() {
+      var target = this.getAttribute('data-tab');
+      for (var j = 0; j < tabs.length; j++) {
+        tabs[j].classList.remove('active');
+        panels[j].classList.remove('active');
+      }
+      this.classList.add('active');
+      document.getElementById('panel' + target.charAt(0).toUpperCase() + target.slice(1)).classList.add('active');
+    });
+  }
+
+  // Tab 1: Add/Subtract
+  var asHours = document.getElementById('asHours');
+  var asMinutes = document.getElementById('asMinutes');
+  var asOp = document.getElementById('asOp');
+  var asDurHours = document.getElementById('asDurHours');
+  var asDurMinutes = document.getElementById('asDurMinutes');
+
+  function calcAddSub() {
+    var h = parseInt(asHours.value) || 0;
+    var m = parseInt(asMinutes.value) || 0;
+    var dh = parseInt(asDurHours.value) || 0;
+    var dm = parseInt(asDurMinutes.value) || 0;
+
+    var totalStart = h * 60 + m;
+    var totalDur = dh * 60 + dm;
+    var result;
+
+    if (asOp.value === 'add') {
+      result = totalStart + totalDur;
+    } else {
+      result = totalStart - totalDur;
+    }
+
+    var dayNote = '';
+    if (result >= 1440) {
+      dayNote = ' (next day)';
+      result = result % 1440;
+    } else if (result < 0) {
+      dayNote = ' (previous day)';
+      result = ((result % 1440) + 1440) % 1440;
+    }
+
+    var rh = Math.floor(result / 60);
+    var rm = result % 60;
+
+    var ampm = rh >= 12 ? 'PM' : 'AM';
+    var displayH = rh % 12;
+    if (displayH === 0) displayH = 12;
+
+    document.getElementById('asResult').textContent = displayH + ':' + String(rm).padStart(2, '0') + ' ' + ampm + dayNote;
+    document.getElementById('asDetail').textContent = rh + ' hours ' + rm + ' minutes total';
+    document.getElementById('asTotalMin').textContent = (h * 60 + m + (asOp.value === 'add' ? totalDur : -totalDur)).toString();
+  }
+
+  asHours.addEventListener('input', calcAddSub);
+  asMinutes.addEventListener('input', calcAddSub);
+  asOp.addEventListener('change', calcAddSub);
+  asDurHours.addEventListener('input', calcAddSub);
+  asDurMinutes.addEventListener('input', calcAddSub);
+  calcAddSub();
+
+  // Tab 2: Time Between
+  var tbStartH = document.getElementById('tbStartH');
+  var tbStartM = document.getElementById('tbStartM');
+  var tbStartAP = document.getElementById('tbStartAP');
+  var tbEndH = document.getElementById('tbEndH');
+  var tbEndM = document.getElementById('tbEndM');
+  var tbEndAP = document.getElementById('tbEndAP');
+
+  function to24(h, m, ap) {
+    h = parseInt(h) || 0;
+    m = parseInt(m) || 0;
+    if (ap === 'AM') {
+      if (h === 12) h = 0;
+    } else {
+      if (h !== 12) h += 12;
+    }
+    return h * 60 + m;
+  }
+
+  function calcBetween() {
+    var startMin = to24(tbStartH.value, tbStartM.value, tbStartAP.value);
+    var endMin = to24(tbEndH.value, tbEndM.value, tbEndAP.value);
+
+    var diff = endMin - startMin;
+    if (diff < 0) {
+      diff += 1440;
+    }
+
+    var dh = Math.floor(diff / 60);
+    var dm = diff % 60;
+    var decimal = (diff / 60).toFixed(2);
+
+    var parts = [];
+    if (dh > 0) parts.push(dh + (dh === 1 ? ' hour' : ' hours'));
+    if (dm > 0) parts.push(dm + (dm === 1 ? ' minute' : ' minutes'));
+    var display = parts.length > 0 ? parts.join(' ') : '0 minutes';
+
+    document.getElementById('tbResult').textContent = display;
+    document.getElementById('tbDetail').textContent = dh + ':' + String(dm).padStart(2, '0') + ' (HH:MM)';
+    document.getElementById('tbTotalMin').textContent = diff.toString();
+    document.getElementById('tbDecimal').textContent = decimal + ' hrs';
+  }
+
+  tbStartH.addEventListener('input', calcBetween);
+  tbStartM.addEventListener('input', calcBetween);
+  tbStartAP.addEventListener('change', calcBetween);
+  tbEndH.addEventListener('input', calcBetween);
+  tbEndM.addEventListener('input', calcBetween);
+  tbEndAP.addEventListener('change', calcBetween);
+  calcBetween();
+</script>

@@ -1,0 +1,483 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Math Calculators", "item": "https://toolcalcs.com/math-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Triangle Calculator" }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      { '@type': 'Question', name: 'How do you calculate the area of a triangle when you know all three sides?', acceptedAnswer: { '@type': 'Answer', text: 'Use Heron\'s formula. First calculate the semi-perimeter s = (a + b + c) / 2, then the area equals the square root of s times (s minus a) times (s minus b) times (s minus c). This works for any triangle as long as the three sides satisfy the triangle inequality.' } },
+      { '@type': 'Question', name: 'What is the Law of Cosines and when is it used?', acceptedAnswer: { '@type': 'Answer', text: 'The Law of Cosines states that c squared equals a squared plus b squared minus 2ab times the cosine of angle C. It is used to find an unknown side when two sides and the included angle are known (SAS), or to find an unknown angle when all three sides are known (SSS). It generalizes the Pythagorean theorem to non-right triangles.' } },
+      { '@type': 'Question', name: 'How do you check if three sides can form a valid triangle?', acceptedAnswer: { '@type': 'Answer', text: 'Apply the triangle inequality theorem: the sum of any two sides must be greater than the third side. You need to check all three combinations: a + b > c, a + c > b, and b + c > a. If any of these conditions fails, the three lengths cannot form a triangle.' } },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Triangle Calculator - Sides, Angles & Area | ToolCalcs"
+  description="Free triangle calculator. Calculate sides, angles, area, and perimeter using SSS, SAS, or right triangle mode. Law of Cosines and Heron's formula built in."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/math-calculators/">Math Calculators</a> &rsaquo;
+    <span>Triangle Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Triangle Calculator</h1>
+  <p class="page-desc">Calculate all sides, angles, area, and perimeter of a triangle. Choose from three modes: SSS, SAS, or Right Triangle.</p>
+
+  <div class="calculator-box">
+    <div class="tab-buttons">
+      <button class="tab-btn active" data-tab="sss">SSS (3 Sides)</button>
+      <button class="tab-btn" data-tab="sas">SAS (2 Sides + Angle)</button>
+      <button class="tab-btn" data-tab="right">Right Triangle</button>
+    </div>
+
+    <!-- SSS Inputs -->
+    <div class="tab-panel" id="sss-panel">
+      <div class="calc-inputs">
+        <div class="input-group">
+          <label for="sss-a">Side a</label>
+          <input type="number" id="sss-a" value="5" min="0" step="any" />
+        </div>
+        <div class="input-group">
+          <label for="sss-b">Side b</label>
+          <input type="number" id="sss-b" value="7" min="0" step="any" />
+        </div>
+        <div class="input-group">
+          <label for="sss-c">Side c</label>
+          <input type="number" id="sss-c" value="9" min="0" step="any" />
+        </div>
+      </div>
+    </div>
+
+    <!-- SAS Inputs -->
+    <div class="tab-panel hidden" id="sas-panel">
+      <div class="calc-inputs">
+        <div class="input-group">
+          <label for="sas-a">Side a</label>
+          <input type="number" id="sas-a" value="6" min="0" step="any" />
+        </div>
+        <div class="input-group">
+          <label for="sas-b">Side b</label>
+          <input type="number" id="sas-b" value="8" min="0" step="any" />
+        </div>
+        <div class="input-group">
+          <label for="sas-C">Angle C (degrees)</label>
+          <input type="number" id="sas-C" value="60" min="0" max="180" step="any" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Triangle Inputs -->
+    <div class="tab-panel hidden" id="right-panel">
+      <div class="calc-inputs">
+        <div class="input-group">
+          <label for="rt-a">Side a (leg)</label>
+          <input type="number" id="rt-a" value="3" min="0" step="any" />
+        </div>
+        <div class="input-group">
+          <label for="rt-b">Side b (leg)</label>
+          <input type="number" id="rt-b" value="4" min="0" step="any" />
+        </div>
+      </div>
+    </div>
+
+    <button class="calc-btn" id="calculateBtn">Calculate Triangle</button>
+
+    <div id="errorMsg" class="error-msg" style="display:none;"></div>
+
+    <div class="result-cards" id="resultCards" style="display:none;">
+      <div class="result-card">
+        <span class="result-label">Side a</span>
+        <span class="result-value" id="resSideA">&mdash;</span>
+      </div>
+      <div class="result-card">
+        <span class="result-label">Side b</span>
+        <span class="result-value" id="resSideB">&mdash;</span>
+      </div>
+      <div class="result-card">
+        <span class="result-label">Side c</span>
+        <span class="result-value" id="resSideC">&mdash;</span>
+      </div>
+      <div class="result-card">
+        <span class="result-label">Angle A</span>
+        <span class="result-value" id="resAngleA">&mdash;</span>
+      </div>
+      <div class="result-card">
+        <span class="result-label">Angle B</span>
+        <span class="result-value" id="resAngleB">&mdash;</span>
+      </div>
+      <div class="result-card">
+        <span class="result-label">Angle C</span>
+        <span class="result-value" id="resAngleC">&mdash;</span>
+      </div>
+      <div class="result-card primary">
+        <span class="result-label">Area</span>
+        <span class="result-value" id="resArea">&mdash;</span>
+        <span class="result-unit">sq units</span>
+      </div>
+      <div class="result-card primary">
+        <span class="result-label">Perimeter</span>
+        <span class="result-value" id="resPerimeter">&mdash;</span>
+        <span class="result-unit">units</span>
+      </div>
+    </div>
+
+    <div class="formula-display" id="formulaDisplay" style="display:none;">
+      <span class="formula-title">Method Used</span>
+      <code id="formulaText"></code>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>What Is a Triangle?</h2>
+    <p>A triangle is a polygon with three sides, three vertices, and three interior angles that always sum to 180 degrees. Triangles are the simplest polygons and are the fundamental building blocks of geometry. Every polygon can be divided into triangles, every surface in 3D computer graphics is rendered using triangles, and the structural rigidity of triangles makes them essential in engineering and architecture. From the roof trusses in buildings to the lattice of a bridge, triangles provide strength and stability that other shapes cannot match.</p>
+    <p>Triangles are classified by their sides and angles. By sides: an equilateral triangle has three equal sides, an isosceles triangle has two equal sides, and a scalene triangle has no equal sides. By angles: an acute triangle has all angles less than 90 degrees, a right triangle has one angle exactly 90 degrees, and an obtuse triangle has one angle greater than 90 degrees. These classifications determine which formulas are most convenient for solving the triangle.</p>
+
+    <h2>Triangle Formulas</h2>
+    <p>This calculator uses several fundamental formulas from trigonometry and geometry to solve triangles completely. Understanding these formulas helps you verify results and apply them in situations beyond what the calculator directly supports.</p>
+
+    <h3>Law of Cosines</h3>
+    <div class="formula-box"><code>c&sup2; = a&sup2; + b&sup2; &ndash; 2ab &middot; cos(C)</code></div>
+    <p>The Law of Cosines is the generalization of the Pythagorean theorem to all triangles. When angle C is 90 degrees, cos(C) = 0, and the formula reduces to c&sup2; = a&sup2; + b&sup2;. The Law of Cosines is used in two main situations: when you know all three sides (SSS) and want to find the angles, or when you know two sides and the included angle (SAS) and want to find the third side. To find an angle from three known sides, rearrange the formula:</p>
+    <div class="formula-box"><code>A = arccos((b&sup2; + c&sup2; &ndash; a&sup2;) / (2bc))</code></div>
+    <p>The Law of Cosines is particularly valuable in navigation, surveying, and physics. A surveyor measuring the distance between two points separated by an obstacle (such as a river or building) can measure two accessible sides and the angle between them, then use the Law of Cosines to calculate the inaccessible distance. In physics, the law is used to resolve vector components and calculate resultant forces or velocities when two vectors act at an angle to each other.</p>
+
+    <h3>Heron's Formula</h3>
+    <div class="formula-box"><code>Area = &radic;(s(s&ndash;a)(s&ndash;b)(s&ndash;c)), where s = (a+b+c)/2</code></div>
+    <p>Heron's formula, attributed to the Greek mathematician Heron of Alexandria (circa 60 CE), calculates the area of a triangle when all three side lengths are known, without requiring the height. The variable s is the semi-perimeter (half the perimeter). For example, a triangle with sides 5, 7, and 9 has a semi-perimeter of (5 + 7 + 9) / 2 = 10.5. The area is &radic;(10.5 &times; 5.5 &times; 3.5 &times; 1.5) = &radic;(96.469) &approx; 17.41 square units.</p>
+    <p>Heron's formula is elegant and practical. It requires only the three side lengths, which are often the easiest measurements to take in the field. Surveyors, carpenters, and engineers regularly use it to calculate areas of triangular plots of land, triangular structural elements, and triangular cross-sections without needing to determine or measure the height.</p>
+
+    <h3>Pythagorean Theorem</h3>
+    <div class="formula-box"><code>c&sup2; = a&sup2; + b&sup2;</code></div>
+    <p>The Pythagorean theorem applies exclusively to right triangles, where c is the hypotenuse (the side opposite the right angle) and a and b are the two legs. It is one of the most famous and widely used formulas in mathematics, discovered independently by multiple ancient civilizations including the Babylonians, Indians, and Chinese, though it is named after the Greek mathematician Pythagoras (circa 570&ndash;495 BCE). For a right triangle with legs 3 and 4, the hypotenuse is &radic;(9 + 16) = &radic;25 = 5. The angles of a right triangle (other than the 90-degree angle) can be found using inverse trigonometric functions: angle A = arctan(a/b).</p>
+
+    <h3>SAS Area Formula</h3>
+    <div class="formula-box"><code>Area = &frac12; &middot; a &middot; b &middot; sin(C)</code></div>
+    <p>When two sides and the included angle are known, the area can be calculated directly using this formula. It is derived from the standard base-times-height formula by recognizing that the height equals one side multiplied by the sine of the included angle. For a triangle with sides 6 and 8 and an included angle of 60 degrees, the area is 0.5 &times; 6 &times; 8 &times; sin(60&deg;) = 0.5 &times; 6 &times; 8 &times; 0.866 = 20.78 square units.</p>
+
+    <h2>Triangle Inequality Theorem</h2>
+    <p>Before performing any calculations, it is essential to verify that the given side lengths can actually form a valid triangle. The triangle inequality theorem states that the sum of any two sides must be greater than the third side. This must hold for all three combinations:</p>
+    <ul>
+      <li>a + b &gt; c</li>
+      <li>a + c &gt; b</li>
+      <li>b + c &gt; a</li>
+    </ul>
+    <p>For example, sides of 3, 4, and 5 form a valid triangle because 3 + 4 = 7 &gt; 5, 3 + 5 = 8 &gt; 4, and 4 + 5 = 9 &gt; 3. However, sides of 1, 2, and 5 do not form a triangle because 1 + 2 = 3 &lt; 5. This calculator validates your inputs and displays an error message if the triangle inequality is not satisfied.</p>
+    <p>The triangle inequality also has a useful corollary: the difference of any two sides must be less than the third side. This means the third side is always constrained between |a &ndash; b| and a + b (exclusive). In practical terms, if you have two sticks of length 5 and 8, any third stick between 3 and 13 (exclusive) will form a triangle with them.</p>
+
+    <h2>Types of Triangles</h2>
+    <p>Triangles can be categorized in several ways, and these categories affect which solving methods are most convenient:</p>
+    <table class="info-table">
+      <thead>
+        <tr><th>Type (by sides)</th><th>Properties</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Equilateral</td><td>All three sides equal; all angles are 60&deg;</td></tr>
+        <tr><td>Isosceles</td><td>Two sides equal; base angles are equal</td></tr>
+        <tr><td>Scalene</td><td>No sides equal; no angles equal</td></tr>
+      </tbody>
+    </table>
+    <table class="info-table">
+      <thead>
+        <tr><th>Type (by angles)</th><th>Properties</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Acute</td><td>All angles less than 90&deg;</td></tr>
+        <tr><td>Right</td><td>One angle exactly 90&deg;</td></tr>
+        <tr><td>Obtuse</td><td>One angle greater than 90&deg;</td></tr>
+      </tbody>
+    </table>
+    <p>An equilateral triangle is also equiangular: every angle is exactly 60 degrees, and its area can be calculated with the simplified formula Area = (&radic;3 / 4) &times; a&sup2;, where a is the side length. Isosceles triangles appear frequently in architecture (gable roofs, A-frame structures) and design. Right triangles are the foundation of trigonometry and are used extensively in construction, navigation, and physics.</p>
+
+    <h2>Triangles in Architecture and Engineering</h2>
+    <p>Triangles are structurally unique among polygons because they are inherently rigid. A triangle cannot be deformed without changing the length of at least one side, unlike a rectangle or other quadrilateral that can be pushed into a parallelogram. This rigidity makes triangles essential in structural engineering.</p>
+    <p>Roof trusses use triangular configurations to distribute the weight of a roof evenly to the supporting walls. Bridge trusses, from the iconic Warren truss to the Pratt and Howe designs, are entirely composed of triangles. The geodesic dome, popularized by architect Buckminster Fuller, uses a network of triangles to create a strong, lightweight hemisphere. Modern skyscrapers use triangular cross-bracing to resist wind and seismic forces. Even in everyday construction, a diagonal brace added to a rectangular frame creates two triangles and prevents the frame from racking.</p>
+    <p>In surveying and navigation, triangulation is a technique for determining the position of a point by measuring angles to it from known points at either end of a fixed baseline. The triangle formed by the baseline and the two measured angles can be solved to determine the distances to the unknown point. This principle underlies GPS technology, where satellites serve as the known points and the distances (rather than angles) are measured using radio signals.</p>
+
+    <h2>Solving Triangles: Step-by-Step Examples</h2>
+    <h3>Example 1: SSS (Three Sides Known)</h3>
+    <p>Given a triangle with sides a = 8, b = 11, c = 13, find all angles and the area.</p>
+    <p><strong>Step 1:</strong> Verify triangle inequality: 8 + 11 = 19 &gt; 13, 8 + 13 = 21 &gt; 11, 11 + 13 = 24 &gt; 8. Valid triangle.</p>
+    <p><strong>Step 2:</strong> Find angle A using the Law of Cosines: A = arccos((11&sup2; + 13&sup2; &ndash; 8&sup2;) / (2 &times; 11 &times; 13)) = arccos((121 + 169 &ndash; 64) / 286) = arccos(226 / 286) = arccos(0.7902) &approx; 37.8&deg;.</p>
+    <p><strong>Step 3:</strong> Find angle B: B = arccos((8&sup2; + 13&sup2; &ndash; 11&sup2;) / (2 &times; 8 &times; 13)) = arccos((64 + 169 &ndash; 121) / 208) = arccos(112 / 208) = arccos(0.5385) &approx; 57.4&deg;.</p>
+    <p><strong>Step 4:</strong> Find angle C: C = 180&deg; &ndash; 37.8&deg; &ndash; 57.4&deg; = 84.8&deg;.</p>
+    <p><strong>Step 5:</strong> Find area using Heron's formula: s = (8 + 11 + 13) / 2 = 16. Area = &radic;(16 &times; 8 &times; 5 &times; 3) = &radic;1920 &approx; 43.82 sq units.</p>
+
+    <h3>Example 2: SAS (Two Sides and Included Angle)</h3>
+    <p>Given sides a = 10, b = 14, and included angle C = 45&deg;, find side c, the other angles, and the area.</p>
+    <p><strong>Step 1:</strong> Find side c: c = &radic;(10&sup2; + 14&sup2; &ndash; 2 &times; 10 &times; 14 &times; cos(45&deg;)) = &radic;(100 + 196 &ndash; 197.99) = &radic;98.01 &approx; 9.90.</p>
+    <p><strong>Step 2:</strong> Find angle A: A = arccos((14&sup2; + 9.90&sup2; &ndash; 10&sup2;) / (2 &times; 14 &times; 9.90)) = arccos((196 + 98.01 &ndash; 100) / 277.2) = arccos(0.6999) &approx; 45.6&deg;.</p>
+    <p><strong>Step 3:</strong> Find angle B: B = 180&deg; &ndash; 45.6&deg; &ndash; 45&deg; = 89.4&deg;.</p>
+    <p><strong>Step 4:</strong> Area = 0.5 &times; 10 &times; 14 &times; sin(45&deg;) = 70 &times; 0.7071 &approx; 49.50 sq units.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>How do you calculate the area of a triangle when you know all three sides?</summary>
+        <p>Use Heron's formula. First, calculate the semi-perimeter: s = (a + b + c) / 2. Then the area equals the square root of s &times; (s &ndash; a) &times; (s &ndash; b) &times; (s &ndash; c). For example, a triangle with sides 6, 8, and 10 has s = 12, and the area = &radic;(12 &times; 6 &times; 4 &times; 2) = &radic;576 = 24 square units. Heron's formula works for any triangle, regardless of type, as long as the sides satisfy the triangle inequality.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is the Law of Cosines and when is it used?</summary>
+        <p>The Law of Cosines states that c&sup2; = a&sup2; + b&sup2; &ndash; 2ab &times; cos(C), where C is the angle opposite side c. It is used in two main situations: to find the third side when two sides and the included angle are known (SAS), or to find angles when all three sides are known (SSS). It generalizes the Pythagorean theorem, which is a special case when angle C is 90 degrees (since cos(90&deg;) = 0). The law is essential in surveying, navigation, and physics for resolving non-right triangles.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How do you check if three sides can form a valid triangle?</summary>
+        <p>Apply the triangle inequality theorem: the sum of any two sides must be strictly greater than the third side. Check all three conditions: a + b &gt; c, a + c &gt; b, and b + c &gt; a. If any condition fails, the sides cannot form a triangle. For example, sides 3, 4, 8 fail because 3 + 4 = 7 &lt; 8. Sides 3, 4, 5 pass all three checks. When two sides sum to exactly the third (a + b = c), the result is a degenerate triangle (a straight line).</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is the difference between SSS, SAS, and ASA in solving triangles?</summary>
+        <p>These abbreviations describe which parts of a triangle are known. SSS (Side-Side-Side) means all three sides are known, and you use the Law of Cosines to find angles. SAS (Side-Angle-Side) means two sides and the included angle are known, and you use the Law of Cosines for the missing side, then find remaining angles. ASA (Angle-Side-Angle) means two angles and the included side are known, and you use the Law of Sines to find the missing sides. Each case has a unique solution as long as the inputs are valid.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can the angles of a triangle add up to more or less than 180 degrees?</summary>
+        <p>In standard Euclidean geometry (flat surfaces), the interior angles of a triangle always sum to exactly 180 degrees. However, on curved surfaces, this rule changes. On a sphere (spherical geometry), the angles sum to more than 180 degrees. On a saddle-shaped surface (hyperbolic geometry), they sum to less than 180 degrees. For everyday calculations on flat surfaces, the 180-degree rule always holds, and this calculator uses it to verify and compute the third angle from the other two.</p>
+      </details>
+    </div>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/math-calculators/area-calculator/">Area Calculator</a> &ndash; Calculate the area of rectangles, circles, triangles, and more.</li>
+      <li><a href="/math-calculators/percentage-calculator/">Percentage Calculator</a> &ndash; Quick percentage calculations for everyday use.</li>
+      <li><a href="/math-calculators/scientific-calculator/">Scientific Calculator</a> &ndash; Full-featured calculator with trigonometric functions.</li>
+      <li><a href="/conversion-calculators/unit-converter/">Unit Converter</a> &ndash; Convert between units of length, area, and more.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+  <RelatedArticles calculatorSlug="triangle-calculator" />
+  <RelatedCalculators currentSlug="triangle-calculator" />
+</BaseLayout>
+
+<style>
+  .tab-buttons {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    padding: 8px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: transparent;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--color-text);
+    transition: all 0.15s;
+  }
+  .tab-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  .tab-btn.active {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+  }
+
+  .tab-panel.hidden { display: none; }
+
+  .error-msg {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: var(--radius);
+    color: #dc2626;
+    font-size: 0.9rem;
+  }
+  [data-theme="dark"] .error-msg {
+    background: #451a1a;
+    border-color: #7f1d1d;
+    color: #fca5a5;
+  }
+
+  .result-cards {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .result-unit {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+  }
+
+  .formula-display {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    text-align: center;
+  }
+  .formula-title {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-bottom: 6px;
+  }
+  .formula-display code {
+    font-size: 0.95rem;
+    color: var(--color-text);
+  }
+
+  @media (max-width: 640px) {
+    .tab-buttons { justify-content: center; }
+    .tab-btn { padding: 6px 12px; font-size: 0.85rem; }
+  }
+
+  .last-updated { font-size: 0.75rem; color: var(--color-text-muted); margin: 4px 0 0; }
+</style>
+
+<script is:inline>
+  var currentTab = 'sss';
+
+  // Tab switching
+  var tabBtns = document.querySelectorAll('.tab-btn');
+  for (var i = 0; i < tabBtns.length; i++) {
+    tabBtns[i].addEventListener('click', function() {
+      for (var j = 0; j < tabBtns.length; j++) {
+        tabBtns[j].classList.remove('active');
+      }
+      this.classList.add('active');
+      currentTab = this.getAttribute('data-tab');
+
+      var panels = document.querySelectorAll('.tab-panel');
+      for (var k = 0; k < panels.length; k++) {
+        panels[k].classList.add('hidden');
+      }
+      document.getElementById(currentTab + '-panel').classList.remove('hidden');
+
+      hideResults();
+    });
+  }
+
+  function getVal(id) {
+    return parseFloat(document.getElementById(id).value) || 0;
+  }
+
+  function fmt(n) {
+    return parseFloat(n.toFixed(4)).toLocaleString('en-US', { maximumFractionDigits: 4 });
+  }
+
+  function fmtDeg(n) {
+    return fmt(n) + '\u00B0';
+  }
+
+  function hideResults() {
+    document.getElementById('resultCards').style.display = 'none';
+    document.getElementById('formulaDisplay').style.display = 'none';
+    document.getElementById('errorMsg').style.display = 'none';
+  }
+
+  function showError(msg) {
+    var el = document.getElementById('errorMsg');
+    el.textContent = msg;
+    el.style.display = 'block';
+    document.getElementById('resultCards').style.display = 'none';
+    document.getElementById('formulaDisplay').style.display = 'none';
+  }
+
+  function showResults(a, b, c, A, B, C, area, perimeter, method) {
+    document.getElementById('errorMsg').style.display = 'none';
+    document.getElementById('resSideA').textContent = fmt(a);
+    document.getElementById('resSideB').textContent = fmt(b);
+    document.getElementById('resSideC').textContent = fmt(c);
+    document.getElementById('resAngleA').textContent = fmtDeg(A);
+    document.getElementById('resAngleB').textContent = fmtDeg(B);
+    document.getElementById('resAngleC').textContent = fmtDeg(C);
+    document.getElementById('resArea').textContent = fmt(area);
+    document.getElementById('resPerimeter').textContent = fmt(perimeter);
+    document.getElementById('resultCards').style.display = 'grid';
+    document.getElementById('formulaText').textContent = method;
+    document.getElementById('formulaDisplay').style.display = 'block';
+  }
+
+  function calculate() {
+    var DEG = Math.PI / 180;
+    var RAD = 180 / Math.PI;
+
+    if (currentTab === 'sss') {
+      var a = getVal('sss-a');
+      var b = getVal('sss-b');
+      var c = getVal('sss-c');
+      if (a <= 0 || b <= 0 || c <= 0) { showError('All sides must be positive numbers.'); return; }
+      if (a + b <= c || a + c <= b || b + c <= a) { showError('Invalid triangle: the sum of any two sides must be greater than the third side.'); return; }
+
+      // Law of Cosines for angles
+      var A = Math.acos((b * b + c * c - a * a) / (2 * b * c)) * RAD;
+      var B = Math.acos((a * a + c * c - b * b) / (2 * a * c)) * RAD;
+      var C = 180 - A - B;
+
+      // Heron's formula for area
+      var s = (a + b + c) / 2;
+      var area = Math.sqrt(s * (s - a) * (s - b) * (s - c));
+      var perimeter = a + b + c;
+
+      showResults(a, b, c, A, B, C, area, perimeter, "SSS: Law of Cosines for angles, Heron's formula for area");
+
+    } else if (currentTab === 'sas') {
+      var a = getVal('sas-a');
+      var b = getVal('sas-b');
+      var Cdeg = getVal('sas-C');
+      if (a <= 0 || b <= 0) { showError('Both sides must be positive numbers.'); return; }
+      if (Cdeg <= 0 || Cdeg >= 180) { showError('Angle C must be between 0 and 180 degrees (exclusive).'); return; }
+
+      var Crad = Cdeg * DEG;
+      // Law of Cosines for missing side
+      var c = Math.sqrt(a * a + b * b - 2 * a * b * Math.cos(Crad));
+
+      // Law of Cosines for remaining angles
+      var A = Math.acos((b * b + c * c - a * a) / (2 * b * c)) * RAD;
+      var B = 180 - A - Cdeg;
+
+      // Area using SAS formula
+      var area = 0.5 * a * b * Math.sin(Crad);
+      var perimeter = a + b + c;
+
+      showResults(a, b, c, A, B, Cdeg, area, perimeter, "SAS: Law of Cosines for side c, then angles via Law of Cosines");
+
+    } else if (currentTab === 'right') {
+      var a = getVal('rt-a');
+      var b = getVal('rt-b');
+      if (a <= 0 || b <= 0) { showError('Both legs must be positive numbers.'); return; }
+
+      // Pythagorean theorem
+      var c = Math.sqrt(a * a + b * b);
+      var A = Math.atan(a / b) * RAD;
+      var B = 90 - A;
+      var C = 90;
+      var area = 0.5 * a * b;
+      var perimeter = a + b + c;
+
+      showResults(a, b, c, A, B, C, area, perimeter, "Right triangle: Pythagorean theorem, c = \u221A(a\u00B2 + b\u00B2)");
+    }
+  }
+
+  document.getElementById('calculateBtn').addEventListener('click', calculate);
+  calculate();
+</script>

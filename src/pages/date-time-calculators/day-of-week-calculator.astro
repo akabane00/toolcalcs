@@ -1,0 +1,325 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Date & Time Calculators", "item": "https://toolcalcs.com/date-time-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Day of Week Calculator" }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How do you calculate the day of the week for any date?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The most common methods are Zeller\'s congruence and the Doomsday algorithm. Both use modular arithmetic to determine the day of the week from the year, month, and day components of a date. In practice, computers use built-in date libraries that handle the calculation automatically by counting days from a known reference date.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is an ISO week number?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'An ISO week number is defined by the ISO 8601 standard. Weeks start on Monday and the first week of the year is the one containing the first Thursday of January. This means the first ISO week always contains January 4. ISO week numbers range from 1 to 52 or 53, depending on the year.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why does the 7-day week exist?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The 7-day week originated in ancient Mesopotamia (modern-day Iraq) around 2000 BCE and was adopted by the ancient Romans, who named the days after celestial bodies: the Sun, Moon, Mars, Mercury, Jupiter, Venus, and Saturn. The 7-day cycle has no basis in astronomy and is purely a cultural convention that has persisted for over 4,000 years.',
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Day of Week Calculator - Find What Day Any Date Falls On | ToolCalcs"
+  description="Free day of week calculator. Find what day of the week any date falls on, plus the day number in the year, ISO week number, and fun facts about the day."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/date-time-calculators/">Date &amp; Time Calculators</a> &rsaquo;
+    <span>Day of Week Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Day of Week Calculator</h1>
+  <p class="page-desc">Find what day of the week any date falls on, plus day of year, week number, and more.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="dateInput">Select a Date</label>
+        <input type="date" id="dateInput" />
+      </div>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Day of Week</span>
+          <span class="result-value" id="dayOfWeek">--</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Day of Year</span>
+          <span class="result-value" id="dayOfYear">--</span>
+          <span class="result-detail" id="dayOfYearDetail"></span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">ISO Week Number</span>
+          <span class="result-value" id="weekNumber">--</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Days Left in Year</span>
+          <span class="result-value" id="daysLeft">--</span>
+        </div>
+      </div>
+      <div class="result-cards secondary">
+        <div class="result-card">
+          <span class="result-label">Quarter</span>
+          <span class="result-value small" id="quarter">--</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Leap Year</span>
+          <span class="result-value small" id="leapYear">--</span>
+        </div>
+      </div>
+    </div>
+    <div class="fun-fact-box" id="funFact" style="display:none;">
+      <h3>Fun Fact</h3>
+      <p id="funFactText"></p>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>How to Calculate the Day of the Week</h2>
+    <p>Determining what day of the week a given date falls on is a classic problem in calendar mathematics. While modern computers can answer this question instantly using built-in date libraries, mathematicians and enthusiasts have developed several elegant algorithms for calculating the day of the week by hand. Understanding these algorithms provides insight into how calendars work and why their structure can seem irregular.</p>
+    <p>The most well-known algorithm is <strong>Zeller's congruence</strong>, developed by Christian Zeller in 1887. The formula takes the day, month, year, and century as inputs and produces a number from 0 to 6, where each number corresponds to a day of the week. Zeller's formula uses modular arithmetic (the remainder after division) to account for the irregular month lengths and leap year rules in the Gregorian calendar.</p>
+    <p>Another popular method is the <strong>Doomsday algorithm</strong>, invented by mathematician John Conway in 1973. This method is designed to be performed mentally and relies on the fact that certain easy-to-remember dates always fall on the same day of the week in any given year. These "Doomsday" reference dates include 4/4, 6/6, 8/8, 10/10, 12/12, and the last day of February. Once you know what day of the week the Doomsday falls on for a particular year, you can count forward or backward from the nearest reference date to find the day for any date in that year.</p>
+    <p>For example, in 2026, the Doomsday (the day that all reference dates fall on) is Saturday. This means April 4, June 6, August 8, October 10, and December 12 are all Saturdays in 2026. To find what day March 7 falls on, you would note that March 7 is the day after February's last day (the Doomsday), so you count forward from the last day of February. Since February 28, 2026, is a Saturday (the Doomsday), March 7 is the following Saturday &mdash; exactly one week later. Therefore, March 7, 2026, is a Saturday.</p>
+    <p>In practice, most people simply use a calculator or calendar app rather than performing the arithmetic by hand. This calculator uses JavaScript's Date object, which internally counts the number of days since a reference date and uses modular arithmetic to determine the day of the week. The result is instantaneous and handles all edge cases, including leap years and dates far in the past or future.</p>
+
+    <h2>The Gregorian Calendar</h2>
+    <p>The Gregorian calendar is the calendar system used by virtually every country in the world for civil purposes. It was introduced by Pope Gregory XIII in 1582 as a reform of the Julian calendar, which had been in use since 46 BCE. The reform was necessary because the Julian calendar's leap year rule was slightly too generous, causing the calendar to drift by about 3 days every 400 years relative to the astronomical seasons.</p>
+    <p>The Gregorian calendar uses the following rules. An ordinary year has 365 days. A leap year has 366 days, with the extra day added to February. A year is a leap year if it is divisible by 4, unless it is divisible by 100, unless it is also divisible by 400. This rule produces an average year length of 365.2425 days, which is extremely close to the actual tropical year of approximately 365.2422 days. The remaining error amounts to about 1 day every 3,236 years.</p>
+    <p>The 12 months of the Gregorian calendar have irregular lengths: January (31), February (28 or 29), March (31), April (30), May (31), June (30), July (31), August (31), September (30), October (31), November (30), December (31). This irregularity is a source of confusion and the reason why day-of-week calculations are not trivial. If every month had the same number of days, the day of the week would follow a simple repeating pattern.</p>
+    <p>The Gregorian calendar was adopted at different times by different countries. Catholic countries in Europe adopted it in 1582. Protestant countries followed over the next two centuries. Britain and its colonies (including what would become the United States) adopted it in 1752, skipping 11 days in September. Russia did not adopt the Gregorian calendar until 1918, and Greece adopted it in 1923. When using this calculator for historical dates, keep in mind that dates before the local adoption of the Gregorian calendar may have been recorded in the Julian calendar and may not match modern calculations.</p>
+
+    <h2>History of the 7-Day Week</h2>
+    <p>The seven-day week is one of the oldest and most enduring units of time measurement in human history. Unlike the day, month, and year, which are based on observable astronomical cycles (Earth's rotation, the Moon's orbit, and Earth's orbit around the Sun), the seven-day week has no astronomical basis. It is a purely cultural convention.</p>
+    <p>The origin of the seven-day week is generally traced to ancient Mesopotamia (modern-day Iraq), where the Babylonians used a seven-day cycle as early as the 7th century BCE. The Babylonians were skilled astronomers and recognized seven celestial bodies visible to the naked eye: the Sun, Moon, Mars, Mercury, Jupiter, Venus, and Saturn. They associated each day of their week with one of these bodies, a practice that has persisted in modified form to this day.</p>
+    <p>The ancient Romans adopted the seven-day week and named the days after the same celestial bodies in Latin: dies Solis (Sun), dies Lunae (Moon), dies Martis (Mars), dies Mercurii (Mercury), dies Jovis (Jupiter), dies Veneris (Venus), and dies Saturni (Saturn). When Germanic tribes encountered the Roman calendar, they replaced the Roman god names with their own equivalents. Tuesday comes from Tiw (the Germanic god of war, equivalent to Mars). Wednesday comes from Woden (equivalent to Mercury). Thursday from Thor (equivalent to Jupiter). Friday from Frigga (equivalent to Venus). The English names Saturday, Sunday, and Monday retain their Latin-derived celestial references.</p>
+    <p>The seven-day week was also adopted independently in Judaism, where the seven-day creation narrative in Genesis established the Sabbath as the seventh day of rest. Christianity and Islam inherited the seven-day cycle, further cementing it as a global standard. By the time of the late Roman Empire, the seven-day week was established throughout Europe and the Middle East, and it has spread worldwide with European colonization and globalization.</p>
+    <p>Despite various attempts to reform the week &mdash; the French Revolutionary calendar used a 10-day "decade," and the Soviet Union experimented with 5-day and 6-day weeks in the 1930s &mdash; the seven-day week has proven remarkably resistant to change. It remains the universal standard for organizing work, rest, religious observance, and social life.</p>
+
+    <h2>Day of Year and ISO Week Numbers</h2>
+    <p>The <strong>day of year</strong> (also called the ordinal date or Julian day of year) is simply the sequential number of a given date within its year. January 1 is day 1, January 2 is day 2, and so on through December 31, which is day 365 (or 366 in a leap year). The day of year is useful in agriculture, meteorology, and astronomy, where events and measurements are often indexed by ordinal date rather than month and day.</p>
+    <p>To calculate the day of year for any date, add the number of days in all preceding months plus the day of the current month. For example, March 7 is 31 (January) + 28 (February, non-leap year) + 7 = day 66. In a leap year, March 7 would be day 67 because February has 29 days.</p>
+    <p>The <strong>ISO week number</strong> is defined by the ISO 8601 standard and is widely used in business, especially in Europe. ISO weeks start on Monday and end on Sunday. The first ISO week of the year is the week containing the first Thursday of January (equivalently, the week containing January 4). This definition means that ISO week 1 always includes at least 4 days of the new year. Some years have 52 ISO weeks, while others have 53.</p>
+    <p>The ISO week system can produce counterintuitive results at the boundaries of the year. December 29, 30, and 31 may fall in ISO week 1 of the following year if they are Monday, Tuesday, or Wednesday. Similarly, January 1, 2, and 3 may fall in ISO week 52 or 53 of the previous year if they are Friday, Saturday, or Sunday. For example, January 1, 2027, is a Friday, so it belongs to ISO week 53 of 2026.</p>
+
+    <h2>Famous Dates and Their Days of the Week</h2>
+    <p>Knowing the day of the week for famous historical events can be a fun exercise and a way to put calendar math into context. Here are some notable dates and the days they fell on:</p>
+    <ul>
+      <li><strong>July 4, 1776</strong> (US Declaration of Independence) &ndash; Thursday</li>
+      <li><strong>July 20, 1969</strong> (Apollo 11 Moon landing) &ndash; Sunday</li>
+      <li><strong>November 9, 1989</strong> (Fall of the Berlin Wall) &ndash; Thursday</li>
+      <li><strong>September 11, 2001</strong> (9/11 attacks) &ndash; Tuesday</li>
+      <li><strong>January 20, 2009</strong> (Barack Obama's first inauguration) &ndash; Tuesday</li>
+      <li><strong>February 29, 2000</strong> (Leap day in a century year) &ndash; Tuesday</li>
+      <li><strong>December 25, 2025</strong> (Christmas Day 2025) &ndash; Thursday</li>
+    </ul>
+    <p>You can verify all of these using this calculator by entering the date and checking the result. It is a great way to test your mental day-of-week calculation skills if you practice the Doomsday algorithm or Zeller's congruence.</p>
+
+    <h2>Calendar Patterns and Cycles</h2>
+    <p>The Gregorian calendar follows repeating patterns that calendar enthusiasts find fascinating. Here are some of the most notable patterns:</p>
+    <p><strong>The 400-year cycle.</strong> The Gregorian calendar repeats exactly every 400 years. The pattern of days, months, and leap years in the years 2000 through 2399 is identical to the pattern in 2400 through 2799. This is because 400 Gregorian years contain exactly 146,097 days, which is exactly 20,871 weeks. Since the number of days is an exact multiple of 7, the days of the week align perfectly after 400 years.</p>
+    <p><strong>The 28-year cycle (with exceptions).</strong> Within a century, the calendar repeats every 28 years because 28 years contain exactly 1,461 weeks (accounting for 7 leap years). However, this pattern breaks at century boundaries that are not divisible by 400 (like 1900 and 2100, which are not leap years). The next break will occur in 2100.</p>
+    <p><strong>Identical calendars.</strong> Two years share the same calendar (same day of week for every date) if they start on the same day and are both leap years or both non-leap years. For example, 2026 and 2037 both start on Thursday and are non-leap years, so they have identical calendars. You can reuse a 2026 wall calendar in 2037.</p>
+    <p><strong>Friday the 13th.</strong> Every year has at least one Friday the 13th and at most three. The 13th falls on a Friday whenever the month begins on a Sunday. February 2026 begins on a Sunday, so February 13, 2026, is a Friday. The distribution of Friday the 13ths follows the same 400-year cycle as the rest of the calendar.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>How do you calculate the day of the week for any date?</summary>
+        <p>Mathematicians use algorithms like Zeller's congruence or the Doomsday algorithm, which apply modular arithmetic to the year, month, and day components of a date. Computers use built-in date libraries that count the number of days from a known reference point and compute the remainder when divided by 7. This calculator uses JavaScript's Date object to determine the day of the week instantly for any date.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is an ISO week number?</summary>
+        <p>An ISO week number is defined by the ISO 8601 international standard. Weeks start on Monday and end on Sunday. The first week of the year (week 1) is the week containing the first Thursday of January. ISO week numbers range from 1 to 52 or 53. Some years have 53 weeks if December 31 falls on a Thursday (or Wednesday in a leap year). The ISO week system is widely used in European business and project planning.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Why does the 7-day week exist?</summary>
+        <p>The 7-day week originated in ancient Mesopotamia around 2000 BCE, likely inspired by the seven celestial bodies visible to the naked eye: the Sun, Moon, Mars, Mercury, Jupiter, Venus, and Saturn. Unlike the day, month, and year, the week has no astronomical basis and is purely a cultural convention. It was adopted by Romans, spread through Christianity, Judaism, and Islam, and eventually became a global standard that has resisted all reform attempts.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Does the calendar ever repeat exactly?</summary>
+        <p>Yes. The Gregorian calendar repeats exactly every 400 years because 400 years contain exactly 146,097 days, which is an exact multiple of 7 (20,871 weeks). Within a century, non-leap years often share identical calendars with years 6, 11, or 28 years apart. Two years have the same calendar if they start on the same day of the week and share the same leap year status. For example, 2026 and 2037 have identical calendars.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How many days are in each quarter of the year?</summary>
+        <p>Quarter 1 (January through March) has 90 days in a common year and 91 days in a leap year. Quarter 2 (April through June) always has 91 days. Quarter 3 (July through September) always has 92 days. Quarter 4 (October through December) always has 92 days. The total is 365 or 366 days. These counts are useful for financial reporting, which often operates on quarterly cycles.</p>
+      </details>
+    </div>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/date-time-calculators/age-calculator/">Age Calculator</a> &ndash; Calculate exact age from a birth date.</li>
+      <li><a href="/date-time-calculators/date-difference-calculator/">Date Difference Calculator</a> &ndash; Find days, weeks, and months between dates.</li>
+      <li><a href="/date-time-calculators/days-until-calculator/">Days Until Calculator</a> &ndash; Count down to any future date.</li>
+      <li><a href="/date-time-calculators/timestamp-calculator/">Timestamp Calculator</a> &ndash; Convert Unix timestamps to dates and back.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+  <RelatedArticles calculatorSlug="day-of-week-calculator" />
+  <RelatedCalculators currentSlug="day-of-week-calculator" />
+</BaseLayout>
+
+<style>
+  .last-updated { font-size: 0.75rem; color: var(--color-text-muted); margin: 4px 0 0; }
+  .result-card.primary {
+    background: #eff6ff;
+    grid-column: 1 / -1;
+  }
+  .result-card.primary .result-value {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: var(--color-primary);
+  }
+  .result-cards.secondary {
+    margin-bottom: 0;
+  }
+  .result-value.small {
+    font-size: 1.1rem;
+  }
+  .result-detail {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+  }
+  .fun-fact-box {
+    margin-top: 16px;
+    padding: 16px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    border-left: 4px solid var(--color-primary);
+  }
+  .fun-fact-box h3 {
+    font-size: 0.95rem;
+    margin: 0 0 6px;
+    color: var(--color-primary);
+  }
+  .fun-fact-box p {
+    font-size: 0.9rem;
+    margin: 0;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+  }
+
+  [data-theme="dark"] .result-card.primary { background: #1e3a5f; }
+
+  @media (max-width: 640px) {
+    .calc-inputs { grid-template-columns: 1fr; }
+    .result-cards { grid-template-columns: 1fr; }
+    .result-card.primary { grid-column: auto; }
+  }
+</style>
+
+<script is:inline>
+  var dateInput = document.getElementById('dateInput');
+
+  // Default to today
+  var today = new Date();
+  var y = today.getFullYear();
+  var m = String(today.getMonth() + 1).padStart(2, '0');
+  var d = String(today.getDate()).padStart(2, '0');
+  dateInput.value = y + '-' + m + '-' + d;
+
+  var dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+  var funFacts = {
+    'Sunday': 'Sunday is named after the Sun. In many cultures, it is considered the first day of the week. In the International Organization for Standardization (ISO 8601), Sunday is the seventh and last day of the week.',
+    'Monday': 'Monday is named after the Moon (Moon-day). It is widely considered the first working day of the week and is often cited as the least favorite day in workplace surveys. The ISO 8601 standard designates Monday as the first day of the week.',
+    'Tuesday': 'Tuesday is named after Tiw (or Tyr), the Norse god of single combat and law. In the Gregorian calendar, any month that begins on a Sunday will have a Friday the 13th, and the 13th will also fall on a Tuesday when the month starts on a Thursday.',
+    'Wednesday': 'Wednesday is named after Woden (Odin), the chief Norse god. In many Romance languages, the name derives from Mercury (Mercredi in French, Miercoles in Spanish). Wednesday is often called "hump day" because it marks the middle of the traditional workweek.',
+    'Thursday': 'Thursday is named after Thor, the Norse god of thunder. In many countries, elections are traditionally held on Thursdays. Thanksgiving in the United States always falls on the fourth Thursday of November.',
+    'Friday': 'Friday is named after Frigga (or Freya), the Norse goddess of love. It is often considered the best day of the workweek because it precedes the weekend. The superstition surrounding Friday the 13th has been traced to the arrest of the Knights Templar on Friday, October 13, 1307.',
+    'Saturday': 'Saturday is named after Saturn, the Roman god of agriculture and time. It is the only day of the English week that retains its Roman name. In many cultures, Saturday is considered a day of rest and leisure.',
+  };
+
+  function getISOWeekNumber(date) {
+    var d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    var dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    var weekNum = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    return weekNum;
+  }
+
+  function isLeapYear(year) {
+    return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+  }
+
+  function getDayOfYear(date) {
+    var start = new Date(date.getFullYear(), 0, 0);
+    var diff = date - start;
+    var oneDay = 86400000;
+    return Math.floor(diff / oneDay);
+  }
+
+  function calculate() {
+    var val = dateInput.value;
+    if (!val) return;
+
+    var date = new Date(val + 'T00:00:00');
+    if (isNaN(date.getTime())) return;
+
+    var dayOfWeek = dayNames[date.getDay()];
+    var dayOfYear = getDayOfYear(date);
+    var year = date.getFullYear();
+    var totalDaysInYear = isLeapYear(year) ? 366 : 365;
+    var daysLeft = totalDaysInYear - dayOfYear;
+    var weekNum = getISOWeekNumber(date);
+    var month = date.getMonth();
+    var quarter = Math.floor(month / 3) + 1;
+    var leap = isLeapYear(year);
+
+    document.getElementById('dayOfWeek').textContent = dayOfWeek;
+    document.getElementById('dayOfYear').textContent = dayOfYear.toString();
+    document.getElementById('dayOfYearDetail').textContent = 'of ' + totalDaysInYear + ' days';
+    document.getElementById('weekNumber').textContent = 'Week ' + weekNum;
+    document.getElementById('daysLeft').textContent = daysLeft.toString();
+    document.getElementById('quarter').textContent = 'Q' + quarter;
+    document.getElementById('leapYear').textContent = leap ? 'Yes' : 'No';
+
+    // Fun fact
+    var funFactBox = document.getElementById('funFact');
+    var funFactText = document.getElementById('funFactText');
+    funFactBox.style.display = 'block';
+    funFactText.textContent = funFacts[dayOfWeek];
+  }
+
+  dateInput.addEventListener('change', calculate);
+  calculate();
+</script>
