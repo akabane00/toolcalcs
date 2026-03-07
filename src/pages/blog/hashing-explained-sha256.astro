@@ -1,0 +1,265 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import AuthorBio from '../../components/AuthorBio.astro';
+import '../../styles/blog.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "SHA-256 and Hashing Explained: What Every Developer Should Know",
+    "description": "Understand cryptographic hashing, compare MD5 vs SHA-256 vs bcrypt, and learn how hashing secures passwords, files, and blockchains.",
+    "datePublished": "2026-03-07",
+    "dateModified": "2026-03-07",
+    "author": { "@type": "Organization", "name": "ToolCalcs", "url": "https://toolcalcs.com" },
+    "publisher": { "@type": "Organization", "name": "ToolCalcs", "url": "https://toolcalcs.com", "logo": { "@type": "ImageObject", "url": "https://toolcalcs.com/logo.png" } },
+    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://toolcalcs.com/blog/hashing-explained-sha256/" }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is hashing the same as encryption?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No, hashing and encryption are fundamentally different. Hashing is a one-way function that produces a fixed-size digest from any input and cannot be reversed to recover the original data. Encryption is a two-way function that transforms data into ciphertext using a key, and the original data can be recovered by decrypting with the correct key. Hashing is used when you need to verify data without storing or recovering the original (like passwords), while encryption is used when you need to protect data that must later be read (like messages or files in transit)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why is MD5 considered insecure?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "MD5 is considered cryptographically broken because researchers have demonstrated practical collision attacks — the ability to create two different inputs that produce the same MD5 hash. In 2004, a team led by Xiaoyun Wang showed that MD5 collisions could be generated in seconds on ordinary hardware. By 2008, researchers exploited MD5 weaknesses to create a rogue SSL certificate authority. MD5 is also extremely fast to compute, making it vulnerable to brute-force attacks on password hashes. While MD5 is still acceptable for non-security checksums (like verifying file downloads against accidental corruption), it should never be used for password hashing, digital signatures, or any security-critical application."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Should I use SHA-256 or bcrypt for password hashing?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "For password hashing, always use bcrypt, scrypt, or Argon2 instead of SHA-256. SHA-256 is a general-purpose cryptographic hash that is designed to be fast, which is actually a disadvantage for password storage because attackers can test billions of SHA-256 guesses per second using GPUs. Bcrypt, scrypt, and Argon2 are specifically designed for password hashing with adjustable work factors that make them intentionally slow and computationally expensive, limiting attackers to thousands of guesses per second. Bcrypt also automatically handles salting. SHA-256 is excellent for file integrity verification, digital signatures, and blockchain, but it is the wrong tool for password storage."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can you reverse or decrypt a hash to get the original data?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No, a cryptographic hash cannot be mathematically reversed to recover the original input. Hash functions are one-way by design — they lose information during the compression process, and the same hash could theoretically correspond to an infinite number of possible inputs (though finding two that match is computationally infeasible for strong algorithms). However, weak or short passwords can be recovered through brute-force attacks (trying every possible combination), dictionary attacks (trying common passwords), or rainbow table lookups (precomputed hash-to-password tables). This is why salting and using slow hash functions like bcrypt are essential for password security."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is salting and why is it important for password hashing?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A salt is a random string of characters that is appended or prepended to a password before hashing. Each user gets a unique salt, which is stored alongside the hash in the database. Salting is critical for three reasons: first, it ensures that two users with the same password produce different hashes, so an attacker who cracks one hash cannot automatically know other users with the same password; second, it defeats rainbow table attacks because precomputed tables would need to be generated for every possible salt value; third, it forces attackers to crack each password individually rather than in bulk. Bcrypt and Argon2 automatically generate and embed salts, which is one reason they are preferred over manual salt-and-hash approaches."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout title="SHA-256 and Hashing Explained: What Every Developer Should Know | ToolCalcs" description="Understand cryptographic hashing, compare MD5 vs SHA-256 vs bcrypt, and learn how hashing secures passwords, files, and blockchains." structuredData={structuredData}>
+  <Breadcrumb items={[
+    { name: 'Home', url: '/' },
+    { name: 'Blog', url: '/blog/' },
+    { name: 'SHA-256 & Hashing Explained' }
+  ]} />
+
+  <article class="blog-article">
+    <header class="article-header">
+      <p class="article-meta">Published March 7, 2026 · By ToolCalcs Team</p>
+      <h1>SHA-256 and Hashing Explained: What Every Developer Should Know</h1>
+      <p class="article-intro">Hashing is one of the most fundamental concepts in computer science and information security, yet it is frequently misunderstood — even by experienced developers. From securing passwords to verifying file integrity to powering blockchain technology, hash functions are quietly working behind the scenes of almost every system you interact with. In this guide, we demystify how hashing works, compare the most common algorithms (MD5, SHA-1, SHA-256, and bcrypt), explore real-world applications, and clarify the critical differences between hashing, encryption, and encoding.</p>
+    </header>
+
+    <section>
+      <h2>What Is a Hash Function?</h2>
+      <p>A hash function is a mathematical algorithm that takes an input of any size — a single character, a paragraph of text, an entire file — and produces a fixed-size output called a <strong>hash</strong>, <strong>digest</strong>, or <strong>checksum</strong>. The output is typically represented as a hexadecimal string.</p>
+      <p>For example, the SHA-256 hash of the word "hello" is:</p>
+      <p><code>2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824</code></p>
+      <p>And the SHA-256 hash of "Hello" (with a capital H) is:</p>
+      <p><code>185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969</code></p>
+      <p>Notice that a single character change (lowercase h to uppercase H) produces a completely different hash. This is known as the <strong>avalanche effect</strong> — a key property of good hash functions where even the smallest change to the input produces a drastically different output.</p>
+
+      <h3>Key Properties of Cryptographic Hash Functions</h3>
+      <p>A strong cryptographic hash function must possess several essential properties:</p>
+      <ul>
+        <li><strong>Deterministic:</strong> The same input always produces the same output. Hashing "hello" with SHA-256 will produce the same 64-character hex string every time, on every machine, in every programming language.</li>
+        <li><strong>Fixed output size:</strong> Regardless of whether the input is 1 byte or 1 gigabyte, the output length is always the same. SHA-256 always produces a 256-bit (32-byte) digest, represented as 64 hexadecimal characters.</li>
+        <li><strong>One-way (preimage resistance):</strong> Given a hash output, it should be computationally infeasible to determine the original input. You cannot "work backward" from the hash to discover what was hashed.</li>
+        <li><strong>Collision resistance:</strong> It should be computationally infeasible to find two different inputs that produce the same hash output. While collisions are theoretically inevitable (infinite inputs mapped to finite outputs), finding one should require an impractical amount of computation.</li>
+        <li><strong>Avalanche effect:</strong> A tiny change in the input causes a massive change in the output. There should be no discernible pattern between similar inputs and their hashes.</li>
+        <li><strong>Fast computation:</strong> For general-purpose hash functions (like SHA-256), computing the hash should be efficient. Note that password-specific hash functions intentionally violate this property to slow down attackers.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Common Hash Algorithms Compared</h2>
+      <p>Not all hash algorithms are equal. Some have been broken and should no longer be used for security purposes, while others remain robust. Here is a comprehensive comparison of the most important algorithms every developer should know.</p>
+
+      <h3>MD5 (Message Digest 5)</h3>
+      <p><strong>Output size:</strong> 128 bits (32 hex characters). <strong>Status: Cryptographically broken.</strong></p>
+      <p>MD5 was designed by Ronald Rivest in 1991 and was widely used for file checksums and password hashing throughout the 1990s and 2000s. In 2004, Chinese mathematician Xiaoyun Wang demonstrated practical collision attacks against MD5, proving that two different inputs could be crafted to produce identical hashes. By 2008, researchers created a rogue certificate authority certificate using MD5 collisions, demonstrating real-world exploitability.</p>
+      <p>MD5 is also extremely fast to compute. On modern GPU hardware, an attacker can compute over <strong>40 billion MD5 hashes per second</strong>, making brute-force attacks against MD5 password hashes trivial for short or common passwords.</p>
+      <p><strong>Still acceptable for:</strong> Non-security checksums, such as verifying that a file was not corrupted during download (where deliberate manipulation is not a concern). <strong>Never use for:</strong> Password hashing, digital signatures, or any security application.</p>
+
+      <h3>SHA-1 (Secure Hash Algorithm 1)</h3>
+      <p><strong>Output size:</strong> 160 bits (40 hex characters). <strong>Status: Deprecated.</strong></p>
+      <p>SHA-1 was developed by the NSA and published by NIST in 1995. For years it was the standard for SSL certificates, Git commits, and digital signatures. In 2017, Google's SHAttered project demonstrated the first practical SHA-1 collision, producing two different PDF files with identical SHA-1 hashes. The attack required approximately 6,500 years of single-CPU computation, equivalent to about $110,000 in cloud computing costs at the time — expensive but feasible for well-funded attackers.</p>
+      <p>Major browsers and certificate authorities stopped accepting SHA-1 SSL certificates in 2017. Git still uses SHA-1 for commit hashes but has been working on migrating to SHA-256. SHA-1 should not be used for any new security applications.</p>
+
+      <h3>SHA-256 (Secure Hash Algorithm 256-bit)</h3>
+      <p><strong>Output size:</strong> 256 bits (64 hex characters). <strong>Status: Secure and widely used.</strong></p>
+      <p>SHA-256 is part of the SHA-2 family designed by the NSA and published in 2001. It is the current gold standard for general-purpose cryptographic hashing. SHA-256 is used in SSL/TLS certificates, Bitcoin mining, file integrity verification, digital signatures, and countless other applications.</p>
+      <p>No practical attacks against SHA-256 have been demonstrated. The theoretical security level of a 256-bit hash means that finding a collision would require approximately 2^128 hash computations — a number so large that it exceeds the computational capacity of all computers on Earth working together for billions of years.</p>
+      <p>The SHA-2 family also includes SHA-384 and SHA-512, which produce larger digests and are used when extra security margin or longer output is desired. SHA-512 is sometimes faster than SHA-256 on 64-bit processors due to its internal word size.</p>
+
+      <h3>SHA-3 (Keccak)</h3>
+      <p><strong>Output sizes:</strong> 224, 256, 384, or 512 bits. <strong>Status: Secure, modern alternative.</strong></p>
+      <p>SHA-3 was selected through a public competition by NIST in 2012 and is based on the Keccak sponge construction, which is fundamentally different from the Merkle-Damgard construction used by MD5, SHA-1, and SHA-2. This architectural diversity means that even if a theoretical weakness were discovered in SHA-2's design, SHA-3 would not be affected. SHA-3 is not a replacement for SHA-2 (both remain secure) but rather a complementary option that provides algorithm diversity.</p>
+
+      <h3>Bcrypt</h3>
+      <p><strong>Output size:</strong> 184 bits (60-character encoded string including salt and parameters). <strong>Status: Recommended for password hashing.</strong></p>
+      <p>Bcrypt is not a general-purpose hash function. It is specifically designed for password hashing with one critical feature: <strong>adjustable computational cost</strong>. Unlike SHA-256, which is designed to be fast, bcrypt is intentionally slow. The work factor (cost parameter) can be increased over time as hardware gets faster, ensuring that brute-force attacks remain impractical.</p>
+      <p>With a work factor of 12 (a common default), bcrypt processes roughly 3 to 4 hashes per second on a single CPU core. Compare this to SHA-256's rate of millions of hashes per second. This massive speed difference is by design — it makes brute-force attacks against bcrypt-hashed passwords orders of magnitude more expensive. Bcrypt also automatically generates and embeds a unique random salt for each password, eliminating the need for manual salt management.</p>
+
+      <h3>Argon2</h3>
+      <p><strong>Status: Modern recommended alternative for password hashing.</strong></p>
+      <p>Argon2 won the Password Hashing Competition in 2015 and is considered the most advanced password hashing algorithm available. It offers three variants: Argon2d (optimized against GPU attacks), Argon2i (optimized against side-channel attacks), and Argon2id (a hybrid of both, recommended for most uses). Argon2 allows tuning of time cost, memory cost, and parallelism, giving developers fine-grained control over the trade-off between security and performance.</p>
+    </section>
+
+    <section>
+      <h2>Real-World Applications of Hashing</h2>
+      <p>Hashing is not just an academic concept. It underpins the security and integrity of systems you use every day.</p>
+
+      <h3>Password Storage</h3>
+      <p>Websites never store your actual password (or at least, they should not). Instead, when you create an account, the server hashes your password using bcrypt or Argon2 and stores only the hash. When you log in, the server hashes your submitted password and compares it to the stored hash. If the hashes match, the password is correct. If the database is breached, attackers get only hashes, not plaintext passwords.</p>
+      <p>This is why websites can verify your password but cannot tell you what your password is when you forget it — they literally do not know. They can only reset it.</p>
+
+      <h3>File Integrity Verification</h3>
+      <p>When you download software, the publisher often provides a SHA-256 hash of the file. After downloading, you can compute the hash of your downloaded file and compare it to the published hash. If they match, the file is identical to the original — it was not corrupted during transfer and was not tampered with by a malicious third party.</p>
+      <p>On the command line, you can verify a file hash like this:</p>
+      <p><code>sha256sum downloaded-file.iso</code></p>
+      <p>This outputs the SHA-256 hash that you compare against the publisher's value. Package managers like apt, npm, and pip perform this verification automatically behind the scenes for every package you install.</p>
+
+      <h3>Digital Signatures</h3>
+      <p>Digital signatures use hashing as a component of their process. To sign a document, the signer computes a hash of the document's content, then encrypts the hash with their private key. The recipient decrypts the signature with the signer's public key to obtain the hash, then independently hashes the document and compares the two. If they match, the document has not been altered since signing, and the signer's identity is confirmed.</p>
+
+      <h3>Blockchain and Cryptocurrency</h3>
+      <p>SHA-256 is the backbone of Bitcoin's proof-of-work system. Miners repeatedly hash block data with a random nonce, searching for a hash that starts with a specific number of leading zeros. The difficulty of finding such a hash is what makes Bitcoin mining computationally expensive and secures the network against manipulation. Each block also contains the hash of the previous block, creating an immutable chain — altering any historical block would change its hash, which would invalidate every subsequent block.</p>
+
+      <h3>Data Structures: Hash Tables and Hash Maps</h3>
+      <p>Beyond cryptography, non-cryptographic hash functions power some of the most fundamental data structures in computer science. Hash tables (called dictionaries in Python, objects in JavaScript, and HashMaps in Java) use hash functions to map keys to array indices, enabling O(1) average-time lookups, insertions, and deletions. These data structures are used billions of times per second across all running software worldwide.</p>
+
+      <h3>Git Version Control</h3>
+      <p>Git uses SHA-1 hashes (with an ongoing migration to SHA-256) to identify every object in its database: commits, trees, blobs, and tags. When you see a commit hash like <code>a1b2c3d4e5f6...</code>, that is the SHA-1 hash of the commit's contents (including the author, message, timestamp, and parent commit hash). This content-addressable storage system guarantees that any modification to the repository's history would change the hashes, making tampering detectable.</p>
+    </section>
+
+    <section>
+      <h2>Hashing vs. Encryption vs. Encoding</h2>
+      <p>These three concepts are frequently confused, but they serve entirely different purposes. Understanding the distinctions is critical for making correct security decisions.</p>
+
+      <h3>Hashing: One-Way Verification</h3>
+      <p><strong>Purpose:</strong> Verify data integrity or identity without revealing the original data. <strong>Direction:</strong> One-way only. You cannot recover the original input from the hash. <strong>Key required:</strong> No. <strong>Output size:</strong> Fixed (regardless of input size). <strong>Use cases:</strong> Password storage, file integrity checks, digital signatures, data deduplication.</p>
+
+      <h3>Encryption: Two-Way Protection</h3>
+      <p><strong>Purpose:</strong> Protect data confidentiality while allowing authorized parties to recover the original. <strong>Direction:</strong> Two-way. Data can be encrypted and then decrypted. <strong>Key required:</strong> Yes (symmetric encryption uses one shared key; asymmetric uses a public/private key pair). <strong>Output size:</strong> Approximately the same as input (plus some overhead). <strong>Use cases:</strong> Secure communication (HTTPS, email), file encryption, database field encryption.</p>
+
+      <h3>Encoding: Format Transformation</h3>
+      <p><strong>Purpose:</strong> Transform data into a different format for compatibility or transport. <strong>Direction:</strong> Two-way and freely reversible by anyone. <strong>Key required:</strong> No. <strong>Security:</strong> None. Encoding provides zero security. <strong>Use cases:</strong> Base64 for binary-to-text conversion, URL encoding for special characters in URLs, UTF-8 for text character representation.</p>
+      <p>A common and dangerous mistake is using encoding (like Base64) to "protect" sensitive data. Base64 is not encryption and provides no security whatsoever — anyone can decode it instantly. Similarly, hashing a password with MD5 or unsalted SHA-256 is technically hashing, but it is insufficiently secure for modern threats. Using the right tool for the right purpose is essential.</p>
+    </section>
+
+    <section>
+      <h2>Password Hashing Best Practices</h2>
+      <p>Password hashing deserves special attention because getting it wrong has directly led to massive data breaches affecting millions of users. Here are the current best practices that every developer should follow.</p>
+
+      <h3>Always Use a Dedicated Password Hashing Function</h3>
+      <p>Use bcrypt, scrypt, or Argon2id — never SHA-256, SHA-1, or MD5 for passwords. General-purpose hash functions are too fast, allowing attackers to test billions of guesses per second.</p>
+
+      <h3>Always Salt Your Hashes</h3>
+      <p>A <strong>salt</strong> is a unique random string generated for each user and combined with their password before hashing. Even if two users have the same password, their different salts produce completely different hashes. Salting defeats rainbow table attacks (precomputed hash-to-password lookup tables) and forces attackers to crack each hash individually.</p>
+      <p>Bcrypt and Argon2 handle salting automatically — the salt is generated and embedded in the output string. If you are using a manual approach (which is discouraged), generate a cryptographically random salt of at least 16 bytes for each password.</p>
+
+      <h3>Use an Appropriate Work Factor</h3>
+      <p>Set the work factor high enough that hashing takes at least 250 milliseconds on your server hardware. For bcrypt, a work factor of 12 to 14 is typical in 2026. For Argon2id, recommendations include at least 64 MB of memory, 3 iterations, and 1 thread. Increase the work factor periodically as hardware improves.</p>
+
+      <h3>Never Implement Your Own Hashing</h3>
+      <p>Use well-established, peer-reviewed libraries for password hashing. In Python, use the <code>bcrypt</code> or <code>argon2-cffi</code> packages. In Node.js, use <code>bcrypt</code> or <code>argon2</code>. In PHP, use the built-in <code>password_hash()</code> function with <code>PASSWORD_BCRYPT</code> or <code>PASSWORD_ARGON2ID</code>. Rolling your own cryptographic implementation is one of the most common and dangerous mistakes in software development.</p>
+
+      <h3>Hash Pepper for Extra Security</h3>
+      <p>A <strong>pepper</strong> is a secret key stored separately from the database (typically in an environment variable or secrets manager) that is combined with the password before hashing. Unlike a salt (which is stored alongside the hash and is unique per user), a pepper is the same for all users and is kept secret. If an attacker gains access to the database but not the application server, the pepper adds an additional layer of protection.</p>
+    </section>
+
+    <section>
+      <h2>Understanding Hash Collisions</h2>
+      <p>A <strong>collision</strong> occurs when two different inputs produce the same hash output. Because hash functions map an infinite set of possible inputs to a finite set of outputs, collisions are mathematically inevitable — but for strong algorithms, finding one should be computationally infeasible.</p>
+
+      <h3>The Birthday Problem</h3>
+      <p>The probability of finding a collision is governed by the birthday paradox from probability theory. In a room of just 23 people, there is a greater than 50% chance that two share a birthday (out of 365 possible dates). Similarly, for a hash function with an n-bit output, you need to compute approximately 2^(n/2) hashes before the probability of a collision exceeds 50%.</p>
+      <p>For SHA-256, this means approximately 2^128 computations — an astronomically large number that is beyond any foreseeable computational capability. For MD5 (128-bit output), the theoretical threshold is 2^64, and practical attacks achieve collisions far faster due to mathematical weaknesses in the algorithm.</p>
+
+      <h3>Why Collisions Matter</h3>
+      <p>If an attacker can create two documents with the same hash, they could substitute a malicious document for a legitimate one without detection. This is how the rogue CA certificate attack exploited MD5 weaknesses in 2008 — the attackers created a legitimate certificate request and a rogue CA certificate that shared the same MD5 hash, then substituted one for the other after the legitimate one was signed.</p>
+    </section>
+
+    <section>
+      <h2>Choosing the Right Hash Algorithm</h2>
+      <p>The correct algorithm depends entirely on your use case:</p>
+      <ul>
+        <li><strong>Password storage:</strong> Argon2id (preferred) or bcrypt. Never use SHA-256, SHA-1, or MD5.</li>
+        <li><strong>File integrity verification:</strong> SHA-256 or SHA-512. Acceptable: SHA-3. Avoid: MD5 and SHA-1 in security contexts.</li>
+        <li><strong>Digital signatures:</strong> SHA-256 or SHA-384 (as specified by the signature algorithm, such as RSA-SHA256 or ECDSA-SHA384).</li>
+        <li><strong>Non-cryptographic checksums:</strong> CRC32, xxHash, or MurmurHash for high-speed checksumming where security is not a concern (hash tables, data deduplication, error detection).</li>
+        <li><strong>Blockchain / proof of work:</strong> SHA-256 (Bitcoin) or Ethash/Keccak-256 (Ethereum historically).</li>
+        <li><strong>HMAC (Hash-based Message Authentication Code):</strong> SHA-256 with a secret key for authenticating API requests and verifying message integrity with sender authentication.</li>
+      </ul>
+    </section>
+
+    <section class="faq-section">
+      <h2>Frequently Asked Questions</h2>
+
+      <details>
+        <summary>Is hashing the same as encryption?</summary>
+        <p>No, hashing and encryption are fundamentally different. Hashing is a one-way function that produces a fixed-size digest from any input and cannot be reversed to recover the original data. Encryption is a two-way function that transforms data into ciphertext using a key, and the original data can be recovered by decrypting with the correct key. Hashing is used when you need to verify data without storing or recovering the original (like passwords), while encryption is used when you need to protect data that must later be read (like messages or files in transit).</p>
+      </details>
+
+      <details>
+        <summary>Why is MD5 considered insecure?</summary>
+        <p>MD5 is considered cryptographically broken because researchers have demonstrated practical collision attacks — the ability to create two different inputs that produce the same MD5 hash. In 2004, a team led by Xiaoyun Wang showed that MD5 collisions could be generated in seconds on ordinary hardware. By 2008, researchers exploited MD5 weaknesses to create a rogue SSL certificate authority. MD5 is also extremely fast to compute, making it vulnerable to brute-force attacks on password hashes. While MD5 is still acceptable for non-security checksums (like verifying file downloads against accidental corruption), it should never be used for password hashing, digital signatures, or any security-critical application.</p>
+      </details>
+
+      <details>
+        <summary>Should I use SHA-256 or bcrypt for password hashing?</summary>
+        <p>For password hashing, always use bcrypt, scrypt, or Argon2 instead of SHA-256. SHA-256 is a general-purpose cryptographic hash that is designed to be fast, which is actually a disadvantage for password storage because attackers can test billions of SHA-256 guesses per second using GPUs. Bcrypt, scrypt, and Argon2 are specifically designed for password hashing with adjustable work factors that make them intentionally slow and computationally expensive, limiting attackers to thousands of guesses per second. Bcrypt also automatically handles salting. SHA-256 is excellent for file integrity verification, digital signatures, and blockchain, but it is the wrong tool for password storage.</p>
+      </details>
+
+      <details>
+        <summary>Can you reverse or decrypt a hash to get the original data?</summary>
+        <p>No, a cryptographic hash cannot be mathematically reversed to recover the original input. Hash functions are one-way by design — they lose information during the compression process, and the same hash could theoretically correspond to an infinite number of possible inputs (though finding two that match is computationally infeasible for strong algorithms). However, weak or short passwords can be recovered through brute-force attacks (trying every possible combination), dictionary attacks (trying common passwords), or rainbow table lookups (precomputed hash-to-password tables). This is why salting and using slow hash functions like bcrypt are essential for password security.</p>
+      </details>
+
+      <details>
+        <summary>What is salting and why is it important for password hashing?</summary>
+        <p>A salt is a random string of characters that is appended or prepended to a password before hashing. Each user gets a unique salt, which is stored alongside the hash in the database. Salting is critical for three reasons: first, it ensures that two users with the same password produce different hashes, so an attacker who cracks one hash cannot automatically know other users with the same password; second, it defeats rainbow table attacks because precomputed tables would need to be generated for every possible salt value; third, it forces attackers to crack each password individually rather than in bulk. Bcrypt and Argon2 automatically generate and embed salts, which is one reason they are preferred over manual salt-and-hash approaches.</p>
+      </details>
+    </section>
+
+    <footer class="article-footer">
+      <h2>Related Tools</h2>
+      <ul>
+        <li><a href="/tools/hash-generator/">Hash Generator</a> — Generate MD5, SHA-1, SHA-256, and SHA-512 hashes from any text input instantly.</li>
+        <li><a href="/tools/password-generator/">Password Generator</a> — Create strong, random passwords with customizable length and character requirements.</li>
+        <li><a href="/tools/base64-encoder-decoder/">Base64 Encoder/Decoder</a> — Encode text to Base64 or decode Base64 strings back to plaintext.</li>
+      </ul>
+      <AuthorBio />
+    </footer>
+  </article>
+</BaseLayout>
