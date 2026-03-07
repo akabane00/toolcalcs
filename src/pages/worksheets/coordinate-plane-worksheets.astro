@@ -1,0 +1,464 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getWorksheetBySlug } from '../../data/worksheets';
+import '../../styles/worksheet.css';
+
+const ws = getWorksheetBySlug('coordinate-plane-worksheets')!;
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://toolcalcs.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Worksheets",
+      "item": "https://toolcalcs.com/worksheets/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Coordinate Plane Worksheets"
+    }
+  ]
+};
+---
+
+<BaseLayout
+  title="Free Coordinate Plane Worksheets - Printable Math Practice | ToolCalcs"
+  description={ws.description}
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/worksheets/">Worksheets</a> &rsaquo;
+    <span>Coordinate Plane Worksheets</span>
+  </nav>
+
+  <h1>{ws.title}</h1>
+  <p class="page-desc">{ws.description}</p>
+
+  <div class="worksheet-box">
+    <div class="config-panel">
+      <h3>Settings</h3>
+      <div class="config-inputs">
+        <div class="config-group">
+          <label for="cfgProblems">Number of Problems</label>
+          <input type="number" id="cfgProblems" value="10" min="8" max="15" />
+        </div>
+        <div class="config-group">
+          <label for="cfgType">Problem Type</label>
+          <select id="cfgType">
+            <option value="plot">Plot Points</option>
+            <option value="identify">Identify Coordinates</option>
+            <option value="distance">Find Distance</option>
+            <option value="mixed" selected>Mixed</option>
+          </select>
+        </div>
+        <div class="config-group">
+          <label for="cfgGrid">Grid Range</label>
+          <select id="cfgGrid">
+            <option value="5">5 &times; 5</option>
+            <option value="10">10 &times; 10</option>
+            <option value="all">All Four Quadrants</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="worksheet-actions">
+      <button class="ws-btn primary" id="btnGenerate">Generate New</button>
+      <button class="ws-btn print" id="btnPrint">Print</button>
+      <label class="toggle-label">
+        <input type="checkbox" id="toggleAnswers" />
+        Show Answers
+      </label>
+    </div>
+
+    <div class="worksheet-content" id="worksheetContent">
+      <div class="worksheet-header-print">
+        <h2>Coordinate Plane Practice</h2>
+        <div class="name-date">
+          <span>Name: ___________________</span>
+          <span>Date: ___________________</span>
+        </div>
+      </div>
+      <div class="problem-grid" id="problemGrid"></div>
+      <div class="answer-key hidden" id="answerKey">
+        <h3>Answer Key</h3>
+        <div class="answer-grid" id="answerGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    :global(.coord-grid-wrap) {
+      display: inline-block;
+      margin: 10px auto;
+      position: relative;
+    }
+    :global(.coord-grid) {
+      display: grid;
+      border: 1px solid #ccc;
+      position: relative;
+    }
+    :global(.coord-grid .cell) {
+      width: 22px;
+      height: 22px;
+      border: 1px solid #e0e0e0;
+      position: relative;
+      box-sizing: border-box;
+    }
+    :global(.coord-grid .cell.axis-x) {
+      border-top: 2px solid #333;
+    }
+    :global(.coord-grid .cell.axis-y) {
+      border-left: 2px solid #333;
+    }
+    :global(.coord-grid .cell.origin) {
+      border-top: 2px solid #333;
+      border-left: 2px solid #333;
+    }
+    :global(.coord-dot) {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #e74c3c;
+      border-radius: 50%;
+      z-index: 2;
+    }
+    :global(.coord-lbl) {
+      position: absolute;
+      font-size: 11px;
+      font-weight: bold;
+      color: #e74c3c;
+      z-index: 2;
+      white-space: nowrap;
+    }
+    :global(.coord-axis-label) {
+      position: absolute;
+      font-size: 10px;
+      color: #666;
+    }
+    :global(.coord-problem-item) {
+      margin-bottom: 20px;
+    }
+    :global(.coord-problem-item .problem-text) {
+      margin-bottom: 8px;
+    }
+    @media print {
+      :global(.coord-grid .cell) {
+        border-color: #ccc;
+      }
+      :global(.coord-grid .cell.axis-x) {
+        border-top-color: #000;
+      }
+      :global(.coord-grid .cell.axis-y) {
+        border-left-color: #000;
+      }
+      :global(.coord-grid .cell.origin) {
+        border-top-color: #000;
+        border-left-color: #000;
+      }
+    }
+  </style>
+
+  <AdUnit slot="ws-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>Understanding the Coordinate Plane</h2>
+    <p>The coordinate plane, also known as the Cartesian plane, is a two-dimensional surface formed by two perpendicular number lines that intersect at a point called the origin. The horizontal number line is called the x-axis, and the vertical number line is called the y-axis. Together, these axes create a grid system that allows us to pinpoint any location using a pair of numbers called coordinates. This powerful mathematical tool, invented by the French philosopher and mathematician Rene Descartes in the 17th century, forms the foundation of analytic geometry and is used extensively in algebra, physics, engineering, computer graphics, and countless other fields.</p>
+    <p>These free printable coordinate plane worksheets are designed for students in grades 5 through 7. They provide structured practice with plotting points, identifying coordinates, and calculating distances between points. Each worksheet generates fresh problems with randomized coordinates, so students always have new material to work with. The configurable settings let teachers and parents control the difficulty by choosing between a small 5 by 5 grid, a larger 10 by 10 grid, or a full four-quadrant grid that includes negative coordinates. A printable coordinate grid is included with each problem that requires spatial reasoning.</p>
+    <p>Mastering the coordinate plane is essential for success in algebra, where students graph linear equations and inequalities. It is also foundational for geometry, trigonometry, calculus, and virtually every branch of mathematics that involves visual or spatial reasoning. Beyond mathematics, coordinate systems are used in computer programming, video game design, GPS navigation, architecture, and data visualization. Students who build a strong understanding of the coordinate plane are preparing themselves for a wide range of academic and professional opportunities.</p>
+
+    <h2>Key Concepts of the Coordinate Plane</h2>
+    <h3>Ordered Pairs</h3>
+    <p>Every point on the coordinate plane is represented by an ordered pair (x, y), where x is the horizontal distance from the origin and y is the vertical distance from the origin. The order matters: (3, 5) is a different point than (5, 3). The first number always represents the x-coordinate (horizontal position), and the second number always represents the y-coordinate (vertical position). Students should remember this as "run before you rise" or "x comes before y, just like in the alphabet." When plotting a point, always move horizontally first along the x-axis, then vertically to reach the correct y-coordinate.</p>
+
+    <h3>The Four Quadrants</h3>
+    <p>The two axes divide the coordinate plane into four regions called quadrants, numbered counterclockwise starting from the upper right. Quadrant I is the upper right where both x and y are positive, such as the point (3, 4). Quadrant II is the upper left where x is negative and y is positive, such as (-2, 5). Quadrant III is the lower left where both x and y are negative, such as (-4, -3). Quadrant IV is the lower right where x is positive and y is negative, such as (6, -1). Points on the axes themselves are not in any quadrant. Understanding which quadrant a point belongs to based on the signs of its coordinates is an important skill that these worksheets help develop.</p>
+
+    <h3>The Distance Formula</h3>
+    <p>The distance between two points (x1, y1) and (x2, y2) on the coordinate plane is calculated using the distance formula, which is derived from the Pythagorean theorem. The formula is: d = the square root of ((x2 - x1) squared + (y2 - y1) squared). The horizontal distance and the vertical distance between the two points form the two legs of a right triangle, and the straight-line distance between the points is the hypotenuse. For example, the distance between (1, 2) and (4, 6) is the square root of ((4-1) squared + (6-2) squared) = the square root of (9 + 16) = the square root of 25 = 5.</p>
+
+    <h2>Grade-Level Guide for Coordinate Plane Worksheets</h2>
+    <h3>Grade 5 (Ages 10-11)</h3>
+    <p>Fifth graders are introduced to the coordinate plane using only the first quadrant, where all coordinates are positive. Start with the 5 by 5 grid and use the Plot Points or Identify Coordinates problem type. At this level, students learn the conventions of ordered pairs, practice moving along the x-axis first and then along the y-axis, and develop the spatial awareness needed to navigate a grid system. Keep worksheets to 8 to 10 problems and use the smaller grid to make the visual experience manageable. Fifth graders should become comfortable with plotting and reading coordinates before moving to larger grids.</p>
+
+    <h3>Grade 6 (Ages 11-12)</h3>
+    <p>Sixth graders extend to the full four-quadrant grid and become comfortable working with negative coordinates. Use the All Four Quadrants setting with Plot Points and Identify Coordinates. Students at this level should be able to determine which quadrant a point belongs to based solely on the signs of its coordinates. They also begin finding distances between points that share an x-coordinate or a y-coordinate, which involves simple subtraction. The 10 by 10 grid provides more space for complex problems. Ten to twelve problems per worksheet is appropriate for most sixth graders.</p>
+
+    <h3>Grade 7 (Ages 12-13)</h3>
+    <p>Seventh graders work with the full distance formula, applying their knowledge of squares and square roots to calculate distances between any two points on the coordinate plane. Use the All Four Quadrants setting with the Mixed problem type for comprehensive practice. Students at this level should be fluent with all three problem types and ready to connect coordinate geometry to algebraic concepts like slope and linear equations. Twelve to fifteen problems per worksheet provides a thorough practice session that covers multiple skills.</p>
+
+    <h2>Tips for Parents and Teachers</h2>
+    <ul>
+      <li><strong>Start with the 5 by 5 grid.</strong> A smaller grid is less overwhelming for beginners and makes it easier to see the relationship between coordinates and positions. Once students are confident, progress to the 10 by 10 grid and then to all four quadrants.</li>
+      <li><strong>Use physical grid activities.</strong> Create a large coordinate grid on the classroom floor using tape. Have students physically walk to coordinates called out by the teacher. This kinesthetic approach helps students internalize the relationship between ordered pairs and spatial positions.</li>
+      <li><strong>Play Coordinate Battleship.</strong> Adapt the classic Battleship game to use coordinate pairs instead of letter-number combinations. Students place ships on a coordinate grid and try to guess their opponent's ship locations by calling out ordered pairs. This game makes coordinate practice engaging and competitive.</li>
+      <li><strong>Emphasize x-first, y-second.</strong> The most common mistake students make is reversing the coordinates. Use consistent language: "Move along the x-axis first, then move up or down to the y-coordinate." Some teachers use the mnemonic "across the hall, then up the stairs."</li>
+      <li><strong>Connect to real-world maps.</strong> Show students how maps use coordinate-like systems. City maps use letter-number grids, and global maps use latitude and longitude. These real-world applications help students see the value of coordinate skills.</li>
+      <li><strong>Build to the distance formula gradually.</strong> Before introducing the formula, have students count grid squares to find distances between points on the same horizontal or vertical line. Then introduce diagonal distances by drawing right triangles on the grid and using the Pythagorean theorem. This scaffolded approach ensures students understand why the distance formula works, not just how to plug in numbers.</li>
+    </ul>
+
+    <h2>How to Use These Worksheets</h2>
+    <p>Select the number of problems, problem type, and grid range using the controls above. Plot Points problems give students an ordered pair and ask them to mark the corresponding point on the included coordinate grid. Identify Coordinates problems show a labeled point on a grid and ask students to write its coordinates. Find Distance problems give two ordered pairs and ask students to calculate the straight-line distance using the distance formula. Mixed mode combines all three types for comprehensive review. Click Generate New to create a fresh worksheet. Use Print for a clean, printer-friendly version with coordinate grids that reproduce clearly on paper. Toggle Show Answers to reveal solutions for quick grading.</p>
+
+    <h2>Real-World Applications of the Coordinate Plane</h2>
+    <h3>Computer Graphics and Video Games</h3>
+    <p>Every image on a computer screen is drawn using coordinates. Each pixel has an (x, y) position, and when a game character moves across the screen, its coordinates are updated frame by frame. Game developers use coordinate geometry constantly to calculate distances between objects, detect collisions, and animate movement. Students who learn coordinate geometry are building the mathematical foundation for computer programming, game design, and digital art.</p>
+
+    <h3>GPS and Navigation</h3>
+    <p>Global Positioning System technology uses a coordinate system to pinpoint locations on the Earth's surface. When your phone shows your location on a map or gives driving directions, it is working with coordinates constantly. The distance formula has a direct analog in GPS calculations: finding the straight-line distance between two geographic points involves the same mathematical principles students practice in these worksheets.</p>
+
+    <h3>Science and Data Visualization</h3>
+    <p>Scientists use the coordinate plane to graph data and visualize relationships between variables. A scatter plot that shows the relationship between study hours and test scores, a line graph that tracks temperature changes over time, and a bar chart that compares sales across regions all use the same x-y axis system students learn in these worksheets. Building comfort with coordinate grids prepares students for data analysis in every scientific discipline.</p>
+
+    <h2>Common Student Mistakes</h2>
+    <ul>
+      <li><strong>Reversing x and y coordinates.</strong> Students often write (y, x) instead of (x, y). Reinforce that x always comes first, just as it comes before y in the alphabet.</li>
+      <li><strong>Moving vertically first.</strong> When plotting (3, 5), some students move up 5 first and then right 3. Always move horizontally first along the x-axis, then vertically.</li>
+      <li><strong>Sign errors with negative coordinates.</strong> In all four quadrants, students sometimes forget that left of the y-axis is negative x and below the x-axis is negative y. Practice identifying the quadrant of a point by its signs.</li>
+      <li><strong>Forgetting the square root in the distance formula.</strong> Students sometimes stop after computing the sum of squares and forget the final square root step. Remind them the formula produces a distance, which should be a reasonable length.</li>
+    </ul>
+
+    <h2>Related Worksheets</h2>
+    <ul>
+      <li><a href="/worksheets/geometry-worksheets/">Geometry Worksheets</a> &ndash; Practice shapes and angles that connect to coordinate geometry.</li>
+      <li><a href="/worksheets/algebra-worksheets/">Algebra Worksheets</a> &ndash; Solve equations and explore linear relationships on the coordinate plane.</li>
+      <li><a href="/worksheets/integers-worksheets/">Integers Worksheets</a> &ndash; Strengthen positive and negative number skills for all-quadrant work.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="ws-bottom" format="horizontal" />
+</BaseLayout>
+
+<script is:inline>
+  var problems = [];
+
+  function randInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function roundTo(val, places) {
+    var factor = Math.pow(10, places);
+    return Math.round(val * factor) / factor;
+  }
+
+  function getGridConfig() {
+    var sel = document.getElementById('cfgGrid').value;
+    if (sel === '5') return { size: 5, minC: 0, maxC: 5, allQuad: false };
+    if (sel === '10') return { size: 10, minC: 0, maxC: 10, allQuad: false };
+    return { size: 6, minC: -6, maxC: 6, allQuad: true };
+  }
+
+  function buildFirstQuadGrid(gridSize, points, showDots) {
+    var cs = 22;
+    var total = gridSize + 1;
+    var html = '';
+    var wrapW = total * cs + 30;
+    var wrapH = total * cs + 30;
+    html += '<div class="coord-grid-wrap" style="position:relative;width:' + wrapW + 'px;height:' + wrapH + 'px;">';
+    html += '<div class="coord-grid" style="grid-template-columns:repeat(' + total + ',' + cs + 'px);grid-template-rows:repeat(' + total + ',' + cs + 'px);width:' + (total * cs) + 'px;height:' + (total * cs) + 'px;">';
+
+    for (var r = 0; r < total; r++) {
+      for (var c = 0; c < total; c++) {
+        var cls = 'cell';
+        if (r === total - 1) cls += ' axis-x';
+        if (c === 0) cls += ' axis-y';
+        html += '<div class="' + cls + '"></div>';
+      }
+    }
+    html += '</div>';
+
+    for (var x = 0; x <= gridSize; x++) {
+      html += '<span class="coord-axis-label" style="left:' + (x * cs - 3) + 'px;top:' + (total * cs + 4) + 'px;">' + x + '</span>';
+    }
+    for (var y = 0; y <= gridSize; y++) {
+      html += '<span class="coord-axis-label" style="left:-16px;top:' + ((gridSize - y) * cs - 7) + 'px;">' + y + '</span>';
+    }
+
+    if (points && showDots) {
+      for (var p = 0; p < points.length; p++) {
+        var pt = points[p];
+        var dx = pt.x * cs;
+        var dy = (gridSize - pt.y) * cs;
+        html += '<div class="coord-dot" style="left:' + (dx - 5) + 'px;top:' + (dy - 5) + 'px;"></div>';
+        if (pt.label) {
+          html += '<span class="coord-lbl" style="left:' + (dx + 6) + 'px;top:' + (dy - 16) + 'px;">' + pt.label + '</span>';
+        }
+      }
+    }
+
+    html += '</div>';
+    return html;
+  }
+
+  function buildAllQuadGrid(gridSize, points, showDots) {
+    var cs = 22;
+    var half = gridSize;
+    var total = gridSize * 2 + 1;
+    var originCol = half;
+    var originRow = half;
+    var html = '';
+    var wrapW = total * cs + 30;
+    var wrapH = total * cs + 30;
+    html += '<div class="coord-grid-wrap" style="position:relative;width:' + wrapW + 'px;height:' + wrapH + 'px;">';
+    html += '<div class="coord-grid" style="grid-template-columns:repeat(' + total + ',' + cs + 'px);grid-template-rows:repeat(' + total + ',' + cs + 'px);width:' + (total * cs) + 'px;height:' + (total * cs) + 'px;">';
+
+    for (var r = 0; r < total; r++) {
+      for (var c = 0; c < total; c++) {
+        var cls = 'cell';
+        if (r === originRow) cls += ' axis-x';
+        if (c === originCol) cls += ' axis-y';
+        if (r === originRow && c === originCol) cls += ' origin';
+        html += '<div class="' + cls + '"></div>';
+      }
+    }
+    html += '</div>';
+
+    for (var x = -half; x <= half; x++) {
+      if (x === 0) continue;
+      html += '<span class="coord-axis-label" style="left:' + ((x + half) * cs - 4) + 'px;top:' + (originRow * cs + cs + 2) + 'px;">' + x + '</span>';
+    }
+    for (var y = -half; y <= half; y++) {
+      if (y === 0) continue;
+      html += '<span class="coord-axis-label" style="left:' + (originCol * cs - 18) + 'px;top:' + ((-y + half) * cs - 7) + 'px;">' + y + '</span>';
+    }
+
+    if (points && showDots) {
+      for (var p = 0; p < points.length; p++) {
+        var pt = points[p];
+        var dx = (pt.x + half) * cs;
+        var dy = (-pt.y + half) * cs;
+        html += '<div class="coord-dot" style="left:' + (dx - 5) + 'px;top:' + (dy - 5) + 'px;"></div>';
+        if (pt.label) {
+          html += '<span class="coord-lbl" style="left:' + (dx + 6) + 'px;top:' + (dy - 16) + 'px;">' + pt.label + '</span>';
+        }
+      }
+    }
+
+    html += '</div>';
+    return html;
+  }
+
+  function generateProblems() {
+    var count = parseInt(document.getElementById('cfgProblems').value, 10);
+    var type = document.getElementById('cfgType').value;
+    var gc = getGridConfig();
+
+    if (isNaN(count) || count < 8) count = 8;
+    if (count > 15) count = 15;
+
+    problems = [];
+    var types = ['plot', 'identify', 'distance'];
+    var labels = 'ABCDEFGHIJKLMNOPQRST';
+
+    for (var i = 0; i < count; i++) {
+      var pType = type === 'mixed' ? types[randInt(0, 2)] : type;
+      var question, answer, pts;
+
+      if (pType === 'plot') {
+        var x = randInt(gc.minC, gc.maxC);
+        var y = randInt(gc.minC, gc.maxC);
+        question = 'Plot the point (' + x + ', ' + y + ') on the grid below.';
+        answer = '(' + x + ', ' + y + ') plotted';
+        pts = [{ x: x, y: y, label: '' }];
+        problems.push({ question: question, answer: answer, pts: pts, pType: 'plot' });
+
+      } else if (pType === 'identify') {
+        var x = randInt(gc.minC, gc.maxC);
+        var y = randInt(gc.minC, gc.maxC);
+        var lbl = labels[i % labels.length];
+        question = 'What are the coordinates of point ' + lbl + ' shown on the grid?';
+        answer = '(' + x + ', ' + y + ')';
+        pts = [{ x: x, y: y, label: lbl }];
+        problems.push({ question: question, answer: answer, pts: pts, pType: 'identify' });
+
+      } else {
+        // distance
+        var x1 = randInt(gc.minC, gc.maxC);
+        var y1 = randInt(gc.minC, gc.maxC);
+        var x2 = randInt(gc.minC, gc.maxC);
+        var y2 = randInt(gc.minC, gc.maxC);
+        while (x1 === x2 && y1 === y2) {
+          x2 = randInt(gc.minC, gc.maxC);
+          y2 = randInt(gc.minC, gc.maxC);
+        }
+        var dist = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+        dist = roundTo(dist, 2);
+        question = 'Find the distance between (' + x1 + ', ' + y1 + ') and (' + x2 + ', ' + y2 + '). Round to 2 decimal places.';
+        answer = '' + dist;
+        problems.push({ question: question, answer: answer, pts: null, pType: 'distance' });
+      }
+    }
+
+    renderProblems();
+    renderAnswerKey();
+    updateAnswerVisibility();
+  }
+
+  function renderProblems() {
+    var grid = document.getElementById('problemGrid');
+    var showAnswers = document.getElementById('toggleAnswers').checked;
+    var gc = getGridConfig();
+    var html = '';
+
+    for (var i = 0; i < problems.length; i++) {
+      var p = problems[i];
+      html += '<div class="problem coord-problem-item" style="page-break-inside:avoid;">';
+      html += '<div class="problem-number">' + (i + 1) + ')</div>';
+      html += '<div class="problem-text">' + p.question + '</div>';
+
+      if (p.pts) {
+        var showDots;
+        if (p.pType === 'plot') {
+          showDots = showAnswers;
+        } else {
+          showDots = true;
+        }
+        if (gc.allQuad) {
+          html += buildAllQuadGrid(gc.size, p.pts, showDots);
+        } else {
+          html += buildFirstQuadGrid(gc.size, p.pts, showDots);
+        }
+      }
+
+      html += '<div class="problem-answer' + (showAnswers ? ' revealed' : '') + '">';
+      html += showAnswers ? p.answer : '_______________';
+      html += '</div>';
+      html += '</div>';
+    }
+
+    grid.innerHTML = html;
+  }
+
+  function renderAnswerKey() {
+    var answerGrid = document.getElementById('answerGrid');
+    var html = '';
+    for (var i = 0; i < problems.length; i++) {
+      html += '<div class="answer-item"><span class="q">' + (i + 1) + '.</span><span class="a">' + problems[i].answer + '</span></div>';
+    }
+    answerGrid.innerHTML = html;
+  }
+
+  function updateAnswerVisibility() {
+    var showAnswers = document.getElementById('toggleAnswers').checked;
+    var answerKey = document.getElementById('answerKey');
+    if (showAnswers) { answerKey.classList.remove('hidden'); } else { answerKey.classList.add('hidden'); }
+    renderProblems();
+  }
+
+  document.getElementById('btnGenerate').addEventListener('click', generateProblems);
+  document.getElementById('btnPrint').addEventListener('click', function() { window.print(); });
+  document.getElementById('toggleAnswers').addEventListener('change', updateAnswerVisibility);
+  generateProblems();
+</script>
