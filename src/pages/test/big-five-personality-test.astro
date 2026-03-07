@@ -1,0 +1,525 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import GameShare from '../../components/GameShare.astro';
+import '../../styles/game.css';
+import '../../styles/quiz.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tests & Games", "item": "https://toolcalcs.com/test/" },
+      { "@type": "ListItem", "position": 3, "name": "Big Five Personality Test" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Big Five Personality Test (OCEAN)",
+    "url": "https://toolcalcs.com/test/big-five-personality-test/",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Free Big Five personality test measuring Openness, Conscientiousness, Extraversion, Agreeableness, and Neuroticism. Get your OCEAN score with 50 research-based questions."
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is the Big Five personality test?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The Big Five personality test, also known as the OCEAN model, measures five broad dimensions of personality: Openness to Experience, Conscientiousness, Extraversion, Agreeableness, and Neuroticism. It is the most widely accepted and scientifically validated personality framework in modern psychology, developed through decades of research by Paul Costa and Robert McCrae.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Is the Big Five more accurate than MBTI?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes, the Big Five model is generally considered more scientifically valid than the MBTI (Myers-Briggs Type Indicator). The Big Five uses continuous scales rather than binary categories, has stronger test-retest reliability, and is supported by extensive peer-reviewed research. While MBTI places people into 16 fixed types, the Big Five treats personality traits as spectrums, providing a more nuanced and accurate picture.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What does OCEAN stand for?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'OCEAN is an acronym for the five personality dimensions measured by the Big Five model: Openness to Experience (creativity and curiosity), Conscientiousness (organization and dependability), Extraversion (sociability and energy), Agreeableness (cooperation and trust), and Neuroticism (emotional instability and stress reactivity). Each trait exists on a spectrum from low to high.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Can Big Five traits change over time?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes, Big Five personality traits can change over time, though they tend to be relatively stable in adulthood. Research shows that people generally become more agreeable and conscientious as they age, while neuroticism and extraversion tend to decrease slightly. Major life events, therapy, and deliberate effort can also influence personality traits over months or years.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is the most important Big Five trait?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'No single Big Five trait is universally the most important — it depends on the context. Conscientiousness is the strongest predictor of job performance and academic success across most fields. Agreeableness is most important for teamwork and relationships. Emotional stability (low Neuroticism) is the best predictor of overall life satisfaction. Each trait has unique advantages depending on the situation.',
+        },
+      },
+    ],
+  }
+];
+---
+
+<BaseLayout
+  title="Big Five Personality Test (OCEAN) - Free Online Assessment | ToolCalcs"
+  description="Free Big Five personality test measuring Openness, Conscientiousness, Extraversion, Agreeableness, and Neuroticism. Get your OCEAN score with 50 research-based questions."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/test/">Tests & Games</a> &rsaquo;
+    <span>Big Five Personality Test</span>
+  </nav>
+
+  <h1>Big Five Personality Test (OCEAN)</h1>
+  <p class="page-desc">Answer 50 research-based questions to discover your personality profile across the five major dimensions: Openness, Conscientiousness, Extraversion, Agreeableness, and Neuroticism.</p>
+
+  <div class="game-box">
+    <div class="game-area" id="gameArea" role="region" aria-label="Big Five personality test area" aria-live="polite">
+      <div class="game-instructions" id="instructionsView">
+        <h2>OCEAN Personality Assessment</h2>
+        <p>You will answer 50 questions on a 5-point scale from Strongly Disagree to Strongly Agree. There are no right or wrong answers — respond honestly for the most accurate results.</p>
+        <button class="game-btn primary" id="startBtn" type="button" style="margin-top:16px;">Start Test</button>
+      </div>
+
+      <div class="play-view" id="playView" style="display:none;">
+        <div class="quiz-progress">
+          <div class="quiz-progress-text" id="progressText">Question 1 of 50</div>
+          <div class="quiz-progress-bar">
+            <div class="quiz-progress-fill" id="progressFill" style="width:2%"></div>
+          </div>
+        </div>
+        <div class="quiz-question">
+          <div class="quiz-question-text" id="questionText"></div>
+        </div>
+        <div class="quiz-likert" id="likertButtons">
+          <button class="quiz-option" data-value="1" type="button">Strongly Disagree</button>
+          <button class="quiz-option" data-value="2" type="button">Disagree</button>
+          <button class="quiz-option" data-value="3" type="button">Neutral</button>
+          <button class="quiz-option" data-value="4" type="button">Agree</button>
+          <button class="quiz-option" data-value="5" type="button">Strongly Agree</button>
+        </div>
+      </div>
+
+      <div class="result-view" id="resultView" style="display:none;">
+        <div class="result-icon" aria-hidden="true">📊</div>
+        <div class="result-label">Your OCEAN Profile</div>
+        <div class="quiz-bar-chart" id="barChart"></div>
+        <div class="quiz-result-desc" id="dimensionDescriptions"></div>
+        <button class="game-btn primary" id="tryAgainBtn" type="button" style="margin-top:16px;">Take Again</button>
+      </div>
+    </div>
+
+    <GameShare />
+
+    <div class="attempt-history" id="attemptHistory" hidden>
+      <h3>Attempt History</h3>
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is the Big Five Personality Model?</h2>
+    <p>The Big Five personality model, also known as the Five-Factor Model (FFM) or OCEAN model, is the most widely accepted and scientifically validated framework for understanding human personality. Unlike pop-psychology personality quizzes, the Big Five is grounded in decades of rigorous empirical research and has been replicated across cultures, languages, and age groups worldwide.</p>
+    <p>The model originated from lexical research in the 1930s and 1940s, when psychologists Gordon Allport and Henry Odbert identified thousands of personality-describing words in the English language. Through statistical factor analysis, researchers discovered that these thousands of descriptors consistently clustered into five broad, independent dimensions. In the 1980s and 1990s, psychologists Paul Costa and Robert McCrae formalized these findings into the NEO Personality Inventory (NEO-PI-R), establishing the Big Five as the dominant model in personality psychology.</p>
+    <p>What makes the Big Five unique is its empirical foundation. Rather than being designed from a particular theory (as the MBTI was designed from Jungian theory), the five factors emerged naturally from statistical analysis of how people actually describe themselves and others. This data-driven approach gives the model strong predictive validity for real-world outcomes including job performance, relationship satisfaction, mental health, and even physical health and longevity.</p>
+
+    <h2>The Five Dimensions (OCEAN)</h2>
+    <p>Each dimension of the Big Five represents a broad spectrum of personality traits. No score is inherently better or worse — each end of the spectrum carries its own strengths and challenges. Here is a detailed breakdown of what each dimension measures:</p>
+
+    <h3>Openness to Experience (O)</h3>
+    <p>Openness reflects the degree to which a person is intellectually curious, imaginative, and receptive to new ideas and experiences. People high in openness tend to appreciate art, explore unconventional ideas, and seek variety in their lives. They are drawn to novelty and often have broad intellectual interests. Those lower in openness prefer familiarity, routine, and practical, straightforward approaches. They tend to be conventional and may find abstract or theoretical discussions less engaging. Openness is associated with creativity, artistic achievement, and liberal political attitudes, while lower openness correlates with pragmatism and comfort with established traditions.</p>
+
+    <h3>Conscientiousness (C)</h3>
+    <p>Conscientiousness measures how organized, dependable, and goal-directed a person is. Highly conscientious individuals are disciplined, thorough, and reliable. They plan ahead, follow through on commitments, and strive for achievement. Those lower in conscientiousness are more spontaneous, flexible, and may struggle with procrastination or disorganization. Conscientiousness is the single strongest personality predictor of job performance across nearly all occupations and is also strongly associated with academic success, health behaviors, and longevity.</p>
+
+    <h3>Extraversion (E)</h3>
+    <p>Extraversion captures the extent to which a person is energized by social interaction, seeks stimulation, and experiences positive emotions. Extraverts are talkative, assertive, and enthusiastic. They thrive in group settings and are often described as having a "presence." Introverts (those low in extraversion) prefer quieter environments, need time alone to recharge, and tend to be more reflective and reserved. Importantly, introversion is not shyness — introverts simply gain energy from solitude rather than social interaction.</p>
+
+    <h3>Agreeableness (A)</h3>
+    <p>Agreeableness reflects how cooperative, trusting, and empathetic a person is in their interactions with others. Highly agreeable people are warm, considerate, and willing to compromise for the sake of social harmony. They tend to be trusting and see the best in others. Those lower in agreeableness are more competitive, skeptical, and willing to challenge others. They prioritize their own interests and may be perceived as blunt or confrontational. Lower agreeableness is associated with leadership in competitive environments and critical thinking, while higher agreeableness predicts better teamwork and relationship satisfaction.</p>
+
+    <h3>Neuroticism (N)</h3>
+    <p>Neuroticism measures emotional instability and the tendency to experience negative emotions such as anxiety, sadness, anger, and vulnerability. People high in neuroticism are more reactive to stress and may experience mood swings more frequently. They are more prone to worry and may interpret ordinary situations as threatening. Those low in neuroticism (sometimes called emotionally stable) are calm, even-tempered, and resilient under pressure. Low neuroticism is one of the strongest predictors of overall life satisfaction and subjective well-being.</p>
+
+    <h2>Big Five vs. MBTI</h2>
+    <p>The Myers-Briggs Type Indicator (MBTI) is perhaps the most well-known personality assessment, but it differs fundamentally from the Big Five in both approach and scientific validity. Understanding these differences can help you choose the right tool for understanding personality.</p>
+    <p>The MBTI categorizes people into 16 discrete types based on four binary dimensions (Introversion/Extraversion, Sensing/Intuition, Thinking/Feeling, Judging/Perceiving). This means you are classified as one type or the other with no middle ground. The Big Five, in contrast, measures traits on continuous scales, acknowledging that most people fall somewhere in the middle rather than at extremes. For example, instead of labeling you as "an introvert" or "an extravert," the Big Five gives you a percentile score that reflects where you fall on the extraversion spectrum.</p>
+    <p>Scientific research consistently supports the Big Five over the MBTI in terms of reliability and validity. Studies have shown that up to 50% of people receive a different MBTI type when retested after just five weeks, whereas Big Five scores remain relatively stable over time. The Big Five also demonstrates stronger predictive validity for real-world outcomes such as job performance, academic achievement, and psychological well-being. Most academic personality researchers use the Big Five as their primary framework, while the MBTI remains more popular in corporate settings and popular culture.</p>
+
+    <h2>How Scores Are Calculated</h2>
+    <p>This assessment uses 50 statements rated on a 5-point Likert scale, with 10 questions measuring each of the five personality dimensions. For each statement, you select your level of agreement from Strongly Disagree (1 point) to Strongly Agree (5 points).</p>
+    <p>Approximately half of the questions are reverse-scored, meaning they describe the opposite end of a dimension. For example, "I have difficulty understanding abstract ideas" is a reverse-scored item for Openness — agreeing with this statement indicates lower openness. For reverse-scored items, the point values are flipped: Strongly Agree becomes 1 point and Strongly Disagree becomes 5 points. This technique reduces response bias and improves measurement accuracy.</p>
+    <p>After completing all 50 questions, raw scores for each dimension are calculated by summing the (adjusted) point values for that dimension's 10 questions. The minimum possible raw score is 10 (all answers at the low end) and the maximum is 50 (all answers at the high end). These raw scores are then converted to a 0-100 percentile scale using the formula: percentile = ((raw score - 10) / 40) x 100. This normalization makes it easy to compare scores across dimensions.</p>
+
+    <h2>What Your Scores Mean</h2>
+    <p>Your scores on each dimension fall into three general ranges: Low (0-35%), Average (36-65%), and High (66-100%). Remember that no score is inherently good or bad — each position on the spectrum has its own advantages. Here is what different score ranges typically indicate:</p>
+    <ul>
+      <li><strong>High Openness (66-100%):</strong> Creative, curious, imaginative, drawn to novelty and abstract thinking. May struggle with routine tasks or practical details.</li>
+      <li><strong>Low Openness (0-35%):</strong> Practical, conventional, down-to-earth, comfortable with familiar routines. May resist change or unconventional approaches.</li>
+      <li><strong>High Conscientiousness (66-100%):</strong> Organized, reliable, disciplined, goal-oriented. May be perceived as rigid or overly perfectionistic.</li>
+      <li><strong>Low Conscientiousness (0-35%):</strong> Flexible, spontaneous, easy-going. May struggle with deadlines, organization, or following through on commitments.</li>
+      <li><strong>High Extraversion (66-100%):</strong> Sociable, energetic, talkative, assertive. May find it difficult to work alone or in quiet environments for extended periods.</li>
+      <li><strong>Low Extraversion (0-35%):</strong> Reflective, reserved, independent, prefers depth over breadth in relationships. May be perceived as aloof or disengaged in group settings.</li>
+      <li><strong>High Agreeableness (66-100%):</strong> Cooperative, trusting, empathetic, conflict-averse. May have difficulty setting boundaries or asserting personal needs.</li>
+      <li><strong>Low Agreeableness (0-35%):</strong> Competitive, direct, skeptical, strong-willed. May struggle with teamwork or be perceived as abrasive.</li>
+      <li><strong>High Neuroticism (66-100%):</strong> Emotionally sensitive, stress-reactive, prone to worry. May be more self-aware and empathetic toward others' distress.</li>
+      <li><strong>Low Neuroticism (0-35%):</strong> Emotionally stable, calm, resilient. May overlook subtle emotional cues or appear indifferent to stressful situations.</li>
+    </ul>
+
+    <h2>Big Five in the Workplace</h2>
+    <p>The Big Five personality dimensions have significant implications for career choice, job performance, and workplace dynamics. Understanding your personality profile can help you identify environments where you will thrive and anticipate potential challenges.</p>
+    <p><strong>Conscientiousness</strong> is the most consistent predictor of job performance across virtually all occupations. Highly conscientious employees are dependable, thorough, and organized — traits that employers universally value. This dimension is particularly important in roles requiring attention to detail, long-term planning, and consistent effort.</p>
+    <p><strong>Extraversion</strong> predicts success in roles that involve frequent social interaction, such as sales, management, teaching, and customer service. However, introverts often excel in positions requiring deep concentration, independent analysis, and careful deliberation, such as research, writing, programming, and accounting.</p>
+    <p><strong>Agreeableness</strong> is valuable in team-oriented environments, healthcare, counseling, and customer-facing roles. However, lower agreeableness can be advantageous in leadership positions, negotiations, and roles that require making tough decisions or delivering critical feedback.</p>
+    <p><strong>Openness</strong> predicts performance in creative and innovative fields such as design, marketing, scientific research, and entrepreneurship. Those lower in openness may prefer structured environments with established procedures, such as administration, accounting, and operations management.</p>
+    <p><strong>Neuroticism</strong> generally has a negative relationship with job satisfaction and performance, but moderate levels can enhance vigilance, attention to risk, and thoroughness in quality-control and safety-critical roles. Emotionally stable individuals tend to handle workplace stress more effectively and maintain higher job satisfaction over time.</p>
+    <p>Many organizations now use Big Five assessments as part of their hiring and development processes. When used ethically and alongside other evaluation methods, personality data can help match candidates to roles, build balanced teams, and identify development opportunities. However, personality should never be the sole criterion for employment decisions.</p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is the Big Five personality test?</h3>
+    <p>The Big Five personality test measures five broad dimensions of personality — Openness, Conscientiousness, Extraversion, Agreeableness, and Neuroticism (OCEAN). Developed through decades of psychological research by Paul Costa, Robert McCrae, and many others, it is considered the gold standard of personality assessment in modern psychology. Unlike type-based tests, it provides scores on continuous scales, giving a nuanced portrait of your personality.</p>
+
+    <h3>Is the Big Five more accurate than MBTI?</h3>
+    <p>The Big Five is generally considered more scientifically valid than the MBTI. It has stronger test-retest reliability (your scores remain consistent over time), better predictive validity for real-world outcomes, and is supported by extensive peer-reviewed research across cultures. The MBTI's binary categorization system also loses information by forcing people into types, while the Big Five preserves the full spectrum of individual differences.</p>
+
+    <h3>What does OCEAN stand for?</h3>
+    <p>OCEAN is a mnemonic acronym representing the five personality dimensions: Openness to Experience, Conscientiousness, Extraversion, Agreeableness, and Neuroticism. Each letter corresponds to one of the five broad factors that together provide a comprehensive description of human personality variation.</p>
+
+    <h3>Can Big Five traits change over time?</h3>
+    <p>Yes, personality traits can and do change over the lifespan, though they are relatively stable in adulthood. Research shows a general pattern of increasing agreeableness and conscientiousness with age (known as the "maturity principle"), along with slight decreases in neuroticism, extraversion, and openness. Significant life events, psychotherapy, and intentional behavior change can also shift trait levels over months and years.</p>
+
+    <h3>What is the most important Big Five trait?</h3>
+    <p>The importance of each trait depends entirely on context. Conscientiousness is the strongest predictor of job performance and academic achievement across most domains. Emotional stability (low neuroticism) is the best predictor of life satisfaction and mental health. Agreeableness matters most for relationship quality and teamwork. There is no single "best" trait — a balanced profile with awareness of your strengths and weaknesses is most valuable.</p>
+  </article>
+
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .game-area { cursor: default; user-select: auto; -webkit-user-select: auto; }
+</style>
+
+<script define:vars={{ gameName: "Big Five Personality Test", gameSlug: "big-five-personality-test", gameIcon: "📊", metricLabel: "OCEAN Profile", metricUnit: "" }}>
+(function () {
+  'use strict';
+
+  var questions = [
+    { text: "I have a vivid imagination.", dim: "O", rev: false },
+    { text: "I am always prepared.", dim: "C", rev: false },
+    { text: "I feel comfortable around people.", dim: "E", rev: false },
+    { text: "I sympathize with others' feelings.", dim: "A", rev: false },
+    { text: "I get stressed out easily.", dim: "N", rev: false },
+    { text: "I have difficulty understanding abstract ideas.", dim: "O", rev: true },
+    { text: "I often forget to put things back in their proper place.", dim: "C", rev: true },
+    { text: "I keep in the background at social events.", dim: "E", rev: true },
+    { text: "I am not interested in other people's problems.", dim: "A", rev: true },
+    { text: "I am relaxed most of the time.", dim: "N", rev: true },
+    { text: "I enjoy hearing new ideas.", dim: "O", rev: false },
+    { text: "I pay attention to details.", dim: "C", rev: false },
+    { text: "I start conversations with strangers.", dim: "E", rev: false },
+    { text: "I take time out for others.", dim: "A", rev: false },
+    { text: "I worry about things.", dim: "N", rev: false },
+    { text: "I am not interested in abstract ideas.", dim: "O", rev: true },
+    { text: "I leave my belongings around.", dim: "C", rev: true },
+    { text: "I have little to say to other people.", dim: "E", rev: true },
+    { text: "I feel little concern for others.", dim: "A", rev: true },
+    { text: "I seldom feel blue.", dim: "N", rev: true },
+    { text: "I am full of ideas.", dim: "O", rev: false },
+    { text: "I follow a schedule.", dim: "C", rev: false },
+    { text: "I am the life of the party.", dim: "E", rev: false },
+    { text: "I make people feel at ease.", dim: "A", rev: false },
+    { text: "I am easily disturbed.", dim: "N", rev: false },
+    { text: "I avoid philosophical discussions.", dim: "O", rev: true },
+    { text: "I neglect my duties.", dim: "C", rev: true },
+    { text: "I don't like to draw attention to myself.", dim: "E", rev: true },
+    { text: "I am hard to get to know on a personal level.", dim: "A", rev: true },
+    { text: "I rarely get irritated.", dim: "N", rev: true },
+    { text: "I love to think up new ways of doing things.", dim: "O", rev: false },
+    { text: "I get chores done right away.", dim: "C", rev: false },
+    { text: "I talk to a lot of different people at parties.", dim: "E", rev: false },
+    { text: "I am interested in people.", dim: "A", rev: false },
+    { text: "I often feel anxious about what could go wrong.", dim: "N", rev: false },
+    { text: "I do not have a good imagination.", dim: "O", rev: true },
+    { text: "I make a mess of things.", dim: "C", rev: true },
+    { text: "I prefer to be alone rather than with others.", dim: "E", rev: true },
+    { text: "I insult people without meaning to.", dim: "A", rev: true },
+    { text: "I feel comfortable with myself.", dim: "N", rev: true },
+    { text: "I enjoy exploring unfamiliar places and cultures.", dim: "O", rev: false },
+    { text: "I carry out my plans consistently.", dim: "C", rev: false },
+    { text: "I feel energized after spending time with a group.", dim: "E", rev: false },
+    { text: "I genuinely care about other people's well-being.", dim: "A", rev: false },
+    { text: "I get upset easily when things don't go as planned.", dim: "N", rev: false },
+    { text: "I prefer sticking with things I already know.", dim: "O", rev: true },
+    { text: "I find it hard to get down to work.", dim: "C", rev: true },
+    { text: "I find it difficult to approach others.", dim: "E", rev: true },
+    { text: "I suspect hidden motives in people.", dim: "A", rev: true },
+    { text: "I remain calm under pressure.", dim: "N", rev: true }
+  ];
+
+  var dimensions = {
+    O: {
+      name: "Openness to Experience",
+      short: "Openness",
+      highDesc: "You are intellectually curious, creative, and open to new experiences. You appreciate art, adventure, and unconventional ideas.",
+      lowDesc: "You prefer routine and familiarity. You are practical, conventional, and prefer straightforward rather than abstract thinking.",
+      facets: ["Imagination", "Artistic Interests", "Emotionality", "Adventurousness", "Intellect"]
+    },
+    C: {
+      name: "Conscientiousness",
+      short: "Conscientiousness",
+      highDesc: "You are organized, dependable, and self-disciplined. You plan ahead and work toward long-term goals with persistence.",
+      lowDesc: "You prefer flexibility and spontaneity over strict plans. You may find rigid schedules constraining and prefer a more relaxed approach.",
+      facets: ["Self-Efficacy", "Orderliness", "Dutifulness", "Achievement-Striving", "Self-Discipline"]
+    },
+    E: {
+      name: "Extraversion",
+      short: "Extraversion",
+      highDesc: "You are outgoing, energetic, and thrive in social situations. You enjoy being around people and tend to be enthusiastic and action-oriented.",
+      lowDesc: "You prefer solitude or small groups and need time alone to recharge. You are reflective and deliberate rather than spontaneous.",
+      facets: ["Friendliness", "Gregariousness", "Assertiveness", "Activity Level", "Excitement-Seeking"]
+    },
+    A: {
+      name: "Agreeableness",
+      short: "Agreeableness",
+      highDesc: "You are cooperative, trusting, and considerate. You value getting along with others and tend to be helpful and willing to compromise.",
+      lowDesc: "You prioritize self-interest and are more competitive than cooperative. You are direct, skeptical, and challenge others' viewpoints.",
+      facets: ["Trust", "Morality", "Altruism", "Cooperation", "Modesty"]
+    },
+    N: {
+      name: "Neuroticism",
+      short: "Neuroticism",
+      highDesc: "You tend to experience negative emotions more frequently, including anxiety, sadness, and irritability. You may be more reactive to stress.",
+      lowDesc: "You are emotionally stable, calm, and resilient. You handle stress well and rarely feel anxious or moody.",
+      facets: ["Anxiety", "Anger", "Depression", "Self-Consciousness", "Vulnerability"]
+    }
+  };
+
+  var dimColors = {
+    O: '#8b5cf6',
+    C: '#3b82f6',
+    E: '#f59e0b',
+    A: '#22c55e',
+    N: '#ef4444'
+  };
+
+  var STORAGE_KEY = 'toolcalcs_big-five-personality-test_history';
+  var MAX_HISTORY = 20;
+
+  function loadHistory() {
+    try { var r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch (e) {}
+    return [];
+  }
+  function saveHistory(h) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch (e) {}
+  }
+  function addToHistory(scores) {
+    var h = loadHistory();
+    h.unshift({ scores: scores, date: new Date().toISOString() });
+    saveHistory(h);
+  }
+
+  // DOM
+  var instructionsView = document.getElementById('instructionsView');
+  var playView = document.getElementById('playView');
+  var resultView = document.getElementById('resultView');
+  var startBtn = document.getElementById('startBtn');
+  var tryAgainBtn = document.getElementById('tryAgainBtn');
+  var progressText = document.getElementById('progressText');
+  var progressFill = document.getElementById('progressFill');
+  var questionText = document.getElementById('questionText');
+  var likertButtons = document.getElementById('likertButtons');
+  var barChart = document.getElementById('barChart');
+  var dimensionDescriptions = document.getElementById('dimensionDescriptions');
+  var attemptHistorySection = document.getElementById('attemptHistory');
+  var historyList = document.getElementById('historyList');
+
+  var shuffledQuestions = [];
+  var currentIndex = 0;
+  var rawScores = { O: 0, C: 0, E: 0, A: 0, N: 0 };
+
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i];
+      a[i] = a[j];
+      a[j] = tmp;
+    }
+    return a;
+  }
+
+  function showView(view) {
+    instructionsView.style.display = 'none';
+    playView.style.display = 'none';
+    resultView.style.display = 'none';
+    view.style.display = '';
+  }
+
+  function startTest() {
+    shuffledQuestions = shuffle(questions);
+    currentIndex = 0;
+    rawScores = { O: 0, C: 0, E: 0, A: 0, N: 0 };
+    showView(playView);
+    showQuestion();
+  }
+
+  function showQuestion() {
+    var q = shuffledQuestions[currentIndex];
+    var num = currentIndex + 1;
+    progressText.textContent = 'Question ' + num + ' of 50';
+    progressFill.style.width = Math.round((num / 50) * 100) + '%';
+    questionText.textContent = q.text;
+
+    // Reset selected state on all buttons
+    var btns = likertButtons.querySelectorAll('.quiz-option');
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].classList.remove('selected');
+    }
+  }
+
+  function handleAnswer(val) {
+    var q = shuffledQuestions[currentIndex];
+    var score = q.rev ? (6 - val) : val;
+    rawScores[q.dim] += score;
+
+    currentIndex++;
+    if (currentIndex < 50) {
+      showQuestion();
+    } else {
+      showResults();
+    }
+  }
+
+  function getLevel(pct) {
+    if (pct <= 35) return 'Low';
+    if (pct <= 65) return 'Average';
+    return 'High';
+  }
+
+  function showResults() {
+    var scores = {};
+    var dimOrder = ['O', 'C', 'E', 'A', 'N'];
+
+    for (var i = 0; i < dimOrder.length; i++) {
+      var d = dimOrder[i];
+      scores[d] = Math.round(((rawScores[d] - 10) / 40) * 100);
+      if (scores[d] < 0) scores[d] = 0;
+      if (scores[d] > 100) scores[d] = 100;
+    }
+
+    // Build bar chart
+    var chartHtml = '';
+    for (var j = 0; j < dimOrder.length; j++) {
+      var dim = dimOrder[j];
+      var pct = scores[dim];
+      var level = getLevel(pct);
+      var info = dimensions[dim];
+      chartHtml += '<div class="quiz-bar-item">';
+      chartHtml += '<div class="quiz-bar-label"><span>' + info.short + '</span><span>' + pct + '% — ' + level + '</span></div>';
+      chartHtml += '<div class="quiz-bar-track"><div class="quiz-bar-fill" style="width:' + pct + '%;background:' + dimColors[dim] + '"></div></div>';
+      chartHtml += '</div>';
+    }
+    barChart.innerHTML = chartHtml;
+
+    // Build dimension descriptions
+    var descHtml = '';
+    for (var k = 0; k < dimOrder.length; k++) {
+      var dd = dimOrder[k];
+      var ddPct = scores[dd];
+      var ddInfo = dimensions[dd];
+      var ddLevel = getLevel(ddPct);
+      var desc = ddPct > 50 ? ddInfo.highDesc : ddInfo.lowDesc;
+      descHtml += '<div style="text-align:left;margin-bottom:16px;">';
+      descHtml += '<strong style="color:' + dimColors[dd] + '">' + ddInfo.name + ' (' + ddLevel + ')</strong>';
+      descHtml += '<p style="margin:4px 0 0;font-size:0.9rem;line-height:1.6;">' + desc + '</p>';
+      descHtml += '</div>';
+    }
+    dimensionDescriptions.innerHTML = descHtml;
+
+    showView(resultView);
+    addToHistory(scores);
+    renderHistory();
+
+    // GameShare
+    var summary = 'O:' + scores.O + '% C:' + scores.C + '% E:' + scores.E + '% A:' + scores.A + '% N:' + scores.N + '%';
+    if (window.GameShare) {
+      window.GameShare.show({
+        gameName: gameName,
+        gameSlug: gameSlug,
+        gameIcon: gameIcon,
+        score: summary,
+        unit: '',
+        metricLabel: metricLabel,
+        ratingLabel: 'OCEAN Profile',
+        ratingColor: '#8b5cf6'
+      });
+    }
+  }
+
+  function renderHistory() {
+    var history = loadHistory();
+    if (history.length === 0) { attemptHistorySection.hidden = true; return; }
+    attemptHistorySection.hidden = false;
+    var html = '';
+    for (var i = 0; i < history.length; i++) {
+      var e = history[i];
+      var s = e.scores;
+      var label = 'O:' + s.O + ' C:' + s.C + ' E:' + s.E + ' A:' + s.A + ' N:' + s.N;
+      html += '<div class="history-item">';
+      html += '<span class="history-score">' + label + '</span>';
+      html += '<span class="history-time">' + formatDate(e.date) + '</span>';
+      html += '</div>';
+    }
+    historyList.innerHTML = html;
+  }
+
+  function formatDate(iso) {
+    try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    catch (e) { return ''; }
+  }
+
+  // Events
+  likertButtons.addEventListener('click', function (e) {
+    var btn = e.target;
+    if (!btn.classList.contains('quiz-option')) return;
+    var val = parseInt(btn.getAttribute('data-value'), 10);
+    if (!val) return;
+
+    // Visual feedback
+    btn.classList.add('selected');
+
+    // Small delay so user sees their selection
+    setTimeout(function () {
+      handleAnswer(val);
+    }, 200);
+  });
+
+  startBtn.addEventListener('click', startTest);
+  tryAgainBtn.addEventListener('click', startTest);
+  renderHistory();
+})();
+</script>

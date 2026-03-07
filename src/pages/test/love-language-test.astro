@@ -1,0 +1,536 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/game.css';
+import '../../styles/quiz.css';
+import GameShare from '../../components/GameShare.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tests & Games", "item": "https://toolcalcs.com/test/" },
+      { "@type": "ListItem", "position": 3, "name": "Love Language Test" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Love Language Test",
+    "url": "https://toolcalcs.com/test/love-language-test/",
+    "applicationCategory": "LifestyleApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Discover your primary love language with this free 30-question test based on Dr. Gary Chapman's 5 Love Languages framework."
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What are the 5 love languages?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The 5 love languages, identified by Dr. Gary Chapman, are Words of Affirmation, Acts of Service, Receiving Gifts, Quality Time, and Physical Touch. Each represents a distinct way people prefer to give and receive love in relationships."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can your love language change over time?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, love languages can shift over time due to life experiences, personal growth, relationship dynamics, and changing circumstances. Stress, major life events like parenthood, and aging can all influence which love language feels most important to you. It is helpful to retake the test periodically."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What if my partner and I have different love languages?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Having different love languages is very common and does not mean your relationship is doomed. The key is awareness and effort. Learn your partner's primary love language and make a conscious effort to express love in their preferred way, even if it does not come naturally to you. Open communication about needs is essential."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How accurate is the love language test?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "This test is based on Dr. Gary Chapman's widely recognized 5 Love Languages framework and uses forced-choice scenario questions to identify your preferences. While it provides meaningful insight into how you prefer to give and receive love, it is a self-assessment tool rather than a clinical diagnostic. Results are most accurate when you answer honestly and instinctively."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can love languages apply to friendships and family?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Absolutely. While the concept was originally developed for romantic relationships, love languages apply to all types of relationships including friendships, parent-child bonds, sibling relationships, and even workplace dynamics. Understanding how the people in your life prefer to receive appreciation can strengthen all of your relationships."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Love Language Test - Discover Your Primary Love Language | ToolCalcs"
+  description="Take the free Love Language Test to discover how you prefer to give and receive love. Based on Dr. Gary Chapman's 5 Love Languages framework."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/test/">Tests & Games</a> &rsaquo;
+    <span>Love Language Test</span>
+  </nav>
+
+  <h1>Love Language Test</h1>
+  <p class="page-desc">Answer 30 scenarios to discover how you prefer to give and receive love.</p>
+
+  <div class="game-box">
+    <div class="game-area" id="gameArea" role="region" aria-label="Love language quiz" aria-live="polite">
+      <!-- Instructions -->
+      <div class="game-instructions" id="instructionsView">
+        <h2>Love Language Test</h2>
+        <p>Based on Dr. Gary Chapman's 5 Love Languages framework. Choose the option that resonates most with you in each scenario.</p>
+        <p style="font-size:0.85rem;color:var(--color-text-muted);">30 questions &middot; About 5 minutes</p>
+        <button class="game-btn primary" id="startBtn" type="button" style="margin-top:16px;">Start Test</button>
+      </div>
+
+      <!-- Quiz View -->
+      <div id="quizView" style="display:none;">
+        <div class="quiz-progress">
+          <div class="quiz-progress-text" id="progressText">Question 1 of 30</div>
+          <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="progressFill"></div></div>
+        </div>
+        <div class="quiz-question">
+          <div class="quiz-question-text" id="questionText"></div>
+        </div>
+        <div class="quiz-options" id="optionsContainer"></div>
+      </div>
+
+      <!-- Result View -->
+      <div id="resultView" style="display:none;" class="quiz-result">
+        <div style="font-size:2.5rem;margin-bottom:8px;" id="resultIcon"></div>
+        <div class="quiz-result-type" id="resultType"></div>
+        <div class="quiz-result-name" id="resultName">Your Primary Love Language</div>
+        <div class="quiz-result-desc" id="resultDesc"></div>
+        <div class="quiz-bar-chart" id="dimensionChart"></div>
+        <div class="quiz-traits" id="resultTips"></div>
+        <button class="game-btn primary" id="retakeBtn" type="button" style="margin-top:16px;">Retake Test</button>
+      </div>
+    </div>
+
+    <GameShare />
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Are the 5 Love Languages?</h2>
+    <p>In 1992, Dr. Gary Chapman published <em>The 5 Love Languages: The Secret to Love That Lasts</em>, a groundbreaking book that transformed how millions of people understand romantic relationships, family bonds, and friendships. The central idea is deceptively simple: people express and experience love in fundamentally different ways, and misunderstanding those differences is one of the most common sources of conflict and disappointment in relationships.</p>
+    <p>Chapman identified five distinct "love languages" through decades of marriage counseling. He observed that couples often talked past each other because they were speaking different emotional languages. One partner might show love by doing the dishes every night, while the other was waiting to hear the words "I appreciate you." Neither partner was wrong or unloving — they were simply communicating affection in ways the other person did not naturally recognize.</p>
+    <p>The five love languages are <strong>Words of Affirmation</strong>, <strong>Acts of Service</strong>, <strong>Receiving Gifts</strong>, <strong>Quality Time</strong>, and <strong>Physical Touch</strong>. Everyone uses all five to some extent, but most people have one or two primary languages that resonate most deeply. When your partner expresses love in your primary language, you feel genuinely loved and emotionally fulfilled. When they miss that language — even with the best intentions — you can feel neglected or unappreciated despite their effort.</p>
+    <p>Understanding your own love language is the first step. Understanding your partner's love language is the second. Together, these insights create a roadmap for building deeper emotional connection, resolving recurring arguments, and making everyday interactions feel more meaningful. This free 30-question test is designed to help you identify your primary love language quickly and accurately.</p>
+
+    <h2>The 5 Love Languages Explained</h2>
+
+    <h3>Words of Affirmation</h3>
+    <p>If your primary love language is Words of Affirmation, you thrive on verbal expressions of love, appreciation, and encouragement. Hearing "I love you," "I'm proud of you," or "You did an amazing job" fills your emotional tank more than almost anything else. Compliments are not superficial to you — they are deeply meaningful. A heartfelt love letter, an encouraging text message during a hard day, or specific verbal recognition of something you did well can make your entire week.</p>
+    <p>People with this love language are also particularly sensitive to harsh words, criticism, and sarcasm. Negative or dismissive language can wound them more deeply than it might affect someone with a different primary language. If your partner's love language is Words of Affirmation, make a habit of expressing gratitude, pointing out their strengths, and verbalizing your feelings regularly. Written notes, text messages, and even voicemails carry enormous weight.</p>
+
+    <h3>Acts of Service</h3>
+    <p>For people whose primary love language is Acts of Service, actions truly speak louder than words. You feel most loved when your partner eases your burden — cooking a meal when you are exhausted, filling up your gas tank, handling an errand you have been dreading, or taking on a household chore without being asked. These gestures communicate "I see you, I care about your well-being, and I want to make your life easier."</p>
+    <p>It is important to note that Acts of Service must be done willingly and cheerfully. Doing a task begrudgingly or with complaints actually has the opposite effect. If your partner speaks this language, pay attention to what overwhelms them or what tasks they mention dreading. Then step in and handle it without fanfare. Following through on commitments and keeping promises also falls under this language — reliability itself is an expression of love.</p>
+
+    <h3>Receiving Gifts</h3>
+    <p>Receiving Gifts is perhaps the most misunderstood love language. It has nothing to do with materialism or greed. For people with this love language, a gift is a tangible symbol of love — physical proof that someone was thinking about them. The monetary value is largely irrelevant. A wildflower picked during a walk, a book by an author they mentioned in passing, or a small souvenir from a trip can mean as much as an expensive piece of jewelry.</p>
+    <p>What matters is the thought and effort behind the gift. People with this love language notice when you remember their preferences, when you pick up something small that reminded you of them, and when you put care into the presentation. Forgotten birthdays, anniversaries, or the absence of gifts during meaningful moments can feel like a genuine lack of love. If your partner speaks this language, keep a running list of things they mention wanting. It is not about spending money — it is about showing that you listen and think of them when they are not around.</p>
+
+    <h3>Quality Time</h3>
+    <p>Quality Time is about giving someone your undivided, focused attention. It is not just being in the same room while scrolling through your phone. For people with this love language, nothing says "I love you" like putting away distractions, making eye contact, and being fully present in the moment together. Deep conversations, shared activities, long walks, cooking together, or simply sitting side by side and connecting make them feel cherished.</p>
+    <p>The enemy of Quality Time is distraction. Checking your phone during dinner, canceling planned dates, or being physically present but mentally elsewhere feels like a rejection to someone with this love language. If your partner values Quality Time, schedule regular one-on-one activities, create daily rituals of connection like morning coffee or evening walks, and be intentional about eliminating distractions when you are together. It is not about the quantity of time — it is about the quality of your presence.</p>
+
+    <h3>Physical Touch</h3>
+    <p>Physical Touch goes well beyond intimacy. For people with this love language, physical closeness and affection are the primary way they feel emotionally connected and secure. Holding hands while walking, a long hug after a hard day, a hand on the shoulder during a conversation, sitting close on the couch, or a reassuring pat on the back all communicate love in a way that words cannot replicate.</p>
+    <p>Physical Touch is a powerful communicator of love because it is immediate and visceral. A hug can communicate comfort, safety, and belonging in an instant. People who speak this language may feel distant or disconnected in relationships that lack regular physical affection, even if love is expressed in other ways. If your partner's love language is Physical Touch, make physical connection a daily habit — hold hands when walking, hug when you arrive home, sit close during movies, and offer comfort through touch during stressful moments.</p>
+
+    <h2>Why Knowing Your Love Language Matters</h2>
+    <p>Understanding your love language is not just an interesting personality insight — it has practical, tangible benefits for every relationship in your life. Here is why it matters.</p>
+    <p><strong>Better communication in relationships.</strong> When you can articulate how you prefer to receive love, you give your partner a clear playbook. Instead of vague frustrations like "I don't feel loved," you can say something specific like "I really need more quality time together without our phones." This specificity transforms abstract emotional needs into actionable steps, making it far easier for your partner to meet them.</p>
+    <p><strong>Understanding your partner's needs.</strong> Equally important is understanding your partner's love language, which may differ from yours. Many relationship conflicts arise when partners express love in their own language rather than their partner's. A husband might work overtime to buy his wife expensive gifts (his language is Receiving Gifts), while she feels neglected because she craves quality evenings together (her language is Quality Time). Neither person is wrong — they are just speaking different languages. Awareness bridges this gap.</p>
+    <p><strong>Reducing conflict from unmet expectations.</strong> A significant portion of relationship arguments stem from feeling unappreciated or unloved. When you understand love languages, you realize that your partner may be expressing love constantly — just not in the way you naturally recognize. This realization alone can defuse resentment and open the door to constructive conversation about how to meet each other's needs more effectively.</p>
+    <p><strong>Applying beyond romantic relationships.</strong> Love languages are not limited to romantic partnerships. Parents can better connect with their children by learning each child's love language. Friends can deepen their bonds by understanding how to show appreciation in ways that truly land. Even in the workplace, recognizing that some colleagues value verbal praise while others prefer practical help can improve team dynamics and morale. The framework is a universal tool for understanding how people feel valued.</p>
+
+    <h2>How This Test Works</h2>
+    <p>This Love Language Test consists of 30 forced-choice scenario questions. Each question presents a real-life relationship scenario and asks you to choose between two options. Each option corresponds to a different love language, and the questions are designed so that every love language appears an equal number of times across the test.</p>
+    <p>As you answer each question, the test tracks your preferences across all five love languages. When you select an option, one point is added to the corresponding love language. After answering all 30 questions, the test calculates the percentage each love language represents in your overall profile and identifies your primary love language — the one with the highest score.</p>
+    <p>There are no right or wrong answers. The test works best when you answer instinctively based on what genuinely resonates with you, rather than what you think the "correct" answer should be. If both options appeal to you, choose the one that feels even slightly more meaningful. If neither option seems ideal, pick the one that is closer to how you feel.</p>
+    <p>The results page shows your primary love language along with a breakdown of all five languages ranked by score. This full profile is valuable because most people have a primary and a strong secondary love language. Understanding your top two or three languages gives you a more nuanced picture of your emotional needs.</p>
+    <p>The questions are shuffled each time you take the test to reduce order bias. You can retake the test as many times as you like — your results may vary slightly depending on your current mood or circumstances, which is completely normal.</p>
+
+    <h2>Tips for Understanding Your Results</h2>
+    <p><strong>Your primary vs. secondary language.</strong> Most people have one dominant love language and one or two strong secondary languages. Pay attention to your top two results. If your scores are close between two languages, you may be bilingual in love — equally fulfilled by both. This is common and simply means you have a broader range of ways to feel loved.</p>
+    <p><strong>Giving vs. receiving preferences may differ.</strong> An important nuance that Chapman's framework highlights is that the way you prefer to receive love may not match how you naturally express it. You might show love through Acts of Service because that is how you were raised, but you personally crave Words of Affirmation. This test focuses on how you prefer to receive love. Consider taking note of how you naturally show love to others as well, as this can reveal additional insights.</p>
+    <p><strong>Love languages can shift over time.</strong> Your primary love language is not permanently fixed. Major life events — becoming a parent, going through a health crisis, changing careers, or experiencing loss — can shift your emotional needs. Someone who valued Quality Time above all else in their twenties might find that Acts of Service becomes more important after having children. Retaking the test every year or two can help you stay attuned to your evolving needs.</p>
+    <p><strong>Context matters.</strong> Your results can be influenced by your current life circumstances. If you are going through a stressful period at work, you might score higher on Acts of Service because you are craving practical help. If you are in a long-distance relationship, Physical Touch might score higher because you are missing what you lack. Consider your results in the context of your current situation and reflect on whether they align with your long-term patterns.</p>
+    <p><strong>Share your results with your partner.</strong> The greatest value of this test comes from sharing and discussing results with your partner. Take the test separately, then compare and talk about what surprised you, what confirmed your expectations, and how you can better meet each other's needs. These conversations often reveal assumptions and blind spots that have been quietly affecting the relationship for years.</p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What are the 5 love languages?</h3>
+    <p>The 5 love languages, identified by Dr. Gary Chapman in his 1992 book, are Words of Affirmation, Acts of Service, Receiving Gifts, Quality Time, and Physical Touch. Each love language represents a distinct way that people prefer to express and experience love. Words of Affirmation focuses on verbal expressions of love and appreciation. Acts of Service emphasizes helpful actions that ease a partner's burden. Receiving Gifts centers on thoughtful, symbolic tokens of affection. Quality Time prioritizes undivided, focused attention and shared experiences. Physical Touch values physical closeness, affection, and the emotional security that comes from physical connection.</p>
+
+    <h3>Can your love language change over time?</h3>
+    <p>Yes, love languages can absolutely change over time. While many people have a relatively stable primary love language throughout their lives, significant life events and circumstances can shift priorities. Becoming a parent, for example, often increases the value placed on Acts of Service as practical help becomes more critical. Going through a period of loneliness or long-distance separation might elevate the importance of Physical Touch or Quality Time. Personal growth, therapy, and increased self-awareness can also reshape how you experience love. It is a good practice to reassess your love language periodically, especially after major life transitions, to ensure your communication with loved ones reflects your current needs.</p>
+
+    <h3>What if my partner and I have different love languages?</h3>
+    <p>Having different love languages is extremely common and does not indicate incompatibility. In fact, most couples have different primary love languages. The key is awareness and intentional effort. Once you understand your partner's love language, you can make a conscious effort to express love in the way that resonates most with them, even if it does not come naturally. For example, if your language is Physical Touch but your partner's is Words of Affirmation, making an effort to verbalize your appreciation and admiration will fill their emotional tank far more effectively than a hug alone. The beauty of the love language framework is that it gives you a concrete roadmap for bridging these differences rather than letting them become a source of frustration.</p>
+
+    <h3>How accurate is the love language test?</h3>
+    <p>This test is based on the widely recognized 5 Love Languages framework developed by Dr. Gary Chapman through decades of marriage counseling. The forced-choice format, where you select between two options in realistic scenarios, is designed to reveal your genuine preferences rather than allowing you to rate everything highly. The test is most accurate when you answer honestly and instinctively rather than overthinking each question. That said, it is a self-assessment tool and should be treated as a starting point for self-reflection and conversation rather than a definitive psychological diagnosis. Your results may vary slightly between sessions depending on your current mood and circumstances, which is normal and expected.</p>
+
+    <h3>Can love languages apply to friendships and family?</h3>
+    <p>Absolutely. While Dr. Chapman originally developed the love language concept in the context of romantic relationships, the framework applies beautifully to all types of relationships. Parents can use love languages to connect more deeply with each child by understanding their individual preferences — one child might thrive on verbal praise while another feels most loved through one-on-one time. Friendships can be strengthened by recognizing that some friends feel valued when you remember their birthday with a small gift, while others care more about you showing up to help them move. Even in professional settings, understanding that some colleagues appreciate verbal recognition while others prefer practical support can improve team dynamics and workplace satisfaction.</p>
+  </article>
+
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .game-area { cursor: default; user-select: auto; -webkit-user-select: auto; }
+</style>
+
+<script define:vars={{ gameName: "Love Language Test", gameSlug: "love-language-test", gameIcon: "\uD83D\uDC9D", metricLabel: "Love Language", metricUnit: "" }}>
+(function () {
+  'use strict';
+
+  var questions = [
+    { text: "Which would make you feel more loved?", options: [
+      { label: "Your partner says 'I'm so proud of you and everything you do'", dim: "words" },
+      { label: "Your partner gives you a long, warm hug after a tough day", dim: "touch" }
+    ]},
+    { text: "On a stressful day, you would most appreciate:", options: [
+      { label: "Your partner cooking dinner so you can relax", dim: "acts" },
+      { label: "Your partner sitting and listening to you talk about your day", dim: "time" }
+    ]},
+    { text: "For your birthday, which would mean more to you?", options: [
+      { label: "A heartfelt handwritten card telling you what you mean to them", dim: "words" },
+      { label: "A carefully chosen gift that shows they really know you", dim: "gifts" }
+    ]},
+    { text: "After a long time apart, what would you look forward to most?", options: [
+      { label: "A big embrace the moment you see each other", dim: "touch" },
+      { label: "Spending the whole evening catching up without distractions", dim: "time" }
+    ]},
+    { text: "When you are feeling down, which would comfort you more?", options: [
+      { label: "Your partner handling your responsibilities so you can rest", dim: "acts" },
+      { label: "Receiving a surprise care package with your favorite things", dim: "gifts" }
+    ]},
+    { text: "Which means more in everyday life?", options: [
+      { label: "Your partner telling you specific things they admire about you", dim: "words" },
+      { label: "Your partner doing the household chores without being asked", dim: "acts" }
+    ]},
+    { text: "On a weekend together, you would prefer:", options: [
+      { label: "A full day doing activities together, just the two of you", dim: "time" },
+      { label: "Your partner surprising you with something they picked up for you", dim: "gifts" }
+    ]},
+    { text: "When you accomplish something big, which response do you prefer?", options: [
+      { label: "Your partner saying 'You are incredible, I knew you could do it'", dim: "words" },
+      { label: "Your partner wrapping you in a tight celebratory hug", dim: "touch" }
+    ]},
+    { text: "What makes you feel most connected to your partner?", options: [
+      { label: "Sitting close together on the couch, touching or cuddling", dim: "touch" },
+      { label: "Having a deep, meaningful conversation without any interruptions", dim: "time" }
+    ]},
+    { text: "If you were sick, which would mean more?", options: [
+      { label: "Your partner bringing you soup, medicine, and taking care of errands", dim: "acts" },
+      { label: "Your partner leaving a sweet get-well note on your nightstand", dim: "words" }
+    ]},
+    { text: "Which gesture would make your day?", options: [
+      { label: "Your partner bringing home your favorite treat just because", dim: "gifts" },
+      { label: "Your partner holding your hand as you walk together", dim: "touch" }
+    ]},
+    { text: "When you feel disconnected from your partner, what helps most?", options: [
+      { label: "Planning a date night with no phones and full attention on each other", dim: "time" },
+      { label: "Your partner doing something practical to lighten your load", dim: "acts" }
+    ]},
+    { text: "Which would you prefer as a regular gesture of love?", options: [
+      { label: "Receiving a daily good morning text with a loving message", dim: "words" },
+      { label: "Your partner regularly bringing you small, thoughtful gifts", dim: "gifts" }
+    ]},
+    { text: "When your partner wants to apologize, which feels most sincere?", options: [
+      { label: "Sitting down face-to-face and giving you their undivided attention to talk it through", dim: "time" },
+      { label: "A heartfelt verbal apology explaining how much you mean to them", dim: "words" }
+    ]},
+    { text: "During a quiet evening at home, you feel most loved when:", options: [
+      { label: "Your partner puts their arm around you or rubs your shoulders", dim: "touch" },
+      { label: "Your partner takes care of cleaning up so you can unwind", dim: "acts" }
+    ]},
+    { text: "Which vacation scenario sounds more appealing?", options: [
+      { label: "Exploring a new city together, sharing every experience side by side", dim: "time" },
+      { label: "Your partner surprising you with a meaningful souvenir from the trip", dim: "gifts" }
+    ]},
+    { text: "What makes you feel most appreciated at the end of the day?", options: [
+      { label: "Your partner saying 'Thank you for everything you do for us'", dim: "words" },
+      { label: "Your partner giving you a foot rub or back massage", dim: "touch" }
+    ]},
+    { text: "When celebrating an anniversary, which would you prefer?", options: [
+      { label: "Receiving a meaningful gift that symbolizes your relationship", dim: "gifts" },
+      { label: "Your partner planning the entire evening so you do not have to worry about a thing", dim: "acts" }
+    ]},
+    { text: "In a long-distance relationship, what would you miss most?", options: [
+      { label: "Physical closeness — hugs, kisses, and being held", dim: "touch" },
+      { label: "Spending uninterrupted time together in person", dim: "time" }
+    ]},
+    { text: "Which daily habit would make you feel most loved?", options: [
+      { label: "Your partner leaving little encouraging notes in your bag or lunch", dim: "words" },
+      { label: "Your partner always making sure the car has gas and your coffee is ready", dim: "acts" }
+    ]},
+    { text: "If your partner wanted to cheer you up, you would prefer:", options: [
+      { label: "Receiving a surprise delivery of flowers or your favorite snack", dim: "gifts" },
+      { label: "Your partner dropping everything to spend the afternoon with you", dim: "time" }
+    ]},
+    { text: "Which gesture during a hard week would mean the most?", options: [
+      { label: "Your partner running all the errands and handling dinner every night", dim: "acts" },
+      { label: "Your partner cuddling with you on the couch each evening", dim: "touch" }
+    ]},
+    { text: "How would you prefer your partner to show pride in you publicly?", options: [
+      { label: "Telling friends and family how amazing you are in front of you", dim: "words" },
+      { label: "Putting their arm around you and staying close by your side", dim: "touch" }
+    ]},
+    { text: "When making up after a disagreement, what helps most?", options: [
+      { label: "Your partner doing something helpful to show they care", dim: "acts" },
+      { label: "Your partner buying you a small peace offering gift", dim: "gifts" }
+    ]},
+    { text: "Which type of surprise would delight you more?", options: [
+      { label: "Your partner secretly planning a day trip just for the two of you", dim: "time" },
+      { label: "Your partner writing you a love letter describing why they fell for you", dim: "words" }
+    ]},
+    { text: "When greeting each other after work, you would prefer:", options: [
+      { label: "A warm, lingering hug and a kiss at the door", dim: "touch" },
+      { label: "Your partner handing you a small gift they saw that reminded them of you", dim: "gifts" }
+    ]},
+    { text: "Which shows love more in a tough financial period?", options: [
+      { label: "Your partner taking over extra chores and tasks to reduce your stress", dim: "acts" },
+      { label: "Your partner making time every evening to sit together and talk things through", dim: "time" }
+    ]},
+    { text: "At a social event, what makes you feel most loved?", options: [
+      { label: "Your partner complimenting you in front of others", dim: "words" },
+      { label: "Your partner making sure you have a great time by handling logistics", dim: "acts" }
+    ]},
+    { text: "On a rainy Sunday, which would you enjoy more?", options: [
+      { label: "Cuddling under a blanket together all afternoon", dim: "touch" },
+      { label: "Your partner presenting you with a book or item they found just for you", dim: "gifts" }
+    ]},
+    { text: "Which routine would make you feel most cherished?", options: [
+      { label: "A weekly date night where you give each other complete attention", dim: "time" },
+      { label: "Your partner regularly giving you thoughtful little gifts throughout the week", dim: "gifts" }
+    ]}
+  ];
+
+  var languages = {
+    words: {
+      name: "Words of Affirmation",
+      icon: "\uD83D\uDCAC",
+      desc: "You feel most loved when your partner expresses affection, appreciation, and encouragement through spoken or written words. Compliments, 'I love you,' love notes, and verbal acknowledgment deeply resonate with you.",
+      tips: ["Write love notes or texts throughout the day", "Give specific compliments rather than generic ones", "Verbally express appreciation for small things", "Use encouraging words during difficult times"]
+    },
+    acts: {
+      name: "Acts of Service",
+      icon: "\uD83E\uDD1D",
+      desc: "Actions speak louder than words for you. You feel most loved when your partner shows care through helpful actions \u2014 cooking a meal, running errands, fixing something around the house, or taking tasks off your plate.",
+      tips: ["Help with chores without being asked", "Take care of tasks your partner finds stressful", "Follow through on commitments and promises", "Anticipate needs before being told"]
+    },
+    gifts: {
+      name: "Receiving Gifts",
+      icon: "\uD83C\uDF81",
+      desc: "You cherish thoughtful gifts that show your partner was thinking about you. It is not about materialism \u2014 it is the thought, effort, and symbolism behind each gift that makes you feel truly loved and remembered.",
+      tips: ["Give small, thoughtful gifts regularly", "Remember significant dates and milestones", "Pick up small items that remind you of them", "Put thought into the presentation and meaning"]
+    },
+    time: {
+      name: "Quality Time",
+      icon: "\u23F0",
+      desc: "Nothing says 'I love you' like undivided attention. You feel most loved when your partner is fully present \u2014 no phones, no distractions \u2014 just genuine, focused togetherness and meaningful conversation.",
+      tips: ["Put away devices during conversations", "Plan regular one-on-one activities", "Make eye contact and actively listen", "Create rituals of connection like morning coffee or evening walks"]
+    },
+    touch: {
+      name: "Physical Touch",
+      icon: "\uD83E\uDD17",
+      desc: "Physical closeness and affection make you feel secure and loved. Hugs, hand-holding, cuddling, and other forms of physical connection are your primary way of feeling bonded to your partner.",
+      tips: ["Hold hands when walking together", "Give hugs when greeting and saying goodbye", "Sit close during conversations", "Offer comfort through physical presence during tough times"]
+    }
+  };
+
+  var LANG_COLORS = {
+    words: '#e91e63',
+    acts: '#ff9800',
+    gifts: '#9c27b0',
+    time: '#2196f3',
+    touch: '#4caf50'
+  };
+
+  // DOM references
+  var instructionsView = document.getElementById('instructionsView');
+  var quizView = document.getElementById('quizView');
+  var resultView = document.getElementById('resultView');
+  var startBtn = document.getElementById('startBtn');
+  var retakeBtn = document.getElementById('retakeBtn');
+  var progressText = document.getElementById('progressText');
+  var progressFill = document.getElementById('progressFill');
+  var questionText = document.getElementById('questionText');
+  var optionsContainer = document.getElementById('optionsContainer');
+  var resultIcon = document.getElementById('resultIcon');
+  var resultType = document.getElementById('resultType');
+  var resultName = document.getElementById('resultName');
+  var resultDesc = document.getElementById('resultDesc');
+  var dimensionChart = document.getElementById('dimensionChart');
+  var resultTips = document.getElementById('resultTips');
+
+  var currentIndex = 0;
+  var shuffled = [];
+  var scores = { words: 0, acts: 0, gifts: 0, time: 0, touch: 0 };
+  var isProcessing = false;
+
+  // Fisher-Yates shuffle
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i];
+      a[i] = a[j];
+      a[j] = tmp;
+    }
+    return a;
+  }
+
+  function showView(view) {
+    instructionsView.style.display = 'none';
+    quizView.style.display = 'none';
+    resultView.style.display = 'none';
+    view.style.display = '';
+  }
+
+  function renderQuestion() {
+    var q = shuffled[currentIndex];
+    progressText.textContent = 'Question ' + (currentIndex + 1) + ' of 30';
+    progressFill.style.width = Math.round(((currentIndex) / 30) * 100) + '%';
+    questionText.textContent = q.text;
+
+    optionsContainer.innerHTML = '';
+    for (var i = 0; i < q.options.length; i++) {
+      var btn = document.createElement('button');
+      btn.className = 'quiz-option';
+      btn.type = 'button';
+      btn.textContent = q.options[i].label;
+      btn.setAttribute('data-dim', q.options[i].dim);
+      optionsContainer.appendChild(btn);
+    }
+  }
+
+  function handleOptionClick(e) {
+    if (isProcessing) return;
+    var target = e.target;
+    if (!target || !target.classList || !target.classList.contains('quiz-option')) return;
+
+    isProcessing = true;
+    var dim = target.getAttribute('data-dim');
+    scores[dim] = (scores[dim] || 0) + 1;
+
+    target.classList.add('selected');
+
+    setTimeout(function () {
+      currentIndex++;
+      if (currentIndex >= 30) {
+        showResults();
+      } else {
+        renderQuestion();
+      }
+      isProcessing = false;
+    }, 300);
+  }
+
+  function showResults() {
+    showView(resultView);
+    progressFill.style.width = '100%';
+
+    // Find top language
+    var topDim = 'words';
+    var topScore = 0;
+    var dims = ['words', 'acts', 'gifts', 'time', 'touch'];
+    for (var i = 0; i < dims.length; i++) {
+      if (scores[dims[i]] > topScore) {
+        topScore = scores[dims[i]];
+        topDim = dims[i];
+      }
+    }
+
+    var topLang = languages[topDim];
+    resultIcon.textContent = topLang.icon;
+    resultType.textContent = topLang.name;
+    resultName.textContent = 'Your Primary Love Language';
+    resultDesc.textContent = topLang.desc;
+
+    // Build sorted bar chart
+    var sorted = dims.slice().sort(function (a, b) { return scores[b] - scores[a]; });
+    var totalPoints = 30;
+    var chartHTML = '';
+    for (var j = 0; j < sorted.length; j++) {
+      var key = sorted[j];
+      var pct = Math.round((scores[key] / totalPoints) * 100);
+      var color = LANG_COLORS[key] || 'var(--color-primary)';
+      chartHTML += '<div class="quiz-bar-item">';
+      chartHTML += '<div class="quiz-bar-label"><span>' + languages[key].icon + ' ' + languages[key].name + '</span><span>' + pct + '%</span></div>';
+      chartHTML += '<div class="quiz-bar-track"><div class="quiz-bar-fill" style="width:' + pct + '%;background:' + color + ';"></div></div>';
+      chartHTML += '</div>';
+    }
+    dimensionChart.innerHTML = chartHTML;
+
+    // Show tips for top language
+    var tipsHTML = '<h3>Tips for ' + topLang.name + '</h3><ul>';
+    for (var t = 0; t < topLang.tips.length; t++) {
+      tipsHTML += '<li>' + topLang.tips[t] + '</li>';
+    }
+    tipsHTML += '</ul>';
+    resultTips.innerHTML = tipsHTML;
+
+    // GameShare
+    if (window.GameShare) {
+      window.GameShare.show({
+        gameName: gameName,
+        gameSlug: gameSlug,
+        gameIcon: topLang.icon,
+        score: topLang.name,
+        unit: Math.round((topScore / 30) * 100) + '%',
+        metricLabel: metricLabel,
+        ratingLabel: topLang.name,
+        ratingColor: '#e91e63'
+      });
+    }
+  }
+
+  function startQuiz() {
+    currentIndex = 0;
+    scores = { words: 0, acts: 0, gifts: 0, time: 0, touch: 0 };
+    shuffled = shuffle(questions);
+    isProcessing = false;
+    showView(quizView);
+    renderQuestion();
+
+    if (window.GameShare) {
+      window.GameShare.hide();
+    }
+  }
+
+  // Event listeners
+  startBtn.addEventListener('click', startQuiz);
+  retakeBtn.addEventListener('click', startQuiz);
+  optionsContainer.addEventListener('click', handleOptionClick);
+})();
+</script>

@@ -1,0 +1,759 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/game.css';
+import '../../styles/quiz.css';
+import GameShare from '../../components/GameShare.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tests & Games", "item": "https://toolcalcs.com/test/" },
+      { "@type": "ListItem", "position": 3, "name": "16 Personalities Test" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "16 Personalities Test",
+    "url": "https://toolcalcs.com/test/personality-type-test/",
+    "applicationCategory": "LifestyleApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Discover your MBTI personality type through 40 carefully crafted binary-choice questions. Free online 16 personalities test with detailed results."
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What are the 16 personality types?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The 16 personality types are based on the Myers-Briggs Type Indicator (MBTI) framework. They are: ISTJ (The Inspector), ISFJ (The Protector), INFJ (The Advocate), INTJ (The Architect), ISTP (The Virtuoso), ISFP (The Adventurer), INFP (The Mediator), INTP (The Logician), ESTP (The Entrepreneur), ESFP (The Entertainer), ENFP (The Campaigner), ENTP (The Debater), ESTJ (The Executive), ESFJ (The Consul), ENFJ (The Protagonist), and ENTJ (The Commander). Each type is defined by four preference dimensions: Extraversion/Introversion, Sensing/Intuition, Thinking/Feeling, and Judging/Perceiving.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How accurate is the MBTI test?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The MBTI has moderate test-retest reliability, with about 75-90% of people getting the same or a very similar type when retaking the test within a few weeks. However, academic psychologists have debated its validity, noting that personality traits exist on a spectrum rather than in binary categories. The MBTI is best used as a tool for self-reflection and understanding preferences rather than as a definitive scientific measurement. Many people find it highly useful for improving communication, career exploration, and personal growth.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Can your personality type change over time?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Your core personality preferences tend to remain relatively stable throughout adulthood, but your MBTI test results can shift as you develop new skills, gain life experience, and mature. People often become more balanced across their preferences as they age. For example, an introvert may develop stronger extraverted skills over time. Major life events, personal growth, and deliberate self-improvement can also influence how you express your type. The underlying preferences usually remain, but how strongly they manifest can change.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is the rarest personality type?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'INFJ (The Advocate) is generally considered the rarest personality type, making up roughly 1-3% of the general population. INTJ (The Architect) and ENTJ (The Commander) are also relatively uncommon. On the other end, ISFJ (The Protector) and ESFJ (The Consul) tend to be among the most common types. However, these distributions can vary by country, culture, and the specific study being referenced.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How long does the 16 personalities test take?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'This 16 personalities test typically takes 5-10 minutes to complete. It consists of 40 binary-choice questions, with 10 questions for each of the four personality dimensions. There is no time limit, so you can take as long as you need to consider each question. For the most accurate results, answer with your first instinct rather than overthinking each choice.',
+        },
+      },
+    ],
+  }
+];
+---
+
+<BaseLayout
+  title="16 Personalities Test - Discover Your MBTI Type | ToolCalcs"
+  description="Free 16 personalities test with 40 questions. Discover your MBTI personality type, strengths, weaknesses, and ideal careers. Takes only 5-10 minutes."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/test/">Tests & Games</a> &rsaquo;
+    <span>16 Personalities Test</span>
+  </nav>
+
+  <h1>16 Personalities Test</h1>
+  <p class="page-desc">Discover your MBTI personality type through 40 carefully crafted questions. Find out your strengths, challenges, and ideal career paths.</p>
+
+  <div class="game-box">
+    <div class="game-area" id="gameArea" role="region" aria-label="Personality test area" aria-live="polite">
+      <div class="game-instructions" id="instructionsView">
+        <h2>16 Personalities Test</h2>
+        <p>Answer 40 binary-choice questions to discover which of the 16 MBTI personality types matches you best. There are no right or wrong answers — just choose the option that feels most natural to you.</p>
+        <p style="font-size:0.85rem;color:var(--color-text-muted);">Takes about 5-10 minutes. Your results include your type, strengths, challenges, and career matches.</p>
+        <button class="game-btn primary" id="startBtn" type="button" style="margin-top:16px;">Start Test</button>
+      </div>
+
+      <div id="quizView" style="display:none;">
+        <div class="quiz-progress">
+          <div class="quiz-progress-text" id="progressText">Question 1 of 40</div>
+          <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="progressFill"></div></div>
+        </div>
+        <div class="quiz-question">
+          <div class="quiz-question-text" id="questionText"></div>
+        </div>
+        <div class="quiz-options" id="optionsContainer"></div>
+      </div>
+
+      <div id="resultView" style="display:none;" class="quiz-result">
+        <div class="quiz-result-type" id="resultType">INFJ</div>
+        <div class="quiz-result-name" id="resultName">The Advocate</div>
+        <div class="quiz-result-desc" id="resultDesc"></div>
+        <div class="quiz-bar-chart" id="dimensionChart"></div>
+        <div class="quiz-traits strengths" id="strengthsList">
+          <h3>Strengths</h3>
+          <ul id="strengthsUl"></ul>
+        </div>
+        <div class="quiz-traits weaknesses" id="weaknessesList">
+          <h3>Challenges</h3>
+          <ul id="weaknessesUl"></ul>
+        </div>
+        <div class="quiz-traits careers" id="careersList">
+          <h3>Career Matches</h3>
+          <ul id="careersUl"></ul>
+        </div>
+        <button class="game-btn primary" id="retakeBtn" type="button" style="margin-top:16px;">Retake Test</button>
+      </div>
+    </div>
+
+    <GameShare />
+
+    <div class="attempt-history" id="attemptHistory" hidden>
+      <h3>Attempt History</h3>
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is the Myers-Briggs Type Indicator (MBTI)?</h2>
+    <p>The Myers-Briggs Type Indicator, commonly known as the MBTI, is one of the world's most widely used personality assessment tools. Developed by Katharine Cook Briggs and her daughter Isabel Briggs Myers during the mid-20th century, it is grounded in the psychological theory of Carl Gustav Jung, the Swiss psychiatrist who proposed that people experience the world through four principal psychological functions: sensation, intuition, feeling, and thinking. Jung argued that one of these functions is dominant for each individual most of the time, and that these functions profoundly shape how we perceive and interact with the world around us.</p>
+    <p>Katharine Briggs began her research into personality types in 1917, long before she encountered Jung's work. When she read his 1921 book <em>Psychological Types</em>, she recognized that his framework aligned closely with her own observations. Together with Isabel, she spent decades refining a questionnaire designed to make Jung's theory accessible and practical for everyday people. Their goal was not to label or limit individuals but rather to help people understand their natural preferences, improve communication, and make better-informed decisions about careers and relationships.</p>
+    <p>The result of their work was the MBTI, first published in 1943. Today it is administered to millions of people each year around the world. Corporations use it for team-building exercises, career counselors use it to guide clients, and individuals take it for self-discovery. While the instrument has its critics — some psychologists prefer the Big Five model of personality, for instance — the MBTI remains one of the most popular and influential personality frameworks ever created, precisely because it gives people a memorable, easy-to-understand vocabulary for discussing personality differences.</p>
+
+    <h2>The Four Dimensions Explained</h2>
+    <p>The MBTI classifies personality along four independent dimensions. Each dimension is a spectrum between two opposing preferences. Everyone uses both sides of each dimension at different times, but most people have a natural leaning toward one side. Understanding these four dimensions is the key to understanding your personality type.</p>
+
+    <h3>Extraversion (E) vs. Introversion (I)</h3>
+    <p>This dimension describes where you direct and receive your energy. Extraverts draw energy from interacting with other people and the external world. They tend to be outgoing, talkative, and action-oriented, and they often process ideas by talking them through with others. After a long day alone, an extravert typically feels drained and seeks social interaction to recharge.</p>
+    <p>Introverts, on the other hand, draw energy from their inner world of thoughts and reflections. They tend to be reserved, thoughtful, and reflective, preferring deep one-on-one conversations to large group interactions. After a long social event, an introvert typically needs quiet time alone to recharge. Introversion is not shyness — introverts can be perfectly comfortable in social settings, but they find solitude restorative rather than draining.</p>
+
+    <h3>Sensing (S) vs. Intuition (N)</h3>
+    <p>This dimension describes how you take in information and what kind of data you naturally pay attention to. Sensors focus on concrete, tangible information gathered through the five senses. They prefer facts, details, and real-world evidence. They tend to be practical, observant, and grounded in present reality, and they trust direct experience over abstract theories.</p>
+    <p>Intuitives focus on patterns, possibilities, and the big picture. They look beyond the surface of things and are drawn to abstract ideas, future possibilities, and underlying meanings. They tend to trust their gut instincts and enjoy imagining how things could be different. While sensors ask "What is?", intuitives ask "What could be?"</p>
+
+    <h3>Thinking (T) vs. Feeling (F)</h3>
+    <p>This dimension describes how you make decisions and evaluate information. Thinkers prioritize logical analysis and objective criteria when making decisions. They value fairness, consistency, and truth, and they tend to be direct and analytical. When faced with a difficult choice, a thinker asks "What makes the most logical sense?"</p>
+    <p>Feelers prioritize values, harmony, and the impact of decisions on people. They are attuned to others' emotions and strive for empathy and compassion in their decision-making. When faced with a difficult choice, a feeler asks "How will this affect the people involved?" Both approaches are valid — thinkers can be deeply caring, and feelers can be highly logical. The dimension simply describes which lens you naturally reach for first.</p>
+
+    <h3>Judging (J) vs. Perceiving (P)</h3>
+    <p>This dimension describes how you prefer to organize your outer life. Judgers prefer structure, planning, and decisiveness. They like to have things settled, make lists, set schedules, and follow through on plans. They feel more comfortable when decisions are made and tasks are completed. A judger's workspace is typically organized, and they rarely miss a deadline.</p>
+    <p>Perceivers prefer flexibility, spontaneity, and adaptability. They like to keep their options open, explore possibilities before committing, and respond to life as it unfolds. They feel more comfortable when they have room to improvise and dislike being boxed in by rigid plans. A perceiver might thrive under the creative pressure of a last-minute deadline. This dimension does not mean that judgers are judgmental or that perceivers are more perceptive — the labels refer specifically to lifestyle preferences around structure versus flexibility.</p>
+
+    <h2>The 16 Personality Types at a Glance</h2>
+    <p>When the four dimensions are combined, they produce 16 distinct personality types. Each type has its own characteristic patterns of thinking, feeling, and behaving. Here is a brief overview of all 16 types, grouped by their shared temperament:</p>
+
+    <h3>Analysts (NT Types)</h3>
+    <ul>
+      <li><strong>INTJ — The Architect:</strong> Strategic, independent, and determined. Architects are long-range thinkers who excel at turning complex ideas into actionable plans. They value competence and are driven by a desire to master the systems they encounter.</li>
+      <li><strong>INTP — The Logician:</strong> Analytical, inventive, and curious. Logicians are deeply interested in understanding how things work at a fundamental level. They love exploring theoretical concepts and are often the most philosophically inclined of all types.</li>
+      <li><strong>ENTJ — The Commander:</strong> Bold, decisive, and strong-willed. Commanders are natural leaders who see inefficiency as a problem to be solved. They set ambitious goals and mobilize people and resources to achieve them with relentless determination.</li>
+      <li><strong>ENTP — The Debater:</strong> Quick-witted, resourceful, and intellectually curious. Debaters enjoy the process of arguing ideas, not to be combative, but to discover the truth. They are skilled at seeing problems from multiple angles and thrive on intellectual challenge.</li>
+    </ul>
+
+    <h3>Diplomats (NF Types)</h3>
+    <ul>
+      <li><strong>INFJ — The Advocate:</strong> Insightful, principled, and compassionate. Advocates are the rarest type, driven by a deep desire to help others and make the world a better place. They combine empathy with a strong moral compass and a talent for understanding complex human dynamics.</li>
+      <li><strong>INFP — The Mediator:</strong> Idealistic, empathetic, and creative. Mediators are guided by their core values and have a deep desire for authenticity. They are often drawn to creative expression and seek to understand themselves and others at a profound level.</li>
+      <li><strong>ENFJ — The Protagonist:</strong> Charismatic, inspiring, and empathetic. Protagonists are natural mentors and leaders who genuinely want to help people reach their potential. They are skilled communicators who can rally groups around a shared vision.</li>
+      <li><strong>ENFP — The Campaigner:</strong> Enthusiastic, creative, and sociable. Campaigners are free spirits who see life as full of possibilities. They are warm, energetic, and deeply curious about people, often serving as the catalyst for new ideas and connections.</li>
+    </ul>
+
+    <h3>Sentinels (SJ Types)</h3>
+    <ul>
+      <li><strong>ISTJ — The Inspector:</strong> Responsible, thorough, and dependable. Inspectors are the backbone of many organizations, valuing duty, reliability, and tradition. They approach their work methodically and take pride in doing things correctly.</li>
+      <li><strong>ISFJ — The Protector:</strong> Warm, dedicated, and reliable. Protectors are quietly caring individuals who remember details about the people they care for. They are loyal, hardworking, and committed to maintaining harmony in their environment.</li>
+      <li><strong>ESTJ — The Executive:</strong> Organized, logical, and assertive. Executives are natural administrators who value order and structure. They lead by example, set clear expectations, and work tirelessly to ensure that rules and procedures are followed.</li>
+      <li><strong>ESFJ — The Consul:</strong> Caring, social, and tradition-minded. Consuls are attentive to others' needs and work hard to create a sense of belonging. They are generous with their time and energy, and they thrive in roles where they can directly help people.</li>
+    </ul>
+
+    <h3>Explorers (SP Types)</h3>
+    <ul>
+      <li><strong>ISTP — The Virtuoso:</strong> Practical, observant, and analytical. Virtuosos are natural mechanics and problem-solvers who love understanding how things work. They prefer to learn by doing and are often skilled with tools, instruments, or technology.</li>
+      <li><strong>ISFP — The Adventurer:</strong> Gentle, sensitive, and artistic. Adventurers are quietly creative individuals who live in the present moment. They are attuned to beauty in the world around them and express themselves through action rather than words.</li>
+      <li><strong>ESTP — The Entrepreneur:</strong> Energetic, pragmatic, and observant. Entrepreneurs are action-oriented individuals who prefer to dive in and figure things out as they go. They have a knack for reading people and situations and are often the life of the party.</li>
+      <li><strong>ESFP — The Entertainer:</strong> Spontaneous, energetic, and fun-loving. Entertainers are born performers who love being at the center of the action. They are warm, generous, and have a contagious enthusiasm that draws people to them.</li>
+    </ul>
+
+    <h2>How This Test Works</h2>
+    <p>This 16 personalities test consists of 40 binary-choice questions — 10 questions for each of the four MBTI dimensions. For each question, you are presented with two options that represent opposite ends of one dimension. You simply choose the option that resonates with you more strongly.</p>
+    <p>There are no right or wrong answers. Each choice adds a point toward one end of a dimension (for example, toward Extraversion or toward Introversion). After all 40 questions are answered, your scores on each dimension are tallied. Whichever side of each dimension you scored higher on becomes the corresponding letter in your four-letter type code.</p>
+    <p>The questions are shuffled randomly each time you take the test, which reduces the effect of question-order bias. The test also shows your percentage leaning on each dimension, which can be especially informative. If you score 52% Extraversion vs. 48% Introversion, for instance, you may identify with aspects of both and should explore descriptions of both types to see which fits best.</p>
+    <p>After determining your type, the test provides a description of your personality, a list of typical strengths and challenges, and a set of career paths that tend to suit your type. These results are based on decades of MBTI research and practical application.</p>
+
+    <h2>Tips for Accurate Results</h2>
+    <p>Getting accurate results from any personality test requires honest, thoughtful responses. Here are some tips to help you get the most out of this assessment:</p>
+    <ul>
+      <li><strong>Go with your first instinct.</strong> Your initial gut reaction is usually the most authentic. Overthinking questions leads to answering based on who you think you should be rather than who you naturally are.</li>
+      <li><strong>Answer as you are, not as you wish to be.</strong> Many people answer personality questions aspirationally — choosing the option they admire rather than the one that truly describes them. Try to be honest about your actual tendencies and preferences.</li>
+      <li><strong>Think about your natural state.</strong> Consider how you behave when you are relaxed and not under pressure from work or social obligations. Your personality type reflects your natural preferences, not the adaptations you make in specific situations.</li>
+      <li><strong>Do not overthink borderline questions.</strong> If both options seem equally true, just pick the one that feels slightly more natural. Everyone has aspects of both sides, and the test is designed to handle slight preferences across many questions.</li>
+      <li><strong>Take the test in a calm environment.</strong> Stress, fatigue, and distractions can all influence your responses. Take the test when you feel calm and have a few uninterrupted minutes to focus.</li>
+    </ul>
+
+    <h2>MBTI in Real Life</h2>
+    <p>Understanding your personality type can be valuable in several areas of life. In the workplace, knowing your type can help you choose a career path that aligns with your natural strengths and preferences. For example, an ENTJ might thrive in executive leadership, while an ISFP might find fulfillment in a creative or artistic role. Many organizations use the MBTI to build more effective teams by ensuring that different personality types are represented and that team members understand each other's communication styles.</p>
+    <p>In relationships, the MBTI can improve communication and reduce conflict. When you understand that your partner processes decisions differently — perhaps they prioritize logic where you prioritize feelings, or they need more social time while you need more solitude — you can approach disagreements with more empathy and less frustration. The framework gives couples a shared language for discussing their differences without assigning blame.</p>
+    <p>For personal growth, the MBTI can illuminate your blind spots and areas for development. Each type has characteristic strengths but also predictable challenges. An INFP, for instance, might struggle with practical details and follow-through despite being deeply creative and empathetic. Recognizing these tendencies allows you to develop strategies to work around them or deliberately strengthen those weaker areas.</p>
+    <p>It is important to remember that no personality type is better or worse than any other. Each type brings unique gifts and perspectives to the table. The purpose of understanding your type is not to put yourself in a box but rather to gain insight into your natural tendencies so you can leverage your strengths and navigate your challenges more effectively.</p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What are the 16 personality types?</h3>
+    <p>The 16 personality types are based on the Myers-Briggs Type Indicator (MBTI) framework. They are: ISTJ (The Inspector), ISFJ (The Protector), INFJ (The Advocate), INTJ (The Architect), ISTP (The Virtuoso), ISFP (The Adventurer), INFP (The Mediator), INTP (The Logician), ESTP (The Entrepreneur), ESFP (The Entertainer), ENFP (The Campaigner), ENTP (The Debater), ESTJ (The Executive), ESFJ (The Consul), ENFJ (The Protagonist), and ENTJ (The Commander). Each type is defined by preferences across four dimensions: Extraversion/Introversion, Sensing/Intuition, Thinking/Feeling, and Judging/Perceiving.</p>
+
+    <h3>How accurate is the MBTI test?</h3>
+    <p>The MBTI has moderate test-retest reliability, with about 75-90% of people getting the same or a very similar type when retaking the test within a few weeks. While some academic psychologists debate its validity compared to other models like the Big Five, millions of people worldwide find it a useful tool for self-reflection, improving communication, exploring careers, and understanding relationships. It is best used as a framework for understanding preferences rather than a rigid classification system.</p>
+
+    <h3>Can your personality type change over time?</h3>
+    <p>Your core personality preferences tend to remain relatively stable throughout adulthood, but your test results can shift as you develop new skills, gain life experience, and mature. People often become more balanced across their preferences as they age. Major life events, personal growth, and deliberate self-improvement can also influence how you express your type. The underlying preferences usually remain, but how strongly they manifest can evolve over the years.</p>
+
+    <h3>What is the rarest personality type?</h3>
+    <p>INFJ (The Advocate) is generally considered the rarest personality type, making up roughly 1-3% of the general population. INTJ (The Architect) and ENTJ (The Commander) are also relatively uncommon. On the other end of the spectrum, ISFJ (The Protector) and ESFJ (The Consul) tend to be among the most common types. These distributions can vary by country, culture, and the specific study being referenced.</p>
+
+    <h3>How long does the 16 personalities test take?</h3>
+    <p>This 16 personalities test typically takes 5-10 minutes to complete. It consists of 40 binary-choice questions, with 10 questions for each of the four personality dimensions. There is no time limit, so you can take as long as you need. For the most accurate results, we recommend answering with your first instinct rather than overthinking each choice.</p>
+  </article>
+
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .game-area { cursor: default; user-select: auto; -webkit-user-select: auto; }
+</style>
+
+<script define:vars={{ gameName: "16 Personalities Test", gameSlug: "personality-type-test", gameIcon: "\uD83E\uDDE0", metricLabel: "Personality Type", metricUnit: "type" }}>
+(function () {
+  'use strict';
+
+  var questions = [
+    { text: "At a party, you tend to:", options: [
+      { label: "Talk to many people, including strangers", dim: "EI", val: 1 },
+      { label: "Talk mostly to people you already know", dim: "EI", val: -1 }
+    ]},
+    { text: "After a long, busy week, you prefer to recharge by:", options: [
+      { label: "Going out with friends or attending social events", dim: "EI", val: 1 },
+      { label: "Spending a quiet evening alone or with one close person", dim: "EI", val: -1 }
+    ]},
+    { text: "When working on a group project, you usually:", options: [
+      { label: "Take the lead and coordinate everyone's efforts", dim: "EI", val: 1 },
+      { label: "Prefer to work on your part independently and then combine", dim: "EI", val: -1 }
+    ]},
+    { text: "In conversations, you tend to:", options: [
+      { label: "Think out loud and talk through your ideas with others", dim: "EI", val: 1 },
+      { label: "Think carefully before speaking and share only polished thoughts", dim: "EI", val: -1 }
+    ]},
+    { text: "When meeting new people, you usually:", options: [
+      { label: "Feel energized and enjoy the novelty of new connections", dim: "EI", val: 1 },
+      { label: "Feel it takes significant effort and find it somewhat draining", dim: "EI", val: -1 }
+    ]},
+    { text: "You would rather spend a free Saturday:", options: [
+      { label: "At a busy festival, concert, or community event", dim: "EI", val: 1 },
+      { label: "At home reading, watching a movie, or pursuing a hobby", dim: "EI", val: -1 }
+    ]},
+    { text: "In the workplace, you are more productive when:", options: [
+      { label: "You can brainstorm with colleagues and work in an open space", dim: "EI", val: 1 },
+      { label: "You have a private, quiet workspace with minimal interruptions", dim: "EI", val: -1 }
+    ]},
+    { text: "When you have exciting news, your first impulse is to:", options: [
+      { label: "Call or text several friends right away to share it", dim: "EI", val: 1 },
+      { label: "Sit with the feeling for a while before telling one or two close people", dim: "EI", val: -1 }
+    ]},
+    { text: "During a vacation, you prefer:", options: [
+      { label: "A packed itinerary with group tours and social activities", dim: "EI", val: 1 },
+      { label: "A relaxed schedule with plenty of alone time to explore at your pace", dim: "EI", val: -1 }
+    ]},
+    { text: "When your phone rings unexpectedly, you typically:", options: [
+      { label: "Pick up right away, happy to chat", dim: "EI", val: 1 },
+      { label: "Let it go to voicemail and call back when you feel ready", dim: "EI", val: -1 }
+    ]},
+
+    { text: "When learning a new skill, you prefer to:", options: [
+      { label: "Follow a step-by-step practical guide with hands-on exercises", dim: "SN", val: -1 },
+      { label: "Understand the big-picture theory and concepts first", dim: "SN", val: 1 }
+    ]},
+    { text: "When reading a news article, you focus on:", options: [
+      { label: "The specific facts, figures, and concrete details", dim: "SN", val: -1 },
+      { label: "The broader implications and what it could mean for the future", dim: "SN", val: 1 }
+    ]},
+    { text: "In a conversation about the future, you tend to:", options: [
+      { label: "Focus on realistic plans and what is practically achievable", dim: "SN", val: -1 },
+      { label: "Explore imaginative possibilities and 'what if' scenarios", dim: "SN", val: 1 }
+    ]},
+    { text: "When solving a problem, you typically:", options: [
+      { label: "Rely on proven methods and past experience", dim: "SN", val: -1 },
+      { label: "Look for innovative approaches and new angles", dim: "SN", val: 1 }
+    ]},
+    { text: "You are more drawn to:", options: [
+      { label: "Concrete, tangible things you can see and touch", dim: "SN", val: -1 },
+      { label: "Abstract concepts, symbols, and hidden meanings", dim: "SN", val: 1 }
+    ]},
+    { text: "When giving directions, you tend to say:", options: [
+      { label: "Turn left at the gas station, then right after the third building", dim: "SN", val: -1 },
+      { label: "Head roughly north; you will feel when you are in the right area", dim: "SN", val: 1 }
+    ]},
+    { text: "You trust more:", options: [
+      { label: "Your direct experience and what you have personally observed", dim: "SN", val: -1 },
+      { label: "Your intuition and gut feelings about situations", dim: "SN", val: 1 }
+    ]},
+    { text: "When writing an email, you tend to:", options: [
+      { label: "Be specific and detailed, covering all the facts", dim: "SN", val: -1 },
+      { label: "Focus on the main idea and let the reader fill in the details", dim: "SN", val: 1 }
+    ]},
+    { text: "In your daily life, you prefer:", options: [
+      { label: "Established routines and a predictable schedule", dim: "SN", val: -1 },
+      { label: "Variety, new experiences, and changing things up", dim: "SN", val: 1 }
+    ]},
+    { text: "When describing an event, you naturally focus on:", options: [
+      { label: "Exactly what happened, in sequential order", dim: "SN", val: -1 },
+      { label: "The overall feeling, themes, and what it reminded you of", dim: "SN", val: 1 }
+    ]},
+
+    { text: "When a friend comes to you with a problem, your first instinct is to:", options: [
+      { label: "Help them analyze the situation logically and find a solution", dim: "TF", val: 1 },
+      { label: "Listen empathetically and validate their feelings first", dim: "TF", val: -1 }
+    ]},
+    { text: "When making a major purchase, you base your decision mostly on:", options: [
+      { label: "Objective research, specs, and cost-benefit analysis", dim: "TF", val: 1 },
+      { label: "How it makes you feel and whether it aligns with your values", dim: "TF", val: -1 }
+    ]},
+    { text: "In a debate, you value:", options: [
+      { label: "Logical consistency and factual accuracy above all", dim: "TF", val: 1 },
+      { label: "Understanding each person's perspective and maintaining respect", dim: "TF", val: -1 }
+    ]},
+    { text: "When giving feedback to someone, you prioritize:", options: [
+      { label: "Being honest and direct, even if the truth is uncomfortable", dim: "TF", val: 1 },
+      { label: "Being tactful and gentle to protect the other person's feelings", dim: "TF", val: -1 }
+    ]},
+    { text: "You are more bothered by:", options: [
+      { label: "People who make illogical or irrational decisions", dim: "TF", val: 1 },
+      { label: "People who are insensitive or dismissive of others' emotions", dim: "TF", val: -1 }
+    ]},
+    { text: "When choosing between two job offers, you weigh more heavily:", options: [
+      { label: "Salary, career advancement, and objective qualifications", dim: "TF", val: 1 },
+      { label: "The team culture, relationships, and how meaningful the work feels", dim: "TF", val: -1 }
+    ]},
+    { text: "In a conflict between two friends, you tend to:", options: [
+      { label: "Assess who is objectively right based on the facts", dim: "TF", val: 1 },
+      { label: "Try to understand both sides and mediate for harmony", dim: "TF", val: -1 }
+    ]},
+    { text: "When watching a movie, you are more likely to critique:", options: [
+      { label: "Plot holes, logical inconsistencies, and technical execution", dim: "TF", val: 1 },
+      { label: "Whether the characters felt real and the story was emotionally moving", dim: "TF", val: -1 }
+    ]},
+    { text: "You believe the best leaders are those who:", options: [
+      { label: "Make tough, rational decisions based on data and strategy", dim: "TF", val: 1 },
+      { label: "Inspire people through empathy, vision, and genuine caring", dim: "TF", val: -1 }
+    ]},
+    { text: "When a rule seems unfair, you are more concerned about:", options: [
+      { label: "Whether the rule is logically consistent and applied equally", dim: "TF", val: 1 },
+      { label: "Whether the rule causes harm or distress to specific individuals", dim: "TF", val: -1 }
+    ]},
+
+    { text: "When starting a new project, you prefer to:", options: [
+      { label: "Create a detailed plan with milestones and deadlines first", dim: "JP", val: 1 },
+      { label: "Dive in and figure things out as you go along", dim: "JP", val: -1 }
+    ]},
+    { text: "Your workspace is typically:", options: [
+      { label: "Neat, organized, and everything has a designated place", dim: "JP", val: 1 },
+      { label: "A bit messy, but you know where everything is in your own system", dim: "JP", val: -1 }
+    ]},
+    { text: "When packing for a trip, you usually:", options: [
+      { label: "Make a checklist days in advance and pack methodically", dim: "JP", val: 1 },
+      { label: "Throw things together the night before or morning of departure", dim: "JP", val: -1 }
+    ]},
+    { text: "Regarding deadlines, you tend to:", options: [
+      { label: "Finish tasks well ahead of time to avoid last-minute stress", dim: "JP", val: 1 },
+      { label: "Work best under pressure and often complete things just in time", dim: "JP", val: -1 }
+    ]},
+    { text: "When making plans with friends, you prefer:", options: [
+      { label: "Setting a specific date, time, and place well in advance", dim: "JP", val: 1 },
+      { label: "Keeping things loose and deciding spontaneously", dim: "JP", val: -1 }
+    ]},
+    { text: "When faced with a big decision, you tend to:", options: [
+      { label: "Decide quickly so you can move forward with certainty", dim: "JP", val: 1 },
+      { label: "Keep your options open as long as possible before committing", dim: "JP", val: -1 }
+    ]},
+    { text: "At the end of the day, you feel more satisfied when:", options: [
+      { label: "You completed your to-do list and accomplished your goals", dim: "JP", val: 1 },
+      { label: "You had interesting experiences, even if some tasks remain unfinished", dim: "JP", val: -1 }
+    ]},
+    { text: "Your approach to rules and guidelines is:", options: [
+      { label: "Follow them closely; rules exist for good reason", dim: "JP", val: 1 },
+      { label: "Treat them as suggestions; flexibility leads to better outcomes", dim: "JP", val: -1 }
+    ]},
+    { text: "When shopping for groceries, you typically:", options: [
+      { label: "Bring a list and stick to it closely", dim: "JP", val: 1 },
+      { label: "Browse the aisles and buy whatever catches your eye", dim: "JP", val: -1 }
+    ]},
+    { text: "If your plans suddenly change, you usually:", options: [
+      { label: "Feel frustrated and try to get back on schedule quickly", dim: "JP", val: 1 },
+      { label: "Adapt easily and enjoy the unexpected change of direction", dim: "JP", val: -1 }
+    ]}
+  ];
+
+  var types = {
+    ISTJ: {
+      name: "The Inspector",
+      desc: "ISTJs are responsible, thorough, and dependable individuals who value duty and tradition. They approach life with a methodical, detail-oriented mindset and take pride in doing things correctly. Their commitment to reliability and order makes them the backbone of many organizations and communities.",
+      strengths: ["Reliable", "Detail-oriented", "Organized", "Hardworking", "Loyal"],
+      weaknesses: ["Inflexible", "Judgmental", "Resistant to change", "Difficulty expressing emotions"],
+      careers: ["Accountant", "Auditor", "Project Manager", "Military Officer", "Systems Administrator"]
+    },
+    ISFJ: {
+      name: "The Protector",
+      desc: "ISFJs are warm, dedicated, and quietly caring individuals who remember details about the people they love. They are loyal, hardworking, and committed to maintaining harmony in their environment. Their combination of dependability and genuine compassion makes them natural caregivers and supporters.",
+      strengths: ["Supportive", "Patient", "Observant", "Dependable", "Empathetic"],
+      weaknesses: ["Overly self-sacrificing", "Conflict-avoidant", "Reluctant to change", "Takes things personally"],
+      careers: ["Nurse", "Social Worker", "Teacher", "Librarian", "Human Resources Specialist"]
+    },
+    INFJ: {
+      name: "The Advocate",
+      desc: "INFJs are insightful, principled, and compassionate individuals driven by a deep desire to help others and make the world better. They combine empathy with a strong moral compass and a talent for understanding complex human dynamics. As the rarest personality type, they bring a unique blend of idealism and determination to everything they do.",
+      strengths: ["Insightful", "Principled", "Compassionate", "Determined", "Creative"],
+      weaknesses: ["Perfectionist", "Overly private", "Prone to burnout", "Sensitive to criticism"],
+      careers: ["Counselor", "Psychologist", "Writer", "Nonprofit Director", "UX Researcher"]
+    },
+    INTJ: {
+      name: "The Architect",
+      desc: "INTJs are strategic, independent, and determined thinkers who excel at turning complex ideas into actionable plans. They value competence and efficiency above all else and are driven by a relentless desire to understand and master the systems they encounter. Their combination of vision and pragmatism makes them formidable problem-solvers.",
+      strengths: ["Strategic", "Independent", "Innovative", "Determined", "Analytical"],
+      weaknesses: ["Arrogant", "Dismissive of emotions", "Overly critical", "Difficulty collaborating"],
+      careers: ["Software Architect", "Scientist", "Investment Banker", "Surgeon", "Strategic Consultant"]
+    },
+    ISTP: {
+      name: "The Virtuoso",
+      desc: "ISTPs are practical, observant, and analytical individuals who love understanding how things work. They prefer to learn by doing and are often naturally skilled with tools, instruments, or technology. Their calm, adaptable nature makes them excellent at handling crises and solving hands-on problems under pressure.",
+      strengths: ["Practical", "Adaptable", "Resourceful", "Calm under pressure", "Observant"],
+      weaknesses: ["Insensitive", "Risk-prone", "Easily bored", "Commitment-averse"],
+      careers: ["Mechanic", "Engineer", "Forensic Scientist", "Pilot", "Emergency Medical Technician"]
+    },
+    ISFP: {
+      name: "The Adventurer",
+      desc: "ISFPs are gentle, sensitive, and artistic individuals who live fully in the present moment. They are attuned to beauty in the world around them and express themselves through action rather than words. Their quiet creativity and strong personal values make them deeply authentic and genuinely kind people.",
+      strengths: ["Artistic", "Charming", "Sensitive", "Imaginative", "Passionate"],
+      weaknesses: ["Overly competitive", "Unpredictable", "Easily stressed", "Avoids confrontation"],
+      careers: ["Graphic Designer", "Photographer", "Veterinarian", "Chef", "Interior Designer"]
+    },
+    INFP: {
+      name: "The Mediator",
+      desc: "INFPs are idealistic, empathetic, and creative individuals guided by a deep core of personal values. They have a profound desire for authenticity and meaning in everything they do. Their rich inner world and genuine concern for others often draw them to creative expression, helping professions, and causes they believe in deeply.",
+      strengths: ["Empathetic", "Creative", "Open-minded", "Idealistic", "Passionate"],
+      weaknesses: ["Impractical", "Self-isolating", "Overly idealistic", "Difficulty with details"],
+      careers: ["Writer", "Therapist", "Graphic Designer", "Music Therapist", "Nonprofit Manager"]
+    },
+    INTP: {
+      name: "The Logician",
+      desc: "INTPs are analytical, inventive, and endlessly curious thinkers who are deeply interested in understanding how things work at a fundamental level. They love exploring theoretical concepts and are often the most philosophically inclined of all types. Their ability to see patterns and connections that others miss makes them powerful innovators and problem-solvers.",
+      strengths: ["Analytical", "Objective", "Imaginative", "Original", "Open-minded"],
+      weaknesses: ["Absent-minded", "Insensitive", "Condescending", "Difficulty following through"],
+      careers: ["Software Developer", "Mathematician", "Philosopher", "Data Scientist", "Research Scientist"]
+    },
+    ESTP: {
+      name: "The Entrepreneur",
+      desc: "ESTPs are energetic, pragmatic, and observant individuals who prefer to dive in and figure things out as they go. They have a natural knack for reading people and situations accurately and quickly. Their boldness, sociability, and ability to think on their feet make them skilled negotiators and natural risk-takers.",
+      strengths: ["Bold", "Practical", "Observant", "Direct", "Sociable"],
+      weaknesses: ["Impatient", "Risk-prone", "Unstructured", "Insensitive"],
+      careers: ["Sales Manager", "Entrepreneur", "Paramedic", "Detective", "Sports Coach"]
+    },
+    ESFP: {
+      name: "The Entertainer",
+      desc: "ESFPs are spontaneous, energetic, and fun-loving individuals who embrace life with infectious enthusiasm. They are born performers who love being at the center of the action and making others happy. Their warmth, generosity, and ability to live fully in the present moment make them the life of every gathering.",
+      strengths: ["Energetic", "Generous", "Observant", "Practical", "Fun-loving"],
+      weaknesses: ["Easily bored", "Sensitive to criticism", "Poor long-term planner", "Avoids conflict"],
+      careers: ["Event Planner", "Actor", "Flight Attendant", "Tour Guide", "Fitness Trainer"]
+    },
+    ENFP: {
+      name: "The Campaigner",
+      desc: "ENFPs are enthusiastic, creative, and deeply sociable individuals who see life as full of exciting possibilities. They are warm, energetic, and genuinely curious about people, often serving as catalysts for new ideas and connections. Their combination of imagination and people skills makes them inspiring communicators and natural motivators.",
+      strengths: ["Enthusiastic", "Creative", "Sociable", "Optimistic", "Perceptive"],
+      weaknesses: ["Disorganized", "Overthinking", "Overly accommodating", "Difficulty focusing"],
+      careers: ["Journalist", "Marketing Creative", "Counselor", "Public Relations Specialist", "Entrepreneur"]
+    },
+    ENTP: {
+      name: "The Debater",
+      desc: "ENTPs are quick-witted, resourceful, and intellectually curious individuals who thrive on challenge and novelty. They enjoy arguing ideas not to be combative, but to discover the truth and sharpen their understanding. Their ability to see problems from multiple angles and generate creative solutions makes them excellent innovators and strategic thinkers.",
+      strengths: ["Quick-witted", "Knowledgeable", "Charismatic", "Energetic", "Innovative"],
+      weaknesses: ["Argumentative", "Insensitive", "Intolerant of routine", "Difficulty following through"],
+      careers: ["Lawyer", "Startup Founder", "Management Consultant", "Film Producer", "Political Strategist"]
+    },
+    ESTJ: {
+      name: "The Executive",
+      desc: "ESTJs are organized, logical, and assertive natural administrators who value order, structure, and clear expectations. They lead by example and work tirelessly to ensure that standards are met and procedures are followed. Their dedication, directness, and strong sense of responsibility make them effective managers and community leaders.",
+      strengths: ["Organized", "Dedicated", "Strong-willed", "Direct", "Reliable"],
+      weaknesses: ["Inflexible", "Stubborn", "Uncomfortable with change", "Judgmental"],
+      careers: ["Business Manager", "Judge", "Financial Advisor", "School Administrator", "Military Officer"]
+    },
+    ESFJ: {
+      name: "The Consul",
+      desc: "ESFJs are caring, social, and tradition-minded individuals who are attentive to others' needs and work hard to create a sense of belonging. They are generous with their time and energy and thrive in roles where they can directly help people. Their loyalty, warmth, and strong sense of duty make them the glue that holds families, teams, and communities together.",
+      strengths: ["Caring", "Loyal", "Sociable", "Practical", "Warm"],
+      weaknesses: ["Needy for approval", "Inflexible", "Selfless to a fault", "Sensitive to criticism"],
+      careers: ["Teacher", "Healthcare Administrator", "Real Estate Agent", "Public Relations Manager", "Social Worker"]
+    },
+    ENFJ: {
+      name: "The Protagonist",
+      desc: "ENFJs are charismatic, inspiring, and deeply empathetic natural leaders who genuinely want to help people reach their full potential. They are skilled communicators who can rally groups around a shared vision and motivate action. Their combination of warmth, conviction, and organizational talent makes them powerful agents of positive change.",
+      strengths: ["Charismatic", "Empathetic", "Organized", "Inspiring", "Altruistic"],
+      weaknesses: ["Overly idealistic", "Too selfless", "Sensitive to criticism", "Indecisive under stress"],
+      careers: ["HR Director", "Teacher", "Life Coach", "Diplomat", "Marketing Director"]
+    },
+    ENTJ: {
+      name: "The Commander",
+      desc: "ENTJs are bold, decisive, and strong-willed natural leaders who see inefficiency as a problem to be solved. They set ambitious goals and mobilize people and resources with relentless determination. Their strategic vision, confidence, and ability to make tough decisions under pressure make them exceptionally effective in leadership roles.",
+      strengths: ["Efficient", "Confident", "Strategic", "Charismatic", "Strong-willed"],
+      weaknesses: ["Stubborn", "Intolerant", "Impatient", "Emotionally distant"],
+      careers: ["CEO", "Management Consultant", "Entrepreneur", "University Professor", "Corporate Strategist"]
+    }
+  };
+
+  var STORAGE_KEY = 'toolcalcs_personality-type-test_history';
+  var MAX_HISTORY = 20;
+
+  var scores = { EI: 0, SN: 0, TF: 0, JP: 0 };
+  var currentQ = 0;
+  var shuffled = [];
+
+  var instructionsView = document.getElementById('instructionsView');
+  var quizView = document.getElementById('quizView');
+  var resultView = document.getElementById('resultView');
+  var startBtn = document.getElementById('startBtn');
+  var retakeBtn = document.getElementById('retakeBtn');
+  var progressText = document.getElementById('progressText');
+  var progressFill = document.getElementById('progressFill');
+  var questionText = document.getElementById('questionText');
+  var optionsContainer = document.getElementById('optionsContainer');
+  var resultType = document.getElementById('resultType');
+  var resultName = document.getElementById('resultName');
+  var resultDesc = document.getElementById('resultDesc');
+  var dimensionChart = document.getElementById('dimensionChart');
+  var strengthsUl = document.getElementById('strengthsUl');
+  var weaknessesUl = document.getElementById('weaknessesUl');
+  var careersUl = document.getElementById('careersUl');
+  var attemptHistorySection = document.getElementById('attemptHistory');
+  var historyList = document.getElementById('historyList');
+
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i];
+      a[i] = a[j];
+      a[j] = tmp;
+    }
+    return a;
+  }
+
+  function showView(view) {
+    instructionsView.style.display = 'none';
+    quizView.style.display = 'none';
+    resultView.style.display = 'none';
+    view.style.display = '';
+  }
+
+  function loadHistory() {
+    try { var r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch (e) {}
+    return [];
+  }
+
+  function saveHistory(h) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch (e) {}
+  }
+
+  function addToHistory(typeCode) {
+    var h = loadHistory();
+    var t = types[typeCode];
+    h.unshift({ score: typeCode, name: t ? t.name : '', date: new Date().toISOString() });
+    saveHistory(h);
+  }
+
+  function formatDate(iso) {
+    try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    catch (e) { return ''; }
+  }
+
+  function renderHistory() {
+    var history = loadHistory();
+    if (history.length === 0) { attemptHistorySection.hidden = true; return; }
+    attemptHistorySection.hidden = false;
+    historyList.innerHTML = history.map(function (e) {
+      return '<div class="history-item">' +
+        '<span class="history-score">' + e.score + '</span>' +
+        '<span class="history-rating" style="background:#2563eb">' + (e.name || '') + '</span>' +
+        '<span class="history-time">' + formatDate(e.date) + '</span>' +
+      '</div>';
+    }).join('');
+  }
+
+  function startQuiz() {
+    scores = { EI: 0, SN: 0, TF: 0, JP: 0 };
+    currentQ = 0;
+    shuffled = shuffle(questions);
+    showView(quizView);
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    var q = shuffled[currentQ];
+    progressText.textContent = 'Question ' + (currentQ + 1) + ' of ' + shuffled.length;
+    progressFill.style.width = Math.round(((currentQ) / shuffled.length) * 100) + '%';
+    questionText.textContent = q.text;
+
+    optionsContainer.innerHTML = '';
+    var opts = Math.random() < 0.5 ? [q.options[0], q.options[1]] : [q.options[1], q.options[0]];
+    for (var i = 0; i < opts.length; i++) {
+      (function (opt) {
+        var btn = document.createElement('button');
+        btn.className = 'quiz-option';
+        btn.type = 'button';
+        btn.textContent = opt.label;
+        btn.addEventListener('click', function () {
+          handleAnswer(opt);
+        });
+        optionsContainer.appendChild(btn);
+      })(opts[i]);
+    }
+  }
+
+  function handleAnswer(opt) {
+    scores[opt.dim] += opt.val;
+
+    var btns = optionsContainer.querySelectorAll('.quiz-option');
+    for (var i = 0; i < btns.length; i++) {
+      if (btns[i].textContent === opt.label) {
+        btns[i].classList.add('selected');
+      }
+      btns[i].style.pointerEvents = 'none';
+    }
+
+    currentQ++;
+    if (currentQ >= shuffled.length) {
+      setTimeout(function () { showResult(); }, 350);
+    } else {
+      setTimeout(function () { renderQuestion(); }, 350);
+    }
+  }
+
+  function determineType() {
+    var e = scores.EI >= 0 ? 'E' : 'I';
+    var n = scores.SN >= 0 ? 'N' : 'S';
+    var t = scores.TF >= 0 ? 'T' : 'F';
+    var j = scores.JP >= 0 ? 'J' : 'P';
+    return e + n + t + j;
+  }
+
+  function showResult() {
+    var typeCode = determineType();
+    var typeData = types[typeCode];
+    if (!typeData) { typeData = types['INFJ']; }
+
+    showView(resultView);
+    resultType.textContent = typeCode;
+    resultName.textContent = typeData.name;
+    resultDesc.textContent = typeData.desc;
+
+    var maxScore = 10;
+    var dims = [
+      { left: 'E', right: 'I', key: 'EI', leftLabel: 'Extraversion', rightLabel: 'Introversion' },
+      { left: 'S', right: 'N', key: 'SN', leftLabel: 'Sensing', rightLabel: 'Intuition' },
+      { left: 'T', right: 'F', key: 'TF', leftLabel: 'Thinking', rightLabel: 'Feeling' },
+      { left: 'J', right: 'P', key: 'JP', leftLabel: 'Judging', rightLabel: 'Perceiving' }
+    ];
+
+    dimensionChart.innerHTML = '';
+    for (var i = 0; i < dims.length; i++) {
+      var d = dims[i];
+      var raw = scores[d.key];
+      var leftPct = Math.round(50 + (raw / maxScore) * 50);
+      if (leftPct > 100) leftPct = 100;
+      if (leftPct < 0) leftPct = 0;
+      var rightPct = 100 - leftPct;
+
+      var item = document.createElement('div');
+      item.className = 'quiz-bar-item';
+      item.innerHTML =
+        '<div class="quiz-bar-label">' +
+          '<span>' + d.leftLabel + ' ' + leftPct + '%</span>' +
+          '<span>' + d.rightLabel + ' ' + rightPct + '%</span>' +
+        '</div>' +
+        '<div class="quiz-bar-track">' +
+          '<div class="quiz-bar-fill" style="width:' + leftPct + '%"></div>' +
+        '</div>';
+      dimensionChart.appendChild(item);
+    }
+
+    strengthsUl.innerHTML = '';
+    for (var s = 0; s < typeData.strengths.length; s++) {
+      var li = document.createElement('li');
+      li.textContent = typeData.strengths[s];
+      strengthsUl.appendChild(li);
+    }
+
+    weaknessesUl.innerHTML = '';
+    for (var w = 0; w < typeData.weaknesses.length; w++) {
+      var li2 = document.createElement('li');
+      li2.textContent = typeData.weaknesses[w];
+      weaknessesUl.appendChild(li2);
+    }
+
+    careersUl.innerHTML = '';
+    for (var c = 0; c < typeData.careers.length; c++) {
+      var li3 = document.createElement('li');
+      li3.textContent = typeData.careers[c];
+      careersUl.appendChild(li3);
+    }
+
+    progressFill.style.width = '100%';
+
+    addToHistory(typeCode);
+    renderHistory();
+
+    if (window.GameShare) {
+      window.GameShare.show({
+        gameName: gameName,
+        gameSlug: gameSlug,
+        gameIcon: gameIcon,
+        score: typeCode,
+        unit: metricUnit,
+        metricLabel: metricLabel,
+        ratingLabel: typeData.name,
+        ratingColor: '#2563eb'
+      });
+    }
+  }
+
+  startBtn.addEventListener('click', startQuiz);
+  retakeBtn.addEventListener('click', startQuiz);
+  renderHistory();
+})();
+</script>

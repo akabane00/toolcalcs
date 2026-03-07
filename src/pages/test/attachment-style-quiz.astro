@@ -1,0 +1,503 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import GameShare from '../../components/GameShare.astro';
+import '../../styles/game.css';
+import '../../styles/quiz.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tests & Games", "item": "https://toolcalcs.com/test/" },
+      { "@type": "ListItem", "position": 3, "name": "Attachment Style Quiz" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Attachment Style Quiz",
+    "url": "https://toolcalcs.com/test/attachment-style-quiz/",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Free attachment style quiz with 25 questions. Discover if you're Secure, Anxious, Avoidant, or Fearful-Avoidant. Understand your relationship patterns."
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What are the 4 attachment styles?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The four attachment styles are Secure, Anxious-Preoccupied, Dismissive-Avoidant, and Fearful-Avoidant (also called Disorganized). Secure individuals are comfortable with intimacy and independence. Anxious individuals crave closeness and fear abandonment. Avoidant individuals value self-sufficiency and distance. Fearful-Avoidant individuals desire closeness but also fear it, creating a push-pull dynamic in relationships.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Can your attachment style change?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes, attachment styles can change over time. While your attachment style is initially shaped in early childhood, it is not fixed for life. Therapy, self-awareness, and healthy relationship experiences can help individuals move toward a more secure attachment style. This process is sometimes called "earned security." Significant life events, both positive and negative, can also shift your attachment patterns.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What causes insecure attachment?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Insecure attachment typically develops from inconsistent, unavailable, or frightening caregiving during early childhood. Anxious attachment often results from inconsistent responsiveness — sometimes the caregiver is nurturing, other times absent. Avoidant attachment develops when caregivers consistently discourage emotional expression. Fearful-Avoidant attachment often stems from environments where the caregiver was both a source of comfort and fear, such as in cases of trauma or neglect.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How does attachment style affect relationships?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Attachment style profoundly influences how you behave in romantic relationships. It affects how you handle conflict, express emotions, seek or avoid closeness, and respond to your partner\'s needs. Secure individuals tend to have the most satisfying relationships. Anxious individuals may become clingy or jealous. Avoidant individuals may emotionally withdraw. Fearful-Avoidant individuals may swing between seeking and rejecting intimacy. Understanding your style helps you build healthier relationship patterns.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is the most common attachment style?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Research suggests that approximately 55-65% of the general population has a Secure attachment style. Among insecure styles, Avoidant attachment accounts for roughly 20-25%, Anxious attachment for about 15-20%, and Fearful-Avoidant for approximately 5-10%. These percentages can vary across cultures and populations. Having an insecure attachment style is common and does not mean something is wrong with you — it simply reflects your early relational experiences.',
+        },
+      },
+    ],
+  }
+];
+---
+
+<BaseLayout
+  title="Attachment Style Quiz - Discover Your Attachment Type | ToolCalcs"
+  description="Free attachment style quiz with 25 questions. Discover if you're Secure, Anxious, Avoidant, or Fearful-Avoidant. Understand your relationship patterns."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/test/">Tests & Games</a> &rsaquo;
+    <span>Attachment Style Quiz</span>
+  </nav>
+
+  <h1>Attachment Style Quiz</h1>
+  <p class="page-desc">Answer 25 questions to discover your attachment style. Are you Secure, Anxious, Avoidant, or Fearful-Avoidant?</p>
+
+  <div class="game-box">
+    <div class="game-area" id="gameArea" role="region" aria-label="Attachment style quiz area" aria-live="polite">
+      <div class="game-instructions" id="instructionsView">
+        <h2>Attachment Style Quiz</h2>
+        <p>Rate how much each statement describes you in close relationships. There are no right or wrong answers — be as honest as possible.</p>
+        <button class="game-btn primary" id="startBtn" type="button" style="margin-top:16px;">Start Quiz</button>
+      </div>
+
+      <div class="play-view" id="playView" style="display:none;">
+        <div class="quiz-progress">
+          <div class="quiz-progress-text" id="progressText">Question 1 of 25</div>
+          <div class="quiz-progress-bar">
+            <div class="quiz-progress-fill" id="progressFill" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="quiz-question">
+          <div class="quiz-question-text" id="questionText"></div>
+        </div>
+        <div class="quiz-likert" id="likertButtons"></div>
+      </div>
+
+      <div class="result-view" id="resultView" style="display:none;">
+        <div class="quiz-result" id="quizResult"></div>
+        <button class="game-btn primary" id="retakeBtn" type="button" style="margin-top:16px;">Retake Quiz</button>
+      </div>
+    </div>
+
+    <GameShare />
+
+    <div class="attempt-history" id="attemptHistory" hidden>
+      <h3>Quiz History</h3>
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is Attachment Theory?</h2>
+    <p>Attachment theory is one of the most influential frameworks in modern psychology for understanding how humans form emotional bonds. Originally developed by British psychiatrist <strong>John Bowlby</strong> in the 1950s and 1960s, attachment theory proposes that the quality of the bond between an infant and their primary caregiver shapes the child's emotional development and influences their relationships throughout life. Bowlby believed that humans are biologically wired to seek proximity to attachment figures, especially during times of stress, danger, or vulnerability.</p>
+    <p>Bowlby's work was significantly expanded by developmental psychologist <strong>Mary Ainsworth</strong>, whose groundbreaking research in the 1970s introduced the concept of distinct attachment styles. Ainsworth's famous <strong>"Strange Situation"</strong> experiment observed how infants (aged 12-18 months) responded when briefly separated from their mothers and then reunited. By carefully coding the infants' behaviors — how distressed they became during separation and how they reacted upon the mother's return — Ainsworth identified three primary attachment patterns: secure, anxious-ambivalent, and avoidant. A fourth category, disorganized attachment, was later added by researchers Mary Main and Judith Solomon in the 1980s.</p>
+    <p>In the late 1980s, psychologists <strong>Cindy Hazan and Phillip Shaver</strong> extended attachment theory into the realm of adult romantic relationships. They demonstrated that the same attachment patterns observed in infants could be found in how adults relate to their romantic partners. This was a pivotal moment in psychology — it showed that attachment is not just a childhood phenomenon but a lifelong process that shapes how we love, argue, seek comfort, and navigate intimacy.</p>
+
+    <h2>The 4 Attachment Styles</h2>
+    <p>Modern attachment research recognizes four primary attachment styles in adults. Each style reflects a distinct pattern of thinking, feeling, and behaving in close relationships. While most people have a dominant style, it is common to show traits of more than one style depending on context and relationship dynamics.</p>
+
+    <h3>Secure Attachment</h3>
+    <p>Individuals with a secure attachment style are comfortable with both emotional intimacy and independence. They trust their partners, communicate their needs openly, and are able to support their partners in return. Securely attached people do not fear abandonment or feel uncomfortable with closeness. When conflict arises, they tend to address issues directly and constructively rather than withdrawing or escalating. Research consistently shows that securely attached individuals report the highest levels of relationship satisfaction, emotional well-being, and resilience to stress. Approximately 55-65% of the general population is estimated to have a secure attachment style.</p>
+
+    <h3>Anxious-Preoccupied Attachment</h3>
+    <p>People with an anxious-preoccupied attachment style have a deep desire for closeness and a persistent worry that their partner does not love them as much as they love their partner. They tend to be hypervigilant to signs of rejection and may interpret neutral behaviors as evidence that their partner is losing interest. They often seek frequent reassurance, may become upset by perceived changes in a partner's mood, and can experience intense jealousy or possessiveness. While their emotional attunement can make them deeply caring partners, the constant anxiety can also create a self-fulfilling prophecy — their need for reassurance may push partners away, confirming their worst fears.</p>
+
+    <h3>Dismissive-Avoidant Attachment</h3>
+    <p>Individuals with a dismissive-avoidant style place a high value on independence and self-sufficiency. They tend to suppress their emotions and may feel uncomfortable when partners express strong emotional needs. Avoidant individuals often maintain emotional distance in relationships, may be reluctant to commit, and tend to withdraw when conversations become too emotionally intense. They often pride themselves on not needing others and may view emotional dependency as a weakness. While they are capable of forming relationships, their partners frequently report feeling emotionally shut out or undervalued. Underneath the surface, however, avoidant individuals often do desire connection — they have simply learned to protect themselves by keeping emotional distance.</p>
+
+    <h3>Fearful-Avoidant (Disorganized) Attachment</h3>
+    <p>The fearful-avoidant style, sometimes called disorganized attachment, is characterized by a fundamental conflict: the individual simultaneously craves emotional closeness and fears it. This creates a distinctive push-pull dynamic where they may draw close to a partner only to suddenly withdraw when vulnerability feels overwhelming. People with this style often have difficulty regulating their emotions, may oscillate between anxious and avoidant behaviors, and can appear unpredictable to their partners. This style is most commonly associated with experiences of trauma, loss, or frightening caregiving during childhood, where the attachment figure was both a source of comfort and a source of fear.</p>
+
+    <h2>How Attachment Styles Develop</h2>
+    <p>Attachment styles are primarily shaped during the first few years of life through interactions with primary caregivers. When a caregiver is consistently responsive, warm, and attuned to the child's emotional needs, the child develops a secure internal working model — a belief that they are worthy of love and that others can be trusted. This becomes the foundation for secure attachment.</p>
+    <p>When caregiving is <strong>inconsistent</strong> — sometimes responsive, sometimes neglectful — the child learns that love is available but unreliable. This uncertainty often leads to anxious attachment, as the child learns to cling and protest in order to maintain the caregiver's attention. When caregiving is <strong>consistently dismissive</strong> of emotional needs — when a child learns that expressing distress leads to rejection — the child adapts by suppressing emotions and developing avoidant attachment. When caregiving is <strong>frightening or chaotic</strong> — as in cases of abuse or severe instability — the child develops fearful-avoidant attachment, unable to develop a coherent strategy for maintaining safety.</p>
+    <p>However, attachment patterns are not permanently set in stone. Research has demonstrated that attachment styles can and do <strong>change across the lifespan</strong>. Positive relationship experiences in adolescence and adulthood, meaningful friendships, effective psychotherapy, and deliberate self-reflection can all help an individual shift from insecure to secure attachment. This process, known as <strong>"earned security,"</strong> shows that your early experiences influence but do not determine your relational future.</p>
+
+    <h2>Attachment Styles in Adult Relationships</h2>
+    <p>Understanding how each attachment style manifests in adult romantic relationships is key to improving relationship dynamics. Here is how each style typically shows up:</p>
+    <ul>
+      <li><strong>Secure + Secure:</strong> Both partners communicate openly, resolve conflicts constructively, and feel safe expressing vulnerability. This pairing typically results in high relationship satisfaction for both individuals.</li>
+      <li><strong>Anxious + Avoidant:</strong> This is one of the most common insecure pairings and often creates a "pursuer-distancer" dynamic. The anxious partner seeks closeness while the avoidant partner withdraws, intensifying both partners' insecurities. Despite the friction, this pairing is remarkably common because each style unconsciously confirms the other's worldview.</li>
+      <li><strong>Anxious + Anxious:</strong> Both partners may experience high emotional intensity, frequent reassurance-seeking, and amplified fears of abandonment. While there may be strong passion, the relationship can become emotionally volatile without external support or secure role models.</li>
+      <li><strong>Avoidant + Avoidant:</strong> This pairing may appear stable on the surface due to shared emotional distance, but it often lacks deep intimacy. Both partners may feel unfulfilled without understanding why, as neither is comfortable initiating emotional vulnerability.</li>
+    </ul>
+    <p>The good news is that any combination of styles can lead to a fulfilling relationship when both partners are willing to understand their patterns and work toward more secure functioning. A securely attached partner can serve as a stabilizing force for an insecurely attached individual, helping them develop more secure behaviors over time.</p>
+
+    <h2>Moving Toward Secure Attachment</h2>
+    <p>Regardless of your current attachment style, moving toward a more secure way of relating is possible. Here are evidence-based strategies for developing earned security:</p>
+    <ul>
+      <li><strong>Develop self-awareness:</strong> Understanding your patterns is the first step. Reflect on how you behave in relationships — do you tend to cling, withdraw, or oscillate between the two? Recognizing your habitual responses gives you the power to choose differently.</li>
+      <li><strong>Seek therapy:</strong> Approaches such as Emotionally Focused Therapy (EFT), Cognitive Behavioral Therapy (CBT), and psychodynamic therapy have all shown effectiveness in helping individuals develop more secure attachment patterns. A skilled therapist can help you explore how your early experiences shaped your current relational behaviors.</li>
+      <li><strong>Practice vulnerability:</strong> Secure attachment requires the ability to be vulnerable with safe people. Start small — share a feeling, ask for help, express a need — and build from there. Over time, these small acts of vulnerability can rewire your internal working model.</li>
+      <li><strong>Choose secure partners:</strong> Surrounding yourself with securely attached friends and partners can provide a corrective emotional experience. Secure individuals model healthy communication, emotional availability, and respectful boundaries.</li>
+      <li><strong>Regulate your nervous system:</strong> Insecure attachment is closely linked to nervous system dysregulation. Practices such as mindfulness meditation, deep breathing, yoga, and regular exercise can help you stay grounded during emotional activation, reducing reactive behaviors.</li>
+    </ul>
+
+    <h2>How This Quiz Works</h2>
+    <p>This attachment style quiz presents you with 25 statements about how you feel and behave in close relationships. For each statement, you rate your agreement on a 5-point Likert scale ranging from "Strongly Disagree" to "Strongly Agree." The statements are designed to measure tendencies associated with each of the four attachment styles: Secure, Anxious-Preoccupied, Dismissive-Avoidant, and Fearful-Avoidant.</p>
+    <p>Your responses are scored by adding up the values for each attachment dimension. The dimension with the highest percentage score is identified as your primary attachment style. The quiz also displays your scores across all four dimensions as a bar chart, allowing you to see how strongly you identify with each style. Most people are not purely one style — you may have a primary style with secondary tendencies from another category.</p>
+    <p>Please note that this quiz is a self-report tool intended for educational and self-reflection purposes. It is not a clinical diagnostic instrument. For a thorough assessment of your attachment style, consider working with a licensed therapist or psychologist who specializes in attachment-based approaches. Your results may also vary depending on your current mood, recent relationship experiences, and the specific relationships you have in mind while answering.</p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What are the 4 attachment styles?</h3>
+    <p>The four attachment styles are Secure, Anxious-Preoccupied, Dismissive-Avoidant, and Fearful-Avoidant (also called Disorganized). Secure individuals are comfortable with intimacy and independence. Anxious individuals crave closeness and fear abandonment. Avoidant individuals value self-sufficiency and distance. Fearful-Avoidant individuals desire closeness but also fear it, creating a push-pull dynamic in relationships.</p>
+
+    <h3>Can your attachment style change?</h3>
+    <p>Yes, attachment styles can change over time. While your attachment style is initially shaped in early childhood, it is not fixed for life. Therapy, self-awareness, and healthy relationship experiences can help individuals move toward a more secure attachment style. This process is sometimes called "earned security." Significant life events, both positive and negative, can also shift your attachment patterns.</p>
+
+    <h3>What causes insecure attachment?</h3>
+    <p>Insecure attachment typically develops from inconsistent, unavailable, or frightening caregiving during early childhood. Anxious attachment often results from inconsistent responsiveness. Avoidant attachment develops when caregivers consistently discourage emotional expression. Fearful-Avoidant attachment often stems from environments where the caregiver was both a source of comfort and fear.</p>
+
+    <h3>How does attachment style affect relationships?</h3>
+    <p>Attachment style profoundly influences how you behave in romantic relationships. It affects how you handle conflict, express emotions, seek or avoid closeness, and respond to your partner's needs. Secure individuals tend to have the most satisfying relationships. Anxious individuals may become clingy. Avoidant individuals may emotionally withdraw. Fearful-Avoidant individuals may swing between seeking and rejecting intimacy.</p>
+
+    <h3>What is the most common attachment style?</h3>
+    <p>Research suggests that approximately 55-65% of the general population has a Secure attachment style. Among insecure styles, Avoidant attachment accounts for roughly 20-25%, Anxious attachment for about 15-20%, and Fearful-Avoidant for approximately 5-10%. These percentages can vary across cultures and populations. Having an insecure attachment style is common and does not mean something is wrong with you.</p>
+  </article>
+
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .game-area { cursor: default; user-select: auto; -webkit-user-select: auto; }
+</style>
+
+<script define:vars={{ gameName: "Attachment Style Quiz", gameSlug: "attachment-style-quiz", gameIcon: "\uD83D\uDD17", metricLabel: "Attachment Style", metricUnit: "" }}>
+(function () {
+  'use strict';
+
+  var questions = [
+    { text: "I find it easy to get close to others.", dim: "secure" },
+    { text: "I worry that my partner doesn't really love me.", dim: "anxious" },
+    { text: "I prefer not to depend on others.", dim: "avoidant" },
+    { text: "I want close relationships but find it hard to fully trust others.", dim: "fearful" },
+    { text: "I am comfortable depending on my partner and having them depend on me.", dim: "secure" },
+    { text: "I often worry that my partner will leave me.", dim: "anxious" },
+    { text: "I feel uncomfortable when others get too emotionally close.", dim: "avoidant" },
+    { text: "I sometimes push people away even though I want them close.", dim: "fearful" },
+    { text: "I feel confident that my partner is there for me when I need them.", dim: "secure" },
+    { text: "I need a lot of reassurance that I am loved.", dim: "anxious" },
+    { text: "I value my independence more than having close relationships.", dim: "avoidant" },
+    { text: "I feel torn between wanting intimacy and being afraid of getting hurt.", dim: "fearful" },
+    { text: "I can openly share my feelings with my partner without fear of judgment.", dim: "secure" },
+    { text: "When my partner is away, I worry about them being attracted to someone else.", dim: "anxious" },
+    { text: "I find it difficult to ask others for help even when I need it.", dim: "avoidant" },
+    { text: "My desire for closeness sometimes scares people away.", dim: "fearful" },
+    { text: "I handle conflict in relationships by discussing issues calmly.", dim: "secure" },
+    { text: "Small changes in my partner's mood make me anxious about our relationship.", dim: "anxious" },
+    { text: "I feel more comfortable handling my emotions on my own.", dim: "avoidant" },
+    { text: "I have been told that I send mixed signals in relationships.", dim: "fearful" },
+    { text: "I trust that most people have good intentions.", dim: "secure" },
+    { text: "I tend to fall in love quickly and intensely.", dim: "anxious" },
+    { text: "When a relationship gets too serious, I feel an urge to pull back.", dim: "avoidant" },
+    { text: "I crave emotional connection but often feel unworthy of it.", dim: "fearful" },
+    { text: "I feel secure and at ease in my closest relationships.", dim: "secure" }
+  ];
+
+  var styles = {
+    secure: {
+      name: "Secure",
+      icon: "\uD83D\uDEE1\uFE0F",
+      color: "#22c55e",
+      desc: "You are comfortable with emotional intimacy and interdependence. You trust your partner, communicate openly, and can balance closeness with healthy independence. You feel worthy of love and expect others to be responsive to your needs.",
+      traits: ["Comfortable with closeness", "Trusting", "Good communicator", "Emotionally available", "Resilient in conflict"],
+      tips: ["Continue nurturing open communication", "Be patient with partners who have different attachment styles", "Model secure behavior for those around you", "Maintain your healthy boundaries"]
+    },
+    anxious: {
+      name: "Anxious-Preoccupied",
+      icon: "\uD83D\uDCAD",
+      color: "#f59e0b",
+      desc: "You crave closeness and worry about your relationships. You may seek frequent reassurance, fear abandonment, and be highly attuned to your partner's moods and behaviors. Your desire for connection is strong, but anxiety can sometimes push people away.",
+      traits: ["Deeply caring", "Highly attuned to others", "Seeks reassurance", "Fear of abandonment", "Emotionally expressive"],
+      tips: ["Practice self-soothing techniques", "Communicate needs directly rather than testing your partner", "Build self-worth independent of relationships", "Challenge catastrophic thinking patterns"]
+    },
+    avoidant: {
+      name: "Dismissive-Avoidant",
+      icon: "\uD83C\uDFD4\uFE0F",
+      color: "#3b82f6",
+      desc: "You value independence and self-sufficiency highly. You may feel uncomfortable with too much closeness and tend to suppress emotions. While you can form relationships, you prefer maintaining emotional distance and may withdraw when things get too intimate.",
+      traits: ["Self-reliant", "Emotionally controlled", "Values independence", "Uncomfortable with neediness", "Private"],
+      tips: ["Practice identifying and expressing emotions", "Challenge beliefs that needing others is weakness", "Allow vulnerability in small, safe steps", "Recognize that interdependence is healthy"]
+    },
+    fearful: {
+      name: "Fearful-Avoidant",
+      icon: "\uD83C\uDF0A",
+      color: "#ef4444",
+      desc: "You experience a push-pull dynamic in relationships \u2014 desiring closeness but fearing it at the same time. You may oscillate between seeking connection and withdrawing. This style often stems from past experiences where caregivers were both a source of comfort and fear.",
+      traits: ["Complex emotional world", "Push-pull dynamics", "Difficulty trusting", "Desires connection", "Fears rejection"],
+      tips: ["Work with a therapist to process past experiences", "Practice staying present during emotional discomfort", "Build trust gradually with safe people", "Develop awareness of your push-pull patterns"]
+    }
+  };
+
+  var LIKERT_LABELS = ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"];
+  var LIKERT_VALUES = [1, 2, 3, 4, 5];
+
+  var STORAGE_KEY = 'toolcalcs_attachment-style-quiz_history';
+  var MAX_HISTORY = 20;
+
+  function loadHistory() {
+    try { var r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch (e) {}
+    return [];
+  }
+  function saveHistory(h) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch (e) {}
+  }
+  function addToHistory(styleName, color) {
+    var h = loadHistory();
+    h.unshift({ score: styleName, date: new Date().toISOString(), color: color });
+    saveHistory(h);
+  }
+
+  // DOM
+  var instructionsView = document.getElementById('instructionsView');
+  var playView = document.getElementById('playView');
+  var resultView = document.getElementById('resultView');
+  var startBtn = document.getElementById('startBtn');
+  var retakeBtn = document.getElementById('retakeBtn');
+  var progressText = document.getElementById('progressText');
+  var progressFill = document.getElementById('progressFill');
+  var questionText = document.getElementById('questionText');
+  var likertButtons = document.getElementById('likertButtons');
+  var quizResult = document.getElementById('quizResult');
+  var attemptHistorySection = document.getElementById('attemptHistory');
+  var historyList = document.getElementById('historyList');
+
+  var shuffled = [];
+  var currentIndex = 0;
+  var scores = { secure: 0, anxious: 0, avoidant: 0, fearful: 0 };
+
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i];
+      a[i] = a[j];
+      a[j] = tmp;
+    }
+    return a;
+  }
+
+  function showView(view) {
+    [instructionsView, playView, resultView].forEach(function (v) { v.style.display = 'none'; });
+    view.style.display = '';
+  }
+
+  function countQuestionsPerDim() {
+    var counts = { secure: 0, anxious: 0, avoidant: 0, fearful: 0 };
+    for (var i = 0; i < questions.length; i++) {
+      counts[questions[i].dim]++;
+    }
+    return counts;
+  }
+
+  function renderQuestion() {
+    var q = shuffled[currentIndex];
+    var num = currentIndex + 1;
+    var total = shuffled.length;
+    progressText.textContent = 'Question ' + num + ' of ' + total;
+    progressFill.style.width = Math.round((num / total) * 100) + '%';
+    questionText.textContent = q.text;
+
+    likertButtons.innerHTML = '';
+    for (var i = 0; i < LIKERT_LABELS.length; i++) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'quiz-option';
+      btn.textContent = LIKERT_LABELS[i];
+      btn.dataset.value = String(LIKERT_VALUES[i]);
+      likertButtons.appendChild(btn);
+    }
+  }
+
+  function handleLikertClick(e) {
+    var target = e.target;
+    if (!target || !target.dataset || !target.dataset.value) return;
+
+    var val = parseInt(target.dataset.value, 10);
+    var q = shuffled[currentIndex];
+    scores[q.dim] += val;
+
+    // Brief highlight
+    target.classList.add('selected');
+
+    setTimeout(function () {
+      currentIndex++;
+      if (currentIndex >= shuffled.length) {
+        showResults();
+      } else {
+        renderQuestion();
+      }
+    }, 200);
+  }
+
+  function showResults() {
+    showView(resultView);
+
+    var dimCounts = countQuestionsPerDim();
+    var pcts = {};
+    var topKey = 'secure';
+    var topPct = 0;
+
+    var dims = ['secure', 'anxious', 'avoidant', 'fearful'];
+    for (var i = 0; i < dims.length; i++) {
+      var d = dims[i];
+      var minPossible = dimCounts[d] * 1;
+      var maxPossible = dimCounts[d] * 5;
+      var raw = scores[d];
+      var pct = Math.round(((raw - minPossible) / (maxPossible - minPossible)) * 100);
+      pcts[d] = pct;
+      if (pct > topPct) {
+        topPct = pct;
+        topKey = d;
+      }
+    }
+
+    var topStyle = styles[topKey];
+
+    // Build result HTML
+    var html = '';
+    html += '<div class="quiz-result-type" style="color:' + topStyle.color + '">' + topStyle.icon + ' ' + topStyle.name + '</div>';
+    html += '<div class="quiz-result-name">Your Primary Attachment Style</div>';
+    html += '<div class="quiz-result-desc">' + topStyle.desc + '</div>';
+
+    // Bar chart
+    html += '<div class="quiz-bar-chart">';
+    for (var j = 0; j < dims.length; j++) {
+      var dk = dims[j];
+      var st = styles[dk];
+      html += '<div class="quiz-bar-item">';
+      html += '<div class="quiz-bar-label"><span>' + st.icon + ' ' + st.name + '</span><span>' + pcts[dk] + '%</span></div>';
+      html += '<div class="quiz-bar-track"><div class="quiz-bar-fill" style="width:' + pcts[dk] + '%;background:' + st.color + '"></div></div>';
+      html += '</div>';
+    }
+    html += '</div>';
+
+    // Traits
+    html += '<div class="quiz-traits strengths"><h3>Key Traits</h3><ul>';
+    for (var t = 0; t < topStyle.traits.length; t++) {
+      html += '<li>' + topStyle.traits[t] + '</li>';
+    }
+    html += '</ul></div>';
+
+    // Tips
+    html += '<div class="quiz-traits careers"><h3>Tips for Your Style</h3><ul>';
+    for (var p = 0; p < topStyle.tips.length; p++) {
+      html += '<li>' + topStyle.tips[p] + '</li>';
+    }
+    html += '</ul></div>';
+
+    // Toward Secure section
+    html += '<div class="quiz-related">';
+    html += '<h3>Toward Secure Attachment</h3>';
+    html += '<p style="text-align:left;font-size:0.9rem;color:var(--color-text-muted);line-height:1.6;margin-bottom:0;">';
+    html += 'No matter your current style, moving toward secure attachment is possible. ';
+    html += 'Practice open communication, develop emotional awareness, seek supportive relationships, ';
+    html += 'and consider working with a therapist who specializes in attachment-based approaches. ';
+    html += 'Small, consistent steps toward vulnerability and trust can gradually reshape your relational patterns.';
+    html += '</p>';
+    html += '</div>';
+
+    quizResult.innerHTML = html;
+
+    addToHistory(topStyle.name, topStyle.color);
+    renderHistory();
+
+    if (window.GameShare) {
+      window.GameShare.show({
+        gameName: gameName,
+        gameSlug: gameSlug,
+        gameIcon: topStyle.icon,
+        score: topStyle.name,
+        unit: '',
+        metricLabel: metricLabel,
+        ratingLabel: topStyle.name,
+        ratingColor: topStyle.color
+      });
+    }
+  }
+
+  function startQuiz() {
+    shuffled = shuffle(questions);
+    currentIndex = 0;
+    scores = { secure: 0, anxious: 0, avoidant: 0, fearful: 0 };
+    showView(playView);
+    renderQuestion();
+
+    if (window.GameShare) {
+      window.GameShare.hide();
+    }
+  }
+
+  function renderHistory() {
+    var history = loadHistory();
+    if (history.length === 0) { attemptHistorySection.hidden = true; return; }
+    attemptHistorySection.hidden = false;
+    var items = '';
+    for (var i = 0; i < history.length; i++) {
+      var e = history[i];
+      items += '<div class="history-item">';
+      items += '<span class="history-score">' + e.score + '</span>';
+      items += '<span class="history-rating" style="background:' + (e.color || '#2563eb') + '">' + e.score + '</span>';
+      items += '<span class="history-time">' + formatDate(e.date) + '</span>';
+      items += '</div>';
+    }
+    historyList.innerHTML = items;
+  }
+
+  function formatDate(iso) {
+    try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    catch (e) { return ''; }
+  }
+
+  // Events
+  likertButtons.addEventListener('click', handleLikertClick);
+  startBtn.addEventListener('click', startQuiz);
+  retakeBtn.addEventListener('click', startQuiz);
+  renderHistory();
+})();
+</script>

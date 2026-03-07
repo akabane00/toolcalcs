@@ -1,0 +1,518 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import GameShare from '../../components/GameShare.astro';
+import '../../styles/game.css';
+import '../../styles/quiz.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tests & Games", "item": "https://toolcalcs.com/test/" },
+      { "@type": "ListItem", "position": 3, "name": "Enneagram Test" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Enneagram Test",
+    "url": "https://toolcalcs.com/test/enneagram-test/",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Free Enneagram personality test with 36 questions. Discover your Enneagram type, wing, and growth path. Understand your core motivations and fears."
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is the Enneagram?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The Enneagram is a personality typing system that describes nine distinct types, each with its own core motivation, fear, and worldview. It maps how people think, feel, and behave based on deeply rooted patterns formed in childhood. Unlike trait-based models, the Enneagram focuses on underlying motivations rather than surface behaviors.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What are Enneagram wings?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Wings are the two types adjacent to your core Enneagram type on the Enneagram circle. One wing typically has a stronger influence and adds nuance to your personality. For example, a Type 4 with a 3-wing (4w3) is more ambitious and image-conscious, while a 4w5 is more introspective and cerebral. Your wing does not change your core type but flavors how it is expressed.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Can your Enneagram type change?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Most Enneagram teachers hold that your core type remains the same throughout your life. However, how you express your type can change dramatically depending on your level of psychological health. Through personal growth, therapy, and self-awareness, you can move toward the healthier expressions of your type and integrate qualities from your growth arrow direction.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is the most common Enneagram type?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'There is no definitive scientific data on the most common Enneagram type, as results vary by population and testing method. However, large-scale surveys suggest Type 6 (The Loyalist) and Type 9 (The Peacemaker) are among the most frequently identified types, while Type 5 (The Investigator) and Type 8 (The Challenger) tend to be less commonly reported.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How is the Enneagram different from MBTI?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The MBTI (Myers-Briggs Type Indicator) categorizes people by cognitive preferences such as introversion vs. extraversion and thinking vs. feeling, resulting in 16 types. The Enneagram focuses on core motivations, fears, and desires, producing 9 types with additional nuance from wings and growth/stress arrows. The MBTI describes how you process information, while the Enneagram explores why you behave the way you do.',
+        },
+      },
+    ],
+  }
+];
+---
+
+<BaseLayout
+  title="Enneagram Test - Discover Your Enneagram Type | ToolCalcs"
+  description="Free Enneagram personality test with 36 questions. Discover your Enneagram type, wing, and growth path. Understand your core motivations and fears."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/test/">Tests & Games</a> &rsaquo;
+    <span>Enneagram Test</span>
+  </nav>
+
+  <h1>Enneagram Test</h1>
+  <p class="page-desc">Answer 36 questions to discover your Enneagram type, wing, and growth path. Learn what drives you at your core.</p>
+
+  <div class="game-box">
+    <div class="game-area" id="gameArea" role="region" aria-label="Enneagram personality test area" aria-live="polite">
+      <div class="game-instructions" id="instructionsView">
+        <h2>Discover Your Enneagram Type</h2>
+        <p>This test contains 36 statements. Rate how much each statement describes you on a scale from Strongly Disagree to Strongly Agree. There are no right or wrong answers — go with your gut instinct.</p>
+        <button class="game-btn primary" id="startBtn" type="button" style="margin-top:16px;">Start Test</button>
+      </div>
+
+      <div class="play-view" id="playView" style="display:none;">
+        <div class="quiz-progress">
+          <div class="quiz-progress-text" id="progressText">Question 1 of 36</div>
+          <div class="quiz-progress-bar">
+            <div class="quiz-progress-fill" id="progressFill" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="quiz-question">
+          <div class="quiz-question-text" id="questionText"></div>
+        </div>
+        <div class="quiz-likert" id="likertContainer"></div>
+      </div>
+
+      <div class="result-view" id="resultView" style="display:none;">
+        <div class="quiz-result" id="resultContent"></div>
+      </div>
+    </div>
+
+    <GameShare />
+
+    <div class="attempt-history" id="attemptHistory" hidden>
+      <h3>Attempt History</h3>
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is the Enneagram?</h2>
+    <p>The Enneagram is a powerful personality typing system that describes nine fundamentally different patterns of thinking, feeling, and behaving. The word "Enneagram" comes from the Greek words <em>ennea</em> (nine) and <em>gramma</em> (written or drawn), referring to the nine-pointed geometric figure at the heart of the system. Unlike many personality frameworks that focus on observable traits, the Enneagram dives deeper into the core motivations, fears, and desires that shape how each type sees the world.</p>
+    <p>The origins of the Enneagram are debated among scholars. Some trace elements of the system to ancient spiritual traditions, including the Desert Fathers of early Christianity and Sufi mysticism. The modern Enneagram of personality was developed primarily in the 20th century. Oscar Ichazo, a Bolivian-born philosopher, is credited with connecting the nine points to specific personality fixations in the 1950s and 1960s. His student, Chilean psychiatrist Claudio Naranjo, further developed these ideas by mapping them to psychological patterns and introducing the system to Western psychology in the 1970s. Since then, authors such as Don Richard Riso, Russ Hudson, Helen Palmer, and Beatrice Chestnut have expanded the theory into a comprehensive framework used in personal development, therapy, business leadership, and relationship counseling.</p>
+    <p>What sets the Enneagram apart from other personality models is its dynamic nature. Each type is not a static label but a living pattern that shifts along predictable pathways under stress and growth. The system also accounts for wings, subtypes (self-preservation, social, and one-to-one), and levels of development within each type. This layered approach means that two people of the same core type can look quite different on the surface while sharing the same fundamental motivation underneath.</p>
+
+    <h2>The 9 Enneagram Types</h2>
+    <p>Each of the nine Enneagram types represents a distinct worldview and strategy for navigating life. Here is a brief overview of all nine types:</p>
+    <ul>
+      <li><strong>Type 1 - The Reformer:</strong> Principled, purposeful, and self-controlled. Ones are driven by a desire to be good and to have integrity. They have a strong inner critic and strive for improvement in themselves and the world. At their best, they are wise, ethical, and inspiring. At their worst, they can become rigid, critical, and resentful.</li>
+      <li><strong>Type 2 - The Helper:</strong> Generous, demonstrative, and people-pleasing. Twos focus on the needs of others, often anticipating what people want before they ask. They desire to be loved and needed. Healthy Twos are genuinely caring and empathetic, while unhealthy Twos can become manipulative and possessive, giving to get.</li>
+      <li><strong>Type 3 - The Achiever:</strong> Adaptive, excelling, and driven. Threes are motivated by the need to succeed and to be admired. They are efficient, goal-oriented, and image-conscious. At their best, they are authentic, inspiring role models. Under stress, they may become overly competitive, deceptive, or disconnected from their true feelings.</li>
+      <li><strong>Type 4 - The Individualist:</strong> Expressive, dramatic, and self-absorbed. Fours seek identity and significance, feeling that something essential is missing from their lives. They are drawn to beauty, depth, and authenticity. Healthy Fours are creative and emotionally honest. Unhealthy Fours can become moody, envious, and withdrawn.</li>
+      <li><strong>Type 5 - The Investigator:</strong> Perceptive, innovative, and secretive. Fives are driven by the need to understand the world and to feel competent. They conserve energy and resources, preferring to observe before engaging. At their best, they are visionary and pioneering thinkers. At their worst, they become isolated, detached, and overly cerebral.</li>
+      <li><strong>Type 6 - The Loyalist:</strong> Engaging, responsible, and anxious. Sixes seek security and support, often scanning for potential threats and worst-case scenarios. They are loyal, hardworking, and excellent troubleshooters. Healthy Sixes are courageous and community-minded. Unhealthy Sixes can become paranoid, reactive, and indecisive.</li>
+      <li><strong>Type 7 - The Enthusiast:</strong> Spontaneous, versatile, and scattered. Sevens are motivated by the desire to experience life fully and to avoid pain. They are energetic, optimistic planners who love new possibilities. At their best, they are joyful, grateful, and deeply present. Under stress, they become impulsive, unfocused, and escapist.</li>
+      <li><strong>Type 8 - The Challenger:</strong> Self-confident, decisive, and confrontational. Eights seek to be strong and to protect themselves and others from vulnerability. They are natural leaders who value directness and justice. Healthy Eights are magnanimous and protective. Unhealthy Eights can become domineering, aggressive, and controlling.</li>
+      <li><strong>Type 9 - The Peacemaker:</strong> Receptive, reassuring, and complacent. Nines desire inner stability and peace of mind. They are easygoing mediators who can see all sides of a situation. At their best, they are inclusive, supportive, and deeply connected. At their worst, they become passive, disengaged, and stubborn through inaction.</li>
+    </ul>
+
+    <h2>Understanding Wings</h2>
+    <p>In the Enneagram system, your wing is one of the two types that sit adjacent to your core type on the Enneagram circle. While your core type defines your fundamental motivation and worldview, your wing adds a secondary flavor that influences how your core type is expressed. Most people lean toward one wing more than the other, though it is possible to have a relatively balanced influence from both.</p>
+    <p>For example, a Type 1 can have either a 9-wing (1w9) or a 2-wing (1w2). A 1w9, sometimes called "The Idealist," tends to be more reserved, philosophical, and detached, combining the One's perfectionism with the Nine's desire for inner peace. A 1w2, sometimes called "The Advocate," is warmer, more interpersonal, and driven to help others live up to high standards. Both are still fundamentally Type 1, but the wing creates a noticeably different expression of that type.</p>
+    <p>Understanding your wing can help explain why you might relate to some aspects of an adjacent type. It also provides additional pathways for growth, as you can intentionally develop the positive qualities of both your wings. Some Enneagram practitioners note that your dominant wing may shift over the course of your life, with one wing being more prominent in youth and the other becoming more developed in maturity.</p>
+
+    <h2>Growth and Stress Arrows</h2>
+    <p>One of the most powerful features of the Enneagram is the system of arrows that connect each type to two others, showing predictable patterns of growth (integration) and stress (disintegration). When you are in a healthy, secure state, you naturally take on the positive qualities of your growth arrow type. When you are under prolonged stress, you tend to exhibit the negative qualities of your stress arrow type.</p>
+    <p>The growth and stress directions follow specific paths. For instance, Type 1 moves toward Type 7 in growth, becoming more spontaneous, joyful, and open to new experiences rather than being rigidly focused on perfection. Under stress, Type 1 moves toward Type 4, becoming moody, irrational, and self-pitying rather than maintaining their usual composure. Understanding these arrows gives you early warning signs when you are moving in an unhealthy direction and a clear roadmap for the qualities you can cultivate during times of personal growth.</p>
+    <p>The full pattern of arrows is as follows: 1 goes to 7 in growth and 4 in stress. 2 goes to 4 in growth and 8 in stress. 3 goes to 6 in growth and 9 in stress. 4 goes to 1 in growth and 2 in stress. 5 goes to 8 in growth and 7 in stress. 6 goes to 9 in growth and 3 in stress. 7 goes to 5 in growth and 1 in stress. 8 goes to 2 in growth and 5 in stress. 9 goes to 3 in growth and 6 in stress. These connections create a web of relationships between the types, showing how each type has access to a broader range of personality resources than just their core pattern.</p>
+
+    <h2>How This Test Works</h2>
+    <p>This Enneagram test consists of 36 carefully crafted statements, with four statements corresponding to each of the nine Enneagram types. For each statement, you rate your level of agreement on a five-point Likert scale ranging from Strongly Disagree to Strongly Agree. There are no right or wrong answers. The goal is to respond honestly based on how you actually think and behave, not how you wish you were or how you think you should be.</p>
+    <p>The questions are presented in a randomized order to reduce bias and prevent you from guessing which type a particular question maps to. Your responses are scored by summing the points for each type. The type with the highest total score is identified as your primary Enneagram type. The wing is then calculated by comparing the scores of the two types adjacent to your primary type. The higher-scoring adjacent type becomes your wing designation.</p>
+    <p>While no online test can replace a thorough self-study process or working with a trained Enneagram practitioner, this assessment provides a solid starting point for discovering your type. If your top two or three types are very close in score, consider reading the full descriptions of each and reflecting on which core motivation resonates most deeply with you.</p>
+
+    <h2>The Enneagram in Relationships</h2>
+    <p>The Enneagram is a remarkably useful tool for understanding relationship dynamics. Because it reveals the underlying motivations behind behavior, it helps partners, friends, colleagues, and family members understand not just what someone does, but why they do it. This deeper understanding fosters empathy and reduces the tendency to take another person's behavior personally.</p>
+    <p>Each type has characteristic patterns in relationships. Twos tend to give generously but may struggle to receive. Fives need significant alone time and can withdraw when overwhelmed. Eights value directness and can inadvertently intimidate more sensitive types. Nines may avoid conflict to keep the peace, leading to unexpressed resentment over time. By understanding these patterns, couples and teams can develop strategies for communicating more effectively and meeting each other's core needs.</p>
+    <p>The Enneagram also illuminates common areas of conflict between types. For example, a Type 1 and a Type 7 may clash over structure versus spontaneity, yet they are actually on the same growth arrow, meaning they have much to teach each other. A Type 3 and a Type 4 may struggle with the Achiever's focus on external success versus the Individualist's focus on internal authenticity, but both share a concern with identity and self-worth. Recognizing these complementary tensions can transform conflicts into opportunities for mutual growth.</p>
+    <p>In workplace settings, the Enneagram helps teams understand cognitive diversity. A team of all Threes may be high-performing but lack the reflective depth that Fours and Fives bring. A team heavy in Sixes may be excellent at risk assessment but struggle with the bold innovation that Sevens and Eights provide. Balanced teams that understand each type's contribution tend to be more creative, resilient, and effective.</p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is the Enneagram?</h3>
+    <p>The Enneagram is a personality typing system that identifies nine distinct types, each defined by a core motivation, fear, and desire. It goes beyond surface-level behavior to explore why people think, feel, and act in characteristic ways. The system includes additional layers such as wings, growth and stress arrows, subtypes, and levels of development, making it one of the most nuanced personality frameworks available. It is widely used in personal development, therapy, spiritual growth, and organizational leadership.</p>
+
+    <h3>What are Enneagram wings?</h3>
+    <p>Wings are the two types that sit on either side of your core type on the Enneagram circle. One of these adjacent types typically has a stronger influence on your personality, adding a secondary flavor to your core type. For example, a Type 6 with a 5-wing (6w5) tends to be more analytical and independent, while a 6w7 is more outgoing and adventurous. Your wing does not change your core motivation but modifies how it is expressed in your daily life.</p>
+
+    <h3>Can your Enneagram type change?</h3>
+    <p>The dominant view among Enneagram teachers is that your core type remains stable throughout your life. What changes is your level of health and self-awareness within your type. Through growth work, you can move along the integration arrow and develop qualities associated with other types, but your fundamental motivation and fear remain consistent. Life experiences, therapy, and spiritual practice can all help you express the healthiest version of your type.</p>
+
+    <h3>What is the most common Enneagram type?</h3>
+    <p>There is no definitive scientific consensus on which Enneagram type is most common, as large-scale population studies are limited. Surveys from various Enneagram organizations suggest that Type 6 and Type 9 are among the most frequently reported types, possibly because their adaptive, community-oriented strategies are common in many cultures. Type 5 and Type 8 tend to be reported less frequently. However, these figures may be influenced by self-selection bias in who chooses to take Enneagram tests.</p>
+
+    <h3>How is the Enneagram different from MBTI?</h3>
+    <p>The Myers-Briggs Type Indicator (MBTI) classifies people along four preference dimensions — Extraversion vs. Introversion, Sensing vs. Intuition, Thinking vs. Feeling, and Judging vs. Perceiving — producing 16 possible types. It focuses on cognitive preferences and information processing style. The Enneagram, in contrast, identifies nine types based on core motivations, fears, and desires. It addresses the emotional and behavioral patterns that drive a person at the deepest level. While MBTI answers "How do you process the world?", the Enneagram answers "Why do you do what you do?" Many people find value in using both systems together for a more complete picture of their personality.</p>
+  </article>
+
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .game-area { cursor: default; user-select: auto; -webkit-user-select: auto; }
+</style>
+
+<script define:vars={{ gameName: "Enneagram Test", gameSlug: "enneagram-test", gameIcon: "\uD83D\uDD37", metricLabel: "Enneagram Type", metricUnit: "" }}>
+(function () {
+  'use strict';
+
+  var questions = [
+    { text: "I hold myself to very high standards of right and wrong.", dim: "T1" },
+    { text: "I feel a strong responsibility to correct mistakes and improve things.", dim: "T1" },
+    { text: "I get frustrated when people do things carelessly or incorrectly.", dim: "T1" },
+    { text: "I have a persistent inner voice that tells me I should be doing better.", dim: "T1" },
+
+    { text: "I naturally notice what others need before they ask.", dim: "T2" },
+    { text: "I feel most valued when people depend on me for help.", dim: "T2" },
+    { text: "I often put other people's needs ahead of my own.", dim: "T2" },
+    { text: "I find it difficult to say no when someone asks for my help.", dim: "T2" },
+
+    { text: "I am highly driven to achieve goals and be seen as successful.", dim: "T3" },
+    { text: "I adapt my presentation depending on the audience or situation.", dim: "T3" },
+    { text: "I measure my self-worth largely by my accomplishments.", dim: "T3" },
+    { text: "I find it hard to slow down because there is always more to achieve.", dim: "T3" },
+
+    { text: "I often feel that something important is missing from my life.", dim: "T4" },
+    { text: "I experience emotions more deeply and intensely than most people.", dim: "T4" },
+    { text: "I am drawn to beauty, meaning, and authentic self-expression.", dim: "T4" },
+    { text: "I sometimes feel envious of the ease with which others seem to live.", dim: "T4" },
+
+    { text: "I need a lot of private time to think and recharge.", dim: "T5" },
+    { text: "I prefer to observe and analyze situations before getting involved.", dim: "T5" },
+    { text: "I feel drained when too many people demand my time and energy.", dim: "T5" },
+    { text: "I would rather master a subject deeply than know a little about many things.", dim: "T5" },
+
+    { text: "I tend to imagine worst-case scenarios and prepare for them.", dim: "T6" },
+    { text: "I value loyalty and commitment in my relationships above almost everything.", dim: "T6" },
+    { text: "I often question whether I can trust people or situations fully.", dim: "T6" },
+    { text: "I look to trusted authorities or systems for guidance when making big decisions.", dim: "T6" },
+
+    { text: "I love making plans and get excited about future possibilities.", dim: "T7" },
+    { text: "I tend to avoid unpleasant emotions by staying busy or distracted.", dim: "T7" },
+    { text: "I get bored easily and am always looking for new experiences.", dim: "T7" },
+    { text: "I am naturally optimistic and can reframe almost any setback positively.", dim: "T7" },
+
+    { text: "I speak my mind directly, even if it makes others uncomfortable.", dim: "T8" },
+    { text: "I feel a strong need to be in control of my own life and circumstances.", dim: "T8" },
+    { text: "I instinctively protect the underdog and stand up against injustice.", dim: "T8" },
+    { text: "I would rather confront a problem head-on than wait for it to resolve itself.", dim: "T8" },
+
+    { text: "I tend to go along with what others want to keep the peace.", dim: "T9" },
+    { text: "I find it hard to know what I really want when others have strong opinions.", dim: "T9" },
+    { text: "I avoid conflict whenever possible, even if it means suppressing my own views.", dim: "T9" },
+    { text: "I can easily see all sides of an argument and find it hard to take a firm stand.", dim: "T9" }
+  ];
+
+  var likertOptions = [
+    { label: "Strongly Disagree", val: 1 },
+    { label: "Disagree", val: 2 },
+    { label: "Neutral", val: 3 },
+    { label: "Agree", val: 4 },
+    { label: "Strongly Agree", val: 5 }
+  ];
+
+  var types = {
+    T1: { num: 1, name: "The Reformer", desc: "Principled, purposeful, and self-controlled. You have a strong sense of right and wrong and strive to improve yourself and the world around you. Your core desire is to be good and to have integrity. You are motivated by a deep conviction that things can and should be better, and you hold yourself to the same exacting standards you apply to others.", fear: "Being corrupt or defective", desire: "To be good and have integrity", growth: 7, stress: 4, strengths: ["Ethical", "Reliable", "Organized", "Fair-minded"], weaknesses: ["Critical", "Perfectionistic", "Rigid"] },
+    T2: { num: 2, name: "The Helper", desc: "Generous, demonstrative, and people-pleasing. You are warm-hearted and attuned to the needs of others, often knowing what people need before they ask. Your core desire is to be loved and appreciated. You express your caring nature through acts of service and emotional support, and you thrive when your relationships feel close and reciprocal.", fear: "Being unwanted or unworthy of love", desire: "To be loved and needed", growth: 4, stress: 8, strengths: ["Caring", "Empathetic", "Generous", "Warm"], weaknesses: ["Possessive", "People-pleasing", "Intrusive"] },
+    T3: { num: 3, name: "The Achiever", desc: "Adaptive, excelling, and driven. You are energetic and goal-oriented, with a natural ability to motivate yourself and others toward success. Your core desire is to feel valuable and worthwhile. You excel at reading what a situation requires and adjusting your approach to achieve the best possible outcome, often becoming a role model for others.", fear: "Being worthless or without inherent value", desire: "To feel valuable and worthwhile", growth: 6, stress: 9, strengths: ["Efficient", "Ambitious", "Confident", "Inspiring"], weaknesses: ["Competitive", "Image-conscious", "Deceptive"] },
+    T4: { num: 4, name: "The Individualist", desc: "Expressive, dramatic, and self-absorbed. You possess a rich inner emotional life and a deep need for authenticity and personal significance. Your core desire is to find yourself and create a unique identity. You are drawn to beauty and meaning, and you have an unusual ability to sit with difficult emotions that others avoid.", fear: "Having no identity or personal significance", desire: "To find yourself and create a unique identity", growth: 1, stress: 2, strengths: ["Creative", "Authentic", "Introspective", "Emotionally honest"], weaknesses: ["Moody", "Envious", "Self-absorbed"] },
+    T5: { num: 5, name: "The Investigator", desc: "Perceptive, innovative, and secretive. You are curious and independent, with a deep need to understand how the world works. Your core desire is to be capable and competent. You conserve your energy and resources carefully, preferring to observe and analyze before engaging, and you value expertise and self-sufficiency above almost everything.", fear: "Being helpless, useless, or overwhelmed", desire: "To be capable and competent", growth: 8, stress: 7, strengths: ["Analytical", "Objective", "Perceptive", "Self-sufficient"], weaknesses: ["Detached", "Isolated", "Stingy with energy"] },
+    T6: { num: 6, name: "The Loyalist", desc: "Engaging, responsible, and anxious. You are committed and security-oriented, with an exceptional ability to foresee problems and prepare for them. Your core desire is to have support and guidance. You are deeply loyal to the people and institutions you trust, and you bring a practical, vigilant perspective that helps groups avoid pitfalls.", fear: "Being without support or guidance", desire: "To have security and support", growth: 9, stress: 3, strengths: ["Loyal", "Responsible", "Hardworking", "Vigilant"], weaknesses: ["Anxious", "Suspicious", "Indecisive"] },
+    T7: { num: 7, name: "The Enthusiast", desc: "Spontaneous, versatile, and scattered. You are optimistic and forward-looking, with an insatiable appetite for new experiences and ideas. Your core desire is to be satisfied and content. You bring infectious energy to everything you do, generating excitement and possibilities wherever you go, and you instinctively reframe negatives into positives.", fear: "Being deprived or trapped in pain", desire: "To be happy and satisfied", growth: 5, stress: 1, strengths: ["Optimistic", "Versatile", "Spontaneous", "Quick-thinking"], weaknesses: ["Impulsive", "Scattered", "Escapist"] },
+    T8: { num: 8, name: "The Challenger", desc: "Self-confident, decisive, and confrontational. You are strong-willed and assertive, with a natural instinct to protect yourself and others from vulnerability. Your core desire is to protect yourself and determine your own path. You value directness, strength, and justice, and you are willing to stand up against any force that threatens those you care about.", fear: "Being harmed or controlled by others", desire: "To protect yourself and determine your own path", growth: 2, stress: 5, strengths: ["Decisive", "Protective", "Direct", "Self-confident"], weaknesses: ["Domineering", "Aggressive", "Confrontational"] },
+    T9: { num: 9, name: "The Peacemaker", desc: "Receptive, reassuring, and complacent. You are easygoing and accepting, with a remarkable ability to see multiple perspectives and bring people together. Your core desire is inner stability and peace of mind. You create harmony in your environment and help others feel comfortable, and you have a natural gift for mediation and seeing the big picture.", fear: "Loss of connection or fragmentation", desire: "To have inner stability and peace of mind", growth: 3, stress: 6, strengths: ["Peaceful", "Supportive", "Adaptable", "Patient"], weaknesses: ["Complacent", "Passive", "Stubborn through inaction"] }
+  };
+
+  var STORAGE_KEY = 'toolcalcs_enneagram-test_history';
+  var MAX_HISTORY = 20;
+
+  function loadHistory() {
+    try { var r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch (e) {}
+    return [];
+  }
+  function saveHistory(h) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch (e) {}
+  }
+  function addToHistory(typeLabel) {
+    var h = loadHistory();
+    h.unshift({ score: typeLabel, date: new Date().toISOString() });
+    saveHistory(h);
+  }
+
+  // DOM
+  var instructionsView = document.getElementById('instructionsView');
+  var playView = document.getElementById('playView');
+  var resultView = document.getElementById('resultView');
+  var startBtn = document.getElementById('startBtn');
+  var progressText = document.getElementById('progressText');
+  var progressFill = document.getElementById('progressFill');
+  var questionText = document.getElementById('questionText');
+  var likertContainer = document.getElementById('likertContainer');
+  var resultContent = document.getElementById('resultContent');
+  var attemptHistorySection = document.getElementById('attemptHistory');
+  var historyList = document.getElementById('historyList');
+
+  var shuffled = [];
+  var currentIndex = 0;
+  var scores = {};
+
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i];
+      a[i] = a[j];
+      a[j] = tmp;
+    }
+    return a;
+  }
+
+  function showView(view) {
+    instructionsView.style.display = 'none';
+    playView.style.display = 'none';
+    resultView.style.display = 'none';
+    view.style.display = '';
+  }
+
+  function resetScores() {
+    scores = { T1: 0, T2: 0, T3: 0, T4: 0, T5: 0, T6: 0, T7: 0, T8: 0, T9: 0 };
+  }
+
+  function renderQuestion() {
+    var q = shuffled[currentIndex];
+    var num = currentIndex + 1;
+    var total = shuffled.length;
+    progressText.textContent = 'Question ' + num + ' of ' + total;
+    progressFill.style.width = Math.round((num / total) * 100) + '%';
+    questionText.textContent = q.text;
+
+    likertContainer.innerHTML = '';
+    for (var i = 0; i < likertOptions.length; i++) {
+      var btn = document.createElement('button');
+      btn.className = 'quiz-option';
+      btn.type = 'button';
+      btn.textContent = likertOptions[i].label;
+      btn.dataset.val = String(likertOptions[i].val);
+      btn.dataset.dim = q.dim;
+      likertContainer.appendChild(btn);
+    }
+  }
+
+  function handleLikertClick(e) {
+    var target = e.target;
+    if (!target || !target.classList || !target.classList.contains('quiz-option')) return;
+    var val = parseInt(target.dataset.val, 10);
+    var dim = target.dataset.dim;
+
+    // Visual feedback
+    target.classList.add('selected');
+
+    scores[dim] = (scores[dim] || 0) + val;
+    currentIndex++;
+
+    if (currentIndex >= shuffled.length) {
+      setTimeout(function () { showResults(); }, 250);
+    } else {
+      setTimeout(function () { renderQuestion(); }, 250);
+    }
+  }
+
+  function getAdjacentTypes(typeKey) {
+    var num = types[typeKey].num;
+    var prev = num === 1 ? 9 : num - 1;
+    var next = num === 9 ? 1 : num + 1;
+    return { prev: 'T' + prev, next: 'T' + next };
+  }
+
+  function calculateWing(topKey) {
+    var adj = getAdjacentTypes(topKey);
+    var prevScore = scores[adj.prev] || 0;
+    var nextScore = scores[adj.next] || 0;
+    if (prevScore >= nextScore) {
+      return { wingKey: adj.prev, wingNum: types[adj.prev].num };
+    }
+    return { wingKey: adj.next, wingNum: types[adj.next].num };
+  }
+
+  function showResults() {
+    showView(resultView);
+
+    // Find top type
+    var topKey = 'T1';
+    var topScore = 0;
+    var allKeys = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9'];
+    for (var i = 0; i < allKeys.length; i++) {
+      if (scores[allKeys[i]] > topScore) {
+        topScore = scores[allKeys[i]];
+        topKey = allKeys[i];
+      }
+    }
+
+    var topType = types[topKey];
+    var wing = calculateWing(topKey);
+    var wingLabel = 'w' + wing.wingNum;
+    var fullLabel = 'Type ' + topType.num + wingLabel;
+
+    var growthType = types['T' + topType.growth];
+    var stressType = types['T' + topType.stress];
+
+    // Max possible per type = 4 questions * 5 points = 20
+    var maxScore = 20;
+
+    // Build result HTML
+    var html = '';
+    html += '<div class="result-icon" aria-hidden="true">\uD83D\uDD37</div>';
+    html += '<div class="quiz-result-type">' + fullLabel + '</div>';
+    html += '<div class="quiz-result-name">' + topType.name + '</div>';
+    html += '<div class="quiz-result-desc">' + topType.desc + '</div>';
+
+    // Bar chart
+    html += '<div class="quiz-bar-chart">';
+    for (var j = 0; j < allKeys.length; j++) {
+      var key = allKeys[j];
+      var t = types[key];
+      var s = scores[key] || 0;
+      var pct = Math.round((s / maxScore) * 100);
+      var isTop = key === topKey;
+      html += '<div class="quiz-bar-item">';
+      html += '<div class="quiz-bar-label"><span>Type ' + t.num + ' - ' + t.name + '</span><span>' + s + '/' + maxScore + '</span></div>';
+      html += '<div class="quiz-bar-track"><div class="quiz-bar-fill" style="width:' + pct + '%;' + (isTop ? 'background:#6366f1;' : '') + '"></div></div>';
+      html += '</div>';
+    }
+    html += '</div>';
+
+    // Core fear and desire
+    html += '<div class="quiz-traits strengths"><h3>Core Desire</h3><ul><li>' + topType.desire + '</li></ul></div>';
+    html += '<div class="quiz-traits weaknesses"><h3>Core Fear</h3><ul><li>' + topType.fear + '</li></ul></div>';
+
+    // Growth and stress arrows
+    html += '<div class="quiz-traits careers"><h3>Growth Direction</h3><ul><li>In growth, you move toward Type ' + growthType.num + ' (' + growthType.name + ')</li></ul></div>';
+    html += '<div class="quiz-traits careers"><h3>Stress Direction</h3><ul><li>Under stress, you move toward Type ' + stressType.num + ' (' + stressType.name + ')</li></ul></div>';
+
+    // Strengths
+    html += '<div class="quiz-traits strengths"><h3>Key Strengths</h3><ul>';
+    for (var k = 0; k < topType.strengths.length; k++) {
+      html += '<li>' + topType.strengths[k] + '</li>';
+    }
+    html += '</ul></div>';
+
+    // Weaknesses
+    html += '<div class="quiz-traits weaknesses"><h3>Growth Areas</h3><ul>';
+    for (var m = 0; m < topType.weaknesses.length; m++) {
+      html += '<li>' + topType.weaknesses[m] + '</li>';
+    }
+    html += '</ul></div>';
+
+    // Try again button
+    html += '<button class="game-btn primary" id="tryAgainBtn" type="button" style="margin-top:16px;">Take Test Again</button>';
+
+    resultContent.innerHTML = html;
+
+    // Bind try again
+    var tryAgainBtn = document.getElementById('tryAgainBtn');
+    if (tryAgainBtn) {
+      tryAgainBtn.addEventListener('click', startGame);
+    }
+
+    // Save history
+    addToHistory(fullLabel);
+    renderHistory();
+
+    // Show share
+    if (window.GameShare) {
+      window.GameShare.show({
+        gameName: gameName,
+        gameSlug: gameSlug,
+        gameIcon: gameIcon,
+        score: 'Type ' + topType.num,
+        unit: topType.name,
+        metricLabel: metricLabel,
+        ratingLabel: 'Type ' + topType.num + wingLabel,
+        ratingColor: '#6366f1'
+      });
+    }
+  }
+
+  function startGame() {
+    resetScores();
+    shuffled = shuffle(questions);
+    currentIndex = 0;
+    showView(playView);
+    renderQuestion();
+
+    if (window.GameShare) {
+      window.GameShare.hide();
+    }
+  }
+
+  function renderHistory() {
+    var history = loadHistory();
+    if (history.length === 0) { attemptHistorySection.hidden = true; return; }
+    attemptHistorySection.hidden = false;
+    var items = '';
+    for (var i = 0; i < history.length; i++) {
+      var e = history[i];
+      items += '<div class="history-item">';
+      items += '<span class="history-score">' + e.score + '</span>';
+      items += '<span class="history-rating" style="background:#6366f1">' + e.score + '</span>';
+      items += '<span class="history-time">' + formatDate(e.date) + '</span>';
+      items += '</div>';
+    }
+    historyList.innerHTML = items;
+  }
+
+  function formatDate(iso) {
+    try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    catch (e) { return ''; }
+  }
+
+  // Events
+  likertContainer.addEventListener('click', handleLikertClick);
+  startBtn.addEventListener('click', startGame);
+  renderHistory();
+})();
+</script>

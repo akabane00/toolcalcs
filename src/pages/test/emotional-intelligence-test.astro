@@ -1,0 +1,810 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import GameShare from '../../components/GameShare.astro';
+import '../../styles/game.css';
+import '../../styles/quiz.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tests & Games", "item": "https://toolcalcs.com/test/" },
+      { "@type": "ListItem", "position": 3, "name": "Emotional Intelligence (EQ) Test" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Emotional Intelligence (EQ) Test",
+    "url": "https://toolcalcs.com/test/emotional-intelligence-test/",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Free EQ test measuring your emotional intelligence across 4 domains: Self-Awareness, Self-Management, Social Awareness, and Relationship Management. 30 scenario-based questions."
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is emotional intelligence (EQ)?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Emotional intelligence (EQ) is the ability to recognize, understand, manage, and effectively use emotions in yourself and others. It encompasses four core domains: self-awareness, self-management, social awareness, and relationship management. Unlike IQ, which measures cognitive ability, EQ measures how well you navigate interpersonal and intrapersonal emotional landscapes.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Can emotional intelligence be improved?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes, emotional intelligence can be developed and improved throughout your life. Unlike IQ, which remains relatively stable, EQ is a set of skills that can be strengthened through practice, self-reflection, mindfulness, therapy, coaching, and deliberate effort. Research shows that targeted EQ training programs can produce measurable improvements in as little as a few weeks.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is a good EQ score?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'On this assessment, scores above 60 indicate strong emotional intelligence, while scores above 80 are considered exceptional. Most people score between 40 and 70. A score below 40 does not mean you lack emotional intelligence entirely; it simply highlights areas where focused development can make a significant difference in your personal and professional relationships.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Is EQ more important than IQ?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Research suggests that EQ is often a stronger predictor of success in leadership, teamwork, and personal relationships than IQ alone. While IQ contributes to academic and technical ability, EQ determines how effectively you collaborate, handle stress, resolve conflicts, and inspire others. Many experts consider both important, with EQ playing a particularly crucial role in workplace performance and life satisfaction.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How is EQ measured?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'EQ is measured through various methods including self-report questionnaires, scenario-based assessments, and 360-degree feedback evaluations. This test uses scenario-based questions where you choose how you would respond to real-life situations. Your responses are scored across four domains of emotional intelligence, and the results are normalized to a 0-100 scale for easy interpretation.',
+        },
+      },
+    ],
+  }
+];
+---
+
+<BaseLayout
+  title="Emotional Intelligence (EQ) Test - Free Online Assessment | ToolCalcs"
+  description="Free EQ test measuring your emotional intelligence across 4 domains: Self-Awareness, Self-Management, Social Awareness, and Relationship Management. 30 scenario-based questions."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/test/">Tests &amp; Games</a> &rsaquo;
+    <span>Emotional Intelligence (EQ) Test</span>
+  </nav>
+
+  <h1>Emotional Intelligence (EQ) Test</h1>
+  <p class="page-desc">Answer 30 realistic scenario questions to measure your emotional intelligence across four key domains. How well do you understand and manage emotions?</p>
+
+  <div class="game-box">
+    <div class="game-area" id="gameArea" role="region" aria-label="EQ test area" aria-live="polite">
+      <div class="game-instructions" id="instructionsView">
+        <h2>EQ Assessment</h2>
+        <p>You will be presented with 30 real-life scenarios. For each one, choose the response that best reflects how you would actually react. There are no trick questions, but some responses demonstrate higher emotional intelligence than others.</p>
+        <button class="game-btn primary" id="startBtn" type="button" style="margin-top:16px;">Start Test</button>
+      </div>
+
+      <div class="play-view" id="playView" style="display:none;">
+        <div class="quiz-progress">
+          <div class="quiz-progress-text" id="progressText">Question 1 of 30</div>
+          <div class="quiz-progress-bar">
+            <div class="quiz-progress-fill" id="progressFill" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="quiz-question">
+          <div class="quiz-question-text" id="questionText"></div>
+        </div>
+        <div class="quiz-options" id="optionsContainer"></div>
+      </div>
+
+      <div class="result-view" id="resultView" style="display:none;">
+        <div class="result-icon" aria-hidden="true">🧠</div>
+        <div class="result-label">Your EQ Score</div>
+        <div class="score-display">
+          <span class="score-value" id="finalScore">0</span>
+          <span class="score-unit">/100</span>
+        </div>
+        <div class="rating-badge" id="ratingBadge"></div>
+        <div class="quiz-bar-chart" id="domainChart" style="margin-top:24px;"></div>
+        <div class="quiz-result-desc" id="domainDetails"></div>
+        <div class="quiz-result-desc" id="improvementTips"></div>
+        <button class="game-btn primary" id="tryAgainBtn" type="button" style="margin-top:16px;">Take Again</button>
+      </div>
+    </div>
+
+    <GameShare />
+
+    <div class="attempt-history" id="attemptHistory" hidden>
+      <h3>Attempt History</h3>
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is Emotional Intelligence?</h2>
+    <p>Emotional intelligence, commonly referred to as EQ (Emotional Quotient), is the capacity to be aware of, control, and express one's emotions, and to handle interpersonal relationships judiciously and empathetically. The concept was first formally defined by psychologists Peter Salovey and John Mayer in 1990 and later popularized by Daniel Goleman in his 1995 bestselling book <em>Emotional Intelligence: Why It Can Matter More Than IQ</em>.</p>
+    <p>Goleman argued that traditional measures of intelligence, such as IQ tests, fail to capture a crucial set of abilities that determine how well we navigate life. While IQ may predict academic performance, EQ predicts how effectively we manage behavior, navigate social complexities, and make personal decisions that achieve positive results. Research by TalentSmart found that emotional intelligence is the strongest predictor of workplace performance, explaining 58% of success across all job types.</p>
+    <p>Emotional intelligence is not about suppressing emotions or always being pleasant. It is about recognizing emotions as valuable sources of information and using that awareness to guide thinking and behavior constructively. A person with high EQ can identify what they are feeling, understand why they are feeling it, and choose how to act upon that emotion in a way that serves both themselves and others.</p>
+
+    <h2>The 4 Domains of Emotional Intelligence</h2>
+    <p>Modern emotional intelligence frameworks generally divide EQ into four interconnected domains. Each domain represents a distinct set of skills, and together they paint a complete picture of emotional competence.</p>
+
+    <h3>Self-Awareness</h3>
+    <p>Self-awareness is the foundation of emotional intelligence. It involves accurately perceiving your own emotions in the moment and understanding your tendencies across situations. People with strong self-awareness recognize how their feelings affect their thoughts, behavior, and performance. They have an accurate self-assessment of their strengths and limitations and possess a well-grounded sense of confidence. Self-aware individuals can identify the specific emotions they are experiencing rather than just feeling generically "good" or "bad." They notice patterns in their emotional reactions and understand what triggers certain responses.</p>
+
+    <h3>Self-Management</h3>
+    <p>Self-management builds on self-awareness by adding the ability to regulate emotional reactions. It includes controlling impulsive feelings and behaviors, managing emotions in healthy ways, taking initiative, following through on commitments, and adapting to changing circumstances. A person strong in self-management does not eliminate negative emotions but chooses constructive responses rather than reactive ones. They can delay gratification, tolerate ambiguity, think before acting, and maintain composure under pressure. This domain also encompasses the drive to achieve goals and the optimism to persist through setbacks.</p>
+
+    <h3>Social Awareness</h3>
+    <p>Social awareness shifts the focus outward to the emotions of others. It is the ability to accurately read the room, pick up on emotional cues, understand the dynamics of a group, and empathize with what others are experiencing. Socially aware people are skilled at detecting unspoken feelings, understanding what someone needs even when they do not articulate it directly, and recognizing power dynamics within organizations or social groups. This domain is critical for effective communication, conflict resolution, and building genuine connections with diverse individuals.</p>
+
+    <h3>Relationship Management</h3>
+    <p>Relationship management integrates the other three domains into the ability to interact effectively with others. It involves clear communication, inspirational leadership, effective teamwork, conflict management, and the ability to influence and develop others. People skilled in relationship management can build strong bonds, find common ground, persuade and motivate others, and navigate disagreements without damaging relationships. This domain is often considered the most visible expression of emotional intelligence, as it determines the quality of our interactions and the strength of our social networks.</p>
+
+    <h2>EQ vs. IQ: Why Emotional Intelligence May Matter More</h2>
+    <p>For decades, IQ was considered the primary predictor of success. However, mounting research has challenged this assumption. While IQ contributes to about 20% of the factors that determine life success, the remaining 80% is influenced by other factors, many of which fall under the umbrella of emotional intelligence.</p>
+    <p>Studies have consistently found that individuals with high EQ earn an average of $29,000 more per year than those with low EQ. They tend to receive higher performance ratings, get promoted more frequently, and demonstrate stronger leadership abilities. In a study of senior leaders, those who scored highest in EQ competencies outperformed their annual revenue targets by 20%.</p>
+    <p>IQ and EQ are not opposing forces. They work together. IQ may get you hired, but EQ determines whether you thrive in the role. A brilliant engineer with low EQ may struggle to collaborate with teammates, while a moderately talented one with high EQ may lead entire projects successfully. The ideal is to develop both cognitive and emotional capabilities, but when one must be prioritized, EQ often delivers more practical value in real-world settings.</p>
+    <p>Furthermore, while IQ is largely determined by genetics and remains relatively stable throughout life, EQ is a learnable skill set. This means that regardless of your starting point, you can make meaningful improvements through deliberate practice and self-reflection.</p>
+
+    <h2>How This Test Measures Your EQ</h2>
+    <p>This emotional intelligence assessment uses a scenario-based approach rather than simple self-report questions. Scenario-based testing is widely regarded as a more accurate measure of EQ because it evaluates how you would respond in realistic situations, rather than how you rate abstract traits about yourself.</p>
+    <p>Each of the 30 questions presents a realistic interpersonal situation that you might encounter in your workplace, social life, or personal relationships. For each scenario, four response options are provided, each representing a different level of emotional intelligence. The options are scored from 1 to 4 points, where 4 represents the most emotionally intelligent response and 1 represents the least.</p>
+    <p>The questions are distributed across the four EQ domains: Self-Awareness (8 questions), Self-Management (8 questions), Social Awareness (7 questions), and Relationship Management (7 questions). Your responses are tallied per domain and then combined into an overall EQ score normalized to a 0-100 scale.</p>
+    <p>While no online assessment can replace a comprehensive professional evaluation, this test provides meaningful insight into your emotional strengths and areas for development. Use your results as a starting point for self-reflection rather than a definitive judgment.</p>
+
+    <h2>How to Improve Your Emotional Intelligence</h2>
+    <p>Unlike IQ, emotional intelligence can be developed at any age. Here are practical strategies organized by domain:</p>
+
+    <h3>Improving Self-Awareness</h3>
+    <ul>
+      <li><strong>Practice mindfulness:</strong> Spend 5-10 minutes daily observing your thoughts and feelings without judgment. Mindfulness meditation has been shown to increase activity in brain regions associated with emotional regulation.</li>
+      <li><strong>Keep an emotion journal:</strong> At the end of each day, write down the emotions you experienced, what triggered them, and how you responded. Over time, patterns will emerge that deepen your self-understanding.</li>
+      <li><strong>Seek feedback:</strong> Ask trusted colleagues or friends how they perceive your emotional responses. Others often see things about us that we miss.</li>
+      <li><strong>Pause and label:</strong> When you notice an emotional shift, pause and name the specific emotion. Moving from "I feel bad" to "I feel frustrated because my contribution was overlooked" is a powerful step.</li>
+    </ul>
+
+    <h3>Improving Self-Management</h3>
+    <ul>
+      <li><strong>Practice the 10-second rule:</strong> When you feel a strong emotional reaction, wait 10 seconds before responding. This brief pause engages the prefrontal cortex and reduces impulsive reactions.</li>
+      <li><strong>Reframe negative situations:</strong> Train yourself to find a constructive perspective in challenging situations. Instead of "This is a disaster," try "This is difficult, but what can I learn from it?"</li>
+      <li><strong>Build stress-management routines:</strong> Regular exercise, adequate sleep, and breathing techniques create a foundation that makes emotional regulation easier.</li>
+      <li><strong>Set small goals:</strong> Practice self-discipline in minor areas (like maintaining a consistent morning routine) to build the self-management muscle for larger challenges.</li>
+    </ul>
+
+    <h3>Improving Social Awareness</h3>
+    <ul>
+      <li><strong>Practice active listening:</strong> Focus entirely on the speaker without planning your response. Notice their tone, body language, and the emotions behind their words.</li>
+      <li><strong>Observe group dynamics:</strong> In meetings or social gatherings, take mental notes about who speaks, who is quiet, who defers, and who dominates. This builds your ability to read social situations.</li>
+      <li><strong>Ask open-ended questions:</strong> Instead of yes-or-no questions, ask "How did that make you feel?" or "What was that experience like for you?" to deepen understanding of others' perspectives.</li>
+      <li><strong>Read fiction:</strong> Studies show that reading literary fiction improves empathy by exercising the brain's ability to understand different perspectives and emotional states.</li>
+    </ul>
+
+    <h3>Improving Relationship Management</h3>
+    <ul>
+      <li><strong>Address conflicts early:</strong> Small issues that are left unaddressed grow into large problems. Practice having difficult conversations when stakes are still low.</li>
+      <li><strong>Give genuine appreciation:</strong> Regularly acknowledge the contributions and positive qualities of others. Specific praise ("I appreciated how you handled that client call") is more impactful than general praise.</li>
+      <li><strong>Practice clear communication:</strong> Express your needs and boundaries directly but respectfully. Use "I" statements ("I feel concerned when...") rather than accusations ("You always...").</li>
+      <li><strong>Invest in relationships proactively:</strong> Do not wait until you need something to nurture connections. Regular check-ins, genuine interest, and reliability build trust over time.</li>
+    </ul>
+
+    <h2>EQ in the Workplace</h2>
+    <p>Emotional intelligence has a profound impact on workplace dynamics and career success. Organizations increasingly recognize that technical skills alone are insufficient for effective performance, particularly in roles that require collaboration, leadership, or customer interaction.</p>
+    <p>Research from the Center for Creative Leadership found that the primary causes of executive derailment involve deficits in emotional competence, particularly difficulty handling interpersonal problems, unsatisfactory team leadership during times of conflict, and inability to adapt to change. In contrast, the most successful leaders consistently demonstrate strong emotional intelligence across all four domains.</p>
+    <p>In team settings, members with high EQ contribute to psychological safety, which Google's Project Aristotle identified as the most important factor in high-performing teams. When team members feel safe to take risks, express disagreement, and show vulnerability, creativity and productivity increase significantly.</p>
+    <p>For career advancement, emotional intelligence often serves as the differentiating factor between equally qualified candidates. Hiring managers increasingly use behavioral interview questions designed to assess EQ, and many organizations now include emotional intelligence in their leadership development programs. Whether you are an individual contributor, a manager, or a senior executive, investing in your emotional intelligence is one of the highest-return professional development strategies available.</p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is emotional intelligence (EQ)?</h3>
+    <p>Emotional intelligence (EQ) is the ability to recognize, understand, manage, and effectively use emotions in yourself and others. It encompasses four core domains: self-awareness, self-management, social awareness, and relationship management. Unlike IQ, which measures cognitive ability, EQ measures how well you navigate interpersonal and intrapersonal emotional landscapes.</p>
+
+    <h3>Can emotional intelligence be improved?</h3>
+    <p>Yes, emotional intelligence can be developed and improved throughout your life. Unlike IQ, which remains relatively stable, EQ is a set of skills that can be strengthened through practice, self-reflection, mindfulness, therapy, coaching, and deliberate effort. Research shows that targeted EQ training programs can produce measurable improvements in as little as a few weeks.</p>
+
+    <h3>What is a good EQ score?</h3>
+    <p>On this assessment, scores above 60 indicate strong emotional intelligence, while scores above 80 are considered exceptional. Most people score between 40 and 70. A score below 40 does not mean you lack emotional intelligence entirely; it simply highlights areas where focused development can make a significant difference in your personal and professional relationships.</p>
+
+    <h3>Is EQ more important than IQ?</h3>
+    <p>Research suggests that EQ is often a stronger predictor of success in leadership, teamwork, and personal relationships than IQ alone. While IQ contributes to academic and technical ability, EQ determines how effectively you collaborate, handle stress, resolve conflicts, and inspire others. Many experts consider both important, with EQ playing a particularly crucial role in workplace performance and life satisfaction.</p>
+
+    <h3>How is EQ measured?</h3>
+    <p>EQ is measured through various methods including self-report questionnaires, scenario-based assessments, and 360-degree feedback evaluations. This test uses scenario-based questions where you choose how you would respond to real-life situations. Your responses are scored across four domains of emotional intelligence, and the results are normalized to a 0-100 scale for easy interpretation.</p>
+  </article>
+
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .game-area { cursor: default; user-select: auto; -webkit-user-select: auto; }
+</style>
+
+<script define:vars={{ gameName: "EQ Test", gameSlug: "emotional-intelligence-test", gameIcon: "\u{1F9E0}", metricLabel: "EQ Score", metricUnit: "/100" }}>
+(function () {
+  'use strict';
+
+  var questions = [
+    {
+      text: "Your colleague publicly takes credit for your idea in a meeting. You:",
+      dim: "selfManage",
+      options: [
+        { label: "Speak with them privately after the meeting to address it", val: 4 },
+        { label: "Confront them angrily in front of everyone", val: 1 },
+        { label: "Say nothing but seethe internally for days", val: 2 },
+        { label: "Send a passive-aggressive email copying your manager", val: 1 }
+      ]
+    },
+    {
+      text: "You receive harsh criticism on a project you worked very hard on. Your first reaction is to:",
+      dim: "selfAware",
+      options: [
+        { label: "Dismiss the feedback entirely and assume the critic is wrong", val: 1 },
+        { label: "Feel hurt but take time to consider which parts of the feedback are valid", val: 4 },
+        { label: "Immediately agree with everything to avoid conflict", val: 2 },
+        { label: "Argue defensively about every point raised", val: 1 }
+      ]
+    },
+    {
+      text: "You notice a coworker has been unusually quiet and withdrawn for several days. You:",
+      dim: "socialAware",
+      options: [
+        { label: "Assume they are just having a bad week and ignore it", val: 2 },
+        { label: "Gossip with others about what might be wrong", val: 1 },
+        { label: "Find a quiet moment to ask if they are okay and if they need support", val: 4 },
+        { label: "Report their behavior change to your manager", val: 1 }
+      ]
+    },
+    {
+      text: "Two members of your team are in a heated disagreement that is affecting group productivity. You:",
+      dim: "relManage",
+      options: [
+        { label: "Tell them both to grow up and get over it", val: 1 },
+        { label: "Avoid getting involved and hope it resolves itself", val: 2 },
+        { label: "Facilitate a calm discussion where both sides feel heard", val: 4 },
+        { label: "Take the side of whoever you think is right", val: 1 }
+      ]
+    },
+    {
+      text: "You are stuck in heavy traffic and running late for an important meeting. You:",
+      dim: "selfManage",
+      options: [
+        { label: "Call ahead to inform them, then use the time to prepare mentally", val: 4 },
+        { label: "Honk aggressively and curse at other drivers", val: 1 },
+        { label: "Frantically weave through traffic, risking safety", val: 1 },
+        { label: "Panic and consider canceling the meeting entirely", val: 2 }
+      ]
+    },
+    {
+      text: "After a stressful day at work, you come home feeling irritable. You:",
+      dim: "selfAware",
+      options: [
+        { label: "Snap at your family or roommates over minor things", val: 1 },
+        { label: "Recognize your irritability and tell your household you need a few minutes to decompress", val: 4 },
+        { label: "Pretend everything is fine while feeling increasingly tense", val: 2 },
+        { label: "Pour a few drinks to numb the frustration", val: 1 }
+      ]
+    },
+    {
+      text: "A friend cancels plans with you for the third time this month. You:",
+      dim: "socialAware",
+      options: [
+        { label: "Consider that they might be going through something difficult and check in on them", val: 4 },
+        { label: "Post a vague complaint about unreliable people on social media", val: 1 },
+        { label: "Cut them off completely without explanation", val: 1 },
+        { label: "Feel annoyed but say nothing and let resentment build", val: 2 }
+      ]
+    },
+    {
+      text: "Your team is celebrating a success, but one member contributed very little. You:",
+      dim: "relManage",
+      options: [
+        { label: "Publicly call out their lack of contribution", val: 1 },
+        { label: "Include everyone in the celebration but later have a private conversation about expectations", val: 4 },
+        { label: "Say nothing and let the resentment grow among the rest of the team", val: 2 },
+        { label: "Exclude them from the celebration to teach them a lesson", val: 1 }
+      ]
+    },
+    {
+      text: "You realize you have made a significant mistake at work that will affect your team. You:",
+      dim: "selfManage",
+      options: [
+        { label: "Try to cover it up before anyone notices", val: 1 },
+        { label: "Blame the mistake on unclear instructions or a colleague", val: 1 },
+        { label: "Immediately own the mistake, inform those affected, and propose a solution", val: 4 },
+        { label: "Acknowledge it but downplay the severity significantly", val: 2 }
+      ]
+    },
+    {
+      text: "During a group discussion, you notice that a quieter team member keeps getting interrupted. You:",
+      dim: "socialAware",
+      options: [
+        { label: "Say nothing because it is not your problem", val: 2 },
+        { label: "Wait for a natural pause and say you would like to hear what that person was about to share", val: 4 },
+        { label: "Loudly tell the interrupters to be quiet", val: 1 },
+        { label: "Send them a private message later suggesting they be more assertive", val: 3 }
+      ]
+    },
+    {
+      text: "You did not get the promotion you expected. The person who got it has less experience. You:",
+      dim: "selfAware",
+      options: [
+        { label: "Immediately start job hunting out of spite", val: 1 },
+        { label: "Feel disappointed and ask your manager for specific feedback on what you can develop", val: 4 },
+        { label: "Complain to coworkers about how unfair the decision was", val: 1 },
+        { label: "Accept it quietly but lose motivation for months", val: 2 }
+      ]
+    },
+    {
+      text: "A newer employee asks you what seems like a very basic question. You:",
+      dim: "relManage",
+      options: [
+        { label: "Answer patiently and offer to help if they have more questions", val: 4 },
+        { label: "Sigh visibly and give a curt one-word answer", val: 1 },
+        { label: "Direct them to read the manual without further explanation", val: 2 },
+        { label: "Make a joke at their expense in front of others", val: 1 }
+      ]
+    },
+    {
+      text: "You are in a meeting and feel strongly that the proposed plan is flawed. Everyone else seems supportive. You:",
+      dim: "selfManage",
+      options: [
+        { label: "Stay silent to avoid being the odd one out", val: 2 },
+        { label: "Raise your concerns respectfully, backing them with specific reasoning", val: 4 },
+        { label: "Bluntly say the plan is terrible and will fail", val: 1 },
+        { label: "Agree in the meeting but complain privately afterward", val: 1 }
+      ]
+    },
+    {
+      text: "You catch yourself feeling envious of a friend's recent success. You:",
+      dim: "selfAware",
+      options: [
+        { label: "Acknowledge the envy, congratulate them, and reflect on your own goals", val: 4 },
+        { label: "Make subtly dismissive comments about their achievement", val: 1 },
+        { label: "Pretend you are happy while avoiding them", val: 2 },
+        { label: "Try to one-up them by exaggerating your own accomplishments", val: 1 }
+      ]
+    },
+    {
+      text: "Your company announces a major restructuring that will change your role significantly. You:",
+      dim: "selfManage",
+      options: [
+        { label: "Refuse to cooperate and vocally resist the changes", val: 1 },
+        { label: "Feel anxious but seek to understand the reasoning and identify opportunities in the new structure", val: 4 },
+        { label: "Passively go along without engaging, hoping it fails", val: 1 },
+        { label: "Worry constantly but do not take any action to adapt", val: 2 }
+      ]
+    },
+    {
+      text: "A customer or client is speaking to you rudely and making unreasonable demands. You:",
+      dim: "selfManage",
+      options: [
+        { label: "Match their tone and argue back forcefully", val: 1 },
+        { label: "Stay calm, acknowledge their frustration, and work toward a realistic solution", val: 4 },
+        { label: "Silently comply with everything they demand to make them go away", val: 2 },
+        { label: "Walk away without resolving the issue", val: 1 }
+      ]
+    },
+    {
+      text: "You notice your mood dramatically shifts when scrolling through social media. You:",
+      dim: "selfAware",
+      options: [
+        { label: "Continue scrolling while feeling progressively worse", val: 1 },
+        { label: "Do not notice any connection between social media and your mood", val: 1 },
+        { label: "Recognize the pattern, put down your phone, and do something that restores your energy", val: 4 },
+        { label: "Notice you feel worse but tell yourself it does not matter", val: 2 }
+      ]
+    },
+    {
+      text: "A team member delivers a presentation that is clearly underprepared. Afterward, they ask for your honest opinion. You:",
+      dim: "relManage",
+      options: [
+        { label: "Tell them it was fine to spare their feelings, offering no useful feedback", val: 2 },
+        { label: "Provide specific, constructive feedback while acknowledging what they did well", val: 4 },
+        { label: "Bluntly say it was bad and list everything wrong", val: 1 },
+        { label: "Avoid the conversation entirely by changing the subject", val: 1 }
+      ]
+    },
+    {
+      text: "You are at a dinner party and someone shares a political opinion you strongly disagree with. You:",
+      dim: "socialAware",
+      options: [
+        { label: "Launch into a heated debate to prove them wrong", val: 1 },
+        { label: "Listen to understand their perspective and ask thoughtful questions", val: 4 },
+        { label: "Roll your eyes and disengage from the conversation", val: 1 },
+        { label: "Nod along even though you fundamentally disagree", val: 2 }
+      ]
+    },
+    {
+      text: "You are leading a team project and the deadline has been moved up by two weeks. You:",
+      dim: "relManage",
+      options: [
+        { label: "Panic and tell the team they will need to work overtime every day", val: 1 },
+        { label: "Reassess priorities with the team, adjust scope if needed, and communicate a clear revised plan", val: 4 },
+        { label: "Accept the deadline without informing the team of the change until last minute", val: 1 },
+        { label: "Complain to your manager that the deadline is unrealistic and refuse to adjust", val: 2 }
+      ]
+    },
+    {
+      text: "You feel overwhelmed by multiple deadlines and responsibilities piling up. You:",
+      dim: "selfManage",
+      options: [
+        { label: "Freeze and procrastinate because everything feels impossible", val: 1 },
+        { label: "Stay up all night trying to do everything at once", val: 1 },
+        { label: "Prioritize tasks by urgency and importance, then tackle them one at a time", val: 4 },
+        { label: "Complain to everyone about how busy you are without taking action", val: 2 }
+      ]
+    },
+    {
+      text: "You witness a colleague being unfairly criticized by a senior manager in front of others. You:",
+      dim: "socialAware",
+      options: [
+        { label: "Enjoy the drama and tell others about it later", val: 1 },
+        { label: "Check on the colleague afterward to offer support and acknowledge what happened was unfair", val: 4 },
+        { label: "Pretend you did not see anything", val: 2 },
+        { label: "Confront the senior manager publicly on the spot", val: 1 }
+      ]
+    },
+    {
+      text: "Your partner or close friend tells you something you did hurt their feelings. You:",
+      dim: "selfAware",
+      options: [
+        { label: "Listen without defensiveness, try to understand their perspective, and apologize sincerely", val: 4 },
+        { label: "Immediately list things they have done that hurt you", val: 1 },
+        { label: "Tell them they are being too sensitive", val: 1 },
+        { label: "Apologize quickly just to end the conversation", val: 2 }
+      ]
+    },
+    {
+      text: "You are about to give a presentation and feel extremely nervous. You:",
+      dim: "selfAware",
+      options: [
+        { label: "Deny that you are nervous and try to suppress the feeling entirely", val: 1 },
+        { label: "Acknowledge the nervousness as normal, use breathing techniques, and channel the energy into enthusiasm", val: 4 },
+        { label: "Consider faking an illness to avoid presenting", val: 1 },
+        { label: "Rush through the presentation as fast as possible to get it over with", val: 2 }
+      ]
+    },
+    {
+      text: "A new person joins your social group and seems to struggle fitting in. You:",
+      dim: "socialAware",
+      options: [
+        { label: "Wait for them to make the effort to fit in on their own", val: 2 },
+        { label: "Make an intentional effort to include them in conversations and introduce them to others", val: 4 },
+        { label: "Ignore them because the group dynamics are fine as they are", val: 1 },
+        { label: "Be friendly when they approach you but do not go out of your way", val: 3 }
+      ]
+    },
+    {
+      text: "You are asked to work on a project with someone you personally dislike. You:",
+      dim: "relManage",
+      options: [
+        { label: "Focus on the shared goal, maintain professionalism, and find common ground", val: 4 },
+        { label: "Request to be reassigned to a different project", val: 2 },
+        { label: "Do the minimum collaboration possible and avoid them", val: 1 },
+        { label: "Let your personal feelings affect the quality of your shared work", val: 1 }
+      ]
+    },
+    {
+      text: "After a disagreement with a friend, you realize that you were actually in the wrong. You:",
+      dim: "selfAware",
+      options: [
+        { label: "Reach out, acknowledge you were wrong, and apologize without making excuses", val: 4 },
+        { label: "Wait for them to reach out first because apologizing feels uncomfortable", val: 2 },
+        { label: "Convince yourself you were actually right to avoid the discomfort", val: 1 },
+        { label: "Apologize but add qualifiers like 'but you also...'", val: 1 }
+      ]
+    },
+    {
+      text: "You are trying to motivate a team that is exhausted and demoralized after a tough quarter. You:",
+      dim: "relManage",
+      options: [
+        { label: "Tell them to toughen up because that is just how business works", val: 1 },
+        { label: "Acknowledge the difficulty, celebrate small wins, and involve them in planning next steps", val: 4 },
+        { label: "Promise bonuses or rewards you cannot guarantee", val: 1 },
+        { label: "Give them a generic motivational speech without addressing their specific concerns", val: 2 }
+      ]
+    },
+    {
+      text: "Someone gives you a compliment that you feel is undeserved. You:",
+      dim: "selfManage",
+      options: [
+        { label: "Deflect it completely by saying you did nothing special", val: 2 },
+        { label: "Brag about additional accomplishments while accepting it", val: 1 },
+        { label: "Accept it graciously while internally reflecting on whether it aligns with your self-perception", val: 4 },
+        { label: "Assume they want something from you and become suspicious", val: 1 }
+      ]
+    },
+    {
+      text: "You overhear colleagues speaking negatively about another coworker who is not present. You:",
+      dim: "socialAware",
+      options: [
+        { label: "Join in because it is just harmless venting", val: 1 },
+        { label: "Steer the conversation in a more constructive direction or excuse yourself", val: 4 },
+        { label: "Say nothing but remember the information for your own benefit", val: 1 },
+        { label: "Listen silently without contributing but do not intervene", val: 2 }
+      ]
+    }
+  ];
+
+  var domains = {
+    selfAware: {
+      name: "Self-Awareness",
+      icon: "\u{1FA9E}",
+      desc: "The ability to recognize and understand your own emotions, strengths, weaknesses, and their impact on others."
+    },
+    selfManage: {
+      name: "Self-Management",
+      icon: "\u{1F3AF}",
+      desc: "The ability to control impulsive feelings, manage emotions in healthy ways, and adapt to changing circumstances."
+    },
+    socialAware: {
+      name: "Social Awareness",
+      icon: "\u{1F465}",
+      desc: "The ability to understand the emotions, needs, and concerns of others, pick up on social cues, and feel comfortable socially."
+    },
+    relManage: {
+      name: "Relationship Management",
+      icon: "\u{1F91D}",
+      desc: "The ability to develop and maintain good relationships, communicate clearly, inspire and influence others, and manage conflict."
+    }
+  };
+
+  var eqRanges = [
+    { min: 80, label: "Exceptional", color: "#16a34a" },
+    { min: 60, label: "Strong", color: "#22c55e" },
+    { min: 40, label: "Moderate", color: "#f59e0b" },
+    { min: 20, label: "Developing", color: "#f97316" },
+    { min: 0, label: "Needs Work", color: "#ef4444" }
+  ];
+
+  var improvementTipsMap = {
+    selfAware: "<strong>Tips to Improve Self-Awareness:</strong> Practice daily mindfulness meditation for 5-10 minutes. Keep an emotion journal noting triggers and reactions. Regularly ask trusted people for honest feedback about your emotional patterns.",
+    selfManage: "<strong>Tips to Improve Self-Management:</strong> Use the 10-second rule before reacting to strong emotions. Build routines that reduce decision fatigue. Practice reframing negative situations by identifying what you can learn or control.",
+    socialAware: "<strong>Tips to Improve Social Awareness:</strong> Practice active listening by focusing entirely on the speaker. Observe body language and tone in conversations. Read fiction to build empathy. Ask open-ended questions to understand others' perspectives.",
+    relManage: "<strong>Tips to Improve Relationship Management:</strong> Address conflicts early before they escalate. Give specific, genuine appreciation regularly. Practice clear 'I' statements in difficult conversations. Invest in relationships proactively, not just when you need something."
+  };
+
+  var STORAGE_KEY = 'toolcalcs_emotional-intelligence-test_history';
+  var MAX_HISTORY = 20;
+
+  function getEQRating(score) {
+    for (var i = 0; i < eqRanges.length; i++) {
+      if (score >= eqRanges[i].min) return { label: eqRanges[i].label, color: eqRanges[i].color };
+    }
+    return { label: "Needs Work", color: "#ef4444" };
+  }
+
+  function loadHistory() {
+    try { var r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch (e) {}
+    return [];
+  }
+  function saveHistory(h) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch (e) {}
+  }
+  function addToHistory(score) {
+    var h = loadHistory();
+    h.unshift({ score: score, date: new Date().toISOString(), rating: getEQRating(score).label });
+    saveHistory(h);
+  }
+
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i];
+      a[i] = a[j];
+      a[j] = tmp;
+    }
+    return a;
+  }
+
+  function formatDate(iso) {
+    try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    catch (e) { return ''; }
+  }
+
+  // DOM
+  var instructionsView = document.getElementById('instructionsView');
+  var playView = document.getElementById('playView');
+  var resultView = document.getElementById('resultView');
+  var startBtn = document.getElementById('startBtn');
+  var tryAgainBtn = document.getElementById('tryAgainBtn');
+  var progressText = document.getElementById('progressText');
+  var progressFill = document.getElementById('progressFill');
+  var questionText = document.getElementById('questionText');
+  var optionsContainer = document.getElementById('optionsContainer');
+  var finalScore = document.getElementById('finalScore');
+  var ratingBadge = document.getElementById('ratingBadge');
+  var domainChart = document.getElementById('domainChart');
+  var domainDetails = document.getElementById('domainDetails');
+  var improvementTips = document.getElementById('improvementTips');
+  var attemptHistorySection = document.getElementById('attemptHistory');
+  var historyList = document.getElementById('historyList');
+
+  var shuffledQuestions = [];
+  var currentIndex = 0;
+  var scores = { selfAware: 0, selfManage: 0, socialAware: 0, relManage: 0 };
+  var domainCounts = { selfAware: 0, selfManage: 0, socialAware: 0, relManage: 0 };
+  var isProcessing = false;
+
+  function showView(view) {
+    instructionsView.style.display = 'none';
+    playView.style.display = 'none';
+    resultView.style.display = 'none';
+    view.style.display = '';
+  }
+
+  function startGame() {
+    shuffledQuestions = shuffle(questions);
+    currentIndex = 0;
+    scores = { selfAware: 0, selfManage: 0, socialAware: 0, relManage: 0 };
+    domainCounts = { selfAware: 0, selfManage: 0, socialAware: 0, relManage: 0 };
+
+    // Count questions per domain
+    for (var i = 0; i < shuffledQuestions.length; i++) {
+      domainCounts[shuffledQuestions[i].dim]++;
+    }
+
+    isProcessing = false;
+    showView(playView);
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    var q = shuffledQuestions[currentIndex];
+    var total = shuffledQuestions.length;
+    var pct = Math.round(((currentIndex) / total) * 100);
+
+    progressText.textContent = 'Question ' + (currentIndex + 1) + ' of ' + total;
+    progressFill.style.width = pct + '%';
+    questionText.textContent = q.text;
+
+    var shuffledOpts = shuffle(q.options);
+    var html = '';
+    for (var i = 0; i < shuffledOpts.length; i++) {
+      html += '<button class="quiz-option" type="button" data-val="' + shuffledOpts[i].val + '" data-dim="' + q.dim + '">' + shuffledOpts[i].label + '</button>';
+    }
+    optionsContainer.innerHTML = html;
+  }
+
+  function handleOptionClick(e) {
+    if (isProcessing) return;
+    var btn = e.target;
+    if (!btn || !btn.classList || !btn.classList.contains('quiz-option')) return;
+
+    isProcessing = true;
+    var val = parseInt(btn.getAttribute('data-val'), 10);
+    var dim = btn.getAttribute('data-dim');
+
+    btn.classList.add('selected');
+    scores[dim] += val;
+
+    setTimeout(function () {
+      currentIndex++;
+      if (currentIndex >= shuffledQuestions.length) {
+        showResults();
+      } else {
+        renderQuestion();
+      }
+      isProcessing = false;
+    }, 300);
+  }
+
+  function showResults() {
+    // Calculate total EQ score (0-100)
+    var totalRaw = scores.selfAware + scores.selfManage + scores.socialAware + scores.relManage;
+    var totalMax = shuffledQuestions.length * 4;  // 120
+    var totalMin = shuffledQuestions.length * 1;  // 30
+    var eqScore = Math.round(((totalRaw - totalMin) / (totalMax - totalMin)) * 100);
+    if (eqScore < 0) eqScore = 0;
+    if (eqScore > 100) eqScore = 100;
+
+    showView(resultView);
+    finalScore.textContent = String(eqScore);
+
+    var rating = getEQRating(eqScore);
+    ratingBadge.textContent = rating.label;
+    ratingBadge.style.background = rating.color;
+
+    // Domain bar chart
+    var chartHTML = '';
+    var lowestDim = '';
+    var lowestPct = 101;
+    var dimKeys = ['selfAware', 'selfManage', 'socialAware', 'relManage'];
+
+    for (var i = 0; i < dimKeys.length; i++) {
+      var key = dimKeys[i];
+      var domainMax = domainCounts[key] * 4;
+      var domainMin = domainCounts[key] * 1;
+      var domainPct = Math.round(((scores[key] - domainMin) / (domainMax - domainMin)) * 100);
+      if (domainPct < 0) domainPct = 0;
+      if (domainPct > 100) domainPct = 100;
+
+      if (domainPct < lowestPct) {
+        lowestPct = domainPct;
+        lowestDim = key;
+      }
+
+      var domainColor = getEQRating(domainPct).color;
+      chartHTML += '<div class="quiz-bar-item">';
+      chartHTML += '<div class="quiz-bar-label"><span>' + domains[key].icon + ' ' + domains[key].name + '</span><span>' + domainPct + '%</span></div>';
+      chartHTML += '<div class="quiz-bar-track"><div class="quiz-bar-fill" style="width:' + domainPct + '%;background:' + domainColor + '"></div></div>';
+      chartHTML += '</div>';
+    }
+    domainChart.innerHTML = chartHTML;
+
+    // Domain details
+    var detailsHTML = '<div style="text-align:left;max-width:450px;margin:0 auto;">';
+    for (var j = 0; j < dimKeys.length; j++) {
+      var dk = dimKeys[j];
+      detailsHTML += '<p><strong>' + domains[dk].icon + ' ' + domains[dk].name + ':</strong> ' + domains[dk].desc + '</p>';
+    }
+    detailsHTML += '</div>';
+    domainDetails.innerHTML = detailsHTML;
+
+    // Improvement tips for lowest domain
+    if (lowestDim && improvementTipsMap[lowestDim]) {
+      improvementTips.innerHTML = '<div style="text-align:left;max-width:450px;margin:16px auto 0;padding:16px;background:var(--color-bg);border-radius:var(--radius);border:1px solid var(--color-border);"><p style="margin-bottom:4px;font-size:0.9rem;color:var(--color-text-muted);">Your biggest growth area:</p><p>' + improvementTipsMap[lowestDim] + '</p></div>';
+    }
+
+    addToHistory(eqScore);
+    renderHistory();
+
+    if (window.GameShare) {
+      window.GameShare.show({
+        gameName: gameName,
+        gameSlug: gameSlug,
+        gameIcon: gameIcon,
+        score: eqScore,
+        unit: metricUnit,
+        metricLabel: metricLabel,
+        ratingLabel: rating.label,
+        ratingColor: rating.color
+      });
+    }
+  }
+
+  function renderHistory() {
+    var history = loadHistory();
+    if (history.length === 0) { attemptHistorySection.hidden = true; return; }
+    attemptHistorySection.hidden = false;
+    var html = '';
+    for (var i = 0; i < history.length; i++) {
+      var e = history[i];
+      var r = getEQRating(e.score);
+      html += '<div class="history-item">';
+      html += '<span class="history-score">' + e.score + '/100</span>';
+      html += '<span class="history-rating" style="background:' + r.color + '">' + r.label + '</span>';
+      html += '<span class="history-time">' + formatDate(e.date) + '</span>';
+      html += '</div>';
+    }
+    historyList.innerHTML = html;
+  }
+
+  // Events
+  optionsContainer.addEventListener('click', handleOptionClick);
+  startBtn.addEventListener('click', startGame);
+  tryAgainBtn.addEventListener('click', startGame);
+  renderHistory();
+})();
+</script>
