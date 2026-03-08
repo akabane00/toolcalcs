@@ -150,6 +150,7 @@ const structuredData = [
   <div class="quick-fact">
     <span class="quick-fact-label">Quick Fact:</span>
     <strong>{fmt(number)} in words is "{words}"</strong>
+    <button class="copy-result-btn" id="copyResultBtn" title="Copy to clipboard">Copy</button>
   </div>
 
   <!-- Result Cards -->
@@ -347,6 +348,18 @@ const structuredData = [
     color: var(--color-primary);
     font-size: 1.15rem;
   }
+  .copy-result-btn {
+    margin-left: 12px;
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-bg);
+    cursor: pointer;
+    color: var(--color-text-muted);
+    transition: all 0.15s;
+  }
+  .copy-result-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
 
   .section-heading {
     font-size: 1.2rem;
@@ -468,6 +481,15 @@ const structuredData = [
     html += '<br><strong>Ordinal Number:</strong> ' + ordSuf;
     resultDiv.innerHTML = html;
   }
+
+  var copyBtn = document.getElementById('copyResultBtn') as HTMLButtonElement;
+  copyBtn.addEventListener('click', function() {
+    var text = (document.querySelector('.quick-fact strong') as HTMLElement).textContent || '';
+    navigator.clipboard.writeText(text).then(function() {
+      copyBtn.textContent = 'Copied!';
+      setTimeout(function() { copyBtn.textContent = 'Copy'; }, 2000);
+    });
+  });
 
   convertBtn.addEventListener('click', doConvert);
   convertInput.addEventListener('keydown', function(e) {

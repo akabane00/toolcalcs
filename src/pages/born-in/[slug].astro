@@ -125,6 +125,7 @@ const structuredData = [
   <div class="quick-fact">
     <span class="quick-fact-label">Quick Fact:</span>
     <strong>If you were born in {year}, you are turning {turningAge} in 2026.</strong>
+    <button class="copy-result-btn" id="copyResultBtn" title="Copy to clipboard">Copy</button>
   </div>
 
   <!-- Result Cards -->
@@ -316,6 +317,17 @@ const structuredData = [
     color: var(--color-primary);
     font-size: 1.15rem;
   }
+  .copy-result-btn {
+    margin-left: 12px;
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: #fff;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .copy-result-btn:hover { background: var(--color-bg); }
 
   .section-heading {
     font-size: 1.2rem;
@@ -396,4 +408,16 @@ const structuredData = [
   dayInput.addEventListener('keydown', function(e) {
     if ((e as KeyboardEvent).key === 'Enter') calculateExactAge();
   });
+
+  var copyBtn = document.getElementById('copyResultBtn') as HTMLButtonElement;
+  if (copyBtn) {
+    copyBtn.addEventListener('click', function() {
+      var factEl = copyBtn.closest('.quick-fact');
+      var text = factEl ? (factEl.querySelector('strong')?.textContent || '') : '';
+      navigator.clipboard.writeText(text).then(function() {
+        copyBtn.textContent = 'Copied!';
+        setTimeout(function() { copyBtn.textContent = 'Copy'; }, 1500);
+      });
+    });
+  }
 </script>
