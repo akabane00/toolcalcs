@@ -56,6 +56,31 @@ function getPlaceValues(n: number): { position: string; digit: number; placeName
 
 const placeValues = number > 0 ? getPlaceValues(number) : [];
 
+// Mathematical properties
+function getFactors(n: number): number[] {
+  if (n <= 0 || n > 10000) return [];
+  const factors: number[] = [];
+  for (let i = 1; i <= Math.sqrt(n); i++) {
+    if (n % i === 0) { factors.push(i); if (i !== n / i) factors.push(n / i); }
+  }
+  return factors.sort((a, b) => a - b);
+}
+
+function sumOfDigits(n: number): number {
+  return String(n).split('').reduce((s, d) => s + parseInt(d, 10), 0);
+}
+
+function digitalRoot(n: number): number {
+  if (n === 0) return 0;
+  return 1 + ((n - 1) % 9);
+}
+
+const factors = getFactors(number);
+const digitSum = sumOfDigits(number);
+const digRoot = digitalRoot(number);
+const isPerfectSquare = number > 0 && Math.sqrt(number) === Math.floor(Math.sqrt(number));
+const isPerfectCube = number > 0 && Math.cbrt(number) === Math.floor(Math.cbrt(number));
+
 // SEO
 const title = `${fmt(number)} in Words - ${capitalizedWords} | ToolCalcs`;
 const description = `${fmt(number)} in words is "${words}". The ordinal form is "${ordinal}" (${ordinalSuffix}). Learn to write numbers in English words with our converter.`;
@@ -209,6 +234,29 @@ const structuredData = [
               <td>{p.words}</td>
             </tr>
           ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+
+  <!-- Mathematical Properties -->
+  {number > 0 && (
+    <h2 class="section-heading">Mathematical Properties of {fmt(number)}</h2>
+    <div class="calculator-box">
+      <table class="data-table">
+        <tbody>
+          <tr><td>Parity</td><td>{isEven ? 'Even' : 'Odd'}</td></tr>
+          <tr><td>Prime or Composite</td><td>{isPrime ? 'Prime' : number === 1 ? 'Neither' : 'Composite'}</td></tr>
+          <tr><td>Sum of Digits</td><td>{digitSum}</td></tr>
+          <tr><td>Digital Root</td><td>{digRoot}</td></tr>
+          {isPerfectSquare && <tr><td>Perfect Square</td><td>Yes ({Math.sqrt(number)}&sup2;)</td></tr>}
+          {isPerfectCube && <tr><td>Perfect Cube</td><td>Yes ({Math.round(Math.cbrt(number))}&sup3;)</td></tr>}
+          {factors.length > 0 && factors.length <= 20 && (
+            <tr><td>Factors</td><td>{factors.join(', ')}</td></tr>
+          )}
+          {factors.length > 0 && (
+            <tr><td>Number of Factors</td><td>{factors.length}</td></tr>
+          )}
         </tbody>
       </table>
     </div>
