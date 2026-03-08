@@ -7,17 +7,8 @@ export default defineConfig({
   site: 'https://toolcalcs.com',
   integrations: [sitemap({
     filter(page) {
-      // Exclude noindexed programmatic routes from sitemap
-      const noindexRoutes = [
-        '/auto-loan/', '/born-in/', '/compound-interest/', '/cooking/',
-        '/days-ago/', '/days-from-now/', '/decimal-to-fraction/', '/factors-of/',
-        '/fraction/', '/grade/', '/math/', '/number-to-words/',
-        '/percent-off/', '/percentage/', '/roman-numerals/', '/salary/',
-        '/temperature/', '/time-convert/', '/times-tables/', '/tip/',
-        '/what-percent/',
-        '/zodiac/', '/angel-number/'
-      ];
-      // Keep index pages (exact route match), exclude sub-pages
+      // Keep noindex only for zodiac & angel-number (low-quality bulk content)
+      const noindexRoutes = ['/zodiac/', '/angel-number/'];
       for (const route of noindexRoutes) {
         if (page.includes(route) && page !== `https://toolcalcs.com${route}`) {
           return false;
