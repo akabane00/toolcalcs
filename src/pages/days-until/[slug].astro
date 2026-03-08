@@ -53,6 +53,28 @@ const relatedEvents = event.relatedSlugs
 // Content paragraphs
 const contentParagraphs = event.contentBody.split('\n\n').filter((p) => p.trim());
 
+// Countdown milestones
+const milestoneMarkers = [
+  { days: 365, label: '1 Year' },
+  { days: 180, label: '6 Months' },
+  { days: 90, label: '3 Months' },
+  { days: 30, label: '1 Month' },
+  { days: 14, label: '2 Weeks' },
+  { days: 7, label: '1 Week' },
+  { days: 1, label: '1 Day' },
+];
+
+const milestones = milestoneMarkers
+  .filter((m) => m.days < totalDays)
+  .map((m) => {
+    const mDate = new Date(target.getTime() - m.days * msPerDay);
+    return {
+      ...m,
+      date: `${monthNames[mDate.getMonth()]} ${mDate.getDate()}, ${mDate.getFullYear()}`,
+      dayOfWeek: dayNames[mDate.getDay()],
+    };
+  });
+
 // Structured data
 const structuredData = [
   {
@@ -125,6 +147,31 @@ const structuredData = [
     </div>
   </div>
 
+  <!-- Countdown Milestones -->
+  {milestones.length > 0 && (
+    <h2 class="section-heading">Countdown Milestones</h2>
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Milestone</th>
+            <th>Date</th>
+            <th>Day</th>
+          </tr>
+        </thead>
+        <tbody>
+          {milestones.map((m) => (
+            <tr>
+              <td>{m.label} before</td>
+              <td>{m.date}</td>
+              <td>{m.dayOfWeek}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+
   <AdUnit slot="countdown-mid" format="rectangle" />
 
   <!-- Content Section -->
@@ -132,11 +179,24 @@ const structuredData = [
     <h2>About {event.name}</h2>
     {contentParagraphs.map((p) => <p>{p}</p>)}
 
+    <h2>How the Countdown Is Calculated</h2>
+    <p>
+      This countdown calculates the number of days between today's date and {displayDate} ({targetDayOfWeek}). The calculation counts calendar days, not business days. The countdown updates automatically when you visit this page, so you always see the most current number of days remaining until {event.name}.
+    </p>
+    <p>
+      The weeks-and-days breakdown divides the total days by 7 to show full weeks with remaining days. The months-and-days breakdown uses calendar month boundaries for a more intuitive time perspective. All three formats (days, weeks, months) represent the same duration.
+    </p>
+
     <h2>Frequently Asked Questions</h2>
     {event.faqItems.map((faq) => (
       <h3>{faq.question}</h3>
       <p>{faq.answer}</p>
     ))}
+
+    <h2>Plan Ahead for {event.name}</h2>
+    <p>
+      With {isPast ? 'the event having passed' : totalDays + ' days to go'}, now is a good time to start planning. Mark key preparation dates on your calendar and set reminders for important deadlines. Breaking your preparation into smaller milestones makes large countdowns more manageable and helps ensure you are ready when the day arrives.
+    </p>
 
     <h2>Related Countdowns</h2>
     <ul>
