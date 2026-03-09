@@ -1,0 +1,161 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import { getAllBMIPages, type BMIPage } from '../../data/bmi';
+
+const allPages = getAllBMIPages();
+const count = allPages.length;
+
+const heights = [...new Set(allPages.map(p => p.heightDisplay))];
+
+function getPagesForHeight(heightDisplay: string): BMIPage[] {
+  return allPages
+    .filter(p => p.heightDisplay === heightDisplay)
+    .sort((a, b) => a.weightKg - b.weightKg);
+}
+
+const midIndex = Math.floor(heights.length / 2);
+
+const colorMap: Record<string, string> = {
+  blue: '#2563eb',
+  green: '#16a34a',
+  orange: '#ea580c',
+  red: '#dc2626',
+};
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://toolcalcs.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "BMI Chart"
+    }
+  ]
+};
+---
+
+<BaseLayout
+  title="BMI Chart by Height and Weight - Body Mass Index Table | ToolCalcs"
+  description={`Browse ${count} BMI calculations organized by height and weight. Find your BMI instantly with our pre-calculated chart for heights from 5'4" to 6'0" and weights from 120 to 250 lbs.`}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <span>BMI Chart</span>
+  </nav>
+
+  <h1>BMI Chart by Height and Weight</h1>
+  <p class="page-desc">Browse {count} pre-calculated BMI values organized by height. Click any row for a detailed breakdown, or use our <a href="/health-calculators/bmi-calculator/">interactive BMI calculator</a> for custom measurements.</p>
+
+  <AdUnit slot="bmi-idx-top" format="horizontal" />
+
+  {heights.map((h, i) => (
+    <>
+      <section class="bmi-height-section">
+        <h2 class="bmi-height-heading">BMI for {h}</h2>
+        <div class="table-container">
+          <table class="data-table bmi-table">
+            <thead>
+              <tr>
+                <th>Weight</th>
+                <th>BMI</th>
+                <th>Category</th>
+              </tr>
+            </thead>
+            <tbody>
+              {getPagesForHeight(h).map((p) => (
+                <tr>
+                  <td><a href={`/bmi/${p.slug}/`} class="bmi-row-link">{p.weightDisplay}</a></td>
+                  <td>{p.bmi}</td>
+                  <td><span style={`color: ${colorMap[p.categoryColor] || p.categoryColor}; font-weight: 600;`}>{p.category}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+      {i === midIndex && <AdUnit slot="bmi-idx-mid" format="rectangle" />}
+    </>
+  ))}
+
+  <article class="content-section">
+    <h2>How to Use This BMI Chart</h2>
+    <p>
+      This BMI chart provides a quick reference for finding your Body Mass Index based on height and weight. To use it, locate your height from the sections above, then find the row matching your weight. The table displays your BMI value and its corresponding category so you can assess where you fall on the scale at a glance.
+    </p>
+    <p>
+      Each row in the chart links to a detailed page with a full breakdown of how the BMI was calculated, what it means for your health, and how it compares to healthy ranges. If your exact height or weight is not listed, use our <a href="/health-calculators/bmi-calculator/">interactive BMI calculator</a> to enter custom values and get an instant result.
+    </p>
+    <p>
+      BMI is calculated using the formula: BMI = weight (kg) / height (m)<sup>2</sup>. For imperial measurements, the formula is BMI = 703 &times; weight (lbs) / height (in)<sup>2</sup>. Both formulas produce the same result. The values in this chart use metric conversion behind the scenes but are displayed with familiar imperial units for convenience.
+    </p>
+
+    <h2>Understanding BMI Categories</h2>
+    <p>
+      The World Health Organization defines four primary BMI categories for adults. A BMI below 18.5 is classified as <strong>Underweight</strong>, which may indicate insufficient nutrition or an underlying health condition. A BMI between 18.5 and 24.9 falls in the <strong>Normal</strong> range, generally associated with the lowest health risks. A BMI from 25.0 to 29.9 is considered <strong>Overweight</strong>, and a BMI of 30.0 or higher is classified as <strong>Obese</strong>.
+    </p>
+    <p>
+      It is important to understand that BMI is a screening tool, not a diagnostic measure. It does not directly measure body fat percentage, and it cannot distinguish between muscle mass and fat mass. Athletes and individuals with high muscle density may have an elevated BMI while being in excellent health. Similarly, older adults who have lost muscle mass may have a normal BMI despite carrying excess body fat. For a more complete picture, consider combining BMI with waist circumference measurements, body fat percentage, and other health indicators.
+    </p>
+    <p>
+      BMI categories apply to adults aged 20 and older. For children and teenagers, BMI is interpreted differently using age- and sex-specific percentile charts. A pediatrician can help assess whether a child's BMI falls within a healthy range for their age group.
+    </p>
+
+    <h2>When to See a Doctor</h2>
+    <p>
+      If your BMI falls outside the normal range, it may be worth discussing with a healthcare provider. A BMI in the overweight or obese range is associated with increased risk of heart disease, type 2 diabetes, high blood pressure, sleep apnea, and certain cancers. Even modest weight loss of 5 to 10 percent of body weight can significantly reduce these risks and improve overall health markers.
+    </p>
+    <p>
+      On the other end of the spectrum, a BMI in the underweight range can signal nutritional deficiencies, weakened immune function, or conditions like osteoporosis. If you are underweight and experiencing fatigue, hair loss, or frequent illness, seek medical advice to identify and address the underlying cause.
+    </p>
+    <p>
+      Ultimately, BMI is one piece of a larger health puzzle. Regular check-ups, a balanced diet, consistent physical activity, and attention to how you feel day to day are all essential. Use this chart as a starting point for understanding your body composition, and consult a medical professional for personalized guidance tailored to your unique health profile.
+    </p>
+
+    <p><a href="/">Back to ToolCalcs Home &rarr;</a></p>
+  </article>
+
+  <AdUnit slot="bmi-idx-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .bmi-height-section {
+    margin-bottom: 36px;
+  }
+  .bmi-height-heading {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--color-border);
+    color: var(--color-text);
+  }
+  .bmi-table {
+    max-width: 560px;
+  }
+  .bmi-table td:first-child {
+    font-weight: 600;
+  }
+  .bmi-row-link {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .bmi-row-link:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 640px) {
+    .bmi-table {
+      max-width: 100%;
+    }
+  }
+</style>

@@ -1,0 +1,169 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import { getAllMortgagePages, formatMoney } from '../../data/mortgage';
+import type { MortgagePage } from '../../data/mortgage';
+
+const allPages = getAllMortgagePages();
+const count = allPages.length;
+
+// Group by loan amount
+const amounts = [...new Set(allPages.map(p => p.loanAmount))].sort((a, b) => a - b);
+
+function fmtMoney(n: number): string {
+  return '$' + Math.round(n).toLocaleString('en-US');
+}
+
+function getPagesForAmount(amount: number): MortgagePage[] {
+  return allPages
+    .filter(p => p.loanAmount === amount)
+    .sort((a, b) => a.termYears - b.termYears || a.rate - b.rate);
+}
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://toolcalcs.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Mortgage Calculator"
+    }
+  ]
+};
+---
+
+<BaseLayout
+  title="Mortgage Payment Calculator - Monthly Payment Tables | ToolCalcs"
+  description={`Calculate monthly mortgage payments for any loan amount, interest rate, and term. Browse ${count} pre-calculated mortgage scenarios with detailed payment breakdowns.`}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <span>Mortgage Calculator</span>
+  </nav>
+
+  <h1>Mortgage Payment Calculator</h1>
+  <p class="page-desc">Calculate monthly mortgage payments for any loan amount, interest rate, and term. Browse {count} pre-calculated scenarios below or use our <a href="/financial-calculators/mortgage-calculator/">interactive mortgage calculator</a>.</p>
+
+  <AdUnit slot="mortgage-idx-top" format="horizontal" />
+
+  {amounts.map(function (amount, idx) {
+    var pages = getPagesForAmount(amount);
+    var midpoint = Math.floor(amounts.length / 2);
+    return (
+      <>
+        <section class="mtg-amount-section">
+          <h2 class="mtg-amount-heading">{fmtMoney(amount)} Mortgage Payments</h2>
+          <div class="table-container">
+            <table class="data-table mtg-table">
+              <thead>
+                <tr>
+                  <th>Loan Amount</th>
+                  <th>Term</th>
+                  <th>Rate</th>
+                  <th>Monthly Payment</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pages.map(function (p) {
+                  return (
+                    <tr>
+                      <td><a href={`/mortgage/${p.slug}/`}>{p.loanDisplay}</a></td>
+                      <td>{p.termYears} years</td>
+                      <td>{p.rate}%</td>
+                      <td class="mtg-payment">${formatMoney(p.monthlyPayment)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </section>
+        {idx === midpoint && <AdUnit slot="mortgage-idx-mid" format="rectangle" />}
+      </>
+    );
+  })}
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>How to Use This Mortgage Guide</h2>
+    <p>
+      This page contains {count} pre-calculated mortgage payment scenarios organized by loan amount. Each row shows the loan amount, term length, interest rate, and the resulting monthly principal and interest payment. Click any row to view a detailed breakdown that includes total interest paid, estimated property taxes, homeowners insurance, and the full PITI (principal, interest, taxes, insurance) payment.
+    </p>
+    <p>
+      If you need to calculate a custom scenario with a specific loan amount or interest rate not listed here, use our full <a href="/financial-calculators/mortgage-calculator/">interactive mortgage calculator</a> to enter your own values and see a complete amortization schedule.
+    </p>
+
+    <h2>Understanding Mortgage Payments</h2>
+    <p>
+      A mortgage payment is typically made up of four components, often abbreviated as PITI: principal, interest, taxes, and insurance. The principal portion reduces your loan balance, while interest is the cost charged by the lender for borrowing the money. Property taxes and homeowners insurance are usually collected monthly by the lender and held in an escrow account until they are due.
+    </p>
+    <p>
+      The monthly principal and interest payment is calculated using a standard amortization formula that takes into account three variables: the loan amount, the annual interest rate, and the loan term in months. At the beginning of the loan, a larger share of each payment goes toward interest. Over time, as the balance decreases, more of the payment is applied to the principal. This gradual shift is known as amortization.
+    </p>
+    <p>
+      Two common mortgage terms are 15-year and 30-year fixed-rate loans. A 30-year mortgage has lower monthly payments because the cost is spread over a longer period, but you pay significantly more in total interest. A 15-year mortgage has higher monthly payments but saves tens of thousands of dollars in interest and builds equity much faster. For example, a $300,000 mortgage at 6.5% costs about $1,896 per month over 30 years (with $382,633 in total interest), compared to $2,613 per month over 15 years (with only $170,389 in total interest).
+    </p>
+
+    <h2>Factors That Affect Your Payment</h2>
+    <p>
+      Several factors influence how much you will pay each month on your mortgage. The most significant are the loan amount, the interest rate, and the loan term. Even a small change in the interest rate can have a substantial impact. On a $300,000 loan over 30 years, the difference between a 6% rate and a 7% rate is roughly $200 per month, or more than $70,000 over the life of the loan.
+    </p>
+    <p>
+      Your credit score plays a major role in determining the interest rate you qualify for. Borrowers with higher credit scores typically receive lower rates, which translates into significant savings. Other factors include the size of your down payment (a larger down payment reduces the loan amount and may eliminate private mortgage insurance), the type of loan (conventional, FHA, VA, or USDA), and the location of the property, which affects property tax rates and insurance costs.
+    </p>
+    <p>
+      To explore different loan scenarios and find the right mortgage for your budget, try our <a href="/financial-calculators/mortgage-calculator/">mortgage calculator</a>. You can also use the <a href="/financial-calculators/home-affordability-calculator/">home affordability calculator</a> to determine how much house you can comfortably afford based on your income and expenses.
+    </p>
+
+    <p><a href="/">Back to ToolCalcs Home &rarr;</a></p>
+  </article>
+
+  <AdUnit slot="mortgage-idx-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .mtg-amount-section {
+    margin-bottom: 36px;
+  }
+  .mtg-amount-heading {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--color-border);
+    color: var(--color-text);
+  }
+  .mtg-table a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .mtg-table a:hover {
+    text-decoration: underline;
+  }
+  .mtg-payment {
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+  .mtg-table td:first-child {
+    white-space: nowrap;
+  }
+
+  @media (max-width: 640px) {
+    .mtg-table {
+      font-size: 0.82rem;
+    }
+    .mtg-table th,
+    .mtg-table td {
+      padding: 6px 8px;
+    }
+  }
+</style>

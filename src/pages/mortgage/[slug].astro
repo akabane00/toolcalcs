@@ -1,0 +1,524 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import '../../styles/calculator.css';
+import { getAllMortgagePages, type MortgagePage } from '../../data/mortgage';
+
+export function getStaticPaths() {
+  return getAllMortgagePages().map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: MortgagePage };
+const {
+  slug,
+  loanAmount,
+  rate,
+  termYears,
+  monthlyPayment,
+  totalPayment,
+  totalInterest,
+  monthlyTax,
+  monthlyInsurance,
+  monthlyPITI,
+} = page;
+
+function fmtMoney(n: number): string {
+  return '$' + Math.round(n).toLocaleString('en-US');
+}
+
+function fmtMoneyDecimal(n: number): string {
+  return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+const amountDisplay = fmtMoney(loanAmount);
+
+// --- Amortization summary at key years ---
+const monthlyRate = rate / 100 / 12;
+const totalMonths = termYears * 12;
+const checkYears = termYears === 15
+  ? [1, 3, 5, 7, 10, 13, 15]
+  : [1, 5, 10, 15, 20, 25, 30];
+
+const amortSummary = checkYears.filter(y => y <= termYears).map(year => {
+  const monthsPaid = year * 12;
+  let balance = loanAmount;
+  let totalPrincipalPaid = 0;
+  let totalInterestPaid = 0;
+  for (let i = 0; i < monthsPaid; i++) {
+    const interestPayment = balance * monthlyRate;
+    const principalPayment = monthlyPayment - interestPayment;
+    totalPrincipalPaid += principalPayment;
+    totalInterestPaid += interestPayment;
+    balance -= principalPayment;
+  }
+  return {
+    year,
+    balance: Math.max(0, Math.round(balance)),
+    principalPaid: Math.round(totalPrincipalPaid),
+    interestPaid: Math.round(totalInterestPaid),
+  };
+});
+
+// --- First month breakdown ---
+const firstMonthInterest = loanAmount * monthlyRate;
+const firstMonthPrincipal = monthlyPayment - firstMonthInterest;
+
+// --- Related pages ---
+const allPages = getAllMortgagePages();
+const relatedByRate = allPages
+  .filter(p => p.loanAmount === loanAmount && p.termYears === termYears && p.rate !== rate)
+  .sort((a, b) => a.rate - b.rate);
+const relatedByAmount = allPages
+  .filter(p => p.rate === rate && p.termYears === termYears && p.loanAmount !== loanAmount)
+  .sort((a, b) => a.loanAmount - b.loanAmount)
+  .slice(0, 8);
+
+// --- SEO ---
+const title = `${amountDisplay} Mortgage Payment \u2014 ${termYears} Year at ${rate}% Rate | ToolCalcs`;
+const description = `Calculate the monthly payment on a ${amountDisplay} mortgage at ${rate}% for ${termYears} years. Monthly P&I: ${fmtMoneyDecimal(monthlyPayment)}. Total interest: ${fmtMoney(totalInterest)}. See full amortization and compare rates.`;
+const breadcrumbShort = `${amountDisplay} Mortgage`;
+
+// --- FAQ content ---
+const faq1Q = `What is the monthly payment on a ${amountDisplay} mortgage at ${rate}%?`;
+const faq1A = `The monthly principal and interest payment on a ${amountDisplay} mortgage at ${rate}% for ${termYears} years is ${fmtMoneyDecimal(monthlyPayment)}. Including estimated property tax and insurance, the total monthly PITI payment is approximately ${fmtMoneyDecimal(monthlyPITI)}.`;
+
+const faq2Q = `How much interest do you pay on a ${amountDisplay} mortgage?`;
+const faq2A = `Over the life of a ${termYears}-year loan at ${rate}%, you would pay ${fmtMoney(totalInterest)} in total interest on a ${amountDisplay} mortgage. The total amount repaid including principal is ${fmtMoney(totalPayment)}.`;
+
+const faq3Q = `Is ${rate}% a good mortgage rate?`;
+const faq3A = `Whether ${rate}% is a good mortgage rate depends on current market conditions, your credit score, and loan type. Historically, the average 30-year fixed mortgage rate has ranged from about 3% to 8%. Compare offers from multiple lenders and check current benchmark rates to evaluate whether ${rate}% is competitive for your situation. Even a 0.25% difference can save thousands over the life of the loan.`;
+
+// --- Structured Data ---
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Mortgage Calculator", "item": "https://toolcalcs.com/mortgage/" },
+      { "@type": "ListItem", "position": 3, "name": breadcrumbShort },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": faq1Q,
+        "acceptedAnswer": { "@type": "Answer", "text": faq1A },
+      },
+      {
+        "@type": "Question",
+        "name": faq2Q,
+        "acceptedAnswer": { "@type": "Answer", "text": faq2A },
+      },
+      {
+        "@type": "Question",
+        "name": faq3Q,
+        "acceptedAnswer": { "@type": "Answer", "text": faq3A },
+      },
+    ],
+  },
+];
+
+// --- Interest-to-principal ratio for context ---
+const interestRatio = ((totalInterest / loanAmount) * 100).toFixed(1);
+---
+
+<BaseLayout
+  title={title} description={description} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/mortgage/">Mortgage Calculator</a> &rsaquo;
+    <span>{breadcrumbShort}</span>
+  </nav>
+
+  <h1>{amountDisplay} Mortgage Payment &mdash; {termYears} Year at {rate}%</h1>
+  <p class="page-desc">
+    See the full monthly payment breakdown, amortization schedule, and total interest for a {amountDisplay} home loan at {rate}% over {termYears} years.
+  </p>
+
+  <!-- Quick Fact -->
+  <div class="quick-fact">
+    <span class="quick-fact-label">Quick Fact:</span>
+    <strong>Your estimated monthly payment is {fmtMoneyDecimal(monthlyPayment)}</strong>
+  </div>
+
+  <!-- Result Cards -->
+  <div class="result-cards mortgage-result-cards">
+    <div class="result-card primary">
+      <span class="result-label">Monthly P&I Payment</span>
+      <span class="result-value">{fmtMoneyDecimal(monthlyPayment)}</span>
+    </div>
+    <div class="result-card success">
+      <span class="result-label">Monthly PITI</span>
+      <span class="result-value">{fmtMoneyDecimal(monthlyPITI)}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Total Payment</span>
+      <span class="result-value">{fmtMoney(totalPayment)}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Total Interest</span>
+      <span class="result-value">{fmtMoney(totalInterest)}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Interest Rate</span>
+      <span class="result-value">{rate}%</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Loan Term</span>
+      <span class="result-value">{termYears} Years</span>
+    </div>
+  </div>
+
+  <!-- Payment Breakdown -->
+  <h2 class="section-heading">Payment Breakdown</h2>
+  <div class="calculator-box">
+    <p class="mortgage-breakdown-note">First month breakdown for your {amountDisplay} mortgage at {rate}%:</p>
+    <div class="breakdown-row">
+      <span class="breakdown-label">Principal</span>
+      <span class="breakdown-value">{fmtMoneyDecimal(firstMonthPrincipal)}</span>
+    </div>
+    <div class="breakdown-row">
+      <span class="breakdown-label">Interest</span>
+      <span class="breakdown-value">{fmtMoneyDecimal(firstMonthInterest)}</span>
+    </div>
+    <div class="breakdown-row">
+      <span class="breakdown-label">Property Tax (est.)</span>
+      <span class="breakdown-value">{fmtMoneyDecimal(monthlyTax)}</span>
+    </div>
+    <div class="breakdown-row">
+      <span class="breakdown-label">Homeowners Insurance (est.)</span>
+      <span class="breakdown-value">{fmtMoneyDecimal(monthlyInsurance)}</span>
+    </div>
+    <div class="breakdown-row breakdown-total">
+      <span class="breakdown-label">Total Monthly (PITI)</span>
+      <span class="breakdown-value">{fmtMoneyDecimal(monthlyPITI)}</span>
+    </div>
+    <div class="disclaimer">
+      Tax and insurance are estimates based on national averages (1.1% property tax rate, 0.35% insurance rate). Your actual costs will vary by location and coverage.
+    </div>
+  </div>
+
+  <!-- Amortization Summary -->
+  <h2 class="section-heading">Amortization Summary</h2>
+  <div class="table-container">
+    <table class="data-table mortgage-amort-table">
+      <thead>
+        <tr>
+          <th>Year</th>
+          <th>Principal Paid</th>
+          <th>Interest Paid</th>
+          <th>Balance Remaining</th>
+        </tr>
+      </thead>
+      <tbody>
+        {amortSummary.map(function (row) {
+          return (
+            <tr>
+              <td>Year {row.year}</td>
+              <td>{fmtMoney(row.principalPaid)}</td>
+              <td>{fmtMoney(row.interestPaid)}</td>
+              <td>{fmtMoney(row.balance)}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  </div>
+
+  <AdUnit slot="mortgage-mid" format="horizontal" />
+
+  <!-- Compare Rates Table -->
+  {relatedByRate.length > 0 && (
+    <h2 class="section-heading">Compare Rates for {amountDisplay} Mortgage</h2>
+    <p class="compare-desc">See how different interest rates affect your monthly payment on a {amountDisplay} loan over {termYears} years.</p>
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Rate</th>
+            <th>Monthly P&I</th>
+            <th>Total Interest</th>
+            <th>Total Paid</th>
+          </tr>
+        </thead>
+        <tbody>
+          {relatedByRate.map(function (p) {
+            return (
+              <tr>
+                <td><a class="compare-link" href={`/mortgage/${p.slug}/`}>{p.rate}%</a></td>
+                <td>{fmtMoneyDecimal(p.monthlyPayment)}</td>
+                <td>{fmtMoney(p.totalInterest)}</td>
+                <td>{fmtMoney(p.totalPayment)}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  )}
+
+  <!-- Compare Loan Amounts Table -->
+  {relatedByAmount.length > 0 && (
+    <h2 class="section-heading">Compare Loan Amounts at {rate}%</h2>
+    <p class="compare-desc">See monthly payments for different loan amounts at {rate}% over {termYears} years.</p>
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Loan Amount</th>
+            <th>Monthly P&I</th>
+            <th>Total Interest</th>
+            <th>Total Paid</th>
+          </tr>
+        </thead>
+        <tbody>
+          {relatedByAmount.map(function (p) {
+            return (
+              <tr>
+                <td><a class="compare-link" href={`/mortgage/${p.slug}/`}>{fmtMoney(p.loanAmount)}</a></td>
+                <td>{fmtMoneyDecimal(p.monthlyPayment)}</td>
+                <td>{fmtMoney(p.totalInterest)}</td>
+                <td>{fmtMoney(p.totalPayment)}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  )}
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>How Much Is a {amountDisplay} Mortgage Payment?</h2>
+    <p>
+      If you borrow {amountDisplay} to buy a home with a {termYears}-year fixed-rate mortgage at {rate}% interest, your monthly principal and interest payment will be <strong>{fmtMoneyDecimal(monthlyPayment)}</strong>. This is the amount you pay each month directly toward reducing your loan balance and covering the cost of borrowing.
+    </p>
+    <p>
+      However, your actual monthly housing cost is typically higher than the principal and interest alone. Most homeowners also pay property taxes and homeowners insurance as part of their monthly mortgage payment, often collected through an escrow account managed by the lender. When you include estimated property taxes ({fmtMoneyDecimal(monthlyTax)}/month) and homeowners insurance ({fmtMoneyDecimal(monthlyInsurance)}/month), the total monthly PITI payment comes to approximately <strong>{fmtMoneyDecimal(monthlyPITI)}</strong>.
+    </p>
+    <p>
+      Over the full {termYears}-year term, you will repay a total of {fmtMoney(totalPayment)}, which means you pay {fmtMoney(totalInterest)} in interest on top of the original {amountDisplay} loan. That interest represents {interestRatio}% of the original loan amount. This is why even small differences in your interest rate can have a dramatic impact on the total cost of your mortgage.
+    </p>
+    <p>
+      Keep in mind that these figures assume you hold the mortgage for the full {termYears} years without refinancing or making extra payments. In practice, many homeowners refinance, sell, or make additional principal payments, all of which can significantly reduce the total interest paid over the life of the loan.
+    </p>
+
+    <h2>How Mortgage Payments Are Calculated</h2>
+    <p>
+      Monthly mortgage payments are calculated using a standard amortization formula that ensures equal payments over the entire life of the loan. The formula accounts for the principal amount, the interest rate, and the total number of payments:
+    </p>
+    <div class="formula-box">
+      M = P &times; [r(1 + r)<sup>n</sup>] / [(1 + r)<sup>n</sup> &minus; 1]
+    </div>
+    <p>Where:</p>
+    <ul>
+      <li><strong>M</strong> = Monthly payment = <strong>{fmtMoneyDecimal(monthlyPayment)}</strong></li>
+      <li><strong>P</strong> = Principal (loan amount) = <strong>{amountDisplay}</strong></li>
+      <li><strong>r</strong> = Monthly interest rate = {rate}% / 12 = <strong>{(rate / 12).toFixed(5)}%</strong></li>
+      <li><strong>n</strong> = Total number of payments = {termYears} &times; 12 = <strong>{totalMonths}</strong></li>
+    </ul>
+    <p>
+      The key insight of this formula is that while your monthly payment stays the same throughout the loan, the proportion allocated to interest versus principal changes dramatically over time. In the early years, the majority of each payment goes toward interest. For this {amountDisplay} mortgage at {rate}%, the very first payment splits as follows: {fmtMoneyDecimal(firstMonthInterest)} goes to interest and only {fmtMoneyDecimal(firstMonthPrincipal)} reduces your loan balance.
+    </p>
+    <p>
+      As you progress through the loan, more of each payment is applied to principal and less to interest, because the outstanding balance decreases each month. By the final years of the mortgage, nearly the entire payment goes toward principal. This gradual shift is called amortization, and it explains why building equity in a home is slow at first but accelerates significantly in the later years of the loan.
+    </p>
+    <p>
+      Understanding this breakdown is important for financial planning. If you are considering making extra payments toward your mortgage, those additional dollars go directly to principal reduction, which can shave years off the loan and save tens of thousands of dollars in interest. For example, adding just $100 per month to your payment on this {amountDisplay} mortgage could save you a substantial amount over time.
+    </p>
+
+    <h2>Understanding Your Total Housing Cost</h2>
+    <p>
+      The monthly principal and interest payment is only one component of the true cost of homeownership. To get an accurate picture of your monthly housing budget, you need to account for several additional expenses:
+    </p>
+    <ul>
+      <li><strong>Property Taxes:</strong> Typically range from 0.5% to 2.5% of the home's assessed value annually, depending on your location. Our estimate uses a 1.1% national average rate.</li>
+      <li><strong>Homeowners Insurance:</strong> Protects your property against damage and liability. Costs vary by coverage level, location, and home value. We estimate 0.35% of the loan amount annually.</li>
+      <li><strong>Private Mortgage Insurance (PMI):</strong> If your down payment is less than 20%, most lenders require PMI, which can add 0.5% to 1% of the loan amount per year to your payment. PMI is not included in the estimates above.</li>
+      <li><strong>HOA Fees:</strong> If your property is in a homeowners association, monthly dues can range from $100 to $500 or more, covering community maintenance and amenities.</li>
+      <li><strong>Maintenance and Repairs:</strong> Financial planners recommend budgeting 1% to 2% of the home's value annually for upkeep, which includes routine maintenance, appliance replacement, and unexpected repairs.</li>
+    </ul>
+    <p>
+      A common guideline is the 28/36 rule: your total monthly housing cost should not exceed 28% of your gross monthly income, and total debt payments (including housing) should stay below 36%. Using this guideline, a monthly PITI payment of {fmtMoneyDecimal(monthlyPITI)} would require a gross monthly income of at least {fmtMoney(Math.round(monthlyPITI / 0.28))}, or roughly {fmtMoney(Math.round(monthlyPITI / 0.28 * 12))} per year.
+    </p>
+
+    <h2>Fixed-Rate vs. Adjustable-Rate Mortgages</h2>
+    <p>
+      This calculation assumes a fixed-rate mortgage, where the interest rate of {rate}% remains constant for the entire {termYears}-year term. Fixed-rate mortgages offer predictability because your monthly principal and interest payment of {fmtMoneyDecimal(monthlyPayment)} will never change, making it easier to budget over the long term.
+    </p>
+    <p>
+      Adjustable-rate mortgages (ARMs) typically offer a lower initial rate for a set period (commonly 5 or 7 years), after which the rate adjusts periodically based on market conditions. While an ARM might start with a lower payment than {fmtMoneyDecimal(monthlyPayment)}, there is risk that payments could increase significantly when the rate adjusts. ARMs can make sense if you plan to sell or refinance before the adjustment period begins, but they add uncertainty to your long-term financial planning.
+    </p>
+
+    <h2>Strategies to Reduce Your Mortgage Cost</h2>
+    <p>
+      There are several proven strategies to reduce the total cost of a {amountDisplay} mortgage:
+    </p>
+    <ul>
+      <li><strong>Make biweekly payments:</strong> Instead of 12 monthly payments, make half-payments every two weeks. This results in 26 half-payments (equivalent to 13 full payments) per year, effectively making one extra payment annually. This can shave years off a {termYears}-year mortgage.</li>
+      <li><strong>Round up your payment:</strong> Rounding your payment up to the nearest hundred or adding a fixed extra amount each month accelerates principal reduction. Even an extra $50 or $100 per month makes a meaningful difference over the life of the loan.</li>
+      <li><strong>Refinance when rates drop:</strong> If market rates fall significantly below your current {rate}%, refinancing to a lower rate can reduce both your monthly payment and total interest cost. A common rule of thumb is that refinancing makes sense when you can reduce your rate by at least 0.5% to 0.75%, after accounting for closing costs.</li>
+      <li><strong>Choose a shorter term:</strong> A 15-year mortgage has a higher monthly payment than a 30-year, but the interest rate is typically lower and you build equity much faster. The total interest paid on a 15-year loan is dramatically less than on a 30-year loan.</li>
+      <li><strong>Make a larger down payment:</strong> A bigger down payment reduces the loan amount, lowering both the monthly payment and total interest. Putting 20% or more down also eliminates the need for PMI.</li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>{faq1Q}</h3>
+    <p>{faq1A}</p>
+
+    <h3>{faq2Q}</h3>
+    <p>{faq2A}</p>
+
+    <h3>{faq3Q}</h3>
+    <p>{faq3A}</p>
+
+    <h2>Related Mortgage Calculations</h2>
+    <ul>
+      {relatedByRate.slice(0, 6).map(function (p) {
+        return (
+          <li>
+            <a href={`/mortgage/${p.slug}/`}>
+              {fmtMoney(p.loanAmount)} Mortgage at {p.rate}% &rarr; {fmtMoneyDecimal(p.monthlyPayment)}/mo
+            </a>
+          </li>
+        );
+      })}
+      {relatedByAmount.slice(0, 4).map(function (p) {
+        return (
+          <li>
+            <a href={`/mortgage/${p.slug}/`}>
+              {fmtMoney(p.loanAmount)} Mortgage at {p.rate}% &rarr; {fmtMoneyDecimal(p.monthlyPayment)}/mo
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+
+    <p><a href="/mortgage/">&larr; Mortgage Calculator</a> | <a href="/financial-calculators/">Financial Calculators</a></p>
+
+    <CrossLinks links={[
+      { href: '/mortgage/', label: 'Mortgage Calculator', icon: '\uD83C\uDFE0' },
+      { href: '/compound-interest/', label: 'Compound Interest Calculator', icon: '\uD83D\uDCB0' },
+      { href: '/financial-calculators/', label: 'Financial Calculators', icon: '\uD83D\uDCC8' },
+      { href: '/salary/', label: 'Salary Calculator', icon: '\uD83D\uDCB5' },
+    ]} />
+  </article>
+
+  <AdUnit slot="mortgage-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .quick-fact {
+    background: #eff6ff;
+    border-radius: var(--radius);
+    padding: 16px 24px;
+    margin-bottom: 24px;
+    font-size: 1.1rem;
+  }
+  .quick-fact-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .quick-fact strong {
+    color: var(--color-primary);
+    font-size: 1.15rem;
+  }
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+  .mortgage-result-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .mortgage-result-cards .result-card.primary .result-value {
+    font-size: 1.6rem;
+  }
+  .mortgage-breakdown-note {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 16px;
+  }
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--color-border);
+    font-size: 0.95rem;
+  }
+  .breakdown-row:last-of-type {
+    border-bottom: none;
+  }
+  .breakdown-label {
+    color: var(--color-text);
+  }
+  .breakdown-value {
+    font-weight: 600;
+    color: var(--color-text);
+  }
+  .breakdown-total {
+    border-top: 2px solid var(--color-text);
+    border-bottom: none;
+    margin-top: 4px;
+    padding-top: 12px;
+    font-size: 1.05rem;
+  }
+  .breakdown-total .breakdown-label {
+    font-weight: 700;
+  }
+  .breakdown-total .breakdown-value {
+    font-weight: 700;
+    color: var(--color-primary);
+    font-size: 1.1rem;
+  }
+  .disclaimer {
+    background: #fef3c7;
+    border-radius: var(--radius);
+    padding: 10px 16px;
+    font-size: 0.85rem;
+    color: #92400e;
+    margin-top: 16px;
+    line-height: 1.5;
+  }
+  .compare-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+  .compare-link {
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .compare-link:hover {
+    text-decoration: underline;
+  }
+  .mortgage-amort-table {
+    margin-bottom: 32px;
+  }
+  .mortgage-amort-table tbody tr:nth-child(even) td {
+    background: var(--color-bg);
+  }
+
+  @media (max-width: 768px) {
+    .mortgage-result-cards {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 480px) {
+    .mortgage-result-cards {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
