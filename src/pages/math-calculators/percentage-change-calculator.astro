@@ -1,0 +1,272 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Math Calculators",
+        "item": "https://toolcalcs.com/math-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Percentage Change Calculator"
+      }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How do you calculate percentage change?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Percentage change is calculated with the formula: ((New Value - Original Value) / |Original Value|) x 100. A positive result indicates an increase, while a negative result indicates a decrease.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is the difference between percentage change and percentage difference?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Percentage change measures the change from one specific value to another (directional, with a clear "old" and "new"), while percentage difference measures the difference between two values relative to their average (non-directional). Percentage change can be positive or negative; percentage difference is always positive.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Can percentage change be more than 100%?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes. Percentage change exceeds 100% whenever the new value is more than double the original value (for increases) or when the value drops by more than the original amount (which is not possible for standard decreases, since a 100% decrease means reaching zero). For example, a stock going from $10 to $35 is a 250% increase.',
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Percentage Change Calculator - Increase & Decrease"
+  description="Free percentage change calculator. Find the percentage increase or decrease between two values with the formula, absolute change, and direction."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/math-calculators/">Math Calculators</a> &rsaquo;
+    <span>Percentage Change Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Percentage Change Calculator &mdash; Increase &amp; Decrease</h1>
+  <p class="page-desc">Calculate the percentage change between two values to see if the change is an increase or decrease.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="originalValue">Original Value</label>
+        <input type="number" id="originalValue" value="200" step="any" />
+      </div>
+      <div class="input-group">
+        <label for="newValue">New Value</label>
+        <input type="number" id="newValue" value="250" step="any" />
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate Change</button>
+    </div>
+
+    <div class="calc-results" id="results" style="display:none;">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Percentage Change</span>
+          <span class="result-value" id="pctChange">--</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Absolute Change</span>
+          <span class="result-value" id="absChange">--</span>
+        </div>
+        <div class="result-card success" id="directionCard">
+          <span class="result-label">Direction</span>
+          <span class="result-value" id="direction">--</span>
+        </div>
+      </div>
+      <div id="formulaBreakdown" class="formula-breakdown"></div>
+      <div id="reverseCalc" class="reverse-calc"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>What Is Percentage Change?</h2>
+    <p>Percentage change is a mathematical measure that describes how much a value has increased or decreased relative to its original amount, expressed as a percentage. It is one of the most widely used calculations in everyday life, business, science, and finance because it provides a standardized way to compare changes of different magnitudes. Whether you are tracking stock prices, monitoring population growth, evaluating sales performance, or comparing test scores, percentage change gives you a clear, intuitive number that communicates the scale of change.</p>
+    <p>A positive percentage change indicates an increase from the original value, while a negative percentage change indicates a decrease. For example, if a product's price goes from $50 to $65, the percentage change is +30%, meaning the price increased by 30 percent of its original value. If the price drops from $50 to $40, the percentage change is &minus;20%, meaning the price decreased by 20 percent.</p>
+    <p>Percentage change is particularly valuable because it normalizes differences in scale. A $10 increase on a $50 item is a 20% change, but the same $10 increase on a $1,000 item is only a 1% change. Raw numbers alone can be misleading; percentage change puts everything in proper perspective.</p>
+
+    <h2>Percentage Change Formula</h2>
+    <div class="formula-box">
+      <code>Percentage Change = ((New Value &minus; Original Value) / |Original Value|) &times; 100</code>
+    </div>
+    <p>The formula has three components. The numerator (New Value &minus; Original Value) gives the absolute change, which is the raw difference between the two numbers. The denominator (|Original Value|) is the absolute value of the starting number, which serves as the reference point. Dividing by the original value converts the raw change into a proportion, and multiplying by 100 converts that proportion into a percentage.</p>
+    <p><strong>Example 1 (Increase):</strong> A company's revenue went from $500,000 to $650,000. Percentage change = (650,000 &minus; 500,000) / 500,000 &times; 100 = 150,000 / 500,000 &times; 100 = <strong>+30%</strong>.</p>
+    <p><strong>Example 2 (Decrease):</strong> A city's crime rate dropped from 1,200 incidents to 960 incidents. Percentage change = (960 &minus; 1,200) / 1,200 &times; 100 = &minus;240 / 1,200 &times; 100 = <strong>&minus;20%</strong>.</p>
+    <p><strong>Example 3 (Large increase):</strong> A startup's user base grew from 5,000 to 18,000. Percentage change = (18,000 &minus; 5,000) / 5,000 &times; 100 = 13,000 / 5,000 &times; 100 = <strong>+260%</strong>.</p>
+
+    <h2>Percentage Change vs Percentage Difference</h2>
+    <p>These two calculations are often confused, but they serve different purposes:</p>
+    <ul>
+      <li><strong>Percentage change</strong> is directional. It measures the change from a specific starting point (the original value) to an ending point (the new value). It has a clear "before" and "after." The result can be positive (increase) or negative (decrease).</li>
+      <li><strong>Percentage difference</strong> is non-directional. It measures how two values differ relative to their average. Neither value is the "original." The result is always positive. The formula is: |Value A &minus; Value B| / ((Value A + Value B) / 2) &times; 100.</li>
+    </ul>
+    <p>Use percentage change when you know which value came first (e.g., last year's sales vs this year's sales). Use percentage difference when you are comparing two values without a clear time order (e.g., comparing the populations of two cities).</p>
+
+    <h2>Common Uses of Percentage Change</h2>
+    <h3>Finance and Investing</h3>
+    <p>Percentage change is fundamental to financial analysis. Stock returns are always expressed as percentage changes because they allow investors to compare performance across stocks at different price levels. A stock going from $10 to $12 (20% gain) outperformed a stock going from $500 to $510 (2% gain), even though the second stock gained more in absolute dollars. Analysts also use percentage change to track revenue growth, profit margins, earnings per share, and market indices over time.</p>
+
+    <h3>Retail and Pricing</h3>
+    <p>Retailers use percentage change to set prices, evaluate promotions, and track inflation. When a product's cost increases from a supplier, the percentage increase helps determine how much to raise the retail price. Discounts are percentage decreases from the original price. Understanding percentage change helps consumers evaluate whether a "sale" is genuinely a good deal by comparing the discount percentage to typical price fluctuations.</p>
+
+    <h3>Science and Demographics</h3>
+    <p>Population growth rates, disease infection rates, chemical concentration changes, and experimental results are all reported as percentage changes. For example, saying a country's population grew by 2.3% annually is far more meaningful than saying it grew by 530,000 people, because the percentage accounts for the base population size.</p>
+
+    <h3>Health and Fitness</h3>
+    <p>Weight loss progress is often tracked as a percentage of starting weight. A 10-pound loss represents very different achievement levels for a 150-pound person (6.7% change) versus a 300-pound person (3.3% change). Medical lab results also use percentage change to track biomarker trends like cholesterol, blood sugar, and hormone levels over time.</p>
+
+    <h2>Handling Special Cases</h2>
+    <p>Percentage change calculations have a few edge cases that require special attention:</p>
+    <ul>
+      <li><strong>Original value is zero:</strong> Division by zero is undefined, so percentage change cannot be calculated when the starting value is exactly zero. In practice, you might use a very small baseline value or report the change in absolute terms instead.</li>
+      <li><strong>Negative original values:</strong> When the original value is negative (e.g., comparing quarterly profits where the first quarter was a loss), the formula still works mathematically, but interpretation becomes less intuitive. We use the absolute value of the original to keep the sign meaningful.</li>
+      <li><strong>Change exceeding 100%:</strong> Percentage change can absolutely exceed 100%. If a value triples, the change is +200% (not +300%, since the change itself is two times the original, while the new value is three times the original). A value cannot decrease by more than 100%, since that would mean going past zero.</li>
+    </ul>
+
+    <h2>Percentage Change in Reverse</h2>
+    <p>An important concept is that percentage changes are not symmetrical. A 50% increase followed by a 50% decrease does not return to the original value. If you start with 100 and increase by 50%, you get 150. Decreasing 150 by 50% gives 75, not 100. This asymmetry has practical implications for financial returns, pricing strategies, and data analysis.</p>
+    <p>To reverse a percentage increase of P%, you need a decrease of P / (1 + P/100) &times; 100. For example, to reverse a 50% increase, you need a 33.3% decrease. To reverse a 25% increase, you need a 20% decrease.</p>
+
+    <h2>Tips for Accurate Calculations</h2>
+    <ul>
+      <li><strong>Always identify the base value:</strong> The "original" or "old" value is always the denominator. Switching the order of values reverses the sign and changes the magnitude.</li>
+      <li><strong>Use consistent units:</strong> Make sure both values are measured in the same units (dollars, kilograms, people, etc.) before calculating.</li>
+      <li><strong>Report the sign:</strong> Always include the plus or minus sign. A "25% change" is ambiguous; a "+25% change" or "&minus;25% change" is clear.</li>
+      <li><strong>Consider the context:</strong> A 10% increase in revenue might be modest growth, while a 10% increase in a patient's heart rate could be clinically significant. Percentage change provides the math; interpretation requires domain knowledge.</li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>How do you calculate percentage change?</summary>
+        <p>Use the formula: ((New Value &minus; Original Value) / |Original Value|) &times; 100. Subtract the original from the new to get the raw change, divide by the absolute value of the original, and multiply by 100. A positive answer means an increase; a negative answer means a decrease.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is the difference between percentage change and percentage difference?</summary>
+        <p>Percentage change is directional and measures how much a value increased or decreased from a specific starting point. Percentage difference is non-directional and measures how two values differ relative to their average. Use percentage change when one value is clearly the "original" and use percentage difference when comparing two independent values.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can percentage change be more than 100%?</summary>
+        <p>Yes, absolutely. Percentage change exceeds 100% whenever the new value is more than double the original. For example, going from 100 to 350 is a +250% change. However, a decrease cannot exceed 100% because a 100% decrease means the value has reached zero.</p>
+      </details>
+    </div>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/math-calculators/percentage-calculator/">Percentage Calculator</a> - Calculate any percentage of a number.</li>
+      <li><a href="/everyday-calculators/discount-calculator/">Discount Calculator</a> - Calculate sale prices and savings.</li>
+      <li><a href="/financial-calculators/roi-calculator/">ROI Calculator</a> - Calculate return on investment.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+  <RelatedArticles calculatorSlug="percentage-change-calculator" />
+  <RelatedCalculators currentSlug="percentage-change-calculator" />
+</BaseLayout>
+
+<style>
+  .formula-breakdown {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+  .reverse-calc {
+    margin-top: 12px;
+    padding: 12px 16px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+  .last-updated { font-size: 0.75rem; color: var(--color-text-muted); margin: 4px 0 0; }
+  @media (max-width: 640px) {
+    .calc-inputs { grid-template-columns: 1fr; }
+    .result-cards { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script is:inline>
+  function calculatePercentChange() {
+    var original = parseFloat(document.getElementById('originalValue').value);
+    var newVal = parseFloat(document.getElementById('newValue').value);
+
+    if (isNaN(original) || isNaN(newVal)) return;
+    if (original === 0) {
+      document.getElementById('pctChange').textContent = 'N/A (original is 0)';
+      document.getElementById('absChange').textContent = (newVal - original).toString();
+      document.getElementById('direction').textContent = newVal > 0 ? 'Increase' : newVal < 0 ? 'Decrease' : 'No Change';
+      document.getElementById('results').style.display = 'block';
+      document.getElementById('formulaBreakdown').innerHTML = '<strong>Note:</strong> Percentage change is undefined when the original value is zero.';
+      document.getElementById('reverseCalc').innerHTML = '';
+      return;
+    }
+
+    var absChange = newVal - original;
+    var pctChange = (absChange / Math.abs(original)) * 100;
+    var directionText = pctChange > 0 ? 'Increase' : pctChange < 0 ? 'Decrease' : 'No Change';
+
+    var sign = pctChange > 0 ? '+' : '';
+    document.getElementById('pctChange').textContent = sign + pctChange.toFixed(2) + '%';
+
+    var absPrefix = absChange > 0 ? '+' : '';
+    document.getElementById('absChange').textContent = absPrefix + absChange.toLocaleString(undefined, {maximumFractionDigits: 4});
+    document.getElementById('direction').textContent = directionText;
+
+    var dirCard = document.getElementById('directionCard');
+    dirCard.className = 'result-card';
+    if (pctChange > 0) dirCard.classList.add('success');
+    else if (pctChange < 0) dirCard.style.background = '#fef2f2';
+    else dirCard.style.background = '';
+
+    var breakdown = '<strong>Formula:</strong> ((' + newVal + ' - ' + original + ') / |' + original + '|) &times; 100<br>';
+    breakdown += '<strong>Step 1:</strong> ' + newVal + ' - ' + original + ' = ' + absChange + '<br>';
+    breakdown += '<strong>Step 2:</strong> ' + absChange + ' / ' + Math.abs(original) + ' = ' + (absChange / Math.abs(original)).toFixed(6) + '<br>';
+    breakdown += '<strong>Step 3:</strong> ' + (absChange / Math.abs(original)).toFixed(6) + ' &times; 100 = <strong>' + sign + pctChange.toFixed(2) + '%</strong>';
+    document.getElementById('formulaBreakdown').innerHTML = breakdown;
+
+    var pctAbs = Math.abs(pctChange);
+    var revText = '<strong>Reverse check:</strong> ' + pctAbs.toFixed(2) + '% of ' + original + ' = ' + (Math.abs(original) * pctAbs / 100).toLocaleString(undefined, {maximumFractionDigits: 4});
+    document.getElementById('reverseCalc').innerHTML = revText;
+
+    document.getElementById('results').style.display = 'block';
+  }
+
+  document.getElementById('calculateBtn').addEventListener('click', calculatePercentChange);
+  calculatePercentChange();
+</script>

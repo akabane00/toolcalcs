@@ -1,0 +1,376 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Health Calculators",
+        "item": "https://toolcalcs.com/health-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "BMR Calculator"
+      }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is Basal Metabolic Rate (BMR)?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'BMR is the number of calories your body burns at complete rest to maintain vital functions like breathing, circulation, and cell production. It represents the minimum energy your body needs to survive without any physical activity.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is the difference between BMR and TDEE?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'BMR measures calories burned at rest, while TDEE (Total Daily Energy Expenditure) includes BMR plus all calories burned through physical activity, digestion, and non-exercise movement. TDEE is always higher than BMR and is calculated by multiplying BMR by an activity factor.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How can I increase my BMR?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The most effective way to increase BMR is by building lean muscle mass through resistance training, since muscle tissue burns more calories at rest than fat. Eating adequate protein, staying hydrated, getting enough sleep, and avoiding extreme calorie restriction also help maintain or boost BMR.',
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="BMR Calculator - Basal Metabolic Rate"
+  description="Free BMR calculator using the Mifflin-St Jeor equation. Find your basal metabolic rate and daily calorie needs by activity level."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/health-calculators/">Health Calculators</a> &rsaquo;
+    <span>BMR Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>BMR Calculator &mdash; Basal Metabolic Rate</h1>
+  <p class="page-desc">Calculate the number of calories your body burns at rest using the Mifflin-St Jeor equation.</p>
+
+  <div class="calculator-box">
+    <div class="unit-toggle">
+      <button class="toggle-btn active" data-unit="imperial" id="btnImperial">Imperial (lbs/ft)</button>
+      <button class="toggle-btn" data-unit="metric" id="btnMetric">Metric (kg/cm)</button>
+    </div>
+
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="age">Age</label>
+        <input type="number" id="age" value="30" min="15" max="120" step="1" />
+      </div>
+      <div class="input-group">
+        <label>Gender</label>
+        <div class="radio-row">
+          <label class="radio-label"><input type="radio" name="gender" value="male" checked /> Male</label>
+          <label class="radio-label"><input type="radio" name="gender" value="female" /> Female</label>
+        </div>
+      </div>
+    </div>
+
+    <div id="imperialInputs" class="calc-inputs">
+      <div class="input-group">
+        <label for="feet">Height (feet)</label>
+        <input type="number" id="feet" value="5" min="1" max="8" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="inches">Inches</label>
+        <input type="number" id="inches" value="10" min="0" max="11" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="weightLbs">Weight (lbs)</label>
+        <input type="number" id="weightLbs" value="160" min="1" step="1" />
+      </div>
+    </div>
+
+    <div id="metricInputs" class="calc-inputs hidden">
+      <div class="input-group">
+        <label for="heightCm">Height (cm)</label>
+        <input type="number" id="heightCm" value="178" min="50" max="250" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="weightKg">Weight (kg)</label>
+        <input type="number" id="weightKg" value="73" min="1" step="0.1" />
+      </div>
+    </div>
+
+    <div style="margin-bottom:24px;">
+      <button class="calc-btn" id="calculateBtn">Calculate BMR</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Basal Metabolic Rate</span>
+          <span class="result-value" id="bmrValue">--</span>
+          <span class="result-label">calories/day</span>
+        </div>
+      </div>
+      <div id="activityTable" style="display:none;">
+        <h3 style="margin:16px 0 8px;font-size:1rem;">Daily Calories by Activity Level</h3>
+        <table class="info-table" style="max-width:100%;">
+          <thead>
+            <tr><th>Activity Level</th><th>Multiplier</th><th>Calories/Day</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Sedentary (little/no exercise)</td><td>1.2</td><td id="cal12">--</td></tr>
+            <tr><td>Lightly Active (1-3 days/wk)</td><td>1.375</td><td id="cal1375">--</td></tr>
+            <tr><td>Moderately Active (3-5 days/wk)</td><td>1.55</td><td id="cal155">--</td></tr>
+            <tr><td>Very Active (6-7 days/wk)</td><td>1.725</td><td id="cal1725">--</td></tr>
+            <tr><td>Extra Active (athlete/physical job)</td><td>1.9</td><td id="cal19">--</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>What Is Basal Metabolic Rate?</h2>
+    <p>Basal Metabolic Rate (BMR) is the number of calories your body requires to perform its most basic life-sustaining functions while at complete rest. These functions include breathing, blood circulation, cell production and repair, nutrient processing, and maintaining body temperature. BMR accounts for roughly 60 to 75 percent of the total calories you burn each day, making it by far the largest component of your daily energy expenditure.</p>
+    <p>Understanding your BMR is essential for anyone managing their weight, whether the goal is fat loss, muscle gain, or simple maintenance. By knowing how many calories your body needs just to survive, you can make informed decisions about how much to eat and how active to be. Unlike vague calorie guidelines, BMR gives you a personalized starting point based on your own body metrics.</p>
+    <p>The concept of basal metabolism dates back to the early 1900s when researchers first began measuring oxygen consumption to estimate energy use. Over the decades, scientists developed several predictive equations. The Mifflin-St Jeor equation, published in 1990, has become the gold standard recommended by the Academy of Nutrition and Dietetics because it consistently provides the most accurate estimates for the broadest range of people.</p>
+
+    <h2>The Mifflin-St Jeor Equation</h2>
+    <p>This calculator uses the Mifflin-St Jeor equation, which is widely regarded as the most reliable formula for estimating BMR in healthy adults. The formula is as follows:</p>
+    <div class="formula-box">
+      <code>Men: BMR = 10 &times; weight(kg) + 6.25 &times; height(cm) &minus; 5 &times; age &minus; 161 + 166</code>
+    </div>
+    <div class="formula-box">
+      <code>Women: BMR = 10 &times; weight(kg) + 6.25 &times; height(cm) &minus; 5 &times; age &minus; 161</code>
+    </div>
+    <p><strong>Example for a 30-year-old man:</strong> Weight 73 kg, Height 178 cm. BMR = (10 &times; 73) + (6.25 &times; 178) &minus; (5 &times; 30) &minus; 161 + 166 = 730 + 1,112.5 &minus; 150 &minus; 161 + 166 = <strong>1,698 calories/day</strong>.</p>
+    <p><strong>Example for a 25-year-old woman:</strong> Weight 60 kg, Height 165 cm. BMR = (10 &times; 60) + (6.25 &times; 165) &minus; (5 &times; 25) &minus; 161 = 600 + 1,031.25 &minus; 125 &minus; 161 = <strong>1,345 calories/day</strong>.</p>
+    <p>The Mifflin-St Jeor equation was validated in a 2005 study by the American Dietetic Association, which found it to be accurate within 10 percent of measured BMR for most healthy individuals. It replaced the older Harris-Benedict equation (1919) as the preferred formula because it better reflects modern body compositions and lifestyles.</p>
+
+    <h2>BMR vs TDEE</h2>
+    <p>While BMR measures calories burned at complete rest, <strong>Total Daily Energy Expenditure (TDEE)</strong> represents the total number of calories you burn in a full day, including all physical activity. TDEE is calculated by multiplying your BMR by an activity factor that reflects how active you are throughout the day.</p>
+    <p>TDEE has three main components. The first is BMR, which is by far the largest. The second is the <strong>thermic effect of food (TEF)</strong>, which is the energy spent digesting and absorbing nutrients, typically about 10 percent of caloric intake. The third is the <strong>thermic effect of activity (TEA)</strong>, which includes both structured exercise and non-exercise activity thermogenesis (NEAT), such as fidgeting, walking, and standing.</p>
+    <p>For practical calorie planning, TDEE is the number you should target. If you want to lose weight, eat below your TDEE. To gain weight, eat above it. To maintain, eat at it. But BMR is the foundation of that calculation, which is why knowing your BMR is the first step. You can calculate your full daily needs with our <a href="/health-calculators/tdee-calculator/">TDEE Calculator</a>.</p>
+
+    <h2>Activity Level Multipliers</h2>
+    <p>Once you know your BMR, multiplying it by an activity factor gives you an estimate of your TDEE. The commonly used multipliers come from the Katch-McArdle framework and are as follows:</p>
+    <table class="info-table" style="max-width:100%;">
+      <thead>
+        <tr><th>Activity Level</th><th>Description</th><th>Multiplier</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Sedentary</td><td>Desk job, little or no exercise</td><td>1.2</td></tr>
+        <tr><td>Lightly Active</td><td>Light exercise 1-3 days per week</td><td>1.375</td></tr>
+        <tr><td>Moderately Active</td><td>Moderate exercise 3-5 days per week</td><td>1.55</td></tr>
+        <tr><td>Very Active</td><td>Hard exercise 6-7 days per week</td><td>1.725</td></tr>
+        <tr><td>Extra Active</td><td>Athlete or physical labor job</td><td>1.9</td></tr>
+      </tbody>
+    </table>
+    <p>Most people overestimate their activity level. If you work a desk job and exercise three times a week for 30 to 45 minutes, "Lightly Active" (1.375) is usually the most accurate choice. Reserve "Very Active" for people who train intensely almost every day or have physically demanding occupations like construction, farming, or professional athletics.</p>
+
+    <h2>Factors That Affect BMR</h2>
+    <p>Several biological and lifestyle factors influence your basal metabolic rate beyond the variables captured by the equation:</p>
+    <ul>
+      <li><strong>Muscle mass:</strong> Muscle tissue is metabolically active and burns more calories at rest than fat tissue. People with more lean muscle have a higher BMR. This is why strength training is one of the most effective ways to boost metabolism over time.</li>
+      <li><strong>Age:</strong> BMR decreases by about 1 to 2 percent per decade after age 20, primarily due to the gradual loss of muscle mass (sarcopenia). This explains why maintaining the same diet becomes harder as you get older.</li>
+      <li><strong>Gender:</strong> Men generally have a higher BMR than women because they tend to carry more muscle mass and less body fat. Hormonal differences, particularly testosterone levels, also play a role.</li>
+      <li><strong>Genetics:</strong> Studies on twins suggest that BMR has a genetic component, with heritability estimates ranging from 40 to 70 percent. Some people naturally burn calories faster or slower due to inherited metabolic traits.</li>
+      <li><strong>Thyroid function:</strong> The thyroid gland regulates metabolism through hormones T3 and T4. Hypothyroidism (underactive thyroid) can lower BMR by 15 to 40 percent, while hyperthyroidism (overactive thyroid) raises it.</li>
+      <li><strong>Body temperature and climate:</strong> Your body expends energy maintaining core temperature. Cold environments slightly increase BMR as the body works harder to stay warm. Fever also raises BMR temporarily.</li>
+      <li><strong>Diet and calorie restriction:</strong> Prolonged extreme calorie restriction lowers BMR through a process called metabolic adaptation. The body becomes more efficient at using fewer calories, which is why crash diets often lead to weight regain.</li>
+    </ul>
+
+    <h2>How to Increase Your BMR</h2>
+    <p>While some factors are beyond your control, there are evidence-based strategies to raise or maintain a healthy BMR:</p>
+    <ul>
+      <li><strong>Build muscle:</strong> Resistance training (weightlifting, bodyweight exercises, resistance bands) is the most impactful strategy. Each pound of muscle burns approximately 6 to 7 calories per day at rest, compared to 2 to 3 calories for a pound of fat.</li>
+      <li><strong>Eat enough protein:</strong> Protein has a higher thermic effect than carbohydrates or fat, meaning your body burns more calories digesting it. Aim for 0.7 to 1.0 grams of protein per pound of body weight daily.</li>
+      <li><strong>Avoid extreme diets:</strong> Very low-calorie diets (under 1,200 calories) trigger metabolic adaptation, lowering your BMR. Instead, aim for a moderate deficit of 300 to 500 calories below TDEE for sustainable fat loss.</li>
+      <li><strong>Stay hydrated:</strong> Studies show that drinking 500 ml of cold water can temporarily increase metabolic rate by 24 to 30 percent for about an hour. Chronic dehydration may mildly suppress metabolism.</li>
+      <li><strong>Get quality sleep:</strong> Sleep deprivation disrupts hormones that regulate metabolism and appetite. Adults need 7 to 9 hours of quality sleep each night for optimal metabolic function.</li>
+      <li><strong>Manage stress:</strong> Chronic stress elevates cortisol, which can promote fat storage (especially abdominal fat) and interfere with metabolic hormones. Regular exercise, meditation, and adequate rest help manage stress levels.</li>
+    </ul>
+
+    <h2>BMR Equations Compared</h2>
+    <p>Several equations have been developed to estimate BMR. Here is how the most popular ones compare:</p>
+    <ul>
+      <li><strong>Mifflin-St Jeor (1990):</strong> Uses weight, height, age, and gender. Most accurate for the general population and the equation used by this calculator.</li>
+      <li><strong>Harris-Benedict (1919, revised 1984):</strong> The original BMR equation. Still widely used but tends to overestimate BMR by 5 to 15 percent compared to measured values.</li>
+      <li><strong>Katch-McArdle (1996):</strong> Uses lean body mass instead of total weight, making it more accurate for very lean or very obese individuals. Requires a body fat percentage measurement.</li>
+      <li><strong>Cunningham (1991):</strong> Similar to Katch-McArdle, it relies on lean body mass. Preferred in sports nutrition for athletes with known body composition.</li>
+    </ul>
+    <p>For most people who do not know their body fat percentage, the Mifflin-St Jeor equation provides the best balance of accuracy and practicality.</p>
+
+    <h2>Using BMR for Weight Management</h2>
+    <p>Your BMR serves as the foundation for any calorie-based weight management plan. Here is how to apply it:</p>
+    <ul>
+      <li><strong>Weight loss:</strong> Calculate your TDEE (BMR &times; activity multiplier), then subtract 300 to 500 calories. This creates a deficit of roughly 0.5 to 1 pound of fat loss per week without triggering severe metabolic adaptation.</li>
+      <li><strong>Weight gain / muscle building:</strong> Add 250 to 500 calories above your TDEE. Combine with a resistance training program and adequate protein intake (1.0 to 1.2 grams per pound of body weight) to maximize lean mass gains.</li>
+      <li><strong>Maintenance:</strong> Eat at your estimated TDEE. Monitor weight weekly and adjust by 100 to 200 calories if weight trends up or down over two to three weeks.</li>
+    </ul>
+    <p>Remember that these are estimates. Individual responses vary based on genetics, hormones, gut microbiome, and daily variations in activity. Use BMR and TDEE as starting points, then adjust based on real-world results over time.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>What is Basal Metabolic Rate (BMR)?</summary>
+        <p>BMR is the number of calories your body burns at complete rest to maintain vital functions like breathing, blood circulation, and cell repair. It represents the minimum energy needed to keep your body alive without any physical activity. BMR typically accounts for 60 to 75 percent of your total daily calorie expenditure.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is the difference between BMR and TDEE?</summary>
+        <p>BMR measures only the calories burned at rest, while TDEE (Total Daily Energy Expenditure) includes BMR plus all additional calories burned through physical activity, digestion, and non-exercise movement. TDEE is calculated by multiplying BMR by an activity factor ranging from 1.2 (sedentary) to 1.9 (extremely active). For calorie planning, TDEE is the number you should use to set your daily intake target.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How can I increase my BMR?</summary>
+        <p>The most effective way to increase BMR is by building lean muscle mass through resistance training, since muscle burns more calories at rest than fat. Eating adequate protein (0.7 to 1.0 grams per pound of body weight), staying well-hydrated, getting 7 to 9 hours of sleep, and avoiding extreme calorie restriction all help maintain or boost your metabolic rate over time.</p>
+      </details>
+    </div>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/health-calculators/tdee-calculator/">TDEE Calculator</a> - Calculate your total daily energy expenditure.</li>
+      <li><a href="/health-calculators/calorie-calculator/">Calorie Calculator</a> - Find daily calorie needs for your goal.</li>
+      <li><a href="/health-calculators/macro-calculator/">Macro Calculator</a> - Get your protein, carb, and fat targets.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+  <RelatedArticles calculatorSlug="bmr-calculator" />
+  <RelatedCalculators currentSlug="bmr-calculator" />
+</BaseLayout>
+
+<style>
+  .unit-toggle {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    padding: 4px;
+    width: fit-content;
+  }
+  .toggle-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    transition: all 0.15s;
+  }
+  .toggle-btn.active {
+    background: var(--color-surface);
+    color: var(--color-primary);
+    box-shadow: var(--shadow-sm);
+  }
+  .hidden { display: none !important; }
+  .radio-row {
+    display: flex;
+    gap: 16px;
+    padding: 8px 0;
+  }
+  .radio-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+  .last-updated { font-size: 0.75rem; color: var(--color-text-muted); margin: 4px 0 0; }
+  @media (max-width: 640px) {
+    .calc-inputs { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script is:inline>
+  var unit = 'imperial';
+
+  document.getElementById('btnImperial').addEventListener('click', function() {
+    unit = 'imperial';
+    document.getElementById('btnImperial').classList.add('active');
+    document.getElementById('btnMetric').classList.remove('active');
+    document.getElementById('imperialInputs').classList.remove('hidden');
+    document.getElementById('metricInputs').classList.add('hidden');
+  });
+
+  document.getElementById('btnMetric').addEventListener('click', function() {
+    unit = 'metric';
+    document.getElementById('btnMetric').classList.add('active');
+    document.getElementById('btnImperial').classList.remove('active');
+    document.getElementById('metricInputs').classList.remove('hidden');
+    document.getElementById('imperialInputs').classList.add('hidden');
+  });
+
+  function calculateBMR() {
+    var age = parseFloat(document.getElementById('age').value) || 0;
+    var genderEls = document.querySelectorAll('input[name="gender"]');
+    var gender = 'male';
+    for (var i = 0; i < genderEls.length; i++) {
+      if (genderEls[i].checked) { gender = genderEls[i].value; break; }
+    }
+
+    var weightKg, heightCm;
+
+    if (unit === 'imperial') {
+      var feet = parseFloat(document.getElementById('feet').value) || 0;
+      var inches = parseFloat(document.getElementById('inches').value) || 0;
+      var lbs = parseFloat(document.getElementById('weightLbs').value) || 0;
+      if (feet === 0 || lbs === 0 || age === 0) return;
+      weightKg = lbs * 0.453592;
+      heightCm = (feet * 12 + inches) * 2.54;
+    } else {
+      heightCm = parseFloat(document.getElementById('heightCm').value) || 0;
+      weightKg = parseFloat(document.getElementById('weightKg').value) || 0;
+      if (heightCm === 0 || weightKg === 0 || age === 0) return;
+    }
+
+    var bmr;
+    if (gender === 'male') {
+      bmr = 10 * weightKg + 6.25 * heightCm - 5 * age - 161 + 166;
+    } else {
+      bmr = 10 * weightKg + 6.25 * heightCm - 5 * age - 161;
+    }
+
+    bmr = Math.round(bmr);
+    document.getElementById('bmrValue').textContent = bmr.toLocaleString();
+
+    var multipliers = [1.2, 1.375, 1.55, 1.725, 1.9];
+    var ids = ['cal12', 'cal1375', 'cal155', 'cal1725', 'cal19'];
+    for (var j = 0; j < multipliers.length; j++) {
+      document.getElementById(ids[j]).textContent = Math.round(bmr * multipliers[j]).toLocaleString();
+    }
+
+    document.getElementById('activityTable').style.display = 'block';
+  }
+
+  document.getElementById('calculateBtn').addEventListener('click', calculateBMR);
+  calculateBMR();
+</script>

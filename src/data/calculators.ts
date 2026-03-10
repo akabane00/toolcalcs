@@ -925,6 +925,77 @@ export const calculators: Calculator[] = [
     categorySlug: 'astrology-calculators',
     icon: '🐉',
   },
+  // Health (new)
+  {
+    title: 'BMR Calculator',
+    slug: 'bmr-calculator',
+    description: 'Calculate your Basal Metabolic Rate using the Mifflin-St Jeor equation. See daily calorie needs by activity level.',
+    category: 'Health Calculators',
+    categorySlug: 'health-calculators',
+    icon: '🔥',
+  },
+  // Math (new)
+  {
+    title: 'Percentage Change Calculator',
+    slug: 'percentage-change-calculator',
+    description: 'Calculate the percentage increase or decrease between two values. See absolute change, direction, and step-by-step formula.',
+    category: 'Math Calculators',
+    categorySlug: 'math-calculators',
+    icon: '📈',
+  },
+  // Conversion (new)
+  {
+    title: 'Data Size Converter',
+    slug: 'data-size-converter',
+    description: 'Convert between bytes, KB, MB, GB, TB, and PB using binary 1024-based conversion. See all unit conversions at once.',
+    category: 'Conversion Calculators',
+    categorySlug: 'conversion-calculators',
+    icon: '💾',
+  },
+  // Date & Time (new)
+  {
+    title: 'Hours Calculator (Time Between)',
+    slug: 'hours-between-calculator',
+    description: 'Calculate the exact hours and minutes between two clock times. Supports AM/PM, next-day crossing, and decimal hours.',
+    category: 'Date & Time Calculators',
+    categorySlug: 'date-time-calculators',
+    icon: '⏰',
+  },
+  // Everyday (new batch)
+  {
+    title: 'Fuel Economy Calculator',
+    slug: 'fuel-economy-calculator',
+    description: 'Calculate MPG, cost per mile, L/100km equivalent, and annual fuel cost from distance driven and fuel consumed.',
+    category: 'Everyday Calculators',
+    categorySlug: 'everyday-calculators',
+    icon: '⛽',
+  },
+  {
+    title: 'Age Difference Calculator',
+    slug: 'age-difference-calculator',
+    description: 'Find the exact age gap between two people in years, months, and days. Includes current ages and the half-your-age-plus-7 rule.',
+    category: 'Everyday Calculators',
+    categorySlug: 'everyday-calculators',
+    icon: '👫',
+  },
+  // Construction (new)
+  {
+    title: 'Tile Calculator',
+    slug: 'tile-calculator',
+    description: 'Calculate how many tiles you need for any room with wastage allowance, boxes needed, and cost estimates.',
+    category: 'Construction Calculators',
+    categorySlug: 'construction-calculators',
+    icon: '🔲',
+  },
+  // Math (new)
+  {
+    title: 'Slope Calculator',
+    slug: 'slope-calculator',
+    description: 'Find slope, rise, run, line equation (y = mx + b), angle in degrees, and distance between two points.',
+    category: 'Math Calculators',
+    categorySlug: 'math-calculators',
+    icon: '📐',
+  },
 ];
 
 export function getCalculatorsByCategory(categorySlug: string): Calculator[] {
@@ -942,19 +1013,19 @@ const relatedGroups: Record<string, string[]> = {
   // Financial - Business & Wealth
   'business-wealth': ['margin-calculator', 'breakeven-calculator', 'crypto-profit-calculator', 'rental-yield-calculator', 'net-worth-calculator', 'debt-to-income-calculator', 'credit-card-payoff-calculator', 'debt-payoff-calculator'],
   // Health - Body Composition
-  'body-composition': ['bmi-calculator', 'tdee-calculator', 'calorie-calculator', 'body-fat-calculator', 'ideal-weight-calculator', 'macro-calculator', 'water-intake-calculator', 'protein-intake-calculator', 'bac-calculator'],
+  'body-composition': ['bmi-calculator', 'bmr-calculator', 'tdee-calculator', 'calorie-calculator', 'body-fat-calculator', 'ideal-weight-calculator', 'macro-calculator', 'water-intake-calculator', 'protein-intake-calculator', 'bac-calculator'],
   // Health - Wellness
   'wellness': ['sleep-calculator', 'pace-calculator', 'pregnancy-due-date-calculator', 'ovulation-calculator', 'pregnancy-weight-gain-calculator'],
   // Math
-  'math-tools': ['percentage-calculator', 'fraction-calculator', 'standard-deviation-calculator', 'area-calculator', 'probability-calculator', 'gpa-calculator', 'random-number-generator', 'scientific-calculator', 'average-calculator', 'triangle-calculator', 'lcm-gcf-calculator', 'prime-number-checker', 'quadratic-formula-calculator', 'volume-calculator'],
+  'math-tools': ['percentage-calculator', 'percentage-change-calculator', 'fraction-calculator', 'standard-deviation-calculator', 'area-calculator', 'probability-calculator', 'gpa-calculator', 'random-number-generator', 'scientific-calculator', 'average-calculator', 'triangle-calculator', 'lcm-gcf-calculator', 'prime-number-checker', 'quadratic-formula-calculator', 'volume-calculator', 'slope-calculator'],
   // Date & Time
-  'date-time': ['age-calculator', 'date-difference-calculator', 'days-until-calculator', 'time-zone-converter', 'business-days-calculator', 'time-duration-calculator', 'timestamp-calculator', 'day-of-week-calculator'],
+  'date-time': ['age-calculator', 'date-difference-calculator', 'days-until-calculator', 'time-zone-converter', 'business-days-calculator', 'time-duration-calculator', 'timestamp-calculator', 'day-of-week-calculator', 'hours-between-calculator'],
   // Everyday
-  'everyday': ['tip-calculator', 'discount-calculator', 'hours-calculator', 'square-footage-calculator', 'gas-cost-calculator', 'electricity-cost-calculator', 'word-counter', 'dog-age-calculator', 'sales-tax-calculator', 'grade-calculator', 'cat-age-calculator'],
+  'everyday': ['tip-calculator', 'discount-calculator', 'hours-calculator', 'square-footage-calculator', 'gas-cost-calculator', 'electricity-cost-calculator', 'word-counter', 'dog-age-calculator', 'sales-tax-calculator', 'grade-calculator', 'cat-age-calculator', 'fuel-economy-calculator', 'age-difference-calculator'],
   // Construction
-  'construction': ['concrete-calculator', 'paint-calculator', 'roofing-calculator', 'flooring-calculator', 'mulch-calculator', 'fence-calculator', 'drywall-calculator', 'deck-calculator', 'solar-panel-calculator', 'gravel-calculator', 'stair-calculator'],
+  'construction': ['concrete-calculator', 'paint-calculator', 'roofing-calculator', 'flooring-calculator', 'mulch-calculator', 'fence-calculator', 'drywall-calculator', 'deck-calculator', 'solar-panel-calculator', 'gravel-calculator', 'stair-calculator', 'tile-calculator'],
   // Conversion
-  'conversion': ['unit-converter', 'currency-converter', 'temperature-converter', 'cooking-measurement-converter', 'length-converter', 'weight-converter', 'speed-converter'],
+  'conversion': ['unit-converter', 'currency-converter', 'temperature-converter', 'cooking-measurement-converter', 'length-converter', 'weight-converter', 'speed-converter', 'data-size-converter'],
   // Astrology
   'astrology': ['zodiac-sign-calculator', 'zodiac-compatibility-calculator', 'numerology-calculator', 'angel-number-calculator', 'tarot-reading', 'chinese-zodiac-calculator'],
 };

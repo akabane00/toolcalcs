@@ -1,0 +1,321 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Conversion Calculators",
+        "item": "https://toolcalcs.com/conversion-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Data Size Converter"
+      }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'Is 1 GB equal to 1000 MB or 1024 MB?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'It depends on the standard. In binary (IEC), 1 GiB = 1,024 MiB, which is what operating systems like Windows use. In decimal (SI), 1 GB = 1,000 MB, which is what storage manufacturers use on packaging. This converter uses the binary 1024-based system, which reflects actual computer memory addressing.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why does my hard drive show less space than advertised?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Hard drive manufacturers use the decimal (SI) system where 1 GB = 1,000,000,000 bytes. Your operating system uses the binary system where 1 GB = 1,073,741,824 bytes. A drive sold as "500 GB" contains 500,000,000,000 bytes, which the OS reports as about 465 GB. The missing space is not a defect—it is a difference in measurement standards.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is the difference between a bit and a byte?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'A bit (b) is the smallest unit of data—a single 0 or 1. A byte (B) consists of 8 bits. Internet speeds are usually measured in bits per second (Mbps), while file sizes are measured in bytes (MB). To convert Mbps to MBps, divide by 8. For example, a 100 Mbps connection transfers about 12.5 MB per second.',
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Data Size Converter - Bytes, KB, MB, GB, TB"
+  description="Free data size converter. Convert between bytes, kilobytes, megabytes, gigabytes, terabytes, and petabytes using binary (1024) conversion."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/conversion-calculators/">Conversion Calculators</a> &rsaquo;
+    <span>Data Size Converter</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Data Size Converter &mdash; Bytes, KB, MB, GB, TB</h1>
+  <p class="page-desc">Convert between data storage units instantly using binary (1024-based) conversion.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="dataValue">Value</label>
+        <input type="number" id="dataValue" value="1" min="0" step="any" />
+      </div>
+      <div class="input-group">
+        <label for="fromUnit">From</label>
+        <select id="fromUnit">
+          <option value="0">Bytes (B)</option>
+          <option value="1">Kilobytes (KB)</option>
+          <option value="2">Megabytes (MB)</option>
+          <option value="3" selected>Gigabytes (GB)</option>
+          <option value="4">Terabytes (TB)</option>
+          <option value="5">Petabytes (PB)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="toUnit">To</label>
+        <select id="toUnit">
+          <option value="0">Bytes (B)</option>
+          <option value="1">Kilobytes (KB)</option>
+          <option value="2" selected>Megabytes (MB)</option>
+          <option value="3">Gigabytes (GB)</option>
+          <option value="4">Terabytes (TB)</option>
+          <option value="5">Petabytes (PB)</option>
+        </select>
+      </div>
+      <button class="calc-btn" id="calculateBtn">Convert</button>
+    </div>
+
+    <div class="calc-results" id="results" style="display:none;">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label" id="convLabel">Result</span>
+          <span class="result-value" id="convValue">--</span>
+        </div>
+      </div>
+      <div id="formulaShow" class="formula-show"></div>
+      <h3 style="margin:20px 0 8px;font-size:1rem;">All Unit Conversions</h3>
+      <div class="table-container">
+        <table class="data-table" id="allUnitsTable">
+          <thead>
+            <tr><th>Unit</th><th>Value</th></tr>
+          </thead>
+          <tbody id="allUnitsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>What Are Data Size Units?</h2>
+    <p>Data size units measure the amount of digital information stored or transmitted by computers and electronic devices. At the most fundamental level, all digital data is represented as a sequence of binary digits (bits), which are either 0 or 1. Eight bits make one byte, and bytes are the basic building block from which all larger units are derived. Understanding these units is essential for anyone who works with computers, manages storage, or deals with internet bandwidth.</p>
+    <p>As technology advanced and storage capacities grew, larger units were introduced to make numbers manageable. Just as it is easier to say "5 kilometers" rather than "5,000 meters," it is easier to say "500 GB" rather than "536,870,912,000 bytes." The hierarchy follows a consistent pattern: each step up represents 1,024 times the previous unit (in binary) or 1,000 times (in decimal).</p>
+
+    <h2>Binary vs Decimal: The 1024 vs 1000 Debate</h2>
+    <p>One of the most confusing aspects of data sizes is the existence of two competing standards for unit definitions:</p>
+    <table class="info-table" style="max-width:100%;">
+      <thead>
+        <tr><th>Binary (IEC, 1024-based)</th><th>Decimal (SI, 1000-based)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1 KiB = 1,024 bytes</td><td>1 KB = 1,000 bytes</td></tr>
+        <tr><td>1 MiB = 1,048,576 bytes</td><td>1 MB = 1,000,000 bytes</td></tr>
+        <tr><td>1 GiB = 1,073,741,824 bytes</td><td>1 GB = 1,000,000,000 bytes</td></tr>
+        <tr><td>1 TiB = 1,099,511,627,776 bytes</td><td>1 TB = 1,000,000,000,000 bytes</td></tr>
+      </tbody>
+    </table>
+    <p>The <strong>binary system</strong> (powers of 1,024) is how computers actually address memory. RAM, operating systems, and file managers use this system. This is why a 256 GB SSD shows as roughly 238 GB in your operating system. The <strong>decimal system</strong> (powers of 1,000) is used by storage manufacturers on product labels, network speeds, and the International System of Units (SI).</p>
+    <p>In 1998, the International Electrotechnical Commission (IEC) introduced the "binary prefix" names (kibibyte, mebibyte, gibibyte) with symbols KiB, MiB, GiB to eliminate ambiguity. However, most software and everyday language still uses KB, MB, and GB to mean binary values. This converter uses the binary (1024-based) system, which is what your operating system and most software tools report.</p>
+
+    <h2>Data Size Reference Table</h2>
+    <p>Here is a quick reference showing the binary conversion factors between common data units:</p>
+    <table class="info-table" style="max-width:100%;">
+      <thead>
+        <tr><th>Unit</th><th>Bytes</th><th>Equivalent</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1 Byte</td><td>1</td><td>8 bits</td></tr>
+        <tr><td>1 KB</td><td>1,024</td><td>1,024 Bytes</td></tr>
+        <tr><td>1 MB</td><td>1,048,576</td><td>1,024 KB</td></tr>
+        <tr><td>1 GB</td><td>1,073,741,824</td><td>1,024 MB</td></tr>
+        <tr><td>1 TB</td><td>1,099,511,627,776</td><td>1,024 GB</td></tr>
+        <tr><td>1 PB</td><td>1,125,899,906,842,624</td><td>1,024 TB</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Common File Sizes</h2>
+    <p>To put data sizes into everyday context, here are typical file sizes you encounter regularly:</p>
+    <ul>
+      <li><strong>Text email (no attachments):</strong> 5-25 KB</li>
+      <li><strong>Word document (10 pages):</strong> 50-200 KB</li>
+      <li><strong>MP3 song (4 minutes):</strong> 3-5 MB</li>
+      <li><strong>Smartphone photo (12 MP):</strong> 3-8 MB</li>
+      <li><strong>RAW camera photo:</strong> 20-50 MB</li>
+      <li><strong>HD movie (1080p, 2 hours):</strong> 4-8 GB</li>
+      <li><strong>4K movie (2 hours):</strong> 15-30 GB</li>
+      <li><strong>Video game (AAA title):</strong> 50-150 GB</li>
+      <li><strong>Full operating system install:</strong> 20-40 GB</li>
+    </ul>
+
+    <h2>Storage vs Transfer Speeds</h2>
+    <p>A common source of confusion is the difference between storage units and transfer speed units. Storage is measured in <strong>bytes</strong> (B), while network and internet speeds are measured in <strong>bits</strong> (b). Since 1 byte = 8 bits, you must divide network speeds by 8 to determine actual download speeds in bytes per second.</p>
+    <p>For example, a 100 Mbps (megabits per second) internet connection can theoretically download at 12.5 MB/s (megabytes per second). A 1 Gbps connection maxes out at 125 MB/s. In practice, overhead from network protocols reduces real-world speeds to about 85-95% of the theoretical maximum.</p>
+    <p>This distinction matters when estimating download times. A 4 GB movie on a 100 Mbps connection would take approximately 4,096 MB / 12.5 MB/s = about 328 seconds, or roughly 5.5 minutes under ideal conditions.</p>
+
+    <h2>How Storage Capacities Have Evolved</h2>
+    <p>The growth of digital storage over the past few decades is staggering:</p>
+    <ul>
+      <li><strong>1971:</strong> The first floppy disk held 80 KB.</li>
+      <li><strong>1981:</strong> The IBM PC shipped with 16 KB of RAM. A 10 MB hard drive was considered enormous.</li>
+      <li><strong>1984:</strong> The first CD-ROM could store 650 MB, which was revolutionary at the time.</li>
+      <li><strong>1996:</strong> DVDs arrived with 4.7 GB capacity, enough for a full-length movie.</li>
+      <li><strong>2006:</strong> Blu-ray discs offered 25-50 GB, enabling high-definition content.</li>
+      <li><strong>2015:</strong> Consumer SSDs commonly reached 1 TB. The cost per GB dropped below $0.50.</li>
+      <li><strong>2024:</strong> Consumer NVMe SSDs commonly reach 4-8 TB. Enterprise drives exceed 100 TB. Cloud storage offers virtually unlimited capacity on demand.</li>
+    </ul>
+    <p>This exponential growth roughly follows a trend where storage capacity doubles approximately every two years while costs steadily decline, making digital storage increasingly accessible to everyone.</p>
+
+    <h2>Choosing the Right Storage Size</h2>
+    <p>Here are general recommendations for choosing storage based on common use cases:</p>
+    <ul>
+      <li><strong>64-128 GB:</strong> Basic smartphone storage for apps, photos, and some music.</li>
+      <li><strong>256 GB:</strong> Comfortable smartphone or light laptop usage with moderate photo/video libraries.</li>
+      <li><strong>512 GB - 1 TB:</strong> Standard laptop or desktop for everyday use, moderate gaming, and media libraries.</li>
+      <li><strong>2-4 TB:</strong> Heavy gaming libraries, video editing projects, or large media collections.</li>
+      <li><strong>8+ TB:</strong> Professional video production, server storage, or extensive archival needs.</li>
+    </ul>
+    <p>When planning storage needs, always add a buffer of at least 20% above your current requirements. Operating systems and applications grow with updates, and running a drive at near-full capacity can degrade performance, especially with SSDs.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>Is 1 GB equal to 1000 MB or 1024 MB?</summary>
+        <p>It depends on the standard being used. In the binary system (used by operating systems and this converter), 1 GB = 1,024 MB. In the decimal system (used by storage manufacturers and networking), 1 GB = 1,000 MB. The difference is about 7.4% and grows larger with bigger units. This is why a "1 TB" hard drive shows as approximately 931 GB in your operating system.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Why does my hard drive show less space than advertised?</summary>
+        <p>Hard drive manufacturers label their products using decimal (SI) units where 1 GB = 1,000,000,000 bytes. Your operating system reports capacity using binary units where 1 GB = 1,073,741,824 bytes. A "500 GB" drive contains 500,000,000,000 bytes, which your OS displays as approximately 465.66 GB. The storage is all there; the two systems simply count differently.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is the difference between a bit and a byte?</summary>
+        <p>A bit is the smallest unit of digital data, representing a single 0 or 1. A byte is a group of 8 bits. Internet speeds are typically measured in megabits per second (Mbps), while file sizes are measured in megabytes (MB). To convert from Mbps to MBps (megabytes per second), divide by 8. A 200 Mbps internet connection downloads at about 25 MB per second.</p>
+      </details>
+    </div>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/conversion-calculators/unit-converter/">Unit Converter</a> - Convert between length, weight, temperature, and more.</li>
+      <li><a href="/conversion-calculators/speed-converter/">Speed Converter</a> - Convert between mph, km/h, knots, and more.</li>
+      <li><a href="/math-calculators/percentage-calculator/">Percentage Calculator</a> - Calculate any percentage of a number.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+  <RelatedArticles calculatorSlug="data-size-converter" />
+  <RelatedCalculators currentSlug="data-size-converter" />
+</BaseLayout>
+
+<style>
+  .formula-show {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+  .last-updated { font-size: 0.75rem; color: var(--color-text-muted); margin: 4px 0 0; }
+  @media (max-width: 640px) {
+    .calc-inputs { grid-template-columns: 1fr; }
+    .result-cards { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script is:inline>
+  var unitNames = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
+
+  function formatNumber(num) {
+    if (num === 0) return '0';
+    if (Math.abs(num) >= 1) {
+      return num.toLocaleString(undefined, { maximumFractionDigits: 4 });
+    }
+    var s = num.toPrecision(6);
+    return parseFloat(s).toString();
+  }
+
+  function convertData() {
+    var value = parseFloat(document.getElementById('dataValue').value);
+    var fromIdx = parseInt(document.getElementById('fromUnit').value);
+    var toIdx = parseInt(document.getElementById('toUnit').value);
+
+    if (isNaN(value)) return;
+
+    // Convert to bytes first, then to target unit
+    var bytes = value * Math.pow(1024, fromIdx);
+    var result = bytes / Math.pow(1024, toIdx);
+
+    document.getElementById('convLabel').textContent = value + ' ' + unitNames[fromIdx] + ' =';
+    document.getElementById('convValue').textContent = formatNumber(result) + ' ' + unitNames[toIdx];
+
+    // Show formula
+    var steps = Math.abs(toIdx - fromIdx);
+    var direction = toIdx > fromIdx ? 'divide' : 'multiply';
+    var formula = '';
+    if (fromIdx === toIdx) {
+      formula = '<strong>Same unit:</strong> No conversion needed.';
+    } else {
+      formula = '<strong>Formula:</strong> ' + value + ' ' + unitNames[fromIdx];
+      if (direction === 'multiply') {
+        formula += ' &times; 1024<sup>' + steps + '</sup> = ' + formatNumber(result) + ' ' + unitNames[toIdx];
+      } else {
+        formula += ' &divide; 1024<sup>' + steps + '</sup> = ' + formatNumber(result) + ' ' + unitNames[toIdx];
+      }
+      formula += '<br><strong>Factor:</strong> 1024<sup>' + steps + '</sup> = ' + Math.pow(1024, steps).toLocaleString();
+    }
+    document.getElementById('formulaShow').innerHTML = formula;
+
+    // All conversions table
+    var tbody = document.getElementById('allUnitsBody');
+    tbody.innerHTML = '';
+    for (var i = 0; i < unitNames.length; i++) {
+      var converted = bytes / Math.pow(1024, i);
+      var row = document.createElement('tr');
+      var td1 = document.createElement('td');
+      td1.textContent = unitNames[i];
+      var td2 = document.createElement('td');
+      td2.textContent = formatNumber(converted);
+      row.appendChild(td1);
+      row.appendChild(td2);
+      tbody.appendChild(row);
+    }
+
+    document.getElementById('results').style.display = 'block';
+  }
+
+  document.getElementById('calculateBtn').addEventListener('click', convertData);
+  convertData();
+</script>

@@ -1,0 +1,254 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Construction Calculators",
+        "item": "https://toolcalcs.com/construction-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Tile Calculator"
+      }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How much extra tile should I buy for waste?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'For a standard straight grid layout in a rectangular room, add 10% extra tile for waste. Diagonal installations require 15% extra, and herringbone or complex patterns need 15-20% additional material. Rooms with many cuts around cabinets, pipes, and fixtures can push waste even higher. Always buy all tile at once from the same production lot, since colors and calibration can vary between lots.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How do I calculate how many tiles I need?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'First, calculate your room area in square feet by multiplying the length by the width. Next, calculate the area of one tile in square feet by multiplying the tile length by the tile width (convert inches to feet first by dividing by 12). Divide the room area by the tile area to get the base number of tiles, then multiply by your waste factor (1.10 for 10% waste). Round up to the nearest whole number. Finally, divide by the number of tiles per box to determine how many boxes to order.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What size tile is best for a small bathroom?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Medium-sized tiles such as 12x12 inches or 12x24 inches work well in small bathrooms because they create fewer grout lines, making the space appear larger and cleaner. Very small mosaic tiles (1-2 inches) are best reserved for accents or shower floors where more grip is needed. Very large format tiles (24x48 inches) can work but require a perfectly level subfloor and generate more waste due to cuts around fixtures. Lighter colors also help small bathrooms feel more spacious.',
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Tile Calculator — How Many Tiles Do You Need? | ToolCalcs"
+  description="Free tile calculator. Calculate how many tiles you need for any room with wastage allowance, boxes needed, and cost estimates for your tiling project."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/construction-calculators/">Construction Calculators</a> &rsaquo;
+    <span>Tile Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Tile Calculator</h1>
+  <p class="page-desc">Calculate how many tiles you need for your floor or wall project, including wastage, boxes required, and estimated material cost.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="roomLength">Room Length (ft)</label>
+        <input type="number" id="roomLength" value="12" min="0" step="0.1" />
+      </div>
+      <div class="input-group">
+        <label for="roomWidth">Room Width (ft)</label>
+        <input type="number" id="roomWidth" value="10" min="0" step="0.1" />
+      </div>
+      <div class="input-group">
+        <label for="tileLength">Tile Length (inches)</label>
+        <input type="number" id="tileLength" value="12" min="0" step="0.1" />
+      </div>
+      <div class="input-group">
+        <label for="tileWidth">Tile Width (inches)</label>
+        <input type="number" id="tileWidth" value="12" min="0" step="0.1" />
+      </div>
+      <div class="input-group">
+        <label for="wastage">Wastage (%)</label>
+        <input type="number" id="wastage" value="10" min="0" max="50" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="tilesPerBox">Tiles per Box</label>
+        <input type="number" id="tilesPerBox" value="10" min="1" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="pricePerTile">Price per Tile ($)</label>
+        <input type="number" id="pricePerTile" value="2.50" min="0" step="0.01" />
+      </div>
+    </div>
+
+    <button class="calc-btn" id="calculateBtn">Calculate Tiles Needed</button>
+
+    <div class="calc-results" id="resultsSection" style="display:none;">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Room Area</span>
+          <span class="result-value" id="resultArea">--</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Tiles Needed (with wastage)</span>
+          <span class="result-value" id="resultTiles">--</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Boxes Needed</span>
+          <span class="result-value" id="resultBoxes">--</span>
+        </div>
+        <div class="result-card success">
+          <span class="result-label">Estimated Cost</span>
+          <span class="result-value" id="resultCost">--</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>How to Measure for Tile</h2>
+    <p>Accurate measurement is the foundation of a successful tile installation. Ordering too few tiles leads to project delays and potentially mismatched replacement tiles from a different production batch. Ordering too many wastes money, though having a small surplus for future repairs is always wise. The measurement process starts with the room itself and extends to understanding your chosen tile's dimensions and coverage per unit.</p>
+    <p>Begin by measuring the room length and width in feet. Use a tape measure and take measurements at the longest and widest points of the room. For rectangular rooms, the calculation is straightforward: multiply length by width to get the total square footage. A room that is 12 feet long and 10 feet wide has an area of 120 square feet. If the room is not a perfect rectangle, break it into smaller rectangular sections, calculate each area separately, and add them together.</p>
+    <div class="formula-box">
+      <code>Room Area = Length (ft) &times; Width (ft)</code>
+    </div>
+    <p>Next, determine the area of a single tile. Tile dimensions are typically given in inches, so you need to convert to square feet for the calculation. Divide each tile dimension by 12 to convert from inches to feet, then multiply the two values together. A 12-by-12-inch tile covers 1 square foot, while a 6-by-6-inch tile covers only 0.25 square feet. A 12-by-24-inch tile covers 2 square feet per tile.</p>
+    <div class="formula-box">
+      <code>Tile Area (sq ft) = (Tile Length in. / 12) &times; (Tile Width in. / 12)</code>
+    </div>
+    <p>To find the number of tiles needed, divide the room area by the area of one tile. Then multiply by the waste factor to account for cuts, breakage, and installation losses. For a 120 square foot room using 12-by-12-inch tiles with a 10 percent waste factor, you would need 120 divided by 1 equals 120 tiles, multiplied by 1.10 equals 132 tiles. Always round up to the nearest whole tile, and then round up again to full boxes when purchasing.</p>
+    <div class="formula-box">
+      <code>Tiles Needed = (Room Area / Tile Area) &times; (1 + Wastage% / 100)</code>
+    </div>
+    <p>When measuring irregularly shaped rooms such as L-shaped kitchens, bathrooms with alcoves, or rooms with bay windows, measure each rectangular section separately and add them together. For rooms with permanent fixtures like kitchen islands or bathtub enclosures, you can subtract the fixture footprint from the total area, though many professionals prefer to include fixture areas in the calculation to ensure adequate spare tiles for repairs.</p>
+
+    <h2>Tile Layout Patterns and Their Impact on Material Needs</h2>
+    <p>The layout pattern you choose affects both the aesthetic of the finished floor and the amount of waste generated during installation. Different patterns require different amounts of cutting, and more cuts mean more waste. Understanding the major tile layout patterns helps you select the right wastage percentage for your project.</p>
+    <p><strong>Straight grid (or stack bond)</strong> is the simplest and most material-efficient pattern. Tiles are laid in perfectly aligned rows and columns, with each tile edge lining up with the tiles beside it. This pattern requires cuts only at the room perimeter and around obstacles. A 10 percent waste factor is typically sufficient for a straight grid in a rectangular room. This pattern works best with square tiles and is the easiest for DIY installers.</p>
+    <p><strong>Brick bond (or running bond)</strong> offsets each row by half a tile width, similar to the pattern in a brick wall. This is one of the most popular tile layouts because it is visually appealing and helps disguise slight variations in tile size. The offset means more partial tiles at the ends of rows, so a 10 to 12 percent waste factor is appropriate. Brick bond works especially well with rectangular subway tiles and large-format rectangular tiles.</p>
+    <p><strong>Diagonal layout</strong> sets tiles at a 45-degree angle to the walls. Every tile touching a wall must be cut at an angle, generating significantly more waste than a straight layout. Use a 15 percent waste factor for diagonal installations. The diagonal pattern creates a dynamic visual effect and can make small rooms appear larger by drawing the eye along the longest dimension of the space.</p>
+    <p><strong>Herringbone pattern</strong> arranges rectangular tiles in a zigzag formation where each tile meets the next at a 90-degree angle, creating a distinctive V-shaped pattern. Herringbone requires precise cuts at all edges and produces the most waste of any standard pattern. Use a 15 to 20 percent waste factor for herringbone. This pattern is a premium design choice often seen in entryways, kitchens, and high-end bathrooms.</p>
+    <p><strong>Basketweave and pinwheel</strong> are decorative patterns that alternate tile orientations to create a woven appearance. These patterns typically use two different tile sizes and require careful planning. Waste factors of 15 to 20 percent are common. Because of the complexity, these patterns are usually best left to experienced tile installers.</p>
+
+    <h2>Wastage Guidelines for Different Situations</h2>
+    <p>Choosing the correct wastage percentage is one of the most important decisions in tile ordering. Too little waste allowance risks running short of material, which is a costly problem if the tile is discontinued or the replacement lot does not match. Too much waste allowance means spending more than necessary, though extra tiles stored for future repairs can be valuable.</p>
+    <p>A <strong>10 percent wastage</strong> rate is the industry standard for simple rectangular rooms with a straight grid pattern. This covers the cuts needed at walls, doorways, and typical installation losses. Most professional tile setters consider 10 percent the minimum waste allowance for any project.</p>
+    <p>Use <strong>15 percent wastage</strong> for diagonal layouts, rooms with many corners or alcoves, and projects where the tile installer is less experienced. Bathrooms often warrant 15 percent because of the cuts needed around toilets, vanities, shower curbs, and floor drains. Any room with more than four corners should use at least 15 percent.</p>
+    <p>Budget <strong>20 percent or more</strong> for herringbone patterns, complex mosaic designs, natural stone tiles that may have inconsistent sizing, and rooms with highly irregular shapes. Very large format tiles (24 by 48 inches or larger) also benefit from a higher waste factor because each broken or miscut tile represents a larger loss of material and cost.</p>
+    <p>Regardless of the waste factor, always buy an extra box or two beyond your calculated needs and store them in a dry place. Tile production lots vary in shade and calibration, and matching a tile five years later for a repair is often impossible. Having spare tiles on hand saves both time and money when repairs are eventually needed.</p>
+
+    <h2>Choosing the Right Tile Size</h2>
+    <p>Tile size has a significant impact on the appearance of a room, the difficulty of installation, and the amount of waste generated. Modern tiles come in a vast range of sizes, from tiny 1-inch mosaics to massive 48-by-48-inch slabs. Selecting the right size involves balancing aesthetics, practical considerations, and the condition of your subfloor.</p>
+    <p><strong>Small tiles (1 to 4 inches)</strong> are typically sold in sheets on a mesh backing for easier installation. They are ideal for shower floors where more grout lines provide better slip resistance, and for decorative accents such as backsplash borders and niche inserts. Small tiles have the highest grout-to-tile ratio, which means more grout maintenance over time. They also require a very flat subfloor to avoid a wavy appearance.</p>
+    <p><strong>Medium tiles (6 to 12 inches)</strong> are the most versatile and popular size range. The classic 12-by-12-inch floor tile remains a staple for kitchens, bathrooms, and entryways. Subway tiles in the 3-by-6-inch or 4-by-12-inch range dominate kitchen and bathroom wall applications. Medium tiles balance ease of installation with visual appeal and are suitable for most DIY projects.</p>
+    <p><strong>Large tiles (12 by 24 inches and above)</strong> create a modern, spacious look with fewer grout lines. They can make small rooms appear larger by reducing visual breaks in the floor surface. However, large tiles require an extremely flat subfloor because any unevenness causes lippage, where tile edges sit at different heights. Self-leveling compound is often needed before installing large-format tiles. These tiles are heavier and more difficult to handle, making professional installation recommended for sizes above 24 inches.</p>
+    <p>The condition of your subfloor should guide your tile size selection. Concrete slabs that are flat and level can accommodate any tile size. Plywood subfloors with minor imperfections work well with small and medium tiles but may need additional preparation for large formats. Old subfloors with significant dips and humps should be leveled before any tile installation, but they are least forgiving with large-format tiles.</p>
+
+    <h2>Estimating Total Project Cost</h2>
+    <p>The tile itself is only one component of the total project cost. A realistic budget should include tile, setting materials, grout, tools or equipment rental, and labor if you are hiring a professional installer. Understanding all the cost components helps you avoid surprises and budget accurately.</p>
+    <p><strong>Tile costs</strong> range from as little as $0.50 per square foot for basic ceramic to $15 or more per square foot for premium porcelain, natural stone, or designer patterns. Ceramic tile is the most affordable and comes in a wide variety of colors and designs. Porcelain tile is denser and more water-resistant, making it suitable for outdoor use and wet areas. Natural stone such as marble, travertine, and slate is the most expensive but offers unique beauty that cannot be replicated by manufactured tile.</p>
+    <p><strong>Setting materials</strong> include thinset mortar, which costs $15 to $30 per 50-pound bag and covers 60 to 80 square feet depending on trowel size. Grout costs $10 to $25 per bag and covers 70 to 100 square feet for 12-by-12-inch tiles with standard joint widths. Tile spacers cost $3 to $10 per bag. Waterproofing membrane for wet areas adds $0.50 to $2.00 per square foot.</p>
+    <p><strong>Professional installation</strong> labor typically costs $4 to $8 per square foot for standard floor tile. Complex patterns, large-format tiles, wall tile, and shower installations cost $6 to $12 per square foot or more. Demolition and removal of existing flooring adds $1 to $3 per square foot. Subfloor preparation and leveling can add another $1 to $5 per square foot depending on the condition of the existing surface.</p>
+    <p>For a complete 120 square foot bathroom renovation using mid-range porcelain tile at $5 per square foot, the total material and installation costs might break down as follows: tile at $600, thinset and grout at $60, waterproofing at $180, professional labor at $840, and demolition at $180, for a total project cost of approximately $1,860, or $15.50 per square foot installed. Getting three quotes from local tile installers is the best way to determine fair pricing in your area.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>How much extra tile should I buy for waste?</summary>
+        <p>For a standard straight grid layout in a rectangular room, add 10 percent extra tile for waste. Diagonal installations require 15 percent extra, and herringbone or complex patterns need 15 to 20 percent additional material. Rooms with many cuts around cabinets, pipes, and fixtures can push waste even higher. Always buy all tile at once from the same production lot, since colors and calibration can vary between batches. Store extra tiles in a dry place for future repairs, as matching tile from a different production run years later is often impossible. If you are installing large-format tiles that are more prone to breakage during cutting, consider adding an extra 5 percent to any of these recommended waste factors.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How do I calculate how many tiles I need?</summary>
+        <p>First, calculate your room area in square feet by multiplying the length by the width. Next, calculate the area of one tile in square feet by multiplying the tile length by the tile width after converting inches to feet by dividing by 12. Divide the room area by the tile area to get the base number of tiles, then multiply by your waste factor, such as 1.10 for 10 percent waste. Round up to the nearest whole number. Finally, divide by the number of tiles per box and round up to determine how many boxes to order. For example, a 120 square foot room using 12-by-12-inch tiles with 10 percent waste needs 132 tiles. If tiles come 10 per box, you would order 14 boxes, giving you 140 tiles with a few spares.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What size tile is best for a small bathroom?</summary>
+        <p>Medium-sized tiles such as 12 by 12 inches or 12 by 24 inches work well in small bathrooms because they create fewer grout lines, making the space appear larger and cleaner. Very small mosaic tiles of 1 to 2 inches are best reserved for accents and shower floors where more grip is needed. Very large format tiles of 24 by 48 inches can work but require a perfectly level subfloor and generate more waste due to cuts around fixtures. Lighter colors also help small bathrooms feel more spacious. For walls, 4-by-12-inch or 3-by-12-inch subway tiles in a horizontal brick bond pattern create a classic look that elongates the room visually. Consider using the same tile on the floor and walls for a cohesive appearance that makes the space feel larger.</p>
+      </details>
+    </div>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/construction-calculators/flooring-calculator/">Flooring Calculator</a> - Calculate materials needed for hardwood, laminate, tile, vinyl, or carpet.</li>
+      <li><a href="/everyday-calculators/square-footage-calculator/">Square Footage Calculator</a> - Calculate area in square feet for rooms, yards, and complex shapes.</li>
+      <li><a href="/construction-calculators/paint-calculator/">Paint Calculator</a> - Estimate gallons of paint needed for walls and ceilings.</li>
+      <li><a href="/construction-calculators/gravel-calculator/">Gravel Calculator</a> - Calculate tons and cubic yards of gravel for driveways and landscaping.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+  <RelatedArticles calculatorSlug="tile-calculator" />
+  <RelatedCalculators currentSlug="tile-calculator" />
+</BaseLayout>
+
+<style>
+  .last-updated { font-size: 0.75rem; color: var(--color-text-muted); margin: 4px 0 0; }
+</style>
+
+<script is:inline>
+  document.getElementById('calculateBtn').addEventListener('click', function() {
+    var roomLength = parseFloat(document.getElementById('roomLength').value) || 0;
+    var roomWidth = parseFloat(document.getElementById('roomWidth').value) || 0;
+    var tileLength = parseFloat(document.getElementById('tileLength').value) || 0;
+    var tileWidth = parseFloat(document.getElementById('tileWidth').value) || 0;
+    var wastage = parseFloat(document.getElementById('wastage').value) || 0;
+    var tilesPerBox = parseInt(document.getElementById('tilesPerBox').value) || 1;
+    var pricePerTile = parseFloat(document.getElementById('pricePerTile').value) || 0;
+
+    if (roomLength <= 0 || roomWidth <= 0) {
+      alert('Please enter room dimensions greater than 0.');
+      return;
+    }
+    if (tileLength <= 0 || tileWidth <= 0) {
+      alert('Please enter tile dimensions greater than 0.');
+      return;
+    }
+
+    var roomArea = roomLength * roomWidth;
+    var tileLengthFt = tileLength / 12;
+    var tileWidthFt = tileWidth / 12;
+    var tileArea = tileLengthFt * tileWidthFt;
+
+    var baseTiles = roomArea / tileArea;
+    var tilesNeeded = Math.ceil(baseTiles * (1 + wastage / 100));
+    var boxesNeeded = Math.ceil(tilesNeeded / tilesPerBox);
+    var totalCost = tilesNeeded * pricePerTile;
+
+    document.getElementById('resultArea').textContent = roomArea.toFixed(2) + ' sq ft';
+    document.getElementById('resultTiles').textContent = tilesNeeded.toLocaleString() + ' tiles';
+    document.getElementById('resultBoxes').textContent = boxesNeeded.toLocaleString() + ' boxes';
+    document.getElementById('resultCost').textContent = '$' + totalCost.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+    document.getElementById('resultsSection').style.display = '';
+  });
+</script>
