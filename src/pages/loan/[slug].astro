@@ -1,0 +1,481 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import '../../styles/calculator.css';
+import { getAllLoanPages, LOAN_AMOUNTS, RATES, TERMS, formatMoney, type LoanPage } from '../../data/loan';
+
+export function getStaticPaths() {
+  return getAllLoanPages().map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: LoanPage };
+const {
+  slug,
+  loanAmount,
+  rate,
+  termYears,
+  monthlyPayment,
+  totalPayment,
+  totalInterest,
+} = page;
+
+function fmtMoney(n: number): string {
+  return '$' + Math.round(n).toLocaleString('en-US');
+}
+
+function fmtMoneyDecimal(n: number): string {
+  return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+const amountDisplay = fmtMoney(loanAmount);
+const totalMonths = termYears * 12;
+const monthlyRate = rate / 100 / 12;
+
+// --- First month breakdown ---
+const firstMonthInterest = loanAmount * monthlyRate;
+const firstMonthPrincipal = monthlyPayment - firstMonthInterest;
+
+// --- Effective cost: total interest as % of loan ---
+const effectiveCost = ((totalInterest / loanAmount) * 100).toFixed(1);
+
+// --- Principal vs Interest breakdown ---
+const principalPercent = ((loanAmount / totalPayment) * 100).toFixed(1);
+const interestPercent = ((totalInterest / totalPayment) * 100).toFixed(1);
+
+// --- Rate comparison: same amount & term, all available rates ---
+const allPages = getAllLoanPages();
+const relatedByRate = allPages
+  .filter(p => p.loanAmount === loanAmount && p.termYears === termYears && p.rate !== rate)
+  .sort((a, b) => a.rate - b.rate);
+
+// --- Term comparison: same amount & rate, all available terms ---
+const relatedByTerm = allPages
+  .filter(p => p.loanAmount === loanAmount && p.rate === rate && p.termYears !== termYears)
+  .sort((a, b) => a.termYears - b.termYears);
+
+// --- Related loans for links ---
+const relatedLoans = allPages
+  .filter(p => p.slug !== slug)
+  .sort((a, b) => Math.abs(a.loanAmount - loanAmount) - Math.abs(b.loanAmount - loanAmount))
+  .slice(0, 8);
+
+// --- SEO ---
+const title = `${amountDisplay} Personal Loan \u2014 ${termYears} Year at ${rate}% | ToolCalcs`;
+const description = `Calculate the monthly payment on a ${amountDisplay} personal loan at ${rate}% for ${termYears} years. Monthly payment: ${fmtMoneyDecimal(monthlyPayment)}. Total interest: ${fmtMoney(totalInterest)}. Compare rates and terms.`;
+const breadcrumbShort = `${amountDisplay} Loan at ${rate}%`;
+
+// --- FAQ content ---
+const faq1Q = `What is the monthly payment on a ${amountDisplay} personal loan at ${rate}%?`;
+const faq1A = `The monthly payment on a ${amountDisplay} personal loan at ${rate}% for ${termYears} years is ${fmtMoneyDecimal(monthlyPayment)}. Over the full term, you will pay a total of ${fmtMoney(totalPayment)}, including ${fmtMoney(totalInterest)} in interest.`;
+
+const faq2Q = `How much total interest will I pay on a ${amountDisplay} loan?`;
+const faq2A = `Over the life of a ${termYears}-year personal loan at ${rate}%, you would pay ${fmtMoney(totalInterest)} in total interest on ${amountDisplay} borrowed. That means the total cost of borrowing is ${effectiveCost}% of the original loan amount.`;
+
+const faq3Q = `Is ${rate}% a good interest rate for a personal loan?`;
+const faq3A = `Personal loan interest rates typically range from 6% to 36%, depending on your credit score, income, and lender. A rate of ${rate}% is ${rate <= 10 ? 'competitive and generally available to borrowers with good to excellent credit' : rate <= 15 ? 'in the moderate range, typical for borrowers with fair to good credit' : 'on the higher end, often associated with fair credit or shorter credit history'}. Improving your credit score, reducing existing debt, and comparing offers from multiple lenders can help you qualify for a lower rate.`;
+
+const faq4Q = `Should I choose a shorter or longer loan term?`;
+const faq4A = `A shorter loan term means higher monthly payments but significantly less total interest. A longer term lowers your monthly payment but increases the total cost of borrowing. For this ${amountDisplay} loan at ${rate}%, a shorter term would save you money overall, while a longer term keeps monthly payments more manageable. Choose based on your monthly budget and how quickly you want to be debt-free.`;
+
+// --- Structured Data ---
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Financial Calculators", "item": "https://toolcalcs.com/financial-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Personal Loan Calculator", "item": "https://toolcalcs.com/loan/" },
+      { "@type": "ListItem", "position": 4, "name": breadcrumbShort },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": faq1Q,
+        "acceptedAnswer": { "@type": "Answer", "text": faq1A },
+      },
+      {
+        "@type": "Question",
+        "name": faq2Q,
+        "acceptedAnswer": { "@type": "Answer", "text": faq2A },
+      },
+      {
+        "@type": "Question",
+        "name": faq3Q,
+        "acceptedAnswer": { "@type": "Answer", "text": faq3A },
+      },
+      {
+        "@type": "Question",
+        "name": faq4Q,
+        "acceptedAnswer": { "@type": "Answer", "text": faq4A },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title={title} description={description} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/financial-calculators/">Financial Calculators</a> &rsaquo;
+    <a href="/loan/">Personal Loan Calculator</a> &rsaquo;
+    <span>{breadcrumbShort}</span>
+  </nav>
+
+  <h1>{amountDisplay} Personal Loan &mdash; {termYears} Year at {rate}%</h1>
+  <p class="page-desc">
+    See the full monthly payment breakdown, total interest cost, and rate comparisons for a {amountDisplay} personal loan at {rate}% over {termYears} years.
+  </p>
+
+  <!-- Result Cards -->
+  <div class="result-cards loan-result-cards">
+    <div class="result-card primary">
+      <span class="result-label">Monthly Payment</span>
+      <span class="result-value">{fmtMoneyDecimal(monthlyPayment)}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Total Interest</span>
+      <span class="result-value">{fmtMoney(totalInterest)}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Total Payment</span>
+      <span class="result-value">{fmtMoney(totalPayment)}</span>
+    </div>
+    <div class="result-card success">
+      <span class="result-label">Effective Cost</span>
+      <span class="result-value">{effectiveCost}%</span>
+    </div>
+  </div>
+
+  <!-- Payment Breakdown -->
+  <h2 class="section-heading">Payment Breakdown</h2>
+  <div class="calculator-box">
+    <p class="loan-breakdown-note">First month breakdown for your {amountDisplay} personal loan at {rate}%:</p>
+    <div class="breakdown-row">
+      <span class="breakdown-label">Principal</span>
+      <span class="breakdown-value">{fmtMoneyDecimal(firstMonthPrincipal)}</span>
+    </div>
+    <div class="breakdown-row">
+      <span class="breakdown-label">Interest</span>
+      <span class="breakdown-value">{fmtMoneyDecimal(firstMonthInterest)}</span>
+    </div>
+    <div class="breakdown-row breakdown-total">
+      <span class="breakdown-label">Total Monthly Payment</span>
+      <span class="breakdown-value">{fmtMoneyDecimal(monthlyPayment)}</span>
+    </div>
+    <div class="loan-breakdown-summary">
+      Over the full {termYears}-year term ({totalMonths} payments), {principalPercent}% of your total payments go toward principal and {interestPercent}% go toward interest.
+    </div>
+  </div>
+
+  <!-- Rate Comparison Table -->
+  {relatedByRate.length > 0 && (
+    <h2 class="section-heading">Compare Rates for {amountDisplay} Loan ({termYears}-Year Term)</h2>
+    <p class="compare-desc">See how different interest rates affect your monthly payment on a {amountDisplay} loan over {termYears} years.</p>
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Rate</th>
+            <th>Monthly Payment</th>
+            <th>Total Interest</th>
+            <th>Total Paid</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="current-row">
+            <td><strong>{rate}% (current)</strong></td>
+            <td><strong>{fmtMoneyDecimal(monthlyPayment)}</strong></td>
+            <td><strong>{fmtMoney(totalInterest)}</strong></td>
+            <td><strong>{fmtMoney(totalPayment)}</strong></td>
+          </tr>
+          {relatedByRate.map(function (p) {
+            return (
+              <tr>
+                <td><a class="compare-link" href={`/loan/${p.slug}/`}>{p.rate}%</a></td>
+                <td>{fmtMoneyDecimal(p.monthlyPayment)}</td>
+                <td>{fmtMoney(p.totalInterest)}</td>
+                <td>{fmtMoney(p.totalPayment)}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  )}
+
+  <AdUnit slot="loan-mid" format="horizontal" />
+
+  <!-- Term Comparison Table -->
+  {relatedByTerm.length > 0 && (
+    <h2 class="section-heading">Compare Terms for {amountDisplay} Loan at {rate}%</h2>
+    <p class="compare-desc">See how different loan terms affect your monthly payment and total cost on a {amountDisplay} loan at {rate}%.</p>
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Term</th>
+            <th>Monthly Payment</th>
+            <th>Total Interest</th>
+            <th>Total Paid</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="current-row">
+            <td><strong>{termYears} years (current)</strong></td>
+            <td><strong>{fmtMoneyDecimal(monthlyPayment)}</strong></td>
+            <td><strong>{fmtMoney(totalInterest)}</strong></td>
+            <td><strong>{fmtMoney(totalPayment)}</strong></td>
+          </tr>
+          {relatedByTerm.map(function (p) {
+            return (
+              <tr>
+                <td><a class="compare-link" href={`/loan/${p.slug}/`}>{p.termYears} years</a></td>
+                <td>{fmtMoneyDecimal(p.monthlyPayment)}</td>
+                <td>{fmtMoney(p.totalInterest)}</td>
+                <td>{fmtMoney(p.totalPayment)}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  )}
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>Understanding Your Personal Loan Payment</h2>
+    <p>
+      If you borrow {amountDisplay} with a {termYears}-year personal loan at a fixed interest rate of {rate}%, your monthly payment will be <strong>{fmtMoneyDecimal(monthlyPayment)}</strong>. This fixed amount covers both principal repayment and interest charges, and it remains the same every month for the entire {termYears}-year term.
+    </p>
+    <p>
+      Over the life of the loan, you will make {totalMonths} monthly payments totaling {fmtMoney(totalPayment)}. Of that amount, {amountDisplay} repays the original principal and {fmtMoney(totalInterest)} is the total interest cost. That means the interest adds {effectiveCost}% on top of what you originally borrowed. Understanding this total cost is essential when deciding whether a personal loan is the right choice for your financial situation.
+    </p>
+    <p>
+      Personal loans are installment loans, meaning you receive a lump sum upfront and repay it in equal monthly installments over a set period. Unlike credit cards, which have revolving balances and variable rates, personal loans provide a predictable payoff schedule. You know exactly when the loan will be paid in full, which makes budgeting straightforward.
+    </p>
+    <p>
+      The fixed monthly payment structure also means that in the early months, a larger portion of your payment goes toward interest. For this {amountDisplay} loan, the first monthly payment breaks down as follows: {fmtMoneyDecimal(firstMonthInterest)} goes to interest and {fmtMoneyDecimal(firstMonthPrincipal)} goes toward reducing your balance. As you pay down the principal over time, the interest portion shrinks and the principal portion grows, even though the total payment stays the same at {fmtMoneyDecimal(monthlyPayment)}.
+    </p>
+
+    <h2>How Personal Loan Interest Works</h2>
+    <p>
+      Personal loan interest is calculated using a standard amortization formula. This formula ensures that your payment remains constant throughout the life of the loan while properly allocating each payment between interest and principal reduction. The formula is:
+    </p>
+    <div class="formula-box">
+      M = P &times; [r(1 + r)<sup>n</sup>] / [(1 + r)<sup>n</sup> &minus; 1]
+    </div>
+    <p>Where:</p>
+    <ul>
+      <li><strong>M</strong> = Monthly payment = <strong>{fmtMoneyDecimal(monthlyPayment)}</strong></li>
+      <li><strong>P</strong> = Principal (loan amount) = <strong>{amountDisplay}</strong></li>
+      <li><strong>r</strong> = Monthly interest rate = {rate}% &divide; 12 = <strong>{(rate / 12).toFixed(4)}%</strong></li>
+      <li><strong>n</strong> = Total number of payments = {termYears} &times; 12 = <strong>{totalMonths}</strong></li>
+    </ul>
+    <p>
+      This formula works by balancing two competing forces: the interest that accrues on your outstanding balance each month and the need to fully repay the loan within the specified term. Each month, interest is calculated on the remaining balance, not the original loan amount. This is known as simple interest amortization, and it means you pay less interest over time as your balance decreases.
+    </p>
+    <p>
+      It is important to distinguish between the interest rate and the APR (Annual Percentage Rate). The interest rate is the base cost of borrowing, while the APR includes the interest rate plus any origination fees, closing costs, or other charges rolled into the loan. Many personal loans charge an origination fee of 1% to 8% of the loan amount, which is deducted from the disbursed funds. When comparing loan offers, always compare APRs, as they provide a more complete picture of the true cost of borrowing.
+    </p>
+    <p>
+      Another factor to consider is the compounding method. Most personal loans use simple interest, where interest is calculated only on the remaining principal balance. This is more favorable to borrowers than compound interest, where interest would be calculated on both the principal and any accumulated unpaid interest. With simple interest, making extra payments directly reduces the principal and therefore reduces the total interest you pay.
+    </p>
+
+    <h2>Fixed vs Variable Rate Personal Loans</h2>
+    <p>
+      This calculation assumes a <strong>fixed-rate personal loan</strong>, where the interest rate of {rate}% remains constant for the entire {termYears}-year term. With a fixed rate, your monthly payment of {fmtMoneyDecimal(monthlyPayment)} never changes, making it easy to budget and plan your finances. You know exactly how much you will pay each month and when the loan will be fully repaid.
+    </p>
+    <p>
+      <strong>Variable-rate personal loans</strong> (also called adjustable-rate loans) start with a lower introductory rate that can change periodically based on a benchmark index, such as the prime rate or SOFR. While the initial payment may be lower than {fmtMoneyDecimal(monthlyPayment)}, there is a risk that your rate and payment could increase significantly if market rates rise. Variable rates are often tied to a specific index plus a margin, and many have caps on how much the rate can increase per adjustment period and over the life of the loan.
+    </p>
+    <p>
+      For most borrowers, a fixed-rate personal loan is the safer choice because it eliminates interest rate risk. However, a variable-rate loan might make sense if you plan to pay off the loan quickly before any rate adjustments take effect, or if you believe rates will remain stable or decrease during your loan term. Before choosing a variable rate, make sure you understand the adjustment schedule, rate caps, and the worst-case scenario for your monthly payment.
+    </p>
+    <p>
+      Regardless of which type you choose, it is critical to read the loan agreement carefully. Look for prepayment penalties, which some lenders charge if you pay off the loan early. Ideally, choose a loan with no prepayment penalty so you have the flexibility to make extra payments or pay off the loan ahead of schedule without incurring additional fees.
+    </p>
+
+    <h2>Tips to Get a Lower Interest Rate</h2>
+    <p>
+      The interest rate you receive on a personal loan depends largely on your creditworthiness and the lender you choose. Here are proven strategies to secure the lowest rate possible:
+    </p>
+    <ul>
+      <li><strong>Improve your credit score:</strong> Your credit score is the single biggest factor in determining your interest rate. Scores above 740 typically qualify for the best rates (often 6% to 8%), while scores below 640 may result in rates of 15% to 36% or denial altogether. To improve your score, pay all bills on time, reduce credit card balances below 30% of your limits, and avoid opening multiple new accounts in a short period.</li>
+      <li><strong>Compare multiple lenders:</strong> Rates vary significantly between lenders. Check offers from traditional banks, credit unions, and online lenders. Many online lenders allow you to prequalify with a soft credit check that does not affect your score, making it easy to compare offers side by side. Aim to check at least three to five lenders before committing.</li>
+      <li><strong>Choose a shorter loan term:</strong> Lenders often offer lower rates on shorter-term loans because they carry less risk. While the monthly payment will be higher, you will pay substantially less in total interest. If your budget allows, opting for a {termYears <= 3 ? '2' : '3'}-year term instead of a longer one can save you hundreds or thousands of dollars.</li>
+      <li><strong>Consider a secured loan:</strong> Secured personal loans, backed by collateral such as a savings account or certificate of deposit, typically carry lower rates than unsecured loans. However, you risk losing the collateral if you default on the loan.</li>
+      <li><strong>Add a co-signer:</strong> If your credit is not strong enough to qualify for a competitive rate, adding a co-signer with excellent credit can help you secure a lower rate. Keep in mind that the co-signer is equally responsible for repaying the loan if you are unable to make payments.</li>
+      <li><strong>Reduce your debt-to-income ratio:</strong> Lenders consider your DTI ratio when setting your rate. Paying down existing debts before applying for a personal loan can improve your DTI and may result in a more favorable rate.</li>
+    </ul>
+
+    <h2>When Does a Personal Loan Make Sense?</h2>
+    <p>
+      Personal loans are versatile financial tools, but they are not always the best option. Here are common situations where a personal loan at {rate}% may be a smart choice:
+    </p>
+    <ul>
+      <li><strong>Debt consolidation:</strong> If you have high-interest credit card debt (typically 18% to 25% APR), consolidating it into a personal loan at {rate}% can save significant money on interest and simplify your payments into one monthly bill. This is one of the most popular reasons people take out personal loans.</li>
+      <li><strong>Home improvement:</strong> For renovations that do not require a home equity loan, a personal loan provides quick funding without using your home as collateral. This is particularly useful for smaller projects that do not justify the closing costs of a home equity loan.</li>
+      <li><strong>Major purchases:</strong> Financing a large expense like appliances, furniture, or a special event with a personal loan at {rate}% is often cheaper than using a credit card, especially if you cannot pay the balance in full within a billing cycle.</li>
+      <li><strong>Emergency expenses:</strong> Medical bills, car repairs, or other unexpected costs can be managed with a personal loan, providing a structured repayment plan rather than an open-ended credit card balance.</li>
+    </ul>
+    <p>
+      However, a personal loan may not be the best choice if you can pay for the expense from savings, if you qualify for a 0% APR promotional credit card offer, or if you would need to borrow for an extended period (in which case a home equity loan might offer a lower rate). Always compare the total cost of different financing options before committing.
+    </p>
+    <p>
+      Before taking on any loan, ensure that the monthly payment of {fmtMoneyDecimal(monthlyPayment)} fits comfortably within your budget. A common guideline is that total debt payments (including rent or mortgage, car loans, student loans, and the new personal loan) should not exceed 36% of your gross monthly income. If this {amountDisplay} loan at {rate}% would push you beyond that threshold, consider borrowing a smaller amount or extending the term to reduce the monthly obligation.
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>{faq1Q}</h3>
+    <p>{faq1A}</p>
+
+    <h3>{faq2Q}</h3>
+    <p>{faq2A}</p>
+
+    <h3>{faq3Q}</h3>
+    <p>{faq3A}</p>
+
+    <h3>{faq4Q}</h3>
+    <p>{faq4A}</p>
+
+    <h2>Related Personal Loan Calculations</h2>
+    <ul>
+      {relatedByRate.slice(0, 4).map(function (p) {
+        return (
+          <li>
+            <a href={`/loan/${p.slug}/`}>
+              {fmtMoney(p.loanAmount)} Loan at {p.rate}% for {p.termYears}yr &rarr; {fmtMoneyDecimal(p.monthlyPayment)}/mo
+            </a>
+          </li>
+        );
+      })}
+      {relatedByTerm.slice(0, 4).map(function (p) {
+        return (
+          <li>
+            <a href={`/loan/${p.slug}/`}>
+              {fmtMoney(p.loanAmount)} Loan at {p.rate}% for {p.termYears}yr &rarr; {fmtMoneyDecimal(p.monthlyPayment)}/mo
+            </a>
+          </li>
+        );
+      })}
+      {relatedLoans.slice(0, 4).map(function (p) {
+        return (
+          <li>
+            <a href={`/loan/${p.slug}/`}>
+              {fmtMoney(p.loanAmount)} Loan at {p.rate}% for {p.termYears}yr &rarr; {fmtMoneyDecimal(p.monthlyPayment)}/mo
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+
+    <p><a href="/loan/">&larr; Personal Loan Calculator</a> | <a href="/financial-calculators/">Financial Calculators</a></p>
+
+    <CrossLinks links={[
+      { href: '/mortgage/', label: 'Mortgage Calculator', icon: '\uD83C\uDFE0' },
+      { href: '/financial-calculators/auto-loan-calculator/', label: 'Auto Loan Calculator', icon: '\uD83D\uDE97' },
+      { href: '/compound-interest/', label: 'Compound Interest Calculator', icon: '\uD83D\uDCB0' },
+      { href: '/financial-calculators/', label: 'Financial Calculators', icon: '\uD83D\uDCC8' },
+    ]} />
+  </article>
+
+  <AdUnit slot="loan-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+  .loan-result-cards {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .loan-result-cards .result-card.primary .result-value {
+    font-size: 1.6rem;
+  }
+  .loan-breakdown-note {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 16px;
+  }
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--color-border);
+    font-size: 0.95rem;
+  }
+  .breakdown-row:last-of-type {
+    border-bottom: none;
+  }
+  .breakdown-label {
+    color: var(--color-text);
+  }
+  .breakdown-value {
+    font-weight: 600;
+    color: var(--color-text);
+  }
+  .breakdown-total {
+    border-top: 2px solid var(--color-text);
+    border-bottom: none;
+    margin-top: 4px;
+    padding-top: 12px;
+    font-size: 1.05rem;
+  }
+  .breakdown-total .breakdown-label {
+    font-weight: 700;
+  }
+  .breakdown-total .breakdown-value {
+    font-weight: 700;
+    color: var(--color-primary);
+    font-size: 1.1rem;
+  }
+  .loan-breakdown-summary {
+    background: #eff6ff;
+    border-radius: var(--radius);
+    padding: 10px 16px;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-top: 16px;
+    line-height: 1.5;
+  }
+  .compare-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+  .compare-link {
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .compare-link:hover {
+    text-decoration: underline;
+  }
+  .current-row td {
+    background: #eff6ff;
+  }
+
+  @media (max-width: 768px) {
+    .loan-result-cards {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 480px) {
+    .loan-result-cards {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

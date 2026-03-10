@@ -1,0 +1,425 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import '../../styles/calculator.css';
+import { getAllDownPaymentPages, getDownPaymentPageBySlug, HOME_PRICES, DOWN_PERCENTS, formatMoney, formatMoneyWhole } from '../../data/down-payment';
+import type { DownPaymentPage } from '../../data/down-payment';
+
+const fmt = (n: number): string => '$' + formatMoney(n);
+const fmtW = (n: number): string => '$' + formatMoneyWhole(n);
+
+export function getStaticPaths() {
+  return getAllDownPaymentPages().map(function (page) {
+    return {
+      params: { slug: page.slug },
+      props: { page },
+    };
+  });
+}
+
+const { page } = Astro.props as { page: DownPaymentPage };
+const {
+  slug,
+  homePrice,
+  priceDisplay,
+  downPercent,
+  downAmount,
+  downDisplay,
+  loanAmount,
+  loanDisplay,
+  estimatedMonthly,
+  estimatedRate,
+  pmiMonthly,
+  totalMonthlyWithPMI,
+} = page;
+
+const allPages = getAllDownPaymentPages();
+
+// Down payment comparison: same home price, all available percentages
+const samePrice = allPages
+  .filter(function (p) { return p.homePrice === homePrice; })
+  .sort(function (a, b) { return a.downPercent - b.downPercent; });
+
+// Price comparison: same down percent, different home prices
+const samePercent = allPages
+  .filter(function (p) { return p.downPercent === downPercent && p.homePrice !== homePrice; })
+  .sort(function (a, b) { return a.homePrice - b.homePrice; });
+
+// Related scenarios for links at the bottom
+const relatedPages = allPages
+  .filter(function (p) { return p.slug !== slug; })
+  .slice(0, 8);
+
+const hasPMI = downPercent < 20;
+
+const title = `${downPercent}% Down Payment on a $${priceDisplay} Home - Calculator & Guide | ToolCalcs`;
+const description = `Calculate a ${downPercent}% down payment on a $${priceDisplay} home. Down payment: $${downDisplay}. Loan amount: $${loanDisplay}. Estimated monthly payment: ${fmt(estimatedMonthly)} at ${estimatedRate}% rate.${hasPMI ? ' PMI: $' + formatMoney(pmiMonthly) + '/mo.' : ' No PMI required.'}`;
+
+// --- FAQ content ---
+const faq1Q = `How much is a ${downPercent}% down payment on a $${priceDisplay} home?`;
+const faq1A = `A ${downPercent}% down payment on a $${priceDisplay} home is $${downDisplay}. This leaves a loan amount of $${loanDisplay}. At a ${estimatedRate}% interest rate on a 30-year fixed mortgage, the estimated monthly principal and interest payment is ${fmt(estimatedMonthly)}.`;
+
+const faq2Q = `Do I need to pay PMI with ${downPercent}% down?`;
+const faq2A = hasPMI
+  ? `Yes, with a ${downPercent}% down payment you will likely need to pay private mortgage insurance (PMI). On a $${loanDisplay} loan, PMI at 0.5% annually costs approximately ${fmt(pmiMonthly)} per month. PMI is typically required when you put down less than 20% and can be removed once you reach 20% equity in your home.`
+  : `No, with a ${downPercent}% down payment you do not need to pay private mortgage insurance (PMI). PMI is typically required only when you put down less than 20% of the home price. Since your down payment meets or exceeds the 20% threshold, you avoid this additional monthly cost.`;
+
+const faq3Q = `What is the monthly payment on a $${priceDisplay} home with ${downPercent}% down?`;
+const faq3A = `With a ${downPercent}% down payment ($${downDisplay}) on a $${priceDisplay} home, your loan amount is $${loanDisplay}. At ${estimatedRate}% interest on a 30-year fixed mortgage, the estimated monthly principal and interest payment is ${fmt(estimatedMonthly)}.${hasPMI ? ' Including PMI of $' + formatMoney(pmiMonthly) + ', your total estimated monthly payment is $' + formatMoney(totalMonthlyWithPMI) + '.' : ''}`;
+
+const faq4Q = `How can I avoid paying PMI on a $${priceDisplay} home?`;
+const faq4A = `To avoid PMI on a $${priceDisplay} home, you need a down payment of at least 20%, which is ${fmtW(homePrice * 0.2)}. If you cannot reach 20% down, some options include piggyback loans (80-10-10), lender-paid PMI with a slightly higher interest rate, or VA loans which do not require PMI regardless of down payment amount.`;
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Financial Calculators", "item": "https://toolcalcs.com/financial-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Mortgage Calculator", "item": "https://toolcalcs.com/mortgage/" },
+      { "@type": "ListItem", "position": 4, "name": `Down Payment for $${priceDisplay}` },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": faq1Q,
+        "acceptedAnswer": { "@type": "Answer", "text": faq1A },
+      },
+      {
+        "@type": "Question",
+        "name": faq2Q,
+        "acceptedAnswer": { "@type": "Answer", "text": faq2A },
+      },
+      {
+        "@type": "Question",
+        "name": faq3Q,
+        "acceptedAnswer": { "@type": "Answer", "text": faq3A },
+      },
+      {
+        "@type": "Question",
+        "name": faq4Q,
+        "acceptedAnswer": { "@type": "Answer", "text": faq4A },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title={title} description={description} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/financial-calculators/">Financial Calculators</a> &rsaquo;
+    <a href="/mortgage/">Mortgage Calculator</a> &rsaquo;
+    <span>Down Payment for ${priceDisplay}</span>
+  </nav>
+
+  <h1>{downPercent}% Down Payment on a ${priceDisplay} Home</h1>
+  <p class="page-desc">See exactly how much you need for a {downPercent}% down payment on a ${priceDisplay} home, including the loan amount, estimated monthly payment, and PMI costs.</p>
+
+  <!-- Result Cards -->
+  <div class="result-cards dp-result-cards">
+    <div class="result-card primary">
+      <span class="result-label">Down Payment Amount</span>
+      <span class="result-value">${downDisplay}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Loan Amount</span>
+      <span class="result-value">${loanDisplay}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Est. Monthly Payment (P&I)</span>
+      <span class="result-value">{fmt(estimatedMonthly)}</span>
+    </div>
+    <div class="result-card success">
+      <span class="result-label">Monthly with PMI</span>
+      <span class="result-value">
+        {hasPMI ? `${fmt(totalMonthlyWithPMI)}` : 'No PMI'}
+        <span class={`pmi-badge ${hasPMI ? 'pmi-yes' : 'pmi-no'}`}>
+          {hasPMI ? 'PMI' : 'No PMI'}
+        </span>
+      </span>
+    </div>
+  </div>
+
+  <!-- Down Payment Comparison Table: same home price, different percentages -->
+  <h2 class="section-heading">Down Payment Options for a ${priceDisplay} Home</h2>
+  <p class="dp-compare-desc">Compare different down payment percentages for a ${priceDisplay} home at {estimatedRate}% interest (30-year fixed).</p>
+  <div class="table-container">
+    <table class="data-table dp-table">
+      <thead>
+        <tr>
+          <th>Down %</th>
+          <th>Down Amount</th>
+          <th>Loan Amount</th>
+          <th>Monthly Payment</th>
+          <th>PMI</th>
+        </tr>
+      </thead>
+      <tbody>
+        {samePrice.map(function (p) {
+          var isCurrent = p.slug === slug;
+          return (
+            <tr class={isCurrent ? 'highlight-row' : ''}>
+              <td>
+                {isCurrent
+                  ? <strong>{p.downPercent}%</strong>
+                  : <a class="compare-link" href={`/down-payment/${p.slug}/`}>{p.downPercent}%</a>
+                }
+              </td>
+              <td>${p.downDisplay}</td>
+              <td>${p.loanDisplay}</td>
+              <td>{fmt(p.estimatedMonthly)}</td>
+              <td>
+                <span class={`pmi-badge ${p.downPercent < 20 ? 'pmi-yes' : 'pmi-no'}`}>
+                  {p.downPercent < 20 ? `${fmt(p.pmiMonthly)}` : 'No PMI'}
+                </span>
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  </div>
+
+  <AdUnit slot="dp-mid" format="horizontal" />
+
+  <!-- Price Comparison Table: same down %, different home prices -->
+  {samePercent.length > 0 && (
+    <h2 class="section-heading">{downPercent}% Down on Different Home Prices</h2>
+    <p class="dp-compare-desc">See how a {downPercent}% down payment compares across different home prices at {estimatedRate}% interest (30-year fixed).</p>
+    <div class="table-container">
+      <table class="data-table dp-table">
+        <thead>
+          <tr>
+            <th>Home Price</th>
+            <th>Down Amount</th>
+            <th>Loan Amount</th>
+            <th>Monthly Payment</th>
+          </tr>
+        </thead>
+        <tbody>
+          {samePercent.map(function (p) {
+            return (
+              <tr>
+                <td><a class="compare-link" href={`/down-payment/${p.slug}/`}>${p.priceDisplay}</a></td>
+                <td>${p.downDisplay}</td>
+                <td>${p.loanDisplay}</td>
+                <td>{fmt(p.estimatedMonthly)}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  )}
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>Understanding Your Down Payment</h2>
+    <p>
+      A down payment is the upfront cash you pay when purchasing a home, expressed as a percentage of the total purchase price. For a <strong>${priceDisplay}</strong> home with a <strong>{downPercent}%</strong> down payment, you need <strong>${downDisplay}</strong> in cash at closing. The remaining <strong>${loanDisplay}</strong> is financed through your mortgage.
+    </p>
+    <p>
+      The size of your down payment directly affects several key aspects of your home purchase. A larger down payment reduces the amount you need to borrow, which lowers your monthly mortgage payment and the total interest you pay over the life of the loan. It also determines whether you need to pay private mortgage insurance (PMI), which adds to your monthly costs when your down payment is less than 20%.
+    </p>
+    <p>
+      For this ${priceDisplay} home, putting {downPercent}% down means borrowing ${loanDisplay}. At the estimated rate of {estimatedRate}% on a 30-year fixed mortgage, your monthly principal and interest payment is <strong>{fmt(estimatedMonthly)}</strong>.{hasPMI ? ` Because your down payment is below 20%, you will also pay an estimated ${fmt(pmiMonthly)} per month in PMI, bringing your total to ${fmt(totalMonthlyWithPMI)} per month.` : ' Since your down payment meets the 20% threshold, you do not need to pay PMI, saving you money every month.'}
+    </p>
+    <p>
+      When budgeting for a home purchase, remember that the down payment is not your only upfront cost. Closing costs typically add 2% to 5% of the home price, which for a ${priceDisplay} home could be an additional ${ formatMoneyWhole(homePrice * 0.02) } to ${ formatMoneyWhole(homePrice * 0.05) }. Factor these costs into your savings plan alongside your down payment target.
+    </p>
+
+    <h2>How Down Payment Affects Your Monthly Payment</h2>
+    <p>
+      The relationship between your down payment and monthly payment is straightforward: a larger down payment means a smaller loan, which means a lower monthly payment. However, the differences can be substantial. Consider the range for a ${priceDisplay} home at {estimatedRate}%:
+    </p>
+    <ul>
+      {samePrice.map(function (p) {
+        return (
+          <li>
+            <strong>{p.downPercent}% down (${p.downDisplay}):</strong> Loan of ${p.loanDisplay} with a monthly P&I payment of {fmt(p.estimatedMonthly)}{p.downPercent < 20 ? ` plus ${fmt(p.pmiMonthly)} PMI = ${fmt(p.totalMonthlyWithPMI)} total` : ' (no PMI)'}
+          </li>
+        );
+      })}
+    </ul>
+    <p>
+      As you can see, increasing your down payment from the minimum to 20% can save you hundreds of dollars per month. Over a 30-year mortgage, these monthly savings add up to tens of thousands of dollars in reduced interest and eliminated PMI payments. The key is finding the right balance between saving for a larger down payment and taking advantage of current home prices and interest rates.
+    </p>
+    <p>
+      Financial advisors often recommend following the 28/36 rule: your total monthly housing costs (including mortgage, taxes, insurance, and PMI) should not exceed 28% of your gross monthly income. Using this guideline, a monthly payment of {fmt(totalMonthlyWithPMI)} would suggest a minimum gross monthly income of approximately {fmtW(Math.round(totalMonthlyWithPMI / 0.28))}, or about {fmtW(Math.round(totalMonthlyWithPMI / 0.28 * 12))} per year.
+    </p>
+
+    <h2>What Is PMI and How to Avoid It</h2>
+    <p>
+      Private mortgage insurance (PMI) is an additional monthly cost that lenders require when your down payment is less than 20% of the home's purchase price. PMI protects the lender (not you) in case you default on the loan. The cost typically ranges from 0.3% to 1.5% of the original loan amount per year, depending on your credit score, loan-to-value ratio, and loan type.
+    </p>
+    <p>
+      For this ${priceDisplay} home with {downPercent}% down, the loan amount is ${loanDisplay}.{hasPMI ? ` At an estimated PMI rate of 0.5% annually, your monthly PMI cost is approximately <strong>${fmt(pmiMonthly)}</strong>. This is added on top of your ${fmt(estimatedMonthly)} principal and interest payment, bringing your total monthly obligation to ${fmt(totalMonthlyWithPMI)}.` : ' Since you are putting 20% or more down, <strong>you do not need to pay PMI</strong>, which saves you a significant amount each month compared to lower down payment options.'}
+    </p>
+    <p>
+      The good news is that PMI is not permanent. Once you reach 20% equity in your home (either through payments or home value appreciation), you can request PMI removal. By law, lenders must automatically cancel PMI when your loan balance reaches 78% of the original purchase price. There are several strategies to avoid or minimize PMI:
+    </p>
+    <ul>
+      <li><strong>Save for a 20% down payment:</strong> The most straightforward way to avoid PMI entirely. For a ${priceDisplay} home, that means saving {fmtW(homePrice * 0.2)}.</li>
+      <li><strong>Piggyback loan (80-10-10):</strong> Take out a second smaller loan to cover part of the down payment, keeping the primary mortgage at 80% loan-to-value. For example, an 80% first mortgage, 10% second mortgage, and 10% cash down payment.</li>
+      <li><strong>Lender-paid PMI (LPMI):</strong> Some lenders offer to pay the PMI in exchange for a slightly higher interest rate. This can make sense if you plan to stay in the home for a shorter period.</li>
+      <li><strong>VA loans:</strong> If you are an eligible veteran or active-duty service member, VA loans do not require PMI regardless of the down payment amount.</li>
+      <li><strong>Make extra payments:</strong> After purchasing, make additional principal payments to reach 20% equity faster and request PMI removal sooner.</li>
+    </ul>
+
+    <h2>Down Payment Assistance Programs</h2>
+    <p>
+      If saving ${downDisplay} for a {downPercent}% down payment on a ${priceDisplay} home feels challenging, you may qualify for down payment assistance (DPA) programs. These programs are available at the federal, state, and local levels and can significantly reduce the cash you need upfront.
+    </p>
+    <ul>
+      <li><strong>FHA Loans:</strong> Backed by the Federal Housing Administration, FHA loans allow down payments as low as 3.5% with a credit score of 580 or higher. For a ${priceDisplay} home, that would be {fmtW(Math.round(homePrice * 0.035))}. FHA loans have their own mortgage insurance requirements (MIP), which functions similarly to PMI.</li>
+      <li><strong>State and local DPA programs:</strong> Many states, counties, and cities offer grants or low-interest loans to help first-time homebuyers cover down payment and closing costs. These programs often have income limits and may require homebuyer education courses.</li>
+      <li><strong>USDA loans:</strong> For homes in eligible rural and suburban areas, USDA loans offer zero-down-payment financing for qualifying borrowers. There are income limits based on the area's median income.</li>
+      <li><strong>VA loans:</strong> Available to veterans, active-duty military, and eligible surviving spouses, VA loans require no down payment at all and have no PMI requirement.</li>
+      <li><strong>Conventional 97 loans:</strong> Fannie Mae and Freddie Mac offer conventional loans with as little as 3% down for first-time buyers, making homeownership accessible with a smaller savings target. For a ${priceDisplay} home, that is only {fmtW(Math.round(homePrice * 0.03))} down.</li>
+      <li><strong>Employer assistance:</strong> Some employers offer homebuying assistance programs as part of their benefits package, particularly in high-cost housing markets.</li>
+    </ul>
+    <p>
+      Research the programs available in your area and check your eligibility. Many buyers are surprised to learn how many assistance options are available, and combining multiple programs can dramatically reduce your out-of-pocket costs at closing.
+    </p>
+
+    <h2>How to Save for a Down Payment</h2>
+    <p>
+      Saving ${downDisplay} for a {downPercent}% down payment requires a clear plan and consistent discipline. Here are proven strategies to reach your down payment goal faster:
+    </p>
+    <ul>
+      <li><strong>Set a specific savings target and timeline.</strong> Your goal is ${downDisplay} plus closing costs (estimated at ${ formatMoneyWhole(Math.round(homePrice * 0.03)) } to ${ formatMoneyWhole(Math.round(homePrice * 0.05)) }). Divide the total by the number of months in your timeline to determine how much you need to save each month.</li>
+      <li><strong>Open a dedicated savings account.</strong> Keep your down payment funds separate from your everyday spending in a high-yield savings account. This makes it easier to track progress and reduces the temptation to dip into the fund.</li>
+      <li><strong>Automate your savings.</strong> Set up automatic transfers from your checking account to your down payment fund on each payday. Treating savings like a bill ensures consistency and removes the decision from the equation.</li>
+      <li><strong>Reduce discretionary spending.</strong> Review your budget for areas where you can cut back temporarily. Even small reductions in dining out, subscriptions, and entertainment can add up to hundreds of dollars per month.</li>
+      <li><strong>Increase your income.</strong> Consider a side job, freelancing, selling unused items, or asking for a raise. Direct all additional income toward your down payment fund for fastest results.</li>
+      <li><strong>Save windfalls.</strong> Tax refunds, bonuses, gifts, and inheritances can give your savings a significant boost. Commit to putting at least a portion of any unexpected money toward your down payment goal.</li>
+      <li><strong>Look into first-time buyer programs.</strong> If you have not owned a home in the past three years, you may qualify as a first-time buyer for programs that offer lower down payment requirements or matching funds.</li>
+    </ul>
+    <p>
+      Remember that buying a home is a marathon, not a sprint. Even if saving ${downDisplay} takes a few years, building the financial discipline and cash reserves will put you in a stronger position as a homeowner. Meanwhile, focus on improving your credit score, which can qualify you for a lower interest rate and potentially save you more than a larger down payment would.
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>{faq1Q}</h3>
+    <p>{faq1A}</p>
+
+    <h3>{faq2Q}</h3>
+    <p>{faq2A}</p>
+
+    <h3>{faq3Q}</h3>
+    <p>{faq3A}</p>
+
+    <h3>{faq4Q}</h3>
+    <p>{faq4A}</p>
+
+    <!-- Related Down Payment Scenarios -->
+    <h2>Related Down Payment Scenarios</h2>
+    <ul>
+      {relatedPages.map(function (p) {
+        return (
+          <li>
+            <a href={`/down-payment/${p.slug}/`}>
+              {p.downPercent}% down on ${p.priceDisplay} home &rarr; ${p.downDisplay} down, {fmt(p.estimatedMonthly)}/mo
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+
+    <p><a href="/down-payment/">&larr; View All Down Payment Scenarios</a> | <a href="/financial-calculators/">Financial Calculators</a></p>
+
+    <CrossLinks links={[
+      { href: '/mortgage/', label: 'Mortgage Calculator', icon: '\uD83C\uDFE0' },
+      { href: '/financial-calculators/home-affordability-calculator/', label: 'Home Affordability Calculator', icon: '\uD83D\uDCCA' },
+      { href: '/financial-calculators/loan-calculator/', label: 'Loan Calculator', icon: '\uD83D\uDCB0' },
+    ]} />
+  </article>
+
+  <AdUnit slot="dp-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .dp-result-cards {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .dp-result-cards .result-card.primary .result-value {
+    font-size: 1.6rem;
+  }
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+  .dp-compare-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+  .dp-table {
+    margin-bottom: 32px;
+  }
+  .dp-table tbody tr:nth-child(even) td {
+    background: var(--color-bg);
+  }
+  .highlight-row td {
+    background: #eff6ff !important;
+    font-weight: 600;
+  }
+  [data-theme="dark"] .highlight-row td {
+    background: #1e3a5f !important;
+  }
+  .compare-link {
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .compare-link:hover {
+    text-decoration: underline;
+  }
+  .pmi-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    vertical-align: middle;
+    margin-left: 4px;
+  }
+  .pmi-yes {
+    background: #fef3c7;
+    color: #92400e;
+  }
+  .pmi-no {
+    background: #dcfce7;
+    color: #166534;
+  }
+  [data-theme="dark"] .pmi-yes {
+    background: #78350f;
+    color: #fef3c7;
+  }
+  [data-theme="dark"] .pmi-no {
+    background: #14532d;
+    color: #dcfce7;
+  }
+
+  @media (max-width: 768px) {
+    .dp-result-cards {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 480px) {
+    .dp-result-cards {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

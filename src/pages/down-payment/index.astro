@@ -1,0 +1,229 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import { getAllDownPaymentPages, HOME_PRICES, formatMoney, formatMoneyWhole } from '../../data/down-payment';
+import type { DownPaymentPage } from '../../data/down-payment';
+
+const fmt = (n: number): string => '$' + formatMoney(n);
+const allPages = getAllDownPaymentPages();
+const count = allPages.length;
+
+// Labels for each home price section
+const priceLabels: { value: number; display: string }[] = HOME_PRICES.map(function (p) {
+  return { value: p, display: '$' + p.toLocaleString('en-US') };
+});
+
+function getPagesForPrice(priceVal: number): DownPaymentPage[] {
+  return allPages
+    .filter(function (p) { return p.homePrice === priceVal; })
+    .sort(function (a, b) { return a.downPercent - b.downPercent; });
+}
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://toolcalcs.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Financial Calculators",
+      "item": "https://toolcalcs.com/financial-calculators/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Down Payment Calculator"
+    }
+  ]
+};
+---
+
+<BaseLayout
+  title="Down Payment Calculator - How Much to Put Down on a House | ToolCalcs"
+  description={`Explore ${count} pre-calculated down payment scenarios for homes from $200,000 to $1,000,000. See down payment amounts, loan balances, monthly payments, and PMI costs for 3% to 20% down.`}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/financial-calculators/">Financial Calculators</a> &rsaquo;
+    <span>Down Payment Calculator</span>
+  </nav>
+
+  <h1>Down Payment Calculator</h1>
+  <p class="page-desc">
+    Explore {count} pre-calculated down payment scenarios for homes priced from $200,000 to $1,000,000. Each table below shows how different down payment percentages affect your loan amount, monthly payment, and PMI costs. Click any row to see the full breakdown.
+  </p>
+
+  <p class="dp-idx-cta">
+    Want to enter your own numbers? Try our <a href="/financial-calculators/mortgage-calculator/">interactive mortgage calculator</a>.
+  </p>
+
+  <AdUnit slot="dp-idx-top" format="horizontal" />
+
+  {priceLabels.map(function (pl) {
+    var pages = getPagesForPrice(pl.value);
+    if (pages.length === 0) return null;
+    return (
+      <section class="dp-price-section">
+        <h2 class="dp-price-heading">{pl.display} Home</h2>
+        <div class="table-container">
+          <table class="data-table dp-idx-table">
+            <thead>
+              <tr>
+                <th>Down %</th>
+                <th>Down Payment</th>
+                <th>Loan Amount</th>
+                <th>Est. Monthly</th>
+                <th>PMI</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pages.map(function (p) {
+                return (
+                  <tr>
+                    <td>
+                      <a class="dp-idx-link" href={`/down-payment/${p.slug}/`}>
+                        {p.downPercent}%
+                      </a>
+                    </td>
+                    <td>${p.downDisplay}</td>
+                    <td>${p.loanDisplay}</td>
+                    <td>{fmt(p.estimatedMonthly)}</td>
+                    <td>
+                      <span class={`pmi-badge ${p.downPercent < 20 ? 'pmi-yes' : 'pmi-no'}`}>
+                        {p.downPercent < 20 ? `${fmt(p.pmiMonthly)}` : 'No PMI'}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    );
+  })}
+
+  <AdUnit slot="dp-idx-mid" format="horizontal" />
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>How to Use This Guide</h2>
+    <p>
+      This page provides {count} pre-calculated down payment scenarios for homes at nine different price points, from $200,000 to $1,000,000. For each home price, you can compare different down payment percentages (3%, 5%, 10%, 15%, and 20%) side by side.
+    </p>
+    <p>
+      Each scenario shows four key numbers: the down payment amount in dollars, the resulting loan amount, the estimated monthly principal and interest payment (based on a {allPages[0]?.estimatedRate ?? 6.5}% fixed rate over 30 years), and the monthly PMI cost if applicable. Click any row to see a detailed breakdown, including how that down payment compares to other options for the same home and across different price points.
+    </p>
+    <p>
+      All monthly payment estimates use a 30-year fixed mortgage at {allPages[0]?.estimatedRate ?? 6.5}% interest. Your actual rate will depend on your credit score, loan type, and market conditions. PMI is estimated at 0.5% of the loan amount annually and applies when the down payment is less than 20%.
+    </p>
+
+    <h2>Understanding Down Payments</h2>
+    <p>
+      A down payment is the portion of a home's purchase price that you pay upfront in cash, with the remainder financed through a mortgage. The size of your down payment affects nearly every aspect of your home purchase:
+    </p>
+    <ul>
+      <li><strong>Monthly payment:</strong> A larger down payment means a smaller loan, which directly reduces your monthly mortgage payment. This frees up cash flow for other expenses, savings, and investments.</li>
+      <li><strong>Interest costs:</strong> Because you are borrowing less, the total interest paid over the life of the loan is significantly lower with a larger down payment. Even a few percentage points more down can save tens of thousands over 30 years.</li>
+      <li><strong>PMI requirements:</strong> If your down payment is less than 20%, most conventional lenders require private mortgage insurance (PMI). This adds 0.3% to 1.5% of the loan amount to your annual costs. Reaching 20% down eliminates this expense entirely.</li>
+      <li><strong>Loan approval:</strong> A larger down payment demonstrates financial stability to lenders and reduces their risk, which can help you qualify for better interest rates and loan terms.</li>
+      <li><strong>Equity position:</strong> Starting with more equity protects you against market downturns. If home values decline, a larger down payment provides a buffer that keeps you from owing more than the home is worth.</li>
+    </ul>
+    <p>
+      There is no single "right" down payment amount. The best choice depends on your savings, income, financial goals, local housing market, and risk tolerance. Use the tables above to compare scenarios and find the balance that works for your situation. For a fully customizable analysis, try our <a href="/financial-calculators/mortgage-calculator/">mortgage calculator</a>.
+    </p>
+
+    <h2>Common Down Payment Myths</h2>
+    <p>
+      Many potential homebuyers believe they need a 20% down payment to buy a home, but this is not true. While 20% down eliminates PMI and provides the lowest monthly payment, there are many loan programs that allow much lower down payments:
+    </p>
+    <ul>
+      <li><strong>Conventional loans:</strong> Available with as little as 3% down for first-time buyers through Fannie Mae and Freddie Mac programs.</li>
+      <li><strong>FHA loans:</strong> Require as little as 3.5% down with a credit score of 580 or higher.</li>
+      <li><strong>VA loans:</strong> Zero down payment required for eligible veterans and service members.</li>
+      <li><strong>USDA loans:</strong> Zero down payment for eligible rural and suburban properties.</li>
+    </ul>
+    <p>
+      The right down payment amount is the one that lets you buy a home you can comfortably afford while maintaining an emergency fund and not depleting all your savings. Consult with a mortgage lender to understand all your options based on your specific financial situation.
+    </p>
+
+    <p><a href="/">Back to ToolCalcs Home &rarr;</a> | <a href="/financial-calculators/">Financial Calculators</a></p>
+  </article>
+
+  <AdUnit slot="dp-idx-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .dp-idx-cta {
+    font-size: 0.95rem;
+    margin-bottom: 24px;
+  }
+  .dp-idx-cta a {
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+  .dp-price-section {
+    margin-bottom: 36px;
+  }
+  .dp-price-heading {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--color-border);
+    color: var(--color-text);
+  }
+  .dp-idx-table {
+    margin-bottom: 8px;
+  }
+  .dp-idx-table tbody tr:nth-child(even) td {
+    background: var(--color-bg);
+  }
+  .dp-idx-link {
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .dp-idx-link:hover {
+    text-decoration: underline;
+  }
+  .pmi-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .pmi-yes {
+    background: #fef3c7;
+    color: #92400e;
+  }
+  .pmi-no {
+    background: #dcfce7;
+    color: #166534;
+  }
+  [data-theme="dark"] .pmi-yes {
+    background: #78350f;
+    color: #fef3c7;
+  }
+  [data-theme="dark"] .pmi-no {
+    background: #14532d;
+    color: #dcfce7;
+  }
+
+  @media (max-width: 640px) {
+    .dp-idx-table {
+      font-size: 0.82rem;
+    }
+  }
+</style>

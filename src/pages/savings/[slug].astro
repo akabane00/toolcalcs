@@ -1,0 +1,469 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import '../../styles/calculator.css';
+import { getAllSavingsPages, DEPOSITS, RATES, TERMS, formatMoney, round2 } from '../../data/savings';
+import type { SavingsPage } from '../../data/savings';
+
+const fmt = (n: number): string => '$' + formatMoney(n);
+
+export function getStaticPaths() {
+  return getAllSavingsPages().map(function (page) {
+    return {
+      params: { slug: page.slug },
+      props: { page },
+    };
+  });
+}
+
+const { page } = Astro.props as { page: SavingsPage };
+const {
+  slug,
+  initialDeposit,
+  depositDisplay,
+  rate,
+  termYears,
+  futureValue,
+  totalInterest,
+  monthlyEquivalent,
+} = page;
+
+const allPages = getAllSavingsPages();
+
+// Growth rate: total interest as % of deposit
+const growthRate = round2((totalInterest / initialDeposit) * 100);
+
+// Year-by-year breakdown (annual compounding)
+const yearlyBreakdown: { year: number; startBalance: number; interestEarned: number; endBalance: number }[] = [];
+for (var y = 1; y <= termYears; y++) {
+  var startBal = initialDeposit * Math.pow(1 + rate / 100, y - 1);
+  var endBal = initialDeposit * Math.pow(1 + rate / 100, y);
+  var interestThisYear = endBal - startBal;
+  yearlyBreakdown.push({
+    year: y,
+    startBalance: round2(startBal),
+    interestEarned: round2(interestThisYear),
+    endBalance: round2(endBal),
+  });
+}
+
+// Rate comparison: same deposit & term, all available rates
+const rateComparison = RATES.map(function (r) {
+  var fv = round2(initialDeposit * Math.pow(1 + r / 100, termYears));
+  var ti = round2(fv - initialDeposit);
+  return { rate: r, futureValue: fv, totalInterest: ti };
+});
+
+// Term comparison: same deposit & rate, all available terms
+const termComparison = TERMS.map(function (t) {
+  var fv = round2(initialDeposit * Math.pow(1 + rate / 100, t));
+  var ti = round2(fv - initialDeposit);
+  return { term: t, futureValue: fv, totalInterest: ti };
+});
+
+// Related savings scenarios
+const relatedPages = allPages.filter(function (p) {
+  return p.slug !== slug && (
+    (p.initialDeposit === initialDeposit && p.termYears === termYears && p.rate !== rate) ||
+    (p.initialDeposit === initialDeposit && p.rate === rate && p.termYears !== termYears)
+  );
+}).slice(0, 8);
+
+// Precomputed values for JSX (avoid complex inline expressions)
+const lastYearInterest = fmt(yearlyBreakdown[yearlyBreakdown.length - 1].interestEarned);
+const lastYearBalance = fmt(yearlyBreakdown[yearlyBreakdown.length - 1].startBalance);
+const firstYearInterest = fmt(yearlyBreakdown[0].interestEarned);
+const fiveYrInterest = fmt(round2(initialDeposit * Math.pow(1 + rate / 100, 5) - initialDeposit));
+const twentyYrInterest = fmt(round2(initialDeposit * Math.pow(1 + rate / 100, 20) - initialDeposit));
+const monthlyCompoundFV = fmt(round2(initialDeposit * Math.pow(1 + (rate / 100) / 12, 12 * termYears)));
+const monthlyCompoundDiff = fmt(round2(initialDeposit * Math.pow(1 + (rate / 100) / 12, 12 * termYears) - futureValue));
+const simpleInterest = fmt(round2(initialDeposit * (rate / 100) * termYears));
+const compoundExtra = fmt(round2(totalInterest - initialDeposit * (rate / 100) * termYears));
+const altRate = rate >= 1 ? rate - 1 : rate + 1;
+const rateDiffAmount = fmt(Math.abs(round2((initialDeposit * Math.pow(1 + rate / 100, termYears)) - (initialDeposit * Math.pow(1 + altRate / 100, termYears)))));
+const bankRateDiff = fmt(round2(totalInterest - initialDeposit * Math.pow(1.005, termYears) + initialDeposit));
+const marketGrowth = fmt(round2(initialDeposit * Math.pow(1.08, termYears)));
+
+const title = `${fmt(initialDeposit)} Savings After ${termYears} Years at ${rate}% APY | ToolCalcs`;
+const description = `See how ${fmt(initialDeposit)} grows after ${termYears} years at ${rate}% APY. Future value: ${fmt(futureValue)}. Total interest earned: ${fmt(totalInterest)}. Year-by-year growth table included.`;
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Financial Calculators", "item": "https://toolcalcs.com/financial-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Savings Calculator", "item": "https://toolcalcs.com/savings/" },
+      { "@type": "ListItem", "position": 4, "name": `${depositDisplay} at ${rate}% for ${termYears}yr` },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": `How much will ${depositDisplay} be worth after ${termYears} years at ${rate}% APY?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `${depositDisplay} deposited at ${rate}% APY with annual compounding will grow to ${fmt(futureValue)} after ${termYears} years, earning ${fmt(totalInterest)} in total interest.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `How much interest does ${depositDisplay} earn at ${rate}% APY?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `${depositDisplay} earns ${fmt(totalInterest)} in interest over ${termYears} years at ${rate}% APY. That averages out to approximately ${fmt(monthlyEquivalent)} per month in interest income.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `Is ${rate}% APY a good savings rate?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `A ${rate}% APY is ${rate >= 5 ? 'considered competitive and above the national average' : rate >= 4 ? 'a solid rate that beats the national average' : 'a reasonable rate'} for savings accounts. High-yield savings accounts and CDs from online banks often offer rates in this range. The national average savings rate is typically below 1%, so ${rate}% represents a significantly better return.`,
+        },
+      },
+      {
+        "@type": "Question",
+        "name": `Should I put ${depositDisplay} in a savings account or invest it?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `A savings account is ideal for emergency funds and short-term goals because your money is FDIC-insured and accessible. For long-term goals (10+ years), investing in diversified index funds historically provides higher returns. At ${rate}% APY, ${depositDisplay} grows to ${fmt(futureValue)} in ${termYears} years in savings, while stock market averages of 7-10% could yield more over the same period but with greater risk.`,
+        },
+      },
+    ],
+  },
+];
+
+const crossLinks = [
+  { href: '/financial-calculators/compound-interest-calculator/', label: 'Compound Interest Calculator', icon: '📊' },
+  { href: '/financial-calculators/investment-calculator/', label: 'Investment Calculator', icon: '📈' },
+  { href: '/financial-calculators/retirement-calculator/', label: 'Retirement Calculator', icon: '🏖️' },
+];
+---
+
+<BaseLayout
+  title={title} description={description} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/financial-calculators/">Financial Calculators</a> &rsaquo;
+    <a href="/savings/">Savings Calculator</a> &rsaquo;
+    <span>{depositDisplay} at {rate}%</span>
+  </nav>
+
+  <h1>{fmt(initialDeposit)} Savings After {termYears} Years at {rate}% APY</h1>
+  <p class="page-desc">See exactly how {depositDisplay} grows over {termYears} years with a {rate}% annual percentage yield. Your savings earn <strong>{fmt(totalInterest)}</strong> in total interest.</p>
+
+  <!-- Result Cards -->
+  <div class="result-cards sav-result-cards">
+    <div class="result-card primary">
+      <span class="result-label">Future Value</span>
+      <span class="result-value">{fmt(futureValue)}</span>
+    </div>
+    <div class="result-card success">
+      <span class="result-label">Total Interest Earned</span>
+      <span class="result-value">{fmt(totalInterest)}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Monthly Interest (avg)</span>
+      <span class="result-value">{fmt(monthlyEquivalent)}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Growth Rate</span>
+      <span class="result-value">{growthRate}%</span>
+    </div>
+  </div>
+
+  <!-- Year-by-Year Growth Table -->
+  <h2 class="section-heading">Year-by-Year Growth</h2>
+  <div class="table-container">
+    <table class="data-table sav-table">
+      <thead>
+        <tr>
+          <th>Year</th>
+          <th>Starting Balance</th>
+          <th>Interest Earned</th>
+          <th>Ending Balance</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="sav-row-start">
+          <td>0</td>
+          <td>{fmt(initialDeposit)}</td>
+          <td>-</td>
+          <td>{fmt(initialDeposit)}</td>
+        </tr>
+        {yearlyBreakdown.map(function (row) {
+          var isHighlight = row.year === termYears;
+          return (
+            <tr class={isHighlight ? 'sav-row-final' : ''}>
+              <td>{row.year}</td>
+              <td>{fmt(row.startBalance)}</td>
+              <td class="sav-interest-cell">{fmt(row.interestEarned)}</td>
+              <td class={isHighlight ? 'sav-row-final-cell' : ''}>{fmt(row.endBalance)}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  </div>
+
+  <AdUnit slot="sav-mid" format="horizontal" />
+
+  <!-- Rate Comparison Table -->
+  <h2 class="section-heading">Rate Comparison: {depositDisplay} for {termYears} Years</h2>
+  <p class="sav-compare-desc">See how different APY rates affect your {depositDisplay} savings over {termYears} years.</p>
+  <div class="table-container">
+    <table class="data-table sav-table">
+      <thead>
+        <tr>
+          <th>APY Rate</th>
+          <th>Future Value</th>
+          <th>Total Interest</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rateComparison.map(function (row) {
+          var isCurrent = row.rate === rate;
+          return (
+            <tr class={isCurrent ? 'sav-row-current' : ''}>
+              <td>{row.rate}%{isCurrent ? ' (this page)' : ''}</td>
+              <td>{fmt(row.futureValue)}</td>
+              <td>{fmt(row.totalInterest)}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Term Comparison Table -->
+  <h2 class="section-heading">Term Comparison: {depositDisplay} at {rate}% APY</h2>
+  <p class="sav-compare-desc">See how the length of time affects your {depositDisplay} savings at {rate}% APY.</p>
+  <div class="table-container">
+    <table class="data-table sav-table">
+      <thead>
+        <tr>
+          <th>Term</th>
+          <th>Future Value</th>
+          <th>Total Interest</th>
+        </tr>
+      </thead>
+      <tbody>
+        {termComparison.map(function (row) {
+          var isCurrent = row.term === termYears;
+          return (
+            <tr class={isCurrent ? 'sav-row-current' : ''}>
+              <td>{row.term} {row.term === 1 ? 'year' : 'years'}{isCurrent ? ' (this page)' : ''}</td>
+              <td>{fmt(row.futureValue)}</td>
+              <td>{fmt(row.totalInterest)}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>How Your Savings Grow Over Time</h2>
+    <p>
+      When you deposit {depositDisplay} into a savings account earning {rate}% APY, your money grows through the power of compound interest. After {termYears} years, your initial deposit becomes <strong>{fmt(futureValue)}</strong>, meaning you earn <strong>{fmt(totalInterest)}</strong> in interest without adding a single extra dollar. That is a total growth of {growthRate}% on your original deposit.
+    </p>
+    <p>
+      To put this in practical terms, your savings earn an average of <strong>{fmt(monthlyEquivalent)}</strong> per month in interest over the {termYears}-year period. In the first year alone, your {depositDisplay} earns {firstYearInterest} in interest. {termYears > 1 && <Fragment>By year {termYears}, the annual interest grows to {lastYearInterest}, because you are earning interest on a larger and larger balance each year.</Fragment>}{termYears <= 1 && 'Even in a single year, compound interest gives your money a meaningful boost.'}
+    </p>
+    <p>
+      The growth pattern is not linear. In the early years, interest earnings are more modest because they are calculated only on amounts close to your original deposit. As the years pass, each year's interest is calculated on a progressively larger balance, creating an accelerating growth curve. This is the fundamental principle that makes long-term saving so powerful: the longer you leave your money to compound, the harder it works for you.
+    </p>
+    <p>
+      Consider the difference between saving for 5 years versus 20 years at {rate}% APY. With {depositDisplay}, a 5-year term earns {fiveYrInterest} in interest. Extending to 20 years earns {twentyYrInterest}. The extra 15 years do not merely triple the interest; they multiply it significantly because of the compounding effect building on itself year after year.
+    </p>
+
+    <h2>The Power of Compound Interest</h2>
+    <p>
+      Compound interest is often called the eighth wonder of the world, and for good reason. It is the mechanism by which your interest earns its own interest, creating a snowball effect that accelerates wealth accumulation over time. The formula used for this calculation is:
+    </p>
+    <div class="formula-box">
+      FV = P &times; (1 + r)<sup>t</sup>
+    </div>
+    <p>Where:</p>
+    <ul>
+      <li><strong>FV</strong> = Future Value = <strong>{fmt(futureValue)}</strong></li>
+      <li><strong>P</strong> = Initial deposit (principal) = <strong>{depositDisplay}</strong></li>
+      <li><strong>r</strong> = Annual interest rate (decimal) = <strong>{rate / 100}</strong> ({rate}%)</li>
+      <li><strong>t</strong> = Number of years = <strong>{termYears}</strong></li>
+    </ul>
+    <p>Plugging in the numbers for this specific scenario:</p>
+    <div class="formula-box">
+      FV = {depositDisplay.replace('$', '')} &times; (1 + {rate / 100})<sup>{termYears}</sup> = <strong>{fmt(futureValue)}</strong>
+    </div>
+    <p>
+      This formula assumes annual compounding, which is common for CDs and many savings products. With annual compounding, interest is calculated once per year and added to the principal. Some accounts compound daily or monthly, which would yield slightly more. For example, the same {depositDisplay} at {rate}% compounded monthly for {termYears} years would grow to {monthlyCompoundFV}, a difference of {monthlyCompoundDiff} due to more frequent compounding.
+    </p>
+    <p>
+      The contrast with simple interest is even more striking. Simple interest calculates returns only on the original principal: {depositDisplay} at {rate}% simple interest for {termYears} years earns {simpleInterest}. Compound interest earns {fmt(totalInterest)}, which is {compoundExtra} more. That extra amount comes entirely from earning interest on previously earned interest.
+    </p>
+
+    <h2>High-Yield Savings Accounts vs CDs</h2>
+    <p>
+      When looking to earn {rate}% APY on your {depositDisplay}, you have two primary options: high-yield savings accounts (HYSAs) and certificates of deposit (CDs). Each has distinct advantages depending on your financial goals and need for liquidity.
+    </p>
+    <p>
+      <strong>High-yield savings accounts</strong> offer flexibility. Your money is accessible at any time, and there are no penalties for withdrawals. Online banks and credit unions frequently offer APYs between 4% and 5%, significantly above the national average of less than 1%. However, rates on HYSAs are variable, meaning the bank can change them at any time. If you deposit {depositDisplay} today at {rate}%, the rate could decrease in six months if market conditions change.
+    </p>
+    <p>
+      <strong>Certificates of deposit (CDs)</strong> lock in your rate for a fixed period, which provides certainty. If you secure a {rate}% CD for {termYears} years, you are guaranteed that rate for the entire term. The trade-off is reduced liquidity: withdrawing funds before the CD matures typically incurs an early withdrawal penalty, often equivalent to several months of interest. CDs are ideal when you know you will not need the money before the term ends and want to lock in a favorable rate.
+    </p>
+    <p>
+      For {depositDisplay} over {termYears} years, a CD ladder strategy can provide both competitive rates and periodic access to your funds. This involves splitting your deposit across multiple CDs with staggered maturity dates. As each CD matures, you can reinvest at current rates or use the funds as needed. Many financial advisors recommend a mix of both HYSAs (for emergency funds and short-term needs) and CDs (for medium-term savings goals).
+    </p>
+
+    <h2>Tips to Maximize Your Savings Growth</h2>
+    <p>
+      Growing {depositDisplay} to {fmt(futureValue)} over {termYears} years at {rate}% APY requires choosing the right account and following a few smart strategies. Here are proven tips to maximize your savings growth:
+    </p>
+    <ul>
+      <li><strong>Shop for the best APY.</strong> Rates vary significantly between banks. Online banks and credit unions often offer rates 10 to 20 times higher than traditional brick-and-mortar banks. Even a small rate difference adds up over time. The difference between {rate}% and {altRate}% on {depositDisplay} over {termYears} years is {rateDiffAmount}.</li>
+      <li><strong>Automate your deposits.</strong> Setting up automatic transfers from your checking account ensures consistent saving. Even adding $100 per month on top of your {depositDisplay} initial deposit can dramatically increase your final balance.</li>
+      <li><strong>Do not touch your savings.</strong> Every withdrawal resets the compounding clock on the amount removed. Let your money compound uninterrupted for the full {termYears} years to achieve the {fmt(futureValue)} target.</li>
+      <li><strong>Reinvest your interest.</strong> Make sure your interest is being reinvested rather than paid out. Most savings accounts and CDs do this automatically, but always verify. Reinvesting is what makes compound interest work.</li>
+      <li><strong>Consider tax-advantaged accounts.</strong> If this savings is for retirement, placing it in a Roth IRA or traditional IRA can shelter your {rate}% earnings from taxes, allowing even more of your money to compound over time.</li>
+      <li><strong>Monitor rate changes.</strong> If you are in a variable-rate HYSA, periodically check that your rate is still competitive. Banks sometimes lower rates for existing customers while offering promotions to new ones. Be willing to move your money to maintain the best rate.</li>
+    </ul>
+    <p>
+      The most important factor in savings growth is time. Starting with {depositDisplay} today and giving it {termYears} years to grow at {rate}% yields {fmt(totalInterest)} in pure interest earnings. Delaying even one year means missing out on {fmt(yearlyBreakdown[0].interestEarned)} of first-year interest and the compounding benefits that follow.
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>How much will {depositDisplay} be worth after {termYears} years at {rate}% APY?</h3>
+    <p>
+      {depositDisplay} deposited at {rate}% APY with annual compounding will grow to <strong>{fmt(futureValue)}</strong> after {termYears} years. You earn {fmt(totalInterest)} in total interest, which represents a {growthRate}% return on your original deposit. The average monthly interest earned over this period is {fmt(monthlyEquivalent)}.
+    </p>
+
+    <h3>How much interest does {depositDisplay} earn at {rate}% APY?</h3>
+    <p>
+      At {rate}% APY with annual compounding, {depositDisplay} earns <strong>{fmt(totalInterest)}</strong> in total interest over {termYears} years. In the first year, you earn {firstYearInterest} in interest. {termYears > 1 && <Fragment>By the final year, annual interest grows to {lastYearInterest} because you are earning interest on your accumulated balance of {lastYearBalance}.</Fragment>} With simple interest, you would earn only {simpleInterest}, so compounding adds an extra {compoundExtra}.
+    </p>
+
+    <h3>Is {rate}% APY a good savings rate?</h3>
+    <p>
+      {rate >= 5 && <Fragment>A {rate}% APY is an excellent savings rate that significantly exceeds the national average. As of recent years, the average savings account rate at traditional banks hovers below 0.5%, making {rate}% roughly {Math.round(rate / 0.5)} times better.</Fragment>}{rate >= 4 && rate < 5 && <Fragment>A {rate}% APY is a competitive rate that comfortably beats the national average savings rate of less than 0.5%. Online banks and credit unions are the most likely places to find rates in this range.</Fragment>}{rate < 4 && <Fragment>A {rate}% APY is a reasonable rate that exceeds the national average. While not the highest available, it still provides meaningful returns on your savings.</Fragment>} High-yield savings accounts and CDs from online banks regularly offer rates in the {rate >= 5 ? '4% to 5%+' : '3% to 5%'} range. For {depositDisplay}, the difference between a {rate}% APY and a typical 0.5% bank rate over {termYears} years is {bankRateDiff} in additional interest.
+    </p>
+
+    <h3>Should I put {depositDisplay} in a savings account or invest it?</h3>
+    <p>
+      The answer depends on your time horizon and risk tolerance. A savings account earning {rate}% APY is ideal for money you need within the next 1 to 5 years: emergency funds, down payment savings, or planned large purchases. Your principal is FDIC-insured up to $250,000 and completely safe. For long-term goals beyond 10 years, investing in a diversified stock index fund has historically returned 7% to 10% annually, though with significant short-term volatility. At {rate}% APY, {depositDisplay} grows to {fmt(futureValue)} in {termYears} years with zero risk. At a hypothetical 8% market return, it could grow to {marketGrowth}, but with the possibility of losing value in any given year.
+    </p>
+  </article>
+
+  <!-- Related Savings Scenarios -->
+  {relatedPages.length > 0 && (
+    <section class="sav-related">
+      <h2 class="section-heading">Related Savings Scenarios</h2>
+      <ul class="sav-related-list">
+        {relatedPages.map(function (p) {
+          return (
+            <li>
+              <a href={`/savings/${p.slug}/`}>
+                {p.depositDisplay} at {p.rate}% for {p.termYears} {p.termYears === 1 ? 'year' : 'years'} &rarr; {fmt(p.futureValue)}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  )}
+
+  <CrossLinks links={crossLinks} />
+
+  <p class="sav-back-link"><a href="/savings/">&larr; View All Savings Calculations</a></p>
+
+  <AdUnit slot="sav-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .sav-result-cards {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .sav-result-cards .result-card.primary .result-value {
+    font-size: 1.6rem;
+  }
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+  .sav-compare-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+  .sav-table {
+    margin-bottom: 32px;
+  }
+  .sav-table tbody tr:nth-child(even) td {
+    background: var(--color-bg);
+  }
+  .sav-row-start td {
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+  .sav-row-final td {
+    font-weight: 700;
+    background: rgba(37, 99, 235, 0.04);
+  }
+  .sav-row-current td {
+    background: rgba(37, 99, 235, 0.06);
+    font-weight: 600;
+  }
+  .sav-interest-cell {
+    color: var(--color-success, #16a34a);
+  }
+  .sav-related {
+    margin-top: 32px;
+  }
+  .sav-related-list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 6px;
+  }
+  .sav-related-list a {
+    display: block;
+    padding: 8px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 0.88rem;
+    color: var(--color-text);
+    transition: border-color 0.15s;
+  }
+  .sav-related-list a:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+  .sav-back-link {
+    margin-top: 24px;
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 768px) {
+    .sav-result-cards {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 480px) {
+    .sav-result-cards {
+      grid-template-columns: 1fr;
+    }
+    .sav-related-list {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
