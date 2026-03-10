@@ -1,0 +1,471 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/game.css';
+import '../../styles/quiz.css';
+import GameShare from '../../components/GameShare.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tests & Games", "item": "https://toolcalcs.com/test/" },
+      { "@type": "ListItem", "position": 3, "name": "Quick IQ Test" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Quick IQ Test",
+    "url": "https://toolcalcs.com/test/iq-test/",
+    "applicationCategory": "LifestyleApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Estimate your IQ with this free 20-question test covering pattern recognition, logical reasoning, spatial thinking, and numerical ability. Results in under 10 minutes."
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is IQ and how is it measured?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "IQ stands for Intelligence Quotient. It is a score derived from standardized tests designed to measure human intelligence and cognitive abilities. Modern IQ tests like the Wechsler Adult Intelligence Scale (WAIS) measure multiple domains including verbal comprehension, perceptual reasoning, working memory, and processing speed. The average IQ score is set at 100, with a standard deviation of 15 points, meaning about 68% of people score between 85 and 115."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is this online IQ test accurate?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "This test provides a fun estimate of your IQ based on pattern recognition, logical reasoning, spatial thinking, and numerical ability. However, it is not a substitute for a professionally administered IQ test. Clinical IQ tests like the WAIS-IV or Stanford-Binet are administered by licensed psychologists in controlled conditions over 1-2 hours. This quick test gives a general indication of cognitive strengths but should be treated as entertainment, not a clinical diagnosis."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is a good IQ score?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "IQ scores follow a normal distribution: 85-115 is considered average (68% of the population), 115-130 is above average, 130-145 is gifted, and above 145 is highly gifted or genius level. Scores below 85 are considered below average, and below 70 may indicate intellectual disability. However, IQ is just one measure of cognitive ability and does not capture creativity, emotional intelligence, practical skills, or many other important forms of intelligence."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can you improve your IQ score?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Research suggests that fluid intelligence (the ability to solve novel problems) can be modestly improved through brain training, education, and cognitive exercises, though the extent of improvement is debated. Crystallized intelligence (accumulated knowledge and skills) continues to grow throughout life with learning and experience. Regular mental challenges, physical exercise, quality sleep, proper nutrition, and lifelong learning all contribute to maintaining and potentially improving cognitive performance."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the Flynn Effect?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Flynn Effect, named after researcher James Flynn, is the observation that average IQ scores have been rising steadily across generations, approximately 3 points per decade since the early 20th century. This increase is attributed to improved nutrition, better education, greater access to information, reduced lead exposure, and increased cognitive stimulation in modern environments. Interestingly, some researchers have noted a reversal of the Flynn Effect in some developed countries since the 1990s."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Quick IQ Test - Free Online IQ Estimate in 10 Minutes | ToolCalcs"
+  description="Estimate your IQ with this free 20-question test covering pattern recognition, logical reasoning, spatial thinking, and numerical ability. Results in under 10 minutes."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/test/">Tests & Games</a> &rsaquo;
+    <span>Quick IQ Test</span>
+  </nav>
+
+  <h1>Quick IQ Test</h1>
+  <p class="page-desc">20 questions across pattern recognition, logic, spatial thinking, and numerical ability. Get your estimated IQ in under 10 minutes.</p>
+
+  <div class="game-box">
+    <div class="game-area" id="gameArea" role="region" aria-label="IQ test quiz" aria-live="polite">
+      <!-- Instructions -->
+      <div class="game-instructions" id="instructionsView">
+        <h2>Quick IQ Test</h2>
+        <p>Test your cognitive abilities across 4 categories. Choose the best answer for each question. There is no time limit, but try to work through the questions at a natural pace.</p>
+        <p style="font-size:0.85rem;color:var(--color-text-muted);">20 questions &middot; 4 categories &middot; About 8 minutes</p>
+        <button class="game-btn primary" id="startBtn" type="button" style="margin-top:16px;">Start IQ Test</button>
+      </div>
+
+      <!-- Quiz View -->
+      <div id="quizView" style="display:none;">
+        <div class="quiz-progress">
+          <div class="quiz-progress-text" id="progressText">Question 1 of 20</div>
+          <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="progressFill"></div></div>
+        </div>
+        <div id="categoryBadge" style="font-size:0.75rem;color:var(--color-text-muted);text-align:center;margin-bottom:4px;"></div>
+        <div class="quiz-question">
+          <div class="quiz-question-text" id="questionText"></div>
+        </div>
+        <div class="quiz-options" id="optionsContainer"></div>
+      </div>
+
+      <!-- Result View -->
+      <div id="resultView" style="display:none;" class="quiz-result">
+        <div style="font-size:2.5rem;margin-bottom:4px;" id="resultIcon"></div>
+        <div class="quiz-result-type" id="resultIQ"></div>
+        <div class="quiz-result-name" id="resultLabel"></div>
+        <div id="bellCurveContainer"></div>
+        <div class="quiz-result-desc" id="resultDesc"></div>
+        <div class="quiz-bar-chart" id="categoryChart"></div>
+        <div id="disclaimerText" style="font-size:0.75rem;color:var(--color-text-muted);max-width:450px;margin:12px auto 0;font-style:italic;"></div>
+        <button class="game-btn primary" id="retakeBtn" type="button" style="margin-top:16px;">Retake Test</button>
+      </div>
+    </div>
+
+    <GameShare />
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>The History of IQ Testing</h2>
+    <p>The story of IQ testing begins in Paris in 1905. French psychologist Alfred Binet was commissioned by the French government to develop a method for identifying students who needed additional educational support. Working with his colleague Theodore Simon, Binet created the Binet-Simon Scale, a series of tasks that assessed memory, attention, and problem-solving abilities. The tasks were arranged by difficulty and matched to age levels, establishing the concept of "mental age" that would become foundational to intelligence testing.</p>
+    <p>Binet himself was cautious about his invention. He emphasized that the scale measured current performance, not innate potential, and warned against using it to label children as permanently limited. Unfortunately, his nuanced perspective was not always shared by those who adopted and adapted his test in subsequent decades.</p>
+    <p>In 1916, Stanford University psychologist Lewis Terman adapted the Binet-Simon Scale for American audiences, creating the Stanford-Binet Intelligence Scale. Terman introduced the concept of the Intelligence Quotient, calculated by dividing mental age by chronological age and multiplying by 100. A 10-year-old performing at the level of a 12-year-old would have an IQ of 120 (12/10 x 100). This formula worked well for children but became problematic for adults, since mental development plateaus while chronological age continues to advance.</p>
+    <p>The modern era of IQ testing was shaped by David Wechsler, a Romanian-American psychologist who developed the Wechsler-Bellevue Intelligence Scale in 1939, which evolved into the Wechsler Adult Intelligence Scale (WAIS) and the Wechsler Intelligence Scale for Children (WISC). Wechsler abandoned the mental age formula in favor of a deviation IQ system, where scores are calculated by comparing an individual's performance to the statistical distribution of scores within their age group. The average is set at 100 with a standard deviation of 15 points. This is the system used by virtually all modern IQ tests.</p>
+
+    <h2>What Does IQ Actually Measure?</h2>
+    <p>IQ tests measure a collection of cognitive abilities that psychologists believe represent a general factor of intelligence, often called "g" (general intelligence). The concept of g was first proposed by Charles Spearman in 1904 after he observed that people who scored well on one type of cognitive test tended to score well on others. This positive correlation across different cognitive domains suggested an underlying general ability.</p>
+    <p>Modern IQ tests typically assess four major domains. <strong>Verbal comprehension</strong> measures vocabulary, language understanding, and the ability to express ideas in words. <strong>Perceptual reasoning</strong> (or fluid reasoning) measures the ability to identify patterns, solve novel problems, and think abstractly without relying on prior knowledge. <strong>Working memory</strong> measures the ability to hold and manipulate information in short-term memory. <strong>Processing speed</strong> measures how quickly you can perceive, understand, and respond to simple information.</p>
+    <p>It is crucial to understand what IQ does not measure. IQ tests do not capture creativity, emotional intelligence, practical problem-solving ability, musical or artistic talent, physical coordination, social skills, motivation, or wisdom. These are all forms of intelligence that matter enormously in real life but fall outside the scope of traditional IQ testing. Howard Gardner's theory of multiple intelligences, proposed in 1983, identifies at least eight distinct types of intelligence, of which traditional IQ tests measure only two or three.</p>
+
+    <h2>Understanding the Normal Distribution</h2>
+    <p>IQ scores follow a normal distribution, also known as a bell curve. This mathematical pattern means that most people cluster around the average (100), with progressively fewer people at extreme scores. The standard deviation of 15 points provides a framework for interpreting scores.</p>
+    <p>Approximately 68 percent of the population scores between 85 and 115 (within one standard deviation of the mean). About 95 percent score between 70 and 130 (within two standard deviations). And roughly 99.7 percent score between 55 and 145 (within three standard deviations). Scores at the extreme ends of the distribution are exceptionally rare. Only about 2 percent of the population scores above 130, and only about 0.1 percent scores above 145.</p>
+    <p>Here is how IQ score ranges are typically classified: 70-84 is below average, 85-99 is low average, 100-114 is average, 115-129 is above average, 130-144 is gifted, and 145+ is highly gifted or genius level. These classifications are statistical descriptions, not value judgments. IQ is just one dimension of human capability, and people at every level of the scale lead fulfilling, successful lives.</p>
+
+    <h2>The Flynn Effect</h2>
+    <p>One of the most intriguing findings in IQ research is the Flynn Effect, named after New Zealand researcher James Flynn. In the 1980s, Flynn documented that average IQ scores had been rising steadily across generations in every country where data was available. The increase averaged approximately 3 IQ points per decade, meaning that a person scoring 100 on a modern test would have scored approximately 115 on a test from 1950.</p>
+    <p>The causes of the Flynn Effect are debated, but likely factors include improved nutrition (particularly during early childhood and pregnancy), better education with more emphasis on abstract and analytical thinking, greater access to information through media and technology, reduced exposure to environmental toxins like lead, and increased cognitive stimulation in modern environments. The effect is most pronounced on tests of fluid intelligence (abstract reasoning) rather than crystallized intelligence (factual knowledge).</p>
+    <p>Interestingly, some researchers have documented a reversal of the Flynn Effect in several developed countries, including Norway, Denmark, and Finland, beginning in the 1990s. Average IQ scores in these countries appear to have plateaued or slightly declined. The reasons are unclear but may involve changes in education systems, increased screen time, or environmental factors. This "negative Flynn Effect" remains an active area of research.</p>
+
+    <h2>Nature vs. Nurture in Intelligence</h2>
+    <p>The question of how much intelligence is determined by genetics versus environment has been one of the most contentious debates in psychology. Modern research suggests that both play significant roles, with their relative contributions changing across the lifespan.</p>
+    <p>Twin studies have consistently shown that identical twins raised apart have IQ scores that are more similar than those of fraternal twins raised together, suggesting a strong genetic component. Behavioral genetics estimates that heritability of IQ is approximately 50 percent in childhood but rises to 60 to 80 percent in adulthood. This increasing heritability with age appears paradoxical but is explained by gene-environment correlation: as people gain more freedom to choose their environments, they increasingly select environments that match and reinforce their genetic predispositions.</p>
+    <p>However, heritability does not mean immutability. The environment plays a critical role, especially in childhood. Adequate nutrition, cognitive stimulation, quality education, emotional security, and freedom from toxic stress all contribute to reaching one's genetic potential. Studies of children adopted from deprived environments into enriched ones show substantial IQ gains, sometimes 15 to 20 points, demonstrating the powerful role of environment.</p>
+
+    <h2>Multiple Intelligences and Beyond IQ</h2>
+    <p>In 1983, Harvard psychologist Howard Gardner proposed the theory of multiple intelligences, challenging the idea that a single IQ score can capture the full range of human cognitive abilities. Gardner identified eight distinct intelligences: linguistic, logical-mathematical, spatial, musical, bodily-kinesthetic, interpersonal, intrapersonal, and naturalistic. Traditional IQ tests primarily measure linguistic and logical-mathematical intelligence.</p>
+    <p>Psychologist Robert Sternberg proposed the triarchic theory of intelligence, identifying three types: analytical intelligence (academic problem-solving, measured by IQ tests), creative intelligence (the ability to deal with novel situations and generate new ideas), and practical intelligence (the ability to adapt to real-world environments, sometimes called "street smarts"). Sternberg's research showed that practical and creative intelligence predict real-world success in ways that analytical intelligence alone cannot.</p>
+    <p>Emotional intelligence (EQ), popularized by Daniel Goleman in 1995, refers to the ability to recognize, understand, manage, and effectively use emotions in yourself and others. Research has shown that EQ can be a better predictor of workplace success, relationship quality, and overall life satisfaction than IQ in many contexts. High EQ is associated with better leadership, stronger relationships, lower stress, and greater resilience.</p>
+
+    <h2>Limitations of IQ Tests</h2>
+    <p>While IQ tests are among the most reliable and well-validated psychological instruments, they have significant limitations that are important to understand.</p>
+    <ul>
+      <li><strong>Cultural bias:</strong> IQ tests have historically been criticized for cultural bias. Questions that reference specific cultural knowledge, vocabulary, or experiences can disadvantage people from different cultural backgrounds. Modern test developers work to minimize this bias, but it remains a concern.</li>
+      <li><strong>Narrow scope:</strong> IQ tests measure specific cognitive abilities but miss creativity, emotional intelligence, practical skills, musical talent, athletic ability, and many other forms of intelligence that contribute to success and well-being.</li>
+      <li><strong>Test anxiety:</strong> Performance on IQ tests can be significantly affected by anxiety, motivation, health, fatigue, and testing conditions. A single score on a single day may not accurately represent a person's true cognitive potential.</li>
+      <li><strong>Stereotype threat:</strong> Research has shown that simply reminding people of negative stereotypes about their group's intelligence can reduce their test performance by several points. This psychological phenomenon suggests that IQ scores reflect social and emotional factors in addition to raw cognitive ability.</li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is IQ and how is it measured?</h3>
+    <p>IQ stands for Intelligence Quotient. It is a score derived from standardized tests designed to assess human cognitive abilities across multiple domains including verbal comprehension, perceptual reasoning, working memory, and processing speed. Modern IQ tests like the Wechsler Adult Intelligence Scale (WAIS-IV) and the Stanford-Binet Intelligence Scale are administered by licensed psychologists in controlled settings. The average score is set at 100 with a standard deviation of 15 points, meaning approximately 68 percent of people score between 85 and 115.</p>
+
+    <h3>Is this online IQ test accurate?</h3>
+    <p>This test provides a fun and educational estimate of your cognitive abilities based on pattern recognition, logical reasoning, spatial thinking, and numerical ability. However, it is not a substitute for a professionally administered IQ test. Clinical IQ assessments are conducted by licensed psychologists in standardized conditions over one to two hours and measure a broader range of cognitive functions. This quick test gives a general indication of your cognitive strengths and relative performance, but should be treated as entertainment and self-reflection rather than a clinical diagnosis.</p>
+
+    <h3>What is a good IQ score?</h3>
+    <p>IQ scores are distributed on a bell curve where 100 is the median. Scores between 85 and 115 encompass approximately 68 percent of the population and are considered average. Scores of 115 to 129 are above average, 130 to 144 indicate giftedness, and scores above 145 are classified as highly gifted or genius level. However, IQ is just one measure of cognitive ability. Many highly successful people have average IQ scores, and success in life depends on many factors including emotional intelligence, creativity, motivation, opportunity, and perseverance.</p>
+
+    <h3>Can you improve your IQ score?</h3>
+    <p>Research on this question is mixed. Fluid intelligence, the ability to solve novel problems, appears to be modestly improvable through targeted brain training, though benefits may not transfer broadly to other cognitive domains. Crystallized intelligence, accumulated knowledge and skills, continues to grow throughout life with education and experience. Regular mental challenges, physical exercise, quality sleep of seven to nine hours, proper nutrition, and lifelong learning all contribute to maintaining and potentially improving cognitive performance. The brain's neuroplasticity ensures that it can form new connections at any age.</p>
+
+    <h3>What is the Flynn Effect?</h3>
+    <p>The Flynn Effect is the observation that average IQ scores have risen steadily across generations, approximately 3 points per decade since the early 20th century. Named after researcher James Flynn, this phenomenon has been documented in every country where historical IQ data is available. The increase is attributed to improved nutrition, better education, greater access to information, reduced exposure to environmental toxins, and increased cognitive stimulation in modern environments. Some researchers have recently noted a plateau or slight reversal of this trend in certain developed countries since the 1990s.</p>
+  </article>
+
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .game-area { cursor: default; user-select: auto; -webkit-user-select: auto; }
+  :global(.iq-bell-wrap) { max-width: 400px; margin: 16px auto; position: relative; }
+  :global(.iq-bell-svg) { width: 100%; height: auto; }
+  :global(.iq-bell-curve) { fill: none; stroke: var(--color-border); stroke-width: 2; }
+  :global(.iq-bell-fill) { fill: var(--color-primary); opacity: 0.15; }
+  :global(.iq-bell-marker) { stroke: var(--color-primary); stroke-width: 2.5; }
+  :global(.iq-bell-labels) { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--color-text-muted); padding: 0 8px; }
+  :global(.iq-cat-badge) { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 600; color: #fff; margin-bottom: 8px; }
+  :global(.iq-score-big) { font-size: 3rem; font-weight: 800; color: var(--color-primary); line-height: 1.1; }
+  :global(.iq-range-text) { font-size: 0.9rem; color: var(--color-text-muted); margin: 4px 0 12px; }
+</style>
+
+<script define:vars={{ gameName: "Quick IQ Test", gameSlug: "iq-test", gameIcon: "\uD83D\uDCA1", metricLabel: "Estimated IQ", metricUnit: "" }}>
+(function () {
+  'use strict';
+
+  // Questions: 5 per category, each with 4 options, answer index, and difficulty points
+  var questions = [
+    // === Pattern Recognition (5) ===
+    { cat: "Pattern Recognition", text: "What comes next in the sequence: 2, 6, 18, 54, ?", options: ["108", "162", "72", "148"], answer: 1, pts: 1 },
+    { cat: "Pattern Recognition", text: "What comes next: 1, 1, 2, 3, 5, 8, ?", options: ["10", "11", "13", "15"], answer: 2, pts: 1 },
+    { cat: "Pattern Recognition", text: "What comes next: 3, 6, 11, 18, 27, ?", options: ["36", "38", "34", "40"], answer: 1, pts: 2 },
+    { cat: "Pattern Recognition", text: "What comes next: 1, 4, 9, 16, 25, ?", options: ["30", "36", "49", "32"], answer: 1, pts: 2 },
+    { cat: "Pattern Recognition", text: "What comes next: 2, 3, 5, 7, 11, 13, ?", options: ["15", "17", "19", "16"], answer: 1, pts: 3 },
+
+    // === Logical Reasoning (5) ===
+    { cat: "Logical Reasoning", text: "All Bloops are Razzies. All Razzies are Loogies. Are all Bloops Loogies?", options: ["Yes", "No", "Cannot be determined", "Only some"], answer: 0, pts: 1 },
+    { cat: "Logical Reasoning", text: "If it rains, the grass gets wet. The grass is wet. Did it rain?", options: ["Yes, definitely", "No", "Not necessarily - something else could have made it wet", "Only if there was no sprinkler"], answer: 2, pts: 2 },
+    { cat: "Logical Reasoning", text: "Some cats are black. Some black things are hats. Which must be true?", options: ["Some cats are hats", "No cats are hats", "Neither conclusion can be drawn", "All hats are cats"], answer: 2, pts: 2 },
+    { cat: "Logical Reasoning", text: "If A is taller than B, and B is taller than C, and C is taller than D, who is the shortest?", options: ["A", "B", "C", "D"], answer: 3, pts: 1 },
+    { cat: "Logical Reasoning", text: "Only one of these statements is true: (1) Statement 2 is true. (2) Statement 1 is false. Which is true?", options: ["Statement 1", "Statement 2", "Both", "Neither"], answer: 1, pts: 3 },
+
+    // === Spatial Thinking (5) ===
+    { cat: "Spatial Thinking", text: "If you fold a square piece of paper in half diagonally, what shape do you get?", options: ["Rectangle", "Triangle", "Pentagon", "Smaller square"], answer: 1, pts: 1 },
+    { cat: "Spatial Thinking", text: "A cube has 6 faces, 12 edges, and how many corners (vertices)?", options: ["6", "8", "10", "4"], answer: 1, pts: 1 },
+    { cat: "Spatial Thinking", text: "If you look at a clock in a mirror showing 3:00, what time does the mirror image appear to show?", options: ["9:00", "3:00", "6:00", "12:00"], answer: 0, pts: 2 },
+    { cat: "Spatial Thinking", text: "How many squares (of any size) can you count on a standard 2x2 grid?", options: ["4", "5", "6", "8"], answer: 1, pts: 2 },
+    { cat: "Spatial Thinking", text: "If you unfold a cube, which shape is NOT a valid net of the cube?", options: ["A cross/plus shape", "A T-shape", "A straight line of 6 squares", "An L-shape with 3 + 3 squares"], answer: 2, pts: 3 },
+
+    // === Numerical Ability (5) ===
+    { cat: "Numerical Ability", text: "What is 15% of 240?", options: ["32", "36", "38", "34"], answer: 1, pts: 1 },
+    { cat: "Numerical Ability", text: "If a shirt costs $40 after a 20% discount, what was the original price?", options: ["$48", "$50", "$52", "$56"], answer: 1, pts: 2 },
+    { cat: "Numerical Ability", text: "A train travels 120 miles in 2.5 hours. What is its average speed?", options: ["42 mph", "48 mph", "52 mph", "60 mph"], answer: 1, pts: 1 },
+    { cat: "Numerical Ability", text: "If you invest $1,000 at 10% annual interest (compounded), how much do you have after 2 years?", options: ["$1,200", "$1,210", "$1,100", "$1,220"], answer: 1, pts: 2 },
+    { cat: "Numerical Ability", text: "Three people can paint 3 fences in 3 hours. How many fences can 9 people paint in 9 hours?", options: ["9", "18", "27", "81"], answer: 2, pts: 3 }
+  ];
+
+  var IQ_RANGES = [
+    { min: 0,  max: 5,  iq: [75, 85],   label: "Below Average", color: "#ef4444" },
+    { min: 6,  max: 12, iq: [85, 100],  label: "Average", color: "#f59e0b" },
+    { min: 13, max: 20, iq: [100, 115], label: "Above Average", color: "#22c55e" },
+    { min: 21, max: 28, iq: [115, 130], label: "Superior", color: "#3b82f6" },
+    { min: 29, max: 36, iq: [130, 145], label: "Gifted", color: "#8b5cf6" },
+    { min: 37, max: 99, iq: [145, 160], label: "Exceptional", color: "#ec4899" }
+  ];
+
+  var CAT_COLORS = {
+    "Pattern Recognition": "#3b82f6",
+    "Logical Reasoning": "#22c55e",
+    "Spatial Thinking": "#f59e0b",
+    "Numerical Ability": "#ec4899"
+  };
+
+  // DOM
+  var instructionsView = document.getElementById('instructionsView');
+  var quizView = document.getElementById('quizView');
+  var resultView = document.getElementById('resultView');
+  var startBtn = document.getElementById('startBtn');
+  var retakeBtn = document.getElementById('retakeBtn');
+  var progressText = document.getElementById('progressText');
+  var progressFill = document.getElementById('progressFill');
+  var questionText = document.getElementById('questionText');
+  var optionsContainer = document.getElementById('optionsContainer');
+  var categoryBadge = document.getElementById('categoryBadge');
+  var resultIcon = document.getElementById('resultIcon');
+  var resultIQ = document.getElementById('resultIQ');
+  var resultLabel = document.getElementById('resultLabel');
+  var resultDesc = document.getElementById('resultDesc');
+  var categoryChart = document.getElementById('categoryChart');
+  var bellCurveContainer = document.getElementById('bellCurveContainer');
+  var disclaimerText = document.getElementById('disclaimerText');
+
+  var currentIndex = 0;
+  var shuffled = [];
+  var totalScore = 0;
+  var catScores = {};
+  var catMaxes = {};
+  var isProcessing = false;
+
+  function shuffleArr(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+  }
+
+  function showView(view) {
+    instructionsView.style.display = 'none';
+    quizView.style.display = 'none';
+    resultView.style.display = 'none';
+    view.style.display = '';
+  }
+
+  function renderQuestion() {
+    var q = shuffled[currentIndex];
+    progressText.textContent = 'Question ' + (currentIndex + 1) + ' of 20';
+    progressFill.style.width = Math.round((currentIndex / 20) * 100) + '%';
+    questionText.textContent = q.text;
+    categoryBadge.innerHTML = '<span class="iq-cat-badge" style="background:' + (CAT_COLORS[q.cat] || '#6b7280') + ';">' + q.cat + '</span>';
+
+    optionsContainer.innerHTML = '';
+    for (var i = 0; i < q.options.length; i++) {
+      var btn = document.createElement('button');
+      btn.className = 'quiz-option';
+      btn.type = 'button';
+      btn.textContent = q.options[i];
+      btn.setAttribute('data-idx', String(i));
+      optionsContainer.appendChild(btn);
+    }
+  }
+
+  function handleOptionClick(e) {
+    if (isProcessing) return;
+    var target = e.target;
+    if (!target || !target.classList || !target.classList.contains('quiz-option')) return;
+
+    isProcessing = true;
+    var idx = parseInt(target.getAttribute('data-idx'), 10);
+    var q = shuffled[currentIndex];
+    var correct = idx === q.answer;
+
+    if (correct) {
+      totalScore += q.pts;
+      catScores[q.cat] = (catScores[q.cat] || 0) + q.pts;
+      target.style.borderColor = '#22c55e';
+      target.style.background = '#22c55e';
+      target.style.color = '#fff';
+    } else {
+      target.style.borderColor = '#ef4444';
+      target.style.background = '#ef4444';
+      target.style.color = '#fff';
+      // Highlight correct answer
+      var btns = optionsContainer.querySelectorAll('.quiz-option');
+      for (var b = 0; b < btns.length; b++) {
+        if (parseInt(btns[b].getAttribute('data-idx'), 10) === q.answer) {
+          btns[b].style.borderColor = '#22c55e';
+          btns[b].style.background = '#22c55e';
+          btns[b].style.color = '#fff';
+        }
+      }
+    }
+
+    setTimeout(function () {
+      currentIndex++;
+      if (currentIndex >= 20) {
+        showResults();
+      } else {
+        renderQuestion();
+      }
+      isProcessing = false;
+    }, 800);
+  }
+
+  function showResults() {
+    showView(resultView);
+    progressFill.style.width = '100%';
+
+    // Find IQ range
+    var range = IQ_RANGES[1];
+    for (var r = 0; r < IQ_RANGES.length; r++) {
+      if (totalScore >= IQ_RANGES[r].min && totalScore <= IQ_RANGES[r].max) {
+        range = IQ_RANGES[r];
+        break;
+      }
+    }
+
+    // Interpolate IQ within range
+    var rangeSpan = range.max - range.min;
+    var scoreInRange = totalScore - range.min;
+    var pct = rangeSpan > 0 ? scoreInRange / rangeSpan : 0.5;
+    var estimatedIQ = Math.round(range.iq[0] + pct * (range.iq[1] - range.iq[0]));
+
+    resultIcon.textContent = gameIcon;
+    resultIQ.innerHTML = '<span class="iq-score-big">' + estimatedIQ + '</span>';
+    resultLabel.innerHTML = '<span class="iq-range-text">Estimated IQ: ' + range.iq[0] + ' - ' + range.iq[1] + '</span>';
+
+    // Descriptions
+    var descriptions = {
+      "Below Average": "Your score suggests room for growth in these cognitive areas. Remember that IQ tests measure only specific types of intelligence, and many successful people score in this range. Practice with logic puzzles, math problems, and pattern games can help sharpen these skills.",
+      "Average": "Your score falls within the average range, where the majority of people score. This indicates solid cognitive abilities across the tested domains. You have a balanced foundation of analytical skills that serves you well in everyday life.",
+      "Above Average": "Your score indicates above-average cognitive abilities. You demonstrate strong skills in reasoning, pattern recognition, and problem-solving. This level of cognitive function is associated with success in academic and professional environments.",
+      "Superior": "Excellent! Your score indicates superior cognitive abilities. You demonstrate exceptional skills in analytical thinking, pattern recognition, and logical reasoning. You likely excel in complex problem-solving and abstract thinking tasks.",
+      "Gifted": "Outstanding! Your score places you in the gifted range, representing the top 2% of the population. You show remarkable abilities in abstract reasoning, pattern recognition, and cognitive flexibility.",
+      "Exceptional": "Remarkable! Your score suggests exceptional cognitive abilities, placing you among a very small percentage of the population. You demonstrate extraordinary pattern recognition, logical reasoning, and problem-solving capabilities."
+    };
+    resultDesc.textContent = descriptions[range.label] || descriptions["Average"];
+
+    // Bell curve SVG
+    var markerX = 20 + ((estimatedIQ - 55) / (145 - 55)) * 360;
+    if (markerX < 20) markerX = 20;
+    if (markerX > 380) markerX = 380;
+
+    bellCurveContainer.innerHTML = '<div class="iq-bell-wrap">' +
+      '<svg class="iq-bell-svg" viewBox="0 0 400 120">' +
+      '<path class="iq-bell-fill" d="M20,110 Q60,108 100,100 Q150,70 200,20 Q250,70 300,100 Q340,108 380,110 Z"/>' +
+      '<path class="iq-bell-curve" d="M20,110 Q60,108 100,100 Q150,70 200,20 Q250,70 300,100 Q340,108 380,110"/>' +
+      '<line class="iq-bell-marker" x1="' + markerX + '" y1="10" x2="' + markerX + '" y2="115"/>' +
+      '<circle cx="' + markerX + '" cy="10" r="4" fill="var(--color-primary)"/>' +
+      '</svg>' +
+      '<div class="iq-bell-labels"><span>70</span><span>85</span><span>100</span><span>115</span><span>130</span><span>145</span></div>' +
+      '</div>';
+
+    // Category breakdown
+    var cats = ["Pattern Recognition", "Logical Reasoning", "Spatial Thinking", "Numerical Ability"];
+    var chartHTML = '';
+    for (var c = 0; c < cats.length; c++) {
+      var cat = cats[c];
+      var scored = catScores[cat] || 0;
+      var maxPts = catMaxes[cat] || 1;
+      var catPct = Math.round((scored / maxPts) * 100);
+      var color = CAT_COLORS[cat] || 'var(--color-primary)';
+      chartHTML += '<div class="quiz-bar-item">';
+      chartHTML += '<div class="quiz-bar-label"><span>' + cat + '</span><span>' + catPct + '%</span></div>';
+      chartHTML += '<div class="quiz-bar-track"><div class="quiz-bar-fill" style="width:' + catPct + '%;background:' + color + ';"></div></div>';
+      chartHTML += '</div>';
+    }
+    categoryChart.innerHTML = chartHTML;
+
+    disclaimerText.textContent = 'Disclaimer: This is a quick estimation for entertainment purposes. For an accurate IQ assessment, consult a licensed psychologist who can administer a standardized test like the WAIS-IV or Stanford-Binet in a clinical setting.';
+
+    // GameShare
+    if (window.GameShare) {
+      window.GameShare.show({
+        gameName: gameName,
+        gameSlug: gameSlug,
+        gameIcon: gameIcon,
+        score: estimatedIQ,
+        unit: 'IQ',
+        metricLabel: metricLabel,
+        ratingLabel: range.label,
+        ratingColor: range.color
+      });
+    }
+  }
+
+  function startQuiz() {
+    currentIndex = 0;
+    totalScore = 0;
+    catScores = {};
+    catMaxes = {};
+    isProcessing = false;
+
+    // Calculate max possible per category
+    for (var i = 0; i < questions.length; i++) {
+      var cat = questions[i].cat;
+      catMaxes[cat] = (catMaxes[cat] || 0) + questions[i].pts;
+    }
+
+    shuffled = shuffleArr(questions);
+    showView(quizView);
+    renderQuestion();
+    if (window.GameShare) window.GameShare.hide();
+  }
+
+  startBtn.addEventListener('click', startQuiz);
+  retakeBtn.addEventListener('click', startQuiz);
+  optionsContainer.addEventListener('click', handleOptionClick);
+})();
+</script>

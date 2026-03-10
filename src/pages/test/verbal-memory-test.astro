@@ -1,0 +1,546 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import GameShare from '../../components/GameShare.astro';
+import '../../styles/game.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tests & Games", "item": "https://toolcalcs.com/test/" },
+      { "@type": "ListItem", "position": 3, "name": "Verbal Memory Test" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Verbal Memory Test",
+    "url": "https://toolcalcs.com/test/verbal-memory-test/",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "How many words can you keep in memory? Words are shown one at a time. Decide if each word is new or if you've seen it before."
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the Verbal Memory Test?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Verbal Memory Test measures your ability to remember words. Words are shown one at a time, and you must decide whether each word is one you have already seen or a new word. The test continues until you make 3 mistakes, and your score is the number of correct answers."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is a good score on the Verbal Memory Test?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "An average score is 15-30 correct answers. Scores of 31-50 are considered good, 51-75 are great, and anything above 76 is exceptional. Your score depends on both your working memory capacity and your ability to distinguish familiar words from new ones."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does verbal memory differ from visual memory?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Verbal memory processes language-based information like words, names, and stories using the phonological loop. Visual memory processes images, shapes, and spatial information using the visuospatial sketchpad. These are separate systems within working memory, and people often have stronger ability in one area than the other."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Verbal Memory Test - How Many Words Can You Remember? | ToolCalcs"
+  description="Test your verbal memory. Words appear one at a time — decide if each is new or seen before. 3 strikes and you're out. Free online verbal memory test."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/test/">Tests & Games</a> &rsaquo;
+    <span>Verbal Memory Test</span>
+  </nav>
+
+  <h1>Verbal Memory Test</h1>
+  <p class="page-desc">Words are shown one at a time. Decide if each word is new or if you have seen it before in this session.</p>
+
+  <div class="game-box">
+    <div class="game-area" id="gameArea" role="region" aria-label="Verbal memory test area" aria-live="polite">
+      <div class="game-instructions" id="instructionsView">
+        <h2>Verbal Memory Test</h2>
+        <p>You will see words one at a time. If the word is new, click "NEW." If you have already seen it during this round, click "SEEN." You have 3 lives.</p>
+        <p style="font-size:0.85rem;color:var(--color-text-muted);">Score = total correct answers before 3 mistakes.</p>
+        <button class="game-btn primary" id="startBtn" type="button" style="margin-top:16px;">Start Test</button>
+      </div>
+
+      <div class="play-view" id="playView" style="display:none;">
+        <div class="status-bar">
+          <span class="level-info" id="scoreInfo">Score: 0</span>
+          <span class="lives-info" id="livesInfo">&#10060; 0 / 3</span>
+        </div>
+        <div class="verbal-word-display" id="wordDisplay">ocean</div>
+        <div class="verbal-buttons">
+          <button class="game-btn verbal-btn seen-btn" id="seenBtn" type="button">SEEN</button>
+          <button class="game-btn verbal-btn new-btn" id="newBtn" type="button">NEW</button>
+        </div>
+        <div class="verbal-feedback" id="verbalFeedback">&nbsp;</div>
+      </div>
+
+      <div class="result-view" id="resultView" style="display:none;">
+        <div class="result-icon" aria-hidden="true">📝</div>
+        <div class="result-label">Game Over</div>
+        <div class="score-display">
+          <span class="score-value" id="finalScore">0</span>
+          <span class="score-unit">correct answers</span>
+        </div>
+        <div class="rating-badge" id="ratingBadge">&mdash;</div>
+        <button class="game-btn primary" id="tryAgainBtn" type="button" style="margin-top:16px;">Try Again</button>
+      </div>
+    </div>
+
+    <GameShare />
+
+    <div class="attempt-history" id="attemptHistory" hidden>
+      <h3>Attempt History</h3>
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is the Verbal Memory Test?</h2>
+    <p>The Verbal Memory Test is an interactive cognitive assessment that measures your ability to encode, store, and retrieve word-based information from memory. Unlike tests that measure how many items you can hold in mind simultaneously (working memory span), this test evaluates recognition memory: your ability to distinguish between words you have encountered before and completely new words.</p>
+    <p>During the test, words from a curated pool of common English nouns appear one at a time on screen. For each word, you must decide whether it is a word you have already seen during the current session ("SEEN") or a word appearing for the first time ("NEW"). Correct answers increase your score, while incorrect answers cost you one of your three lives. The game ends after three mistakes, and your final score reflects the total number of correct judgments you made.</p>
+    <p>This format tests a fundamental aspect of human memory known as recognition memory, which is generally easier than recall (producing information from memory without cues) but still requires effective encoding and retrieval processes. The challenge intensifies as the test progresses because your pool of "seen" words grows larger, making it increasingly difficult to keep track of which words have appeared and which have not.</p>
+
+    <h2>Understanding Verbal and Declarative Memory</h2>
+    <p>Verbal memory falls under the broader umbrella of declarative memory, which refers to memories that can be consciously recalled and verbally described. Declarative memory is typically divided into two subcategories: episodic memory (memories of personal experiences and events) and semantic memory (general knowledge and facts about the world).</p>
+    <p>When you encounter a word in this test, you form an episodic memory trace: you remember the specific event of seeing that particular word during this particular testing session. This is different from your semantic knowledge of the word itself (what it means). The test challenges your episodic memory system because you need to distinguish between your general familiarity with a word (you know what "ocean" means) and your specific memory of encountering it moments ago during the test.</p>
+    <p>This distinction between familiarity and recollection is central to the dual-process theory of recognition memory, proposed by psychologists Andrew Yonelinas and Larry Jacoby. According to this theory, recognition judgments can be based on either a general feeling of familiarity (a vague sense that you have encountered something before) or on recollection (retrieving specific contextual details about the prior encounter). Effective performance on the Verbal Memory Test often depends on recollection rather than mere familiarity, because every word in the pool is already familiar to you as an English speaker.</p>
+
+    <h2>Recognition vs. Recall</h2>
+    <p>Recognition and recall are two fundamentally different ways of accessing stored memories, and they place different demands on the memory system. Recall requires you to generate information from memory with minimal external cues, like being asked "What words did you see in the test?" Recognition, on the other hand, presents you with a stimulus and asks whether it matches something in memory: "Have you seen this word before?"</p>
+    <p>Recognition is generally easier than recall because the item itself serves as a powerful retrieval cue. When you see the word "glacier" on screen, the word directly activates its memory trace if one exists. In recall, you must search your memory without this external prompt, which requires more effortful retrieval processes.</p>
+    <p>However, recognition is not infallible. Research has identified several factors that can lead to false recognition, where you incorrectly "recognize" something you have never actually encountered. The Deese-Roediger-McDermott (DRM) paradigm demonstrates this: if you study a list of words related to sleep (bed, rest, awake, tired, dream, pillow), many people will falsely recognize the word "sleep" even though it was never presented. This occurs because the concept of sleep becomes highly activated through its associations with the studied words.</p>
+    <p>In the Verbal Memory Test, you may experience similar confusion if words from the pool share semantic associations. Maintaining accurate recognition requires careful encoding of each specific word as a distinct event, rather than relying on a general sense of familiarity with the category of words being presented.</p>
+
+    <h2>How Verbal Memory Differs from Visual Memory</h2>
+    <p>The influential model of working memory proposed by Alan Baddeley in 1974 includes separate subsystems for verbal and visual information. The phonological loop handles verbal and acoustic information, while the visuospatial sketchpad processes visual and spatial information. These systems operate somewhat independently, meaning that verbal memory ability does not perfectly predict visual memory ability, and vice versa.</p>
+    <p>The phonological loop has two components: a phonological store that holds speech-based information for about 1 to 2 seconds, and an articulatory rehearsal process that refreshes this information through subvocal speech (essentially, talking to yourself silently). When you see a word in this test, you likely engage the phonological loop: the word is converted into its sound-based representation and briefly stored while you make your judgment.</p>
+    <p>Visual memory, by contrast, operates through the visuospatial sketchpad, which maintains and manipulates visual images and spatial relationships. Tests like the Visual Memory Test on this site measure this separate system. Research shows that people often have asymmetric abilities: some individuals excel at verbal tasks but struggle with visual ones, while others show the opposite pattern.</p>
+    <p>Interestingly, when the stimuli are words (as in this test), both systems may be engaged. You process the visual appearance of the word and simultaneously convert it to a phonological representation. This dual encoding can actually strengthen the memory trace, which is why many memory strategies involve creating both verbal and visual representations of information.</p>
+
+    <h2>Cognitive Load Theory and Memory Limitations</h2>
+    <p>Cognitive load theory, developed by John Sweller in the late 1980s, explains why tasks that seem simple can become overwhelming as demands increase. The theory distinguishes between intrinsic load (the inherent complexity of the material), extraneous load (unnecessary processing demands caused by poor design), and germane load (processing that contributes to learning and memory formation).</p>
+    <p>In the Verbal Memory Test, cognitive load increases naturally as the test progresses. Early in the test, you have only seen a few words, so the discrimination task is easy. But as more words accumulate in your "seen" list, the intrinsic load increases because you must search a larger mental set for each recognition judgment. This is why the test becomes progressively more challenging even though the task itself (seen or new?) never changes.</p>
+    <p>Research on the effects of set size on recognition memory shows that performance typically declines as the number of studied items increases, following a logarithmic function. This means the first few items added to memory cause the largest decrease in accuracy, while later items have progressively smaller effects. This pattern is consistent with signal detection theory, which models recognition memory as a process of discriminating between the strength of memory signals for old and new items.</p>
+
+    <h2>Memory Consolidation</h2>
+    <p>While the Verbal Memory Test primarily engages short-term and working memory, the process of memory consolidation, which transforms short-term memories into stable long-term representations, plays a background role. Consolidation occurs through repeated reactivation of neural patterns during both waking rest and sleep, particularly during slow-wave sleep (deep sleep) stages.</p>
+    <p>For the purposes of this test, consolidation is less directly relevant because the entire test occurs within a single brief session. However, if you practice the test regularly, the strategies and patterns you develop will undergo consolidation between sessions. This is why performance often improves more between practice days than within a single extended practice session, a phenomenon known as the spacing effect.</p>
+
+    <h2>Strategies to Improve Your Score</h2>
+    <ul>
+      <li><strong>Active encoding:</strong> Do not passively read each word. Instead, actively process it by forming a vivid mental image, thinking of a personal association, or placing it in an imaginary scene. Deeper processing leads to stronger memory traces.</li>
+      <li><strong>Elaborative rehearsal:</strong> When you see a new word, connect it to something meaningful. For "glacier," you might think of a specific glacier you have seen in a photograph. These elaborations create multiple retrieval paths.</li>
+      <li><strong>Chunking and categorization:</strong> Mentally group words by category (nature words, object words, abstract words). This organizational structure makes it easier to search your memory when a word reappears.</li>
+      <li><strong>Pay attention to your first impression:</strong> Research shows that the immediate "gut feeling" of familiarity is often accurate. If a word feels familiar the instant it appears, it is likely one you have seen before.</li>
+      <li><strong>Use the distinctiveness heuristic:</strong> For each new word, notice something distinctive about it. The more unique your encoding of each word, the easier it will be to discriminate it from words you have not seen.</li>
+      <li><strong>Maintain focus:</strong> Divided attention dramatically impairs encoding. Ensure you are fully attending to each word when it appears, without letting your mind wander between trials.</li>
+    </ul>
+
+    <h2>Verbal Memory and Aging</h2>
+    <p>Verbal memory shows a characteristic pattern of age-related change. Vocabulary knowledge and semantic memory (knowing what words mean) typically remain stable or even improve through the 60s and 70s, a phenomenon known as crystallized intelligence. However, the ability to form new episodic memories for specific verbal material (like remembering which words appeared in a list) begins to decline in middle adulthood.</p>
+    <p>This decline is thought to reflect changes in the hippocampus, a brain structure critical for forming new episodic memories, which loses approximately 1 to 2 percent of its volume per decade after age 30. However, the rate of decline varies enormously between individuals, and lifestyle factors including physical exercise, social engagement, cognitive stimulation, and adequate sleep can significantly slow or partially offset age-related memory decline.</p>
+    <p>Interestingly, older adults tend to show a specific pattern on recognition memory tests: they maintain relatively high "hit rates" (correctly identifying old items) but show increased "false alarm rates" (incorrectly identifying new items as old). This pattern suggests that the familiarity signal becomes less precise with age, making it harder to distinguish between genuine memories and mere familiarity.</p>
+
+    <h2>Training Benefits and Transfer</h2>
+    <p>Regular practice on verbal memory tasks has been shown to improve performance on those specific tasks. A meta-analysis by Melby-Lervag and Hulme (2013) found that memory training programs produce reliable improvements on trained tasks, with moderate to large effect sizes. The more debated question is whether these improvements generalize to everyday memory situations.</p>
+    <p>Some evidence suggests that verbal memory training can improve related abilities like reading comprehension and vocabulary learning, since these tasks also depend on the ability to encode and retrieve word-based information. The strongest transfer effects tend to occur between tasks that share underlying cognitive processes, consistent with the idea that training strengthens specific neural circuits rather than boosting a general memory capacity.</p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>How does the word selection algorithm work?</h3>
+    <p>The test begins by showing 3 new words to build your initial "seen" pool. After that, each round randomly decides whether to show a new word or a previously seen word. Early in the test, new words appear more frequently (about 60% of the time). As your score increases, previously seen words appear more often, increasing the challenge of remembering an ever-growing list.</p>
+
+    <h3>Why do I sometimes feel certain a word is new when it actually appeared before?</h3>
+    <p>This is a common experience that reflects the limitations of episodic memory encoding. Not every word you see is equally well encoded. Words that were processed superficially, presented during a moment of inattention, or not connected to meaningful associations are more likely to be forgotten. This is why active, elaborative encoding strategies significantly improve performance.</p>
+
+    <h3>Is verbal memory the same as reading ability?</h3>
+    <p>No, though they are related. Reading involves decoding written symbols, understanding syntax, and extracting meaning from text. Verbal memory specifically refers to the ability to encode, store, and retrieve word-based information. Good readers tend to have good verbal memory because reading practice strengthens the phonological loop and builds rich semantic networks, but the two abilities can be dissociated.</p>
+
+    <h3>Can I train my verbal memory to improve everyday memory?</h3>
+    <p>Practice on verbal memory tasks reliably improves performance on similar tasks. Whether this translates to everyday improvements depends on how well the trained skills match real-world demands. Strategies learned during practice, such as active encoding and elaborative rehearsal, are general-purpose tools that can be applied to remembering names, studying for exams, or recalling information from meetings.</p>
+  </article>
+
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .game-area { cursor: default; user-select: auto; -webkit-user-select: auto; }
+
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    margin-bottom: 4px;
+  }
+  .level-info { font-weight: 700; font-size: 1rem; color: var(--color-text); }
+  .lives-info { font-size: 0.95rem; font-weight: 600; color: var(--color-text-muted); }
+
+  .verbal-word-display {
+    font-size: 2.4rem;
+    font-weight: 800;
+    text-align: center;
+    padding: 32px 16px 24px;
+    color: var(--color-text);
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.15s;
+  }
+
+  .verbal-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    padding: 0 24px 12px;
+  }
+  :global(.verbal-btn) {
+    min-width: 120px;
+    padding: 14px 32px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s, border-color 0.15s;
+  }
+  :global(.verbal-btn:active) {
+    transform: scale(0.95);
+  }
+  :global(.seen-btn) {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+  }
+  :global(.seen-btn:hover) {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+  }
+  :global(.new-btn) {
+    background: #16a34a;
+    color: #fff;
+    border-color: #16a34a;
+  }
+  :global(.new-btn:hover) {
+    background: #15803d;
+    border-color: #15803d;
+  }
+  :global(.verbal-btn.flash-correct) {
+    background: #22c55e;
+    border-color: #22c55e;
+  }
+  :global(.verbal-btn.flash-wrong) {
+    background: #ef4444;
+    border-color: #ef4444;
+    animation: verbalShake 0.35s ease;
+  }
+  @keyframes verbalShake {
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
+  }
+
+  .verbal-feedback {
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 8px 16px 16px;
+    min-height: 36px;
+    color: var(--color-text-muted);
+  }
+
+  .play-view {
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .result-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 280px;
+    padding: 24px;
+  }
+  .result-icon { font-size: 3rem; margin-bottom: 8px; }
+  .result-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+
+  @media (max-width: 640px) {
+    .verbal-word-display { font-size: 1.8rem; padding: 24px 12px 16px; }
+    .verbal-buttons { gap: 10px; padding: 0 16px 12px; }
+    :global(.verbal-btn) { min-width: 100px; padding: 12px 20px; font-size: 0.95rem; }
+  }
+</style>
+
+<script define:vars={{ gameName: "Verbal Memory Test", gameSlug: "verbal-memory-test", gameIcon: "📝", metricLabel: "Words", metricUnit: "correct" }}>
+(function () {
+  'use strict';
+
+  var WORD_POOL = [
+    "ocean", "bridge", "garden", "thunder", "crystal", "mountain", "silver", "compass",
+    "lantern", "harvest", "glacier", "temple", "falcon", "marble", "candle", "shadow",
+    "pillar", "voyage", "anchor", "meadow", "cavern", "ribbon", "timber", "breeze",
+    "cobalt", "plume", "ember", "summit", "oasis", "beacon", "prism", "fable",
+    "grove", "atlas", "coral", "dusk", "forge", "haven", "ivory", "lotus",
+    "manor", "nectar", "quartz", "raven", "sage", "thorn", "velvet", "waltz",
+    "zenith", "armor", "basin", "cedar", "delta", "flame", "glyph", "haze",
+    "inlet", "jade", "knoll", "linen", "moss", "noble", "orbit", "pearl",
+    "quest", "ridge", "slate", "trove", "umber", "vigor", "wren", "yarn",
+    "amber", "bloom", "crest", "dune", "echo", "frost", "glint"
+  ];
+
+  var MAX_STRIKES = 3;
+
+  var RATING_SCALE = [
+    { min: 76, label: 'Exceptional', color: '#16a34a' },
+    { min: 51, label: 'Great', color: '#22c55e' },
+    { min: 31, label: 'Good', color: '#2563eb' },
+    { min: 15, label: 'Average', color: '#f59e0b' },
+    { min: 0, label: 'Below Average', color: '#ef4444' }
+  ];
+
+  function getRating(score) {
+    for (var i = 0; i < RATING_SCALE.length; i++) {
+      if (score >= RATING_SCALE[i].min) return RATING_SCALE[i];
+    }
+    return { label: 'Below Average', color: '#ef4444' };
+  }
+
+  var STORAGE_KEY = 'toolcalcs_verbal-memory-test_history';
+  var MAX_HISTORY = 20;
+
+  function loadHistory() {
+    try { var r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch (e) {}
+    return [];
+  }
+  function saveHistory(h) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch (e) {}
+  }
+  function addToHistory(score) {
+    var h = loadHistory();
+    h.unshift({ score: score, date: new Date().toISOString(), rating: getRating(score).label });
+    saveHistory(h);
+  }
+
+  var instructionsView = document.getElementById('instructionsView');
+  var playView = document.getElementById('playView');
+  var resultView = document.getElementById('resultView');
+  var startBtn = document.getElementById('startBtn');
+  var tryAgainBtn = document.getElementById('tryAgainBtn');
+  var scoreInfo = document.getElementById('scoreInfo');
+  var livesInfo = document.getElementById('livesInfo');
+  var wordDisplay = document.getElementById('wordDisplay');
+  var seenBtn = document.getElementById('seenBtn');
+  var newBtn = document.getElementById('newBtn');
+  var verbalFeedback = document.getElementById('verbalFeedback');
+  var finalScore = document.getElementById('finalScore');
+  var ratingBadge = document.getElementById('ratingBadge');
+  var attemptHistorySection = document.getElementById('attemptHistory');
+  var historyList = document.getElementById('historyList');
+
+  var score = 0;
+  var strikes = 0;
+  var isPlaying = false;
+  var canAnswer = false;
+  var seenWords = {};
+  var availableWords = [];
+  var shownCount = 0;
+  var currentWord = '';
+  var currentIsNew = true;
+
+  function showView(view) {
+    instructionsView.style.display = 'none';
+    playView.style.display = 'none';
+    resultView.style.display = 'none';
+    view.style.display = '';
+  }
+
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i];
+      a[i] = a[j];
+      a[j] = tmp;
+    }
+    return a;
+  }
+
+  function pickNextWord() {
+    var seenList = Object.keys(seenWords);
+    var showSeen = false;
+
+    if (shownCount < 3) {
+      showSeen = false;
+    } else if (seenList.length > 0 && availableWords.length > 0) {
+      var seenProb = Math.min(0.4 + (score * 0.003), 0.7);
+      showSeen = Math.random() < seenProb;
+    } else if (availableWords.length === 0 && seenList.length > 0) {
+      showSeen = true;
+    }
+
+    if (showSeen && seenList.length > 0) {
+      var idx = Math.floor(Math.random() * seenList.length);
+      currentWord = seenList[idx];
+      currentIsNew = false;
+    } else if (availableWords.length > 0) {
+      currentWord = availableWords.shift();
+      currentIsNew = true;
+    } else {
+      currentWord = seenList[Math.floor(Math.random() * seenList.length)];
+      currentIsNew = false;
+    }
+
+    shownCount++;
+    wordDisplay.textContent = currentWord;
+    verbalFeedback.innerHTML = '&nbsp;';
+    canAnswer = true;
+    seenBtn.classList.remove('flash-correct', 'flash-wrong');
+    newBtn.classList.remove('flash-correct', 'flash-wrong');
+  }
+
+  function handleAnswer(answeredSeen) {
+    if (!isPlaying || !canAnswer) return;
+    canAnswer = false;
+
+    var wordWasSeen = !currentIsNew;
+    var isCorrect = (answeredSeen && wordWasSeen) || (!answeredSeen && !wordWasSeen);
+
+    var clickedBtn = answeredSeen ? seenBtn : newBtn;
+
+    if (isCorrect) {
+      score++;
+      scoreInfo.textContent = 'Score: ' + score;
+      clickedBtn.classList.add('flash-correct');
+      verbalFeedback.textContent = 'Correct!';
+      verbalFeedback.style.color = '#22c55e';
+
+      if (currentIsNew) {
+        seenWords[currentWord] = true;
+      }
+
+      setTimeout(function () {
+        pickNextWord();
+      }, 400);
+    } else {
+      strikes++;
+      livesInfo.textContent = '\u274C ' + strikes + ' / ' + MAX_STRIKES;
+      clickedBtn.classList.add('flash-wrong');
+
+      if (currentIsNew) {
+        verbalFeedback.textContent = 'Wrong! "' + currentWord + '" was NEW.';
+        seenWords[currentWord] = true;
+      } else {
+        verbalFeedback.textContent = 'Wrong! "' + currentWord + '" was SEEN before.';
+      }
+      verbalFeedback.style.color = '#ef4444';
+
+      if (strikes >= MAX_STRIKES) {
+        setTimeout(function () { endGame(); }, 700);
+      } else {
+        setTimeout(function () {
+          pickNextWord();
+        }, 700);
+      }
+    }
+  }
+
+  function startGame() {
+    score = 0;
+    strikes = 0;
+    shownCount = 0;
+    seenWords = {};
+    availableWords = shuffle(WORD_POOL);
+    isPlaying = true;
+    scoreInfo.textContent = 'Score: 0';
+    livesInfo.textContent = '\u274C 0 / ' + MAX_STRIKES;
+    verbalFeedback.style.color = 'var(--color-text-muted)';
+    showView(playView);
+    pickNextWord();
+  }
+
+  function endGame() {
+    isPlaying = false;
+    canAnswer = false;
+    showView(resultView);
+    finalScore.textContent = String(score);
+    var rating = getRating(score);
+    ratingBadge.textContent = rating.label;
+    ratingBadge.style.background = rating.color;
+    addToHistory(score);
+    renderHistory();
+
+    if (window.GameShare) {
+      window.GameShare.show({
+        gameName: gameName,
+        gameSlug: gameSlug,
+        gameIcon: gameIcon,
+        score: score,
+        unit: metricUnit,
+        metricLabel: metricLabel,
+        ratingLabel: rating.label,
+        ratingColor: rating.color
+      });
+    }
+  }
+
+  function renderHistory() {
+    var history = loadHistory();
+    if (history.length === 0) { attemptHistorySection.hidden = true; return; }
+    attemptHistorySection.hidden = false;
+    historyList.innerHTML = history.map(function (e) {
+      var r = getRating(e.score);
+      return '<div class="history-item">' +
+        '<span class="history-score">' + e.score + ' correct</span>' +
+        '<span class="history-rating" style="background:' + r.color + '">' + r.label + '</span>' +
+        '<span class="history-time">' + formatDate(e.date) + '</span>' +
+        '</div>';
+    }).join('');
+  }
+
+  function formatDate(iso) {
+    try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    catch (e) { return ''; }
+  }
+
+  seenBtn.addEventListener('click', function () { handleAnswer(true); });
+  newBtn.addEventListener('click', function () { handleAnswer(false); });
+  startBtn.addEventListener('click', startGame);
+  tryAgainBtn.addEventListener('click', startGame);
+  renderHistory();
+})();
+</script>

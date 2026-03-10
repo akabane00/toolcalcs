@@ -1,0 +1,573 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import GameShare from '../../components/GameShare.astro';
+import '../../styles/game.css';
+import '../../styles/quiz.css';
+
+const gameName = "Career Aptitude Test";
+const gameSlug = "career-aptitude-test";
+const gameIcon = "\uD83D\uDCBC";
+const metricLabel = "Holland Code";
+const metricUnit = "";
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tests & Games", "item": "https://toolcalcs.com/test/" },
+      { "@type": "ListItem", "position": 3, "name": "Career Aptitude Test" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Career Aptitude Test",
+    "url": "https://toolcalcs.com/test/career-aptitude-test/",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Free career aptitude test based on Holland's RIASEC model. 30 questions to discover your ideal career path and work environment preferences."
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is Holland\'s RIASEC model?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Holland\'s RIASEC model is a career interest theory developed by psychologist John L. Holland in 1959. It categorizes people and work environments into six types: Realistic, Investigative, Artistic, Social, Enterprising, and Conventional. The theory proposes that people are happiest and most productive when their personality type matches their work environment.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How accurate is the Holland Code career test?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Holland\'s RIASEC model is one of the most researched and validated career interest frameworks in vocational psychology. It has been used by career counselors worldwide for over 60 years and forms the basis of the U.S. Department of Labor\'s O*NET system. While no single test can perfectly predict career satisfaction, the Holland Code provides a reliable starting point for career exploration.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is a three-letter Holland Code?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'A three-letter Holland Code represents your top three career interest types ranked by strength. For example, AIE means your primary interest is Artistic, followed by Investigative and Enterprising. This three-letter combination narrows down career matches more precisely than a single type, as most people are a blend of multiple interests.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Can my Holland Code change over time?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes, your Holland Code can shift as you gain new experiences, develop new skills, and discover new interests throughout your life. Career interests often evolve through education, work experience, and personal growth. It is recommended to retake the assessment periodically, especially during career transitions or after significant life changes.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How do career counselors use the RIASEC model?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Career counselors use the RIASEC model to help clients identify career paths that align with their natural interests and personality. They match a client\'s Holland Code with occupations that have similar codes in databases like O*NET. Counselors also use it to explain why someone may feel dissatisfied in their current job if there is a mismatch between their type and their work environment.',
+        },
+      },
+    ],
+  }
+];
+---
+
+<BaseLayout
+  title="Career Aptitude Test - Discover Your Holland Code (RIASEC) | ToolCalcs"
+  description="Free career aptitude test based on Holland's RIASEC model. 30 questions to discover your ideal career path and work environment preferences."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/test/">Tests & Games</a> &rsaquo;
+    <span>Career Aptitude Test</span>
+  </nav>
+
+  <h1>Career Aptitude Test</h1>
+  <p class="page-desc">Answer 30 forced-choice questions to discover your Holland Code and find careers that match your natural interests and personality.</p>
+
+  <div class="game-box">
+    <div class="game-area" id="gameArea" role="region" aria-label="Career aptitude test area" aria-live="polite">
+      <div class="game-instructions" id="instructionsView">
+        <h2>Holland Code Career Assessment</h2>
+        <p>For each question, choose the activity that appeals to you more. There are no right or wrong answers — go with your instinct.</p>
+        <p style="font-size:0.85rem;color:var(--color-text-muted);">30 questions &middot; About 5 minutes</p>
+        <button class="game-btn primary" id="startBtn" type="button" style="margin-top:16px;">Start Test</button>
+      </div>
+
+      <div class="play-view" id="playView" style="display:none;">
+        <div class="quiz-progress">
+          <div class="quiz-progress-text" id="progressText">Question 1 of 30</div>
+          <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="progressFill" style="width:0%"></div></div>
+        </div>
+        <div class="quiz-question"><div class="quiz-question-text" id="questionText">Which activity appeals to you more?</div></div>
+        <div class="quiz-options" id="optionsContainer"></div>
+      </div>
+
+      <div class="result-view" id="resultView" style="display:none;">
+        <div class="result-icon" aria-hidden="true">&#x1F4BC;</div>
+        <div class="result-label">Your Holland Code</div>
+        <div class="quiz-result-type" id="hollandCode"></div>
+        <div class="quiz-result-name" id="hollandName"></div>
+        <div class="quiz-bar-chart" id="barChart"></div>
+        <div class="quiz-result-desc" id="resultDescriptions"></div>
+        <button class="game-btn primary" id="tryAgainBtn" type="button" style="margin-top:16px;">Take Again</button>
+      </div>
+    </div>
+
+    <GameShare />
+
+    <div class="attempt-history" id="attemptHistory" hidden>
+      <h3>Attempt History</h3>
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is Holland's RIASEC Model?</h2>
+    <p>Holland's RIASEC model is one of the most influential and widely used career interest frameworks in the world. Developed by American psychologist John L. Holland in 1959, the theory proposes that both people and work environments can be categorized into six fundamental types: Realistic, Investigative, Artistic, Social, Enterprising, and Conventional. The core insight of Holland's theory is elegantly simple: people are happiest and most successful when they work in environments that match their personality type.</p>
+    <p>Holland observed that career satisfaction is not just about skills or salary — it is about fit. A creative, independent person forced into a rigid, rule-bound office job will likely feel stifled, while a detail-oriented person who loves structure would feel overwhelmed in a chaotic, open-ended creative studio. By identifying your dominant interest types, you can narrow your career search to fields where you are most likely to thrive, stay motivated, and experience long-term fulfillment.</p>
+    <p>The model has been validated through decades of research across cultures, industries, and age groups. It forms the foundation of the U.S. Department of Labor's O*NET career database, the Strong Interest Inventory, and the Self-Directed Search (SDS) — tools used by career counselors, universities, and employers worldwide. If you have ever taken a career assessment in school or through a career center, it was almost certainly based on Holland's RIASEC framework.</p>
+
+    <h2>The Six Holland Types Explained</h2>
+
+    <h3>Realistic (R) — The Doer</h3>
+    <p>Realistic types are practical, hands-on, and physically active. They prefer working with things — tools, machines, plants, animals — over working with people or ideas in the abstract. They value tangible results and enjoy seeing the direct outcome of their labor. Realistic individuals tend to be mechanically inclined, athletic, and straightforward in their communication style. They often have strong spatial reasoning and motor skills.</p>
+    <p><strong>Matching careers:</strong> Engineer, electrician, mechanic, carpenter, farmer, pilot, surveyor, chef, firefighter, physical therapist, dental hygienist, veterinary technician, construction manager, and skilled trades of all kinds.</p>
+    <p><strong>Work environment:</strong> Outdoors, workshops, labs with equipment, factories, or anywhere they can use their hands and see physical results.</p>
+
+    <h3>Investigative (I) — The Thinker</h3>
+    <p>Investigative types are analytical, intellectual, and curious. They love solving complex problems, conducting research, and understanding how things work at a deep level. They prefer working independently, thinking through problems methodically, and arriving at evidence-based conclusions. Investigative individuals are drawn to science, mathematics, and technology, and they tend to be reserved, precise, and scholarly.</p>
+    <p><strong>Matching careers:</strong> Scientist, researcher, physician, pharmacist, data analyst, software developer, mathematician, economist, psychologist, forensic specialist, laboratory technician, and university professor.</p>
+    <p><strong>Work environment:</strong> Research laboratories, universities, technology companies, hospitals, or any setting that rewards intellectual curiosity and independent problem-solving.</p>
+
+    <h3>Artistic (A) — The Creator</h3>
+    <p>Artistic types are creative, expressive, and original. They value self-expression, aesthetics, and independence. They prefer unstructured environments where they can use their imagination and work without rigid rules or tight supervision. Artistic individuals are often intuitive, sensitive, and nonconforming. They communicate through visual, written, musical, or performative media.</p>
+    <p><strong>Matching careers:</strong> Graphic designer, writer, musician, architect, photographer, film director, interior designer, actor, fashion designer, art director, animator, copywriter, and UX designer.</p>
+    <p><strong>Work environment:</strong> Studios, theaters, design agencies, publishing houses, or freelance settings that allow creative freedom and flexible schedules.</p>
+
+    <h3>Social (S) — The Helper</h3>
+    <p>Social types are empathetic, cooperative, and people-oriented. They are drawn to helping, teaching, counseling, and serving others. They thrive in collaborative environments and are skilled communicators who value relationships and community. Social individuals tend to be patient, generous, and idealistic, and they find fulfillment in making a positive difference in other people's lives.</p>
+    <p><strong>Matching careers:</strong> Teacher, counselor, social worker, nurse, HR specialist, speech therapist, school psychologist, religious leader, community organizer, nonprofit director, and occupational therapist.</p>
+    <p><strong>Work environment:</strong> Schools, hospitals, community centers, nonprofits, counseling offices, or any setting focused on human interaction and service.</p>
+
+    <h3>Enterprising (E) — The Persuader</h3>
+    <p>Enterprising types are ambitious, energetic, and persuasive. They enjoy leading, influencing, and managing others. They are drawn to competitive environments where they can take risks, make decisions, and drive results. Enterprising individuals are confident communicators who excel at selling ideas, motivating teams, and building organizations. They value status, achievement, and financial reward.</p>
+    <p><strong>Matching careers:</strong> Business executive, sales manager, entrepreneur, lawyer, real estate agent, marketing director, financial advisor, political strategist, recruiter, public relations specialist, and management consultant.</p>
+    <p><strong>Work environment:</strong> Corporate offices, courtrooms, sales floors, startups, political campaigns, or any competitive, fast-paced setting with leadership opportunities.</p>
+
+    <h3>Conventional (C) — The Organizer</h3>
+    <p>Conventional types are detail-oriented, organized, and systematic. They prefer structured environments with clear rules, procedures, and expectations. They excel at managing data, maintaining records, and ensuring accuracy. Conventional individuals are dependable, efficient, and thorough. They find satisfaction in creating order, following established processes, and producing consistent, error-free work.</p>
+    <p><strong>Matching careers:</strong> Accountant, auditor, bank teller, administrative assistant, bookkeeper, tax preparer, logistics coordinator, database administrator, court reporter, compliance officer, and actuary.</p>
+    <p><strong>Work environment:</strong> Offices with clear hierarchies, financial institutions, government agencies, or any structured setting where attention to detail and reliability are paramount.</p>
+
+    <h2>How Career Counselors Use the RIASEC Model</h2>
+    <p>Professional career counselors use Holland's RIASEC model as a foundational tool in their practice. The typical process begins with administering a formal assessment — such as the Self-Directed Search (SDS) or the Strong Interest Inventory — to determine a client's three-letter Holland Code. This code represents the client's top three interest types ranked by strength.</p>
+    <p>Once the code is established, the counselor matches it against occupational databases like O*NET, which assigns RIASEC codes to thousands of occupations. A client with a code of AIE (Artistic-Investigative-Enterprising) might be directed toward careers in architecture, user experience design, or creative directing — roles that blend creativity, analytical thinking, and leadership. The three-letter code provides much more precision than a single type, as most people are blends of multiple interests.</p>
+    <p>Counselors also use the model to explain career dissatisfaction. A Social-type individual working in a Conventional data-entry role may feel isolated and unfulfilled despite being competent at the work. Understanding the mismatch helps the client articulate what is missing and explore alternative paths that offer more human interaction and purpose. This diagnostic power makes the RIASEC model invaluable for career transitions, mid-life career changes, and guiding students toward fulfilling fields of study.</p>
+
+    <h2>Limitations of the Holland Code</h2>
+    <p>While Holland's RIASEC model is an excellent starting point for career exploration, it has important limitations. The model measures interests rather than abilities, meaning your Holland Code tells you what you enjoy but not necessarily what you are good at. A person may score high on Artistic interests but lack the technical skill or training to succeed in a creative field without further development.</p>
+    <p>The model also does not account for values, personality traits, work-life balance preferences, or financial needs — all of which play a significant role in career satisfaction. Two people with identical Holland Codes might have very different ideal careers based on their risk tolerance, salary expectations, geographic preferences, and family obligations.</p>
+    <p>Additionally, the six categories can feel broad. Modern careers often blend multiple types in ways that do not fit neatly into the RIASEC framework. A data scientist, for example, combines Investigative (analytical research), Conventional (systematic data management), and sometimes Artistic (data visualization) elements. The model works best as one component of a broader career planning process that also considers skills assessments, values clarification, informational interviews, and real-world experience.</p>
+
+    <h2>Comparison with Other Career Assessments</h2>
+    <p>Several other career assessment tools exist, each with different strengths. The Strong Interest Inventory, developed by E.K. Strong Jr. in 1927 and updated regularly since, is closely related to Holland's model and provides more detailed interest profiles. The Myers-Briggs Type Indicator (MBTI) focuses on cognitive preferences and decision-making styles rather than career interests, making it complementary to but different from the RIASEC model. CliftonStrengths (formerly StrengthsFinder) identifies your top talent themes and is particularly useful for understanding how you work rather than what fields interest you.</p>
+    <p>The RIASEC model's greatest advantage is its simplicity, universality, and the sheer volume of research supporting it. It is freely available, easy to interpret, and directly links to occupational databases. For comprehensive career planning, combining the Holland Code with a personality assessment (like the Big Five) and a skills inventory provides the most complete picture of career fit.</p>
+
+    <h2>Tips for Career Exploration</h2>
+    <p><strong>Use your code as a starting point, not an endpoint.</strong> Your Holland Code narrows the field but should not limit your exploration. Research occupations that match your code, but also look at adjacent fields. Talk to professionals in those careers through informational interviews to understand the day-to-day reality.</p>
+    <p><strong>Consider all three letters.</strong> Your secondary and tertiary types matter. They add nuance and can point you toward niche careers that perfectly blend your interests. A person with an ISA code might thrive as a museum curator, combining investigation, social interaction, and artistic appreciation.</p>
+    <p><strong>Gain real-world experience.</strong> Internships, job shadowing, volunteering, and freelance projects give you firsthand exposure to different work environments. Theoretical interest does not always translate to practical enjoyment, and real experience is the best way to test your assumptions.</p>
+    <p><strong>Revisit your results over time.</strong> Interests evolve as you gain experience and maturity. What excited you at 20 may not at 40. Retaking career interest assessments every few years ensures your career planning stays aligned with your current self.</p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is Holland's RIASEC model?</h3>
+    <p>Holland's RIASEC model is a career interest theory developed by psychologist John L. Holland in 1959. It categorizes both people and work environments into six types: Realistic (hands-on, practical), Investigative (analytical, scientific), Artistic (creative, expressive), Social (helping, teaching), Enterprising (leading, persuading), and Conventional (organizing, detail-oriented). The model proposes that career satisfaction is highest when there is a strong match between a person's interest type and their work environment. It has been validated through over six decades of research and is the foundation of major career assessment tools worldwide.</p>
+
+    <h3>How accurate is the Holland Code career test?</h3>
+    <p>Holland's RIASEC model is one of the most extensively researched and validated career interest frameworks in vocational psychology. It forms the basis of the U.S. Department of Labor's O*NET occupational database and the Strong Interest Inventory. Research consistently shows that people whose careers match their Holland Code report higher job satisfaction, better performance, and longer tenure. However, it measures interests rather than abilities, so it should be used alongside skills assessments and real-world exploration for comprehensive career planning.</p>
+
+    <h3>What is a three-letter Holland Code?</h3>
+    <p>A three-letter Holland Code represents your top three career interest types ranked from strongest to weakest. For example, a code of SAE means your primary interest is Social, followed by Artistic and Enterprising. The three-letter combination provides much more specificity than a single type and can be matched against occupational codes in databases like O*NET to identify careers that align with your unique blend of interests. Most people are a combination of two or three types rather than a single pure type.</p>
+
+    <h3>Can my Holland Code change over time?</h3>
+    <p>Yes, your Holland Code can evolve as you gain new experiences, education, and life perspective. Young adults often see the most change as they explore different fields through education and early career experiences. Major life events, career transitions, and personal growth can all shift your interest profile. Career development experts recommend retaking interest assessments every few years, especially during periods of transition, to ensure your career planning reflects your current interests and values.</p>
+
+    <h3>How do career counselors use the RIASEC model?</h3>
+    <p>Career counselors use the RIASEC model as a foundational assessment tool to help clients identify career paths that match their natural interests. After determining a client's three-letter Holland Code through a formal assessment, counselors match it against occupational databases to generate a list of compatible careers. They also use the model diagnostically to explain why a client may feel dissatisfied in their current role — often revealing a mismatch between the person's type and their work environment. The model is used in university career centers, workforce development programs, and private career coaching worldwide.</p>
+  </article>
+
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .game-area { cursor: default; user-select: auto; -webkit-user-select: auto; }
+</style>
+
+<script define:vars={{ gameName, gameSlug, gameIcon, metricLabel, metricUnit }}>
+(function () {
+  'use strict';
+
+  var questions = [
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Build or repair something with your hands", dim: "R" },
+      { label: "Analyze data to solve a complex problem", dim: "I" }
+    ]},
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Design an original piece of art or music", dim: "A" },
+      { label: "Teach someone a new skill or concept", dim: "S" }
+    ]},
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Lead a team to achieve a business goal", dim: "E" },
+      { label: "Organize files and maintain detailed records", dim: "C" }
+    ]},
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Operate heavy machinery or power tools", dim: "R" },
+      { label: "Write a creative story or poem", dim: "A" }
+    ]},
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Conduct a scientific experiment in a lab", dim: "I" },
+      { label: "Negotiate a deal or close a sale", dim: "E" }
+    ]},
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Volunteer at a community center", dim: "S" },
+      { label: "Create a detailed spreadsheet or budget", dim: "C" }
+    ]},
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Fix a broken engine or appliance", dim: "R" },
+      { label: "Counsel someone going through a difficult time", dim: "S" }
+    ]},
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Research a topic in depth using academic sources", dim: "I" },
+      { label: "Develop a marketing campaign for a product", dim: "E" }
+    ]},
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Photograph landscapes or design graphics", dim: "A" },
+      { label: "Audit financial records for accuracy", dim: "C" }
+    ]},
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Work outdoors planting or landscaping", dim: "R" },
+      { label: "Study how the human brain processes information", dim: "I" }
+    ]},
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Compose music or choreograph a dance", dim: "A" },
+      { label: "Organize a community fundraising event", dim: "S" }
+    ]},
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Pitch an idea to potential investors", dim: "E" },
+      { label: "Set up an efficient filing or inventory system", dim: "C" }
+    ]},
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Assemble or install electronic components", dim: "R" },
+      { label: "Perform statistical analysis on survey results", dim: "I" }
+    ]},
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Decorate or redesign a living space", dim: "A" },
+      { label: "Help a friend work through a personal problem", dim: "S" }
+    ]},
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Start and manage your own business", dim: "E" },
+      { label: "Proofread documents for errors and formatting", dim: "C" }
+    ]},
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Train animals or care for wildlife", dim: "R" },
+      { label: "Write a screenplay or direct a short film", dim: "A" }
+    ]},
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Investigate the cause of a technical failure", dim: "I" },
+      { label: "Motivate a group of people toward a shared vision", dim: "E" }
+    ]},
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Lead a workshop or support group", dim: "S" },
+      { label: "Process and categorize large amounts of information", dim: "C" }
+    ]},
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Build furniture or craft something from wood", dim: "R" },
+      { label: "Tutor students who are struggling academically", dim: "S" }
+    ]},
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Develop a computer program or algorithm", dim: "I" },
+      { label: "Plan and manage a large-scale conference or event", dim: "E" }
+    ]},
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Paint a mural or create a sculpture", dim: "A" },
+      { label: "Prepare tax returns or balance accounts", dim: "C" }
+    ]},
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Repair and maintain a vehicle fleet", dim: "R" },
+      { label: "Solve a complex mathematical proof", dim: "I" }
+    ]},
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Design costumes or sets for a theater production", dim: "A" },
+      { label: "Mediate a conflict between two parties", dim: "S" }
+    ]},
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Recruit and hire talent for an organization", dim: "E" },
+      { label: "Enter and verify data in a database system", dim: "C" }
+    ]},
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Wire electrical circuits or plumb a building", dim: "R" },
+      { label: "Read and evaluate a scientific research paper", dim: "I" }
+    ]},
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Write poetry or perform spoken word", dim: "A" },
+      { label: "Coordinate volunteers for a charity organization", dim: "S" }
+    ]},
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Give a persuasive presentation to a large audience", dim: "E" },
+      { label: "Compile and organize a detailed report", dim: "C" }
+    ]},
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Cook a complex meal from scratch", dim: "R" },
+      { label: "Analyze trends in a dataset to predict outcomes", dim: "I" }
+    ]},
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Improvise a scene or perform in front of an audience", dim: "A" },
+      { label: "Mentor a young person about life and career choices", dim: "S" }
+    ]},
+    { text: "Which activity appeals to you more?", options: [
+      { label: "Launch a new product line and handle distribution", dim: "E" },
+      { label: "Schedule appointments and manage a busy calendar", dim: "C" }
+    ]}
+  ];
+
+  var types = {
+    R: {
+      name: "Realistic",
+      title: "The Doer",
+      color: "#ef4444",
+      desc: "You are practical, hands-on, and enjoy working with tools, machines, and physical materials. You value tangible results and prefer action over abstract discussion.",
+      careers: ["Engineer", "Mechanic", "Electrician", "Carpenter", "Pilot", "Chef", "Firefighter", "Surveyor", "Physical Therapist"],
+      environment: "You thrive in workshops, outdoors, labs with equipment, or anywhere you can work with your hands and see concrete outcomes."
+    },
+    I: {
+      name: "Investigative",
+      title: "The Thinker",
+      color: "#3b82f6",
+      desc: "You are analytical, curious, and love solving complex problems through research and critical thinking. You prefer working independently and arriving at evidence-based conclusions.",
+      careers: ["Scientist", "Data Analyst", "Physician", "Software Developer", "Economist", "Pharmacist", "Psychologist", "Professor"],
+      environment: "You thrive in research labs, universities, tech companies, or any setting that rewards intellectual depth and independent investigation."
+    },
+    A: {
+      name: "Artistic",
+      title: "The Creator",
+      color: "#8b5cf6",
+      desc: "You are creative, expressive, and value originality and self-expression. You prefer unstructured environments where you can use imagination freely without rigid rules.",
+      careers: ["Graphic Designer", "Writer", "Musician", "Architect", "Photographer", "Film Director", "Interior Designer", "Animator", "UX Designer"],
+      environment: "You thrive in studios, design agencies, theaters, or freelance settings that offer creative freedom and flexible schedules."
+    },
+    S: {
+      name: "Social",
+      title: "The Helper",
+      color: "#22c55e",
+      desc: "You are empathetic, cooperative, and drawn to helping, teaching, and serving others. You thrive in collaborative environments and find fulfillment in making a positive difference.",
+      careers: ["Teacher", "Counselor", "Social Worker", "Nurse", "HR Specialist", "Speech Therapist", "Nonprofit Director", "School Psychologist"],
+      environment: "You thrive in schools, hospitals, community centers, nonprofits, or any setting focused on human interaction and service."
+    },
+    E: {
+      name: "Enterprising",
+      title: "The Persuader",
+      color: "#f59e0b",
+      desc: "You are ambitious, energetic, and enjoy leading, influencing, and managing others. You are drawn to competitive environments with opportunities for achievement and financial reward.",
+      careers: ["Business Executive", "Sales Manager", "Entrepreneur", "Lawyer", "Marketing Director", "Financial Advisor", "Political Strategist", "Recruiter"],
+      environment: "You thrive in corporate offices, startups, courtrooms, sales environments, or any fast-paced setting with leadership opportunities."
+    },
+    C: {
+      name: "Conventional",
+      title: "The Organizer",
+      color: "#64748b",
+      desc: "You are detail-oriented, organized, and systematic. You prefer structured environments with clear rules and procedures, and you find satisfaction in creating order and maintaining accuracy.",
+      careers: ["Accountant", "Auditor", "Administrative Assistant", "Bookkeeper", "Tax Preparer", "Logistics Coordinator", "Database Admin", "Compliance Officer"],
+      environment: "You thrive in structured offices, financial institutions, government agencies, or any setting where reliability and precision are valued."
+    }
+  };
+
+  var STORAGE_KEY = 'toolcalcs_career-aptitude-test_history';
+  var MAX_HISTORY = 20;
+
+  function loadHistory() {
+    try { var r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch (e) {}
+    return [];
+  }
+  function saveHistory(h) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch (e) {}
+  }
+
+  var instructionsView = document.getElementById('instructionsView');
+  var playView = document.getElementById('playView');
+  var resultView = document.getElementById('resultView');
+  var startBtn = document.getElementById('startBtn');
+  var tryAgainBtn = document.getElementById('tryAgainBtn');
+  var progressText = document.getElementById('progressText');
+  var progressFill = document.getElementById('progressFill');
+  var questionText = document.getElementById('questionText');
+  var optionsContainer = document.getElementById('optionsContainer');
+  var barChart = document.getElementById('barChart');
+  var hollandCode = document.getElementById('hollandCode');
+  var hollandName = document.getElementById('hollandName');
+  var resultDescriptions = document.getElementById('resultDescriptions');
+  var attemptHistorySection = document.getElementById('attemptHistory');
+  var historyList = document.getElementById('historyList');
+
+  var shuffled = [];
+  var currentIndex = 0;
+  var scores = {};
+
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+  }
+
+  function showView(view) {
+    instructionsView.style.display = 'none';
+    playView.style.display = 'none';
+    resultView.style.display = 'none';
+    view.style.display = '';
+  }
+
+  function startTest() {
+    shuffled = shuffle(questions);
+    currentIndex = 0;
+    scores = { R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 };
+    showView(playView);
+    showQuestion();
+  }
+
+  function showQuestion() {
+    var q = shuffled[currentIndex];
+    var num = currentIndex + 1;
+    progressText.textContent = 'Question ' + num + ' of 30';
+    progressFill.style.width = Math.round((num / 30) * 100) + '%';
+    questionText.textContent = q.text;
+
+    var html = '';
+    var opts = Math.random() < 0.5 ? [q.options[0], q.options[1]] : [q.options[1], q.options[0]];
+    for (var i = 0; i < opts.length; i++) {
+      html += '<button class="quiz-option" data-dim="' + opts[i].dim + '" type="button">' + opts[i].label + '</button>';
+    }
+    optionsContainer.innerHTML = html;
+  }
+
+  function handleAnswer(dim) {
+    scores[dim]++;
+    currentIndex++;
+    if (currentIndex < 30) {
+      showQuestion();
+    } else {
+      showResults();
+    }
+  }
+
+  function showResults() {
+    var typeOrder = ['R', 'I', 'A', 'S', 'E', 'C'];
+    var sorted = typeOrder.slice().sort(function (a, b) { return scores[b] - scores[a]; });
+    var code = sorted[0] + sorted[1] + sorted[2];
+    var maxScore = 10;
+
+    hollandCode.textContent = code;
+    hollandName.textContent = types[sorted[0]].name + ' - ' + types[sorted[1]].name + ' - ' + types[sorted[2]].name;
+
+    var chartHtml = '';
+    for (var i = 0; i < typeOrder.length; i++) {
+      var t = typeOrder[i];
+      var pct = Math.round((scores[t] / maxScore) * 100);
+      if (pct > 100) pct = 100;
+      var info = types[t];
+      chartHtml += '<div class="quiz-bar-item">';
+      chartHtml += '<div class="quiz-bar-label"><span>' + info.name + ' (' + t + ')</span><span>' + scores[t] + '/' + maxScore + '</span></div>';
+      chartHtml += '<div class="quiz-bar-track"><div class="quiz-bar-fill" style="width:' + pct + '%;background:' + info.color + '"></div></div>';
+      chartHtml += '</div>';
+    }
+    barChart.innerHTML = chartHtml;
+
+    var descHtml = '';
+    for (var j = 0; j < 3; j++) {
+      var key = sorted[j];
+      var info2 = types[key];
+      var rank = j === 0 ? 'Primary' : j === 1 ? 'Secondary' : 'Tertiary';
+      descHtml += '<div style="text-align:left;margin-bottom:20px;padding:16px;border:1px solid var(--color-border);border-radius:var(--radius);">';
+      descHtml += '<strong style="color:' + info2.color + '">' + rank + ': ' + info2.name + ' — ' + info2.title + '</strong>';
+      descHtml += '<p style="margin:8px 0;font-size:0.9rem;line-height:1.6;">' + info2.desc + '</p>';
+      descHtml += '<p style="margin:4px 0;font-size:0.85rem;line-height:1.5;"><strong>Matching Careers:</strong> ' + info2.careers.join(', ') + '</p>';
+      descHtml += '<p style="margin:4px 0;font-size:0.85rem;line-height:1.5;color:var(--color-text-muted);">' + info2.environment + '</p>';
+      descHtml += '</div>';
+    }
+    resultDescriptions.innerHTML = descHtml;
+
+    showView(resultView);
+
+    var h = loadHistory();
+    h.unshift({ code: code, scores: scores, date: new Date().toISOString() });
+    saveHistory(h);
+    renderHistory();
+
+    if (window.GameShare) {
+      window.GameShare.show({
+        gameName: gameName,
+        gameSlug: gameSlug,
+        gameIcon: gameIcon,
+        score: code,
+        unit: '',
+        metricLabel: metricLabel,
+        ratingLabel: types[sorted[0]].name + ' - ' + types[sorted[0]].title,
+        ratingColor: types[sorted[0]].color
+      });
+    }
+  }
+
+  function renderHistory() {
+    var history = loadHistory();
+    if (history.length === 0) { attemptHistorySection.hidden = true; return; }
+    attemptHistorySection.hidden = false;
+    var html = '';
+    for (var i = 0; i < history.length; i++) {
+      var e = history[i];
+      html += '<div class="history-item">';
+      html += '<span class="history-score">' + e.code + '</span>';
+      html += '<span class="history-time">' + formatDate(e.date) + '</span>';
+      html += '</div>';
+    }
+    historyList.innerHTML = html;
+  }
+
+  function formatDate(iso) {
+    try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    catch (e) { return ''; }
+  }
+
+  optionsContainer.addEventListener('click', function (e) {
+    var btn = e.target;
+    if (!btn.classList.contains('quiz-option')) return;
+    var dim = btn.getAttribute('data-dim');
+    if (!dim) return;
+    btn.classList.add('selected');
+    setTimeout(function () { handleAnswer(dim); }, 200);
+  });
+
+  startBtn.addEventListener('click', startTest);
+  tryAgainBtn.addEventListener('click', startTest);
+  renderHistory();
+})();
+</script>

@@ -1,0 +1,530 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import GameShare from '../../components/GameShare.astro';
+import '../../styles/game.css';
+
+const gameName = "Sequence Memory Test";
+const gameSlug = "sequence-memory-test";
+const gameIcon = "🔢";
+const metricLabel = "Sequence Length";
+const metricUnit = "tiles";
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tests & Games", "item": "https://toolcalcs.com/test/" },
+      { "@type": "ListItem", "position": 3, "name": "Sequence Memory Test" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Sequence Memory Test",
+    "url": "https://toolcalcs.com/test/sequence-memory-test/",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Test your memory with this Simon-style sequence game. Watch the pattern of highlighted tiles and repeat it. How long a sequence can you remember?"
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the Sequence Memory Test?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Sequence Memory Test is a Simon-style memory game where you watch a pattern of highlighted tiles on a 3x3 grid and then repeat the sequence in the correct order. The sequence grows by one tile each round, testing the limits of your working memory."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is a good Sequence Memory Test score?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "An average score is 5-7 tiles, which aligns with Miller's Law suggesting most people can hold 7 plus or minus 2 items in working memory. Scores of 8-10 are good, 11-13 are great, and anything above 14 is exceptional."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does sequential memory differ from spatial memory?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Sequential memory involves remembering the order in which events occur, while spatial memory involves remembering locations of objects. The Sequence Memory Test combines both: you must remember which tiles light up (spatial) and the exact order they light up in (sequential)."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Sequence Memory Test - How Long a Pattern Can You Remember? | ToolCalcs"
+  description="Test your sequence memory with this Simon-style game. Watch tiles light up in a pattern and repeat it. Sequence grows each round. Free online memory test."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/test/">Tests & Games</a> &rsaquo;
+    <span>Sequence Memory Test</span>
+  </nav>
+
+  <h1>Sequence Memory Test</h1>
+  <p class="page-desc">Watch the pattern of highlighted tiles and repeat it in order. How long a sequence can you remember?</p>
+
+  <div class="game-box">
+    <div class="game-area" id="gameArea" role="region" aria-label="Sequence memory test area" aria-live="polite">
+      <div class="game-instructions" id="instructionsView">
+        <h2>Sequence Memory Test</h2>
+        <p>A sequence of tiles will light up one at a time. Memorize the pattern, then click the tiles in the same order. The sequence grows longer each round.</p>
+        <p style="font-size:0.85rem;color:var(--color-text-muted);">You have 3 strikes before the game ends.</p>
+        <button class="game-btn primary" id="startBtn" type="button" style="margin-top:16px;">Start Test</button>
+      </div>
+
+      <div class="play-view" id="playView" style="display:none;">
+        <div class="status-bar">
+          <span class="level-info" id="levelInfo">Level: 2</span>
+          <span class="lives-info" id="livesInfo">&#10060; 0 / 3</span>
+        </div>
+        <div class="seq-grid" id="seqGrid" role="grid" aria-label="Sequence grid">
+          <button class="seq-tile" data-tile="0" type="button"></button>
+          <button class="seq-tile" data-tile="1" type="button"></button>
+          <button class="seq-tile" data-tile="2" type="button"></button>
+          <button class="seq-tile" data-tile="3" type="button"></button>
+          <button class="seq-tile" data-tile="4" type="button"></button>
+          <button class="seq-tile" data-tile="5" type="button"></button>
+          <button class="seq-tile" data-tile="6" type="button"></button>
+          <button class="seq-tile" data-tile="7" type="button"></button>
+          <button class="seq-tile" data-tile="8" type="button"></button>
+        </div>
+        <div class="seq-status" id="seqStatus">Watch the sequence...</div>
+      </div>
+
+      <div class="result-view" id="resultView" style="display:none;">
+        <div class="result-icon" aria-hidden="true">🔢</div>
+        <div class="result-label">Game Over</div>
+        <div class="score-display">
+          <span class="score-value" id="finalScore">0</span>
+          <span class="score-unit">tiles remembered</span>
+        </div>
+        <div class="rating-badge" id="ratingBadge">&mdash;</div>
+        <button class="game-btn primary" id="tryAgainBtn" type="button" style="margin-top:16px;">Try Again</button>
+      </div>
+    </div>
+
+    <GameShare />
+
+    <div class="attempt-history" id="attemptHistory" hidden>
+      <h3>Attempt History</h3>
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is the Sequence Memory Test?</h2>
+    <p>The Sequence Memory Test is a cognitive assessment tool inspired by the classic Simon electronic game. It evaluates your ability to observe, memorize, and reproduce a growing sequence of visual cues. In this version, a 3x3 grid of tiles lights up one at a time in a specific pattern. After watching the full sequence, you must click the tiles in the exact same order. Each successful round adds one more step to the sequence, progressively challenging the limits of your working memory.</p>
+    <p>This type of test measures what cognitive psychologists call sequential working memory, which is the ability to maintain and manipulate ordered information in your mind over short periods. It is one of the most well-studied components of human cognition and plays a crucial role in everything from following spoken instructions to learning new skills and solving problems.</p>
+    <p>Unlike simple recognition tasks where you only need to identify whether something is familiar, sequence memory requires you to encode both the identity and the order of each element. This dual demand makes it a particularly sensitive measure of working memory capacity, which is why sequence-based tasks are widely used in neuropsychological assessments, educational testing, and cognitive research.</p>
+
+    <h2>The History of Simon and Sequence Games</h2>
+    <p>The Sequence Memory Test has its roots in the iconic Simon electronic game, invented by Ralph H. Baer and Howard J. Morrison and released by Milton Bradley in 1978. Simon featured four large colored buttons arranged in a circle, each producing a unique tone when illuminated. The device would play an increasingly long sequence of lights and sounds, and the player had to repeat it accurately. The game became one of the most popular electronic toys of the late 20th century and has sold over 100 million units worldwide.</p>
+    <p>Baer, often called the "Father of Video Games" for his earlier invention of the Magnavox Odyssey, designed Simon as a simplified version of an Atari arcade game called Touch Me. While Touch Me was not commercially successful, Simon's colorful design, satisfying sound effects, and portable format made it a cultural phenomenon. The game was so influential that "Simon says" became synonymous with memory pattern games in popular culture.</p>
+    <p>The underlying concept predates Simon by decades. Psychologists have used span tasks, where subjects must repeat sequences of increasing length, since the early 1900s. The digit span test, for example, has been a standard component of intelligence tests since the original Binet-Simon scale. What Simon did was transform this dry psychological procedure into an engaging, competitive experience that anyone could enjoy.</p>
+    <p>Today, digital versions of sequence memory tests are used in cognitive training apps, educational software, and online brain training platforms. Research has shown that the basic mechanism, encoding and reproducing an ordered sequence from memory, activates the same neural networks regardless of whether the stimuli are colors, sounds, positions, or numbers.</p>
+
+    <h2>Working Memory and Miller's Law</h2>
+    <p>Your performance on the Sequence Memory Test is fundamentally limited by your working memory capacity. Working memory is often described as the brain's mental workspace: a cognitive system that temporarily holds and manipulates information needed for complex tasks like reasoning, comprehension, and learning.</p>
+    <p>In 1956, cognitive psychologist George A. Miller published one of the most cited papers in psychology, "The Magical Number Seven, Plus or Minus Two." Miller observed that across a wide range of tasks, people could reliably hold approximately seven items (give or take two) in their immediate memory. This finding, known as Miller's Law, has been replicated thousands of times and remains one of the most robust findings in cognitive science.</p>
+    <p>However, more recent research by Nelson Cowan and others suggests that the true capacity of working memory may be closer to 4 plus or minus 1 items when rehearsal and chunking strategies are controlled for. The discrepancy arises because people naturally group or chunk information to effectively increase their capacity. For example, the sequence "1-4-9-2" might be chunked as "1492" (the year Columbus sailed), reducing four items to one meaningful chunk.</p>
+    <p>In the context of this sequence memory test, most untrained adults can reliably reproduce sequences of 5 to 7 tiles. Those who score higher are likely employing chunking strategies, perhaps grouping tiles by spatial proximity (top row, then bottom left) or by creating a mental "path" across the grid. Understanding these strategies can significantly improve your score.</p>
+
+    <h2>Sequential Memory vs. Spatial Memory</h2>
+    <p>It is important to distinguish between sequential memory and spatial memory, as the Sequence Memory Test actually engages both systems simultaneously. Spatial memory refers to the ability to remember the locations of objects in space. You use spatial memory when you remember where you parked your car or where you left your keys. Sequential memory, on the other hand, is specifically about remembering the order in which events occur.</p>
+    <p>Research using functional brain imaging has shown that these two types of memory are supported by partially overlapping but distinct neural circuits. Spatial memory relies heavily on the hippocampus and posterior parietal cortex, while sequential order information is more dependent on the prefrontal cortex and supplementary motor area. When you perform a sequence memory task, both systems must work together: the spatial system encodes where each tile is located, while the sequential system encodes the order in which they were activated.</p>
+    <p>This dual processing demand is part of what makes the sequence memory test challenging. A pure spatial task (remember which tiles lit up, in any order) would be easier than a sequential task (remember which tiles lit up and the exact order). Studies by Robert Logie and colleagues have demonstrated that spatial and sequential components of working memory can be selectively impaired, suggesting they draw on at least partially independent cognitive resources.</p>
+
+    <h2>Training Effects and Neuroplasticity</h2>
+    <p>One of the most debated questions in cognitive science is whether practicing working memory tasks like the Sequence Memory Test can improve your general cognitive abilities. The evidence is mixed but encouraging. Multiple studies have shown that consistent practice on sequence memory tasks leads to significant improvement on those specific tasks. People who practice regularly can often increase their sequence span by 2 to 4 items over several weeks of training.</p>
+    <p>The more controversial question is whether these improvements transfer to other cognitive tasks. A landmark study by Susanne Jaeggi and colleagues (2008) reported that training on a working memory task called the dual n-back improved performance on fluid intelligence tests. However, subsequent meta-analyses have found that while near-transfer effects (improvement on similar tasks) are robust, far-transfer effects (improvement on unrelated cognitive tasks) are smaller and less consistent.</p>
+    <p>What is clear is that the brain shows measurable changes in response to working memory training. Neuroimaging studies have revealed increased activity in the prefrontal cortex and parietal regions after training, as well as changes in the efficiency of neural communication between these areas. These findings demonstrate that working memory capacity is not fixed but can be modified through targeted practice, a principle known as neuroplasticity.</p>
+
+    <h2>Tips to Improve Your Sequence Memory</h2>
+    <ul>
+      <li><strong>Chunk the sequence:</strong> Instead of remembering each tile individually, group them into spatial patterns. Three tiles in a row become one "line" rather than three separate items.</li>
+      <li><strong>Create a mental path:</strong> Visualize the sequence as a path or route across the grid. This leverages your spatial navigation system, which is highly efficient at encoding ordered routes.</li>
+      <li><strong>Use verbal coding:</strong> Assign names to positions (top-left, center, bottom-right) and create a verbal narrative. "Top-left, then center, then bottom-right" creates a story-like structure that can aid recall.</li>
+      <li><strong>Practice regularly:</strong> Even 5 to 10 minutes of daily practice can lead to measurable improvement within a few weeks. Consistency is more important than session length.</li>
+      <li><strong>Minimize distractions:</strong> Working memory is highly sensitive to interference. Play in a quiet environment and focus entirely on the task.</li>
+      <li><strong>Use rhythm:</strong> Pay attention to the timing of the sequence. The rhythm of the flashes can serve as an additional encoding cue, similar to how musicians use rhythm to memorize long passages.</li>
+      <li><strong>Stay calm:</strong> Anxiety and stress impair working memory performance by consuming cognitive resources that would otherwise be available for the task. Take a deep breath before each sequence plays.</li>
+    </ul>
+
+    <h2>Applications of Sequence Memory</h2>
+    <p>Sequence memory is not just an abstract cognitive ability; it has real-world implications across many domains. Musicians rely heavily on sequential memory to learn and perform pieces from memory. Dancers must remember choreography as an ordered sequence of movements. Athletes in sports like gymnastics and figure skating must execute complex sequences of movements in precise order.</p>
+    <p>In the workplace, sequential memory is critical for following multi-step procedures, remembering instructions given verbally, and executing complex workflows. Software developers, for instance, must hold sequences of logical operations in mind while writing and debugging code. Surgeons must follow precise sequences of steps during procedures.</p>
+    <p>Sequential memory also plays a role in language processing. Understanding a sentence requires holding a sequence of words in memory and extracting meaning from their order. "The dog chased the cat" and "The cat chased the dog" contain the same words but have very different meanings determined entirely by word order. People with impaired sequential memory often struggle with language comprehension, particularly for complex sentences with multiple clauses.</p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is a good Sequence Memory Test score?</h3>
+    <p>An average score for untrained adults is typically between 5 and 7 tiles, which aligns with the classic Miller's Law finding of 7 plus or minus 2 items. Scores of 8 to 10 are considered good, indicating above-average working memory capacity. Scores of 11 to 13 are great and suggest you are employing effective memory strategies. Anything above 14 is exceptional and rare without extensive practice.</p>
+
+    <h3>Can I improve my sequence memory with practice?</h3>
+    <p>Yes, research consistently shows that working memory capacity can be improved through targeted practice. Regular practice on sequence memory tasks typically leads to noticeable improvement within 2 to 4 weeks. The key is consistency: short daily practice sessions are more effective than occasional long sessions.</p>
+
+    <h3>Does sequence memory decline with age?</h3>
+    <p>Working memory capacity, including sequence memory, does gradually decline with age, typically beginning in the mid-20s to early 30s. However, the rate of decline varies greatly between individuals and can be slowed through regular cognitive engagement, physical exercise, adequate sleep, and social activity. Older adults who remain cognitively active often perform as well as younger adults on sequence memory tasks.</p>
+
+    <h3>How does this test relate to IQ?</h3>
+    <p>Working memory capacity is moderately correlated with general intelligence (IQ), with typical correlations around 0.4 to 0.6. However, the Sequence Memory Test measures only one component of working memory, so it should not be interpreted as an IQ test. Many factors beyond working memory contribute to intelligence, including crystallized knowledge, processing speed, and reasoning ability.</p>
+  </article>
+
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .game-area { cursor: default; user-select: auto; -webkit-user-select: auto; }
+
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+  }
+  .level-info { font-weight: 700; font-size: 1rem; color: var(--color-text); }
+  .lives-info { font-size: 0.95rem; font-weight: 600; color: var(--color-text-muted); }
+
+  .seq-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 16px;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+  :global(.seq-tile) {
+    aspect-ratio: 1;
+    border-radius: 10px;
+    border: 2px solid var(--color-border);
+    background: var(--color-surface);
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s, border-color 0.15s;
+    padding: 0;
+    font-size: 0;
+  }
+  :global(.seq-tile:hover) {
+    border-color: var(--color-text-muted);
+    transform: scale(0.97);
+  }
+  :global(.seq-tile.highlight) {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    box-shadow: 0 0 16px rgba(59, 130, 246, 0.5);
+  }
+  :global(.seq-tile.correct-flash) {
+    background: #22c55e;
+    border-color: #22c55e;
+    box-shadow: 0 0 16px rgba(34, 197, 94, 0.5);
+  }
+  :global(.seq-tile.wrong-flash) {
+    background: #ef4444;
+    border-color: #ef4444;
+    box-shadow: 0 0 16px rgba(239, 68, 68, 0.5);
+    animation: seqShake 0.4s ease;
+  }
+  :global(.seq-tile.disabled) {
+    cursor: default;
+    opacity: 0.6;
+  }
+  @keyframes seqShake {
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+
+  .seq-status {
+    text-align: center;
+    padding: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    min-height: 44px;
+  }
+
+  .play-view {
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .result-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 280px;
+    padding: 24px;
+  }
+  .result-icon { font-size: 3rem; margin-bottom: 8px; }
+  .result-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+
+  @media (max-width: 640px) {
+    .seq-grid { gap: 6px; padding: 12px; max-width: 260px; }
+  }
+</style>
+
+<script define:vars={{ gameName: "Sequence Memory Test", gameSlug: "sequence-memory-test", gameIcon: "🔢", metricLabel: "Sequence Length", metricUnit: "tiles" }}>
+(function () {
+  'use strict';
+
+  var TILE_COUNT = 9;
+  var START_LENGTH = 2;
+  var MAX_STRIKES = 3;
+  var FLASH_DURATION = 600;
+  var FLASH_GAP = 200;
+
+  var RATING_SCALE = [
+    { min: 14, label: 'Exceptional', color: '#16a34a' },
+    { min: 11, label: 'Great', color: '#22c55e' },
+    { min: 8, label: 'Good', color: '#2563eb' },
+    { min: 5, label: 'Average', color: '#f59e0b' },
+    { min: 0, label: 'Below Average', color: '#ef4444' }
+  ];
+
+  function getRating(score) {
+    for (var i = 0; i < RATING_SCALE.length; i++) {
+      if (score >= RATING_SCALE[i].min) return RATING_SCALE[i];
+    }
+    return { label: 'Below Average', color: '#ef4444' };
+  }
+
+  var STORAGE_KEY = 'toolcalcs_sequence-memory-test_history';
+  var MAX_HISTORY = 20;
+
+  function loadHistory() {
+    try { var r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch (e) {}
+    return [];
+  }
+  function saveHistory(h) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch (e) {}
+  }
+  function addToHistory(score) {
+    var h = loadHistory();
+    h.unshift({ score: score, date: new Date().toISOString(), rating: getRating(score).label });
+    saveHistory(h);
+  }
+
+  var instructionsView = document.getElementById('instructionsView');
+  var playView = document.getElementById('playView');
+  var resultView = document.getElementById('resultView');
+  var startBtn = document.getElementById('startBtn');
+  var tryAgainBtn = document.getElementById('tryAgainBtn');
+  var levelInfo = document.getElementById('levelInfo');
+  var livesInfo = document.getElementById('livesInfo');
+  var seqGrid = document.getElementById('seqGrid');
+  var seqStatus = document.getElementById('seqStatus');
+  var finalScore = document.getElementById('finalScore');
+  var ratingBadge = document.getElementById('ratingBadge');
+  var attemptHistorySection = document.getElementById('attemptHistory');
+  var historyList = document.getElementById('historyList');
+
+  var tiles = seqGrid.querySelectorAll('.seq-tile');
+
+  var sequence = [];
+  var playerIndex = 0;
+  var currentLength = START_LENGTH;
+  var strikes = 0;
+  var highestCompleted = 0;
+  var isPlaying = false;
+  var isShowingSequence = false;
+  var canClick = false;
+
+  function showView(view) {
+    instructionsView.style.display = 'none';
+    playView.style.display = 'none';
+    resultView.style.display = 'none';
+    view.style.display = '';
+  }
+
+  function setTilesDisabled(disabled) {
+    for (var i = 0; i < tiles.length; i++) {
+      if (disabled) {
+        tiles[i].classList.add('disabled');
+      } else {
+        tiles[i].classList.remove('disabled');
+      }
+    }
+  }
+
+  function clearTileEffects() {
+    for (var i = 0; i < tiles.length; i++) {
+      tiles[i].classList.remove('highlight', 'correct-flash', 'wrong-flash');
+    }
+  }
+
+  function generateSequence(length) {
+    var seq = [];
+    for (var i = 0; i < length; i++) {
+      seq.push(Math.floor(Math.random() * TILE_COUNT));
+    }
+    return seq;
+  }
+
+  function playSequence(callback) {
+    isShowingSequence = true;
+    canClick = false;
+    setTilesDisabled(true);
+    seqStatus.textContent = 'Watch the sequence...';
+
+    var idx = 0;
+    function showNext() {
+      if (idx >= sequence.length) {
+        isShowingSequence = false;
+        canClick = true;
+        setTilesDisabled(false);
+        seqStatus.textContent = 'Your turn! Repeat the sequence.';
+        if (callback) callback();
+        return;
+      }
+      var tileIdx = sequence[idx];
+      tiles[tileIdx].classList.add('highlight');
+      setTimeout(function () {
+        tiles[tileIdx].classList.remove('highlight');
+        idx++;
+        setTimeout(showNext, FLASH_GAP);
+      }, FLASH_DURATION);
+    }
+
+    setTimeout(showNext, 400);
+  }
+
+  function startRound() {
+    playerIndex = 0;
+    clearTileEffects();
+    sequence = generateSequence(currentLength);
+    levelInfo.textContent = 'Level: ' + currentLength;
+    livesInfo.textContent = '\u274C ' + strikes + ' / ' + MAX_STRIKES;
+    playSequence(null);
+  }
+
+  function handleTileClick(e) {
+    if (!isPlaying || !canClick || isShowingSequence) return;
+    var target = e.target.closest('.seq-tile');
+    if (!target) return;
+
+    var tileIdx = parseInt(target.getAttribute('data-tile'));
+    if (isNaN(tileIdx)) return;
+
+    if (tileIdx === sequence[playerIndex]) {
+      target.classList.add('correct-flash');
+      setTimeout(function () { target.classList.remove('correct-flash'); }, 300);
+      playerIndex++;
+
+      if (playerIndex >= sequence.length) {
+        canClick = false;
+        highestCompleted = currentLength;
+        currentLength++;
+        seqStatus.textContent = 'Correct! Next round...';
+        setTimeout(function () { startRound(); }, 800);
+      }
+    } else {
+      target.classList.add('wrong-flash');
+      canClick = false;
+      strikes++;
+      livesInfo.textContent = '\u274C ' + strikes + ' / ' + MAX_STRIKES;
+      seqStatus.textContent = 'Wrong! The correct tile was highlighted.';
+
+      tiles[sequence[playerIndex]].classList.add('highlight');
+
+      setTimeout(function () {
+        clearTileEffects();
+        if (strikes >= MAX_STRIKES) {
+          endGame();
+        } else {
+          seqStatus.textContent = 'Try this sequence again...';
+          setTimeout(function () { startRound(); }, 500);
+        }
+      }, 1000);
+    }
+  }
+
+  function startGame() {
+    currentLength = START_LENGTH;
+    strikes = 0;
+    highestCompleted = 0;
+    isPlaying = true;
+    clearTileEffects();
+    showView(playView);
+    startRound();
+  }
+
+  function endGame() {
+    isPlaying = false;
+    canClick = false;
+    var score = highestCompleted;
+    showView(resultView);
+    finalScore.textContent = String(score);
+    var rating = getRating(score);
+    ratingBadge.textContent = rating.label;
+    ratingBadge.style.background = rating.color;
+    addToHistory(score);
+    renderHistory();
+
+    if (window.GameShare) {
+      window.GameShare.show({
+        gameName: gameName,
+        gameSlug: gameSlug,
+        gameIcon: gameIcon,
+        score: score,
+        unit: metricUnit,
+        metricLabel: metricLabel,
+        ratingLabel: rating.label,
+        ratingColor: rating.color
+      });
+    }
+  }
+
+  function renderHistory() {
+    var history = loadHistory();
+    if (history.length === 0) { attemptHistorySection.hidden = true; return; }
+    attemptHistorySection.hidden = false;
+    historyList.innerHTML = history.map(function (e) {
+      var r = getRating(e.score);
+      return '<div class="history-item">' +
+        '<span class="history-score">' + e.score + ' tiles</span>' +
+        '<span class="history-rating" style="background:' + r.color + '">' + r.label + '</span>' +
+        '<span class="history-time">' + formatDate(e.date) + '</span>' +
+        '</div>';
+    }).join('');
+  }
+
+  function formatDate(iso) {
+    try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    catch (e) { return ''; }
+  }
+
+  seqGrid.addEventListener('click', handleTileClick);
+  startBtn.addEventListener('click', startGame);
+  tryAgainBtn.addEventListener('click', startGame);
+  renderHistory();
+})();
+</script>

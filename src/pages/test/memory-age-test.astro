@@ -1,0 +1,715 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/game.css';
+import '../../styles/quiz.css';
+import GameShare from '../../components/GameShare.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tests & Games", "item": "https://toolcalcs.com/test/" },
+      { "@type": "ListItem", "position": 3, "name": "Memory Age Test" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Memory Age Test",
+    "url": "https://toolcalcs.com/test/memory-age-test/",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "How old is your memory? Complete 5 quick memory challenges to estimate your memory age. Tests short-term, visual, and working memory."
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is memory age?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Memory age is an estimate of how your memory performance compares to typical memory function at different ages. Memory abilities generally peak in the mid-20s and gradually decline with age. A memory age test estimates the age group whose average memory performance most closely matches yours. A 50-year-old with excellent memory might score a memory age of 25, indicating their memory performs like someone much younger."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "At what age does memory start to decline?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Research shows that some memory functions begin to decline as early as the late 20s, though the decline is typically very gradual. Short-term and working memory peak around age 25-30. Processing speed peaks even earlier, around age 18-20. However, semantic memory (general knowledge) and vocabulary continue to improve into the 60s and 70s. Significant memory decline is not inevitable and can be slowed by physical exercise, mental stimulation, social engagement, and healthy lifestyle habits."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How can I improve my memory?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Evidence-based strategies for improving memory include: regular aerobic exercise (increases hippocampal volume), quality sleep of 7-9 hours (consolidates memories), spaced repetition (reviewing information at increasing intervals), the memory palace technique (associating information with spatial locations), chunking (grouping items into meaningful clusters), mindfulness meditation (improves attention and working memory), a diet rich in omega-3 fatty acids and antioxidants, and reducing chronic stress which damages the hippocampus."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What types of memory does this test measure?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "This test evaluates multiple types of memory: number recall tests short-term and working memory capacity, word list recall tests verbal episodic memory, sequence recall tests visual-spatial working memory, face-name matching tests associative memory, and delayed recall tests memory consolidation and long-term retention. Together, these challenges provide a comprehensive picture of your memory function across different domains."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is this memory age test scientifically accurate?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "This test uses challenge types commonly employed in cognitive psychology research, including digit span, word list recall, visual sequence memory, associative memory, and delayed recall. However, it is a simplified, self-administered version designed for entertainment and general self-assessment. Clinical memory assessments like the Wechsler Memory Scale are administered by trained professionals in controlled conditions. Your results may vary based on factors like fatigue, stress, distractions, and device type."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Memory Age Test - How Old Is Your Memory? | ToolCalcs"
+  description="How old is your memory? Complete 5 quick memory challenges to estimate your memory age. Tests short-term, visual, and working memory in under 5 minutes."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/test/">Tests & Games</a> &rsaquo;
+    <span>Memory Age Test</span>
+  </nav>
+
+  <h1>Memory Age Test</h1>
+  <p class="page-desc">Complete 5 quick memory challenges to estimate your memory age. Tests number recall, word memory, sequences, and more.</p>
+
+  <div class="game-box">
+    <div class="game-area" id="gameArea" role="region" aria-label="Memory age test" aria-live="polite">
+      <!-- Instructions -->
+      <div class="game-instructions" id="instructionsView">
+        <h2>Memory Age Test</h2>
+        <p>5 quick challenges will test different aspects of your memory. Stay focused and do your best on each one!</p>
+        <p style="font-size:0.85rem;color:var(--color-text-muted);">5 challenges &middot; About 5 minutes</p>
+        <button class="game-btn primary" id="startBtn" type="button" style="margin-top:16px;">Start Test</button>
+      </div>
+
+      <!-- Play View -->
+      <div class="play-view" id="playView" style="display:none;">
+        <div class="quiz-progress">
+          <div class="quiz-progress-text" id="progressText">Challenge 1 of 5</div>
+          <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="progressFill"></div></div>
+        </div>
+        <div id="challengeArea" style="padding:24px 16px;text-align:center;"></div>
+      </div>
+
+      <!-- Result View -->
+      <div id="resultView" style="display:none;" class="quiz-result">
+        <div style="font-size:2.5rem;margin-bottom:4px;" id="resultIcon"></div>
+        <div class="quiz-result-type" id="resultAge"></div>
+        <div class="quiz-result-name" id="resultLabel"></div>
+        <div class="quiz-result-desc" id="resultDesc"></div>
+        <div class="quiz-bar-chart" id="challengeChart"></div>
+        <div class="quiz-traits" id="resultTips"></div>
+        <button class="game-btn primary" id="retakeBtn" type="button" style="margin-top:16px;">Retake Test</button>
+      </div>
+    </div>
+
+    <GameShare />
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>How Memory Changes With Age</h2>
+    <p>Memory is not a single ability but a collection of interconnected cognitive systems, each with its own developmental trajectory. Understanding how these systems change over the lifespan can help you appreciate your test results and take proactive steps to maintain cognitive health.</p>
+    <p>Memory function follows a general pattern across the lifespan. During childhood and adolescence, memory capacity grows rapidly as the brain develops. Most memory systems reach their peak performance in the mid-twenties, when the brain's prefrontal cortex (responsible for working memory and executive function) reaches full maturity. From the late twenties onward, certain memory functions begin a slow, gradual decline. However, this decline is neither uniform nor inevitable. Some types of memory remain stable or even improve with age, and lifestyle factors have an enormous influence on the rate of change.</p>
+    <p>The hippocampus, a seahorse-shaped structure deep in the temporal lobe, plays a central role in memory formation and retrieval. It is particularly vulnerable to age-related changes. After age 50, the hippocampus shrinks by approximately 1 to 2 percent per year in the average person. However, research has shown that regular aerobic exercise can actually increase hippocampal volume, effectively reversing one to two years of age-related shrinkage. This finding, from a landmark 2011 study published in the Proceedings of the National Academy of Sciences, demonstrates that memory aging is not a fixed trajectory.</p>
+
+    <h2>Types of Memory</h2>
+    <p>The human memory system is far more complex than a simple recording device. Cognitive psychologists have identified several distinct types of memory, each serving different functions and aging at different rates.</p>
+
+    <h3>Short-Term Memory</h3>
+    <p>Short-term memory holds information temporarily for immediate use, typically for 15 to 30 seconds without rehearsal. Its capacity is limited to approximately 7 items (plus or minus 2), as famously described by psychologist George Miller in 1956. Short-term memory peaks in the early twenties and shows modest decline beginning in the thirties. This decline is most noticeable in situations requiring rapid encoding of new information, such as remembering a phone number just spoken to you.</p>
+
+    <h3>Working Memory</h3>
+    <p>Working memory is a more active version of short-term memory. It not only holds information but manipulates it, like doing mental arithmetic or following complex instructions. Working memory relies heavily on the prefrontal cortex and is one of the first cognitive functions to show age-related decline. It peaks in the mid-twenties and declines gradually thereafter. Reduced working memory capacity is responsible for the common experience of walking into a room and forgetting why you went there.</p>
+
+    <h3>Long-Term Memory</h3>
+    <p>Long-term memory stores information for extended periods, from hours to a lifetime. It is subdivided into several types. <strong>Episodic memory</strong> records personal experiences and events and is the most vulnerable to age-related decline. <strong>Semantic memory</strong> stores general knowledge, facts, and vocabulary and actually continues to improve into the sixties and seventies. <strong>Procedural memory</strong> handles learned skills like riding a bike or typing and is remarkably resistant to aging, remaining largely intact even in people with significant cognitive decline.</p>
+
+    <h3>Prospective Memory</h3>
+    <p>Prospective memory is the ability to remember to do things in the future, such as taking medication at a specific time or picking up groceries on the way home. This type of memory declines with age, particularly for time-based tasks (remembering to do something at 3 PM) as opposed to event-based tasks (remembering to give someone a message when you see them). The use of external aids like calendars, alarms, and lists can effectively compensate for prospective memory decline.</p>
+
+    <h2>When Does Memory Peak?</h2>
+    <p>Different memory systems peak at different ages, creating a complex picture of cognitive development across the lifespan. Here is what research tells us about the typical peak ages for various memory and cognitive functions.</p>
+    <p><strong>Processing speed</strong> peaks earliest, around age 18 to 20, and shows the steepest decline with age. This is why younger people tend to be faster at video games and quick-reaction tasks. <strong>Short-term and working memory</strong> peak in the mid-twenties, around age 25 to 30. <strong>Face recognition ability</strong> peaks in the early thirties, around age 30 to 34. <strong>Concentration and sustained attention</strong> peak around age 43, surprisingly late. <strong>Emotional recognition</strong> peaks around age 48. <strong>Vocabulary and semantic knowledge</strong> peak between ages 60 and 70, continuing to grow through most of the lifespan.</p>
+    <p>This staggered pattern of peaks means that no single age represents "peak brain." Different cognitive strengths emerge at different life stages, and the mature brain compensates for speed losses with gains in knowledge, emotional intelligence, and pattern recognition based on accumulated experience.</p>
+
+    <h2>Factors Affecting Memory Age</h2>
+    <p>Your memory age is not determined solely by your chronological age. Numerous lifestyle, health, and environmental factors influence how well your memory functions at any given point in life.</p>
+
+    <h3>Sleep</h3>
+    <p>Sleep is perhaps the most critical factor in memory health. During sleep, the brain consolidates memories by replaying and strengthening neural connections formed during the day. Deep slow-wave sleep is particularly important for declarative memory (facts and events), while REM sleep supports procedural memory and emotional processing. Adults who consistently sleep fewer than 6 hours per night show significantly worse memory performance than those who get 7 to 9 hours. A single night of poor sleep can reduce next-day memory performance by 40 percent.</p>
+
+    <h3>Exercise</h3>
+    <p>Aerobic exercise is one of the most powerful interventions for memory health. Physical activity increases blood flow to the brain, promotes the release of brain-derived neurotrophic factor (BDNF) which supports the growth of new neurons in the hippocampus, reduces inflammation, and improves cardiovascular health. Studies show that just 30 minutes of moderate aerobic exercise three to five times per week can significantly improve memory performance. The benefits are seen at all ages, from children to older adults.</p>
+
+    <h3>Stress</h3>
+    <p>Chronic stress is one of the most damaging factors for memory. The stress hormone cortisol, when elevated over long periods, damages the hippocampus and impairs the formation and retrieval of memories. Acute stress can also interfere with memory, which is why people often have difficulty remembering details during high-pressure situations. Chronic stress is associated with hippocampal shrinkage and increased risk of dementia. Stress management techniques like mindfulness meditation, yoga, and deep breathing have been shown to protect memory function.</p>
+
+    <h3>Diet</h3>
+    <p>Nutrition plays a significant role in brain health and memory function. The Mediterranean diet, rich in fruits, vegetables, whole grains, fish, and olive oil, has been consistently associated with better cognitive outcomes and reduced risk of cognitive decline. Specific nutrients that support memory include omega-3 fatty acids (found in fatty fish, walnuts, and flaxseed), antioxidants (found in berries, dark chocolate, and green tea), B vitamins (found in leafy greens and whole grains), and vitamin D. Excessive sugar consumption and highly processed foods have been linked to poorer memory performance and accelerated cognitive aging.</p>
+
+    <h2>Memory Training: Does It Work?</h2>
+    <p>The question of whether memory training programs actually improve memory has been the subject of intense scientific debate. The evidence is mixed but generally positive for specific types of training.</p>
+    <p><strong>Spaced repetition</strong> is one of the most well-validated memory techniques. By reviewing information at gradually increasing intervals (for example, after 1 day, then 3 days, then 7 days, then 14 days), you exploit the spacing effect to create stronger, more durable memories. This technique is the foundation of flashcard apps like Anki and has been shown to dramatically improve learning efficiency.</p>
+    <p><strong>The memory palace technique</strong> (also called the method of loci) involves associating information with specific locations in a familiar mental space, like rooms in your house. This technique leverages the brain's powerful spatial memory system and has been used by memory champions to memorize thousands of digits, cards, or facts. Research shows that anyone can learn this technique and achieve significant memory improvements within weeks of practice.</p>
+    <p><strong>Chunking</strong> involves grouping individual items into meaningful clusters. For example, the number sequence 1-9-4-5-1-9-6-9 is difficult to remember as eight separate digits but easy as two meaningful dates: 1945 and 1969. Chunking effectively increases the amount of information that can be held in short-term memory by reducing the number of items to remember.</p>
+    <p><strong>Mindfulness meditation</strong> has been shown to improve working memory capacity and attention, both of which are fundamental to memory formation. Even brief meditation practice (10 minutes per day for two weeks) can produce measurable improvements in memory performance. The mechanism appears to involve strengthened connections between the prefrontal cortex and the hippocampus.</p>
+
+    <h2>Lifestyle Tips for a Younger Memory</h2>
+    <ul>
+      <li><strong>Exercise regularly:</strong> Aim for at least 150 minutes of moderate aerobic exercise per week. Walking, swimming, and cycling all benefit brain health.</li>
+      <li><strong>Prioritize sleep:</strong> Get 7 to 9 hours of quality sleep. Maintain a consistent sleep schedule and create an environment conducive to deep sleep.</li>
+      <li><strong>Stay socially active:</strong> Regular social interaction stimulates memory through conversation, emotional processing, and collaborative activities.</li>
+      <li><strong>Challenge your brain:</strong> Learn new skills, play memory games, do crossword puzzles, learn a language, or take up a musical instrument.</li>
+      <li><strong>Manage stress:</strong> Practice mindfulness, meditation, or deep breathing exercises. Chronic stress damages the hippocampus and impairs memory formation.</li>
+      <li><strong>Eat brain-healthy food:</strong> Follow a Mediterranean-style diet rich in omega-3 fatty acids, berries, leafy greens, and whole grains. Limit processed foods and excess sugar.</li>
+      <li><strong>Stay hydrated:</strong> Even mild dehydration can impair cognitive function and memory. Aim for 8 glasses of water daily.</li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is memory age?</h3>
+    <p>Memory age is an estimate of how your memory performance compares to the typical memory function at different chronological ages. Memory abilities generally peak in the mid-twenties and gradually decline with age, though the rate of decline varies greatly between individuals. A memory age test presents various memory challenges and compares your performance to age-group averages. A 50-year-old scoring a memory age of 25 demonstrates memory performance typical of someone in their mid-twenties, indicating exceptionally well-maintained cognitive function.</p>
+
+    <h3>At what age does memory start to decline?</h3>
+    <p>Different memory systems decline at different rates. Processing speed peaks around age 18 to 20 and shows the earliest decline. Short-term and working memory peak around age 25 to 30 and begin a slow decline in the thirties. Episodic memory (remembering specific events) shows noticeable decline starting in the forties. However, semantic memory (general knowledge and vocabulary) continues to improve into the sixties and seventies, and procedural memory (learned skills) remains largely intact throughout life. Significant memory decline is not inevitable and can be substantially slowed through physical exercise, mental stimulation, social engagement, quality sleep, and a healthy diet.</p>
+
+    <h3>How can I improve my memory?</h3>
+    <p>Evidence-based strategies for improving memory include regular aerobic exercise which increases hippocampal volume, quality sleep of 7 to 9 hours for memory consolidation, spaced repetition for learning new information, the memory palace technique for memorizing sequences and lists, chunking for breaking information into meaningful groups, mindfulness meditation for improving attention and working memory, a Mediterranean-style diet rich in omega-3 fatty acids and antioxidants, and reducing chronic stress which damages the hippocampus. Even small changes like adding a daily 30-minute walk and improving sleep habits can produce measurable memory improvements within weeks.</p>
+
+    <h3>What types of memory does this test measure?</h3>
+    <p>This test evaluates five types of memory through distinct challenges. Number recall tests short-term and working memory capacity by asking you to remember increasingly long digit sequences. Word list recall tests verbal episodic memory by presenting words to memorize and recall. Sequence recall tests visual-spatial working memory by showing patterns to reproduce. Face-name matching tests associative memory, the ability to link related information. Delayed recall tests memory consolidation by asking you to remember words from an earlier challenge without seeing them again.</p>
+
+    <h3>Is this memory age test scientifically accurate?</h3>
+    <p>This test uses challenge types commonly employed in cognitive psychology research and clinical memory assessments, including digit span, word list recall, visual sequence memory, paired associates, and delayed recall. These are well-validated measures of different memory functions. However, this is a simplified, self-administered version designed for entertainment and general self-assessment rather than clinical diagnosis. Factors like testing environment, fatigue, stress, and device type can influence your results. Clinical memory assessments like the Wechsler Memory Scale are administered by trained professionals in controlled conditions and provide more precise and reliable measurements.</p>
+  </article>
+
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .game-area { cursor: default; user-select: auto; -webkit-user-select: auto; }
+  :global(.mem-big-number) { font-size: 2.8rem; font-weight: 800; letter-spacing: 6px; color: var(--color-text); margin: 16px 0; animation: quizFadeIn 0.3s ease; }
+  :global(.mem-instruction) { font-size: 0.95rem; color: var(--color-text-muted); margin-bottom: 16px; }
+  :global(.mem-timer-bar) { width: 100%; height: 4px; background: var(--color-border); border-radius: 2px; margin: 12px 0; overflow: hidden; }
+  :global(.mem-timer-fill) { height: 100%; background: var(--color-primary); border-radius: 2px; transition: width 0.1s linear; }
+  :global(.mem-input) { font-size: 1.4rem; padding: 10px 16px; border: 2px solid var(--color-border); border-radius: var(--radius); background: var(--color-surface); color: var(--color-text); text-align: center; width: 100%; max-width: 300px; letter-spacing: 4px; }
+  :global(.mem-input:focus) { border-color: var(--color-primary); outline: none; }
+  :global(.mem-word-grid) { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 400px; margin: 16px auto; }
+  :global(.mem-word-tag) { padding: 6px 14px; border-radius: 16px; font-size: 0.9rem; font-weight: 500; background: var(--color-primary); color: #fff; animation: quizFadeIn 0.3s ease; }
+  :global(.mem-seq-grid) { display: grid; grid-template-columns: repeat(4, 60px); gap: 8px; justify-content: center; margin: 16px auto; }
+  :global(.mem-seq-cell) { width: 60px; height: 60px; border-radius: var(--radius); border: 2px solid var(--color-border); background: var(--color-surface); cursor: pointer; transition: background 0.15s, border-color 0.15s; }
+  :global(.mem-seq-cell.lit) { background: var(--color-primary); border-color: var(--color-primary); }
+  :global(.mem-seq-cell.selected) { background: #22c55e; border-color: #22c55e; }
+  :global(.mem-seq-cell.wrong) { background: #ef4444; border-color: #ef4444; }
+  :global(.mem-pair-grid) { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; max-width: 400px; margin: 16px auto; }
+  :global(.mem-pair-card) { padding: 10px; border: 2px solid var(--color-border); border-radius: var(--radius); text-align: center; font-size: 0.85rem; background: var(--color-surface); }
+  :global(.mem-pair-emoji) { font-size: 1.8rem; display: block; margin-bottom: 4px; }
+  :global(.mem-pair-name) { font-weight: 600; }
+  :global(.mem-select) { padding: 6px 10px; border: 2px solid var(--color-border); border-radius: var(--radius); background: var(--color-surface); color: var(--color-text); font-size: 0.85rem; width: 100%; margin-top: 4px; }
+  :global(.mem-age-display) { font-size: 4rem; font-weight: 800; color: var(--color-primary); line-height: 1.1; }
+  :global(.mem-age-unit) { font-size: 1.2rem; color: var(--color-text-muted); font-weight: 500; }
+  :global(.mem-feedback) { font-size: 0.85rem; margin-top: 8px; font-weight: 600; }
+  :global(.mem-feedback.good) { color: #22c55e; }
+  :global(.mem-feedback.ok) { color: #f59e0b; }
+  :global(.mem-feedback.poor) { color: #ef4444; }
+  @media (max-width: 640px) {
+    :global(.mem-big-number) { font-size: 2rem; letter-spacing: 4px; }
+    :global(.mem-seq-grid) { grid-template-columns: repeat(4, 50px); }
+    :global(.mem-seq-cell) { width: 50px; height: 50px; }
+  }
+</style>
+
+<script define:vars={{ gameName: "Memory Age Test", gameSlug: "memory-age-test", gameIcon: "\uD83E\uDDE0", metricLabel: "Memory Age", metricUnit: "years" }}>
+(function () {
+  'use strict';
+
+  // DOM refs
+  var instructionsView = document.getElementById('instructionsView');
+  var playView = document.getElementById('playView');
+  var resultView = document.getElementById('resultView');
+  var startBtn = document.getElementById('startBtn');
+  var retakeBtn = document.getElementById('retakeBtn');
+  var progressText = document.getElementById('progressText');
+  var progressFill = document.getElementById('progressFill');
+  var challengeArea = document.getElementById('challengeArea');
+  var resultIcon = document.getElementById('resultIcon');
+  var resultAge = document.getElementById('resultAge');
+  var resultLabel = document.getElementById('resultLabel');
+  var resultDesc = document.getElementById('resultDesc');
+  var challengeChart = document.getElementById('challengeChart');
+  var resultTips = document.getElementById('resultTips');
+
+  var WORD_POOL = ["apple", "mountain", "guitar", "ocean", "rocket", "sunset", "crystal", "thunder", "garden", "bridge", "forest", "silver", "dragon", "puzzle", "candle", "window", "planet", "marble", "feather", "castle"];
+  var NAMES = ["Emma", "Liam", "Olivia", "Noah", "Sophia"];
+  var EMOJIS = ["\uD83D\uDC69\u200D\uD83C\uDFA8", "\uD83E\uDDD4", "\uD83D\uDC69\u200D\uD83D\uDE80", "\uD83E\uDDD1\u200D\uD83C\uDF73", "\uD83D\uDC68\u200D\uD83C\uDFEB"];
+
+  var challengeNames = ["Number Recall", "Word List", "Sequence Recall", "Face-Name Match", "Delayed Recall"];
+  var challengeScores = [0, 0, 0, 0, 0];
+  var challengeMax = [24, 10, 8, 5, 10];
+  var currentChallenge = 0;
+  var wordListForDelayed = [];
+  var timerHandle = null;
+
+  function showView(view) {
+    instructionsView.style.display = 'none';
+    playView.style.display = 'none';
+    resultView.style.display = 'none';
+    view.style.display = '';
+  }
+
+  function updateProgress() {
+    progressText.textContent = 'Challenge ' + (currentChallenge + 1) + ' of 5: ' + challengeNames[currentChallenge];
+    progressFill.style.width = Math.round((currentChallenge / 5) * 100) + '%';
+  }
+
+  // Utility: random number string of given length
+  function randomDigits(len) {
+    var s = '';
+    for (var i = 0; i < len; i++) s += String(Math.floor(Math.random() * 10));
+    return s;
+  }
+
+  function shuffleArr(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+  }
+
+  // ===== CHALLENGE 1: Number Recall (3 rounds) =====
+  function runNumberRecall() {
+    var rounds = [5, 7, 9];
+    var roundIndex = 0;
+    var roundScore = 0;
+
+    function doRound() {
+      if (roundIndex >= rounds.length) {
+        challengeScores[0] = roundScore;
+        currentChallenge = 1;
+        nextChallenge();
+        return;
+      }
+      var digits = randomDigits(rounds[roundIndex]);
+      updateProgress();
+
+      // Show number
+      challengeArea.innerHTML = '<p class="mem-instruction">Memorize this ' + rounds[roundIndex] + '-digit number</p>' +
+        '<div class="mem-big-number">' + digits + '</div>' +
+        '<div class="mem-timer-bar"><div class="mem-timer-fill" id="timerFill" style="width:100%;"></div></div>';
+
+      var remaining = 2000;
+      var interval = 50;
+      var fill = document.getElementById('timerFill');
+      timerHandle = setInterval(function () {
+        remaining -= interval;
+        if (fill) fill.style.width = Math.max(0, (remaining / 2000) * 100) + '%';
+        if (remaining <= 0) {
+          clearInterval(timerHandle);
+          showInput(digits);
+        }
+      }, interval);
+    }
+
+    function showInput(digits) {
+      challengeArea.innerHTML = '<p class="mem-instruction">Type the number you saw (' + digits.length + ' digits)</p>' +
+        '<input type="text" class="mem-input" id="recallInput" maxlength="' + digits.length + '" inputmode="numeric" autocomplete="off" />' +
+        '<div style="margin-top:12px;"><button class="game-btn primary" id="submitRecall" type="button">Submit</button></div>';
+
+      var inp = document.getElementById('recallInput');
+      var btn = document.getElementById('submitRecall');
+      if (inp) inp.focus();
+
+      function doSubmit() {
+        var val = inp ? inp.value.trim() : '';
+        // Score: count matching digits in correct positions
+        var correct = 0;
+        for (var i = 0; i < digits.length; i++) {
+          if (val[i] === digits[i]) correct++;
+        }
+        roundScore += correct;
+
+        // Show feedback
+        challengeArea.innerHTML = '<p class="mem-instruction">Your answer: ' + (val || '(empty)') + '</p>' +
+          '<p class="mem-instruction">Correct: ' + digits + '</p>' +
+          '<p class="mem-feedback ' + (correct === digits.length ? 'good' : correct >= digits.length / 2 ? 'ok' : 'poor') + '">' + correct + ' / ' + digits.length + ' digits correct</p>';
+
+        roundIndex++;
+        setTimeout(doRound, 1200);
+      }
+
+      if (btn) btn.addEventListener('click', doSubmit);
+      if (inp) inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') doSubmit(); });
+    }
+
+    doRound();
+  }
+
+  // ===== CHALLENGE 2: Word List =====
+  function runWordList() {
+    updateProgress();
+    var words = shuffleArr(WORD_POOL).slice(0, 10);
+    wordListForDelayed = words.slice(); // save for delayed recall
+
+    // Show words
+    var tagHTML = '<div class="mem-word-grid">';
+    for (var i = 0; i < words.length; i++) {
+      tagHTML += '<span class="mem-word-tag">' + words[i] + '</span>';
+    }
+    tagHTML += '</div>';
+
+    challengeArea.innerHTML = '<p class="mem-instruction">Memorize these 10 words (15 seconds)</p>' + tagHTML +
+      '<div class="mem-timer-bar"><div class="mem-timer-fill" id="timerFill2" style="width:100%;"></div></div>';
+
+    var remaining = 15000;
+    var interval = 50;
+    var fill = document.getElementById('timerFill2');
+    timerHandle = setInterval(function () {
+      remaining -= interval;
+      if (fill) fill.style.width = Math.max(0, (remaining / 15000) * 100) + '%';
+      if (remaining <= 0) {
+        clearInterval(timerHandle);
+        showWordInput(words);
+      }
+    }, interval);
+  }
+
+  function showWordInput(words) {
+    challengeArea.innerHTML = '<p class="mem-instruction">Type as many words as you remember (comma-separated)</p>' +
+      '<textarea class="mem-input" id="wordInput" rows="3" style="letter-spacing:0;font-size:1rem;width:100%;max-width:400px;" placeholder="apple, mountain, ..."></textarea>' +
+      '<div style="margin-top:12px;"><button class="game-btn primary" id="submitWords" type="button">Submit</button></div>';
+
+    var inp = document.getElementById('wordInput');
+    var btn = document.getElementById('submitWords');
+    if (inp) inp.focus();
+
+    function doSubmit() {
+      var val = inp ? inp.value.toLowerCase().trim() : '';
+      var entered = val.split(/[,\s]+/).filter(function (w) { return w.length > 0; });
+      var correct = 0;
+      for (var i = 0; i < entered.length; i++) {
+        for (var j = 0; j < words.length; j++) {
+          if (entered[i] === words[j]) { correct++; break; }
+        }
+      }
+      challengeScores[1] = correct;
+
+      challengeArea.innerHTML = '<p class="mem-instruction">You recalled ' + correct + ' / 10 words correctly!</p>' +
+        '<div class="mem-word-grid">' + words.map(function (w) {
+          var found = entered.indexOf(w) !== -1;
+          return '<span class="mem-word-tag" style="background:' + (found ? '#22c55e' : '#ef4444') + ';">' + w + '</span>';
+        }).join('') + '</div>';
+
+      currentChallenge = 2;
+      setTimeout(nextChallenge, 1500);
+    }
+
+    if (btn) btn.addEventListener('click', doSubmit);
+  }
+
+  // ===== CHALLENGE 3: Sequence Recall =====
+  function runSequenceRecall() {
+    updateProgress();
+    var seqLength = 8;
+    var sequence = [];
+    for (var i = 0; i < seqLength; i++) {
+      var next;
+      do { next = Math.floor(Math.random() * 16); } while (sequence.length > 0 && sequence[sequence.length - 1] === next);
+      sequence.push(next);
+    }
+
+    // Build grid (4x4)
+    var gridHTML = '<div class="mem-seq-grid" id="seqGrid">';
+    for (var c = 0; c < 16; c++) {
+      gridHTML += '<div class="mem-seq-cell" data-idx="' + c + '"></div>';
+    }
+    gridHTML += '</div>';
+
+    challengeArea.innerHTML = '<p class="mem-instruction">Watch the sequence, then repeat it</p>' + gridHTML;
+
+    // Play sequence
+    var showIdx = 0;
+    var cells = document.querySelectorAll('.mem-seq-cell');
+
+    function lightUp() {
+      if (showIdx >= sequence.length) {
+        setTimeout(function () { allowInput(sequence, cells); }, 400);
+        return;
+      }
+      var cell = cells[sequence[showIdx]];
+      if (cell) cell.classList.add('lit');
+      setTimeout(function () {
+        if (cell) cell.classList.remove('lit');
+        showIdx++;
+        setTimeout(lightUp, 300);
+      }, 500);
+    }
+
+    setTimeout(lightUp, 500);
+  }
+
+  function allowInput(sequence, cells) {
+    challengeArea.querySelector('.mem-instruction').textContent = 'Now repeat the sequence by clicking the squares';
+    var userSeq = [];
+    var correct = 0;
+
+    function cellClick(e) {
+      var target = e.target;
+      if (!target || !target.classList || !target.classList.contains('mem-seq-cell')) return;
+      var idx = parseInt(target.getAttribute('data-idx'), 10);
+      var pos = userSeq.length;
+      userSeq.push(idx);
+
+      if (idx === sequence[pos]) {
+        correct++;
+        target.classList.add('selected');
+      } else {
+        target.classList.add('wrong');
+      }
+
+      setTimeout(function () {
+        target.classList.remove('selected', 'wrong');
+      }, 300);
+
+      if (userSeq.length >= sequence.length) {
+        document.getElementById('seqGrid').removeEventListener('click', cellClick);
+        challengeScores[2] = correct;
+
+        challengeArea.innerHTML = '<p class="mem-instruction">Sequence complete! You got ' + correct + ' / ' + sequence.length + ' correct.</p>';
+        currentChallenge = 3;
+        setTimeout(nextChallenge, 1200);
+      }
+    }
+
+    document.getElementById('seqGrid').addEventListener('click', cellClick);
+  }
+
+  // ===== CHALLENGE 4: Face-Name Match =====
+  function runFaceNameMatch() {
+    updateProgress();
+    var pairs = [];
+    var shuffledNames = shuffleArr(NAMES);
+    var shuffledEmojis = shuffleArr(EMOJIS);
+    for (var i = 0; i < 5; i++) {
+      pairs.push({ name: shuffledNames[i], emoji: shuffledEmojis[i] });
+    }
+
+    // Show pairs
+    var pairHTML = '<div class="mem-pair-grid">';
+    for (var p = 0; p < pairs.length; p++) {
+      pairHTML += '<div class="mem-pair-card"><span class="mem-pair-emoji">' + pairs[p].emoji + '</span><span class="mem-pair-name">' + pairs[p].name + '</span></div>';
+    }
+    pairHTML += '</div>';
+
+    challengeArea.innerHTML = '<p class="mem-instruction">Memorize these face-name pairs (10 seconds)</p>' + pairHTML +
+      '<div class="mem-timer-bar"><div class="mem-timer-fill" id="timerFill3" style="width:100%;"></div></div>';
+
+    var remaining = 10000;
+    var interval = 50;
+    var fill = document.getElementById('timerFill3');
+    timerHandle = setInterval(function () {
+      remaining -= interval;
+      if (fill) fill.style.width = Math.max(0, (remaining / 10000) * 100) + '%';
+      if (remaining <= 0) {
+        clearInterval(timerHandle);
+        showFaceNameInput(pairs);
+      }
+    }, interval);
+  }
+
+  function showFaceNameInput(pairs) {
+    var shuffledPairs = shuffleArr(pairs);
+    var nameOptions = shuffleArr(pairs.map(function (p) { return p.name; }));
+
+    var html = '<p class="mem-instruction">Match each face to the correct name</p><div class="mem-pair-grid">';
+    for (var i = 0; i < shuffledPairs.length; i++) {
+      html += '<div class="mem-pair-card"><span class="mem-pair-emoji">' + shuffledPairs[i].emoji + '</span>';
+      html += '<select class="mem-select" data-correct="' + shuffledPairs[i].name + '"><option value="">Select...</option>';
+      for (var n = 0; n < nameOptions.length; n++) {
+        html += '<option value="' + nameOptions[n] + '">' + nameOptions[n] + '</option>';
+      }
+      html += '</select></div>';
+    }
+    html += '</div><div style="margin-top:12px;"><button class="game-btn primary" id="submitPairs" type="button">Submit</button></div>';
+
+    challengeArea.innerHTML = html;
+
+    document.getElementById('submitPairs').addEventListener('click', function () {
+      var selects = challengeArea.querySelectorAll('.mem-select');
+      var correct = 0;
+      for (var s = 0; s < selects.length; s++) {
+        if (selects[s].value === selects[s].getAttribute('data-correct')) correct++;
+      }
+      challengeScores[3] = correct;
+
+      challengeArea.innerHTML = '<p class="mem-instruction">You matched ' + correct + ' / 5 pairs correctly!</p>';
+      currentChallenge = 4;
+      setTimeout(nextChallenge, 1200);
+    });
+  }
+
+  // ===== CHALLENGE 5: Delayed Recall =====
+  function runDelayedRecall() {
+    updateProgress();
+    challengeArea.innerHTML = '<p class="mem-instruction">Remember the word list from Challenge 2? Type as many as you can recall (comma-separated)</p>' +
+      '<textarea class="mem-input" id="delayedInput" rows="3" style="letter-spacing:0;font-size:1rem;width:100%;max-width:400px;" placeholder="apple, mountain, ..."></textarea>' +
+      '<div style="margin-top:12px;"><button class="game-btn primary" id="submitDelayed" type="button">Submit</button></div>';
+
+    var inp = document.getElementById('delayedInput');
+    if (inp) inp.focus();
+
+    document.getElementById('submitDelayed').addEventListener('click', function () {
+      var val = inp ? inp.value.toLowerCase().trim() : '';
+      var entered = val.split(/[,\s]+/).filter(function (w) { return w.length > 0; });
+      var correct = 0;
+      for (var i = 0; i < entered.length; i++) {
+        for (var j = 0; j < wordListForDelayed.length; j++) {
+          if (entered[i] === wordListForDelayed[j]) { correct++; break; }
+        }
+      }
+      challengeScores[4] = correct;
+
+      challengeArea.innerHTML = '<p class="mem-instruction">You recalled ' + correct + ' / 10 words from memory!</p>' +
+        '<div class="mem-word-grid">' + wordListForDelayed.map(function (w) {
+          var found = entered.indexOf(w) !== -1;
+          return '<span class="mem-word-tag" style="background:' + (found ? '#22c55e' : '#ef4444') + ';">' + w + '</span>';
+        }).join('') + '</div>';
+
+      setTimeout(showResults, 1500);
+    });
+  }
+
+  function nextChallenge() {
+    updateProgress();
+    switch (currentChallenge) {
+      case 0: runNumberRecall(); break;
+      case 1: runWordList(); break;
+      case 2: runSequenceRecall(); break;
+      case 3: runFaceNameMatch(); break;
+      case 4: runDelayedRecall(); break;
+      default: showResults(); break;
+    }
+  }
+
+  function showResults() {
+    showView(resultView);
+    progressFill.style.width = '100%';
+
+    // Calculate total score (weighted)
+    var totalMax = 0;
+    var totalGot = 0;
+    for (var i = 0; i < 5; i++) {
+      totalGot += challengeScores[i];
+      totalMax += challengeMax[i];
+    }
+    var pct = totalGot / totalMax; // 0 to 1
+
+    // Map percentage to memory age (lower age = better)
+    // 100% -> 15, 0% -> 75
+    var memoryAge = Math.round(75 - (pct * 60));
+    if (memoryAge < 15) memoryAge = 15;
+    if (memoryAge > 75) memoryAge = 75;
+
+    var ageLabel, ageDesc, tips;
+    if (memoryAge <= 20) {
+      ageLabel = "Exceptional Memory";
+      ageDesc = "Your memory performs like that of a teenager! You demonstrated outstanding recall across all challenge types. Your working memory, visual memory, and associative memory are all functioning at peak levels.";
+      tips = ["Maintain your sharp memory with continued mental challenges", "Consider memory sports or competitions", "Your strong memory foundation will serve you well throughout life"];
+    } else if (memoryAge <= 30) {
+      ageLabel = "Excellent Memory";
+      ageDesc = "Your memory is functioning at peak adult levels. You showed strong performance across multiple memory domains, with particularly good recall and pattern recognition abilities.";
+      tips = ["Keep challenging your memory with new learning", "Regular exercise and good sleep will maintain these levels", "Try learning a new language to further strengthen memory networks"];
+    } else if (memoryAge <= 40) {
+      ageLabel = "Good Memory";
+      ageDesc = "Your memory is performing well, showing solid ability across the different challenge types. There may be room for improvement in specific areas, but overall your memory function is healthy and reliable.";
+      tips = ["Practice spaced repetition for better long-term retention", "Try memory palace techniques for sequence recall", "Ensure you get 7-9 hours of quality sleep"];
+    } else if (memoryAge <= 55) {
+      ageLabel = "Average Memory";
+      ageDesc = "Your memory is functioning at a typical level. Some areas may be stronger than others, which is completely normal. With targeted practice, you can improve the areas where you scored lower.";
+      tips = ["Start a daily brain training routine (10-15 minutes)", "Increase aerobic exercise to boost hippocampal health", "Practice chunking and visualization techniques", "Reduce multitasking to improve focus and encoding"];
+    } else {
+      ageLabel = "Room for Improvement";
+      ageDesc = "Your memory scores suggest there is significant room for improvement. Don't worry \u2014 memory is a skill that can be strengthened at any age with the right strategies and consistent practice.";
+      tips = ["Begin with simple memory exercises daily", "Prioritize sleep quality and stress reduction", "Consider a Mediterranean diet for brain health", "Start regular aerobic exercise (even 20-minute walks help)", "Consult a healthcare provider if you have concerns"];
+    }
+
+    resultIcon.textContent = gameIcon;
+    resultAge.innerHTML = '<span class="mem-age-display">' + memoryAge + '</span> <span class="mem-age-unit">years old</span>';
+    resultLabel.textContent = ageLabel;
+    resultDesc.textContent = ageDesc;
+
+    // Challenge breakdown chart
+    var catColors = ['#3b82f6', '#22c55e', '#f59e0b', '#ec4899', '#8b5cf6'];
+    var chartHTML = '';
+    for (var c = 0; c < 5; c++) {
+      var cPct = Math.round((challengeScores[c] / challengeMax[c]) * 100);
+      chartHTML += '<div class="quiz-bar-item">';
+      chartHTML += '<div class="quiz-bar-label"><span>' + challengeNames[c] + '</span><span>' + challengeScores[c] + '/' + challengeMax[c] + ' (' + cPct + '%)</span></div>';
+      chartHTML += '<div class="quiz-bar-track"><div class="quiz-bar-fill" style="width:' + cPct + '%;background:' + catColors[c] + ';"></div></div>';
+      chartHTML += '</div>';
+    }
+    challengeChart.innerHTML = chartHTML;
+
+    // Tips
+    var tipsHTML = '<h3>Tips to Improve</h3><ul>';
+    for (var t = 0; t < tips.length; t++) {
+      tipsHTML += '<li>' + tips[t] + '</li>';
+    }
+    tipsHTML += '</ul>';
+    resultTips.innerHTML = tipsHTML;
+
+    // GameShare
+    if (window.GameShare) {
+      var ratingColor = memoryAge <= 25 ? '#22c55e' : memoryAge <= 35 ? '#3b82f6' : memoryAge <= 50 ? '#f59e0b' : '#ef4444';
+      window.GameShare.show({
+        gameName: gameName,
+        gameSlug: gameSlug,
+        gameIcon: gameIcon,
+        score: memoryAge,
+        unit: metricUnit,
+        metricLabel: metricLabel,
+        ratingLabel: ageLabel,
+        ratingColor: ratingColor
+      });
+    }
+  }
+
+  function startTest() {
+    currentChallenge = 0;
+    challengeScores = [0, 0, 0, 0, 0];
+    wordListForDelayed = [];
+    if (timerHandle) clearInterval(timerHandle);
+    showView(playView);
+    nextChallenge();
+    if (window.GameShare) window.GameShare.hide();
+  }
+
+  startBtn.addEventListener('click', startTest);
+  retakeBtn.addEventListener('click', startTest);
+})();
+</script>

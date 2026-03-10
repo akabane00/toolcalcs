@@ -1,0 +1,547 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/game.css';
+import '../../styles/quiz.css';
+import GameShare from '../../components/GameShare.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tests & Games", "item": "https://toolcalcs.com/test/" },
+      { "@type": "ListItem", "position": 3, "name": "Mental Age Test" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Mental Age Test",
+    "url": "https://toolcalcs.com/test/mental-age-test/",
+    "applicationCategory": "LifestyleApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Discover your mental age! Answer 25 fun questions about your preferences, habits, and reactions to find out if your mind is younger or older than your real age."
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is mental age?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Mental age is a concept introduced by psychologist Alfred Binet in 1905 that describes the intellectual functioning level of an individual compared to the average for a given chronological age. In modern usage, it has expanded to include emotional maturity, lifestyle preferences, and psychological outlook. A mental age test estimates whether your mindset and habits align more closely with someone younger or older than your actual age."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can your mental age be different from your real age?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Absolutely. Mental age and chronological age often differ significantly. Someone who is 40 years old might have a mental age of 28 if they maintain youthful curiosity, adaptability, and energy. Conversely, a 20-year-old with highly mature habits, risk aversion, and preference for routine might score a mental age of 35. These differences are influenced by personality, life experiences, lifestyle choices, and neuroplasticity."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is this mental age test scientifically accurate?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "This test is designed as a fun, self-reflective exercise based on behavioral patterns commonly associated with different age groups. It is not a clinical psychological assessment. The questions draw on research about lifestyle habits, technology use, sleep patterns, and social preferences that tend to vary by age. For a clinical evaluation of cognitive age, consult a licensed psychologist."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How can I keep my brain young?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Research shows several evidence-based strategies for maintaining cognitive youth: regular physical exercise (especially aerobic activity), continuous learning and mental challenges, quality sleep of 7-9 hours, social engagement, a Mediterranean-style diet rich in omega-3 fatty acids, stress management through mindfulness or meditation, and limiting excessive screen time. Neuroplasticity allows the brain to form new connections at any age."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What factors influence mental age?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Mental age is influenced by a combination of factors including genetics, education, social environment, physical health, mental health, lifestyle habits, cultural background, and personal experiences. People who remain curious, socially active, physically fit, and open to new experiences tend to maintain a younger mental age regardless of their chronological age."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Mental Age Test - How Old Is Your Mind Really? | ToolCalcs"
+  description="Discover your mental age! Answer 25 fun questions about your preferences, habits, and reactions to find out if your mind is younger or older than your real age."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/test/">Tests & Games</a> &rsaquo;
+    <span>Mental Age Test</span>
+  </nav>
+
+  <h1>Mental Age Test</h1>
+  <p class="page-desc">Answer 25 fun questions about your preferences, habits, and reactions to discover your true mental age.</p>
+
+  <div class="game-box">
+    <div class="game-area" id="gameArea" role="region" aria-label="Mental age quiz" aria-live="polite">
+      <!-- Instructions -->
+      <div class="game-instructions" id="instructionsView">
+        <h2>Mental Age Test</h2>
+        <p>How old is your mind really? Answer honestly about your preferences, habits, and reactions to everyday situations.</p>
+        <p style="font-size:0.85rem;color:var(--color-text-muted);">25 questions &middot; About 4 minutes</p>
+        <button class="game-btn primary" id="startBtn" type="button" style="margin-top:16px;">Start Test</button>
+      </div>
+
+      <!-- Quiz View -->
+      <div id="quizView" style="display:none;">
+        <div class="quiz-progress">
+          <div class="quiz-progress-text" id="progressText">Question 1 of 25</div>
+          <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="progressFill"></div></div>
+        </div>
+        <div class="quiz-question">
+          <div class="quiz-question-text" id="questionText"></div>
+        </div>
+        <div class="quiz-options" id="optionsContainer"></div>
+      </div>
+
+      <!-- Result View -->
+      <div id="resultView" style="display:none;" class="quiz-result">
+        <div style="font-size:2.5rem;margin-bottom:4px;" id="resultIcon"></div>
+        <div class="quiz-result-type" id="resultAge"></div>
+        <div class="quiz-result-name" id="resultLabel">Your Mental Age</div>
+        <div class="quiz-result-desc" id="resultDesc"></div>
+        <div class="quiz-bar-chart" id="resultTraitsChart"></div>
+        <div class="quiz-traits strengths" id="resultTraits"></div>
+        <button class="game-btn primary" id="retakeBtn" type="button" style="margin-top:16px;">Retake Test</button>
+      </div>
+    </div>
+
+    <GameShare />
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is Mental Age?</h2>
+    <p>Mental age is a concept that dates back to 1905, when French psychologist Alfred Binet developed the first practical intelligence test. Working with Theodore Simon, Binet created a series of tasks designed to measure children's intellectual abilities relative to their peers. If a child could complete tasks typically solved by eight-year-olds, that child was said to have a mental age of eight, regardless of their actual chronological age. This was a revolutionary idea at the time because it separated intellectual development from biological age for the first time in a measurable way.</p>
+    <p>The original Binet-Simon scale was designed primarily for educational purposes. The French government wanted to identify students who needed additional academic support, and Binet's test provided an objective method for doing so. The concept of mental age quickly spread beyond France. In 1916, Lewis Terman at Stanford University adapted the test for American audiences, creating the famous Stanford-Binet Intelligence Scale. Terman also introduced the intelligence quotient (IQ), calculated by dividing mental age by chronological age and multiplying by 100.</p>
+    <p>In modern usage, the term "mental age" has expanded well beyond its original clinical definition. Today, when people talk about mental age, they often refer to a broader concept that encompasses emotional maturity, lifestyle preferences, energy levels, technology habits, social behavior, and overall psychological outlook on life. A 50-year-old who embraces new technology, stays curious, exercises regularly, and maintains a playful sense of humor might be said to have a younger mental age. Meanwhile, a 25-year-old who prefers quiet evenings, values routine, avoids risk, and prioritizes stability might be described as having an older mental age.</p>
+
+    <h2>Mental Age vs. Chronological Age</h2>
+    <p>Chronological age is simply the number of years since your birth. It is a fixed, biological measurement that advances at the same rate for everyone. Mental age, by contrast, is fluid and subjective. It reflects how your mind processes the world, how you relate to others, and how your habits and preferences align with typical patterns associated with different life stages.</p>
+    <p>These two measurements frequently diverge. Research has shown that biological aging and psychological aging do not always move in lockstep. Some people remain psychologically youthful well into their seventies and eighties, while others adopt an "old" mindset while still physically young. The gap between mental and chronological age can be influenced by dozens of factors, including genetics, education, social environment, physical health, mental health, and personal life experiences.</p>
+    <p>One key factor is cognitive reserve, a concept from neuroscience that describes the brain's resilience to damage and decline. People with higher cognitive reserve, typically built through education, intellectually stimulating work, social engagement, and lifelong learning, tend to maintain younger cognitive profiles as they age. Their brains have more neural pathways and connections, allowing them to compensate for age-related changes more effectively.</p>
+
+    <h2>What Influences Your Mental Age?</h2>
+    <p>Mental age is shaped by a complex interplay of factors that span biology, environment, and personal choice. Understanding these influences can help you appreciate why your mental age might differ from your chronological age and what you can do to shape it.</p>
+
+    <h3>Neuroplasticity</h3>
+    <p>The brain's ability to reorganize and form new neural connections throughout life is called neuroplasticity. This remarkable capacity means that your brain is not a fixed organ that simply deteriorates over time. Instead, it actively adapts to your experiences, learning, and environment. People who regularly challenge their brains with new skills, languages, puzzles, or creative activities tend to maintain greater neuroplasticity and, consequently, a younger mental age. Conversely, a lifestyle dominated by routine and mental passivity can accelerate cognitive aging.</p>
+
+    <h3>Physical Health and Exercise</h3>
+    <p>Physical activity is one of the most powerful predictors of mental age. Aerobic exercise increases blood flow to the brain, promotes the growth of new brain cells in the hippocampus (a region critical for memory), and releases brain-derived neurotrophic factor (BDNF), a protein that supports cognitive function. Studies have consistently shown that physically active older adults perform cognitively at levels comparable to sedentary individuals who are 10 to 15 years younger.</p>
+
+    <h3>Social Connections</h3>
+    <p>Social engagement is a significant factor in maintaining a youthful mind. People with strong social networks tend to have lower rates of cognitive decline and depression. Social interaction stimulates the brain through conversation, emotional processing, empathy, and collaborative problem-solving. Isolation and loneliness, on the other hand, are associated with accelerated cognitive aging and increased risk of dementia.</p>
+
+    <h3>Curiosity and Openness</h3>
+    <p>The personality trait of openness to experience is strongly associated with younger mental age. People who remain curious about the world, seek out new experiences, embrace change, and question assumptions tend to maintain cognitive flexibility and emotional vitality. This trait can be cultivated at any age through deliberate exposure to new ideas, cultures, activities, and perspectives.</p>
+
+    <h3>Sleep Quality</h3>
+    <p>Sleep plays a critical role in cognitive health. During sleep, the brain consolidates memories, clears metabolic waste products (including beta-amyloid, a protein linked to Alzheimer's disease), and restores neural energy. Chronic sleep deprivation accelerates cognitive aging, impairs memory, reduces emotional regulation, and increases susceptibility to stress. Adults who consistently get 7 to 9 hours of quality sleep tend to maintain sharper cognitive function and a younger mental profile.</p>
+
+    <h2>The Psychology of Age Perception</h2>
+    <p>How old you feel is not just a frivolous question. Research in psychology has shown that subjective age, the age you feel inside, has real consequences for health and longevity. A landmark study published in JAMA Internal Medicine in 2014 found that people who felt younger than their chronological age had lower mortality rates over an eight-year follow-up period, even after controlling for health status, depression, and other variables.</p>
+    <p>This phenomenon appears to work through several mechanisms. People who feel younger tend to be more physically active, more socially engaged, more optimistic, and more willing to seek medical care when needed. They are also less likely to accept decline as inevitable, which leads them to take proactive steps to maintain their health and cognitive function. Feeling young creates a positive feedback loop where youthful behavior reinforces youthful identity, which in turn motivates continued healthy behavior.</p>
+    <p>Cultural factors also play a significant role. In societies that value youth and productivity, older adults may internalize negative stereotypes about aging, which can actually accelerate cognitive decline through a mechanism called stereotype threat. In cultures that revere elders and associate age with wisdom and authority, older individuals often maintain higher levels of cognitive engagement and life satisfaction.</p>
+
+    <h2>How to Keep Your Brain Young</h2>
+    <p>While you cannot stop chronological aging, there is strong scientific evidence that you can slow or even reverse aspects of cognitive aging. Here are evidence-based strategies for maintaining a younger mental age.</p>
+    <ul>
+      <li><strong>Exercise regularly.</strong> Aim for at least 150 minutes of moderate aerobic activity per week. Walking, swimming, cycling, and dancing are all excellent choices. Exercise is the single most effective intervention for brain health.</li>
+      <li><strong>Never stop learning.</strong> Take up a new language, instrument, or skill. Enroll in courses, read widely, and engage with challenging material. The brain thrives on novelty and complexity.</li>
+      <li><strong>Prioritize sleep.</strong> Maintain a consistent sleep schedule, create a dark and quiet sleep environment, and aim for 7 to 9 hours per night. Good sleep hygiene is foundational to cognitive health.</li>
+      <li><strong>Stay socially active.</strong> Maintain friendships, join groups or clubs, volunteer, and engage in meaningful conversations. Social interaction is one of the most cognitively stimulating activities available.</li>
+      <li><strong>Eat a brain-healthy diet.</strong> The Mediterranean diet, rich in fish, olive oil, nuts, fruits, vegetables, and whole grains, has been consistently associated with better cognitive outcomes. Omega-3 fatty acids, found in fatty fish and walnuts, are particularly beneficial for brain health.</li>
+      <li><strong>Manage stress.</strong> Chronic stress floods the brain with cortisol, which damages the hippocampus and impairs memory. Mindfulness meditation, yoga, deep breathing, and time in nature are proven stress reducers.</li>
+      <li><strong>Challenge your brain.</strong> Puzzles, strategy games, creative writing, musical improvisation, and problem-solving activities all promote neuroplasticity and cognitive resilience.</li>
+    </ul>
+
+    <h2>Fun Facts About Age and Perception</h2>
+    <p>The relationship between age and perception is full of surprising findings. Here are some fascinating facts that highlight how complex the concept of age really is.</p>
+    <p>Most adults over 25 feel younger than their actual age. A 2018 study found that 70 percent of adults over 40 feel at least 10 years younger than they are. This gap between felt age and actual age tends to increase as people get older, with 70-year-olds often feeling as though they are in their late fifties.</p>
+    <p>The brain does not decline uniformly. While processing speed and working memory peak in the mid-twenties, vocabulary, general knowledge, and emotional intelligence continue to improve into the sixties and seventies. Crystallized intelligence, the accumulated knowledge and skills you build over a lifetime, often outweighs the decline in fluid intelligence.</p>
+    <p>Bilingual individuals tend to show signs of cognitive aging approximately four to five years later than monolingual individuals. Managing two or more languages provides constant cognitive exercise that builds neural resilience.</p>
+    <p>Playing a musical instrument is associated with better cognitive function in older age. Musicians show enhanced memory, attention, and executive function compared to non-musicians, and these benefits appear to increase with years of practice.</p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is mental age?</h3>
+    <p>Mental age is a concept introduced by psychologist Alfred Binet in 1905 that describes the intellectual functioning level of an individual compared to the average for a given chronological age. In modern usage, it has expanded to include emotional maturity, lifestyle preferences, and psychological outlook. A mental age test estimates whether your mindset and habits align more closely with someone younger or older than your actual age. Your mental age can be influenced by personality, life experiences, health habits, social connections, and neuroplasticity.</p>
+
+    <h3>Can your mental age be different from your real age?</h3>
+    <p>Absolutely. Mental age and chronological age often differ significantly. Someone who is 40 years old might have a mental age of 28 if they maintain youthful curiosity, adaptability, and energy. Conversely, a 20-year-old with highly mature habits, risk aversion, and preference for routine might score a mental age of 35. Research has shown that subjective age, how old you feel, has real consequences for health outcomes and longevity. People who feel younger than their chronological age tend to be more physically active, socially engaged, and optimistic.</p>
+
+    <h3>Is this mental age test scientifically accurate?</h3>
+    <p>This test is designed as a fun, self-reflective exercise based on behavioral patterns commonly associated with different age groups. It draws on research about lifestyle habits, technology use, sleep patterns, social preferences, and emotional reactions that tend to vary by age. However, it is not a clinical psychological assessment and should not be used for diagnostic purposes. For a clinical evaluation of cognitive age or intellectual functioning, consult a licensed psychologist who can administer standardized assessments like the Wechsler Adult Intelligence Scale.</p>
+
+    <h3>How can I keep my brain young?</h3>
+    <p>Research shows several evidence-based strategies for maintaining cognitive youth. Regular physical exercise, especially aerobic activity, is the single most effective intervention. Continuous learning and mental challenges promote neuroplasticity. Quality sleep of 7 to 9 hours allows the brain to consolidate memories and clear waste products. Social engagement stimulates cognitive function through conversation and emotional processing. A Mediterranean-style diet rich in omega-3 fatty acids supports brain health. Stress management through mindfulness or meditation protects the hippocampus from cortisol damage.</p>
+
+    <h3>What factors influence mental age?</h3>
+    <p>Mental age is influenced by a combination of factors including genetics, education level, social environment, physical health, mental health, lifestyle habits, cultural background, and personal experiences. Neuroplasticity, the brain's ability to form new connections, plays a central role. People who remain curious, socially active, physically fit, and open to new experiences tend to maintain a younger mental age regardless of their chronological age. Conversely, isolation, sedentary behavior, chronic stress, and lack of mental stimulation can accelerate psychological aging.</p>
+  </article>
+
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .game-area { cursor: default; user-select: auto; -webkit-user-select: auto; }
+  :global(.ma-age-display) { font-size: 4rem; font-weight: 800; color: var(--color-primary); line-height: 1.1; }
+  :global(.ma-age-unit) { font-size: 1.2rem; color: var(--color-text-muted); font-weight: 500; }
+  :global(.ma-comparison) { font-size: 0.95rem; color: var(--color-text-muted); margin: 8px 0 16px; }
+  :global(.ma-bracket-title) { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; color: var(--color-primary); }
+  :global(.ma-trait-pills) { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 12px 0 20px; }
+  :global(.ma-trait-pill) { padding: 4px 14px; border-radius: 16px; font-size: 0.8rem; font-weight: 500; background: #dbeafe; color: #1e40af; }
+  :global(:root[data-theme="dark"] .ma-trait-pill) { background: #1e3a5f; color: #93c5fd; }
+</style>
+
+<script define:vars={{ gameName: "Mental Age Test", gameSlug: "mental-age-test", gameIcon: "\uD83E\uDDD2", metricLabel: "Mental Age", metricUnit: "years" }}>
+(function () {
+  'use strict';
+
+  var questions = [
+    { text: "What's your ideal Friday night?", options: [
+      { label: "Going out to a club or party with friends", weight: 18 },
+      { label: "Dinner and drinks at a trendy restaurant", weight: 26 },
+      { label: "Movie night on the couch with snacks", weight: 34 },
+      { label: "Reading a good book and going to bed early", weight: 50 }
+    ]},
+    { text: "You find a $100 bill on the ground. What do you do?", options: [
+      { label: "Treat yourself immediately to something fun", weight: 16 },
+      { label: "Post about it on social media", weight: 20 },
+      { label: "Put it in your savings account", weight: 42 },
+      { label: "Try to find the owner or donate it", weight: 55 }
+    ]},
+    { text: "How many social media apps do you actively use?", options: [
+      { label: "5 or more, I'm on everything", weight: 16 },
+      { label: "3-4, the main ones", weight: 24 },
+      { label: "1-2, just to stay connected", weight: 38 },
+      { label: "None, I prefer real-life interactions", weight: 55 }
+    ]},
+    { text: "Your alarm goes off. What's your morning routine?", options: [
+      { label: "Snooze 5+ times, rush out the door", weight: 17 },
+      { label: "Quick shower, grab coffee, out in 20 minutes", weight: 25 },
+      { label: "Morning workout or walk, then a proper breakfast", weight: 38 },
+      { label: "Wake early, meditate, plan the day carefully", weight: 52 }
+    ]},
+    { text: "What kind of music do you prefer?", options: [
+      { label: "Whatever's trending on TikTok right now", weight: 15 },
+      { label: "Pop, hip-hop, or EDM", weight: 22 },
+      { label: "Rock, indie, or alternative", weight: 32 },
+      { label: "Jazz, classical, or oldies", weight: 50 }
+    ]},
+    { text: "A friend cancels plans last minute. Your reaction?", options: [
+      { label: "Ugh, immediately text someone else to hang out", weight: 18 },
+      { label: "Disappointed but pivot to something else fun", weight: 25 },
+      { label: "Honestly? Secretly relieved. Hello, couch time!", weight: 38 },
+      { label: "Understand completely, things happen", weight: 48 }
+    ]},
+    { text: "How do you handle a disagreement with someone?", options: [
+      { label: "Get heated and argue my point passionately", weight: 18 },
+      { label: "Vent to friends about it afterward", weight: 24 },
+      { label: "Try to see both sides and find a compromise", weight: 40 },
+      { label: "Stay calm, choose my battles wisely", weight: 52 }
+    ]},
+    { text: "What's your go-to snack?", options: [
+      { label: "Energy drinks and chips", weight: 16 },
+      { label: "Pizza or fast food", weight: 22 },
+      { label: "Cheese and crackers, or a smoothie", weight: 35 },
+      { label: "Fresh fruit, nuts, or dark chocolate", weight: 48 }
+    ]},
+    { text: "How do you feel about naps?", options: [
+      { label: "Naps are for kids and old people", weight: 20 },
+      { label: "I'd love to nap but never have time", weight: 28 },
+      { label: "Weekend naps are sacred", weight: 38 },
+      { label: "I take a power nap almost every afternoon", weight: 52 }
+    ]},
+    { text: "What's your relationship with your phone at bedtime?", options: [
+      { label: "I scroll until I pass out, phone in hand", weight: 16 },
+      { label: "I browse for 30 minutes then put it down", weight: 25 },
+      { label: "I try to stop screens an hour before bed", weight: 40 },
+      { label: "My phone charges in another room overnight", weight: 55 }
+    ]},
+    { text: "You're on vacation. How do you plan your days?", options: [
+      { label: "No plan at all! Go where the wind takes me", weight: 18 },
+      { label: "A loose list of things to see, flexible timing", weight: 28 },
+      { label: "A planned itinerary with some free time built in", weight: 40 },
+      { label: "Detailed schedule with reservations and tickets booked ahead", weight: 54 }
+    ]},
+    { text: "How do you react to new technology?", options: [
+      { label: "First adopter! I preorder everything", weight: 17 },
+      { label: "I check it out once my friends have it", weight: 25 },
+      { label: "I adopt when it becomes clearly useful", weight: 38 },
+      { label: "I prefer what already works for me", weight: 52 }
+    ]},
+    { text: "What's your ideal way to exercise?", options: [
+      { label: "Extreme sports or competitive team sports", weight: 18 },
+      { label: "Gym workouts or running", weight: 26 },
+      { label: "Yoga, swimming, or hiking", weight: 38 },
+      { label: "Walking and gardening", weight: 52 }
+    ]},
+    { text: "How do you feel about staying up past midnight?", options: [
+      { label: "That's when the real fun starts!", weight: 17 },
+      { label: "Sure, on weekends", weight: 25 },
+      { label: "Only on special occasions", weight: 40 },
+      { label: "I can barely keep my eyes open past 10 PM", weight: 55 }
+    ]},
+    { text: "You get a surprise day off. What do you do?", options: [
+      { label: "Call friends and plan something spontaneous", weight: 18 },
+      { label: "Catch up on that show everyone's watching", weight: 24 },
+      { label: "Tackle that to-do list I've been putting off", weight: 40 },
+      { label: "Enjoy a quiet morning with coffee, maybe visit a garden", weight: 52 }
+    ]},
+    { text: "How do you typically learn something new?", options: [
+      { label: "Watch a 30-second TikTok or Reel about it", weight: 15 },
+      { label: "YouTube tutorials", weight: 24 },
+      { label: "Read an in-depth article or take an online course", weight: 38 },
+      { label: "Buy a book on the subject and study it thoroughly", weight: 52 }
+    ]},
+    { text: "What's your spending style?", options: [
+      { label: "Buy now, worry later (YOLO!)", weight: 16 },
+      { label: "I budget loosely but treat myself often", weight: 25 },
+      { label: "I save consistently but allow for fun purchases", weight: 40 },
+      { label: "I track every expense and prioritize saving", weight: 54 }
+    ]},
+    { text: "How do you feel about small talk?", options: [
+      { label: "I love it, I'll chat with anyone!", weight: 20 },
+      { label: "It's fine, I can do it when needed", weight: 28 },
+      { label: "I prefer deeper, more meaningful conversations", weight: 40 },
+      { label: "I'd rather avoid it altogether", weight: 48 }
+    ]},
+    { text: "Someone cuts you off in traffic. Your reaction?", options: [
+      { label: "Honk aggressively and maybe yell something", weight: 18 },
+      { label: "Mutter under my breath and move on", weight: 28 },
+      { label: "Take a deep breath, not worth the stress", weight: 42 },
+      { label: "I barely noticed, I was listening to my podcast", weight: 50 }
+    ]},
+    { text: "What's your favorite type of TV content?", options: [
+      { label: "Reality TV shows and TikTok compilations", weight: 16 },
+      { label: "Action movies, comedy series, or anime", weight: 24 },
+      { label: "Documentaries, dramas, or mystery thrillers", weight: 38 },
+      { label: "News, history programs, or nature documentaries", weight: 52 }
+    ]},
+    { text: "How do you feel about cooking?", options: [
+      { label: "I survive on takeout and instant noodles", weight: 16 },
+      { label: "I can make a few basic meals", weight: 24 },
+      { label: "I enjoy cooking and try new recipes regularly", weight: 38 },
+      { label: "Cooking from scratch is one of my greatest joys", weight: 52 }
+    ]},
+    { text: "What's your social circle like?", options: [
+      { label: "Huge! I know everyone and love big groups", weight: 17 },
+      { label: "A solid group of friends, we do everything together", weight: 25 },
+      { label: "A few close friends I see regularly", weight: 38 },
+      { label: "A small inner circle I've known for decades", weight: 52 }
+    ]},
+    { text: "How do you handle waiting (in line, at a restaurant)?", options: [
+      { label: "Ugh, so impatient! I might leave", weight: 17 },
+      { label: "Pull out my phone and scroll social media", weight: 23 },
+      { label: "Chat with whoever's around or people-watch", weight: 38 },
+      { label: "Wait patiently, what's the rush?", weight: 52 }
+    ]},
+    { text: "What would make you happiest right now?", options: [
+      { label: "A surprise adventure or festival tickets", weight: 18 },
+      { label: "A weekend getaway with my favorite people", weight: 28 },
+      { label: "A week of uninterrupted peace and quiet", weight: 42 },
+      { label: "Knowing my family is healthy and my future is secure", weight: 56 }
+    ]},
+    { text: "How do you feel about change?", options: [
+      { label: "Bring it on! Change keeps life exciting", weight: 18 },
+      { label: "I adapt, but I need a little time", weight: 28 },
+      { label: "I prefer stability but can handle it when needed", weight: 42 },
+      { label: "I value routine and predictability", weight: 54 }
+    ]}
+  ];
+
+  var ageBrackets = [
+    { min: 10, max: 19, label: "Teen Spirit", icon: "\uD83D\uDE1C",
+      desc: "Your mind is bursting with youthful energy, spontaneity, and enthusiasm! You live in the moment, embrace trends, and approach life with a carefree attitude. Your curiosity about the world is infectious, and you are not afraid to try new things or make mistakes.",
+      traits: ["Spontaneous", "Energetic", "Trend-savvy", "Social butterfly", "Risk-taking", "Optimistic"] },
+    { min: 20, max: 29, label: "Young Explorer", icon: "\uD83C\uDF1F",
+      desc: "Your mental age reflects a perfect balance of youthful energy and emerging maturity. You are adventurous and open-minded, but you are also starting to develop long-term goals and meaningful relationships. The world feels full of possibilities.",
+      traits: ["Adventurous", "Adaptable", "Ambitious", "Open-minded", "Tech-savvy", "Socially active"] },
+    { min: 30, max: 39, label: "Balanced Adult", icon: "\uD83C\uDFAF",
+      desc: "Your mind strikes an excellent balance between fun and responsibility. You know what you want, you are confident in your choices, and you have developed strong emotional intelligence. You enjoy both social time and quiet moments of reflection.",
+      traits: ["Confident", "Emotionally mature", "Goal-oriented", "Balanced", "Self-aware", "Reliable"] },
+    { min: 40, max: 49, label: "Wise Realist", icon: "\uD83E\uDDD0",
+      desc: "Your mental age reflects deep wisdom, patience, and a clear sense of priorities. You value quality over quantity in all aspects of life. You have learned from experience and approach challenges with calm confidence. Stability and meaningful connections matter most to you.",
+      traits: ["Patient", "Wise", "Pragmatic", "Calm under pressure", "Selective", "Experienced"] },
+    { min: 50, max: 70, label: "Old Soul", icon: "\uD83E\uDDD3",
+      desc: "You carry the wisdom and serenity of an old soul. Your mind values peace, reflection, and deep human connection above all else. You have a philosophical outlook on life and prefer substance over superficiality. Your emotional depth and patience are remarkable.",
+      traits: ["Philosophical", "Serene", "Deeply empathetic", "Reflective", "Traditional", "Content"] }
+  ];
+
+  // DOM references
+  var instructionsView = document.getElementById('instructionsView');
+  var quizView = document.getElementById('quizView');
+  var resultView = document.getElementById('resultView');
+  var startBtn = document.getElementById('startBtn');
+  var retakeBtn = document.getElementById('retakeBtn');
+  var progressText = document.getElementById('progressText');
+  var progressFill = document.getElementById('progressFill');
+  var questionText = document.getElementById('questionText');
+  var optionsContainer = document.getElementById('optionsContainer');
+  var resultIcon = document.getElementById('resultIcon');
+  var resultAge = document.getElementById('resultAge');
+  var resultLabel = document.getElementById('resultLabel');
+  var resultDesc = document.getElementById('resultDesc');
+  var resultTraitsChart = document.getElementById('resultTraitsChart');
+  var resultTraits = document.getElementById('resultTraits');
+
+  var currentIndex = 0;
+  var shuffled = [];
+  var totalWeight = 0;
+  var isProcessing = false;
+
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+  }
+
+  function showView(view) {
+    instructionsView.style.display = 'none';
+    quizView.style.display = 'none';
+    resultView.style.display = 'none';
+    view.style.display = '';
+  }
+
+  function renderQuestion() {
+    var q = shuffled[currentIndex];
+    progressText.textContent = 'Question ' + (currentIndex + 1) + ' of 25';
+    progressFill.style.width = Math.round((currentIndex / 25) * 100) + '%';
+    questionText.textContent = q.text;
+
+    optionsContainer.innerHTML = '';
+    var opts = shuffle(q.options);
+    for (var i = 0; i < opts.length; i++) {
+      var btn = document.createElement('button');
+      btn.className = 'quiz-option';
+      btn.type = 'button';
+      btn.textContent = opts[i].label;
+      btn.setAttribute('data-weight', String(opts[i].weight));
+      optionsContainer.appendChild(btn);
+    }
+  }
+
+  function handleOptionClick(e) {
+    if (isProcessing) return;
+    var target = e.target;
+    if (!target || !target.classList || !target.classList.contains('quiz-option')) return;
+
+    isProcessing = true;
+    var w = parseInt(target.getAttribute('data-weight'), 10);
+    totalWeight += w;
+    target.classList.add('selected');
+
+    setTimeout(function () {
+      currentIndex++;
+      if (currentIndex >= 25) {
+        showResults();
+      } else {
+        renderQuestion();
+      }
+      isProcessing = false;
+    }, 300);
+  }
+
+  function showResults() {
+    showView(resultView);
+    progressFill.style.width = '100%';
+
+    // Calculate mental age: average of weights, roughly 10-56 range mapped
+    var avg = totalWeight / 25;
+    // Map average weight to mental age (15-65 range)
+    var mentalAge = Math.round(avg * 1.05);
+    if (mentalAge < 12) mentalAge = 12;
+    if (mentalAge > 68) mentalAge = 68;
+
+    // Find bracket
+    var bracket = ageBrackets[2]; // default to balanced
+    for (var i = 0; i < ageBrackets.length; i++) {
+      if (mentalAge >= ageBrackets[i].min && mentalAge <= ageBrackets[i].max) {
+        bracket = ageBrackets[i];
+        break;
+      }
+    }
+
+    resultIcon.textContent = bracket.icon;
+    resultAge.innerHTML = '<span class="ma-age-display">' + mentalAge + '</span> <span class="ma-age-unit">years old</span>';
+    resultLabel.innerHTML = '<span class="ma-bracket-title">' + bracket.label + '</span>';
+    resultDesc.textContent = bracket.desc;
+
+    // Comparison text
+    var comparisonHTML = '<p class="ma-comparison">The average mental age for test takers is 32. ';
+    if (mentalAge < 28) {
+      comparisonHTML += 'Your mind is younger than most!</p>';
+    } else if (mentalAge > 36) {
+      comparisonHTML += 'Your mind is more mature than most!</p>';
+    } else {
+      comparisonHTML += 'You are right around the average!</p>';
+    }
+    resultTraitsChart.innerHTML = comparisonHTML;
+
+    // Show traits
+    var pillsHTML = '<div class="ma-trait-pills">';
+    for (var t = 0; t < bracket.traits.length; t++) {
+      pillsHTML += '<span class="ma-trait-pill">' + bracket.traits[t] + '</span>';
+    }
+    pillsHTML += '</div>';
+    resultTraits.innerHTML = pillsHTML;
+
+    // GameShare
+    if (window.GameShare) {
+      var ratingColor = mentalAge < 25 ? '#22c55e' : mentalAge < 35 ? '#2563eb' : mentalAge < 45 ? '#f59e0b' : '#e91e63';
+      window.GameShare.show({
+        gameName: gameName,
+        gameSlug: gameSlug,
+        gameIcon: bracket.icon,
+        score: mentalAge,
+        unit: metricUnit,
+        metricLabel: metricLabel,
+        ratingLabel: bracket.label,
+        ratingColor: ratingColor
+      });
+    }
+  }
+
+  function startQuiz() {
+    currentIndex = 0;
+    totalWeight = 0;
+    shuffled = shuffle(questions);
+    isProcessing = false;
+    showView(quizView);
+    renderQuestion();
+    if (window.GameShare) window.GameShare.hide();
+  }
+
+  startBtn.addEventListener('click', startQuiz);
+  retakeBtn.addEventListener('click', startQuiz);
+  optionsContainer.addEventListener('click', handleOptionClick);
+})();
+</script>

@@ -1,0 +1,400 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import GameShare from '../../components/GameShare.astro';
+import '../../styles/game.css';
+import '../../styles/quiz.css';
+
+const gameName = "Anxiety Test (GAD-7)";
+const gameSlug = "anxiety-test";
+const gameIcon = "\uD83D\uDCAD";
+const metricLabel = "GAD-7 Score";
+const metricUnit = "/21";
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tests & Games", "item": "https://toolcalcs.com/test/" },
+      { "@type": "ListItem", "position": 3, "name": "Anxiety Test (GAD-7)" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Anxiety Test (GAD-7)",
+    "url": "https://toolcalcs.com/test/anxiety-test/",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Free anxiety self-assessment based on the GAD-7 clinical screening tool. 7 questions measuring generalized anxiety severity over the past 2 weeks."
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is the GAD-7?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The GAD-7 (Generalized Anxiety Disorder 7-item scale) is a validated clinical screening tool developed by Drs. Robert Spitzer, Janet Williams, and Kurt Kroenke in 2006. It consists of 7 questions that measure the severity of generalized anxiety disorder symptoms over the past two weeks. It is widely used in primary care and mental health settings worldwide.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Is the GAD-7 a diagnosis?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'No, the GAD-7 is a screening tool, not a diagnostic instrument. A high score suggests the presence of anxiety symptoms that warrant further evaluation, but only a qualified mental health professional can diagnose an anxiety disorder through comprehensive clinical assessment. This online version is for educational purposes only.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What do GAD-7 scores mean?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'GAD-7 scores range from 0 to 21 and are interpreted as follows: 0-4 indicates minimal anxiety, 5-9 indicates mild anxiety, 10-14 indicates moderate anxiety, and 15-21 indicates severe anxiety. A score of 10 or above is commonly used as a clinical cutoff suggesting the need for professional evaluation.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'When should I see a professional for anxiety?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'You should consider seeking professional help if anxiety interferes with your daily activities, relationships, or work performance; if you experience persistent physical symptoms like racing heart, difficulty breathing, or sleep problems; if you use alcohol or substances to cope; or if you score 10 or above on the GAD-7. There is no wrong time to seek help — even mild anxiety can benefit from professional support.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What treatments are available for anxiety?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Effective treatments for anxiety include cognitive-behavioral therapy (CBT), which is the gold-standard psychotherapy for anxiety disorders; medication such as SSRIs or SNRIs prescribed by a physician; mindfulness-based stress reduction; relaxation techniques; regular exercise; and lifestyle modifications. Most people benefit from a combination of approaches tailored to their individual needs.',
+        },
+      },
+    ],
+  }
+];
+---
+
+<BaseLayout
+  title="Anxiety Test (GAD-7) - Free Anxiety Self-Assessment | ToolCalcs"
+  description="Free anxiety self-assessment based on the GAD-7 clinical screening tool. 7 questions measuring generalized anxiety severity over the past 2 weeks."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/test/">Tests & Games</a> &rsaquo;
+    <span>Anxiety Test (GAD-7)</span>
+  </nav>
+
+  <h1>Anxiety Test (GAD-7)</h1>
+  <p class="page-desc">Answer 7 questions about your experiences over the past 2 weeks to assess your anxiety severity using the clinically validated GAD-7 screening tool.</p>
+
+  <div class="game-box">
+    <div class="game-area" id="gameArea" role="region" aria-label="Anxiety self-assessment area" aria-live="polite">
+      <div class="game-instructions" id="instructionsView">
+        <h2>GAD-7 Anxiety Screening</h2>
+        <p>Over the <strong>last 2 weeks</strong>, how often have you been bothered by the following problems? Select the option that best describes your experience for each question.</p>
+        <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:12px 16px;margin:16px 0;font-size:0.85rem;line-height:1.6;text-align:left;">
+          <strong>Disclaimer:</strong> This is a screening tool for educational purposes only. It is <strong>NOT</strong> a clinical diagnosis. If you are experiencing significant anxiety, please consult a qualified mental health professional. If you are in crisis, call or text <strong>988</strong> (Suicide &amp; Crisis Lifeline).
+        </div>
+        <p style="font-size:0.85rem;color:var(--color-text-muted);">7 questions &middot; About 2 minutes</p>
+        <button class="game-btn primary" id="startBtn" type="button" style="margin-top:16px;">Start Assessment</button>
+      </div>
+
+      <div class="play-view" id="playView" style="display:none;">
+        <div class="quiz-progress">
+          <div class="quiz-progress-text" id="progressText">Question 1 of 7</div>
+          <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="progressFill" style="width:0%"></div></div>
+        </div>
+        <div class="quiz-question">
+          <p style="font-size:0.8rem;color:var(--color-text-muted);margin:0 0 4px;">Over the last 2 weeks, how often have you been bothered by:</p>
+          <div class="quiz-question-text" id="questionText"></div>
+        </div>
+        <div class="quiz-options" id="optionsContainer"></div>
+      </div>
+
+      <div class="result-view" id="resultView" style="display:none;">
+        <div class="result-icon" aria-hidden="true">&#x1F4AD;</div>
+        <div class="result-label">Your GAD-7 Score</div>
+        <div class="quiz-result-type" id="scoreDisplay"></div>
+        <div id="severityBadge" style="display:inline-block;padding:6px 16px;border-radius:20px;font-weight:700;font-size:0.95rem;margin-bottom:16px;"></div>
+        <div class="quiz-result-desc" id="resultDesc"></div>
+        <div id="seekHelp" style="display:none;background:#fef2f2;border:1px solid #fca5a5;border-radius:var(--radius);padding:16px;margin:16px auto;max-width:500px;text-align:left;font-size:0.9rem;line-height:1.6;">
+          <strong style="color:#991b1b;">When to Seek Professional Help</strong>
+          <p style="margin:8px 0 0;">Your score suggests moderate to severe anxiety symptoms. We strongly recommend speaking with a healthcare provider or mental health professional. Effective treatments are available and can significantly improve your quality of life.</p>
+          <p style="margin:8px 0 0;"><strong>Crisis Resources:</strong> Call or text <strong>988</strong> (Suicide &amp; Crisis Lifeline) | Text HOME to <strong>741741</strong> (Crisis Text Line)</p>
+        </div>
+        <div id="strategiesSection" style="max-width:500px;margin:16px auto;text-align:left;">
+          <strong>Self-Help Strategies</strong>
+          <ul style="margin:8px 0;padding-left:20px;font-size:0.9rem;line-height:1.8;">
+            <li>Practice deep breathing exercises (4-7-8 technique)</li>
+            <li>Engage in regular physical activity (30 minutes most days)</li>
+            <li>Limit caffeine and alcohol intake</li>
+            <li>Maintain a consistent sleep schedule</li>
+            <li>Try mindfulness meditation or progressive muscle relaxation</li>
+            <li>Stay connected with supportive friends and family</li>
+          </ul>
+        </div>
+        <button class="game-btn primary" id="tryAgainBtn" type="button" style="margin-top:16px;">Take Again</button>
+      </div>
+    </div>
+
+    <GameShare />
+
+    <div class="attempt-history" id="attemptHistory" hidden>
+      <h3>Attempt History</h3>
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is Generalized Anxiety Disorder?</h2>
+    <p>Generalized Anxiety Disorder (GAD) is one of the most common mental health conditions, affecting approximately 6.8 million adults in the United States alone — about 3.1% of the population. Unlike the normal worry that everyone experiences from time to time, GAD involves persistent, excessive, and often uncontrollable anxiety about everyday matters such as health, finances, work, and family. This worry occurs more days than not for at least six months and is accompanied by physical symptoms such as muscle tension, fatigue, restlessness, and difficulty concentrating.</p>
+    <p>What distinguishes GAD from normal worry is its intensity, duration, and the degree to which it interferes with daily functioning. Everyone worries before a job interview or a medical appointment, but a person with GAD may worry intensely about these situations for weeks in advance, struggle to control the worry even when they recognize it is excessive, and experience physical symptoms that affect their sleep, appetite, and ability to concentrate at work. The worry often jumps from one topic to another, creating a constant undercurrent of anxiety that is exhausting and difficult to escape.</p>
+    <p>GAD frequently co-occurs with other conditions, including major depression, other anxiety disorders (such as social anxiety disorder or panic disorder), and substance use disorders. This comorbidity can complicate diagnosis and treatment, which is why professional evaluation is important for anyone experiencing significant anxiety symptoms.</p>
+
+    <h2>Understanding the GAD-7 Screening Tool</h2>
+    <p>The GAD-7 (Generalized Anxiety Disorder 7-item scale) was developed by Drs. Robert L. Spitzer, Janet B.W. Williams, and Kurt Kroenke and published in the journal <em>Archives of Internal Medicine</em> in 2006. It was designed as a brief, practical screening tool that could be administered in primary care settings to identify patients who may have generalized anxiety disorder and to monitor symptom severity over time.</p>
+    <p>The development of the GAD-7 was rigorous. The researchers began with 13 candidate items based on the diagnostic criteria for GAD in the DSM-IV and the International Classification of Diseases (ICD-10). Through factor analysis and validation studies involving over 2,700 patients in primary care clinics, they refined the instrument to 7 items that demonstrated excellent internal consistency (Cronbach's alpha of 0.92) and strong test-retest reliability.</p>
+    <p>Each of the 7 items asks how often the patient has been bothered by a specific anxiety symptom over the past two weeks. Responses are scored on a 4-point Likert scale: Not at all (0 points), Several days (1 point), More than half the days (2 points), and Nearly every day (3 points). The total score ranges from 0 to 21, with established cutoff points for minimal (0-4), mild (5-9), moderate (10-14), and severe (15-21) anxiety.</p>
+    <p>A score of 10 or above has been identified as the optimal cutoff for detecting clinically significant anxiety, with a sensitivity of 89% and a specificity of 82% for generalized anxiety disorder. The GAD-7 has since been translated into over 100 languages and is used in clinical practice, research, and public health screening worldwide.</p>
+
+    <h2>Understanding Anxiety: Normal vs. Clinical</h2>
+    <p>Anxiety is a normal and even adaptive human emotion. It is the body's built-in alarm system — the fight-or-flight response that prepares us to deal with threats. Feeling anxious before a presentation, a first date, or a medical test is completely normal. This type of situational anxiety typically resolves once the stressful event passes and does not significantly impair daily functioning.</p>
+    <p>Clinical anxiety, however, is different in several key ways. It is disproportionate to the actual threat, persistent over time (lasting weeks or months), difficult or impossible to control through willpower alone, and significantly impairs the person's ability to work, maintain relationships, or enjoy life. Physical symptoms — racing heart, shortness of breath, gastrointestinal problems, muscle tension, insomnia, and fatigue — are common and can be so severe that people initially seek medical treatment for what they believe is a physical illness.</p>
+    <p>Recognizing the difference between normal worry and clinical anxiety is important because clinical anxiety responds well to treatment, but it rarely improves on its own without intervention. Many people suffer unnecessarily for years because they believe their anxiety is just part of their personality or something they should be able to handle on their own. In reality, anxiety disorders are highly treatable conditions, and seeking help is a sign of strength, not weakness.</p>
+
+    <h2>Types of Anxiety Disorders</h2>
+    <p>While the GAD-7 specifically screens for generalized anxiety disorder, it is helpful to understand that anxiety disorders encompass several distinct conditions:</p>
+    <p><strong>Generalized Anxiety Disorder (GAD)</strong> involves chronic, excessive worry about multiple areas of life. The worry is difficult to control and is accompanied by physical symptoms like restlessness, fatigue, and muscle tension.</p>
+    <p><strong>Social Anxiety Disorder</strong> (social phobia) involves intense fear and avoidance of social situations due to concern about being judged, embarrassed, or humiliated. It goes far beyond normal shyness and can be severely debilitating.</p>
+    <p><strong>Panic Disorder</strong> involves recurrent, unexpected panic attacks — sudden surges of intense fear accompanied by physical symptoms like pounding heart, chest pain, dizziness, and shortness of breath. People with panic disorder often develop a fear of the attacks themselves.</p>
+    <p><strong>Specific Phobias</strong> involve intense, irrational fear of a specific object or situation, such as heights, flying, spiders, or blood. The fear is disproportionate to the actual danger and leads to avoidance behavior.</p>
+    <p><strong>Agoraphobia</strong> involves fear and avoidance of situations where escape might be difficult or help unavailable during a panic attack, such as crowded places, public transportation, or being outside the home alone.</p>
+
+    <h2>Treatment Options for Anxiety</h2>
+    <p>Anxiety disorders are among the most treatable mental health conditions. The two primary evidence-based treatments are psychotherapy and medication, and they can be used individually or in combination depending on the severity and the individual's preferences.</p>
+    <p><strong>Cognitive-Behavioral Therapy (CBT)</strong> is the gold-standard psychotherapy for anxiety disorders. CBT helps people identify and challenge the distorted thought patterns that fuel anxiety, develop healthier coping strategies, and gradually face feared situations through a process called exposure therapy. Research consistently shows that CBT produces significant and lasting improvements, with many patients maintaining their gains years after treatment ends.</p>
+    <p><strong>Medication</strong> can be highly effective, particularly for moderate to severe anxiety. Selective serotonin reuptake inhibitors (SSRIs) like sertraline (Zoloft) and escitalopram (Lexapro), and serotonin-norepinephrine reuptake inhibitors (SNRIs) like venlafaxine (Effexor) and duloxetine (Cymbalta), are first-line pharmacological treatments. These medications typically take 4-6 weeks to reach full effectiveness. Benzodiazepines may be prescribed for short-term relief but carry risks of dependence and are generally not recommended for long-term use.</p>
+    <p><strong>Lifestyle modifications</strong> play an important supportive role. Regular exercise has been shown to reduce anxiety symptoms significantly — some studies suggest it can be as effective as medication for mild to moderate anxiety. Adequate sleep, reduced caffeine and alcohol intake, mindfulness meditation, yoga, and strong social connections all contribute to lower anxiety levels. These strategies work best in combination with professional treatment for clinical anxiety.</p>
+
+    <h2>Coping Strategies for Everyday Anxiety</h2>
+    <p>Whether your anxiety is clinical or situational, several evidence-based strategies can help you manage symptoms in daily life:</p>
+    <p><strong>Deep breathing techniques</strong> activate the parasympathetic nervous system and counteract the fight-or-flight response. The 4-7-8 technique (inhale for 4 seconds, hold for 7, exhale for 8) is a simple method you can use anywhere. Practice it several times daily, not just during anxious moments, to build the habit.</p>
+    <p><strong>Progressive muscle relaxation</strong> involves systematically tensing and then releasing each muscle group in your body. This technique reduces physical tension — one of the hallmark symptoms of GAD — and teaches you to recognize the difference between tension and relaxation.</p>
+    <p><strong>Mindfulness meditation</strong> trains you to observe anxious thoughts without judgment or engagement. Rather than trying to suppress anxiety (which often makes it worse), mindfulness encourages you to notice the thoughts, acknowledge them, and let them pass. Regular practice has been shown to reduce anxiety symptoms and increase emotional resilience.</p>
+    <p><strong>Limiting avoidance behavior</strong> is crucial because avoidance reinforces anxiety. When you avoid a feared situation, you experience temporary relief, which teaches your brain that the situation was truly dangerous. Gradually facing feared situations — ideally with professional guidance — breaks this cycle and reduces anxiety over time.</p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is the GAD-7?</h3>
+    <p>The GAD-7 (Generalized Anxiety Disorder 7-item scale) is a clinically validated screening tool developed by Drs. Spitzer, Williams, and Kroenke in 2006. It consists of 7 questions that assess the frequency of anxiety symptoms over the past two weeks. Each item is scored from 0 (not at all) to 3 (nearly every day), producing a total score of 0-21. It is one of the most widely used anxiety screening instruments in healthcare settings worldwide and has been translated into over 100 languages.</p>
+
+    <h3>Is the GAD-7 a diagnosis?</h3>
+    <p>No, the GAD-7 is a screening tool, not a diagnostic instrument. A high score indicates the presence of anxiety symptoms that may warrant further clinical evaluation, but it cannot replace a comprehensive assessment by a qualified mental health professional. Diagnosis of generalized anxiety disorder requires a thorough clinical interview, consideration of medical causes, and evaluation based on DSM-5 criteria. This online version is intended for educational and self-awareness purposes only.</p>
+
+    <h3>What do GAD-7 scores mean?</h3>
+    <p>GAD-7 scores are interpreted using established severity cutoffs: 0-4 points indicates minimal anxiety (symptoms are within the normal range), 5-9 points indicates mild anxiety (some symptoms present but may not require treatment), 10-14 points indicates moderate anxiety (clinically significant symptoms that warrant professional evaluation), and 15-21 points indicates severe anxiety (significant impairment likely, professional help strongly recommended). A score of 10 or above is the commonly used threshold for identifying clinically meaningful anxiety.</p>
+
+    <h3>When should I see a professional for anxiety?</h3>
+    <p>Consider seeking professional help if your anxiety persists for more than a few weeks, interferes with your work or relationships, causes significant physical symptoms, disrupts your sleep, or leads you to avoid situations you need or want to participate in. A GAD-7 score of 10 or above is a strong indicator that professional evaluation would be beneficial. However, there is no wrong time to seek help — even people with mild anxiety can benefit from learning evidence-based coping strategies through therapy.</p>
+
+    <h3>What treatments are available for anxiety?</h3>
+    <p>The most effective treatments for anxiety include cognitive-behavioral therapy (CBT), which helps you identify and change unhelpful thought patterns; medication such as SSRIs or SNRIs prescribed by a doctor; and lifestyle modifications including regular exercise, adequate sleep, mindfulness practice, and reduced caffeine and alcohol consumption. Most anxiety disorders respond well to treatment, and many people experience significant improvement within weeks to months. The best approach depends on the individual and is typically determined in collaboration with a healthcare provider.</p>
+  </article>
+
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .game-area { cursor: default; user-select: auto; -webkit-user-select: auto; }
+</style>
+
+<script define:vars={{ gameName, gameSlug, gameIcon, metricLabel, metricUnit }}>
+(function () {
+  'use strict';
+
+  var questions = [
+    "Feeling nervous, anxious, or on edge",
+    "Not being able to stop or control worrying",
+    "Worrying too much about different things",
+    "Trouble relaxing",
+    "Being so restless that it is hard to sit still",
+    "Becoming easily annoyed or irritable",
+    "Feeling afraid, as if something awful might happen"
+  ];
+
+  var optionLabels = [
+    { text: "Not at all", value: 0 },
+    { text: "Several days", value: 1 },
+    { text: "More than half the days", value: 2 },
+    { text: "Nearly every day", value: 3 }
+  ];
+
+  var severityLevels = [
+    { min: 0, max: 4, label: "Minimal Anxiety", color: "#22c55e", bgColor: "#dcfce7", desc: "Your score suggests minimal anxiety. Your symptoms are within the normal range. Most people experience occasional worry, and your current level does not indicate a clinical concern. Continue practicing healthy habits like regular exercise, good sleep hygiene, and stress management to maintain your well-being." },
+    { min: 5, max: 9, label: "Mild Anxiety", color: "#f59e0b", bgColor: "#fef3c7", desc: "Your score suggests mild anxiety. You are experiencing some anxiety symptoms that may be noticeable but are likely manageable. Consider incorporating relaxation techniques, regular exercise, and mindfulness practices into your routine. If symptoms persist or worsen, consider speaking with a healthcare provider." },
+    { min: 10, max: 14, label: "Moderate Anxiety", color: "#f97316", bgColor: "#fff7ed", desc: "Your score suggests moderate anxiety. Your symptoms are clinically significant and may be affecting your daily life, work, or relationships. We recommend speaking with a healthcare provider or mental health professional for further evaluation. Effective treatments are available and can make a meaningful difference." },
+    { min: 15, max: 21, label: "Severe Anxiety", color: "#ef4444", bgColor: "#fef2f2", desc: "Your score suggests severe anxiety. You are experiencing significant anxiety symptoms that are very likely affecting your quality of life. We strongly recommend seeking professional help as soon as possible. Effective treatments including therapy and medication can provide substantial relief. You do not have to manage this alone." }
+  ];
+
+  var STORAGE_KEY = 'toolcalcs_anxiety-test_history';
+  var MAX_HISTORY = 20;
+
+  function loadHistory() {
+    try { var r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch (e) {}
+    return [];
+  }
+  function saveHistory(h) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch (e) {}
+  }
+
+  var instructionsView = document.getElementById('instructionsView');
+  var playView = document.getElementById('playView');
+  var resultView = document.getElementById('resultView');
+  var startBtn = document.getElementById('startBtn');
+  var tryAgainBtn = document.getElementById('tryAgainBtn');
+  var progressText = document.getElementById('progressText');
+  var progressFill = document.getElementById('progressFill');
+  var questionText = document.getElementById('questionText');
+  var optionsContainer = document.getElementById('optionsContainer');
+  var scoreDisplay = document.getElementById('scoreDisplay');
+  var severityBadge = document.getElementById('severityBadge');
+  var resultDesc = document.getElementById('resultDesc');
+  var seekHelp = document.getElementById('seekHelp');
+  var attemptHistorySection = document.getElementById('attemptHistory');
+  var historyList = document.getElementById('historyList');
+
+  var currentIndex = 0;
+  var totalScore = 0;
+
+  function showView(view) {
+    instructionsView.style.display = 'none';
+    playView.style.display = 'none';
+    resultView.style.display = 'none';
+    view.style.display = '';
+  }
+
+  function startTest() {
+    currentIndex = 0;
+    totalScore = 0;
+    showView(playView);
+    showQuestion();
+  }
+
+  function showQuestion() {
+    var num = currentIndex + 1;
+    progressText.textContent = 'Question ' + num + ' of 7';
+    progressFill.style.width = Math.round((num / 7) * 100) + '%';
+    questionText.textContent = questions[currentIndex];
+
+    var html = '';
+    for (var i = 0; i < optionLabels.length; i++) {
+      html += '<button class="quiz-option" data-value="' + optionLabels[i].value + '" type="button">' + optionLabels[i].text + '</button>';
+    }
+    optionsContainer.innerHTML = html;
+  }
+
+  function handleAnswer(val) {
+    totalScore += val;
+    currentIndex++;
+    if (currentIndex < 7) {
+      showQuestion();
+    } else {
+      showResults();
+    }
+  }
+
+  function getSeverity(score) {
+    for (var i = 0; i < severityLevels.length; i++) {
+      if (score >= severityLevels[i].min && score <= severityLevels[i].max) return severityLevels[i];
+    }
+    return severityLevels[0];
+  }
+
+  function showResults() {
+    var severity = getSeverity(totalScore);
+
+    scoreDisplay.textContent = totalScore + ' / 21';
+    scoreDisplay.style.color = severity.color;
+
+    severityBadge.textContent = severity.label;
+    severityBadge.style.background = severity.bgColor;
+    severityBadge.style.color = severity.color;
+
+    resultDesc.textContent = severity.desc;
+
+    if (totalScore >= 10) {
+      seekHelp.style.display = 'block';
+    } else {
+      seekHelp.style.display = 'none';
+    }
+
+    showView(resultView);
+
+    var h = loadHistory();
+    h.unshift({ score: totalScore, severity: severity.label, date: new Date().toISOString() });
+    saveHistory(h);
+    renderHistory();
+
+    if (window.GameShare) {
+      window.GameShare.show({
+        gameName: gameName,
+        gameSlug: gameSlug,
+        gameIcon: gameIcon,
+        score: totalScore + '/21',
+        unit: '',
+        metricLabel: metricLabel,
+        ratingLabel: severity.label,
+        ratingColor: severity.color
+      });
+    }
+  }
+
+  function renderHistory() {
+    var history = loadHistory();
+    if (history.length === 0) { attemptHistorySection.hidden = true; return; }
+    attemptHistorySection.hidden = false;
+    var html = '';
+    for (var i = 0; i < history.length; i++) {
+      var e = history[i];
+      html += '<div class="history-item">';
+      html += '<span class="history-score">' + e.score + '/21 — ' + e.severity + '</span>';
+      html += '<span class="history-time">' + formatDate(e.date) + '</span>';
+      html += '</div>';
+    }
+    historyList.innerHTML = html;
+  }
+
+  function formatDate(iso) {
+    try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    catch (e) { return ''; }
+  }
+
+  optionsContainer.addEventListener('click', function (e) {
+    var btn = e.target;
+    if (!btn.classList.contains('quiz-option')) return;
+    var val = parseInt(btn.getAttribute('data-value'), 10);
+    if (isNaN(val)) return;
+    btn.classList.add('selected');
+    setTimeout(function () { handleAnswer(val); }, 200);
+  });
+
+  startBtn.addEventListener('click', startTest);
+  tryAgainBtn.addEventListener('click', startTest);
+  renderHistory();
+})();
+</script>

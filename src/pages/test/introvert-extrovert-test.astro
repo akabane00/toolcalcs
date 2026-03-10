@@ -1,0 +1,594 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import GameShare from '../../components/GameShare.astro';
+import '../../styles/game.css';
+import '../../styles/quiz.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tests & Games", "item": "https://toolcalcs.com/test/" },
+      { "@type": "ListItem", "position": 3, "name": "Introvert vs Extrovert Test" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Introvert vs Extrovert Test",
+    "url": "https://toolcalcs.com/test/introvert-extrovert-test/",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Free introvert-extrovert spectrum test. 20 quick questions to discover where you fall on the introversion-extraversion scale. Are you an ambivert?"
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is the difference between introversion and shyness?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Introversion and shyness are often confused but are fundamentally different. Introversion is a preference for lower-stimulation environments and a tendency to recharge through solitude. Introverts choose to spend time alone because they enjoy it. Shyness, on the other hand, is a fear of social judgment. A shy person may desperately want to socialize but feels anxious about it. You can be an introvert who is perfectly confident in social settings, or an extrovert who is shy and nervous around others.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is an ambivert?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'An ambivert is someone who falls near the middle of the introversion-extraversion spectrum. Ambiverts display qualities of both introverts and extroverts depending on the situation. They can enjoy lively social gatherings but also need meaningful alone time. Research suggests that ambiverts may actually have certain advantages, particularly in sales and leadership, because they can naturally adapt their energy level to match different social contexts.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Can introverts become extroverts?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Your position on the introversion-extraversion spectrum is largely influenced by brain chemistry and genetics and tends to remain stable throughout life. However, you can develop skills associated with the other side of the spectrum. Introverts can learn to be effective public speakers and network comfortably, while extroverts can cultivate focus and reflective thinking. The goal is not to change your fundamental nature but to expand your behavioral repertoire.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Is it better to be an introvert or an extrovert?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Neither is inherently better. Western cultures have historically favored extroverted traits, but research shows that introverts and extroverts both have distinct advantages. Introverts excel at deep thinking, careful analysis, and sustained focus. Extroverts excel at networking, quick decision-making, and energizing groups. The most important thing is understanding your natural tendencies and creating an environment that supports your strengths.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How does introversion relate to the Big Five personality model?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Extraversion is one of the Big Five personality traits (along with Openness, Conscientiousness, Agreeableness, and Neuroticism). In the Big Five model, introversion is the low end of the Extraversion scale. The Big Five measures extraversion as a continuous dimension rather than a binary category, recognizing that most people fall somewhere along a spectrum rather than fitting neatly into one box or the other.',
+        },
+      },
+    ],
+  }
+];
+---
+
+<BaseLayout
+  title="Introvert vs Extrovert Test - Where Do You Fall? | ToolCalcs"
+  description="Free introvert-extrovert spectrum test. 20 quick questions to discover where you fall on the introversion-extraversion scale. Are you an ambivert?"
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/test/">Tests &amp; Games</a> &rsaquo;
+    <span>Introvert vs Extrovert Test</span>
+  </nav>
+
+  <h1>Introvert vs Extrovert Test</h1>
+  <p class="page-desc">Answer 20 quick questions to discover where you fall on the introversion-extraversion spectrum. Are you a strong introvert, an extrovert, or an ambivert in the middle?</p>
+
+  <div class="game-box">
+    <div class="game-area" id="gameArea" role="region" aria-label="Introvert extrovert test area" aria-live="polite">
+      <div class="game-instructions" id="instructionsView">
+        <h2>Introversion-Extraversion Assessment</h2>
+        <p>You will be presented with 20 scenarios, each with two possible responses. Choose the option that feels most natural to you. Do not overthink your answers. Go with your gut reaction, not how you think you should respond. There are no right or wrong answers.</p>
+        <button class="game-btn primary" id="startBtn" type="button" style="margin-top:16px;">Start Test</button>
+      </div>
+
+      <div class="play-view" id="playView" style="display:none;">
+        <div class="quiz-progress">
+          <div class="quiz-progress-text" id="progressText">Question 1 of 20</div>
+          <div class="quiz-progress-bar">
+            <div class="quiz-progress-fill" id="progressFill" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="quiz-question">
+          <div class="quiz-question-text" id="questionText"></div>
+        </div>
+        <div class="quiz-options" id="optionsContainer"></div>
+      </div>
+
+      <div class="result-view" id="resultView" style="display:none;">
+        <div class="result-icon" aria-hidden="true" id="resultIcon"></div>
+        <div class="result-label">Your Spectrum Position</div>
+        <div class="score-display">
+          <span class="score-value" id="finalScore">0</span>
+          <span class="score-unit">/100</span>
+        </div>
+        <div class="rating-badge" id="ratingBadge"></div>
+        <div id="spectrumBar" style="margin-top:24px;"></div>
+        <div class="quiz-result-desc" id="typeDescription"></div>
+        <div class="quiz-result-desc" id="typeTips"></div>
+        <button class="game-btn primary" id="tryAgainBtn" type="button" style="margin-top:16px;">Take Again</button>
+      </div>
+    </div>
+
+    <GameShare />
+
+    <div class="attempt-history" id="attemptHistory" hidden>
+      <h3>Attempt History</h3>
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>Understanding Introversion and Extraversion</h2>
+    <p>The concepts of introversion and extraversion are among the most widely recognized personality dimensions in psychology. Introduced by the Swiss psychiatrist Carl Gustav Jung in his 1921 work <em>Psychological Types</em>, these concepts describe fundamental orientations in how people direct their energy and attention. Jung proposed that introverts direct their energy inward toward their inner world of thoughts, reflections, and ideas, while extraverts direct their energy outward toward the external world of people, activities, and social engagement.</p>
+    <p>Jung's original framework was more nuanced than the simple introvert-versus-extrovert dichotomy that popular culture has adopted. He recognized that no one is purely introverted or extraverted and that these tendencies exist on a spectrum. Every person uses both orientations but tends to prefer and be more energized by one. This preference shapes how we recharge our mental batteries, how we process information, and how we engage with the world around us.</p>
+    <p>In the century since Jung's original work, the introversion-extraversion dimension has been incorporated into virtually every major personality framework, including the Big Five personality model, the Myers-Briggs Type Indicator (MBTI), and Hans Eysenck's model of personality. It is arguably the most robust and replicable personality dimension in psychological research, with consistent findings across cultures, age groups, and measurement methods.</p>
+
+    <h2>Introversion Is Not Shyness</h2>
+    <p>One of the most persistent misconceptions about introversion is that it is synonymous with shyness. This confusion has led to countless misunderstandings and even caused introverts to believe something is wrong with them. Introversion and shyness are fundamentally different psychological constructs.</p>
+    <p>Introversion is a preference for environments with less stimulation. Introverts choose solitude or small-group interactions because these settings feel more comfortable and energizing. After a busy social day, an introvert needs quiet time to recharge, not because they are afraid of people but because social interaction, while enjoyable, depletes their energy. Shyness, in contrast, is a fear of social judgment. A shy person may deeply want to connect with others but is held back by anxiety about being evaluated negatively.</p>
+    <p>The critical distinction is that introversion is a preference, while shyness is a fear. You can be an introvert who is perfectly comfortable giving a presentation to hundreds of people, and you can be an extrovert who is terrified of making small talk at a party. The two dimensions are independent, though they can co-occur. Understanding this difference is essential for developing a healthy relationship with your personality, because introversion does not need to be fixed; it is a legitimate and valuable orientation.</p>
+
+    <h2>The Ambivert Advantage</h2>
+    <p>While the introvert-extrovert binary makes for catchy headlines, the reality is that most people fall somewhere in the middle of the spectrum. These people are often called ambiverts. Ambiverts display a flexible mix of introverted and extroverted tendencies, adapting their energy and communication style based on the situation.</p>
+    <p>Research by organizational psychologist Adam Grant at the University of Pennsylvania found that ambiverts may actually have a distinct advantage in certain domains. In a study of sales performance, Grant found that ambiverts outperformed both strong introverts and strong extroverts. Ambiverts generated 24% more revenue than introverts and 32% more than extroverts. The proposed explanation is that ambiverts can naturally shift between listening (an introverted strength) and enthusiasm (an extroverted strength) as the situation demands.</p>
+    <p>If you score near the middle of this test, you may be an ambivert. This means you have access to the strengths of both orientations and can deploy them flexibly. The key is learning to recognize which mode you are in and whether it matches what the current situation requires.</p>
+
+    <h2>Susan Cain and the Quiet Revolution</h2>
+    <p>The cultural conversation around introversion was transformed by Susan Cain's 2012 book <em>Quiet: The Power of Introverts in a World That Can't Stop Talking</em>. Cain argued that Western culture, and American culture in particular, had developed what she called the Extrovert Ideal: a pervasive belief that the ideal self is gregarious, alpha, and comfortable in the spotlight. This cultural bias systematically undervalues the contributions of introverts and pressures them to act against their nature.</p>
+    <p>Cain's work highlighted research showing that introverts possess unique strengths that are essential for innovation, leadership, and deep thinking. She cited examples of transformative introverts including Rosa Parks, Albert Einstein, Eleanor Roosevelt, and Steve Wozniak. Her TED Talk on the power of introverts has been viewed over 40 million times and sparked a worldwide movement to recognize and accommodate different personality styles in workplaces, schools, and communities.</p>
+    <p>The impact of Cain's work has been substantial. Many organizations have redesigned their office spaces to include quiet zones alongside collaborative areas. Schools have begun to reconsider participation grading that penalizes quiet students. Leadership development programs now recognize that effective leadership does not require a single personality template. The quiet revolution continues to reshape how we understand the value of different personality orientations.</p>
+
+    <h2>The Neuroscience of Introversion and Extraversion</h2>
+    <p>Research in neuroscience has revealed that the brains of introverts and extroverts function somewhat differently, providing biological foundations for behavioral preferences. Hans Eysenck first proposed in the 1960s that introverts have higher baseline levels of cortical arousal than extroverts. This means that introverts' brains are already more stimulated at rest, so they reach an optimal level of stimulation with less external input. Extroverts have lower baseline arousal and therefore seek more external stimulation to reach their optimal state.</p>
+    <p>Modern brain imaging studies have supported and refined this theory. Research has shown that introverts tend to have more blood flow to the frontal lobes, regions associated with internal processing, planning, and remembering. Extroverts tend to show more activity in areas associated with sensory processing and emotional reward. Additionally, introverts appear to be more sensitive to dopamine and prefer the neurotransmitter acetylcholine, which is associated with calm, focused attention. Extroverts are more stimulated by dopamine, the neurotransmitter linked to reward-seeking and excitement.</p>
+    <p>These neurological differences explain why introverts feel drained by prolonged social interaction and why extroverts feel restless during extended periods of solitude. Neither response is better or worse. They are simply different biological configurations that lead to different optimal environments for peak performance and well-being.</p>
+
+    <h2>Introversion and Extraversion in the Workplace</h2>
+    <p>Understanding where employees fall on the introversion-extraversion spectrum can significantly improve workplace dynamics, productivity, and satisfaction. Introverts tend to excel in roles requiring deep concentration, careful analysis, and independent work. They often produce higher-quality written communication, are better at active listening, and bring thoughtful perspectives to team discussions. Extroverts tend to excel in roles requiring frequent social interaction, quick thinking on their feet, and energizing group settings.</p>
+    <p>Open-plan offices, which have dominated workplace design for decades, tend to favor extroverts and can significantly impair introverts' productivity. Research has shown that introverts in open-plan offices experience more stress, lower concentration, and reduced output compared to when they have access to private or semi-private workspaces. Progressive organizations now offer a mix of collaborative spaces and quiet zones, allowing employees to choose the environment that matches their current task and energy level.</p>
+    <p>In team settings, the most effective groups typically include both introverts and extroverts. Extroverts bring energy, enthusiasm, and the ability to think out loud, while introverts bring careful analysis, depth of focus, and the ability to identify risks that more impulsive team members might overlook. The challenge is ensuring that introverted team members have adequate space to contribute, as group dynamics often favor those who speak first and most frequently.</p>
+
+    <h2>Tips for Thriving as Each Type</h2>
+
+    <h3>Tips for Introverts</h3>
+    <ul>
+      <li><strong>Honor your need for recharge time:</strong> Schedule quiet time after social events and busy days. This is not antisocial; it is essential self-care that allows you to show up as your best self.</li>
+      <li><strong>Prepare for social situations:</strong> If you know you will be in a high-stimulation environment, plan conversation topics or set a time limit. Preparation reduces the energy cost of socializing.</li>
+      <li><strong>Communicate your needs:</strong> Let friends, family, and colleagues know that your need for alone time is not a rejection. Most people are understanding once they know it is about energy management, not avoidance.</li>
+      <li><strong>Leverage your strengths:</strong> Deep thinking, careful listening, and thorough analysis are superpowers in a world that often values speed over depth. Do not try to compete on extroverted terms when your introverted strengths serve you better.</li>
+    </ul>
+
+    <h3>Tips for Extroverts</h3>
+    <ul>
+      <li><strong>Build in reflection time:</strong> Your natural tendency to process externally is a strength, but deliberately scheduling time for quiet reflection can deepen your thinking and decision-making.</li>
+      <li><strong>Practice active listening:</strong> Your enthusiasm is infectious, but make sure you are giving introverted colleagues and friends adequate space to share their thoughts at their own pace.</li>
+      <li><strong>Manage your energy wisely:</strong> While social interaction energizes you, spreading yourself too thin across too many commitments can lead to burnout. Quality of connection matters more than quantity.</li>
+      <li><strong>Develop comfort with solitude:</strong> The ability to be alone without feeling bored or restless is a valuable skill. Start with short periods and gradually build your tolerance for quiet, focused time.</li>
+    </ul>
+
+    <h3>Tips for Ambiverts</h3>
+    <ul>
+      <li><strong>Read the room:</strong> Your greatest strength is adaptability. Pay attention to what each situation requires and lean into whichever mode serves you and others best.</li>
+      <li><strong>Monitor your energy:</strong> Because you can operate in both modes, it can be easy to lose track of when you need to switch. Pay attention to early signs of social exhaustion or restlessness.</li>
+      <li><strong>Avoid the comparison trap:</strong> Ambiverts sometimes feel like they do not fit neatly into either category. Embrace the middle ground as a position of strength rather than a lack of definition.</li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is the difference between introversion and shyness?</h3>
+    <p>Introversion and shyness are often confused but are fundamentally different. Introversion is a preference for lower-stimulation environments and a tendency to recharge through solitude. Introverts choose to spend time alone because they enjoy it. Shyness, on the other hand, is a fear of social judgment. A shy person may desperately want to socialize but feels anxious about it. You can be an introvert who is perfectly confident in social settings, or an extrovert who is shy and nervous around others.</p>
+
+    <h3>What is an ambivert?</h3>
+    <p>An ambivert is someone who falls near the middle of the introversion-extraversion spectrum. Ambiverts display qualities of both introverts and extroverts depending on the situation. They can enjoy lively social gatherings but also need meaningful alone time. Research suggests that ambiverts may actually have certain advantages, particularly in sales and leadership, because they can naturally adapt their energy level to match different social contexts.</p>
+
+    <h3>Can introverts become extroverts?</h3>
+    <p>Your position on the introversion-extraversion spectrum is largely influenced by brain chemistry and genetics and tends to remain stable throughout life. However, you can develop skills associated with the other side of the spectrum. Introverts can learn to be effective public speakers and network comfortably, while extroverts can cultivate focus and reflective thinking. The goal is not to change your fundamental nature but to expand your behavioral repertoire.</p>
+
+    <h3>Is it better to be an introvert or an extrovert?</h3>
+    <p>Neither is inherently better. Western cultures have historically favored extroverted traits, but research shows that introverts and extroverts both have distinct advantages. Introverts excel at deep thinking, careful analysis, and sustained focus. Extroverts excel at networking, quick decision-making, and energizing groups. The most important thing is understanding your natural tendencies and creating an environment that supports your strengths.</p>
+
+    <h3>How does introversion relate to the Big Five personality model?</h3>
+    <p>Extraversion is one of the Big Five personality traits (along with Openness, Conscientiousness, Agreeableness, and Neuroticism). In the Big Five model, introversion is the low end of the Extraversion scale. The Big Five measures extraversion as a continuous dimension rather than a binary category, recognizing that most people fall somewhere along a spectrum rather than fitting neatly into one box or the other.</p>
+  </article>
+
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .game-area { cursor: default; user-select: auto; -webkit-user-select: auto; }
+  :global(.spectrum-container) { max-width: 400px; margin: 0 auto; }
+  :global(.spectrum-track) { height: 24px; background: linear-gradient(to right, #6366f1, #a78bfa, #d4d4d8, #fbbf24, #f59e0b); border-radius: 12px; position: relative; margin-top: 8px; }
+  :global(.spectrum-marker) { width: 20px; height: 32px; background: #fff; border: 3px solid #1f2937; border-radius: 6px; position: absolute; top: -4px; transform: translateX(-50%); transition: left 0.5s ease; }
+  :global(.spectrum-labels) { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--color-text-muted); margin-top: 6px; }
+</style>
+
+<script define:vars={{ gameName: "Introvert vs Extrovert Test", gameSlug: "introvert-extrovert-test", gameIcon: "\u{1F504}", metricLabel: "Spectrum Score", metricUnit: "/100" }}>
+(function () {
+  'use strict';
+
+  var questions = [
+    {
+      text: "After a long, busy week at work, you finally have a free Saturday. You:",
+      options: [
+        { label: "Stay home with a good book, a cozy blanket, and zero obligations", side: "I" },
+        { label: "Call friends to plan brunch, shopping, or an adventure together", side: "E" }
+      ]
+    },
+    {
+      text: "You arrive at a party where you know almost no one. You:",
+      options: [
+        { label: "Find one person to have a meaningful one-on-one conversation with", side: "I" },
+        { label: "Start introducing yourself to as many people as possible", side: "E" }
+      ]
+    },
+    {
+      text: "When working on a complex problem, you prefer to:",
+      options: [
+        { label: "Think it through quietly on your own before discussing with anyone", side: "I" },
+        { label: "Talk it out with colleagues to brainstorm ideas and solutions", side: "E" }
+      ]
+    },
+    {
+      text: "Your phone rings unexpectedly. Your gut reaction is:",
+      options: [
+        { label: "Let it go to voicemail and decide later whether to call back", side: "I" },
+        { label: "Answer immediately because you enjoy spontaneous conversations", side: "E" }
+      ]
+    },
+    {
+      text: "You have an hour-long lunch break at work. You would rather:",
+      options: [
+        { label: "Eat alone while reading, walking, or listening to a podcast", side: "I" },
+        { label: "Join a group of coworkers at a restaurant and catch up", side: "E" }
+      ]
+    },
+    {
+      text: "During a group meeting, your natural tendency is to:",
+      options: [
+        { label: "Listen carefully and speak up only when you have something well-considered to say", side: "I" },
+        { label: "Contribute frequently and think out loud as ideas come to you", side: "E" }
+      ]
+    },
+    {
+      text: "Your ideal vacation would be:",
+      options: [
+        { label: "A quiet cabin in the mountains with nature, solitude, and time to reflect", side: "I" },
+        { label: "A bustling city trip with tours, restaurants, nightlife, and new people to meet", side: "E" }
+      ]
+    },
+    {
+      text: "When you are feeling emotionally drained, you recharge by:",
+      options: [
+        { label: "Spending time alone doing something quiet and restorative", side: "I" },
+        { label: "Going out with friends or family and being around people who energize you", side: "E" }
+      ]
+    },
+    {
+      text: "A colleague invites you to a networking event with 200 professionals. You think:",
+      options: [
+        { label: "That sounds exhausting. I would rather connect with a few people individually", side: "I" },
+        { label: "Great opportunity. I love meeting new people and making connections", side: "E" }
+      ]
+    },
+    {
+      text: "When learning something new, you prefer to:",
+      options: [
+        { label: "Read about it independently and explore at your own pace", side: "I" },
+        { label: "Take a class or workshop where you can discuss and practice with others", side: "E" }
+      ]
+    },
+    {
+      text: "At a dinner party, you are most energized by:",
+      options: [
+        { label: "A deep, meaningful conversation with one or two people", side: "I" },
+        { label: "A lively table-wide discussion with lots of laughter and stories", side: "E" }
+      ]
+    },
+    {
+      text: "You just received exciting personal news. Your first instinct is to:",
+      options: [
+        { label: "Savor it privately for a while before telling a few close people", side: "I" },
+        { label: "Immediately share it with as many friends as possible", side: "E" }
+      ]
+    },
+    {
+      text: "When it comes to your social circle, you prefer:",
+      options: [
+        { label: "A small number of deep, meaningful friendships", side: "I" },
+        { label: "A large, diverse network of friends and acquaintances", side: "E" }
+      ]
+    },
+    {
+      text: "Your coworkers would most likely describe you as:",
+      options: [
+        { label: "Thoughtful, observant, and a great listener", side: "I" },
+        { label: "Outgoing, enthusiastic, and always ready to collaborate", side: "E" }
+      ]
+    },
+    {
+      text: "When faced with an unexpected schedule change, you:",
+      options: [
+        { label: "Feel slightly stressed because you had mentally prepared for the original plan", side: "I" },
+        { label: "Adapt easily and see it as an exciting change of pace", side: "E" }
+      ]
+    },
+    {
+      text: "On a long flight, you would prefer to:",
+      options: [
+        { label: "Put on headphones and enjoy music, a book, or a movie in your own world", side: "I" },
+        { label: "Strike up a conversation with the person sitting next to you", side: "E" }
+      ]
+    },
+    {
+      text: "Your approach to generating creative ideas tends to be:",
+      options: [
+        { label: "Reflect quietly and let ideas develop internally over time", side: "I" },
+        { label: "Bounce ideas off others in energetic brainstorming sessions", side: "E" }
+      ]
+    },
+    {
+      text: "When you arrive early to a meeting or appointment, you:",
+      options: [
+        { label: "Enjoy the quiet moment and use the time for your own thoughts", side: "I" },
+        { label: "Chat with whoever else is there or check in with someone nearby", side: "E" }
+      ]
+    },
+    {
+      text: "After hosting or attending a social gathering, you typically feel:",
+      options: [
+        { label: "Tired and in need of alone time to recover, even if you had fun", side: "I" },
+        { label: "Energized and buzzing, sometimes wishing the event lasted longer", side: "E" }
+      ]
+    },
+    {
+      text: "If you could choose your ideal work setup, you would pick:",
+      options: [
+        { label: "A private office or remote setup where you control your environment", side: "I" },
+        { label: "A vibrant open office with easy access to teammates and spontaneous collaboration", side: "E" }
+      ]
+    }
+  ];
+
+  var typeProfiles = {
+    strongIntrovert: {
+      label: "Strong Introvert",
+      icon: "\u{1F319}",
+      color: "#6366f1",
+      desc: "You are a strong introvert. You draw your energy from solitude, deep reflection, and quiet environments. Social situations can be enjoyable but drain your battery quickly, and you need substantial alone time to recharge. You likely have a rich inner world and prefer depth over breadth in both your relationships and your thinking. You do your best work when given privacy and uninterrupted focus time.",
+      tips: "Embrace your need for solitude without guilt. Set clear boundaries around your recharge time. When socializing is necessary, prepare in advance and give yourself permission to leave early. Your capacity for deep thought and careful observation is a genuine superpower in a world that often prioritizes speed over depth."
+    },
+    introvert: {
+      label: "Introvert",
+      icon: "\u{1F319}",
+      color: "#818cf8",
+      desc: "You lean introverted. You prefer smaller gatherings over large parties, deeper conversations over small talk, and need regular alone time to feel your best. You can function well in social settings but find them more draining than energizing. You are likely a thoughtful communicator who listens carefully and speaks with intention. Your friends value you for your reliability and depth.",
+      tips: "Create a daily routine that includes protected quiet time. Communicate your preferences honestly with friends and colleagues. Look for workplaces and social groups that respect different energy styles. Remember that choosing quality over quantity in your social life is a strength, not a limitation."
+    },
+    ambivert: {
+      label: "Ambivert",
+      icon: "\u{2696}\u{FE0F}",
+      color: "#78716c",
+      desc: "You are an ambivert, balanced between introversion and extraversion. You are socially versatile, able to enjoy lively gatherings and quiet evenings with equal comfort. Your energy source depends on context: sometimes people charge you up, and sometimes solitude is what you need. Research suggests ambiverts have a natural advantage in roles that require reading and adapting to different social situations.",
+      tips: "Your greatest asset is flexibility. Pay attention to your energy levels throughout the day and adjust your activities accordingly. You can serve as a bridge between more introverted and extroverted colleagues, helping each side understand the other. Avoid overcommitting to either extreme. Honor both your social and solitary sides."
+    },
+    extrovert: {
+      label: "Extrovert",
+      icon: "\u{2600}\u{FE0F}",
+      color: "#f59e0b",
+      desc: "You lean extroverted. You are energized by social interaction and prefer to be around people more often than not. You are likely an enthusiastic communicator who thinks out loud, enjoys collaboration, and thrives in dynamic environments. While you appreciate some alone time, too much solitude makes you feel restless or bored. Your energy and enthusiasm are contagious.",
+      tips: "Channel your social energy into building meaningful connections rather than just accumulating contacts. Practice active listening and give introverted colleagues space to contribute at their own pace. Build in occasional reflection time to deepen your thinking. Your ability to energize a room is a gift. Use it generously."
+    },
+    strongExtrovert: {
+      label: "Strong Extrovert",
+      icon: "\u{2600}\u{FE0F}",
+      color: "#f97316",
+      desc: "You are a strong extrovert. People are your fuel, and you come alive in social settings. You love meeting new people, being the center of attention, and working collaboratively. Solitude feels uncomfortable and you seek out interaction naturally and frequently. You are likely a natural connector who builds large social networks and brings energy to every room you enter.",
+      tips: "While your social energy is a tremendous strength, make sure to develop your capacity for solitary focus and reflection. Not every problem is best solved through discussion. Practice being comfortable with silence. Be mindful that not everyone shares your energy level, and give quieter people the space they need. Your enthusiasm and warmth make the world a more connected place."
+    }
+  };
+
+  var STORAGE_KEY = 'toolcalcs_introvert-extrovert-test_history';
+  var MAX_HISTORY = 20;
+
+  function getType(score) {
+    if (score <= 20) return typeProfiles.strongIntrovert;
+    if (score <= 40) return typeProfiles.introvert;
+    if (score <= 60) return typeProfiles.ambivert;
+    if (score <= 80) return typeProfiles.extrovert;
+    return typeProfiles.strongExtrovert;
+  }
+
+  function loadHistory() {
+    try { var r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch (e) {}
+    return [];
+  }
+  function saveHistory(h) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch (e) {}
+  }
+  function addToHistory(score) {
+    var h = loadHistory();
+    h.unshift({ score: score, date: new Date().toISOString(), label: getType(score).label });
+    saveHistory(h);
+  }
+
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+  }
+
+  function formatDate(iso) {
+    try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    catch (e) { return ''; }
+  }
+
+  var instructionsView = document.getElementById('instructionsView');
+  var playView = document.getElementById('playView');
+  var resultView = document.getElementById('resultView');
+  var startBtn = document.getElementById('startBtn');
+  var tryAgainBtn = document.getElementById('tryAgainBtn');
+  var progressText = document.getElementById('progressText');
+  var progressFill = document.getElementById('progressFill');
+  var questionText = document.getElementById('questionText');
+  var optionsContainer = document.getElementById('optionsContainer');
+  var resultIcon = document.getElementById('resultIcon');
+  var finalScore = document.getElementById('finalScore');
+  var ratingBadge = document.getElementById('ratingBadge');
+  var spectrumBar = document.getElementById('spectrumBar');
+  var typeDescription = document.getElementById('typeDescription');
+  var typeTips = document.getElementById('typeTips');
+  var attemptHistorySection = document.getElementById('attemptHistory');
+  var historyList = document.getElementById('historyList');
+
+  var shuffledQuestions = [];
+  var currentIndex = 0;
+  var extrovertPoints = 0;
+  var isProcessing = false;
+
+  function showView(view) {
+    instructionsView.style.display = 'none';
+    playView.style.display = 'none';
+    resultView.style.display = 'none';
+    view.style.display = '';
+  }
+
+  function startGame() {
+    shuffledQuestions = shuffle(questions);
+    currentIndex = 0;
+    extrovertPoints = 0;
+    isProcessing = false;
+    showView(playView);
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    var q = shuffledQuestions[currentIndex];
+    var total = shuffledQuestions.length;
+    var pct = Math.round((currentIndex / total) * 100);
+
+    progressText.textContent = 'Question ' + (currentIndex + 1) + ' of ' + total;
+    progressFill.style.width = pct + '%';
+    questionText.textContent = q.text;
+
+    var shuffledOpts = shuffle(q.options);
+    var html = '';
+    for (var i = 0; i < shuffledOpts.length; i++) {
+      html += '<button class="quiz-option" type="button" data-side="' + shuffledOpts[i].side + '">' + shuffledOpts[i].label + '</button>';
+    }
+    optionsContainer.innerHTML = html;
+  }
+
+  function handleOptionClick(e) {
+    if (isProcessing) return;
+    var btn = e.target;
+    if (!btn || !btn.classList || !btn.classList.contains('quiz-option')) return;
+
+    isProcessing = true;
+    var side = btn.getAttribute('data-side');
+    btn.classList.add('selected');
+
+    if (side === 'E') {
+      extrovertPoints++;
+    }
+
+    setTimeout(function () {
+      currentIndex++;
+      if (currentIndex >= shuffledQuestions.length) {
+        showResults();
+      } else {
+        renderQuestion();
+      }
+      isProcessing = false;
+    }, 300);
+  }
+
+  function showResults() {
+    var total = questions.length;
+    var spectrumScore = Math.round((extrovertPoints / total) * 100);
+
+    var type = getType(spectrumScore);
+
+    showView(resultView);
+    resultIcon.textContent = type.icon;
+    finalScore.textContent = String(spectrumScore);
+    ratingBadge.textContent = type.label;
+    ratingBadge.style.background = type.color;
+
+    var specHTML = '<div class="spectrum-container">';
+    specHTML += '<div class="spectrum-track">';
+    specHTML += '<div class="spectrum-marker" style="left:' + spectrumScore + '%"></div>';
+    specHTML += '</div>';
+    specHTML += '<div class="spectrum-labels"><span>Introvert</span><span>Ambivert</span><span>Extrovert</span></div>';
+    specHTML += '</div>';
+    spectrumBar.innerHTML = specHTML;
+
+    typeDescription.innerHTML = '<div style="text-align:left;max-width:450px;margin:0 auto;"><p>' + type.desc + '</p></div>';
+
+    typeTips.innerHTML = '<div style="text-align:left;max-width:450px;margin:16px auto 0;padding:16px;background:var(--color-bg);border-radius:var(--radius);border:1px solid var(--color-border);"><p style="margin-bottom:4px;font-size:0.9rem;color:var(--color-text-muted);">Tips for thriving as a ' + type.label + ':</p><p>' + type.tips + '</p></div>';
+
+    addToHistory(spectrumScore);
+    renderHistory();
+
+    if (window.GameShare) {
+      window.GameShare.show({
+        gameName: gameName,
+        gameSlug: gameSlug,
+        gameIcon: gameIcon,
+        score: spectrumScore,
+        unit: metricUnit,
+        metricLabel: metricLabel,
+        ratingLabel: type.label,
+        ratingColor: type.color
+      });
+    }
+  }
+
+  function renderHistory() {
+    var history = loadHistory();
+    if (history.length === 0) { attemptHistorySection.hidden = true; return; }
+    attemptHistorySection.hidden = false;
+    var html = '';
+    for (var i = 0; i < history.length; i++) {
+      var e = history[i];
+      var t = getType(e.score);
+      html += '<div class="history-item">';
+      html += '<span class="history-score">' + e.score + '/100</span>';
+      html += '<span class="history-rating" style="background:' + t.color + '">' + t.label + '</span>';
+      html += '<span class="history-time">' + formatDate(e.date) + '</span>';
+      html += '</div>';
+    }
+    historyList.innerHTML = html;
+  }
+
+  optionsContainer.addEventListener('click', handleOptionClick);
+  startBtn.addEventListener('click', startGame);
+  tryAgainBtn.addEventListener('click', startGame);
+  renderHistory();
+})();
+</script>

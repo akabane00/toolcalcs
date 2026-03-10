@@ -1,0 +1,456 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import GameShare from '../../components/GameShare.astro';
+import '../../styles/game.css';
+import '../../styles/quiz.css';
+
+const gameName = "Depression Test (PHQ-9)";
+const gameSlug = "depression-test";
+const gameIcon = "\uD83C\uDF27\uFE0F";
+const metricLabel = "PHQ-9 Score";
+const metricUnit = "/27";
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tests & Games", "item": "https://toolcalcs.com/test/" },
+      { "@type": "ListItem", "position": 3, "name": "Depression Test (PHQ-9)" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Depression Test (PHQ-9)",
+    "url": "https://toolcalcs.com/test/depression-test/",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Free depression self-assessment based on the PHQ-9 clinical screening tool. 9 questions measuring depression severity over the past 2 weeks."
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is the PHQ-9?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The PHQ-9 (Patient Health Questionnaire-9) is a validated clinical screening tool for depression developed by Drs. Kurt Kroenke, Robert Spitzer, and Janet Williams in 2001. It consists of 9 questions based on the DSM-IV criteria for major depressive disorder and is widely used in healthcare settings worldwide to screen for and monitor depression severity.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Is the PHQ-9 a diagnosis of depression?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'No, the PHQ-9 is a screening tool, not a diagnostic instrument. A high score indicates the presence of depressive symptoms that warrant further clinical evaluation, but only a qualified mental health professional can diagnose clinical depression through a comprehensive assessment. This online version is for educational and self-awareness purposes only.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What do PHQ-9 scores mean?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'PHQ-9 scores range from 0 to 27. Scores of 0-4 indicate minimal depression, 5-9 indicate mild depression, 10-14 indicate moderate depression, 15-19 indicate moderately severe depression, and 20-27 indicate severe depression. A score of 10 or above is commonly used as a clinical threshold suggesting the need for professional evaluation and possible treatment.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What should I do if I score high on the PHQ-9?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'If you score 10 or above, we recommend contacting a healthcare provider or mental health professional for further evaluation. Effective treatments for depression include cognitive-behavioral therapy, interpersonal therapy, and medications such as SSRIs. If you have thoughts of self-harm, please contact the 988 Suicide and Crisis Lifeline immediately by calling or texting 988.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What treatments are available for depression?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Evidence-based treatments for depression include psychotherapy (particularly cognitive-behavioral therapy and interpersonal therapy), antidepressant medication (such as SSRIs and SNRIs), and lifestyle modifications including regular exercise, improved sleep habits, and social connection. For severe depression, additional options include electroconvulsive therapy and transcranial magnetic stimulation. Most people respond well to treatment, and early intervention leads to better outcomes.',
+        },
+      },
+    ],
+  }
+];
+---
+
+<BaseLayout
+  title="Depression Test (PHQ-9) - Free Depression Self-Assessment | ToolCalcs"
+  description="Free depression self-assessment based on the PHQ-9 clinical screening tool. 9 questions measuring depression severity over the past 2 weeks."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/test/">Tests & Games</a> &rsaquo;
+    <span>Depression Test (PHQ-9)</span>
+  </nav>
+
+  <h1>Depression Test (PHQ-9)</h1>
+  <p class="page-desc">Answer 9 questions about your experiences over the past 2 weeks to assess depression severity using the clinically validated PHQ-9 screening tool.</p>
+
+  <div class="game-box">
+    <div class="game-area" id="gameArea" role="region" aria-label="Depression self-assessment area" aria-live="polite">
+      <div class="game-instructions" id="instructionsView">
+        <h2>PHQ-9 Depression Screening</h2>
+        <p>Over the <strong>last 2 weeks</strong>, how often have you been bothered by the following problems? Select the option that best describes your experience for each question.</p>
+        <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:12px 16px;margin:16px 0;font-size:0.85rem;line-height:1.6;text-align:left;">
+          <strong>Important Disclaimer:</strong> This is a screening tool for educational purposes only. It is <strong>NOT</strong> a clinical diagnosis. If you are experiencing thoughts of self-harm or suicide, please contact the <strong>988 Suicide &amp; Crisis Lifeline</strong> immediately by calling or texting <strong>988</strong>. You can also text HOME to <strong>741741</strong> to reach the Crisis Text Line.
+        </div>
+        <p style="font-size:0.85rem;color:var(--color-text-muted);">9 questions &middot; About 2 minutes</p>
+        <button class="game-btn primary" id="startBtn" type="button" style="margin-top:16px;">Start Assessment</button>
+      </div>
+
+      <div class="play-view" id="playView" style="display:none;">
+        <div class="quiz-progress">
+          <div class="quiz-progress-text" id="progressText">Question 1 of 9</div>
+          <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="progressFill" style="width:0%"></div></div>
+        </div>
+        <div class="quiz-question">
+          <p style="font-size:0.8rem;color:var(--color-text-muted);margin:0 0 4px;">Over the last 2 weeks, how often have you been bothered by:</p>
+          <div class="quiz-question-text" id="questionText"></div>
+        </div>
+        <div class="quiz-options" id="optionsContainer"></div>
+      </div>
+
+      <div class="result-view" id="resultView" style="display:none;">
+        <div class="result-icon" aria-hidden="true">&#x1F327;&#xFE0F;</div>
+        <div class="result-label">Your PHQ-9 Score</div>
+        <div class="quiz-result-type" id="scoreDisplay"></div>
+        <div id="severityBadge" style="display:inline-block;padding:6px 16px;border-radius:20px;font-weight:700;font-size:0.95rem;margin-bottom:16px;"></div>
+        <div class="quiz-result-desc" id="resultDesc"></div>
+
+        <div id="crisisBox" style="display:none;background:#fef2f2;border:2px solid #ef4444;border-radius:var(--radius);padding:16px;margin:16px auto;max-width:500px;text-align:left;font-size:0.9rem;line-height:1.6;">
+          <strong style="color:#991b1b;font-size:1rem;">If You Are in Crisis</strong>
+          <p style="margin:8px 0;">If you are having thoughts of hurting yourself or ending your life, please reach out for help immediately. You are not alone, and support is available 24/7.</p>
+          <ul style="margin:8px 0;padding-left:20px;">
+            <li><strong>988 Suicide &amp; Crisis Lifeline:</strong> Call or text <strong>988</strong></li>
+            <li><strong>Crisis Text Line:</strong> Text HOME to <strong>741741</strong></li>
+            <li><strong>International Association for Suicide Prevention:</strong> <a href="https://www.iasp.info/resources/Crisis_Centres/" target="_blank" rel="noopener noreferrer" style="color:#2563eb;">Find a crisis center</a></li>
+            <li><strong>Emergency Services:</strong> Call <strong>911</strong> (US) or your local emergency number</li>
+          </ul>
+        </div>
+
+        <div id="seekHelp" style="display:none;background:#fff7ed;border:1px solid #fdba74;border-radius:var(--radius);padding:16px;margin:16px auto;max-width:500px;text-align:left;font-size:0.9rem;line-height:1.6;">
+          <strong style="color:#9a3412;">Seeking Professional Help</strong>
+          <p style="margin:8px 0;">Your score suggests depressive symptoms that may benefit from professional evaluation. Effective treatments are available, and most people experience significant improvement with proper support.</p>
+          <p style="margin:8px 0;">Talk to your primary care doctor or contact a mental health professional. You can also visit <a href="https://www.samhsa.gov/find-help/national-helpline" target="_blank" rel="noopener noreferrer" style="color:#2563eb;">SAMHSA's National Helpline</a> (1-800-662-4357) for free referrals.</p>
+        </div>
+
+        <div id="strategiesSection" style="max-width:500px;margin:16px auto;text-align:left;">
+          <strong>Self-Care Strategies</strong>
+          <ul style="margin:8px 0;padding-left:20px;font-size:0.9rem;line-height:1.8;">
+            <li>Maintain a regular daily routine, even on difficult days</li>
+            <li>Engage in physical activity (even a short walk helps)</li>
+            <li>Stay connected with friends, family, or support groups</li>
+            <li>Prioritize consistent sleep habits</li>
+            <li>Set small, achievable daily goals</li>
+            <li>Limit alcohol and avoid recreational drugs</li>
+            <li>Practice self-compassion — recovery takes time</li>
+          </ul>
+        </div>
+
+        <button class="game-btn primary" id="tryAgainBtn" type="button" style="margin-top:16px;">Take Again</button>
+      </div>
+    </div>
+
+    <GameShare />
+
+    <div class="attempt-history" id="attemptHistory" hidden>
+      <h3>Attempt History</h3>
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is Depression?</h2>
+    <p>Depression, clinically known as major depressive disorder (MDD), is a common and serious mental health condition that affects how a person feels, thinks, and handles daily activities. It is far more than feeling sad or going through a rough patch. Depression involves persistent feelings of sadness, emptiness, or hopelessness that last for at least two weeks and significantly impair a person's ability to function at work, in relationships, and in everyday life.</p>
+    <p>According to the World Health Organization, depression affects approximately 280 million people globally, making it one of the leading causes of disability worldwide. In the United States alone, an estimated 21 million adults — about 8.4% of the population — experienced at least one major depressive episode in a given year. Despite its prevalence, depression remains widely misunderstood, and many people suffer in silence due to stigma, lack of awareness, or the mistaken belief that they should be able to simply "snap out of it."</p>
+    <p>Depression is not a character flaw or a sign of weakness. It is a complex medical condition with biological, psychological, and social contributing factors. Genetics, brain chemistry, hormonal changes, chronic stress, trauma, and certain medical conditions can all increase the risk of developing depression. The good news is that depression is one of the most treatable mental health conditions — with proper care, the vast majority of people experience significant improvement.</p>
+
+    <h2>Understanding the PHQ-9 Screening Tool</h2>
+    <p>The PHQ-9 (Patient Health Questionnaire-9) was developed by Drs. Kurt Kroenke, Robert L. Spitzer, and Janet B.W. Williams and published in the <em>Journal of General Internal Medicine</em> in 2001. It was designed as a brief, reliable screening tool that could be used in primary care settings to detect depression, assess its severity, and monitor treatment response over time.</p>
+    <p>The nine items of the PHQ-9 correspond directly to the nine diagnostic criteria for major depressive disorder as defined in the DSM-IV (and carried forward into the DSM-5). Each item asks how often the patient has been bothered by a specific depressive symptom over the past two weeks, scored on a 4-point Likert scale: Not at all (0 points), Several days (1 point), More than half the days (2 points), and Nearly every day (3 points).</p>
+    <p>The total score ranges from 0 to 27. Validation studies involving over 6,000 patients demonstrated excellent internal consistency (Cronbach's alpha of 0.89) and strong test-retest reliability. The PHQ-9 has a sensitivity of 88% and a specificity of 88% for detecting major depressive disorder at a cutoff score of 10, making it one of the most accurate brief screening tools available.</p>
+    <p>The established severity cutoffs are: 0-4 (minimal depression), 5-9 (mild depression), 10-14 (moderate depression), 15-19 (moderately severe depression), and 20-27 (severe depression). These cutoffs help clinicians determine the urgency of intervention — patients scoring 10 or above are typically recommended for further clinical evaluation and potential treatment initiation.</p>
+
+    <h2>Symptoms of Depression</h2>
+    <p>Depression manifests through a wide range of emotional, cognitive, physical, and behavioral symptoms. Understanding these symptoms helps people recognize when normal sadness has crossed into clinical territory.</p>
+    <p><strong>Emotional symptoms</strong> include persistent sadness, emptiness, or hopelessness; loss of interest or pleasure in activities that were once enjoyable (anhedonia); feelings of worthlessness or excessive guilt; and irritability or frustration, even over small matters.</p>
+    <p><strong>Cognitive symptoms</strong> include difficulty concentrating, making decisions, or remembering things; negative thinking patterns and a pessimistic outlook; and in severe cases, recurrent thoughts of death or suicide.</p>
+    <p><strong>Physical symptoms</strong> include changes in appetite (significant weight loss or gain), sleep disturbances (insomnia or hypersomnia), fatigue or loss of energy, psychomotor changes (moving or speaking more slowly, or increased restlessness and agitation), and unexplained aches and pains.</p>
+    <p><strong>Behavioral symptoms</strong> include social withdrawal, neglecting responsibilities, decreased productivity, abandoning hobbies, and in some cases, turning to alcohol or other substances as coping mechanisms.</p>
+
+    <h2>Types of Depression</h2>
+    <p>Depression is not a single condition but rather a spectrum of related disorders with varying features, severity, and duration:</p>
+    <p><strong>Major Depressive Disorder (MDD)</strong> is the most commonly diagnosed form. It involves one or more major depressive episodes lasting at least two weeks, characterized by five or more of the nine DSM-5 criteria symptoms.</p>
+    <p><strong>Persistent Depressive Disorder (Dysthymia)</strong> involves chronic, lower-grade depression lasting at least two years. While symptoms may be less severe than MDD, the long duration can be equally debilitating and significantly impair quality of life.</p>
+    <p><strong>Seasonal Affective Disorder (SAD)</strong> follows a seasonal pattern, typically beginning in fall or winter when daylight hours decrease and remitting in spring. It is thought to be related to changes in circadian rhythm and melatonin levels.</p>
+    <p><strong>Postpartum Depression</strong> occurs during pregnancy or within the first year after childbirth. It affects approximately 1 in 7 new mothers and involves severe depressive symptoms that go beyond the normal "baby blues."</p>
+    <p><strong>Bipolar Depression</strong> occurs as part of bipolar disorder, which involves alternating episodes of depression and mania or hypomania. Treatment differs significantly from unipolar depression, making accurate diagnosis essential.</p>
+
+    <h2>Treatment Options for Depression</h2>
+    <p>Depression is a highly treatable condition. The two primary evidence-based treatment approaches are psychotherapy and medication, and they are most effective when combined.</p>
+    <p><strong>Cognitive-Behavioral Therapy (CBT)</strong> is one of the most studied and effective therapies for depression. It helps patients identify negative thought patterns, challenge distorted beliefs, and develop healthier cognitive and behavioral responses. Research shows that CBT is as effective as medication for mild to moderate depression and provides skills that reduce the risk of relapse.</p>
+    <p><strong>Interpersonal Therapy (IPT)</strong> focuses on improving the quality of interpersonal relationships and social functioning. It addresses issues like grief, role transitions, interpersonal disputes, and social isolation — all of which can contribute to and maintain depression.</p>
+    <p><strong>Antidepressant Medication</strong> is often recommended for moderate to severe depression. Selective serotonin reuptake inhibitors (SSRIs) such as fluoxetine (Prozac), sertraline (Zoloft), and escitalopram (Lexapro) are typically first-line treatments due to their effectiveness and relatively favorable side effect profiles. Serotonin-norepinephrine reuptake inhibitors (SNRIs), atypical antidepressants, and other classes are available when SSRIs are not effective. Medication typically takes 4-6 weeks to reach full effectiveness.</p>
+    <p><strong>Lifestyle modifications</strong> play an important supportive role. Regular physical exercise has been shown in numerous studies to have a significant antidepressant effect, particularly aerobic activity for 30 minutes or more on most days. Adequate sleep, a balanced diet, social connection, reducing alcohol intake, and mindfulness practices all contribute to improved mood and faster recovery.</p>
+    <p>For treatment-resistant depression, additional options include electroconvulsive therapy (ECT), transcranial magnetic stimulation (TMS), ketamine-based treatments, and psychedelic-assisted therapy, all of which are administered under medical supervision.</p>
+
+    <h2>Reducing Stigma Around Depression</h2>
+    <p>One of the greatest barriers to treatment for depression is stigma — the fear of being judged, labeled, or discriminated against for having a mental health condition. This stigma keeps millions of people from seeking help and contributes to unnecessary suffering.</p>
+    <p>It is essential to understand that depression is a medical condition, not a moral failing. Just as no one chooses to develop diabetes or heart disease, no one chooses to become depressed. The brain is an organ, and like any organ, it can malfunction due to genetic predisposition, chemical imbalances, chronic stress, or other biological and environmental factors.</p>
+    <p>Seeking treatment for depression is an act of courage, not weakness. If you or someone you know is struggling with depression, reaching out to a healthcare provider is the most important first step. Early intervention leads to better outcomes, shorter episodes, and reduced risk of recurrence.</p>
+
+    <h2>Crisis Resources</h2>
+    <p>If you or someone you know is experiencing a mental health crisis or having thoughts of suicide, immediate help is available:</p>
+    <ul>
+      <li><strong>988 Suicide &amp; Crisis Lifeline:</strong> Call or text <strong>988</strong> (available 24/7 in the US)</li>
+      <li><strong>Crisis Text Line:</strong> Text HOME to <strong>741741</strong></li>
+      <li><strong>SAMHSA National Helpline:</strong> 1-800-662-4357 (free, confidential, 24/7)</li>
+      <li><strong>International Association for Suicide Prevention:</strong> Visit <a href="https://www.iasp.info/resources/Crisis_Centres/">iasp.info</a> for crisis centers worldwide</li>
+      <li><strong>Emergency Services:</strong> Call 911 (US) or your local emergency number</li>
+    </ul>
+    <p>You are not alone. Help is available, and recovery is possible.</p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is the PHQ-9?</h3>
+    <p>The PHQ-9 (Patient Health Questionnaire-9) is a clinically validated depression screening tool developed by Drs. Kroenke, Spitzer, and Williams in 2001. Its nine items correspond directly to the DSM diagnostic criteria for major depressive disorder. Each item is scored from 0 (not at all) to 3 (nearly every day), producing a total score of 0-27. The PHQ-9 has been extensively validated across diverse populations and is used in clinical practice worldwide for depression screening and severity monitoring.</p>
+
+    <h3>Is the PHQ-9 a diagnosis of depression?</h3>
+    <p>No. The PHQ-9 is a screening tool that identifies the presence and severity of depressive symptoms, but it is not a substitute for a clinical diagnosis. A diagnosis of major depressive disorder requires a comprehensive evaluation by a qualified healthcare provider, including a clinical interview, consideration of medical causes, assessment of functional impairment, and review of the full diagnostic criteria in the DSM-5. This online version is intended for educational and self-awareness purposes only and should not replace professional consultation.</p>
+
+    <h3>What do PHQ-9 scores mean?</h3>
+    <p>PHQ-9 scores are organized into five severity levels: 0-4 indicates minimal depression (symptoms within the normal range), 5-9 indicates mild depression, 10-14 indicates moderate depression, 15-19 indicates moderately severe depression, and 20-27 indicates severe depression. A score of 10 or above is the commonly used clinical threshold that suggests further professional evaluation and potential treatment initiation. However, any persistent symptoms that cause distress or interfere with daily life are worth discussing with a healthcare provider, regardless of the score.</p>
+
+    <h3>What should I do if I score high on the PHQ-9?</h3>
+    <p>If you score 10 or above, we recommend scheduling an appointment with your primary care doctor or a mental health professional for further evaluation. Depression is highly treatable, and most people experience significant improvement with appropriate care. If you are having thoughts of self-harm or suicide, please contact the 988 Suicide and Crisis Lifeline immediately by calling or texting 988, or go to your nearest emergency room. You do not have to face this alone.</p>
+
+    <h3>What treatments are available for depression?</h3>
+    <p>The most effective evidence-based treatments for depression include psychotherapy — particularly cognitive-behavioral therapy (CBT) and interpersonal therapy (IPT) — and antidepressant medication such as SSRIs or SNRIs. Research shows that combining therapy and medication is often more effective than either approach alone, especially for moderate to severe depression. Lifestyle modifications including regular exercise, adequate sleep, social connection, and stress management also play a significant supportive role. For treatment-resistant cases, options like ECT, TMS, and ketamine-based treatments are available under medical supervision.</p>
+  </article>
+
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .game-area { cursor: default; user-select: auto; -webkit-user-select: auto; }
+</style>
+
+<script define:vars={{ gameName, gameSlug, gameIcon, metricLabel, metricUnit }}>
+(function () {
+  'use strict';
+
+  var questions = [
+    "Little interest or pleasure in doing things",
+    "Feeling down, depressed, or hopeless",
+    "Trouble falling or staying asleep, or sleeping too much",
+    "Feeling tired or having little energy",
+    "Poor appetite or overeating",
+    "Feeling bad about yourself — or that you are a failure or have let yourself or your family down",
+    "Trouble concentrating on things, such as reading the newspaper or watching television",
+    "Moving or speaking so slowly that other people could have noticed — or the opposite — being so fidgety or restless that you have been moving around a lot more than usual",
+    "Thoughts that you would be better off dead, or of hurting yourself in some way"
+  ];
+
+  var optionLabels = [
+    { text: "Not at all", value: 0 },
+    { text: "Several days", value: 1 },
+    { text: "More than half the days", value: 2 },
+    { text: "Nearly every day", value: 3 }
+  ];
+
+  var severityLevels = [
+    { min: 0, max: 4, label: "Minimal Depression", color: "#22c55e", bgColor: "#dcfce7", desc: "Your score suggests minimal depression. Your responses indicate that depressive symptoms are largely absent or within the normal range. Continue maintaining healthy habits, social connections, and regular activity to support your mental well-being." },
+    { min: 5, max: 9, label: "Mild Depression", color: "#f59e0b", bgColor: "#fef3c7", desc: "Your score suggests mild depression. You may be experiencing some depressive symptoms. Consider monitoring your mood over the coming weeks. If symptoms persist or worsen, speaking with a healthcare provider can help. Self-care strategies like exercise, social connection, and maintaining routines can be beneficial." },
+    { min: 10, max: 14, label: "Moderate Depression", color: "#f97316", bgColor: "#fff7ed", desc: "Your score suggests moderate depression. Your symptoms are clinically significant and may be affecting your ability to function at work, in relationships, or in daily life. We recommend consulting with a healthcare provider or mental health professional for further evaluation and to discuss treatment options." },
+    { min: 15, max: 19, label: "Moderately Severe Depression", color: "#ef4444", bgColor: "#fef2f2", desc: "Your score suggests moderately severe depression. You are experiencing a significant level of depressive symptoms that are very likely impairing your daily functioning. We strongly encourage you to seek professional help. Effective treatments including therapy and medication can provide meaningful relief." },
+    { min: 20, max: 27, label: "Severe Depression", color: "#991b1b", bgColor: "#fef2f2", desc: "Your score suggests severe depression. This level of symptoms typically causes substantial impairment across all areas of life. Please seek professional help as soon as possible. Contact your healthcare provider, call SAMHSA's helpline at 1-800-662-4357, or go to your nearest emergency room. Recovery is possible with proper treatment." }
+  ];
+
+  var STORAGE_KEY = 'toolcalcs_depression-test_history';
+  var MAX_HISTORY = 20;
+  var answers = [];
+
+  function loadHistory() {
+    try { var r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch (e) {}
+    return [];
+  }
+  function saveHistory(h) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch (e) {}
+  }
+
+  var instructionsView = document.getElementById('instructionsView');
+  var playView = document.getElementById('playView');
+  var resultView = document.getElementById('resultView');
+  var startBtn = document.getElementById('startBtn');
+  var tryAgainBtn = document.getElementById('tryAgainBtn');
+  var progressText = document.getElementById('progressText');
+  var progressFill = document.getElementById('progressFill');
+  var questionText = document.getElementById('questionText');
+  var optionsContainer = document.getElementById('optionsContainer');
+  var scoreDisplay = document.getElementById('scoreDisplay');
+  var severityBadge = document.getElementById('severityBadge');
+  var resultDesc = document.getElementById('resultDesc');
+  var crisisBox = document.getElementById('crisisBox');
+  var seekHelp = document.getElementById('seekHelp');
+  var attemptHistorySection = document.getElementById('attemptHistory');
+  var historyList = document.getElementById('historyList');
+
+  var currentIndex = 0;
+  var totalScore = 0;
+
+  function showView(view) {
+    instructionsView.style.display = 'none';
+    playView.style.display = 'none';
+    resultView.style.display = 'none';
+    view.style.display = '';
+  }
+
+  function startTest() {
+    currentIndex = 0;
+    totalScore = 0;
+    answers = [];
+    showView(playView);
+    showQuestion();
+  }
+
+  function showQuestion() {
+    var num = currentIndex + 1;
+    progressText.textContent = 'Question ' + num + ' of 9';
+    progressFill.style.width = Math.round((num / 9) * 100) + '%';
+    questionText.textContent = questions[currentIndex];
+
+    var html = '';
+    for (var i = 0; i < optionLabels.length; i++) {
+      html += '<button class="quiz-option" data-value="' + optionLabels[i].value + '" type="button">' + optionLabels[i].text + '</button>';
+    }
+    optionsContainer.innerHTML = html;
+  }
+
+  function handleAnswer(val) {
+    totalScore += val;
+    answers.push(val);
+
+    // Question 9 (index 8) is about suicidal ideation — if answered positively, show crisis resources immediately
+    if (currentIndex === 8 && val > 0) {
+      showResults(true);
+      return;
+    }
+
+    currentIndex++;
+    if (currentIndex < 9) {
+      showQuestion();
+    } else {
+      showResults(false);
+    }
+  }
+
+  function getSeverity(score) {
+    for (var i = 0; i < severityLevels.length; i++) {
+      if (score >= severityLevels[i].min && score <= severityLevels[i].max) return severityLevels[i];
+    }
+    return severityLevels[0];
+  }
+
+  function showResults(crisisTriggered) {
+    // If triggered early from question 9, move to next (which finishes the quiz)
+    if (crisisTriggered) {
+      currentIndex++;
+    }
+
+    var severity = getSeverity(totalScore);
+
+    scoreDisplay.textContent = totalScore + ' / 27';
+    scoreDisplay.style.color = severity.color;
+
+    severityBadge.textContent = severity.label;
+    severityBadge.style.background = severity.bgColor;
+    severityBadge.style.color = severity.color;
+
+    resultDesc.textContent = severity.desc;
+
+    // Show crisis box if question 9 was answered positively or score is severe
+    var q9answer = answers.length >= 9 ? answers[8] : (crisisTriggered ? answers[answers.length - 1] : 0);
+    if (q9answer > 0 || totalScore >= 20) {
+      crisisBox.style.display = 'block';
+    } else {
+      crisisBox.style.display = 'none';
+    }
+
+    // Show seek help box for moderate and above (but not if crisis box is already showing severe)
+    if (totalScore >= 10) {
+      seekHelp.style.display = 'block';
+    } else {
+      seekHelp.style.display = 'none';
+    }
+
+    showView(resultView);
+
+    var h = loadHistory();
+    h.unshift({ score: totalScore, severity: severity.label, date: new Date().toISOString() });
+    saveHistory(h);
+    renderHistory();
+
+    if (window.GameShare) {
+      window.GameShare.show({
+        gameName: gameName,
+        gameSlug: gameSlug,
+        gameIcon: gameIcon,
+        score: totalScore + '/27',
+        unit: '',
+        metricLabel: metricLabel,
+        ratingLabel: severity.label,
+        ratingColor: severity.color
+      });
+    }
+  }
+
+  function renderHistory() {
+    var history = loadHistory();
+    if (history.length === 0) { attemptHistorySection.hidden = true; return; }
+    attemptHistorySection.hidden = false;
+    var html = '';
+    for (var i = 0; i < history.length; i++) {
+      var e = history[i];
+      html += '<div class="history-item">';
+      html += '<span class="history-score">' + e.score + '/27 — ' + e.severity + '</span>';
+      html += '<span class="history-time">' + formatDate(e.date) + '</span>';
+      html += '</div>';
+    }
+    historyList.innerHTML = html;
+  }
+
+  function formatDate(iso) {
+    try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    catch (e) { return ''; }
+  }
+
+  optionsContainer.addEventListener('click', function (e) {
+    var btn = e.target;
+    if (!btn.classList.contains('quiz-option')) return;
+    var val = parseInt(btn.getAttribute('data-value'), 10);
+    if (isNaN(val)) return;
+    btn.classList.add('selected');
+    setTimeout(function () { handleAnswer(val); }, 200);
+  });
+
+  startBtn.addEventListener('click', startTest);
+  tryAgainBtn.addEventListener('click', startTest);
+  renderHistory();
+})();
+</script>

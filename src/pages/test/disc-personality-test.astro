@@ -1,0 +1,706 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import GameShare from '../../components/GameShare.astro';
+import '../../styles/game.css';
+import '../../styles/quiz.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tests & Games", "item": "https://toolcalcs.com/test/" },
+      { "@type": "ListItem", "position": 3, "name": "DISC Personality Test" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "DISC Personality Test",
+    "url": "https://toolcalcs.com/test/disc-personality-test/",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Free DISC personality assessment measuring your Dominance, Influence, Steadiness, and Conscientiousness traits. 28 scenario-based questions for workplace insights."
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is the DISC personality model?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'DISC is a behavioral assessment model that categorizes people into four primary personality types: Dominance (D), Influence (I), Steadiness (S), and Conscientiousness (C). Developed from the work of psychologist William Moulton Marston in the 1920s, DISC focuses on observable behavior rather than internal psychology, making it practical for improving workplace communication and team dynamics.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How accurate is the DISC assessment?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'DISC assessments have been shown to have good reliability and validity when used for their intended purpose of understanding behavioral tendencies. They are not designed to diagnose psychological conditions or predict job performance in isolation. The accuracy improves when you answer based on your natural tendencies rather than how you think you should respond. Most people find their results resonate strongly with their self-perception.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Can your DISC type change over time?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Your core DISC profile tends to remain relatively stable throughout adulthood, as it reflects deep-seated behavioral preferences. However, people can and do develop skills associated with other DISC types through deliberate effort and experience. Major life events, career changes, or personal development work can shift your secondary traits. Most experts recommend retaking the assessment every one to two years.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Is any DISC type better than the others?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'No DISC type is inherently better or worse than any other. Each type brings unique strengths and faces distinct challenges. Successful teams typically benefit from having a mix of all four types. The value of DISC lies not in labeling people but in understanding different behavioral styles so you can communicate more effectively, resolve conflicts, and leverage the strengths of diverse perspectives.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How is DISC used in the workplace?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'DISC is widely used in professional settings for team building, leadership development, sales training, conflict resolution, and hiring. Organizations use it to help employees understand their communication styles, improve collaboration, reduce workplace friction, and build more cohesive teams. Over 70% of Fortune 500 companies use some form of DISC assessment in their talent development programs.',
+        },
+      },
+    ],
+  }
+];
+---
+
+<BaseLayout
+  title="DISC Personality Test - Free Workplace Assessment | ToolCalcs"
+  description="Free DISC personality assessment measuring your Dominance, Influence, Steadiness, and Conscientiousness traits. 28 scenario-based questions for workplace insights."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/test/">Tests &amp; Games</a> &rsaquo;
+    <span>DISC Personality Test</span>
+  </nav>
+
+  <h1>DISC Personality Test</h1>
+  <p class="page-desc">Answer 28 workplace scenario questions to discover your DISC personality profile. Find out whether you lead with Dominance, Influence, Steadiness, or Conscientiousness.</p>
+
+  <div class="game-box">
+    <div class="game-area" id="gameArea" role="region" aria-label="DISC personality test area" aria-live="polite">
+      <div class="game-instructions" id="instructionsView">
+        <h2>DISC Assessment</h2>
+        <p>You will be presented with 28 workplace scenarios. For each one, choose the response that best describes how you would naturally react. Answer honestly based on your instincts, not how you think you should respond. There are no right or wrong answers.</p>
+        <button class="game-btn primary" id="startBtn" type="button" style="margin-top:16px;">Start Test</button>
+      </div>
+
+      <div class="play-view" id="playView" style="display:none;">
+        <div class="quiz-progress">
+          <div class="quiz-progress-text" id="progressText">Question 1 of 28</div>
+          <div class="quiz-progress-bar">
+            <div class="quiz-progress-fill" id="progressFill" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="quiz-question">
+          <div class="quiz-question-text" id="questionText"></div>
+        </div>
+        <div class="quiz-options" id="optionsContainer"></div>
+      </div>
+
+      <div class="result-view" id="resultView" style="display:none;">
+        <div class="result-icon" aria-hidden="true" id="resultIcon"></div>
+        <div class="result-label">Your Primary DISC Type</div>
+        <div class="score-display">
+          <span class="score-value" id="primaryType">D</span>
+          <span class="score-unit" id="primaryLabel"></span>
+        </div>
+        <div class="rating-badge" id="ratingBadge"></div>
+        <div class="quiz-bar-chart" id="dimChart" style="margin-top:24px;"></div>
+        <div class="quiz-result-desc" id="typeDescription"></div>
+        <div class="quiz-result-desc" id="compatibleTypes"></div>
+        <button class="game-btn primary" id="tryAgainBtn" type="button" style="margin-top:16px;">Take Again</button>
+      </div>
+    </div>
+
+    <GameShare />
+
+    <div class="attempt-history" id="attemptHistory" hidden>
+      <h3>Attempt History</h3>
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is the DISC Personality Model?</h2>
+    <p>The DISC personality model is one of the most widely used behavioral assessment frameworks in the world. It categorizes human behavior into four primary dimensions: Dominance (D), Influence (I), Steadiness (S), and Conscientiousness (C). Unlike personality models that attempt to measure internal psychological traits, DISC focuses on observable behaviors and communication styles, making it exceptionally practical for improving workplace interactions.</p>
+    <p>The DISC model operates on the principle that people tend to exhibit predictable patterns of behavior that can be observed and understood. By identifying these patterns in yourself and others, you gain a powerful tool for adapting your communication style, resolving conflicts more effectively, and building stronger professional relationships. The model does not attempt to measure intelligence, aptitude, or mental health. Instead, it maps how people prefer to approach tasks, interact with others, respond to challenges, and deal with rules and procedures.</p>
+    <p>Today, DISC assessments are used by an estimated 70% of Fortune 500 companies and over one million people take DISC assessments annually worldwide. Its enduring popularity stems from its simplicity, practicality, and immediate applicability to real-world situations. Whether you are a manager trying to lead a diverse team, a salesperson adapting to different clients, or an individual contributor seeking to improve your collaboration skills, understanding DISC provides actionable insights you can apply immediately.</p>
+
+    <h2>History of DISC: From Marston to Modern Assessment</h2>
+    <p>The DISC model traces its origins to the work of William Moulton Marston, an American psychologist who published <em>Emotions of Normal People</em> in 1928. Marston was a fascinating figure in his own right. He also invented the systolic blood pressure test, a key component of early lie detectors, and under the pen name Charles Moulton, he created the comic book character Wonder Woman. His psychological research, however, would prove to be his most enduring legacy.</p>
+    <p>Marston proposed that human emotional responses could be categorized along two axes: whether a person perceives their environment as favorable or unfavorable, and whether they perceive themselves as having power or control in that environment. The intersection of these two dimensions produced four behavioral patterns that Marston labeled Dominance, Inducement, Submission, and Compliance. While Marston developed the theoretical framework, he did not create an assessment tool. That step came later when industrial psychologist Walter Clarke developed the first DISC assessment instrument in 1956, called the Activity Vector Analysis. Over the following decades, various publishers refined and modernized the assessment, leading to the diverse range of DISC tools available today.</p>
+
+    <h2>The 4 DISC Personality Types Explained</h2>
+
+    <h3>Dominance (D) - The Driver</h3>
+    <p>People who score high in Dominance are direct, results-oriented, and decisive. They thrive on challenge, competition, and achieving tangible outcomes. D-types are comfortable taking charge, making quick decisions, and pushing through obstacles. They value efficiency, competence, and bottom-line results. In a meeting, they are the ones who want to skip small talk and get straight to the agenda. Their communication style is brief, direct, and focused on action items. D-types are energized by authority, challenges, and accomplishing difficult goals. They become frustrated by inefficiency, indecision, and overly detailed processes. Their greatest strengths include decisiveness, determination, and the ability to drive results under pressure. Their challenges include impatience, insensitivity to others' feelings, and a tendency to dominate conversations and override other viewpoints.</p>
+
+    <h3>Influence (I) - The Inspirer</h3>
+    <p>High-Influence individuals are enthusiastic, optimistic, and socially skilled. They are natural communicators who thrive on interaction, collaboration, and recognition. I-types bring energy and creativity to teams and excel at motivating others, building rapport, and generating enthusiasm for new ideas. They value relationships, social recognition, and creative freedom. In meetings, they are animated storytellers who connect ideas to people. Their communication style is warm, expressive, and often includes personal anecdotes. I-types are energized by social interaction, public recognition, and group activities. They become frustrated by isolation, rigid structures, and lack of social engagement. Their greatest strengths include persuasion, creativity, and the ability to build coalitions. Their challenges include difficulty following through on details, a tendency to overpromise, and sometimes prioritizing popularity over results.</p>
+
+    <h3>Steadiness (S) - The Supporter</h3>
+    <p>Steadiness types are patient, reliable, and team-oriented. They value harmony, stability, and sincere relationships. S-types are the backbone of many teams, consistently delivering dependable work and supporting their colleagues. They prefer predictable environments, clear expectations, and sufficient time to adapt to change. In meetings, they listen carefully, ask thoughtful questions, and work to ensure everyone feels included. Their communication style is calm, patient, and considerate. S-types are energized by stability, genuine appreciation, and cooperation. They become frustrated by sudden changes, aggressive behavior, and conflict. Their greatest strengths include dependability, patience, and the ability to create harmonious team environments. Their challenges include difficulty asserting themselves, resistance to change, and a tendency to avoid confrontation even when it is necessary.</p>
+
+    <h3>Conscientiousness (C) - The Analyst</h3>
+    <p>High-Conscientiousness individuals are analytical, detail-oriented, and quality-focused. They value accuracy, expertise, and systematic approaches. C-types are methodical thinkers who prefer to have all the data before making decisions. They set high standards for themselves and others and are uncomfortable with ambiguity or shortcuts. In meetings, they ask probing questions, identify potential risks, and ensure plans are thorough. Their communication style is precise, fact-based, and measured. C-types are energized by opportunities to demonstrate expertise, solve complex problems, and maintain high standards. They become frustrated by carelessness, vague instructions, and pressure to make hasty decisions without adequate information. Their greatest strengths include thoroughness, accuracy, and the ability to identify risks others miss. Their challenges include analysis paralysis, perfectionism, and difficulty adapting when plans need to change quickly.</p>
+
+    <h2>DISC in the Workplace</h2>
+    <p>Understanding DISC profiles transforms workplace dynamics in several practical ways. When team members understand each other's communication preferences, meetings become more productive, emails are better received, and conflicts are resolved faster. A manager who recognizes that their D-type employee needs autonomy and challenge will assign tasks differently than they would for an S-type who needs clear instructions and reassurance.</p>
+    <p>In sales, understanding DISC helps professionals adapt their approach to each client. A D-type buyer wants a brief, results-focused pitch, while an S-type buyer needs time to build trust before discussing business. C-type buyers want detailed specifications and data, while I-type buyers respond to enthusiasm and social proof. Sales teams that train on DISC consistently report higher close rates and better client relationships.</p>
+    <p>For leadership development, DISC provides a framework for understanding why certain leadership styles work better in specific situations. A D-type leader excels in crisis situations that demand decisive action, while an S-type leader builds exceptional team loyalty and retention. The most effective leaders learn to flex between DISC styles based on what the situation requires, rather than defaulting to their natural preference in every context.</p>
+
+    <h2>Improving Communication with Different DISC Types</h2>
+    <p>The most practical application of DISC knowledge is adapting your communication style to match the preferences of the person you are speaking with. When communicating with a D-type, be direct and concise, focus on results and bottom lines, avoid unnecessary details, and give them options rather than dictating solutions. When speaking with an I-type, allow time for social connection, be enthusiastic and expressive, share stories and examples, and give them public recognition for contributions.</p>
+    <p>For S-types, be patient and genuine, provide clear expectations and timelines, avoid sudden changes or aggressive tactics, and show sincere appreciation for their reliability. When working with C-types, provide detailed information and data, give them time to analyze before expecting decisions, be precise in your language, and avoid emotional appeals in favor of logical reasoning. Mastering these adaptations does not mean being inauthentic. It means being versatile enough to meet others where they are, which is a hallmark of effective communicators and leaders.</p>
+
+    <h2>How This Test Works</h2>
+    <p>This DISC assessment presents 28 workplace scenarios. Each scenario offers four response options, one aligned with each DISC dimension. You select the response that most closely matches how you would naturally behave in that situation. Your selections are tallied across all four dimensions, and your scores are converted to percentages showing your relative strength in each area. Your primary type is the dimension with the highest score, and your secondary type is the second highest. Most people have one dominant and one strong secondary dimension, creating a blended profile such as DI, SC, or CD. This blend provides a more nuanced picture of your behavioral tendencies than a single-letter type alone.</p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is the DISC personality model?</h3>
+    <p>DISC is a behavioral assessment model that categorizes people into four primary personality types: Dominance (D), Influence (I), Steadiness (S), and Conscientiousness (C). Developed from the work of psychologist William Moulton Marston in the 1920s, DISC focuses on observable behavior rather than internal psychology, making it practical for improving workplace communication and team dynamics.</p>
+
+    <h3>How accurate is the DISC assessment?</h3>
+    <p>DISC assessments have been shown to have good reliability and validity when used for their intended purpose of understanding behavioral tendencies. They are not designed to diagnose psychological conditions or predict job performance in isolation. The accuracy improves when you answer based on your natural tendencies rather than how you think you should respond. Most people find their results resonate strongly with their self-perception.</p>
+
+    <h3>Can your DISC type change over time?</h3>
+    <p>Your core DISC profile tends to remain relatively stable throughout adulthood, as it reflects deep-seated behavioral preferences. However, people can and do develop skills associated with other DISC types through deliberate effort and experience. Major life events, career changes, or personal development work can shift your secondary traits. Most experts recommend retaking the assessment every one to two years.</p>
+
+    <h3>Is any DISC type better than the others?</h3>
+    <p>No DISC type is inherently better or worse than any other. Each type brings unique strengths and faces distinct challenges. Successful teams typically benefit from having a mix of all four types. The value of DISC lies not in labeling people but in understanding different behavioral styles so you can communicate more effectively, resolve conflicts, and leverage the strengths of diverse perspectives.</p>
+
+    <h3>How is DISC used in the workplace?</h3>
+    <p>DISC is widely used in professional settings for team building, leadership development, sales training, conflict resolution, and hiring. Organizations use it to help employees understand their communication styles, improve collaboration, reduce workplace friction, and build more cohesive teams. Over 70% of Fortune 500 companies use some form of DISC assessment in their talent development programs.</p>
+  </article>
+
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .game-area { cursor: default; user-select: auto; -webkit-user-select: auto; }
+</style>
+
+<script define:vars={{ gameName: "DISC Personality Test", gameSlug: "disc-personality-test", gameIcon: "\u{1F4CB}", metricLabel: "Primary Type", metricUnit: "" }}>
+(function () {
+  'use strict';
+
+  var questions = [
+    {
+      text: "Your team just received a high-priority project with an aggressive deadline. You:",
+      options: [
+        { label: "Take charge and assign tasks immediately to get things moving", dim: "D" },
+        { label: "Rally the team with an energetic pep talk about the exciting opportunity", dim: "I" },
+        { label: "Ask clarifying questions to make sure everyone understands expectations", dim: "S" },
+        { label: "Create a detailed project plan with milestones before starting any work", dim: "C" }
+      ]
+    },
+    {
+      text: "During a team meeting, a conflict arises between two colleagues. You:",
+      options: [
+        { label: "Step in decisively and propose a solution to keep things on track", dim: "D" },
+        { label: "Use humor and diplomacy to defuse the tension and find common ground", dim: "I" },
+        { label: "Listen patiently to both sides and help them find a compromise", dim: "S" },
+        { label: "Analyze the root cause of the disagreement and present the facts objectively", dim: "C" }
+      ]
+    },
+    {
+      text: "Your manager asks you to present your quarterly results to the executive team. You:",
+      options: [
+        { label: "Focus on the key wins and bold strategies that drove the results", dim: "D" },
+        { label: "Make the presentation engaging with stories and audience interaction", dim: "I" },
+        { label: "Carefully prepare so you can deliver a reliable, well-structured overview", dim: "S" },
+        { label: "Build data-rich slides with charts, analysis, and supporting documentation", dim: "C" }
+      ]
+    },
+    {
+      text: "You are assigned to a new cross-functional team. On the first day, you:",
+      options: [
+        { label: "Establish goals and start defining who is responsible for what", dim: "D" },
+        { label: "Introduce yourself warmly and try to learn about each team member", dim: "I" },
+        { label: "Observe the group dynamics and look for ways to support the team", dim: "S" },
+        { label: "Review the project brief thoroughly and identify potential risks early", dim: "C" }
+      ]
+    },
+    {
+      text: "You discover a significant error in a process that has been used for months. You:",
+      options: [
+        { label: "Fix it immediately and implement a better process without hesitation", dim: "D" },
+        { label: "Bring the team together to brainstorm a better approach collaboratively", dim: "I" },
+        { label: "Raise the issue carefully to avoid disrupting established workflows unnecessarily", dim: "S" },
+        { label: "Document the error in detail, analyze how it happened, and propose a tested solution", dim: "C" }
+      ]
+    },
+    {
+      text: "You have a free afternoon with no scheduled meetings. You use it to:",
+      options: [
+        { label: "Tackle the most challenging, high-impact task on your to-do list", dim: "D" },
+        { label: "Catch up with colleagues and build relationships over coffee", dim: "I" },
+        { label: "Organize your workspace and complete ongoing tasks at a relaxed pace", dim: "S" },
+        { label: "Research a complex problem and develop a thorough analysis", dim: "C" }
+      ]
+    },
+    {
+      text: "A client emails with an urgent complaint about your company's service. You:",
+      options: [
+        { label: "Respond immediately with a direct solution and a timeline for resolution", dim: "D" },
+        { label: "Call the client to build rapport and reassure them you will handle it personally", dim: "I" },
+        { label: "Acknowledge their frustration calmly and follow your company's resolution process", dim: "S" },
+        { label: "Investigate the root cause thoroughly before responding with a detailed explanation", dim: "C" }
+      ]
+    },
+    {
+      text: "Your team needs to choose between two competing strategies. You advocate for:",
+      options: [
+        { label: "The bolder option with higher potential payoff, even if riskier", dim: "D" },
+        { label: "The one that generates the most team enthusiasm and creative potential", dim: "I" },
+        { label: "The safer, more proven approach that minimizes disruption", dim: "S" },
+        { label: "Whichever option the data and analysis support most strongly", dim: "C" }
+      ]
+    },
+    {
+      text: "At a company social event, you are most likely to:",
+      options: [
+        { label: "Network strategically with people who can help advance your goals", dim: "D" },
+        { label: "Work the room energetically, telling stories and making everyone laugh", dim: "I" },
+        { label: "Stay with a small group of people you know well and have genuine conversations", dim: "S" },
+        { label: "Observe from the side and engage in deep one-on-one discussions about work", dim: "C" }
+      ]
+    },
+    {
+      text: "You receive negative feedback on a project you led. You:",
+      options: [
+        { label: "Push back on points you disagree with and defend your decisions confidently", dim: "D" },
+        { label: "Focus on the positives and discuss how you can make the next one even better", dim: "I" },
+        { label: "Accept the feedback calmly and commit to making adjustments", dim: "S" },
+        { label: "Analyze the feedback point by point and ask for specific examples", dim: "C" }
+      ]
+    },
+    {
+      text: "Your company is going through a major reorganization. You:",
+      options: [
+        { label: "See it as an opportunity to take on a bigger role with more authority", dim: "D" },
+        { label: "Help keep morale up by staying optimistic and rallying colleagues", dim: "I" },
+        { label: "Focus on maintaining stability for your immediate team during the transition", dim: "S" },
+        { label: "Study the new organizational structure carefully and plan your approach", dim: "C" }
+      ]
+    },
+    {
+      text: "When starting a new project, the first thing you do is:",
+      options: [
+        { label: "Define the end goal and set aggressive targets to drive progress", dim: "D" },
+        { label: "Gather the team to brainstorm ideas and build excitement about the vision", dim: "I" },
+        { label: "Understand the roles and expectations so everyone knows what to do", dim: "S" },
+        { label: "Research best practices and create a detailed plan before beginning", dim: "C" }
+      ]
+    },
+    {
+      text: "A colleague asks for your help with a task outside your area of expertise. You:",
+      options: [
+        { label: "Dive in confidently and figure it out as you go", dim: "D" },
+        { label: "Enthusiastically agree and suggest working on it together", dim: "I" },
+        { label: "Help willingly while being transparent about your limited knowledge", dim: "S" },
+        { label: "Point them to someone more qualified while offering specific resources", dim: "C" }
+      ]
+    },
+    {
+      text: "Your ideal work environment would be:",
+      options: [
+        { label: "Fast-paced and competitive, with clear metrics for success", dim: "D" },
+        { label: "Collaborative and fun, with open communication and creative freedom", dim: "I" },
+        { label: "Stable and supportive, with clear processes and a cohesive team", dim: "S" },
+        { label: "Structured and quiet, with time for focused independent analysis", dim: "C" }
+      ]
+    },
+    {
+      text: "When delegating tasks to team members, you tend to:",
+      options: [
+        { label: "Give clear directives and expect results without micromanaging", dim: "D" },
+        { label: "Explain the big picture vision and let people run with their ideas", dim: "I" },
+        { label: "Walk through each step patiently and check in regularly to offer support", dim: "S" },
+        { label: "Provide detailed written instructions with quality standards and checkpoints", dim: "C" }
+      ]
+    },
+    {
+      text: "You are in a brainstorming session and someone proposes an idea you think is flawed. You:",
+      options: [
+        { label: "Challenge it directly and propose a more effective alternative", dim: "D" },
+        { label: "Build on the idea with enthusiasm, steering it in a better direction", dim: "I" },
+        { label: "Privately mention your concerns later to avoid putting them on the spot", dim: "S" },
+        { label: "Ask specific analytical questions that reveal the flaw without being confrontational", dim: "C" }
+      ]
+    },
+    {
+      text: "When you are under significant stress at work, you tend to:",
+      options: [
+        { label: "Become more demanding and push harder for immediate results", dim: "D" },
+        { label: "Vent to colleagues and seek social support and reassurance", dim: "I" },
+        { label: "Withdraw and try to restore a sense of calm and predictability", dim: "S" },
+        { label: "Focus intensely on details and become more critical of errors", dim: "C" }
+      ]
+    },
+    {
+      text: "Your team just successfully completed a major project. You:",
+      options: [
+        { label: "Immediately look ahead to the next challenge and set new goals", dim: "D" },
+        { label: "Organize a celebration and publicly acknowledge everyone's contributions", dim: "I" },
+        { label: "Express quiet satisfaction and gratitude to each team member individually", dim: "S" },
+        { label: "Conduct a thorough review to document what worked and what can improve", dim: "C" }
+      ]
+    },
+    {
+      text: "A vendor delivers work that does not meet the agreed specifications. You:",
+      options: [
+        { label: "Confront them directly and demand immediate correction", dim: "D" },
+        { label: "Have a friendly conversation about how to get things back on track together", dim: "I" },
+        { label: "Express your concern calmly and give them a reasonable timeline to fix it", dim: "S" },
+        { label: "Reference the original specifications and document each discrepancy in writing", dim: "C" }
+      ]
+    },
+    {
+      text: "You are asked to mentor a new employee. Your approach is to:",
+      options: [
+        { label: "Set clear expectations and push them to take on challenges quickly", dim: "D" },
+        { label: "Build a warm relationship and share your experiences through stories", dim: "I" },
+        { label: "Provide patient guidance and create a supportive learning environment", dim: "S" },
+        { label: "Create a structured development plan with measurable milestones", dim: "C" }
+      ]
+    },
+    {
+      text: "The team cannot agree on a direction during a meeting. You suggest:",
+      options: [
+        { label: "Making a decision now because progress is more important than consensus", dim: "D" },
+        { label: "Taking a vote and going with what most people feel excited about", dim: "I" },
+        { label: "Taking more time to ensure everyone's concerns are heard and addressed", dim: "S" },
+        { label: "Gathering more data before making a decision to ensure we choose correctly", dim: "C" }
+      ]
+    },
+    {
+      text: "When learning a new skill or software tool, you prefer to:",
+      options: [
+        { label: "Jump in and learn by doing, figuring it out through trial and error", dim: "D" },
+        { label: "Learn with a group so you can share tips and discuss as you go", dim: "I" },
+        { label: "Follow a step-by-step tutorial at your own pace until you feel confident", dim: "S" },
+        { label: "Read the documentation thoroughly before touching anything", dim: "C" }
+      ]
+    },
+    {
+      text: "Your biggest frustration at work is when:",
+      options: [
+        { label: "People waste time with unnecessary meetings and slow decision-making", dim: "D" },
+        { label: "The workplace is rigid and there is no room for creative expression", dim: "I" },
+        { label: "Changes are introduced suddenly without preparation or clear communication", dim: "S" },
+        { label: "People cut corners and sacrifice quality for speed", dim: "C" }
+      ]
+    },
+    {
+      text: "You are promoted to lead a team for the first time. Your first priority is to:",
+      options: [
+        { label: "Set clear performance targets and establish accountability", dim: "D" },
+        { label: "Get to know the team personally and create a positive team culture", dim: "I" },
+        { label: "Build trust by showing consistency and supporting each team member", dim: "S" },
+        { label: "Understand existing processes and identify areas for systematic improvement", dim: "C" }
+      ]
+    },
+    {
+      text: "During a lengthy meeting that is going off topic, you:",
+      options: [
+        { label: "Interrupt to redirect the conversation back to the agenda and action items", dim: "D" },
+        { label: "Make a lighthearted comment and smoothly bring the discussion back on track", dim: "I" },
+        { label: "Wait patiently and trust the facilitator will refocus the group eventually", dim: "S" },
+        { label: "Check the agenda and politely note which items still need to be addressed", dim: "C" }
+      ]
+    },
+    {
+      text: "A coworker takes a completely different approach to a shared task than you would. You:",
+      options: [
+        { label: "Tell them your approach is more efficient and push for your method", dim: "D" },
+        { label: "Appreciate the different perspective and suggest combining the best of both", dim: "I" },
+        { label: "Go along with their approach to maintain harmony and avoid conflict", dim: "S" },
+        { label: "Compare both approaches objectively against the project criteria", dim: "C" }
+      ]
+    },
+    {
+      text: "When writing an important email, you focus most on:",
+      options: [
+        { label: "Keeping it short, direct, and action-oriented", dim: "D" },
+        { label: "Making it friendly, personable, and enthusiastic in tone", dim: "I" },
+        { label: "Being polite, considerate, and making sure it will not be misread", dim: "S" },
+        { label: "Including all relevant details, data, and precise language", dim: "C" }
+      ]
+    },
+    {
+      text: "You notice your team's productivity has been declining over the past few weeks. You:",
+      options: [
+        { label: "Address it head-on in a team meeting and set new performance expectations", dim: "D" },
+        { label: "Plan a team-building activity and have one-on-one chats to re-energize morale", dim: "I" },
+        { label: "Check in individually with team members to understand what is causing the slump", dim: "S" },
+        { label: "Analyze performance metrics to identify the root cause before taking action", dim: "C" }
+      ]
+    }
+  ];
+
+  var discTypes = {
+    D: {
+      name: "Dominance",
+      icon: "\u{1F534}",
+      color: "#ef4444",
+      desc: "You are a Driver. Direct, results-oriented, and decisive, you thrive on challenge and competition. You value efficiency and bottom-line results. You are at your best when leading bold initiatives, solving tough problems, and pushing for ambitious goals.",
+      strengths: "Decisiveness, determination, confidence, ability to drive results under pressure",
+      challenges: "Impatience, insensitivity, dominating conversations, overlooking details",
+      idealEnv: "Fast-paced, competitive environment with autonomy and clear metrics for success",
+      compatible: "I (Influence) and C (Conscientiousness)"
+    },
+    I: {
+      name: "Influence",
+      icon: "\u{1F7E1}",
+      color: "#eab308",
+      desc: "You are an Inspirer. Enthusiastic, optimistic, and socially skilled, you thrive on interaction and collaboration. You value relationships and creative freedom. You are at your best when motivating teams, building rapport, and generating excitement for new ideas.",
+      strengths: "Persuasion, creativity, enthusiasm, ability to build coalitions and motivate others",
+      challenges: "Difficulty with follow-through, overpromising, disorganization, avoiding conflict",
+      idealEnv: "Collaborative, fun workplace with open communication and opportunities for recognition",
+      compatible: "D (Dominance) and S (Steadiness)"
+    },
+    S: {
+      name: "Steadiness",
+      icon: "\u{1F7E2}",
+      color: "#22c55e",
+      desc: "You are a Supporter. Patient, reliable, and team-oriented, you value harmony and stability. You prefer predictable environments and genuine relationships. You are at your best when creating cohesive teams, supporting colleagues, and delivering consistently dependable work.",
+      strengths: "Dependability, patience, loyalty, ability to create harmonious team environments",
+      challenges: "Resistance to change, difficulty asserting yourself, avoiding confrontation, indecision",
+      idealEnv: "Stable, supportive workplace with clear processes, minimal surprises, and a cohesive team",
+      compatible: "I (Influence) and C (Conscientiousness)"
+    },
+    C: {
+      name: "Conscientiousness",
+      icon: "\u{1F535}",
+      color: "#3b82f6",
+      desc: "You are an Analyst. Detail-oriented, quality-focused, and systematic, you value accuracy and expertise. You prefer thorough analysis before action. You are at your best when solving complex problems, maintaining high standards, and ensuring quality outcomes.",
+      strengths: "Thoroughness, accuracy, expertise, ability to identify risks and ensure quality",
+      challenges: "Analysis paralysis, perfectionism, overly critical, difficulty with rapid change",
+      idealEnv: "Structured, quiet workspace with time for focused analysis and high-quality standards",
+      compatible: "D (Dominance) and S (Steadiness)"
+    }
+  };
+
+  var STORAGE_KEY = 'toolcalcs_disc-personality-test_history';
+  var MAX_HISTORY = 20;
+
+  function loadHistory() {
+    try { var r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch (e) {}
+    return [];
+  }
+  function saveHistory(h) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch (e) {}
+  }
+  function addToHistory(primary, scores) {
+    var h = loadHistory();
+    h.unshift({ primary: primary, scores: scores, date: new Date().toISOString() });
+    saveHistory(h);
+  }
+
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+  }
+
+  function formatDate(iso) {
+    try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    catch (e) { return ''; }
+  }
+
+  var instructionsView = document.getElementById('instructionsView');
+  var playView = document.getElementById('playView');
+  var resultView = document.getElementById('resultView');
+  var startBtn = document.getElementById('startBtn');
+  var tryAgainBtn = document.getElementById('tryAgainBtn');
+  var progressText = document.getElementById('progressText');
+  var progressFill = document.getElementById('progressFill');
+  var questionText = document.getElementById('questionText');
+  var optionsContainer = document.getElementById('optionsContainer');
+  var resultIcon = document.getElementById('resultIcon');
+  var primaryType = document.getElementById('primaryType');
+  var primaryLabel = document.getElementById('primaryLabel');
+  var ratingBadge = document.getElementById('ratingBadge');
+  var dimChart = document.getElementById('dimChart');
+  var typeDescription = document.getElementById('typeDescription');
+  var compatibleTypesEl = document.getElementById('compatibleTypes');
+  var attemptHistorySection = document.getElementById('attemptHistory');
+  var historyList = document.getElementById('historyList');
+
+  var shuffledQuestions = [];
+  var currentIndex = 0;
+  var scores = { D: 0, I: 0, S: 0, C: 0 };
+  var isProcessing = false;
+
+  function showView(view) {
+    instructionsView.style.display = 'none';
+    playView.style.display = 'none';
+    resultView.style.display = 'none';
+    view.style.display = '';
+  }
+
+  function startGame() {
+    shuffledQuestions = shuffle(questions);
+    currentIndex = 0;
+    scores = { D: 0, I: 0, S: 0, C: 0 };
+    isProcessing = false;
+    showView(playView);
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    var q = shuffledQuestions[currentIndex];
+    var total = shuffledQuestions.length;
+    var pct = Math.round((currentIndex / total) * 100);
+
+    progressText.textContent = 'Question ' + (currentIndex + 1) + ' of ' + total;
+    progressFill.style.width = pct + '%';
+    questionText.textContent = q.text;
+
+    var shuffledOpts = shuffle(q.options);
+    var html = '';
+    for (var i = 0; i < shuffledOpts.length; i++) {
+      html += '<button class="quiz-option" type="button" data-dim="' + shuffledOpts[i].dim + '">' + shuffledOpts[i].label + '</button>';
+    }
+    optionsContainer.innerHTML = html;
+  }
+
+  function handleOptionClick(e) {
+    if (isProcessing) return;
+    var btn = e.target;
+    if (!btn || !btn.classList || !btn.classList.contains('quiz-option')) return;
+
+    isProcessing = true;
+    var dim = btn.getAttribute('data-dim');
+    btn.classList.add('selected');
+    scores[dim]++;
+
+    setTimeout(function () {
+      currentIndex++;
+      if (currentIndex >= shuffledQuestions.length) {
+        showResults();
+      } else {
+        renderQuestion();
+      }
+      isProcessing = false;
+    }, 300);
+  }
+
+  function showResults() {
+    var total = questions.length;
+    var dimKeys = ['D', 'I', 'S', 'C'];
+    var pcts = {};
+    var primaryDim = 'D';
+    var secondaryDim = 'I';
+    var maxScore = 0;
+    var secondMax = 0;
+
+    for (var i = 0; i < dimKeys.length; i++) {
+      var k = dimKeys[i];
+      pcts[k] = Math.round((scores[k] / total) * 100);
+      if (scores[k] > maxScore) {
+        secondMax = maxScore;
+        secondaryDim = primaryDim;
+        maxScore = scores[k];
+        primaryDim = k;
+      } else if (scores[k] > secondMax) {
+        secondMax = scores[k];
+        secondaryDim = k;
+      }
+    }
+
+    var type = discTypes[primaryDim];
+    showView(resultView);
+
+    resultIcon.textContent = type.icon;
+    primaryType.textContent = primaryDim;
+    primaryLabel.textContent = ' - ' + type.name;
+    ratingBadge.textContent = type.name + ' (' + primaryDim + secondaryDim + ')';
+    ratingBadge.style.background = type.color;
+
+    var chartHTML = '';
+    for (var j = 0; j < dimKeys.length; j++) {
+      var dk = dimKeys[j];
+      var dt = discTypes[dk];
+      chartHTML += '<div class="quiz-bar-item">';
+      chartHTML += '<div class="quiz-bar-label"><span>' + dt.icon + ' ' + dt.name + ' (' + dk + ')</span><span>' + pcts[dk] + '%</span></div>';
+      chartHTML += '<div class="quiz-bar-track"><div class="quiz-bar-fill" style="width:' + pcts[dk] + '%;background:' + dt.color + '"></div></div>';
+      chartHTML += '</div>';
+    }
+    dimChart.innerHTML = chartHTML;
+
+    var descHTML = '<div style="text-align:left;max-width:450px;margin:0 auto;">';
+    descHTML += '<p>' + type.desc + '</p>';
+    descHTML += '<p><strong>Key Strengths:</strong> ' + type.strengths + '</p>';
+    descHTML += '<p><strong>Watch Out For:</strong> ' + type.challenges + '</p>';
+    descHTML += '<p><strong>Ideal Work Environment:</strong> ' + type.idealEnv + '</p>';
+    descHTML += '</div>';
+    typeDescription.innerHTML = descHTML;
+
+    compatibleTypesEl.innerHTML = '<div style="text-align:left;max-width:450px;margin:16px auto 0;padding:16px;background:var(--color-bg);border-radius:var(--radius);border:1px solid var(--color-border);"><p><strong>Most Compatible Types:</strong> ' + type.compatible + '</p><p style="margin-top:8px;font-size:0.9rem;color:var(--color-text-muted);">These types complement your ' + type.name + ' style by balancing your strengths and covering areas where you may need support.</p></div>';
+
+    addToHistory(primaryDim, pcts);
+    renderHistory();
+
+    if (window.GameShare) {
+      window.GameShare.show({
+        gameName: gameName,
+        gameSlug: gameSlug,
+        gameIcon: gameIcon,
+        score: type.name + ' (' + primaryDim + ')',
+        unit: metricUnit,
+        metricLabel: metricLabel,
+        ratingLabel: primaryDim + secondaryDim + ' Profile',
+        ratingColor: type.color
+      });
+    }
+  }
+
+  function renderHistory() {
+    var history = loadHistory();
+    if (history.length === 0) { attemptHistorySection.hidden = true; return; }
+    attemptHistorySection.hidden = false;
+    var html = '';
+    for (var i = 0; i < history.length; i++) {
+      var e = history[i];
+      var t = discTypes[e.primary] || discTypes.D;
+      html += '<div class="history-item">';
+      html += '<span class="history-score">' + t.icon + ' ' + e.primary + ' - ' + t.name + '</span>';
+      html += '<span class="history-rating" style="background:' + t.color + '">' + e.primary + '</span>';
+      html += '<span class="history-time">' + formatDate(e.date) + '</span>';
+      html += '</div>';
+    }
+    historyList.innerHTML = html;
+  }
+
+  optionsContainer.addEventListener('click', handleOptionClick);
+  startBtn.addEventListener('click', startGame);
+  tryAgainBtn.addEventListener('click', startGame);
+  renderHistory();
+})();
+</script>

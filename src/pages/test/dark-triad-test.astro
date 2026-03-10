@@ -1,0 +1,496 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import GameShare from '../../components/GameShare.astro';
+import '../../styles/game.css';
+import '../../styles/quiz.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tests & Games", "item": "https://toolcalcs.com/test/" },
+      { "@type": "ListItem", "position": 3, "name": "Dark Triad Personality Test" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Dark Triad Personality Test",
+    "url": "https://toolcalcs.com/test/dark-triad-test/",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Free Dark Triad test measuring Narcissism, Machiavellianism, and Psychopathy traits. 27 honest self-assessment questions based on the Short Dark Triad (SD3) scale."
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is the Dark Triad in psychology?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The Dark Triad is a group of three personality traits: Narcissism (grandiose self-importance and need for admiration), Machiavellianism (manipulative and strategic behavior), and Psychopathy (lack of empathy and impulsive behavior). The term was coined by psychologists Delroy Paulhus and Kevin Williams in 2002. These traits exist on a spectrum, and most people exhibit some degree of each without it being pathological.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Is scoring high on the Dark Triad bad?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Not necessarily. Everyone has some degree of Dark Triad traits, and moderate levels can actually be adaptive. Moderate narcissism correlates with confidence and leadership ability. Strategic thinking associated with Machiavellianism can be valuable in negotiations and business. This test measures personality tendencies on a normal spectrum and is not a clinical diagnosis. High scores simply indicate stronger presence of these traits, not that you are a bad person.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Is this the same as being diagnosed with a personality disorder?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'No. The Dark Triad measures normal personality variations, not clinical disorders. Narcissistic Personality Disorder, Antisocial Personality Disorder, and related diagnoses are clinical conditions that require professional evaluation and cause significant distress or functional impairment. Scoring high on a Dark Triad self-assessment does not mean you have a personality disorder. Only a qualified mental health professional can make clinical diagnoses.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is the Short Dark Triad (SD3) scale?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The Short Dark Triad (SD3) is a 27-item self-report questionnaire developed by Jones and Paulhus in 2014. It measures the three Dark Triad traits using 9 items each on a 5-point Likert scale from Strongly Disagree to Strongly Agree. The SD3 was designed to provide a brief but reliable measure of all three traits simultaneously, making it practical for research and self-assessment purposes.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Can Dark Triad traits change over time?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Research suggests that Dark Triad traits tend to decrease with age, particularly narcissism and psychopathy-related impulsivity. Life experiences, therapy, mindfulness practices, and deliberate personal development can all influence these traits. While core personality tendencies are relatively stable, the behavioral expressions of Dark Triad traits can be modulated significantly through self-awareness and intentional effort.',
+        },
+      },
+    ],
+  }
+];
+---
+
+<BaseLayout
+  title="Dark Triad Personality Test - Free Online Assessment | ToolCalcs"
+  description="Free Dark Triad test measuring Narcissism, Machiavellianism, and Psychopathy traits. 27 honest self-assessment questions based on the Short Dark Triad (SD3) scale."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/test/">Tests &amp; Games</a> &rsaquo;
+    <span>Dark Triad Personality Test</span>
+  </nav>
+
+  <h1>Dark Triad Personality Test</h1>
+  <p class="page-desc">Answer 27 honest self-assessment questions to measure your Narcissism, Machiavellianism, and Psychopathy traits on the Dark Triad spectrum. How dark is your personality?</p>
+
+  <div class="game-box">
+    <div class="game-area" id="gameArea" role="region" aria-label="Dark Triad test area" aria-live="polite">
+      <div class="game-instructions" id="instructionsView">
+        <h2>Dark Triad Assessment</h2>
+        <p>You will rate 27 statements on a scale from Strongly Disagree to Strongly Agree. Answer honestly based on how you truly feel, not how you think you should answer. This is a self-assessment tool for personal insight, not a clinical diagnosis. There are no right or wrong answers.</p>
+        <button class="game-btn primary" id="startBtn" type="button" style="margin-top:16px;">Start Test</button>
+      </div>
+
+      <div class="play-view" id="playView" style="display:none;">
+        <div class="quiz-progress">
+          <div class="quiz-progress-text" id="progressText">Question 1 of 27</div>
+          <div class="quiz-progress-bar">
+            <div class="quiz-progress-fill" id="progressFill" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="quiz-question">
+          <div class="quiz-question-text" id="questionText"></div>
+        </div>
+        <div class="quiz-options" id="optionsContainer"></div>
+      </div>
+
+      <div class="result-view" id="resultView" style="display:none;">
+        <div class="result-icon" aria-hidden="true">🖤</div>
+        <div class="result-label">Your Dark Triad Score</div>
+        <div class="score-display">
+          <span class="score-value" id="finalScore">0</span>
+          <span class="score-unit">/100</span>
+        </div>
+        <div class="rating-badge" id="ratingBadge"></div>
+        <div class="quiz-bar-chart" id="traitChart" style="margin-top:24px;"></div>
+        <div class="quiz-result-desc" id="traitDetails"></div>
+        <div class="quiz-result-desc" id="interpretationNote"></div>
+        <button class="game-btn primary" id="tryAgainBtn" type="button" style="margin-top:16px;">Take Again</button>
+      </div>
+    </div>
+
+    <GameShare />
+
+    <div class="attempt-history" id="attemptHistory" hidden>
+      <h3>Attempt History</h3>
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is the Dark Triad?</h2>
+    <p>The Dark Triad is a concept in psychology that refers to three distinct but overlapping personality traits: Narcissism, Machiavellianism, and Psychopathy. The term was introduced by psychologists Delroy L. Paulhus and Kevin M. Williams in their landmark 2002 paper published in the <em>Journal of Research in Personality</em>. They observed that while these three traits are conceptually distinct, they share a common core of callousness, manipulativeness, and self-interest that warranted studying them as a group.</p>
+    <p>It is essential to understand that Dark Triad traits exist on a spectrum. Every person possesses some degree of each trait, and having moderate levels does not make someone a bad person or indicate a psychological disorder. In fact, research has shown that moderate levels of certain Dark Triad traits can be adaptive in specific contexts. The concept of the Dark Triad is descriptive, not prescriptive. It helps us understand personality variation rather than classify people as good or evil.</p>
+    <p>Since Paulhus and Williams published their original paper, the Dark Triad has become one of the most intensively researched topics in personality psychology, generating hundreds of studies exploring its role in relationships, workplace behavior, leadership, creativity, and evolutionary psychology. The framework provides a useful lens for understanding certain patterns of human behavior that traditional personality models like the Big Five do not fully capture.</p>
+
+    <h2>The Three Dark Triad Traits Explained</h2>
+
+    <h3>Narcissism</h3>
+    <p>Narcissism in the Dark Triad refers to subclinical or grandiose narcissism, which is distinct from Narcissistic Personality Disorder (NPD). It involves a pattern of grandiosity, a deep need for admiration, a sense of entitlement, and a tendency to seek attention and validation from others. People high in subclinical narcissism often have inflated self-views, believe they are special or superior, and expect preferential treatment.</p>
+    <p>The trait is named after the Greek mythological figure Narcissus, who fell in love with his own reflection. In psychological terms, narcissism manifests as an exaggerated sense of self-importance, preoccupation with fantasies of success or power, a belief in being unique, a need for excessive admiration, and a willingness to exploit others to achieve personal goals. Narcissists often make strong first impressions because their confidence is genuinely magnetic, but relationships may deteriorate over time as others encounter the self-centeredness beneath the charm.</p>
+    <p>Research shows that moderate narcissism is associated with positive outcomes including higher self-esteem, greater resilience to criticism, leadership emergence, and strong public speaking ability. However, high levels are associated with relationship difficulties, aggression when ego is threatened, and difficulty maintaining long-term partnerships where mutual give-and-take is required.</p>
+
+    <h3>Machiavellianism</h3>
+    <p>Machiavellianism is named after Niccolo Machiavelli, the Renaissance-era Italian political philosopher whose treatise <em>The Prince</em> advocated strategic, sometimes ruthless political maneuvering. In personality psychology, Machiavellianism refers to a tendency toward manipulation, strategic calculation, cynicism about human nature, and a focus on self-interest and personal gain.</p>
+    <p>High Machiavellians are characterized by a cold, calculating approach to social interactions. They tend to view relationships as transactional, believe that the ends justify the means, maintain emotional distance from others, and are skilled at reading social situations and exploiting them for personal advantage. They are often described as strategic, pragmatic, and willing to bend or break rules when they calculate the risk is acceptable.</p>
+    <p>Unlike narcissism and psychopathy, which involve impulsive or emotionally driven behavior, Machiavellianism is fundamentally strategic. High Machs plan their moves carefully, cultivate useful relationships, and are patient about achieving their goals. They are less likely to engage in overt aggression and more likely to use subtle influence, persuasion, or behind-the-scenes maneuvering. Research links moderate Machiavellianism to success in competitive business environments, negotiation, and political leadership.</p>
+
+    <h3>Psychopathy</h3>
+    <p>Subclinical psychopathy, as measured in the Dark Triad, refers to a personality pattern characterized by low empathy, low anxiety, boldness, thrill-seeking, and impulsive behavior. It is crucial to distinguish this from clinical psychopathy or Antisocial Personality Disorder, which are far more severe conditions requiring professional diagnosis. Subclinical psychopathy exists on the normal spectrum of personality variation.</p>
+    <p>Individuals scoring high on subclinical psychopathy tend to be less sensitive to others' emotions, more willing to take risks, less bothered by negative consequences, and more inclined toward thrill-seeking. They may have a superficial charm that conceals a lack of genuine emotional depth. They often respond poorly to punishment-based learning and may repeat behaviors that have led to negative outcomes because they are less affected by those outcomes emotionally.</p>
+    <p>Research has identified some adaptive qualities associated with moderate subclinical psychopathy, including fearlessness, stress immunity, and the ability to make difficult decisions without being paralyzed by emotional considerations. Some studies have found elevated subclinical psychopathy traits among surgeons, first responders, special forces operators, and CEOs, suggesting that the ability to remain calm and detached under extreme pressure can be advantageous in certain high-stakes professions.</p>
+
+    <h2>The Dark Triad vs. Clinical Personality Disorders</h2>
+    <p>One of the most common misconceptions about the Dark Triad is that high scores equate to personality disorders. This is categorically false. The Dark Triad measures normal personality variation, not pathology. Narcissistic Personality Disorder, Antisocial Personality Disorder, and related clinical conditions are defined by persistent patterns that cause significant distress, impair functioning, and deviate markedly from cultural expectations. They require professional evaluation and often involve more extreme and inflexible versions of the traits measured by the Dark Triad.</p>
+    <p>Subclinical personality traits are dimensional: they exist on a continuum from low to high in the general population. Most people have a mix of all three traits at various levels, and these levels are influenced by genetics, upbringing, culture, and life experiences. Only a qualified mental health professional can diagnose personality disorders, and a self-report questionnaire cannot serve as a substitute for clinical evaluation.</p>
+
+    <h2>Why Do Some People Score Higher on the Dark Triad?</h2>
+    <p>Research has identified several factors that contribute to higher Dark Triad scores. Genetic studies, particularly twin studies, suggest that each trait has a significant heritable component, with estimates ranging from 30% to 65% genetic influence. Environmental factors during childhood and adolescence also play important roles. Insecure attachment styles, inconsistent parenting, and environments that reward competitive or manipulative behavior can contribute to elevated Dark Triad traits.</p>
+    <p>Evolutionary psychologists propose that Dark Triad traits may have been adaptive in ancestral environments. Narcissism could have facilitated mate attraction through displays of confidence. Machiavellianism could have improved success in resource competition through strategic alliances. Psychopathy-related boldness could have provided advantages in dangerous situations requiring fearless action. From this perspective, moderate levels of these traits represent adaptive strategies that have been maintained through natural selection.</p>
+
+    <h2>The Dark Triad in Leadership and Relationships</h2>
+    <p>Dark Triad traits have been extensively studied in the context of leadership. Leaders with moderate narcissism often emerge naturally because their confidence and vision inspire followers. However, highly narcissistic leaders may create toxic environments by demanding excessive admiration and responding aggressively to criticism. Machiavellian leaders can be effective strategists who navigate organizational politics skillfully, but they may erode trust if their manipulative tendencies become apparent.</p>
+    <p>In romantic relationships, initial attraction to Dark Triad individuals is well-documented. Their confidence, charm, and social boldness can be highly appealing in early interactions. However, long-term relationship satisfaction tends to be lower with high Dark Triad partners due to reduced empathy, increased conflict, and a tendency to prioritize self-interest over the relationship's needs. Self-awareness about one's own Dark Triad tendencies can significantly improve relationship outcomes by enabling conscious effort to counterbalance these natural inclinations.</p>
+
+    <h2>Ethical Considerations</h2>
+    <p>Personality assessments, particularly those measuring socially undesirable traits, raise important ethical questions. It is important to use Dark Triad results for self-understanding and personal growth rather than as a tool to label or judge others. These traits are part of normal human variation, and understanding them promotes empathy and self-awareness. If your results concern you or if you are experiencing difficulties in relationships or daily functioning, consider speaking with a licensed mental health professional who can provide proper evaluation and guidance.</p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is the Dark Triad in psychology?</h3>
+    <p>The Dark Triad is a group of three personality traits: Narcissism (grandiose self-importance and need for admiration), Machiavellianism (manipulative and strategic behavior), and Psychopathy (lack of empathy and impulsive behavior). The term was coined by psychologists Delroy Paulhus and Kevin Williams in 2002. These traits exist on a spectrum, and most people exhibit some degree of each without it being pathological.</p>
+
+    <h3>Is scoring high on the Dark Triad bad?</h3>
+    <p>Not necessarily. Everyone has some degree of Dark Triad traits, and moderate levels can actually be adaptive. Moderate narcissism correlates with confidence and leadership ability. Strategic thinking associated with Machiavellianism can be valuable in negotiations and business. This test measures personality tendencies on a normal spectrum and is not a clinical diagnosis. High scores simply indicate stronger presence of these traits, not that you are a bad person.</p>
+
+    <h3>Is this the same as being diagnosed with a personality disorder?</h3>
+    <p>No. The Dark Triad measures normal personality variations, not clinical disorders. Narcissistic Personality Disorder, Antisocial Personality Disorder, and related diagnoses are clinical conditions that require professional evaluation and cause significant distress or functional impairment. Scoring high on a Dark Triad self-assessment does not mean you have a personality disorder. Only a qualified mental health professional can make clinical diagnoses.</p>
+
+    <h3>What is the Short Dark Triad (SD3) scale?</h3>
+    <p>The Short Dark Triad (SD3) is a 27-item self-report questionnaire developed by Jones and Paulhus in 2014. It measures the three Dark Triad traits using 9 items each on a 5-point Likert scale from Strongly Disagree to Strongly Agree. The SD3 was designed to provide a brief but reliable measure of all three traits simultaneously, making it practical for research and self-assessment purposes.</p>
+
+    <h3>Can Dark Triad traits change over time?</h3>
+    <p>Research suggests that Dark Triad traits tend to decrease with age, particularly narcissism and psychopathy-related impulsivity. Life experiences, therapy, mindfulness practices, and deliberate personal development can all influence these traits. While core personality tendencies are relatively stable, the behavioral expressions of Dark Triad traits can be modulated significantly through self-awareness and intentional effort.</p>
+  </article>
+
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .game-area { cursor: default; user-select: auto; -webkit-user-select: auto; }
+</style>
+
+<script define:vars={{ gameName: "Dark Triad Test", gameSlug: "dark-triad-test", gameIcon: "\u{1F5A4}", metricLabel: "Dark Triad Score", metricUnit: "/100" }}>
+(function () {
+  'use strict';
+
+  var questions = [
+    { text: "It is not wise to tell your secrets.", trait: "M", rev: false },
+    { text: "I like to use clever manipulation to get my way.", trait: "M", rev: false },
+    { text: "Whatever it takes, you must get the important people on your side.", trait: "M", rev: false },
+    { text: "Avoid direct conflict with others because they may be useful in the future.", trait: "M", rev: false },
+    { text: "It is wise to keep track of information that you can use against people later.", trait: "M", rev: false },
+    { text: "You should wait for the right time to get back at people.", trait: "M", rev: false },
+    { text: "There are things you should hide from other people to preserve your reputation.", trait: "M", rev: false },
+    { text: "Make sure your plans benefit yourself, not others.", trait: "M", rev: false },
+    { text: "Most people can be manipulated.", trait: "M", rev: false },
+    { text: "People see me as a natural leader.", trait: "N", rev: false },
+    { text: "I hate being the center of attention.", trait: "N", rev: true },
+    { text: "Many group activities tend to be dull without me.", trait: "N", rev: false },
+    { text: "I know that I am special because everyone keeps telling me so.", trait: "N", rev: false },
+    { text: "I like to get acquainted with important people.", trait: "N", rev: false },
+    { text: "I feel embarrassed if someone compliments me.", trait: "N", rev: true },
+    { text: "I have been compared to famous people.", trait: "N", rev: false },
+    { text: "I am an average person.", trait: "N", rev: true },
+    { text: "I insist on getting the respect I deserve.", trait: "N", rev: false },
+    { text: "I like to get revenge on authorities.", trait: "P", rev: false },
+    { text: "I avoid dangerous situations.", trait: "P", rev: true },
+    { text: "Payback needs to be quick and nasty.", trait: "P", rev: false },
+    { text: "People often say I am out of control.", trait: "P", rev: false },
+    { text: "It is true that I can be mean to others.", trait: "P", rev: false },
+    { text: "People who mess with me always regret it.", trait: "P", rev: false },
+    { text: "I have never gotten into trouble with the law.", trait: "P", rev: true },
+    { text: "I enjoy having sex with people I hardly know.", trait: "P", rev: false },
+    { text: "I will say anything to get what I want.", trait: "P", rev: false }
+  ];
+
+  var likertOptions = [
+    { label: "Strongly Disagree", val: 1 },
+    { label: "Disagree", val: 2 },
+    { label: "Neutral", val: 3 },
+    { label: "Agree", val: 4 },
+    { label: "Strongly Agree", val: 5 }
+  ];
+
+  var traitMeta = {
+    M: { name: "Machiavellianism", icon: "\u{265F}\u{FE0F}", color: "#8b5cf6" },
+    N: { name: "Narcissism", icon: "\u{1FA9E}", color: "#f59e0b" },
+    P: { name: "Psychopathy", icon: "\u{1F525}", color: "#ef4444" }
+  };
+
+  var levelRanges = [
+    { min: 75, label: "Very High", color: "#ef4444" },
+    { min: 55, label: "High", color: "#f97316" },
+    { min: 35, label: "Moderate", color: "#f59e0b" },
+    { min: 15, label: "Low", color: "#22c55e" },
+    { min: 0, label: "Very Low", color: "#16a34a" }
+  ];
+
+  var overallRanges = [
+    { min: 75, label: "Very High Dark Triad", color: "#ef4444" },
+    { min: 55, label: "High Dark Triad", color: "#f97316" },
+    { min: 35, label: "Moderate Dark Triad", color: "#f59e0b" },
+    { min: 15, label: "Low Dark Triad", color: "#22c55e" },
+    { min: 0, label: "Very Low Dark Triad", color: "#16a34a" }
+  ];
+
+  var traitInterpretations = {
+    M: {
+      high: "You tend to be strategic and calculating in social interactions. You are comfortable using indirect means to achieve your goals and view relationships partly in terms of their utility. You may be skilled at negotiation and navigating complex political environments.",
+      moderate: "You have a balanced approach to social strategy. You can be pragmatic when needed but generally prefer straightforward dealings with others. You understand strategic thinking without being dominated by it.",
+      low: "You tend to be straightforward and trusting in your interactions. You prefer honest, direct communication and are uncomfortable with manipulation or deception, even when it might serve your interests."
+    },
+    N: {
+      high: "You have a strong sense of self-importance and enjoy being recognized for your qualities. You are confident, charismatic, and drawn to positions of influence. You may sometimes struggle with criticism or situations where you are not the focus.",
+      moderate: "You have healthy self-confidence without excessive self-focus. You appreciate recognition but do not depend on it for your self-worth. You can take leadership roles comfortably while still valuing others' contributions.",
+      low: "You tend to be humble and self-effacing. You are comfortable letting others take the spotlight and may undervalue your own contributions. You might benefit from developing more confidence in your unique qualities."
+    },
+    P: {
+      high: "You tend toward boldness, risk-taking, and emotional detachment. You are less influenced by social norms and may act impulsively. You handle high-pressure situations well but may sometimes disregard others' feelings or the consequences of your actions.",
+      moderate: "You have a balanced mix of boldness and social awareness. You can take calculated risks and handle stress well while generally maintaining awareness of how your actions affect others.",
+      low: "You are empathetic, cautious, and socially considerate. You carefully weigh the consequences of your actions and are sensitive to others' emotions. You may sometimes be overly cautious or avoid necessary risks."
+    }
+  };
+
+  var STORAGE_KEY = 'toolcalcs_dark-triad-test_history';
+  var MAX_HISTORY = 20;
+
+  function getLevel(score, ranges) {
+    for (var i = 0; i < ranges.length; i++) {
+      if (score >= ranges[i].min) return { label: ranges[i].label, color: ranges[i].color };
+    }
+    return { label: "Very Low", color: "#16a34a" };
+  }
+
+  function loadHistory() {
+    try { var r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch (e) {}
+    return [];
+  }
+  function saveHistory(h) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch (e) {}
+  }
+  function addToHistory(score) {
+    var h = loadHistory();
+    h.unshift({ score: score, date: new Date().toISOString(), rating: getLevel(score, overallRanges).label });
+    saveHistory(h);
+  }
+
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+  }
+
+  function formatDate(iso) {
+    try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    catch (e) { return ''; }
+  }
+
+  var instructionsView = document.getElementById('instructionsView');
+  var playView = document.getElementById('playView');
+  var resultView = document.getElementById('resultView');
+  var startBtn = document.getElementById('startBtn');
+  var tryAgainBtn = document.getElementById('tryAgainBtn');
+  var progressText = document.getElementById('progressText');
+  var progressFill = document.getElementById('progressFill');
+  var questionText = document.getElementById('questionText');
+  var optionsContainer = document.getElementById('optionsContainer');
+  var finalScore = document.getElementById('finalScore');
+  var ratingBadge = document.getElementById('ratingBadge');
+  var traitChart = document.getElementById('traitChart');
+  var traitDetails = document.getElementById('traitDetails');
+  var interpretationNote = document.getElementById('interpretationNote');
+  var attemptHistorySection = document.getElementById('attemptHistory');
+  var historyList = document.getElementById('historyList');
+
+  var shuffledQuestions = [];
+  var currentIndex = 0;
+  var answers = [];
+  var isProcessing = false;
+
+  function showView(view) {
+    instructionsView.style.display = 'none';
+    playView.style.display = 'none';
+    resultView.style.display = 'none';
+    view.style.display = '';
+  }
+
+  function startGame() {
+    shuffledQuestions = shuffle(questions);
+    currentIndex = 0;
+    answers = [];
+    isProcessing = false;
+    showView(playView);
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    var q = shuffledQuestions[currentIndex];
+    var total = shuffledQuestions.length;
+    var pct = Math.round((currentIndex / total) * 100);
+
+    progressText.textContent = 'Question ' + (currentIndex + 1) + ' of ' + total;
+    progressFill.style.width = pct + '%';
+    questionText.textContent = '"' + q.text + '"';
+
+    var html = '';
+    for (var i = 0; i < likertOptions.length; i++) {
+      html += '<button class="quiz-option" type="button" data-val="' + likertOptions[i].val + '">' + likertOptions[i].label + '</button>';
+    }
+    optionsContainer.innerHTML = html;
+  }
+
+  function handleOptionClick(e) {
+    if (isProcessing) return;
+    var btn = e.target;
+    if (!btn || !btn.classList || !btn.classList.contains('quiz-option')) return;
+
+    isProcessing = true;
+    var val = parseInt(btn.getAttribute('data-val'), 10);
+    btn.classList.add('selected');
+
+    var q = shuffledQuestions[currentIndex];
+    var actualVal = q.rev ? (6 - val) : val;
+    answers.push({ trait: q.trait, val: actualVal });
+
+    setTimeout(function () {
+      currentIndex++;
+      if (currentIndex >= shuffledQuestions.length) {
+        showResults();
+      } else {
+        renderQuestion();
+      }
+      isProcessing = false;
+    }, 300);
+  }
+
+  function showResults() {
+    var traitScores = { M: 0, N: 0, P: 0 };
+    var traitCounts = { M: 0, N: 0, P: 0 };
+
+    for (var i = 0; i < answers.length; i++) {
+      traitScores[answers[i].trait] += answers[i].val;
+      traitCounts[answers[i].trait]++;
+    }
+
+    var traitPcts = {};
+    var traitKeys = ['M', 'N', 'P'];
+    for (var j = 0; j < traitKeys.length; j++) {
+      var k = traitKeys[j];
+      var maxPossible = traitCounts[k] * 5;
+      var minPossible = traitCounts[k] * 1;
+      traitPcts[k] = Math.round(((traitScores[k] - minPossible) / (maxPossible - minPossible)) * 100);
+      if (traitPcts[k] < 0) traitPcts[k] = 0;
+      if (traitPcts[k] > 100) traitPcts[k] = 100;
+    }
+
+    var overallScore = Math.round((traitPcts.M + traitPcts.N + traitPcts.P) / 3);
+
+    showView(resultView);
+    finalScore.textContent = String(overallScore);
+
+    var overall = getLevel(overallScore, overallRanges);
+    ratingBadge.textContent = overall.label;
+    ratingBadge.style.background = overall.color;
+
+    var chartHTML = '';
+    for (var m = 0; m < traitKeys.length; m++) {
+      var tk = traitKeys[m];
+      var tm = traitMeta[tk];
+      var tl = getLevel(traitPcts[tk], levelRanges);
+      chartHTML += '<div class="quiz-bar-item">';
+      chartHTML += '<div class="quiz-bar-label"><span>' + tm.icon + ' ' + tm.name + '</span><span>' + traitPcts[tk] + '%</span></div>';
+      chartHTML += '<div class="quiz-bar-track"><div class="quiz-bar-fill" style="width:' + traitPcts[tk] + '%;background:' + tm.color + '"></div></div>';
+      chartHTML += '<div style="text-align:right;font-size:0.8rem;color:var(--color-text-muted);margin-top:2px;">' + tl.label + '</div>';
+      chartHTML += '</div>';
+    }
+    traitChart.innerHTML = chartHTML;
+
+    var detailsHTML = '<div style="text-align:left;max-width:450px;margin:0 auto;">';
+    for (var n = 0; n < traitKeys.length; n++) {
+      var dtk = traitKeys[n];
+      var dtm = traitMeta[dtk];
+      var interpLevel = traitPcts[dtk] >= 55 ? 'high' : (traitPcts[dtk] >= 25 ? 'moderate' : 'low');
+      detailsHTML += '<p><strong>' + dtm.icon + ' ' + dtm.name + ' (' + traitPcts[dtk] + '%):</strong> ' + traitInterpretations[dtk][interpLevel] + '</p>';
+    }
+    detailsHTML += '</div>';
+    traitDetails.innerHTML = detailsHTML;
+
+    interpretationNote.innerHTML = '<div style="text-align:left;max-width:450px;margin:16px auto 0;padding:16px;background:var(--color-bg);border-radius:var(--radius);border:1px solid var(--color-border);"><p style="margin-bottom:4px;font-size:0.85rem;color:var(--color-text-muted);"><strong>Important Note:</strong> This is a self-assessment tool for personal insight and is not a clinical diagnosis. Dark Triad traits exist on a normal spectrum of human personality. If your results concern you, consider speaking with a licensed mental health professional.</p></div>';
+
+    addToHistory(overallScore);
+    renderHistory();
+
+    if (window.GameShare) {
+      window.GameShare.show({
+        gameName: gameName,
+        gameSlug: gameSlug,
+        gameIcon: gameIcon,
+        score: overallScore,
+        unit: metricUnit,
+        metricLabel: metricLabel,
+        ratingLabel: overall.label,
+        ratingColor: overall.color
+      });
+    }
+  }
+
+  function renderHistory() {
+    var history = loadHistory();
+    if (history.length === 0) { attemptHistorySection.hidden = true; return; }
+    attemptHistorySection.hidden = false;
+    var html = '';
+    for (var i = 0; i < history.length; i++) {
+      var e = history[i];
+      var r = getLevel(e.score, overallRanges);
+      html += '<div class="history-item">';
+      html += '<span class="history-score">' + e.score + '/100</span>';
+      html += '<span class="history-rating" style="background:' + r.color + '">' + r.label + '</span>';
+      html += '<span class="history-time">' + formatDate(e.date) + '</span>';
+      html += '</div>';
+    }
+    historyList.innerHTML = html;
+  }
+
+  optionsContainer.addEventListener('click', handleOptionClick);
+  startBtn.addEventListener('click', startGame);
+  tryAgainBtn.addEventListener('click', startGame);
+  renderHistory();
+})();
+</script>

@@ -1,0 +1,481 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/game.css';
+import '../../styles/quiz.css';
+import GameShare from '../../components/GameShare.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tests & Games", "item": "https://toolcalcs.com/test/" },
+      { "@type": "ListItem", "position": 3, "name": "Left Brain Right Brain Test" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Left Brain Right Brain Test",
+    "url": "https://toolcalcs.com/test/left-brain-right-brain-test/",
+    "applicationCategory": "LifestyleApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Are you left-brained (logical, analytical) or right-brained (creative, intuitive)? Take this 20-question test to discover your dominant brain hemisphere."
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What does it mean to be left-brained or right-brained?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The left brain right brain theory suggests that people who are left-brain dominant tend to be more logical, analytical, and detail-oriented, while right-brain dominant people tend to be more creative, intuitive, and big-picture thinkers. This idea originated from Roger Sperry's split-brain research in the 1960s. While modern neuroscience has shown that both hemispheres work together for most tasks, people do tend to have thinking style preferences that align with these categories."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is the left brain right brain theory scientifically proven?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The original split-brain research by Roger Sperry (Nobel Prize 1981) showed real differences in hemisphere function: the left hemisphere excels at language, logic, and sequential processing, while the right hemisphere excels at spatial reasoning, pattern recognition, and emotional processing. However, a 2013 University of Utah study analyzing over 1,000 brain scans found no evidence that people preferentially use one hemisphere over the other. Both hemispheres are active in virtually all tasks, though specific functions may be lateralized."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can you be both left-brained and right-brained?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Absolutely. Most people use both hemispheres extensively and have strengths in both logical and creative domains. The concept of brain dominance is best understood as a spectrum rather than a binary classification. Many successful people, from scientists to artists, demonstrate strong abilities in both analytical and creative thinking. This test measures your natural preferences and tendencies rather than rigid categories."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How can I develop my weaker brain hemisphere?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "You can strengthen analytical skills through puzzles, logic games, math practice, coding, and structured planning. Creative skills can be developed through drawing, music, improvisation, brainstorming, and exposure to art and nature. Activities like learning a musical instrument, bilingual practice, and meditation engage both hemispheres simultaneously. The brain's neuroplasticity means these connections can be strengthened at any age with regular practice."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What careers suit left-brained vs right-brained people?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Left-brain dominant thinkers often excel in fields like engineering, accounting, law, computer science, data analysis, and project management. Right-brain dominant thinkers often thrive in creative fields like design, art, music, writing, marketing, and entrepreneurship. However, many modern careers require both skill sets. The most successful professionals typically combine analytical and creative abilities regardless of their natural preferences."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Left Brain Right Brain Test - Discover Your Brain Dominance | ToolCalcs"
+  description="Are you left-brained (logical, analytical) or right-brained (creative, intuitive)? Take this free 20-question test to discover your dominant brain hemisphere."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/test/">Tests & Games</a> &rsaquo;
+    <span>Left Brain Right Brain Test</span>
+  </nav>
+
+  <h1>Left Brain Right Brain Test</h1>
+  <p class="page-desc">Are you logical and analytical, or creative and intuitive? Answer 20 questions to discover your dominant thinking style.</p>
+
+  <div class="game-box">
+    <div class="game-area" id="gameArea" role="region" aria-label="Brain dominance quiz" aria-live="polite">
+      <!-- Instructions -->
+      <div class="game-instructions" id="instructionsView">
+        <h2>Left Brain vs Right Brain</h2>
+        <p>Choose the option that best describes you in each question. There are no right or wrong answers.</p>
+        <p style="font-size:0.85rem;color:var(--color-text-muted);">20 questions &middot; About 3 minutes</p>
+        <button class="game-btn primary" id="startBtn" type="button" style="margin-top:16px;">Start Test</button>
+      </div>
+
+      <!-- Quiz View -->
+      <div id="quizView" style="display:none;">
+        <div class="quiz-progress">
+          <div class="quiz-progress-text" id="progressText">Question 1 of 20</div>
+          <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="progressFill"></div></div>
+        </div>
+        <div class="quiz-question">
+          <div class="quiz-question-text" id="questionText"></div>
+        </div>
+        <div class="quiz-options" id="optionsContainer"></div>
+      </div>
+
+      <!-- Result View -->
+      <div id="resultView" style="display:none;" class="quiz-result">
+        <div id="donutContainer"></div>
+        <div class="quiz-result-type" id="resultType"></div>
+        <div class="quiz-result-name" id="resultName"></div>
+        <div class="quiz-result-desc" id="resultDesc"></div>
+        <div id="traitsComparison"></div>
+        <div class="quiz-result-desc" id="resultLearning" style="margin-top:16px;"></div>
+        <button class="game-btn primary" id="retakeBtn" type="button" style="margin-top:16px;">Retake Test</button>
+      </div>
+    </div>
+
+    <GameShare />
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>The History of Left Brain Right Brain Theory</h2>
+    <p>The idea that the brain's two hemispheres have distinct functions has fascinated scientists and the public for over a century. The modern understanding of brain lateralization began with a series of groundbreaking experiments in the 1960s by neuroscientist Roger Sperry and his student Michael Gazzaniga at the California Institute of Technology.</p>
+    <p>Sperry studied patients who had undergone a corpus callosotomy, a surgical procedure that severs the corpus callosum, the thick band of nerve fibers connecting the left and right hemispheres. This surgery was performed to treat severe epilepsy by preventing seizure activity from spreading between hemispheres. What Sperry discovered in these "split-brain" patients transformed our understanding of how the brain works.</p>
+    <p>In his experiments, Sperry showed that when information was presented exclusively to the right hemisphere (by showing images only to the left visual field), patients could identify objects by touch with their left hand but could not name them verbally. This was because language processing is primarily housed in the left hemisphere, and without the corpus callosum, information could not cross over. The right hemisphere recognized the object but lacked the verbal apparatus to name it.</p>
+    <p>Conversely, when information was presented to the left hemisphere, patients could name objects easily but struggled with spatial and pattern-recognition tasks that the right hemisphere typically handles. These experiments provided the first direct evidence that the two hemispheres have distinct specializations. Sperry received the Nobel Prize in Physiology or Medicine in 1981 for this work, specifically for his discoveries concerning the functional specialization of the cerebral hemispheres.</p>
+
+    <h2>Left Hemisphere vs Right Hemisphere Functions</h2>
+    <p>Based on decades of neuroscience research, the two hemispheres of the brain do show genuine functional differences, though the reality is far more nuanced than the popular left-brain-right-brain dichotomy suggests.</p>
+
+    <h3>Left Hemisphere Specializations</h3>
+    <p>The left hemisphere is predominantly responsible for language processing, including speech production (Broca's area), language comprehension (Wernicke's area), reading, and writing. It excels at sequential and linear processing, meaning it handles information step by step in a logical order. Mathematical computation, especially arithmetic and algebraic reasoning, is strongly lateralized to the left hemisphere. It also handles detailed analysis, categorization, and rule-based thinking. People with strong left-hemisphere tendencies often prefer structured environments, clear instructions, and systematic approaches to problem-solving.</p>
+
+    <h3>Right Hemisphere Specializations</h3>
+    <p>The right hemisphere specializes in spatial awareness and visuospatial processing, including recognizing faces, reading maps, navigating environments, and understanding spatial relationships. It excels at holistic processing, meaning it grasps the big picture and sees patterns that emerge from the whole rather than analyzing individual parts. Musical perception (especially melody and harmony), emotional processing, tone of voice interpretation, and creative ideation are strongly associated with right hemisphere activity. People with strong right-hemisphere tendencies often prefer open-ended tasks, visual information, and intuitive approaches.</p>
+
+    <h2>The Myth of Brain Dominance</h2>
+    <p>While the functional differences between hemispheres are real, the popular idea that people are predominantly "left-brained" or "right-brained" has been largely debunked by modern neuroscience. A comprehensive 2013 study by researchers at the University of Utah analyzed resting-state brain scans of over 1,000 people and found no evidence that individuals preferentially use one hemisphere more than the other.</p>
+    <p>The study, led by Dr. Jeff Anderson, examined functional connectivity across 7,266 brain regions. The researchers found that while certain functions are indeed lateralized (language processing tends to be stronger in the left hemisphere, for example), individual people do not show a global preference for one hemisphere. Both hemispheres are highly active and interconnected in virtually all cognitive tasks. The corpus callosum facilitates approximately 200 million nerve fiber connections between the hemispheres, ensuring constant communication and collaboration.</p>
+    <p>What researchers have found instead is that people differ in their cognitive styles and thinking preferences, but these differences are not explained by hemisphere dominance. A person who prefers analytical thinking is not using their left hemisphere more; rather, they may have stronger development in specific neural networks that span both hemispheres. Similarly, a creative thinker's abilities arise from distributed networks rather than right hemisphere dominance.</p>
+    <p>Despite the scientific nuance, the left-brain-right-brain framework remains popular because it captures a real and intuitive distinction between analytical and creative thinking styles. While the neurological explanation is oversimplified, the behavioral observation that people tend to lean toward either systematic or intuitive approaches is valid and useful for self-understanding.</p>
+
+    <h2>What the Research Actually Shows</h2>
+    <p>Modern neuroscience has moved beyond the simple left-right dichotomy to a more sophisticated understanding of brain organization. Here is what current research reveals about how the brain actually processes different types of thinking.</p>
+    <p><strong>Network-based processing.</strong> Rather than relying on single hemispheres, the brain uses distributed networks that span both hemispheres for complex tasks. The default mode network (involved in imagination and self-reflection), the executive control network (involved in focused attention and planning), and the salience network (involved in switching between internal and external focus) all involve regions in both hemispheres working in concert.</p>
+    <p><strong>Task-specific lateralization.</strong> Certain specific functions are genuinely lateralized. Language production is predominantly left-lateralized in approximately 95 percent of right-handed people and about 70 percent of left-handed people. Face recognition is strongly right-lateralized. But these are specific functions, not general thinking styles. A person who is excellent at language is not therefore "left-brained" in all other domains.</p>
+    <p><strong>Individual variation matters more than hemisphere.</strong> The differences between individual brains are far greater than the differences between hemispheres within a single brain. Factors like education, training, experience, genetics, and practice have much larger effects on cognitive abilities than hemisphere dominance. A trained musician's brain looks different from a non-musician's brain in ways that cut across the left-right divide.</p>
+
+    <h2>Learning Styles and Brain Preferences</h2>
+    <p>While the neurological basis is more complex than hemisphere dominance, understanding your thinking preferences can be genuinely useful for optimizing how you learn and work.</p>
+    <p><strong>Analytical thinkers</strong> tend to prefer step-by-step instructions, written information, logical arguments, data-driven decisions, and structured environments. They often excel in academic settings that emphasize verbal and mathematical reasoning. Effective learning strategies for analytical thinkers include outlining information, creating flowcharts, solving practice problems, and breaking complex topics into smaller components.</p>
+    <p><strong>Creative thinkers</strong> tend to prefer visual information, hands-on experience, open-ended exploration, intuitive understanding, and flexible environments. They often excel when they can see the big picture before diving into details. Effective learning strategies for creative thinkers include mind mapping, using diagrams and color coding, learning through metaphors and analogies, and connecting new information to existing knowledge through associative thinking.</p>
+    <p><strong>Balanced thinkers</strong> can adapt their approach to match the demands of the task. They may analyze data systematically when needed and brainstorm freely when creativity is required. This cognitive flexibility is increasingly valued in modern workplaces where problems require both analytical and creative solutions.</p>
+
+    <h2>How to Develop Both Hemispheres</h2>
+    <p>Regardless of your natural thinking preferences, you can strengthen both analytical and creative abilities through targeted practice. The brain's neuroplasticity ensures that new neural connections can be formed at any age with consistent effort.</p>
+    <ul>
+      <li><strong>To strengthen analytical skills:</strong> Practice logic puzzles and Sudoku, learn a programming language, study mathematics or statistics, play strategy games like chess, create detailed budgets and plans, and practice breaking complex problems into structured steps.</li>
+      <li><strong>To strengthen creative skills:</strong> Take up drawing or painting, learn to play a musical instrument, practice freewriting or journaling, engage in brainstorming sessions, visit art galleries and museums, try improvisation or theater, and deliberately seek out new experiences and perspectives.</li>
+      <li><strong>To engage both simultaneously:</strong> Learn a second language (combines structure with intuition), practice music (combines mathematical patterns with creative expression), engage in design work (combines aesthetic vision with systematic execution), write fiction (combines structured narrative with creative imagination), and play video games that require both strategy and creativity.</li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What does it mean to be left-brained or right-brained?</h3>
+    <p>The left brain right brain theory suggests that people who are left-brain dominant tend to be more logical, analytical, detail-oriented, and methodical, while right-brain dominant people tend to be more creative, intuitive, and big-picture thinkers. This concept originated from Roger Sperry's split-brain research in the 1960s, which demonstrated genuine functional differences between the hemispheres. While modern neuroscience has shown that both hemispheres work together for most tasks, people do tend to have thinking style preferences that align with these general categories.</p>
+
+    <h3>Is the left brain right brain theory scientifically proven?</h3>
+    <p>The functional specialization of the hemispheres is scientifically established. The left hemisphere does excel at language, logic, and sequential processing, while the right hemisphere excels at spatial reasoning, pattern recognition, and emotional processing. However, a 2013 University of Utah study analyzing brain scans from over 1,000 people found no evidence that individuals preferentially use one hemisphere over the other. Both hemispheres are active in virtually all tasks. The popular binary classification is an oversimplification, though the underlying observation about different thinking styles is valid.</p>
+
+    <h3>Can you be both left-brained and right-brained?</h3>
+    <p>Yes, and in fact most people are. The brain naturally uses both hemispheres for nearly all tasks, connected by approximately 200 million nerve fibers in the corpus callosum. Many successful people demonstrate strong abilities in both analytical and creative domains. Scientists often need creative insight to formulate hypotheses, while artists need analytical skills to master technical fundamentals. This test measures your natural preferences and tendencies along a spectrum rather than placing you in a rigid category.</p>
+
+    <h3>How can I develop my weaker brain hemisphere?</h3>
+    <p>You can strengthen analytical skills through logic puzzles, mathematics, coding, structured planning, and strategy games. Creative skills can be developed through drawing, music, improvisation, brainstorming, creative writing, and exposure to art and nature. Activities like learning a musical instrument, practicing a second language, and meditation engage both hemispheres simultaneously. The brain's neuroplasticity means that these neural connections can be strengthened at any age through regular, deliberate practice.</p>
+
+    <h3>What careers suit left-brained vs right-brained people?</h3>
+    <p>People with strong analytical preferences often excel in engineering, accounting, law, computer science, data analysis, medicine, and project management. People with strong creative preferences often thrive in graphic design, fine art, music, creative writing, marketing, architecture, and entrepreneurship. However, the most successful modern careers increasingly require both skill sets. A software engineer needs creativity to solve novel problems. A graphic designer needs analytical skills to understand user behavior. The ideal career matches your natural strengths while challenging you to develop complementary skills.</p>
+  </article>
+
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .game-area { cursor: default; user-select: auto; -webkit-user-select: auto; }
+  :global(.lb-donut-wrap) { position: relative; width: 180px; height: 180px; margin: 0 auto 16px; }
+  :global(.lb-donut-svg) { width: 180px; height: 180px; transform: rotate(-90deg); }
+  :global(.lb-donut-bg) { fill: none; stroke: var(--color-border); stroke-width: 18; }
+  :global(.lb-donut-left) { fill: none; stroke: #3b82f6; stroke-width: 18; stroke-linecap: round; transition: stroke-dasharray 1s ease; }
+  :global(.lb-donut-right) { fill: none; stroke: #ec4899; stroke-width: 18; stroke-linecap: round; transition: stroke-dasharray 1s ease; }
+  :global(.lb-donut-center) { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+  :global(.lb-donut-pct) { font-size: 1.6rem; font-weight: 800; color: var(--color-text); line-height: 1.2; }
+  :global(.lb-donut-label) { font-size: 0.75rem; color: var(--color-text-muted); }
+  :global(.lb-legend) { display: flex; justify-content: center; gap: 20px; margin-bottom: 16px; font-size: 0.85rem; }
+  :global(.lb-legend-dot) { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+  :global(.lb-traits-grid) { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 450px; margin: 0 auto 20px; text-align: left; }
+  :global(.lb-traits-col h4) { font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; }
+  :global(.lb-traits-col ul) { list-style: none; padding: 0; margin: 0; }
+  :global(.lb-traits-col li) { padding: 4px 0; font-size: 0.85rem; color: var(--color-text-muted); }
+  :global(.lb-traits-col li::before) { margin-right: 6px; }
+</style>
+
+<script define:vars={{ gameName: "Left Brain Right Brain Test", gameSlug: "left-brain-right-brain-test", gameIcon: "\uD83E\uDDE0", metricLabel: "Brain Dominance", metricUnit: "" }}>
+(function () {
+  'use strict';
+
+  var questions = [
+    { text: "When making an important decision, you tend to:", options: [
+      { label: "Analyze all the facts and data before choosing", side: "L" },
+      { label: "Go with your gut feeling and intuition", side: "R" }
+    ]},
+    { text: "When organizing a project, you prefer to:", options: [
+      { label: "Create a detailed plan with timelines and milestones", side: "L" },
+      { label: "Start with a rough vision and figure it out as you go", side: "R" }
+    ]},
+    { text: "Which type of book do you enjoy more?", options: [
+      { label: "Non-fiction: science, history, or self-improvement", side: "L" },
+      { label: "Fiction: novels, fantasy, or poetry", side: "R" }
+    ]},
+    { text: "When solving a problem, your first instinct is to:", options: [
+      { label: "Break it down into smaller, logical steps", side: "L" },
+      { label: "Look at the big picture and brainstorm creative solutions", side: "R" }
+    ]},
+    { text: "In a group discussion, you typically:", options: [
+      { label: "Present facts, evidence, and structured arguments", side: "L" },
+      { label: "Share ideas, stories, and imaginative possibilities", side: "R" }
+    ]},
+    { text: "How do you prefer to learn new information?", options: [
+      { label: "Through reading, lectures, and written instructions", side: "L" },
+      { label: "Through hands-on experience and visual demonstrations", side: "R" }
+    ]},
+    { text: "Your workspace tends to be:", options: [
+      { label: "Neat, organized, with everything in its place", side: "L" },
+      { label: "A creative mess with inspiration scattered around", side: "R" }
+    ]},
+    { text: "When giving directions, you usually:", options: [
+      { label: "Give step-by-step verbal instructions with street names", side: "L" },
+      { label: "Draw a quick map or describe landmarks and visuals", side: "R" }
+    ]},
+    { text: "Which subject did you enjoy more in school?", options: [
+      { label: "Math and science", side: "L" },
+      { label: "Art and music", side: "R" }
+    ]},
+    { text: "When watching a movie, you tend to focus on:", options: [
+      { label: "The plot logic, continuity, and whether the story makes sense", side: "L" },
+      { label: "The visuals, music, emotional impact, and artistic style", side: "R" }
+    ]},
+    { text: "How do you usually remember people?", options: [
+      { label: "By their name and the facts they shared about themselves", side: "L" },
+      { label: "By their face, voice, and the feeling of the interaction", side: "R" }
+    ]},
+    { text: "When you have free time, you prefer:", options: [
+      { label: "Doing a puzzle, playing strategy games, or reading", side: "L" },
+      { label: "Drawing, playing music, daydreaming, or exploring nature", side: "R" }
+    ]},
+    { text: "How do you feel about strict deadlines?", options: [
+      { label: "I work best with clear deadlines and structure", side: "L" },
+      { label: "I feel constrained by deadlines and prefer flexibility", side: "R" }
+    ]},
+    { text: "When explaining a concept to someone, you:", options: [
+      { label: "Use precise language, definitions, and logical examples", side: "L" },
+      { label: "Use analogies, metaphors, and visual comparisons", side: "R" }
+    ]},
+    { text: "What type of music do you prefer?", options: [
+      { label: "Music with clever lyrics and complex composition", side: "L" },
+      { label: "Music that creates a mood, feeling, or atmosphere", side: "R" }
+    ]},
+    { text: "When shopping for a product, you typically:", options: [
+      { label: "Compare specs, read reviews, and make a spreadsheet", side: "L" },
+      { label: "Choose based on how it looks, feels, and appeals to you", side: "R" }
+    ]},
+    { text: "In a debate, you are more likely to:", options: [
+      { label: "Present logical arguments backed by evidence and data", side: "L" },
+      { label: "Appeal to emotions, values, and personal stories", side: "R" }
+    ]},
+    { text: "When you daydream, you usually think about:", options: [
+      { label: "Plans, goals, and strategies for the future", side: "L" },
+      { label: "Imaginary scenarios, creative ideas, or past experiences", side: "R" }
+    ]},
+    { text: "Which describes your approach to rules?", options: [
+      { label: "Rules exist for good reasons and should be followed", side: "L" },
+      { label: "Rules are guidelines that can be bent when needed", side: "R" }
+    ]},
+    { text: "When faced with ambiguity, you:", options: [
+      { label: "Feel uncomfortable and want to clarify things immediately", side: "L" },
+      { label: "Feel comfortable with uncertainty and explore possibilities", side: "R" }
+    ]}
+  ];
+
+  var leftTraits = ["Logical thinking", "Detail-oriented", "Analytical", "Sequential processing", "Mathematical ability", "Language skills", "Fact-based decisions", "Rule-following"];
+  var rightTraits = ["Creative thinking", "Big-picture view", "Intuitive", "Holistic processing", "Artistic ability", "Spatial awareness", "Emotion-based decisions", "Imaginative"];
+
+  // DOM refs
+  var instructionsView = document.getElementById('instructionsView');
+  var quizView = document.getElementById('quizView');
+  var resultView = document.getElementById('resultView');
+  var startBtn = document.getElementById('startBtn');
+  var retakeBtn = document.getElementById('retakeBtn');
+  var progressText = document.getElementById('progressText');
+  var progressFill = document.getElementById('progressFill');
+  var questionText = document.getElementById('questionText');
+  var optionsContainer = document.getElementById('optionsContainer');
+  var resultType = document.getElementById('resultType');
+  var resultName = document.getElementById('resultName');
+  var resultDesc = document.getElementById('resultDesc');
+  var donutContainer = document.getElementById('donutContainer');
+  var traitsComparison = document.getElementById('traitsComparison');
+  var resultLearning = document.getElementById('resultLearning');
+
+  var currentIndex = 0;
+  var shuffled = [];
+  var leftScore = 0;
+  var rightScore = 0;
+  var isProcessing = false;
+
+  function shuffleArr(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+  }
+
+  function showView(view) {
+    instructionsView.style.display = 'none';
+    quizView.style.display = 'none';
+    resultView.style.display = 'none';
+    view.style.display = '';
+  }
+
+  function renderQuestion() {
+    var q = shuffled[currentIndex];
+    progressText.textContent = 'Question ' + (currentIndex + 1) + ' of 20';
+    progressFill.style.width = Math.round((currentIndex / 20) * 100) + '%';
+    questionText.textContent = q.text;
+
+    optionsContainer.innerHTML = '';
+    var opts = shuffleArr(q.options);
+    for (var i = 0; i < opts.length; i++) {
+      var btn = document.createElement('button');
+      btn.className = 'quiz-option';
+      btn.type = 'button';
+      btn.textContent = opts[i].label;
+      btn.setAttribute('data-side', opts[i].side);
+      optionsContainer.appendChild(btn);
+    }
+  }
+
+  function handleOptionClick(e) {
+    if (isProcessing) return;
+    var target = e.target;
+    if (!target || !target.classList || !target.classList.contains('quiz-option')) return;
+
+    isProcessing = true;
+    var side = target.getAttribute('data-side');
+    if (side === 'L') leftScore++;
+    else rightScore++;
+
+    target.classList.add('selected');
+
+    setTimeout(function () {
+      currentIndex++;
+      if (currentIndex >= 20) {
+        showResults();
+      } else {
+        renderQuestion();
+      }
+      isProcessing = false;
+    }, 300);
+  }
+
+  function showResults() {
+    showView(resultView);
+    progressFill.style.width = '100%';
+
+    var total = leftScore + rightScore;
+    var leftPct = Math.round((leftScore / total) * 100);
+    var rightPct = 100 - leftPct;
+
+    // Determine dominance
+    var dominance, dominanceDesc, learningTip;
+    if (leftPct >= 65) {
+      dominance = "Left Brain Dominant";
+      dominanceDesc = "You are a strongly analytical and logical thinker. You excel at breaking down complex problems into manageable steps, organizing information systematically, and making decisions based on facts and evidence. Your structured approach to life makes you reliable, detail-oriented, and methodical. You thrive in environments that value precision and clear reasoning.";
+      learningTip = "You learn best through structured formats: outlines, step-by-step guides, written instructions, and logical sequences. Consider using spreadsheets, timelines, and categorization systems to organize new information.";
+    } else if (rightPct >= 65) {
+      dominance = "Right Brain Dominant";
+      dominanceDesc = "You are a strongly creative and intuitive thinker. You excel at seeing the big picture, recognizing patterns, and generating innovative ideas. Your holistic approach to life makes you imaginative, emotionally intelligent, and adaptable. You thrive in environments that value originality and allow creative freedom.";
+      learningTip = "You learn best through visual and experiential formats: diagrams, mind maps, color coding, hands-on activities, and real-world applications. Consider using metaphors, stories, and visual aids to connect with new information.";
+    } else {
+      dominance = "Balanced Brain";
+      dominanceDesc = "You have an excellent balance between analytical and creative thinking. You can switch between logical analysis and creative brainstorming depending on what the situation demands. This cognitive flexibility is a significant strength, allowing you to approach problems from multiple angles and adapt to diverse challenges.";
+      learningTip = "You can adapt your learning approach to match the material. Use structured methods for technical subjects and creative approaches for abstract concepts. Your versatility is your greatest learning advantage.";
+    }
+
+    // Render donut chart
+    var circumference = 2 * Math.PI * 70; // radius 70
+    var leftDash = (leftPct / 100) * circumference;
+    var rightDash = (rightPct / 100) * circumference;
+
+    donutContainer.innerHTML = '<div class="lb-donut-wrap">' +
+      '<svg class="lb-donut-svg" viewBox="0 0 180 180">' +
+      '<circle class="lb-donut-bg" cx="90" cy="90" r="70"/>' +
+      '<circle class="lb-donut-left" cx="90" cy="90" r="70" stroke-dasharray="' + leftDash + ' ' + circumference + '" stroke-dashoffset="0"/>' +
+      '<circle class="lb-donut-right" cx="90" cy="90" r="70" stroke-dasharray="' + rightDash + ' ' + circumference + '" stroke-dashoffset="-' + leftDash + '"/>' +
+      '</svg>' +
+      '<div class="lb-donut-center"><div class="lb-donut-pct">' + leftPct + '/' + rightPct + '</div><div class="lb-donut-label">L / R</div></div>' +
+      '</div>' +
+      '<div class="lb-legend">' +
+      '<span><span class="lb-legend-dot" style="background:#3b82f6;"></span>Left ' + leftPct + '%</span>' +
+      '<span><span class="lb-legend-dot" style="background:#ec4899;"></span>Right ' + rightPct + '%</span>' +
+      '</div>';
+
+    resultType.textContent = dominance;
+    resultName.textContent = leftPct + '% Left Brain / ' + rightPct + '% Right Brain';
+    resultDesc.textContent = dominanceDesc;
+
+    // Traits comparison grid
+    var traitsHTML = '<div class="lb-traits-grid">';
+    traitsHTML += '<div class="lb-traits-col"><h4 style="color:#3b82f6;">Left Brain Traits</h4><ul>';
+    for (var i = 0; i < leftTraits.length; i++) {
+      traitsHTML += '<li>' + (leftPct >= 50 ? '\u2705 ' : '\u25CB ') + leftTraits[i] + '</li>';
+    }
+    traitsHTML += '</ul></div>';
+    traitsHTML += '<div class="lb-traits-col"><h4 style="color:#ec4899;">Right Brain Traits</h4><ul>';
+    for (var j = 0; j < rightTraits.length; j++) {
+      traitsHTML += '<li>' + (rightPct >= 50 ? '\u2705 ' : '\u25CB ') + rightTraits[j] + '</li>';
+    }
+    traitsHTML += '</ul></div></div>';
+    traitsComparison.innerHTML = traitsHTML;
+
+    resultLearning.innerHTML = '<strong>Your Learning Style:</strong> ' + learningTip;
+
+    // GameShare
+    if (window.GameShare) {
+      var ratingColor = leftPct >= 65 ? '#3b82f6' : rightPct >= 65 ? '#ec4899' : '#8b5cf6';
+      window.GameShare.show({
+        gameName: gameName,
+        gameSlug: gameSlug,
+        gameIcon: gameIcon,
+        score: leftPct + '% L / ' + rightPct + '% R',
+        unit: '',
+        metricLabel: metricLabel,
+        ratingLabel: dominance,
+        ratingColor: ratingColor
+      });
+    }
+  }
+
+  function startQuiz() {
+    currentIndex = 0;
+    leftScore = 0;
+    rightScore = 0;
+    shuffled = shuffleArr(questions);
+    isProcessing = false;
+    showView(quizView);
+    renderQuestion();
+    if (window.GameShare) window.GameShare.hide();
+  }
+
+  startBtn.addEventListener('click', startQuiz);
+  retakeBtn.addEventListener('click', startQuiz);
+  optionsContainer.addEventListener('click', handleOptionClick);
+})();
+</script>

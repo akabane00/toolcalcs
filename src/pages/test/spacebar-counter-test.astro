@@ -1,0 +1,581 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import GameShare from '../../components/GameShare.astro';
+import '../../styles/game.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tests & Games", "item": "https://toolcalcs.com/test/" },
+      { "@type": "ListItem", "position": 3, "name": "Spacebar Counter Test" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Spacebar Counter Test",
+    "url": "https://toolcalcs.com/test/spacebar-counter-test/",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "How fast can you press the spacebar? Tap the spacebar as many times as you can in the selected time period. Test your SPS (spacebar presses per second)."
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is a good spacebar speed (SPS)?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "An average spacebar pressing speed is 4-6 SPS (spacebar presses per second). A speed of 6-8 SPS is considered good, 8-10 SPS is fast, and anything above 10 SPS is incredible. Most casual users will score in the 4-7 SPS range."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between SPS and CPS?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "SPS stands for Spacebar Presses per Second, measuring how fast you can tap the spacebar specifically. CPS stands for Clicks Per Second, which measures mouse clicking speed. The spacebar is typically easier to press rapidly due to its larger size, so SPS scores are usually higher than CPS scores for the same person."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can pressing the spacebar too fast hurt my hands?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Repeatedly pressing any key at maximum speed can strain your fingers, wrist, and forearm muscles. Always warm up before intensive tapping sessions, take regular breaks, and stop immediately if you feel pain. Practicing proper ergonomics and hand positioning can help prevent repetitive strain injuries."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Spacebar Counter Test - How Fast Can You Press? | ToolCalcs"
+  description="Test your spacebar speed! Press the spacebar as fast as you can in 1, 5, 10, or 30 seconds. Measure your SPS (spacebar presses per second). Free online test."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/test/">Tests & Games</a> &rsaquo;
+    <span>Spacebar Counter Test</span>
+  </nav>
+
+  <h1>Spacebar Counter Test</h1>
+  <p class="page-desc">Press the spacebar as many times as you can in the selected time. Measure your SPS (spacebar presses per second).</p>
+
+  <div class="game-box">
+    <div class="game-area" id="gameArea" role="region" aria-label="Spacebar counter test area" aria-live="polite">
+      <div class="game-instructions" id="instructionsView">
+        <h2>Spacebar Counter Test</h2>
+        <p>Select a time duration, then press the spacebar as fast as you can. The timer starts on your first press. How fast can you go?</p>
+        <div class="time-selector" id="timeSelector">
+          <button class="time-btn" data-time="1" type="button">1s</button>
+          <button class="time-btn active" data-time="5" type="button">5s</button>
+          <button class="time-btn" data-time="10" type="button">10s</button>
+          <button class="time-btn" data-time="30" type="button">30s</button>
+        </div>
+        <button class="game-btn primary" id="startBtn" type="button" style="margin-top:16px;">Start Test</button>
+      </div>
+
+      <div class="play-view" id="playView" style="display:none;">
+        <div class="spacebar-counter" id="pressCount">0</div>
+        <div class="spacebar-sps" id="liveSPS">0.0 SPS</div>
+        <div class="spacebar-progress-wrap">
+          <div class="spacebar-progress-bar" id="progressBar"></div>
+        </div>
+        <div class="spacebar-timer-label" id="timerLabel">Press spacebar to start!</div>
+        <div class="spacebar-key" id="spacebarKey">
+          <span>SPACE</span>
+        </div>
+        <p class="spacebar-mobile-hint" id="mobileHint" style="display:none;">On mobile, tap the spacebar button above.</p>
+      </div>
+
+      <div class="result-view" id="resultView" style="display:none;">
+        <div class="result-icon" aria-hidden="true">&#9000;&#65039;</div>
+        <div class="result-label">Time's Up!</div>
+        <div class="score-display">
+          <span class="score-value" id="finalSPS">0.0</span>
+          <span class="score-unit">presses per second</span>
+        </div>
+        <div class="spacebar-total" id="totalPresses">Total: 0 presses</div>
+        <div class="rating-badge" id="ratingBadge">&mdash;</div>
+        <button class="game-btn primary" id="tryAgainBtn" type="button" style="margin-top:16px;">Try Again</button>
+      </div>
+    </div>
+
+    <GameShare />
+
+    <div class="attempt-history" id="attemptHistory" hidden>
+      <h3>Attempt History</h3>
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is the Spacebar Counter Test?</h2>
+    <p>The Spacebar Counter Test is an interactive speed test that measures how rapidly you can press the spacebar on your keyboard within a chosen time limit. Your result is expressed as SPS (Spacebar Presses per Second), which represents the average number of times you pressed the spacebar each second during the test period. This metric provides a standardized way to compare your tapping speed with others, regardless of the time duration selected.</p>
+    <p>The test is simple but engaging: select a duration (1, 5, 10, or 30 seconds), then press the spacebar as many times as possible before the timer runs out. A real-time counter shows your total presses, a progress bar tracks the remaining time, and at the end, you receive your SPS score along with a performance rating. The spacebar's large surface area makes it the ideal key for speed tapping tests, as its size reduces the precision required to hit the target compared to smaller individual keys.</p>
+    <p>Spacebar speed testing has become a popular online activity, combining the competitive appeal of beating high scores with the accessible format of a simple browser-based game. It requires no special equipment beyond a standard keyboard and tests a combination of fine motor control, muscular endurance, and neural firing rate that varies significantly between individuals.</p>
+
+    <h2>SPS vs. CPS: Understanding the Difference</h2>
+    <p>You may be familiar with CPS (Clicks Per Second) tests, which measure how fast you can click a mouse button. While SPS and CPS both measure rapid repetitive pressing, there are important differences between the two. The spacebar is significantly larger than a mouse button (typically 5 to 6 times the surface area), which means less precision is required to make contact. Additionally, the spacebar can be pressed with the thumb, which is the strongest and most dexterous digit, while mouse clicking usually involves the index or middle finger.</p>
+    <p>As a result, most people achieve higher SPS scores than CPS scores. Where a typical CPS score might be 6 to 8 clicks per second, the same person might achieve 7 to 10 spacebar presses per second. The mechanical properties of the spacebar also differ from mouse buttons: the spacebar typically has a longer key travel distance but provides more tactile feedback, and its spring mechanism can actually assist rapid pressing if you develop the right rhythm.</p>
+    <p>Both metrics measure aspects of fine motor speed and dexterity, but they engage slightly different muscle groups and movement patterns. CPS primarily involves small finger movements (flexion and extension of the index finger), while SPS involves thumb movements and can recruit wrist and forearm muscles for additional speed. Some competitive gamers train both skills separately, as different games require fast mouse clicking (Minecraft PvP, for example) versus fast keyboard pressing (rhythm games, certain shooter techniques).</p>
+
+    <h2>The Science of Finger Dexterity and Motor Control</h2>
+    <p>Your spacebar pressing speed is determined by a complex chain of neurological and biomechanical factors. The process begins in the motor cortex of your brain, which sends electrical signals down the spinal cord through motor neurons to the muscles in your hand and forearm. The speed at which these signals travel, the efficiency of the neuromuscular junction (where nerves meet muscles), and the contractile properties of your muscle fibers all influence your maximum tapping rate.</p>
+    <p>Research on maximum finger tapping speed has identified several key factors. Neural firing rate is perhaps the most fundamental: motor neurons can fire at rates of up to 20 to 30 times per second, which sets a theoretical upper limit on tapping speed. However, most people cannot achieve this maximum because of limitations in the mechanical properties of their tendons and joints, the time required for muscles to relax between contractions (known as the refractory period), and the coordination required to maintain a consistent pressing motion.</p>
+    <p>Muscle fiber composition also plays a role. Fast-twitch muscle fibers (Type II) contract and relax more quickly than slow-twitch fibers (Type I), enabling faster repetitive movements. The proportion of fast-twitch to slow-twitch fibers in the muscles of your hand and forearm is partly genetically determined, which may explain why some people seem naturally faster at tapping tasks even without practice.</p>
+    <p>The concept of motor unit recruitment is also relevant. When you press a key, your nervous system activates motor units (groups of muscle fibers controlled by a single motor neuron) in a coordinated sequence. Efficient recruitment means activating just enough motor units to depress the key without wasting energy on excessive force. Skilled tappers learn to minimize the force of each press, using only the minimum effort needed to activate the key, which allows faster recovery and higher sustained rates.</p>
+
+    <h2>Tapping Techniques</h2>
+    <p>Several techniques have been developed by competitive speed-tappers to maximize their pressing rate. Understanding these techniques can help you improve your score, though it is important to practice them safely to avoid injury.</p>
+    <h3>Regular Tapping</h3>
+    <p>The most straightforward technique involves pressing the spacebar with your thumb using a natural up-and-down motion. This method is the easiest to learn and the safest for your hands, though it typically produces the lowest speeds (4 to 7 SPS for most people). The speed is limited by the time it takes your thumb to fully extend after each press and return to the starting position.</p>
+    <h3>Jitter Pressing</h3>
+    <p>Jitter pressing involves tensing your hand and forearm muscles to create a rapid vibrating or trembling motion that rapidly depresses the spacebar. Rather than using a full thumb press-and-release cycle, you create a controlled tremor that produces multiple rapid contacts. This technique can achieve 8 to 12 SPS or more but requires practice to maintain control and can cause fatigue quickly.</p>
+    <h3>Butterfly Pressing</h3>
+    <p>Butterfly pressing uses two fingers (typically the thumb and index finger, or two thumbs) alternating on the spacebar. While one finger is pressing down, the other is resetting to its starting position, effectively doubling the rate at which you can make contact. This technique can achieve very high speeds (10 to 15 SPS) but requires precise coordination between both fingers and may not register consistently on all keyboard types.</p>
+    <h3>Drag Pressing</h3>
+    <p>Drag pressing involves lightly dragging your finger across the spacebar with enough pressure to create multiple actuations in a single motion. This technique exploits the mechanical properties of certain keyboard switches to register multiple presses from what is essentially one continuous movement. It can achieve very high apparent speeds but is considered an exploitation of keyboard mechanics rather than a genuine tapping skill.</p>
+
+    <h2>Ergonomics and Safety</h2>
+    <p>While speed-tapping tests are fun and competitive, it is important to practice them responsibly. Repeatedly pressing any key at maximum speed places significant stress on the tendons, joints, and muscles of your hands and wrists. This stress, if excessive or prolonged, can contribute to repetitive strain injuries (RSI) such as tendinitis or carpal tunnel syndrome.</p>
+    <p>To minimize the risk of injury, follow these guidelines. Always warm up your hands before intensive tapping sessions by gently stretching your fingers, wrists, and forearms. Limit individual tapping sessions to a few minutes, and take breaks between attempts. If you feel any pain, numbness, or tingling, stop immediately and rest. Maintain good posture with your wrists in a neutral position (not bent up or down) while typing. Consider using a wrist rest if you plan to practice regularly.</p>
+    <p>It is also worth noting that keyboard choice can affect both your performance and your comfort. Mechanical keyboards with lighter actuation forces require less effort per press, which can reduce fatigue and potentially increase speed. Keyboards with shorter key travel distances also enable faster pressing by reducing the distance your finger must move for each press. However, the most important factor is that the keyboard is comfortable for your hand size and pressing style.</p>
+
+    <h2>World Records and Competitive Tapping</h2>
+    <p>The competitive speed-tapping community has established unofficial records for various time intervals. While there is no single governing body for spacebar pressing records, community-tracked scores suggest that the fastest tappers can achieve 14 to 16 SPS over short intervals (1 second) and sustain 10 to 12 SPS over longer periods (10 or 30 seconds). These top-level performances typically use advanced techniques like jitter or butterfly pressing and represent the upper limits of human fine motor speed.</p>
+    <p>Maintaining high speeds over longer durations is significantly more challenging than short bursts. Muscular fatigue, neural adaptation, and loss of coordination all contribute to declining performance over time. The drop-off from peak speed to sustained speed varies between individuals but is typically 20 to 40 percent. This means that someone who can achieve 12 SPS in a 1-second burst might sustain only 7 to 9 SPS over a 30-second test.</p>
+    <p>The competitive community also distinguishes between different input methods. Scores achieved on mechanical keyboards are generally considered separately from those on membrane keyboards, as the different switch mechanisms can significantly affect achievable speeds. Similarly, some platforms track mobile tapping speeds separately from desktop speeds.</p>
+
+    <h2>Training Tips to Increase Your SPS</h2>
+    <ul>
+      <li><strong>Practice short bursts first:</strong> Master the 1-second test before attempting longer durations. Short bursts let you focus on peak speed without worrying about endurance.</li>
+      <li><strong>Find your rhythm:</strong> Rather than pressing as hard as possible, focus on finding a fast, consistent rhythm. A steady 8 SPS is better than alternating between 12 and 4 SPS.</li>
+      <li><strong>Minimize key travel:</strong> Press the spacebar just hard enough to register, then immediately release. The less distance your finger travels, the faster you can repeat the motion.</li>
+      <li><strong>Use your wrist and forearm:</strong> For higher speeds, engage your wrist and forearm muscles rather than relying solely on finger movement. This distributes the effort across larger muscle groups.</li>
+      <li><strong>Warm up gradually:</strong> Start each practice session at a comfortable pace and gradually increase speed. Cold muscles and tendons are more susceptible to strain.</li>
+      <li><strong>Track your progress:</strong> Use the attempt history feature to monitor improvement over time. Consistent practice typically yields measurable gains within 1 to 2 weeks.</li>
+      <li><strong>Rest adequately:</strong> Muscles grow and adapt during rest periods, not during exercise. Allow at least a day between intensive practice sessions for optimal improvement.</li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is a good SPS score?</h3>
+    <p>For casual users, 4 to 6 SPS is average. Scores of 6 to 8 SPS indicate good speed, 8 to 10 SPS is fast, and anything above 10 SPS is exceptional. Your score will also depend on the test duration, with shorter durations (1 second) typically producing higher SPS than longer ones (30 seconds) due to fatigue.</p>
+
+    <h3>Why does my speed drop during longer tests?</h3>
+    <p>Muscular fatigue is the primary cause. When you press the spacebar rapidly, your finger and forearm muscles contract and relax repeatedly. Over time, metabolic byproducts accumulate in the muscles, the available energy supply is depleted, and the muscles become less responsive. This is a normal physiological process and is the reason why sustained tapping speeds are always lower than peak burst speeds.</p>
+
+    <h3>Does keyboard type affect my score?</h3>
+    <p>Yes, significantly. Mechanical keyboards with lighter switches (such as Cherry MX Speed Silver, with a 45g actuation force and 1.2mm actuation point) generally allow faster pressing than membrane keyboards, which tend to have mushier key feel and less consistent actuation. The spacebar stabilizers, actuation force, and key travel distance all influence how quickly you can press and release the key.</p>
+
+    <h3>Can this test work on mobile devices?</h3>
+    <p>On mobile devices, you can tap the spacebar visual element on screen instead of pressing a physical spacebar. However, touchscreen tapping speeds are typically different from keyboard speeds due to the different tactile feedback and the fact that touchscreens register contact rather than mechanical switch actuation. For the most accurate and comparable results, use a physical keyboard on a desktop or laptop computer.</p>
+  </article>
+
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .game-area { cursor: default; user-select: auto; -webkit-user-select: auto; }
+
+  .time-selector {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 16px;
+  }
+  :global(.time-btn) {
+    padding: 8px 20px;
+    border: 2px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, color 0.15s;
+  }
+  :global(.time-btn:hover) {
+    border-color: var(--color-primary);
+  }
+  :global(.time-btn.active) {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+  }
+
+  .spacebar-counter {
+    font-size: 4rem;
+    font-weight: 900;
+    text-align: center;
+    color: var(--color-text);
+    line-height: 1.1;
+    padding: 16px 0 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .spacebar-sps {
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .spacebar-progress-wrap {
+    height: 8px;
+    background: var(--color-border);
+    border-radius: 4px;
+    margin: 0 24px 8px;
+    overflow: hidden;
+  }
+  :global(.spacebar-progress-bar) {
+    height: 100%;
+    background: var(--color-primary);
+    border-radius: 4px;
+    width: 100%;
+    transition: width 0.05s linear;
+  }
+
+  .spacebar-timer-label {
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-bottom: 16px;
+  }
+
+  :global(.spacebar-key) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 260px;
+    height: 56px;
+    margin: 0 auto 16px;
+    border: 3px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface);
+    cursor: pointer;
+    transition: transform 0.06s, box-shadow 0.06s, border-color 0.06s;
+    box-shadow: 0 4px 0 var(--color-border);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  :global(.spacebar-key span) {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    letter-spacing: 2px;
+  }
+  :global(.spacebar-key.pressed) {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 var(--color-border);
+    border-color: var(--color-primary);
+    background: var(--color-bg);
+  }
+
+  .spacebar-mobile-hint {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-top: 4px;
+  }
+
+  .spacebar-total {
+    font-size: 1rem;
+    color: var(--color-text-muted);
+    margin-bottom: 8px;
+  }
+
+  .play-view {
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 8px;
+  }
+
+  .result-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 280px;
+    padding: 24px;
+  }
+  .result-icon { font-size: 3rem; margin-bottom: 8px; }
+  .result-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+
+  @media (max-width: 640px) {
+    .spacebar-counter { font-size: 3rem; }
+    :global(.spacebar-key) { width: 200px; height: 48px; }
+    :global(.spacebar-key span) { font-size: 0.85rem; }
+    .time-selector { gap: 6px; }
+    :global(.time-btn) { padding: 6px 14px; font-size: 0.85rem; }
+  }
+</style>
+
+<script define:vars={{ gameName: "Spacebar Counter Test", gameSlug: "spacebar-counter-test", gameIcon: "⌨️", metricLabel: "SPS", metricUnit: "presses/sec" }}>
+(function () {
+  'use strict';
+
+  var RATING_SCALE = [
+    { min: 10, label: 'Incredible', color: '#16a34a' },
+    { min: 8, label: 'Fast', color: '#22c55e' },
+    { min: 6, label: 'Good', color: '#2563eb' },
+    { min: 4, label: 'Average', color: '#f59e0b' },
+    { min: 0, label: 'Slow', color: '#ef4444' }
+  ];
+
+  function getRating(sps) {
+    for (var i = 0; i < RATING_SCALE.length; i++) {
+      if (sps >= RATING_SCALE[i].min) return RATING_SCALE[i];
+    }
+    return { label: 'Slow', color: '#ef4444' };
+  }
+
+  var STORAGE_KEY = 'toolcalcs_spacebar-counter-test_history';
+  var MAX_HISTORY = 20;
+
+  function loadHistory() {
+    try { var r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch (e) {}
+    return [];
+  }
+  function saveHistory(h) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch (e) {}
+  }
+  function addToHistory(sps, total, duration) {
+    var h = loadHistory();
+    h.unshift({ score: sps, total: total, duration: duration, date: new Date().toISOString(), rating: getRating(sps).label });
+    saveHistory(h);
+  }
+
+  var instructionsView = document.getElementById('instructionsView');
+  var playView = document.getElementById('playView');
+  var resultView = document.getElementById('resultView');
+  var startBtn = document.getElementById('startBtn');
+  var tryAgainBtn = document.getElementById('tryAgainBtn');
+  var timeSelector = document.getElementById('timeSelector');
+  var pressCount = document.getElementById('pressCount');
+  var liveSPS = document.getElementById('liveSPS');
+  var progressBar = document.getElementById('progressBar');
+  var timerLabel = document.getElementById('timerLabel');
+  var spacebarKey = document.getElementById('spacebarKey');
+  var mobileHint = document.getElementById('mobileHint');
+  var finalSPS = document.getElementById('finalSPS');
+  var totalPresses = document.getElementById('totalPresses');
+  var ratingBadge = document.getElementById('ratingBadge');
+  var attemptHistorySection = document.getElementById('attemptHistory');
+  var historyList = document.getElementById('historyList');
+
+  var selectedDuration = 5;
+  var presses = 0;
+  var isPlaying = false;
+  var timerStarted = false;
+  var startTime = 0;
+  var endTime = 0;
+  var timerInterval = null;
+  var gameActive = false;
+
+  function showView(view) {
+    instructionsView.style.display = 'none';
+    playView.style.display = 'none';
+    resultView.style.display = 'none';
+    view.style.display = '';
+  }
+
+  // Detect mobile
+  var isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  if (isMobile) {
+    mobileHint.style.display = '';
+  }
+
+  // Time selector buttons
+  var timeBtns = timeSelector.querySelectorAll('.time-btn');
+  for (var i = 0; i < timeBtns.length; i++) {
+    timeBtns[i].addEventListener('click', function (e) {
+      var btn = e.currentTarget;
+      for (var j = 0; j < timeBtns.length; j++) {
+        timeBtns[j].classList.remove('active');
+      }
+      btn.classList.add('active');
+      selectedDuration = parseInt(btn.getAttribute('data-time'));
+    });
+  }
+
+  function updateProgress() {
+    if (!timerStarted) return;
+    var elapsed = (Date.now() - startTime) / 1000;
+    var remaining = Math.max(0, selectedDuration - elapsed);
+    var pct = (remaining / selectedDuration) * 100;
+    progressBar.style.width = pct + '%';
+    timerLabel.textContent = remaining.toFixed(1) + 's remaining';
+
+    if (presses > 0 && elapsed > 0) {
+      var currentSPS = (presses / elapsed).toFixed(1);
+      liveSPS.textContent = currentSPS + ' SPS';
+    }
+
+    if (remaining <= 0) {
+      endGame();
+    }
+  }
+
+  function registerPress() {
+    if (!gameActive) return;
+
+    if (!timerStarted) {
+      timerStarted = true;
+      startTime = Date.now();
+      endTime = startTime + (selectedDuration * 1000);
+      timerInterval = setInterval(updateProgress, 50);
+      timerLabel.textContent = selectedDuration.toFixed(1) + 's remaining';
+    }
+
+    // Check if time already up
+    if (Date.now() >= endTime) {
+      endGame();
+      return;
+    }
+
+    presses++;
+    pressCount.textContent = String(presses);
+
+    // Visual feedback
+    spacebarKey.classList.add('pressed');
+    setTimeout(function () {
+      spacebarKey.classList.remove('pressed');
+    }, 60);
+  }
+
+  function startGame() {
+    presses = 0;
+    timerStarted = false;
+    startTime = 0;
+    endTime = 0;
+    gameActive = true;
+    isPlaying = true;
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = null;
+
+    pressCount.textContent = '0';
+    liveSPS.textContent = '0.0 SPS';
+    progressBar.style.width = '100%';
+    timerLabel.textContent = 'Press spacebar to start!';
+    spacebarKey.classList.remove('pressed');
+
+    showView(playView);
+
+    // Focus the game area so keyboard events work
+    document.getElementById('gameArea').focus();
+  }
+
+  function endGame() {
+    gameActive = false;
+    isPlaying = false;
+    timerStarted = false;
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = null;
+
+    var sps = selectedDuration > 0 ? presses / selectedDuration : 0;
+    sps = Math.round(sps * 10) / 10;
+
+    showView(resultView);
+    finalSPS.textContent = sps.toFixed(1);
+    totalPresses.textContent = 'Total: ' + presses + ' presses in ' + selectedDuration + 's';
+    var rating = getRating(sps);
+    ratingBadge.textContent = rating.label;
+    ratingBadge.style.background = rating.color;
+    addToHistory(sps, presses, selectedDuration);
+    renderHistory();
+
+    if (window.GameShare) {
+      window.GameShare.show({
+        gameName: gameName,
+        gameSlug: gameSlug,
+        gameIcon: gameIcon,
+        score: sps.toFixed(1),
+        unit: metricUnit,
+        metricLabel: metricLabel,
+        ratingLabel: rating.label,
+        ratingColor: rating.color
+      });
+    }
+  }
+
+  // Keyboard handler
+  document.addEventListener('keydown', function (e) {
+    if (e.code === 'Space' || e.key === ' ') {
+      e.preventDefault();
+      if (gameActive) {
+        registerPress();
+      }
+    }
+  });
+
+  // Touch/click on spacebar visual element for mobile
+  spacebarKey.addEventListener('mousedown', function (e) {
+    e.preventDefault();
+    if (gameActive) {
+      registerPress();
+    }
+  });
+  spacebarKey.addEventListener('touchstart', function (e) {
+    e.preventDefault();
+    if (gameActive) {
+      registerPress();
+    }
+  }, { passive: false });
+
+  function renderHistory() {
+    var history = loadHistory();
+    if (history.length === 0) { attemptHistorySection.hidden = true; return; }
+    attemptHistorySection.hidden = false;
+    historyList.innerHTML = history.map(function (e) {
+      var r = getRating(e.score);
+      var label = (typeof e.score === 'number' ? e.score.toFixed(1) : e.score) + ' SPS';
+      if (e.duration) label += ' (' + e.duration + 's)';
+      return '<div class="history-item">' +
+        '<span class="history-score">' + label + '</span>' +
+        '<span class="history-rating" style="background:' + r.color + '">' + r.label + '</span>' +
+        '<span class="history-time">' + formatDate(e.date) + '</span>' +
+        '</div>';
+    }).join('');
+  }
+
+  function formatDate(iso) {
+    try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    catch (e) { return ''; }
+  }
+
+  startBtn.addEventListener('click', startGame);
+  tryAgainBtn.addEventListener('click', function () {
+    showView(instructionsView);
+  });
+  renderHistory();
+})();
+</script>
