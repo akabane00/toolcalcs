@@ -1,0 +1,451 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import '../../styles/calculator.css';
+import { getAllCaloriePages, type CaloriePage } from '../../data/calorie-burn';
+
+export function getStaticPaths() {
+  return getAllCaloriePages().map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: CaloriePage };
+const {
+  slug,
+  activity,
+  activityLower,
+  duration,
+  durationDisplay,
+  met,
+  caloriesByWeight,
+  category,
+  description,
+} = page;
+
+// --- Calorie stats for a 155 lb person (reference weight) ---
+const refEntry = caloriesByWeight.find(w => w.weight === 155);
+const refCalories = refEntry ? refEntry.calories : caloriesByWeight[2].calories;
+const minCalories = caloriesByWeight[0].calories;
+const maxCalories = caloriesByWeight[caloriesByWeight.length - 1].calories;
+
+// --- Calories per minute ---
+const calPerMin = Math.round(refCalories / duration);
+
+// --- Equivalent foods ---
+const slicesPizza = (refCalories / 285).toFixed(1);
+const cansOfSoda = (refCalories / 140).toFixed(1);
+
+// --- Duration display lowercase ---
+const durationLower = durationDisplay.toLowerCase();
+
+// --- Related pages ---
+const allPages = getAllCaloriePages();
+const sameActivityDiffDuration = allPages
+  .filter(p => p.activity === activity && p.duration !== duration)
+  .sort((a, b) => a.duration - b.duration);
+const sameCategoryDiffActivity = allPages
+  .filter(p => p.category === category && p.activity !== activity)
+  .sort((a, b) => b.met - a.met)
+  .slice(0, 8);
+
+// --- SEO ---
+const title = 'Calories Burned ' + activity + ' for ' + durationDisplay + ' | ToolCalcs';
+const seoDescription = 'How many calories does ' + activityLower + ' burn in ' + durationLower + '? A 155 lb person burns ' + refCalories + ' calories. See calorie burn for all body weights, formula, and tips.';
+const breadcrumbShort = activity + ' ' + durationLower;
+
+// --- FAQ content ---
+const faq1Q = 'How many calories does ' + activityLower + ' burn in ' + durationLower + '?';
+const faq1A = 'A person weighing 155 lbs burns approximately ' + refCalories + ' calories doing ' + activityLower + ' for ' + durationLower + '. Calorie burn ranges from ' + minCalories + ' calories (130 lbs) to ' + maxCalories + ' calories (230 lbs) depending on body weight. The MET value for this activity is ' + met + '.';
+
+const faq2Q = 'Is ' + activityLower + ' a good exercise for weight loss?';
+const faq2A = met >= 6.0
+  ? activity + ' has a MET value of ' + met + ', making it a high-intensity exercise that is excellent for weight loss. At ' + calPerMin + ' calories per minute for a 155 lb person, it is one of the more efficient ways to create a calorie deficit. Combined with a balanced diet, regular sessions of ' + activityLower + ' can contribute significantly to weight management goals.'
+  : activity + ' has a MET value of ' + met + ', making it a moderate-intensity exercise. While it burns fewer calories per minute than high-intensity activities, it is sustainable for longer durations and easier on the joints. Consistency is key for weight loss, and ' + activityLower + ' can be an effective part of a balanced exercise routine when combined with proper nutrition.';
+
+const faq3Q = 'How accurate is the calorie burn estimate for ' + activityLower + '?';
+const faq3A = 'These estimates use the MET (Metabolic Equivalent of Task) method, which is the standard scientific approach for estimating calorie expenditure. The formula multiplies the MET value (' + met + ' for ' + activityLower + ') by body weight in kilograms and duration in hours. While this provides a reliable estimate, actual calorie burn can vary based on factors like fitness level, exercise intensity, age, gender, and environmental conditions. Heart rate monitors and fitness trackers may provide more personalized readings.';
+
+// --- Structured Data ---
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Calorie Burn Calculator", "item": "https://toolcalcs.com/calorie/" },
+      { "@type": "ListItem", "position": 3, "name": breadcrumbShort },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": faq1Q,
+        "acceptedAnswer": { "@type": "Answer", "text": faq1A },
+      },
+      {
+        "@type": "Question",
+        "name": faq2Q,
+        "acceptedAnswer": { "@type": "Answer", "text": faq2A },
+      },
+      {
+        "@type": "Question",
+        "name": faq3Q,
+        "acceptedAnswer": { "@type": "Answer", "text": faq3A },
+      },
+    ],
+  },
+];
+
+// --- MET intensity label ---
+const intensityLabel = met >= 9.0 ? 'very high' : met >= 6.0 ? 'high' : met >= 3.0 ? 'moderate' : 'light';
+
+// --- Weight loss estimate (lbs per week if done daily) ---
+const lbsPerWeek = ((refCalories * 7) / 3500).toFixed(1);
+---
+
+<BaseLayout
+  title={title} description={seoDescription} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/calorie/">Calorie Burn Calculator</a> &rsaquo;
+    <span>{breadcrumbShort}</span>
+  </nav>
+
+  <h1>Calories Burned {activity} for {durationDisplay}</h1>
+  <p class="page-desc">
+    Find out exactly how many calories you burn doing {activityLower} for {durationLower}, based on your body weight. Uses the scientifically validated MET method.
+  </p>
+
+  <!-- Quick Fact -->
+  <div class="quick-fact">
+    <span class="quick-fact-label">Quick Fact:</span>
+    <strong>A 155 lb person burns {refCalories} calories doing {activityLower} for {durationLower}</strong>
+  </div>
+
+  <!-- Result Cards -->
+  <div class="result-cards calorie-result-cards">
+    <div class="result-card primary">
+      <span class="result-label">Calories Burned (155 lbs)</span>
+      <span class="result-value">{refCalories} cal</span>
+    </div>
+    <div class="result-card success">
+      <span class="result-label">Calories per Minute</span>
+      <span class="result-value">{calPerMin} cal/min</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">MET Value</span>
+      <span class="result-value">{met}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Intensity</span>
+      <span class="result-value cal-intensity">{intensityLabel}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Duration</span>
+      <span class="result-value">{durationDisplay}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Category</span>
+      <span class="result-value">{category}</span>
+    </div>
+  </div>
+
+  <!-- Calories by Weight Table -->
+  <h2 class="section-heading">Calories Burned by Body Weight</h2>
+  <p class="table-note">Calories burned doing {activityLower} for {durationLower} at different body weights:</p>
+  <div class="table-container">
+    <table class="data-table calorie-table">
+      <thead>
+        <tr>
+          <th>Body Weight (lbs)</th>
+          <th>Body Weight (kg)</th>
+          <th>Calories Burned</th>
+        </tr>
+      </thead>
+      <tbody>
+        {caloriesByWeight.map(function (row) {
+          var isRef = row.weight === 155;
+          return (
+            <tr class={isRef ? 'highlight-row' : ''}>
+              <td>{row.weight} lbs</td>
+              <td>{row.weightKg} kg</td>
+              <td class="cal-value">{row.calories} calories</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Formula Explanation -->
+  <h2 class="section-heading">How Calories Are Calculated</h2>
+  <div class="calculator-box">
+    <p class="formula-intro">The calorie burn is calculated using the MET (Metabolic Equivalent of Task) formula:</p>
+    <div class="formula-box">
+      Calories = MET &times; Weight (kg) &times; Duration (hours)
+    </div>
+    <p>For {activityLower} at {duration} minutes:</p>
+    <ul class="formula-steps">
+      <li><strong>MET value:</strong> {met} (measures exercise intensity relative to rest)</li>
+      <li><strong>Weight:</strong> 155 lbs = 70.3 kg (multiply lbs by 0.4536)</li>
+      <li><strong>Duration:</strong> {duration} minutes = {(duration / 60).toFixed(2)} hours</li>
+      <li><strong>Calculation:</strong> {met} &times; 70.3 &times; {(duration / 60).toFixed(2)} = <strong>{refCalories} calories</strong></li>
+    </ul>
+    <div class="disclaimer">
+      MET values are based on the Compendium of Physical Activities. Actual calorie burn varies by individual fitness level, exercise intensity, age, and environmental conditions.
+    </div>
+  </div>
+
+  <AdUnit slot="calorie-mid" format="horizontal" />
+
+  <!-- Different Durations Table -->
+  {sameActivityDiffDuration.length > 0 && (
+    <h2 class="section-heading">{activity} at Different Durations</h2>
+    <p class="compare-desc">See how changing the duration affects calorie burn for {activityLower} (based on a 155 lb person).</p>
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Duration</th>
+            <th>Calories (130 lbs)</th>
+            <th>Calories (155 lbs)</th>
+            <th>Calories (180 lbs)</th>
+            <th>Calories (230 lbs)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sameActivityDiffDuration.map(function (p) {
+            var c130 = p.caloriesByWeight.find(function(w) { return w.weight === 130; });
+            var c155 = p.caloriesByWeight.find(function(w) { return w.weight === 155; });
+            var c180 = p.caloriesByWeight.find(function(w) { return w.weight === 180; });
+            var c230 = p.caloriesByWeight.find(function(w) { return w.weight === 230; });
+            return (
+              <tr>
+                <td><a class="compare-link" href={'/calorie/' + p.slug + '/'}>{p.durationDisplay}</a></td>
+                <td>{c130 ? c130.calories : '-'}</td>
+                <td>{c155 ? c155.calories : '-'}</td>
+                <td>{c180 ? c180.calories : '-'}</td>
+                <td>{c230 ? c230.calories : '-'}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  )}
+
+  <!-- Similar Activities Table -->
+  {sameCategoryDiffActivity.length > 0 && (
+    <h2 class="section-heading">Compare with Other {category} Activities</h2>
+    <p class="compare-desc">See how {activityLower} compares to other {category.toLowerCase()} exercises (calories for a 155 lb person).</p>
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Activity</th>
+            <th>Duration</th>
+            <th>MET</th>
+            <th>Calories Burned</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sameCategoryDiffActivity.map(function (p) {
+            var c155 = p.caloriesByWeight.find(function(w) { return w.weight === 155; });
+            return (
+              <tr>
+                <td><a class="compare-link" href={'/calorie/' + p.slug + '/'}>{p.activity}</a></td>
+                <td>{p.durationDisplay}</td>
+                <td>{p.met}</td>
+                <td class="cal-value">{c155 ? c155.calories : '-'} cal</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  )}
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>How Many Calories Does {activity} Burn?</h2>
+    <p>
+      {description} When performed for {durationLower}, a person weighing 155 lbs can expect to burn approximately <strong>{refCalories} calories</strong>. The calorie burn ranges from {minCalories} calories for a 130 lb person to {maxCalories} calories for someone weighing 230 lbs.
+    </p>
+    <p>
+      {activity} has a MET value of {met}, placing it in the <strong>{intensityLabel} intensity</strong> category. MET, or Metabolic Equivalent of Task, is a standardized measure of exercise intensity. A MET of 1.0 represents the energy you burn at rest, so a MET of {met} means {activityLower} burns {met} times more energy than sitting still. This makes it an effective activity for improving cardiovascular health, building endurance, and managing body weight.
+    </p>
+    <p>
+      At approximately {calPerMin} calories per minute, {durationLower} of {activityLower} is equivalent to burning off about {slicesPizza} slices of pizza or {cansOfSoda} cans of soda. If you did this exercise daily at this duration, you could burn enough calories to lose approximately {lbsPerWeek} lbs per week from exercise alone, assuming no change in diet (based on the 3,500 calories per pound rule).
+    </p>
+
+    <h2>Understanding the MET Method</h2>
+    <p>
+      The MET (Metabolic Equivalent of Task) system is the gold standard for estimating calorie expenditure during physical activity. Developed by researchers and compiled in the Compendium of Physical Activities, MET values have been measured for hundreds of activities through laboratory testing.
+    </p>
+    <p>
+      The formula is straightforward: multiply the MET value by your weight in kilograms by the duration in hours. This gives you the total calorie burn for the session. For {activityLower} with a MET of {met}, heavier individuals burn more calories because it takes more energy to move a larger body mass, and longer durations naturally result in higher total burn.
+    </p>
+    <p>
+      Keep in mind that MET values represent averages. Your actual calorie burn can be higher or lower depending on your fitness level, the specific intensity of your workout, environmental factors like temperature and altitude, and individual metabolic differences. More fit individuals may burn slightly fewer calories for the same activity because their bodies have become more efficient at performing the movement.
+    </p>
+
+    <h2>Tips to Maximize Your Calorie Burn</h2>
+    <p>
+      Whether you are exercising for weight loss, fitness, or general health, here are evidence-based strategies to get the most out of your {activityLower} sessions:
+    </p>
+    <ul>
+      <li><strong>Increase intensity gradually:</strong> As your fitness improves, push the pace or add resistance to keep challenging your body and maintain a high calorie burn rate.</li>
+      <li><strong>Stay consistent:</strong> Regular exercise, even at moderate intensity, is more effective for long-term results than occasional intense workouts. Aim for at least 150 minutes of moderate activity per week.</li>
+      <li><strong>Add intervals:</strong> Incorporating short bursts of higher intensity during your {activityLower} session can boost calorie burn by 10-20% compared to steady-state exercise.</li>
+      <li><strong>Build muscle:</strong> Complement your {activityLower} with strength training. Muscle tissue burns more calories at rest than fat tissue, raising your basal metabolic rate over time.</li>
+      <li><strong>Stay hydrated:</strong> Proper hydration ensures your body can efficiently metabolize fat and carbohydrates during exercise. Even mild dehydration can reduce workout performance.</li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>{faq1Q}</h3>
+    <p>{faq1A}</p>
+
+    <h3>{faq2Q}</h3>
+    <p>{faq2A}</p>
+
+    <h3>{faq3Q}</h3>
+    <p>{faq3A}</p>
+
+    <h2>Related Calorie Burn Calculations</h2>
+    <ul>
+      {sameActivityDiffDuration.map(function (p) {
+        var c155 = p.caloriesByWeight.find(function(w) { return w.weight === 155; });
+        var cal = c155 ? c155.calories : 0;
+        return (
+          <li>
+            <a href={'/calorie/' + p.slug + '/'}>
+              {p.activity} for {p.durationDisplay} &rarr; {cal} cal (155 lbs)
+            </a>
+          </li>
+        );
+      })}
+      {sameCategoryDiffActivity.slice(0, 4).map(function (p) {
+        var c155 = p.caloriesByWeight.find(function(w) { return w.weight === 155; });
+        var cal = c155 ? c155.calories : 0;
+        return (
+          <li>
+            <a href={'/calorie/' + p.slug + '/'}>
+              {p.activity} for {p.durationDisplay} &rarr; {cal} cal (155 lbs)
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+
+    <p><a href="/calorie/">&larr; Calorie Burn Calculator</a> | <a href="/health-fitness-calculators/">Health &amp; Fitness Calculators</a></p>
+
+    <CrossLinks links={[
+      { href: '/calorie/', label: 'Calorie Burn Calculator', icon: '\uD83D\uDD25' },
+      { href: '/bmi/', label: 'BMI Calculator', icon: '\u2696\uFE0F' },
+      { href: '/health-fitness-calculators/', label: 'Health & Fitness Calculators', icon: '\uD83C\uDFCB\uFE0F' },
+      { href: '/health-fitness-calculators/calorie-calculator/', label: 'Daily Calorie Calculator', icon: '\uD83C\uDF4E' },
+    ]} />
+  </article>
+
+  <AdUnit slot="calorie-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .quick-fact {
+    background: #fef3e2;
+    border-radius: var(--radius);
+    padding: 16px 24px;
+    margin-bottom: 24px;
+    font-size: 1.1rem;
+  }
+  .quick-fact-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .quick-fact strong {
+    color: #c2410c;
+    font-size: 1.15rem;
+  }
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+  .calorie-result-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .calorie-result-cards .result-card.primary .result-value {
+    font-size: 1.6rem;
+  }
+  .cal-intensity {
+    text-transform: capitalize;
+  }
+  .table-note {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+  .calorie-table .highlight-row {
+    background: #fef3e2;
+    font-weight: 600;
+  }
+  .cal-value {
+    font-weight: 700;
+    color: #c2410c;
+  }
+  .formula-intro {
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    margin-bottom: 16px;
+  }
+  .formula-steps {
+    margin-top: 12px;
+    padding-left: 20px;
+  }
+  .formula-steps li {
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  .disclaimer {
+    background: #fef3c7;
+    border-radius: var(--radius);
+    padding: 10px 16px;
+    font-size: 0.85rem;
+    color: #92400e;
+    margin-top: 16px;
+    line-height: 1.5;
+  }
+  .compare-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+  .compare-link {
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .compare-link:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 768px) {
+    .calorie-result-cards {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 480px) {
+    .calorie-result-cards {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

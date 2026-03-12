@@ -1,0 +1,174 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import { getAllCaloriePages } from '../../data/calorie-burn';
+import type { CaloriePage } from '../../data/calorie-burn';
+
+const allPages = getAllCaloriePages();
+const count = allPages.length;
+
+// Group by category
+const categories = [...new Set(allPages.map(p => p.category))];
+
+function getPagesForCategory(cat: string): CaloriePage[] {
+  return allPages
+    .filter(p => p.category === cat)
+    .sort((a, b) => b.met - a.met || a.duration - b.duration);
+}
+
+function getRefCalories(page: CaloriePage): number {
+  var entry = page.caloriesByWeight.find(w => w.weight === 155);
+  return entry ? entry.calories : 0;
+}
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://toolcalcs.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Calorie Burn Calculator"
+    }
+  ]
+};
+---
+
+<BaseLayout
+  title="Calories Burned by Activity - Exercise Calorie Calculator | ToolCalcs"
+  description={`Find out how many calories you burn during ${count} different exercises and activities. Compare calorie burn by body weight, duration, and exercise type using the scientifically validated MET method.`}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <span>Calorie Burn Calculator</span>
+  </nav>
+
+  <h1>Calories Burned by Activity</h1>
+  <p class="page-desc">Discover how many calories you burn during {count} different exercises and activities. Each page shows calorie burn for 5 body weights using the scientifically validated MET (Metabolic Equivalent of Task) method. Click any activity to see detailed results.</p>
+
+  <AdUnit slot="calorie-idx-top" format="horizontal" />
+
+  {categories.map(function (cat, idx) {
+    var pages = getPagesForCategory(cat);
+    var midpoint = Math.floor(categories.length / 2);
+    return (
+      <>
+        <section class="cal-category-section">
+          <h2 class="cal-category-heading">{cat} Exercises</h2>
+          <div class="table-container">
+            <table class="data-table cal-table">
+              <thead>
+                <tr>
+                  <th>Activity</th>
+                  <th>Duration</th>
+                  <th>MET</th>
+                  <th>Calories (155 lbs)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pages.map(function (p) {
+                  var cal = getRefCalories(p);
+                  return (
+                    <tr>
+                      <td><a href={'/calorie/' + p.slug + '/'}>{p.activity}</a></td>
+                      <td>{p.durationDisplay}</td>
+                      <td>{p.met}</td>
+                      <td class="cal-value">{cal} cal</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </section>
+        {idx === midpoint && <AdUnit slot="calorie-idx-mid" format="rectangle" />}
+      </>
+    );
+  })}
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>How to Use This Calorie Burn Guide</h2>
+    <p>
+      This page lists {count} pre-calculated calorie burn scenarios organized by exercise category. Each row shows the activity, duration, MET value, and estimated calorie burn for a 155 lb person. Click any row to view a detailed breakdown with calorie estimates for five different body weights (130, 155, 180, 205, and 230 lbs), the calculation formula, and tips for maximizing your workout.
+    </p>
+    <p>
+      If you need a personalized daily calorie estimate based on your age, height, weight, and activity level, use our <a href="/health-fitness-calculators/calorie-calculator/">daily calorie calculator</a>.
+    </p>
+
+    <h2>Understanding Calorie Burn and Exercise</h2>
+    <p>
+      The number of calories you burn during exercise depends on three main factors: the intensity of the activity, your body weight, and the duration of the exercise. More intense activities like running, jump rope, and HIIT burn more calories per minute than lower-intensity exercises like walking or yoga. However, lower-intensity activities can be sustained for longer periods and may be more appropriate depending on your fitness level and goals.
+    </p>
+    <p>
+      All calorie estimates on this page use the MET (Metabolic Equivalent of Task) method, which is the scientific standard for quantifying exercise intensity. A MET value of 1.0 represents the energy you burn sitting at rest. An activity with a MET of 5.0 burns five times more energy than resting. MET values have been measured in laboratory settings for hundreds of activities and compiled in the Compendium of Physical Activities.
+    </p>
+    <p>
+      The formula is simple: <strong>Calories = MET &times; weight (kg) &times; duration (hours)</strong>. This means a heavier person burns more calories doing the same activity because more energy is required to move a larger body mass. Similarly, exercising for a longer duration burns more total calories, even at a moderate intensity.
+    </p>
+
+    <h2>Choosing the Right Exercise for Your Goals</h2>
+    <p>
+      For weight loss, creating a calorie deficit is essential. High-MET activities like running (MET 9.8-11.8), jump rope (MET 12.3), and stair climbing (MET 9.0) offer the most efficient calorie burn per minute. However, the best exercise is one you enjoy and can stick with consistently. A 30-minute walk done daily will burn more calories over a week than a single intense HIIT session.
+    </p>
+    <p>
+      For cardiovascular health, the American Heart Association recommends at least 150 minutes of moderate-intensity exercise or 75 minutes of vigorous-intensity exercise per week. For general fitness and well-being, a mix of cardio, strength training, and flexibility work provides the most comprehensive benefits.
+    </p>
+    <p>
+      Explore each activity page for detailed calorie breakdowns, comparison tables, and personalized tips to get the most from your workouts.
+    </p>
+
+    <p><a href="/">Back to ToolCalcs Home &rarr;</a></p>
+  </article>
+
+  <AdUnit slot="calorie-idx-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .cal-category-section {
+    margin-bottom: 36px;
+  }
+  .cal-category-heading {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--color-border);
+    color: var(--color-text);
+  }
+  .cal-table a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .cal-table a:hover {
+    text-decoration: underline;
+  }
+  .cal-value {
+    font-weight: 700;
+    color: #c2410c;
+  }
+  .cal-table td:first-child {
+    white-space: nowrap;
+  }
+
+  @media (max-width: 640px) {
+    .cal-table {
+      font-size: 0.82rem;
+    }
+    .cal-table th,
+    .cal-table td {
+      padding: 6px 8px;
+    }
+    .cal-table td:first-child {
+      white-space: normal;
+    }
+  }
+</style>
