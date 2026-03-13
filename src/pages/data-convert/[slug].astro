@@ -1,0 +1,397 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import '../../styles/calculator.css';
+import { getAllDataConvertPages, CONVERSIONS, type DataConvertPage } from '../../data/data-conversions';
+
+export function getStaticPaths() {
+  return getAllDataConvertPages().map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: DataConvertPage };
+const {
+  slug,
+  fromValue,
+  fromUnit,
+  fromUnitFull,
+  toUnit,
+  toUnitFull,
+  result,
+  resultDisplay,
+  formula,
+  category,
+  relatedConversions,
+} = page;
+
+// --- Format from value ---
+const fromValueDisplay = fromValue.toLocaleString('en-US');
+
+// --- Decimal (SI) result: 1 KB = 1000 bytes instead of 1024 ---
+const SI_BYTES: Record<string, number> = {
+  B: 1, KB: 1000, MB: 1000 ** 2, GB: 1000 ** 3, TB: 1000 ** 4, PB: 1000 ** 5,
+};
+const decimalResult = (fromValue * SI_BYTES[fromUnit]) / SI_BYTES[toUnit];
+const decimalDisplay = Number.isInteger(decimalResult)
+  ? decimalResult.toLocaleString('en-US')
+  : parseFloat(decimalResult.toPrecision(6)).toString();
+
+// --- Quick reference table: nearby values ---
+const allPages = getAllDataConvertPages();
+const sameType = allPages.filter(p => p.fromUnit === fromUnit && p.toUnit === toUnit);
+const nearbyPages = sameType.sort((a, b) => a.fromValue - b.fromValue);
+
+// --- Binary multiplier/divisor ---
+const BINARY_BYTES: Record<string, number> = {
+  B: 1, KB: 1024, MB: 1024 ** 2, GB: 1024 ** 3, TB: 1024 ** 4, PB: 1024 ** 5,
+};
+const fromBytes = BINARY_BYTES[fromUnit];
+const toBytes = BINARY_BYTES[toUnit];
+const isMultiplying = fromBytes > toBytes;
+const factor = isMultiplying ? fromBytes / toBytes : toBytes / fromBytes;
+const factorDisplay = factor.toLocaleString('en-US');
+const operation = isMultiplying ? 'multiply' : 'divide';
+const operator = isMultiplying ? 'x' : '/';
+
+// --- SEO ---
+const h1Text = fromValueDisplay + ' ' + fromUnit + ' to ' + toUnit;
+const title = h1Text + ' - Data Size Converter | ToolCalcs';
+const seoDescription = 'Convert ' + fromValueDisplay + ' ' + fromUnitFull + ' to ' + toUnitFull + '. ' + fromValueDisplay + ' ' + fromUnit + ' equals ' + resultDisplay + ' ' + toUnit + ' (binary). Quick reference table, formula, and FAQ.';
+const breadcrumbShort = fromValueDisplay + ' ' + fromUnit + ' to ' + toUnit;
+
+// --- Precompute strings for JSX (avoid ${} with dollar signs) ---
+const resultSentence = fromValueDisplay + ' ' + fromUnit + ' = ' + resultDisplay + ' ' + toUnit;
+const decimalSentence = fromValueDisplay + ' ' + fromUnit + ' = ' + decimalDisplay + ' ' + toUnit + ' (decimal)';
+const calcStep = fromValueDisplay + ' ' + operator + ' ' + factorDisplay + ' = ' + resultDisplay + ' ' + toUnit;
+
+// --- FAQ content ---
+const faq1Q = 'How many ' + toUnitFull + ' are in ' + fromValueDisplay + ' ' + fromUnitFull + '?';
+const faq1A = fromValueDisplay + ' ' + fromUnitFull + ' (' + fromUnit + ') equals ' + resultDisplay + ' ' + toUnitFull + ' (' + toUnit + ') using the binary system (1 ' + (isMultiplying ? fromUnit : toUnit) + ' = ' + (isMultiplying ? factorDisplay + ' ' + toUnit : factorDisplay + ' ' + fromUnit) + '). In the decimal (SI) system, ' + fromValueDisplay + ' ' + fromUnit + ' equals ' + decimalDisplay + ' ' + toUnit + '.';
+
+const faq2Q = 'What is the difference between binary and decimal data units?';
+const faq2A = 'Binary units use powers of 1,024 (2 to the 10th power) and are traditionally used by operating systems and memory manufacturers. Decimal (SI) units use powers of 1,000 and are used by storage drive manufacturers and network providers. This difference means a drive advertised as 500 GB (decimal) shows approximately 465 GB in your operating system (binary). The IEC introduced unambiguous prefixes like KiB, MiB, and GiB for binary units, but KB, MB, and GB remain widely used for both systems.';
+
+const faq3Q = 'Why does my hard drive show less space than advertised?';
+const faq3A = 'Hard drive manufacturers use decimal units where 1 GB = 1,000,000,000 bytes, but operating systems like Windows display storage using binary units where 1 GB = 1,073,741,824 bytes. This difference means a 1 TB drive (1,000,000,000,000 bytes) shows as approximately 931 GB in your operating system. The discrepancy grows with larger drives: a 2 TB drive shows about 1,862 GB, and a 4 TB drive shows about 3,725 GB.';
+
+// --- Structured Data ---
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Data Size Converter", "item": "https://toolcalcs.com/data-convert/" },
+      { "@type": "ListItem", "position": 3, "name": breadcrumbShort },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": faq1Q,
+        "acceptedAnswer": { "@type": "Answer", "text": faq1A },
+      },
+      {
+        "@type": "Question",
+        "name": faq2Q,
+        "acceptedAnswer": { "@type": "Answer", "text": faq2A },
+      },
+      {
+        "@type": "Question",
+        "name": faq3Q,
+        "acceptedAnswer": { "@type": "Answer", "text": faq3A },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title={title} description={seoDescription} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/data-convert/">Data Size Converter</a> &rsaquo;
+    <span>{breadcrumbShort}</span>
+  </nav>
+
+  <h1>{h1Text}</h1>
+  <p class="page-desc">
+    Convert {fromValueDisplay} {fromUnitFull} to {toUnitFull} using binary (base-1024) and decimal (base-1000) standards.
+  </p>
+
+  <!-- Result Cards -->
+  <div class="result-cards dc-result-cards">
+    <div class="result-card primary">
+      <span class="result-label">Binary Result (1024-based)</span>
+      <span class="result-value">{resultDisplay} {toUnit}</span>
+    </div>
+    <div class="result-card success">
+      <span class="result-label">Decimal Result (1000-based)</span>
+      <span class="result-value">{decimalDisplay} {toUnit}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">From</span>
+      <span class="result-value">{fromValueDisplay} {fromUnit}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">To</span>
+      <span class="result-value">{toUnitFull}</span>
+    </div>
+  </div>
+
+  <!-- Quick Reference Table -->
+  {nearbyPages.length > 1 && (
+    <h2 class="section-heading">{fromUnit} to {toUnit} Quick Reference</h2>
+    <p class="table-note">Common {fromUnit} to {toUnit} conversions (binary, 1024-based):</p>
+    <div class="table-container">
+      <table class="data-table dc-table">
+        <thead>
+          <tr>
+            <th>{fromUnitFull} ({fromUnit})</th>
+            <th>{toUnitFull} ({toUnit}) - Binary</th>
+            <th>{toUnitFull} ({toUnit}) - Decimal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {nearbyPages.map(function (p) {
+            var isCurrent = p.fromValue === fromValue;
+            var siResult = (p.fromValue * SI_BYTES[p.fromUnit]) / SI_BYTES[p.toUnit];
+            var siDisplay = Number.isInteger(siResult) ? siResult.toLocaleString('en-US') : parseFloat(siResult.toPrecision(6)).toString();
+            return (
+              <tr class={isCurrent ? 'highlight-row' : ''}>
+                <td>
+                  {isCurrent
+                    ? <strong>{p.fromValue.toLocaleString('en-US')} {fromUnit}</strong>
+                    : <a class="compare-link" href={'/data-convert/' + p.slug + '/'}>{p.fromValue.toLocaleString('en-US')} {fromUnit}</a>
+                  }
+                </td>
+                <td class="dc-value">{p.resultDisplay} {toUnit}</td>
+                <td>{siDisplay} {toUnit}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  )}
+
+  <!-- Formula Explanation -->
+  <h2 class="section-heading">Conversion Formula</h2>
+  <div class="calculator-box">
+    <p class="formula-intro">To convert {fromUnit} to {toUnit} (binary), {operation} by {factorDisplay}:</p>
+    <div class="formula-box">
+      {fromUnit} {operator} {factorDisplay} = {toUnit}
+    </div>
+    <p>For {fromValueDisplay} {fromUnit}:</p>
+    <ul class="formula-steps">
+      <li><strong>Value:</strong> {fromValueDisplay} {fromUnitFull}</li>
+      <li><strong>Operation:</strong> {operation} by {factorDisplay}</li>
+      <li><strong>Calculation:</strong> {calcStep}</li>
+    </ul>
+  </div>
+
+  <AdUnit slot="data-convert-mid" format="horizontal" />
+
+  <!-- Binary vs Decimal -->
+  <h2 class="section-heading">Binary vs Decimal Units</h2>
+  <div class="calculator-box">
+    <p>There are two standards for measuring digital data:</p>
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Standard</th>
+            <th>Base</th>
+            <th>1 KB =</th>
+            <th>1 MB =</th>
+            <th>1 GB =</th>
+            <th>Used By</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Binary</strong></td>
+            <td>1,024</td>
+            <td>1,024 B</td>
+            <td>1,048,576 B</td>
+            <td>1,073,741,824 B</td>
+            <td>OS, RAM</td>
+          </tr>
+          <tr>
+            <td><strong>Decimal (SI)</strong></td>
+            <td>1,000</td>
+            <td>1,000 B</td>
+            <td>1,000,000 B</td>
+            <td>1,000,000,000 B</td>
+            <td>Storage drives, ISPs</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="disclaimer">
+      Most operating systems (Windows, Linux) report file sizes in binary units. Storage manufacturers and internet providers use decimal units. This is why a 1 TB hard drive shows as ~931 GB in your OS.
+    </div>
+  </div>
+
+  <!-- Related Conversions -->
+  {relatedConversions.length > 0 && (
+    <h2 class="section-heading">Related Conversions</h2>
+    <div class="dc-related-grid">
+      {relatedConversions.map(function (r) {
+        return (
+          <a class="dc-related-card" href={'/data-convert/' + r.slug + '/'}>
+            {r.label}
+          </a>
+        );
+      })}
+    </div>
+  )}
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>Converting {fromValueDisplay} {fromUnitFull} to {toUnitFull}</h2>
+    <p>
+      When you need to convert {fromValueDisplay} {fromUnit} to {toUnit}, the answer depends on which measurement standard you use. In the binary system used by operating systems and memory, {resultSentence}. In the decimal system used by storage manufacturers and internet providers, {decimalSentence}. The binary system is based on powers of 1,024, while the decimal system uses powers of 1,000.
+    </p>
+    <p>
+      Understanding data size conversions is essential when managing storage, estimating download times, or comparing device specifications. {fromUnitFull} and {toUnitFull} are among the most commonly referenced digital storage units. Whether you are upgrading a hard drive, estimating cloud storage needs, or calculating backup requirements, knowing the exact conversion between these units helps you make informed decisions.
+    </p>
+    <p>
+      The distinction between binary and decimal measurements has practical implications. A hard drive marketed as {fromValueDisplay} {fromUnit} by the manufacturer (using decimal) will show a slightly different number in your operating system (using binary). This is not a defect or false advertising but rather a result of two different counting systems being used by different parts of the technology industry. The IEC introduced dedicated binary prefixes (KiB, MiB, GiB, TiB) to reduce confusion, but the traditional abbreviations remain dominant in everyday use.
+    </p>
+
+    <h2>Common Use Cases for {fromUnit} to {toUnit} Conversion</h2>
+    <ul>
+      <li><strong>Storage planning:</strong> Determine how much disk space files, applications, or databases will consume in different units.</li>
+      <li><strong>Cloud storage:</strong> Compare pricing and capacity across providers that may use different unit conventions.</li>
+      <li><strong>Download estimates:</strong> Calculate how much storage a download or backup will require on your device.</li>
+      <li><strong>Device comparison:</strong> Compare memory and storage specifications across different devices and manufacturers.</li>
+      <li><strong>Data transfer:</strong> Estimate how long file transfers will take based on connection speed and file size.</li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>{faq1Q}</h3>
+    <p>{faq1A}</p>
+
+    <h3>{faq2Q}</h3>
+    <p>{faq2A}</p>
+
+    <h3>{faq3Q}</h3>
+    <p>{faq3A}</p>
+
+    <h2>More Data Size Conversions</h2>
+    <ul>
+      {relatedConversions.slice(0, 6).map(function (r) {
+        return (
+          <li>
+            <a href={'/data-convert/' + r.slug + '/'}>{r.label}</a>
+          </li>
+        );
+      })}
+    </ul>
+
+    <p><a href="/data-convert/">&larr; Data Size Converter</a> | <a href="/">ToolCalcs Home</a></p>
+
+    <CrossLinks links={[
+      { href: '/data-convert/', label: 'Data Size Converter', icon: '\uD83D\uDCBE' },
+      { href: '/web-tools/', label: 'Web Tools', icon: '\uD83C\uDF10' },
+      { href: '/', label: 'All Calculators', icon: '\uD83E\uDDEE' },
+    ]} />
+  </article>
+
+  <AdUnit slot="data-convert-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .dc-result-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .dc-result-cards .result-card.primary .result-value {
+    font-size: 1.5rem;
+  }
+  .dc-result-cards .result-card.success .result-value {
+    font-size: 1.3rem;
+  }
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+  .table-note {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+  .dc-table .highlight-row {
+    background: #eef6ff;
+    font-weight: 600;
+  }
+  .dc-value {
+    font-weight: 700;
+    color: #1d4ed8;
+  }
+  .formula-intro {
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    margin-bottom: 16px;
+  }
+  .formula-steps {
+    margin-top: 12px;
+    padding-left: 20px;
+  }
+  .formula-steps li {
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  .disclaimer {
+    background: #eff6ff;
+    border-radius: var(--radius);
+    padding: 10px 16px;
+    font-size: 0.85rem;
+    color: #1e40af;
+    margin-top: 16px;
+    line-height: 1.5;
+  }
+  .compare-link {
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .compare-link:hover {
+    text-decoration: underline;
+  }
+  .dc-related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .dc-related-card {
+    display: block;
+    padding: 12px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--color-primary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .dc-related-card:hover {
+    background: #f0f7ff;
+    border-color: var(--color-primary);
+  }
+
+  @media (max-width: 768px) {
+    .dc-result-cards {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

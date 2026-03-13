@@ -1,0 +1,653 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import GameShare from '../../components/GameShare.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import '../../styles/game.css';
+import '../../styles/quiz.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tests & Games", "item": "https://toolcalcs.com/test/" },
+      { "@type": "ListItem", "position": 3, "name": "Color Vision Test" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Color Vision Test",
+    "url": "https://toolcalcs.com/test/color-vision-test/",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Test your color vision with this free online Ishihara-style color blindness test. Identify hidden numbers in colored dot plates to check for color deficiencies."
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the Ishihara color vision test?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Ishihara color vision test is the most widely used screening test for red-green color deficiencies. It uses plates containing colored dots arranged so that a person with normal color vision can see a number embedded in the pattern, while a person with a color deficiency sees a different number or no number at all."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How accurate is an online color vision test?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Online color vision tests provide a useful screening but are not a substitute for a professional diagnosis. Monitor calibration, brightness settings, and ambient lighting can affect results. For a definitive assessment, consult an eye care professional who can administer standardized tests under controlled conditions."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can color blindness be cured?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Inherited color vision deficiencies currently have no cure. However, special corrective lenses like EnChroma glasses can enhance color perception for some people. Acquired color vision problems caused by medications or diseases may improve when the underlying cause is treated."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How common is color blindness?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Color blindness affects approximately 8% of men and 0.5% of women of Northern European descent. The most common type is red-green color deficiency. Blue-yellow deficiency and complete color blindness (achromatopsia) are much rarer, affecting fewer than 1 in 10,000 people."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Color Vision Test - Free Online Color Blindness Test | ToolCalcs"
+  description="Test your color vision with this free Ishihara-style color blindness test. Identify hidden numbers in 10 colored dot plates to screen for color deficiencies."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/test/">Tests & Games</a> &rsaquo;
+    <span>Color Vision Test</span>
+  </nav>
+
+  <h1>Color Vision Test</h1>
+  <p class="page-desc">Identify the hidden number in each Ishihara-style dot plate. This test screens for red-green and other color vision deficiencies.</p>
+
+  <div class="game-box">
+    <div class="game-area" id="gameArea" role="region" aria-label="Color vision test area" aria-live="polite">
+      <div class="game-instructions" id="instructionsView">
+        <h2>Color Vision Test</h2>
+        <p>You will see 10 plates, each containing a circle filled with colored dots. A number is hidden within each plate using contrasting colors. Select the number you see from 4 options.</p>
+        <p style="font-size:0.85rem;color:var(--color-text-muted);">For best results, use your screen at normal brightness in a well-lit room.</p>
+        <button class="game-btn primary" id="startBtn" type="button" style="margin-top:16px;">Start Test</button>
+      </div>
+
+      <div class="play-view" id="playView" style="display:none;">
+        <div class="status-bar">
+          <span class="level-info" id="plateInfo">Plate 1 of 10</span>
+          <span class="lives-info" id="scoreInfo">Score: 0/0</span>
+        </div>
+        <div class="cv-plate-wrap">
+          <canvas id="plateCanvas" width="300" height="300" style="display:block;margin:0 auto;border-radius:50%;max-width:100%;"></canvas>
+        </div>
+        <div class="cv-options" id="optionsWrap"></div>
+      </div>
+
+      <div class="result-view" id="resultView" style="display:none;">
+        <div class="result-icon" aria-hidden="true">&#x1F441;</div>
+        <div class="result-label">Test Complete!</div>
+        <div class="score-display">
+          <span class="score-value" id="finalScore">0</span>
+          <span class="score-unit">/ 10</span>
+        </div>
+        <div class="result-detail" id="resultDetail" style="font-size:0.95rem;color:var(--color-text-muted);margin-top:8px;text-align:center;max-width:400px;"></div>
+        <div class="rating-badge" id="ratingBadge">&mdash;</div>
+        <button class="game-btn primary" id="tryAgainBtn" type="button" style="margin-top:16px;">Try Again</button>
+      </div>
+    </div>
+
+    <GameShare />
+
+    <div class="attempt-history" id="attemptHistory" hidden>
+      <h3>Attempt History</h3>
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is the Ishihara Color Vision Test?</h2>
+    <p>The Ishihara color vision test is the most widely recognized screening method for detecting red-green color deficiencies. Developed in 1917 by Dr. Shinobu Ishihara, a professor at the University of Tokyo, the test uses a series of circular plates composed of many small dots of varying size and color. Within each plate, a number or pattern is formed by dots of a particular color that contrasts with the surrounding dots in a way that is visible to people with normal color vision but difficult or impossible for those with color deficiencies to detect.</p>
+    <p>The original Ishihara test consists of 38 plates, though shorter versions with 14 or 24 plates are commonly used in clinical practice. The test is designed primarily to detect red-green color deficiencies, which are by far the most common type of color vision impairment. It does not test for blue-yellow deficiency (tritanopia), though supplementary tests exist for that purpose.</p>
+    <p>Our online version simulates the Ishihara principle using computer-generated dot plates. While it provides a useful screening, it is important to note that screen-based tests are influenced by your monitor's color calibration, brightness settings, and ambient lighting. For a definitive diagnosis, consult an eye care professional who can administer the test under standardized conditions.</p>
+
+    <h2>Understanding Color Vision Deficiency</h2>
+    <p>Color vision depends on three types of cone cells in the retina, each sensitive to a different range of wavelengths: short (blue), medium (green), and long (red). Normal color vision, known as trichromacy, requires all three cone types to function properly. Color vision deficiency occurs when one or more cone types are absent, non-functional, or have an altered spectral sensitivity.</p>
+    <p>The most common forms of color deficiency are protanomaly and deuteranomaly, collectively called red-green color deficiency. Protanomaly involves reduced sensitivity in the long-wavelength (red) cones, making reds appear darker and less vivid. Deuteranomaly involves reduced sensitivity in the medium-wavelength (green) cones, making it difficult to distinguish between reds, greens, and yellows. Together, these conditions affect approximately 8 percent of men and 0.5 percent of women of Northern European descent.</p>
+    <p>Less common forms include tritanomaly (reduced blue sensitivity), protanopia and deuteranopia (complete absence of red or green cone function), and the extremely rare achromatopsia (complete color blindness). Most color vision deficiencies are inherited through X-linked recessive genes, which explains the much higher prevalence in males.</p>
+
+    <h2>How Color Blindness Affects Daily Life</h2>
+    <p>People with color vision deficiencies often develop compensatory strategies and may not realize the extent of their condition until formally tested. Common challenges include difficulty distinguishing ripe from unripe fruit, reading color-coded maps or charts, identifying traffic light colors (particularly in unfamiliar configurations), and matching clothing colors.</p>
+    <p>Certain professions have color vision requirements that exclude people with significant deficiencies. These include pilots, electricians, train drivers, police officers, and some military roles where color discrimination is critical for safety. Many countries require color vision testing as part of the screening process for these occupations.</p>
+    <p>In recent years, awareness of color accessibility in design has grown significantly. Web developers and graphic designers are increasingly encouraged to avoid relying solely on color to convey information, using patterns, labels, and other visual cues in addition to color differences. This practice benefits not only people with color deficiencies but also improves usability for everyone.</p>
+
+    <h2>Types of Color Vision Tests</h2>
+    <p>Beyond the Ishihara test, several other methods exist for assessing color vision. The Farnsworth-Munsell 100 Hue Test requires arranging colored caps in order of hue, providing a detailed assessment of color discrimination ability. The Farnsworth D-15 test is a simplified version used for quick screening. The anomaloscope, considered the gold standard for diagnosis, allows precise measurement of the degree and type of color deficiency by having the subject match colored lights.</p>
+    <p>The Cambridge Colour Test uses a similar principle to the Ishihara test but displays stimuli on a calibrated monitor, allowing precise control over the colors presented. The Hardy-Rand-Rittler (HRR) test is similar to the Ishihara but includes plates for detecting blue-yellow as well as red-green deficiencies.</p>
+    <p>Each test has its strengths and limitations. Pseudoisochromatic plate tests like the Ishihara are excellent for quick screening but cannot precisely quantify the degree of deficiency. Arrangement tests provide more detailed information but take longer to administer. The anomaloscope provides the most precise diagnosis but requires specialized equipment.</p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is the Ishihara color vision test?</h3>
+    <p>The Ishihara test is the most widely used screening test for red-green color deficiencies. It uses plates containing colored dots arranged so that a person with normal color vision can see a number in the pattern, while someone with a color deficiency sees a different number or none at all. It was developed by Dr. Shinobu Ishihara in 1917 and remains the standard screening tool used by eye care professionals worldwide.</p>
+
+    <h3>How accurate is an online color vision test?</h3>
+    <p>Online color vision tests provide a useful preliminary screening but are not a substitute for professional diagnosis. Results can be affected by your monitor's color calibration, brightness, contrast settings, and ambient lighting conditions. If this test suggests a possible deficiency, consult an eye care professional for a standardized assessment under controlled conditions.</p>
+
+    <h3>Can color blindness be cured?</h3>
+    <p>Inherited color vision deficiencies currently have no cure, though gene therapy research shows promise for future treatments. Special corrective lenses, such as EnChroma glasses, can enhance color perception for some people with red-green deficiency by filtering specific wavelengths. Acquired color vision problems caused by medications, cataracts, or other conditions may improve when the underlying cause is addressed.</p>
+
+    <h3>How common is color blindness?</h3>
+    <p>Color blindness affects approximately 8 percent of men and 0.5 percent of women of Northern European descent. Red-green deficiency is by far the most common type. Blue-yellow deficiency affects fewer than 1 in 10,000 people, and complete color blindness (monochromacy) is even rarer at roughly 1 in 30,000.</p>
+  </article>
+
+  <CrossLinks links={[
+    { href: '/test/reaction-time-test/', label: 'Reaction Time Test', icon: '⚡' },
+    { href: '/test/stroop-effect-test/', label: 'Stroop Effect Test', icon: '🧪' },
+    { href: '/test/perfect-pitch-test/', label: 'Perfect Pitch Test', icon: '🎵' },
+  ]} />
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .game-area { cursor: default; user-select: auto; -webkit-user-select: auto; }
+
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    margin-bottom: 4px;
+  }
+  .level-info { font-weight: 700; font-size: 1rem; color: var(--color-text); }
+  .lives-info { font-size: 1rem; font-weight: 700; color: var(--color-primary); }
+
+  .cv-plate-wrap {
+    display: flex;
+    justify-content: center;
+    padding: 12px 16px;
+  }
+
+  .cv-options {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    padding: 12px 16px;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  :global(.cv-opt-btn) {
+    padding: 12px 8px;
+    border-radius: 8px;
+    border: 2px solid var(--color-border);
+    background: var(--color-surface);
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text);
+    transition: background 0.15s, border-color 0.15s;
+  }
+  :global(.cv-opt-btn:hover) {
+    border-color: var(--color-primary);
+  }
+  :global(.cv-opt-btn.correct) {
+    background: #22c55e;
+    border-color: #22c55e;
+    color: #fff;
+  }
+  :global(.cv-opt-btn.wrong) {
+    background: #fecaca;
+    border-color: #ef4444;
+  }
+
+  .play-view {
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .result-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 280px;
+    padding: 24px;
+  }
+  .result-icon { font-size: 3rem; margin-bottom: 8px; }
+  .result-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+
+  @media (max-width: 640px) {
+    .cv-options { gap: 6px; padding: 8px 12px; }
+    :global(.cv-opt-btn) { font-size: 0.95rem; padding: 10px 6px; }
+  }
+</style>
+
+<script define:vars={{ gameName: "Color Vision Test", gameSlug: "color-vision-test", gameIcon: "\u{1F441}", metricLabel: "Score", metricUnit: "/ 10" }}>
+(function () {
+  'use strict';
+
+  // Plate definitions: each has a correct answer, background dots color range, and number dots color range
+  var PLATES = [
+    { answer: 12, options: [12, 17, 21, 7],  bgHue: [30, 50], numHue: [0, 15], bgSat: 70, numSat: 80 },
+    { answer: 8,  options: [8, 3, 6, 5],     bgHue: [100, 140], numHue: [0, 20], bgSat: 60, numSat: 75 },
+    { answer: 29, options: [29, 70, 26, 79],  bgHue: [90, 130], numHue: [350, 30], bgSat: 65, numSat: 70 },
+    { answer: 5,  options: [5, 2, 3, 8],     bgHue: [20, 50], numHue: [100, 140], bgSat: 65, numSat: 70 },
+    { answer: 74, options: [74, 21, 71, 47],  bgHue: [100, 140], numHue: [350, 20], bgSat: 55, numSat: 80 },
+    { answer: 6,  options: [6, 9, 8, 0],     bgHue: [200, 230], numHue: [40, 70], bgSat: 50, numSat: 75 },
+    { answer: 45, options: [45, 15, 42, 54],  bgHue: [80, 120], numHue: [340, 20], bgSat: 60, numSat: 80 },
+    { answer: 16, options: [16, 10, 18, 61],  bgHue: [30, 60], numHue: [110, 150], bgSat: 60, numSat: 70 },
+    { answer: 3,  options: [3, 8, 5, 9],     bgHue: [190, 220], numHue: [50, 80], bgSat: 55, numSat: 70 },
+    { answer: 57, options: [57, 35, 75, 51],  bgHue: [100, 135], numHue: [0, 25], bgSat: 60, numSat: 75 }
+  ];
+
+  var RATING_SCALE = [
+    { min: 10, label: 'Normal Color Vision', color: '#16a34a' },
+    { min: 8,  label: 'Mild Deficiency', color: '#22c55e' },
+    { min: 6,  label: 'Moderate Deficiency', color: '#f59e0b' },
+    { min: 0,  label: 'Significant Deficiency', color: '#ef4444' }
+  ];
+
+  function getRating(score) {
+    for (var i = 0; i < RATING_SCALE.length; i++) {
+      if (score >= RATING_SCALE[i].min) return RATING_SCALE[i];
+    }
+    return RATING_SCALE[RATING_SCALE.length - 1];
+  }
+
+  var STORAGE_KEY = 'toolcalcs_color-vision-test_history';
+  var MAX_HISTORY = 20;
+
+  function loadHistory() {
+    try { var r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch (e) {}
+    return [];
+  }
+  function saveHistory(h) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch (e) {}
+  }
+  function addToHistory(score) {
+    var h = loadHistory();
+    h.unshift({ score: score, date: new Date().toISOString(), rating: getRating(score).label });
+    saveHistory(h);
+  }
+
+  var instructionsView = document.getElementById('instructionsView');
+  var playView = document.getElementById('playView');
+  var resultView = document.getElementById('resultView');
+  var startBtn = document.getElementById('startBtn');
+  var tryAgainBtn = document.getElementById('tryAgainBtn');
+  var plateInfo = document.getElementById('plateInfo');
+  var scoreInfo = document.getElementById('scoreInfo');
+  var plateCanvas = document.getElementById('plateCanvas');
+  var optionsWrap = document.getElementById('optionsWrap');
+  var finalScore = document.getElementById('finalScore');
+  var resultDetail = document.getElementById('resultDetail');
+  var ratingBadge = document.getElementById('ratingBadge');
+  var attemptHistorySection = document.getElementById('attemptHistory');
+  var historyList = document.getElementById('historyList');
+
+  var currentPlate = 0;
+  var correctCount = 0;
+  var answered = 0;
+  var isWaiting = false;
+
+  function showView(view) {
+    instructionsView.style.display = 'none';
+    playView.style.display = 'none';
+    resultView.style.display = 'none';
+    view.style.display = '';
+  }
+
+  // Digit pixel patterns (5x7 grids)
+  var DIGIT_PATTERNS = {
+    0: [
+      [0,1,1,1,0],
+      [1,0,0,0,1],
+      [1,0,0,0,1],
+      [1,0,0,0,1],
+      [1,0,0,0,1],
+      [1,0,0,0,1],
+      [0,1,1,1,0]
+    ],
+    1: [
+      [0,0,1,0,0],
+      [0,1,1,0,0],
+      [0,0,1,0,0],
+      [0,0,1,0,0],
+      [0,0,1,0,0],
+      [0,0,1,0,0],
+      [0,1,1,1,0]
+    ],
+    2: [
+      [0,1,1,1,0],
+      [1,0,0,0,1],
+      [0,0,0,0,1],
+      [0,0,1,1,0],
+      [0,1,0,0,0],
+      [1,0,0,0,0],
+      [1,1,1,1,1]
+    ],
+    3: [
+      [0,1,1,1,0],
+      [1,0,0,0,1],
+      [0,0,0,0,1],
+      [0,0,1,1,0],
+      [0,0,0,0,1],
+      [1,0,0,0,1],
+      [0,1,1,1,0]
+    ],
+    4: [
+      [0,0,0,1,0],
+      [0,0,1,1,0],
+      [0,1,0,1,0],
+      [1,0,0,1,0],
+      [1,1,1,1,1],
+      [0,0,0,1,0],
+      [0,0,0,1,0]
+    ],
+    5: [
+      [1,1,1,1,1],
+      [1,0,0,0,0],
+      [1,1,1,1,0],
+      [0,0,0,0,1],
+      [0,0,0,0,1],
+      [1,0,0,0,1],
+      [0,1,1,1,0]
+    ],
+    6: [
+      [0,1,1,1,0],
+      [1,0,0,0,0],
+      [1,0,0,0,0],
+      [1,1,1,1,0],
+      [1,0,0,0,1],
+      [1,0,0,0,1],
+      [0,1,1,1,0]
+    ],
+    7: [
+      [1,1,1,1,1],
+      [0,0,0,0,1],
+      [0,0,0,1,0],
+      [0,0,1,0,0],
+      [0,0,1,0,0],
+      [0,0,1,0,0],
+      [0,0,1,0,0]
+    ],
+    8: [
+      [0,1,1,1,0],
+      [1,0,0,0,1],
+      [1,0,0,0,1],
+      [0,1,1,1,0],
+      [1,0,0,0,1],
+      [1,0,0,0,1],
+      [0,1,1,1,0]
+    ],
+    9: [
+      [0,1,1,1,0],
+      [1,0,0,0,1],
+      [1,0,0,0,1],
+      [0,1,1,1,1],
+      [0,0,0,0,1],
+      [0,0,0,0,1],
+      [0,1,1,1,0]
+    ]
+  };
+
+  function isInDigit(x, y, number, cx, cy, scale) {
+    var digits = String(number).split('');
+    var totalW = digits.length * 5 + (digits.length - 1);
+    var startX = cx - (totalW * scale) / 2;
+    var startY = cy - (7 * scale) / 2;
+
+    for (var d = 0; d < digits.length; d++) {
+      var pattern = DIGIT_PATTERNS[parseInt(digits[d])];
+      var dx = startX + d * 6 * scale;
+      for (var row = 0; row < 7; row++) {
+        for (var col = 0; col < 5; col++) {
+          if (pattern[row][col]) {
+            var px = dx + col * scale;
+            var py = startY + row * scale;
+            if (x >= px && x < px + scale && y >= py && y < py + scale) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  function hslColor(hue, sat, light) {
+    return 'hsl(' + hue + ',' + sat + '%,' + light + '%)';
+  }
+
+  function randRange(a, b) {
+    return a + Math.random() * (b - a);
+  }
+
+  function drawPlate(plate) {
+    var ctx = plateCanvas.getContext('2d');
+    var W = 300;
+    ctx.clearRect(0, 0, W, W);
+
+    // Fill background circle
+    ctx.beginPath();
+    ctx.arc(W / 2, W / 2, W / 2, 0, Math.PI * 2);
+    ctx.fillStyle = '#f0f0f0';
+    ctx.fill();
+    ctx.clip();
+
+    var dots = [];
+    var attempts = 0;
+    var maxAttempts = 8000;
+    var dotSizes = [4, 5, 6, 7, 8, 9, 10, 11];
+
+    while (dots.length < 600 && attempts < maxAttempts) {
+      attempts++;
+      var r = dotSizes[Math.floor(Math.random() * dotSizes.length)];
+      var x = r + Math.random() * (W - 2 * r);
+      var y = r + Math.random() * (W - 2 * r);
+
+      // Must be inside circle
+      var dx = x - W / 2;
+      var dy = y - W / 2;
+      if (dx * dx + dy * dy > (W / 2 - r) * (W / 2 - r)) continue;
+
+      // Check overlap
+      var overlaps = false;
+      for (var i = 0; i < dots.length; i++) {
+        var ddx = dots[i].x - x;
+        var ddy = dots[i].y - y;
+        if (ddx * ddx + ddy * ddy < (dots[i].r + r + 1) * (dots[i].r + r + 1)) {
+          overlaps = true;
+          break;
+        }
+      }
+      if (overlaps) continue;
+
+      var inNum = isInDigit(x, y, plate.answer, W / 2, W / 2, 12);
+      var hue, sat, light;
+
+      if (inNum) {
+        hue = plate.numHue[0] + Math.random() * ((plate.numHue[1] > plate.numHue[0] ? plate.numHue[1] : plate.numHue[1] + 360) - plate.numHue[0]);
+        if (hue >= 360) hue -= 360;
+        sat = plate.numSat + randRange(-10, 10);
+        light = 45 + randRange(-10, 10);
+      } else {
+        hue = plate.bgHue[0] + Math.random() * (plate.bgHue[1] - plate.bgHue[0]);
+        sat = plate.bgSat + randRange(-10, 10);
+        light = 45 + randRange(-15, 15);
+      }
+
+      dots.push({ x: x, y: y, r: r, hue: hue, sat: sat, light: light });
+    }
+
+    for (var j = 0; j < dots.length; j++) {
+      ctx.beginPath();
+      ctx.arc(dots[j].x, dots[j].y, dots[j].r, 0, Math.PI * 2);
+      ctx.fillStyle = hslColor(dots[j].hue, dots[j].sat, dots[j].light);
+      ctx.fill();
+    }
+  }
+
+  function showPlate(index) {
+    var plate = PLATES[index];
+    plateInfo.textContent = 'Plate ' + (index + 1) + ' of 10';
+    scoreInfo.textContent = 'Score: ' + correctCount + '/' + answered;
+    drawPlate(plate);
+
+    // Shuffle options
+    var opts = plate.options.slice();
+    for (var i = opts.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = opts[i]; opts[i] = opts[j]; opts[j] = tmp;
+    }
+
+    optionsWrap.innerHTML = '';
+    for (var k = 0; k < opts.length; k++) {
+      var btn = document.createElement('button');
+      btn.className = 'cv-opt-btn';
+      btn.type = 'button';
+      btn.textContent = String(opts[k]);
+      btn.setAttribute('data-val', String(opts[k]));
+      optionsWrap.appendChild(btn);
+    }
+  }
+
+  function handleOptionClick(e) {
+    var btn = e.target.closest('.cv-opt-btn');
+    if (!btn || isWaiting) return;
+
+    isWaiting = true;
+    var val = parseInt(btn.getAttribute('data-val'));
+    var plate = PLATES[currentPlate];
+    answered++;
+
+    if (val === plate.answer) {
+      correctCount++;
+      btn.classList.add('correct');
+    } else {
+      btn.classList.add('wrong');
+      // Highlight correct
+      var btns = optionsWrap.querySelectorAll('.cv-opt-btn');
+      for (var i = 0; i < btns.length; i++) {
+        if (parseInt(btns[i].getAttribute('data-val')) === plate.answer) {
+          btns[i].classList.add('correct');
+        }
+      }
+    }
+
+    scoreInfo.textContent = 'Score: ' + correctCount + '/' + answered;
+
+    setTimeout(function () {
+      isWaiting = false;
+      currentPlate++;
+      if (currentPlate >= PLATES.length) {
+        endGame();
+      } else {
+        showPlate(currentPlate);
+      }
+    }, 1000);
+  }
+
+  function startGame() {
+    currentPlate = 0;
+    correctCount = 0;
+    answered = 0;
+    isWaiting = false;
+    showView(playView);
+    showPlate(0);
+  }
+
+  function endGame() {
+    showView(resultView);
+    finalScore.textContent = String(correctCount);
+    var rating = getRating(correctCount);
+    ratingBadge.textContent = rating.label;
+    ratingBadge.style.background = rating.color;
+
+    var details = '';
+    if (correctCount === 10) {
+      details = 'You identified all 10 plates correctly. Your color vision appears to be normal.';
+    } else if (correctCount >= 8) {
+      details = 'You missed ' + (10 - correctCount) + ' plate(s). You may have a mild color vision deficiency, or screen calibration may have affected results.';
+    } else if (correctCount >= 6) {
+      details = 'You missed ' + (10 - correctCount) + ' plates. This suggests a moderate color deficiency. Consider consulting an eye care professional.';
+    } else {
+      details = 'You missed ' + (10 - correctCount) + ' plates. This may indicate a significant color vision deficiency. We recommend a professional evaluation.';
+    }
+    resultDetail.textContent = details;
+
+    addToHistory(correctCount);
+    renderHistory();
+
+    if (window.GameShare) {
+      window.GameShare.show({
+        gameName: gameName,
+        gameSlug: gameSlug,
+        gameIcon: gameIcon,
+        score: correctCount,
+        unit: metricUnit,
+        metricLabel: metricLabel,
+        ratingLabel: rating.label,
+        ratingColor: rating.color
+      });
+    }
+  }
+
+  function renderHistory() {
+    var history = loadHistory();
+    if (history.length === 0) { attemptHistorySection.hidden = true; return; }
+    attemptHistorySection.hidden = false;
+    historyList.innerHTML = history.map(function (e) {
+      var r = getRating(e.score);
+      return '<div class="history-item">' +
+        '<span class="history-score">' + e.score + '/10</span>' +
+        '<span class="history-rating" style="background:' + r.color + '">' + r.label + '</span>' +
+        '<span class="history-time">' + formatDate(e.date) + '</span>' +
+        '</div>';
+    }).join('');
+  }
+
+  function formatDate(iso) {
+    try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    catch (e) { return ''; }
+  }
+
+  optionsWrap.addEventListener('click', handleOptionClick);
+  startBtn.addEventListener('click', startGame);
+  tryAgainBtn.addEventListener('click', startGame);
+  renderHistory();
+})();
+</script>

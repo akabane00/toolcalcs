@@ -1,0 +1,290 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getWorksheetBySlug } from '../../data/worksheets';
+import '../../styles/worksheet.css';
+
+const ws = getWorksheetBySlug('slope-worksheets')!;
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://toolcalcs.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Worksheets",
+      "item": "https://toolcalcs.com/worksheets/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Slope Worksheets"
+    }
+  ]
+};
+---
+
+<BaseLayout
+  title="Free Slope Worksheets - Printable Math Practice | ToolCalcs"
+  description={ws.description}
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/worksheets/">Worksheets</a> &rsaquo;
+    <span>Slope Worksheets</span>
+  </nav>
+
+  <h1>{ws.title}</h1>
+  <p class="page-desc">{ws.description}</p>
+
+  <div class="worksheet-box">
+    <div class="config-panel">
+      <h3>Settings</h3>
+      <div class="config-inputs">
+        <div class="config-group">
+          <label for="cfgProblems">Number of Problems</label>
+          <input type="number" id="cfgProblems" value="10" min="5" max="20" />
+        </div>
+        <div class="config-group">
+          <label for="cfgType">Problem Type</label>
+          <select id="cfgType">
+            <option value="fromPoints" selected>From Two Points</option>
+            <option value="fromGraph">From Graph Description</option>
+            <option value="equation">From Equation</option>
+          </select>
+        </div>
+        <div class="config-group">
+          <label for="cfgRange">Coordinate Range</label>
+          <select id="cfgRange">
+            <option value="10" selected>-10 to 10</option>
+            <option value="20">-20 to 20</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="worksheet-actions">
+      <button class="ws-btn primary" id="btnGenerate">Generate New</button>
+      <button class="ws-btn print" id="btnPrint">Print</button>
+      <label class="toggle-label">
+        <input type="checkbox" id="toggleAnswers" />
+        Show Answers
+      </label>
+    </div>
+
+    <div class="worksheet-content" id="worksheetContent">
+      <div class="worksheet-header-print">
+        <h2>Slope Practice</h2>
+        <div class="name-date">
+          <span>Name: ___________________</span>
+          <span>Date: ___________________</span>
+        </div>
+      </div>
+      <div class="problem-grid" id="problemGrid"></div>
+      <div class="answer-key hidden" id="answerKey">
+        <h3>Answer Key</h3>
+        <div class="answer-grid" id="answerGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="ws-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>What Is Slope and Why Does It Matter?</h2>
+    <p>Slope is a fundamental concept in algebra and coordinate geometry that measures the steepness and direction of a line. Defined as the ratio of vertical change (rise) to horizontal change (run) between any two points on a line, slope tells us how quickly a quantity is changing. The formula m = (y2 - y1) / (x2 - x1) is one of the most-used equations in mathematics, appearing in linear equations, graphing, calculus, physics, and economics.</p>
+    <p>Understanding slope prepares students for advanced topics such as linear equations in slope-intercept form (y = mx + b), systems of equations, and eventually derivatives in calculus. A strong foundation in slope calculation helps students interpret graphs, model real-world relationships, and solve multi-step algebraic problems with confidence.</p>
+
+    <h2>Types of Slope Problems</h2>
+    <h3>From Two Points</h3>
+    <p>The most common type of slope problem gives two coordinate points and asks students to calculate the slope using the formula. This reinforces subtraction with signed numbers and fraction simplification. Students should practice reducing fractions to lowest terms and recognizing when the slope is zero (horizontal line) or undefined (vertical line).</p>
+    <h3>From Graph Description</h3>
+    <p>These problems describe a line passing through specific points or give a rise and run, asking students to determine the slope without a visual graph. This builds the connection between numerical calculation and geometric interpretation.</p>
+    <h3>From Equation</h3>
+    <p>Given a linear equation, students identify the slope by converting to slope-intercept form (y = mx + b). This combines algebraic manipulation with slope identification and prepares students for graphing linear functions.</p>
+
+    <h2>Tips for Finding Slope</h2>
+    <ul>
+      <li><strong>Label your points.</strong> Clearly assign (x1, y1) and (x2, y2) before substituting into the formula.</li>
+      <li><strong>Watch negative signs.</strong> Subtracting negative numbers is the most common source of errors.</li>
+      <li><strong>Simplify your fraction.</strong> Always reduce the slope to lowest terms using the GCF.</li>
+      <li><strong>Know special cases.</strong> A horizontal line has slope 0, and a vertical line has undefined slope.</li>
+    </ul>
+
+    <h2>Related Worksheets</h2>
+    <ul>
+      <li><a href="/worksheets/pythagorean-theorem-worksheets/">Pythagorean Theorem Worksheets</a> - Find missing sides of right triangles.</li>
+      <li><a href="/worksheets/coordinate-plane-worksheets/">Coordinate Plane Worksheets</a> - Plot and identify points on coordinate grids.</li>
+      <li><a href="/worksheets/algebra-worksheets/">Algebra Worksheets</a> - Solve equations and simplify expressions.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="ws-bottom" format="horizontal" />
+</BaseLayout>
+
+<script is:inline>
+  var problems = [];
+
+  function randInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function gcd(a, b) {
+    a = Math.abs(a); b = Math.abs(b);
+    while (b) { var t = b; b = a % b; a = t; }
+    return a;
+  }
+
+  function formatSlope(rise, run) {
+    if (run === 0) return 'undefined';
+    if (rise === 0) return '0';
+    // Normalize sign: negative goes to numerator
+    if (run < 0) { rise = -rise; run = -run; }
+    var g = gcd(Math.abs(rise), Math.abs(run));
+    rise = rise / g;
+    run = run / g;
+    if (run === 1) return '' + rise;
+    return rise + '/' + run;
+  }
+
+  function generateFromPoints(range) {
+    var x1, y1, x2, y2;
+    var attempts = 0;
+    do {
+      x1 = randInt(-range, range);
+      y1 = randInt(-range, range);
+      x2 = randInt(-range, range);
+      y2 = randInt(-range, range);
+      attempts++;
+    } while (x1 === x2 && attempts < 100);
+    if (x1 === x2) x2 = x1 + 1;
+
+    var rise = y2 - y1;
+    var run = x2 - x1;
+    return {
+      text: 'Find the slope of the line through (' + x1 + ', ' + y1 + ') and (' + x2 + ', ' + y2 + ').',
+      answer: formatSlope(rise, run)
+    };
+  }
+
+  function generateFromGraph(range) {
+    var x1, y1, x2, y2;
+    x1 = randInt(-range, range);
+    y1 = randInt(-range, range);
+    var rise = randInt(-8, 8);
+    var run = randInt(1, 8);
+    if (Math.random() > 0.5) run = -run;
+    x2 = x1 + run;
+    y2 = y1 + rise;
+
+    return {
+      text: 'A line rises ' + rise + ' units and runs ' + run + ' units. What is the slope?',
+      answer: formatSlope(rise, run)
+    };
+  }
+
+  function generateFromEquation(range) {
+    var m = randInt(-9, 9);
+    var b = randInt(-range, range);
+    var formats = [];
+
+    // y = mx + b form
+    var bStr = b >= 0 ? ' + ' + b : ' - ' + Math.abs(b);
+    if (b === 0) bStr = '';
+    formats.push({
+      text: 'Find the slope: y = ' + m + 'x' + bStr,
+      answer: '' + m
+    });
+
+    // ax + by = c form
+    var a2 = randInt(1, 6);
+    var b2 = randInt(1, 6);
+    if (Math.random() > 0.5) b2 = -b2;
+    var c2 = randInt(-range, range);
+    var rise2 = -a2;
+    var run2 = b2;
+    formats.push({
+      text: 'Find the slope: ' + a2 + 'x + ' + (b2 < 0 ? '(' + b2 + ')' : b2) + 'y = ' + c2,
+      answer: formatSlope(rise2, run2)
+    });
+
+    return formats[Math.floor(Math.random() * formats.length)];
+  }
+
+  function generateProblems() {
+    var count = parseInt(document.getElementById('cfgProblems').value, 10);
+    var type = document.getElementById('cfgType').value;
+    var range = parseInt(document.getElementById('cfgRange').value, 10);
+
+    if (isNaN(count) || count < 5) count = 5;
+    if (count > 20) count = 20;
+
+    problems = [];
+    for (var i = 0; i < count; i++) {
+      if (type === 'fromPoints') {
+        problems.push(generateFromPoints(range));
+      } else if (type === 'fromGraph') {
+        problems.push(generateFromGraph(range));
+      } else {
+        problems.push(generateFromEquation(range));
+      }
+    }
+
+    renderProblems();
+    renderAnswerKey();
+    updateAnswerVisibility();
+  }
+
+  function renderProblems() {
+    var grid = document.getElementById('problemGrid');
+    var showAnswers = document.getElementById('toggleAnswers').checked;
+    var html = '';
+
+    for (var i = 0; i < problems.length; i++) {
+      var p = problems[i];
+      html += '<div class="problem">';
+      html += '<div class="problem-number">' + (i + 1) + ')</div>';
+      html += '<div class="problem-text">' + p.text + '</div>';
+      html += '<div class="problem-answer' + (showAnswers ? ' revealed' : '') + '">';
+      html += showAnswers ? 'm = ' + p.answer : '___';
+      html += '</div>';
+      html += '</div>';
+    }
+
+    grid.innerHTML = html;
+  }
+
+  function renderAnswerKey() {
+    var answerGrid = document.getElementById('answerGrid');
+    var html = '';
+    for (var i = 0; i < problems.length; i++) {
+      html += '<div class="answer-item">';
+      html += '<span class="q">' + (i + 1) + '.</span>';
+      html += '<span class="a">m = ' + problems[i].answer + '</span>';
+      html += '</div>';
+    }
+    answerGrid.innerHTML = html;
+  }
+
+  function updateAnswerVisibility() {
+    var showAnswers = document.getElementById('toggleAnswers').checked;
+    var answerKey = document.getElementById('answerKey');
+    if (showAnswers) { answerKey.classList.remove('hidden'); }
+    else { answerKey.classList.add('hidden'); }
+    renderProblems();
+  }
+
+  document.getElementById('btnGenerate').addEventListener('click', generateProblems);
+  document.getElementById('btnPrint').addEventListener('click', function () { window.print(); });
+  document.getElementById('toggleAnswers').addEventListener('change', updateAnswerVisibility);
+  generateProblems();
+</script>

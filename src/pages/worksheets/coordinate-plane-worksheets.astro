@@ -52,23 +52,20 @@ const structuredData = {
       <div class="config-inputs">
         <div class="config-group">
           <label for="cfgProblems">Number of Problems</label>
-          <input type="number" id="cfgProblems" value="10" min="8" max="15" />
+          <input type="number" id="cfgProblems" value="10" min="5" max="20" />
         </div>
         <div class="config-group">
-          <label for="cfgType">Problem Type</label>
-          <select id="cfgType">
-            <option value="plot">Plot Points</option>
-            <option value="identify">Identify Coordinates</option>
-            <option value="distance">Find Distance</option>
-            <option value="mixed" selected>Mixed</option>
+          <label for="cfgQuadrants">Quadrants</label>
+          <select id="cfgQuadrants">
+            <option value="first" selected>First Quadrant Only</option>
+            <option value="all">All Four Quadrants</option>
           </select>
         </div>
         <div class="config-group">
-          <label for="cfgGrid">Grid Range</label>
-          <select id="cfgGrid">
-            <option value="5">5 &times; 5</option>
-            <option value="10">10 &times; 10</option>
-            <option value="all">All Four Quadrants</option>
+          <label for="cfgNegative">Include Negative</label>
+          <select id="cfgNegative">
+            <option value="no" selected>No</option>
+            <option value="yes">Yes</option>
           </select>
         </div>
       </div>
@@ -254,10 +251,10 @@ const structuredData = {
   }
 
   function getGridConfig() {
-    var sel = document.getElementById('cfgGrid').value;
-    if (sel === '5') return { size: 5, minC: 0, maxC: 5, allQuad: false };
-    if (sel === '10') return { size: 10, minC: 0, maxC: 10, allQuad: false };
-    return { size: 6, minC: -6, maxC: 6, allQuad: true };
+    var quad = document.getElementById('cfgQuadrants').value;
+    var neg = document.getElementById('cfgNegative').value;
+    if (quad === 'all' || neg === 'yes') return { size: 6, minC: -6, maxC: 6, allQuad: true };
+    return { size: 10, minC: 0, maxC: 10, allQuad: false };
   }
 
   function buildFirstQuadGrid(gridSize, points, showDots) {
@@ -352,18 +349,17 @@ const structuredData = {
 
   function generateProblems() {
     var count = parseInt(document.getElementById('cfgProblems').value, 10);
-    var type = document.getElementById('cfgType').value;
     var gc = getGridConfig();
 
-    if (isNaN(count) || count < 8) count = 8;
-    if (count > 15) count = 15;
+    if (isNaN(count) || count < 5) count = 5;
+    if (count > 20) count = 20;
 
     problems = [];
-    var types = ['plot', 'identify', 'distance'];
+    var types = ['plot', 'identify'];
     var labels = 'ABCDEFGHIJKLMNOPQRST';
 
     for (var i = 0; i < count; i++) {
-      var pType = type === 'mixed' ? types[randInt(0, 2)] : type;
+      var pType = types[i % 2];
       var question, answer, pts;
 
       if (pType === 'plot') {
@@ -374,7 +370,7 @@ const structuredData = {
         pts = [{ x: x, y: y, label: '' }];
         problems.push({ question: question, answer: answer, pts: pts, pType: 'plot' });
 
-      } else if (pType === 'identify') {
+      } else {
         var x = randInt(gc.minC, gc.maxC);
         var y = randInt(gc.minC, gc.maxC);
         var lbl = labels[i % labels.length];
@@ -382,22 +378,6 @@ const structuredData = {
         answer = '(' + x + ', ' + y + ')';
         pts = [{ x: x, y: y, label: lbl }];
         problems.push({ question: question, answer: answer, pts: pts, pType: 'identify' });
-
-      } else {
-        // distance
-        var x1 = randInt(gc.minC, gc.maxC);
-        var y1 = randInt(gc.minC, gc.maxC);
-        var x2 = randInt(gc.minC, gc.maxC);
-        var y2 = randInt(gc.minC, gc.maxC);
-        while (x1 === x2 && y1 === y2) {
-          x2 = randInt(gc.minC, gc.maxC);
-          y2 = randInt(gc.minC, gc.maxC);
-        }
-        var dist = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-        dist = roundTo(dist, 2);
-        question = 'Find the distance between (' + x1 + ', ' + y1 + ') and (' + x2 + ', ' + y2 + '). Round to 2 decimal places.';
-        answer = '' + dist;
-        problems.push({ question: question, answer: answer, pts: null, pType: 'distance' });
       }
     }
 

@@ -1,0 +1,521 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import GameShare from '../../components/GameShare.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import '../../styles/game.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tests & Games", "item": "https://toolcalcs.com/test/" },
+      { "@type": "ListItem", "position": 3, "name": "Visual Acuity Test" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Visual Acuity Test",
+    "url": "https://toolcalcs.com/test/visual-acuity-test/",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Test your visual acuity online with this free Landolt C and Tumbling E style eye test. Identify the direction of the opening as the symbols get smaller."
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is visual acuity?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Visual acuity is the clarity or sharpness of vision measured by the ability to discern letters or symbols at a given distance. It is typically expressed as a fraction like 20/20, where the first number is the test distance and the second is the distance at which a person with normal vision could read the same line."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can this online test replace a professional eye exam?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. This online test provides a rough estimate of your visual acuity for entertainment and screening purposes only. It cannot account for proper viewing distance, screen calibration, lighting conditions, or other clinical factors. Always consult a licensed eye care professional for accurate vision assessment and any concerns about your eyesight."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What do the 20/20 numbers mean?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The notation 20/20 means you can see at 20 feet what a person with normal vision sees at 20 feet. If your result is 20/40, it means you need to be at 20 feet to see what someone with normal vision sees at 40 feet. Lower second numbers indicate better acuity."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is a Landolt C test?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Landolt C test uses a circle with a gap (like the letter C) oriented in different directions. The test taker must identify the direction of the gap. It is considered one of the gold standard optotypes for measuring visual acuity because it does not depend on letter recognition or literacy."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Visual Acuity Test - Free Online Eye Test | ToolCalcs"
+  description="Test your visual acuity online with this free Landolt C style eye test. Identify the gap direction as symbols get progressively smaller. Get an approximate 20/20 score."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/test/">Tests & Games</a> &rsaquo;
+    <span>Visual Acuity Test</span>
+  </nav>
+
+  <h1>Visual Acuity Test</h1>
+  <p class="page-desc">Identify which direction the opening faces as the symbol gets smaller. This is not a medical exam.</p>
+
+  <div class="game-box">
+    <div class="game-area" id="gameArea" role="region" aria-label="Visual acuity test area" aria-live="polite">
+      <div class="game-instructions" id="instructionsView">
+        <h2>Visual Acuity Test</h2>
+        <p>A "C" shape will appear on screen with a gap facing up, down, left, or right. Click the arrow button matching the gap direction. The symbol gets smaller each level.</p>
+        <p style="font-size:0.85rem;color:var(--color-text-muted);">12 levels total. Sit at a comfortable distance from your screen.</p>
+        <p style="font-size:0.8rem;color:#ef4444;font-weight:600;margin-top:8px;">Disclaimer: This is NOT a medical exam. See an eye care professional for accurate vision assessment.</p>
+        <button class="game-btn primary" id="startBtn" type="button" style="margin-top:16px;">Start Test</button>
+      </div>
+
+      <div class="play-view" id="playView" style="display:none;">
+        <div class="status-bar">
+          <span class="level-info" id="levelInfo">Level 1 / 12</span>
+          <span class="lives-info" id="scoreInfo">Correct: 0</span>
+        </div>
+        <div class="va-symbol-area" id="symbolArea">
+          <div class="va-landolt" id="landoltC"></div>
+        </div>
+        <div class="va-direction-buttons" id="dirButtons">
+          <button class="game-btn va-dir-btn" data-dir="up" type="button" aria-label="Gap faces up">&#9650;</button>
+          <div class="va-dir-row">
+            <button class="game-btn va-dir-btn" data-dir="left" type="button" aria-label="Gap faces left">&#9664;</button>
+            <button class="game-btn va-dir-btn" data-dir="right" type="button" aria-label="Gap faces right">&#9654;</button>
+          </div>
+          <button class="game-btn va-dir-btn" data-dir="down" type="button" aria-label="Gap faces down">&#9660;</button>
+        </div>
+        <div class="va-feedback" id="vaFeedback">&nbsp;</div>
+      </div>
+
+      <div class="result-view" id="resultView" style="display:none;">
+        <div class="result-icon" aria-hidden="true">&#128065;</div>
+        <div class="result-label">Test Complete</div>
+        <div class="score-display">
+          <span class="score-value" id="finalScore">20/20</span>
+          <span class="score-unit">estimated acuity</span>
+        </div>
+        <div class="va-result-detail" id="resultDetail"></div>
+        <div class="rating-badge" id="ratingBadge">&mdash;</div>
+        <p style="font-size:0.8rem;color:#ef4444;margin-top:12px;font-weight:600;">This is not a medical diagnosis. Please see an eye care professional.</p>
+        <button class="game-btn primary" id="tryAgainBtn" type="button" style="margin-top:16px;">Try Again</button>
+      </div>
+    </div>
+
+    <GameShare />
+
+    <div class="attempt-history" id="attemptHistory" hidden>
+      <h3>Attempt History</h3>
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is Visual Acuity?</h2>
+    <p>Visual acuity refers to the sharpness or clarity of vision, specifically the ability to distinguish fine details and shapes at a given distance. It is one of the most commonly measured aspects of visual function and serves as a primary indicator of how well the optical system of the eye can focus light onto the retina. The standard measurement system uses the Snellen fraction, such as 20/20, where the numerator represents the testing distance in feet and the denominator represents the distance at which a person with normal vision could identify the same symbols.</p>
+    <p>A visual acuity of 20/20 is considered normal and means that a person can see at 20 feet what is expected to be seen at that distance. However, 20/20 does not represent perfect vision. Some people have acuity of 20/15 or even 20/10, meaning they can resolve details at 20 feet that the average person would need to be 15 or 10 feet away to see. Visual acuity measures only one aspect of vision and does not account for peripheral vision, depth perception, color vision, or contrast sensitivity.</p>
+
+    <h2>How the Landolt C Test Works</h2>
+    <p>The Landolt C, also known as the Landolt ring or broken ring, is one of the most widely used optotypes in clinical vision testing worldwide. It consists of a circle with a gap positioned in one of four or eight directions. The test taker must identify the orientation of the gap, making it a purely spatial resolution task that does not depend on letter recognition, language ability, or literacy.</p>
+    <p>The International Council of Ophthalmology recognizes the Landolt C as a reference standard for visual acuity measurement because of its consistent difficulty across all orientations. Unlike letter charts where some letters (like L or T) are easier to identify than others (like B or D), the Landolt C presents uniform difficulty regardless of gap position. This makes it particularly valuable for cross-cultural studies and for testing young children or individuals who may not be familiar with the Latin alphabet.</p>
+    <p>In this online test, the Landolt C is rendered using CSS and progressively decreases in size across 12 levels. Each level corresponds to an approximate Snellen fraction, from 20/200 (largest) down to 20/10 (smallest). The test tracks which level you can reliably identify the gap direction, providing an estimated acuity score.</p>
+
+    <h2>Factors That Affect Visual Acuity</h2>
+    <p>Several physiological and environmental factors influence visual acuity. Refractive errors are the most common cause of reduced acuity and include myopia (nearsightedness), hyperopia (farsightedness), and astigmatism. These conditions occur when the shape of the eye prevents light from focusing precisely on the retina, resulting in blurred vision at certain distances. Corrective lenses or refractive surgery can typically restore normal acuity in these cases.</p>
+    <p>Pupil size plays a significant role in acuity. Smaller pupils increase depth of focus and reduce the impact of optical aberrations, similar to how a smaller aperture on a camera produces a sharper image. This is why people with uncorrected refractive errors often squint, which effectively narrows the pupil and temporarily improves acuity. In bright light, the pupil constricts naturally, which is one reason visual acuity tends to be better in well-lit conditions.</p>
+    <p>Age-related changes progressively affect acuity. The crystalline lens of the eye gradually loses its flexibility and transparency over decades, leading to presbyopia (difficulty focusing on near objects, typically noticed after age 40) and eventually to cataracts (clouding of the lens). Macular degeneration, which affects the central part of the retina responsible for sharp vision, is another common age-related cause of reduced acuity, particularly in people over 60.</p>
+
+    <h2>Understanding Your Results</h2>
+    <p>The results of this online test provide only a rough approximation of your visual acuity. Numerous factors affect accuracy, including your screen size and resolution, viewing distance, ambient lighting, screen brightness, and whether you are wearing your usual corrective lenses. A clinical eye exam conducted by a licensed professional uses carefully calibrated charts at standardized distances under controlled lighting conditions.</p>
+    <p>If your results suggest acuity below 20/20, it does not necessarily indicate a problem. Many people function well with slight refractive errors. However, if you notice significant difficulty with the larger symbols, experience frequent headaches, or have trouble with everyday visual tasks, scheduling a comprehensive eye examination is advisable. Regular eye exams are recommended every one to two years for adults, and more frequently for those with known eye conditions or risk factors.</p>
+
+    <h2>Tips for Eye Health</h2>
+    <ul>
+      <li><strong>Follow the 20-20-20 rule:</strong> Every 20 minutes, look at something 20 feet away for 20 seconds. This reduces digital eye strain caused by prolonged screen use.</li>
+      <li><strong>Maintain adequate lighting:</strong> Ensure your work area is well lit to reduce eye strain. Avoid glare on screens by positioning them perpendicular to windows.</li>
+      <li><strong>Get regular eye exams:</strong> Many eye conditions develop gradually without obvious symptoms. Regular professional examinations can detect problems early when treatment is most effective.</li>
+      <li><strong>Protect your eyes from UV:</strong> Wear sunglasses that block 99 to 100 percent of UVA and UVB radiation when outdoors. Prolonged UV exposure increases the risk of cataracts and macular degeneration.</li>
+      <li><strong>Eat a balanced diet:</strong> Nutrients like omega-3 fatty acids, lutein, zinc, and vitamins C and E may help prevent age-related vision problems. Leafy greens, fish, eggs, nuts, and citrus fruits are excellent choices.</li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is visual acuity?</h3>
+    <p>Visual acuity is the clarity or sharpness of vision measured by the ability to discern letters or symbols at a given distance. It is typically expressed as a fraction like 20/20, where the first number is the test distance and the second is the distance at which a person with normal vision could read the same line.</p>
+
+    <h3>Can this online test replace a professional eye exam?</h3>
+    <p>No. This online test provides a rough estimate of your visual acuity for entertainment and screening purposes only. It cannot account for proper viewing distance, screen calibration, lighting conditions, or other clinical factors. Always consult a licensed eye care professional for accurate vision assessment and any concerns about your eyesight.</p>
+
+    <h3>What do the 20/20 numbers mean?</h3>
+    <p>The notation 20/20 means you can see at 20 feet what a person with normal vision sees at 20 feet. If your result is 20/40, it means you need to be at 20 feet to see what someone with normal vision sees at 40 feet. Lower second numbers indicate better acuity.</p>
+
+    <h3>What is a Landolt C test?</h3>
+    <p>The Landolt C test uses a circle with a gap oriented in different directions. The test taker must identify the direction of the gap. It is considered one of the gold standard optotypes for measuring visual acuity because it does not depend on letter recognition or literacy.</p>
+  </article>
+
+  <CrossLinks links={[
+    { href: '/test/color-blindness-test/', label: 'Color Blindness Test', icon: '\uD83C\uDFA8' },
+    { href: '/test/reaction-time-test/', label: 'Reaction Time Test', icon: '\u26A1' },
+    { href: '/test/color-vision-test/', label: 'Color Vision Test', icon: '\uD83D\uDC41' },
+  ]} />
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .game-area { cursor: default; user-select: auto; -webkit-user-select: auto; }
+
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    margin-bottom: 4px;
+  }
+  .level-info { font-weight: 700; font-size: 1rem; color: var(--color-text); }
+  .lives-info { font-size: 0.95rem; font-weight: 600; color: var(--color-text-muted); }
+
+  .va-symbol-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 160px;
+    padding: 20px;
+  }
+
+  .va-landolt {
+    border-radius: 50%;
+    border: solid var(--color-text);
+    position: relative;
+    box-sizing: border-box;
+    transition: width 0.3s, height 0.3s, border-width 0.3s;
+  }
+
+  .va-direction-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 0 24px 12px;
+  }
+  .va-dir-row {
+    display: flex;
+    gap: 48px;
+  }
+  :global(.va-dir-btn) {
+    width: 56px;
+    height: 56px;
+    font-size: 1.4rem;
+    border-radius: 50%;
+    border: 2px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, transform 0.1s, border-color 0.15s;
+  }
+  :global(.va-dir-btn:hover) {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: #fff;
+  }
+  :global(.va-dir-btn:active) {
+    transform: scale(0.9);
+  }
+  :global(.va-dir-btn.flash-correct) {
+    background: #22c55e !important;
+    border-color: #22c55e !important;
+    color: #fff !important;
+  }
+  :global(.va-dir-btn.flash-wrong) {
+    background: #ef4444 !important;
+    border-color: #ef4444 !important;
+    color: #fff !important;
+  }
+
+  .va-feedback {
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 8px 16px 16px;
+    min-height: 36px;
+    color: var(--color-text-muted);
+  }
+
+  .va-result-detail {
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+
+  .play-view {
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .result-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 280px;
+    padding: 24px;
+  }
+  .result-icon { font-size: 3rem; margin-bottom: 8px; }
+  .result-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+
+  @media (max-width: 640px) {
+    .va-symbol-area { min-height: 120px; padding: 16px; }
+    :global(.va-dir-btn) { width: 48px; height: 48px; font-size: 1.2rem; }
+    .va-dir-row { gap: 36px; }
+  }
+</style>
+
+<script define:vars={{ gameName: "Visual Acuity Test", gameSlug: "visual-acuity-test", gameIcon: "\uD83D\uDC41", metricLabel: "Acuity", metricUnit: "estimated" }}>
+(function () {
+  'use strict';
+
+  var LEVELS = [
+    { size: 120, border: 24, snellen: '20/200' },
+    { size: 100, border: 20, snellen: '20/160' },
+    { size: 84, border: 17, snellen: '20/125' },
+    { size: 70, border: 14, snellen: '20/100' },
+    { size: 58, border: 12, snellen: '20/80' },
+    { size: 48, border: 10, snellen: '20/63' },
+    { size: 40, border: 8, snellen: '20/50' },
+    { size: 32, border: 6, snellen: '20/40' },
+    { size: 26, border: 5, snellen: '20/32' },
+    { size: 20, border: 4, snellen: '20/25' },
+    { size: 16, border: 3, snellen: '20/20' },
+    { size: 12, border: 2, snellen: '20/10' }
+  ];
+
+  var DIRECTIONS = ['up', 'down', 'left', 'right'];
+
+  var RATING_MAP = {
+    '20/10': { label: 'Exceptional', color: '#16a34a' },
+    '20/20': { label: 'Normal', color: '#22c55e' },
+    '20/25': { label: 'Near Normal', color: '#2563eb' },
+    '20/32': { label: 'Mild Reduction', color: '#2563eb' },
+    '20/40': { label: 'Moderate', color: '#f59e0b' },
+    '20/50': { label: 'Moderate', color: '#f59e0b' },
+    '20/63': { label: 'Below Average', color: '#ef4444' },
+    '20/80': { label: 'Below Average', color: '#ef4444' },
+    '20/100': { label: 'Poor', color: '#ef4444' },
+    '20/125': { label: 'Poor', color: '#ef4444' },
+    '20/160': { label: 'Poor', color: '#ef4444' },
+    '20/200': { label: 'Very Poor', color: '#ef4444' }
+  };
+
+  function getRating(snellen) {
+    return RATING_MAP[snellen] || { label: 'Unknown', color: '#94a3b8' };
+  }
+
+  var STORAGE_KEY = 'toolcalcs_visual-acuity-test_history';
+  var MAX_HISTORY = 20;
+
+  function loadHistory() {
+    try { var r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch (e) {}
+    return [];
+  }
+  function saveHistory(h) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch (e) {}
+  }
+  function addToHistory(snellen) {
+    var h = loadHistory();
+    h.unshift({ score: snellen, date: new Date().toISOString(), rating: getRating(snellen).label });
+    saveHistory(h);
+  }
+
+  var instructionsView = document.getElementById('instructionsView');
+  var playView = document.getElementById('playView');
+  var resultView = document.getElementById('resultView');
+  var startBtn = document.getElementById('startBtn');
+  var tryAgainBtn = document.getElementById('tryAgainBtn');
+  var levelInfo = document.getElementById('levelInfo');
+  var scoreInfo = document.getElementById('scoreInfo');
+  var landoltC = document.getElementById('landoltC');
+  var vaFeedback = document.getElementById('vaFeedback');
+  var finalScore = document.getElementById('finalScore');
+  var resultDetail = document.getElementById('resultDetail');
+  var ratingBadge = document.getElementById('ratingBadge');
+  var attemptHistorySection = document.getElementById('attemptHistory');
+  var historyList = document.getElementById('historyList');
+  var dirBtns = document.querySelectorAll('[data-dir]');
+
+  var currentLevel = 0;
+  var correctCount = 0;
+  var currentDir = 'up';
+  var canAnswer = false;
+  var lastCorrectLevel = -1;
+
+  function showView(view) {
+    instructionsView.style.display = 'none';
+    playView.style.display = 'none';
+    resultView.style.display = 'none';
+    view.style.display = '';
+  }
+
+  function renderLandolt(level, direction) {
+    var cfg = LEVELS[level];
+    landoltC.style.width = cfg.size + 'px';
+    landoltC.style.height = cfg.size + 'px';
+    landoltC.style.borderWidth = cfg.border + 'px';
+
+    var gapSize = cfg.border + 2;
+    var clipVal = '';
+    if (direction === 'up') {
+      var half = cfg.size / 2;
+      clipVal = 'polygon(0% 0%, ' + (half - gapSize/2) + 'px 0%, ' + (half - gapSize/2) + 'px ' + cfg.border + 'px, ' + (half + gapSize/2) + 'px ' + cfg.border + 'px, ' + (half + gapSize/2) + 'px 0%, 100% 0%, 100% 100%, 0% 100%)';
+    } else if (direction === 'down') {
+      var half = cfg.size / 2;
+      clipVal = 'polygon(0% 0%, 100% 0%, 100% 100%, ' + (half + gapSize/2) + 'px 100%, ' + (half + gapSize/2) + 'px ' + (cfg.size - cfg.border) + 'px, ' + (half - gapSize/2) + 'px ' + (cfg.size - cfg.border) + 'px, ' + (half - gapSize/2) + 'px 100%, 0% 100%)';
+    } else if (direction === 'left') {
+      var half = cfg.size / 2;
+      clipVal = 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% ' + (half + gapSize/2) + 'px, ' + cfg.border + 'px ' + (half + gapSize/2) + 'px, ' + cfg.border + 'px ' + (half - gapSize/2) + 'px, 0% ' + (half - gapSize/2) + 'px)';
+    } else {
+      var half = cfg.size / 2;
+      clipVal = 'polygon(0% 0%, 100% 0%, 100% ' + (half - gapSize/2) + 'px, ' + (cfg.size - cfg.border) + 'px ' + (half - gapSize/2) + 'px, ' + (cfg.size - cfg.border) + 'px ' + (half + gapSize/2) + 'px, 100% ' + (half + gapSize/2) + 'px, 100% 100%, 0% 100%)';
+    }
+    landoltC.style.clipPath = clipVal;
+  }
+
+  function nextRound() {
+    if (currentLevel >= LEVELS.length) {
+      endGame();
+      return;
+    }
+    currentDir = DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)];
+    levelInfo.textContent = 'Level ' + (currentLevel + 1) + ' / ' + LEVELS.length;
+    scoreInfo.textContent = 'Correct: ' + correctCount;
+    vaFeedback.innerHTML = '&nbsp;';
+    renderLandolt(currentLevel, currentDir);
+    canAnswer = true;
+    dirBtns.forEach(function (b) { b.classList.remove('flash-correct', 'flash-wrong'); });
+  }
+
+  function handleDir(dir) {
+    if (!canAnswer) return;
+    canAnswer = false;
+
+    var btn = document.querySelector('[data-dir="' + dir + '"]');
+    var isCorrect = dir === currentDir;
+
+    if (isCorrect) {
+      correctCount++;
+      lastCorrectLevel = currentLevel;
+      if (btn) btn.classList.add('flash-correct');
+      vaFeedback.textContent = 'Correct!';
+      vaFeedback.style.color = '#22c55e';
+    } else {
+      if (btn) btn.classList.add('flash-wrong');
+      vaFeedback.textContent = 'Wrong! The gap was facing ' + currentDir + '.';
+      vaFeedback.style.color = '#ef4444';
+    }
+
+    currentLevel++;
+    setTimeout(nextRound, 600);
+  }
+
+  function startGame() {
+    currentLevel = 0;
+    correctCount = 0;
+    lastCorrectLevel = -1;
+    showView(playView);
+    nextRound();
+  }
+
+  function endGame() {
+    var bestSnellen = lastCorrectLevel >= 0 ? LEVELS[lastCorrectLevel].snellen : '20/200';
+    var rating = getRating(bestSnellen);
+
+    showView(resultView);
+    finalScore.textContent = bestSnellen;
+    resultDetail.textContent = correctCount + ' of ' + LEVELS.length + ' correct';
+    ratingBadge.textContent = rating.label;
+    ratingBadge.style.background = rating.color;
+
+    addToHistory(bestSnellen);
+    renderHistory();
+
+    if (window.GameShare) {
+      window.GameShare.show({
+        gameName: gameName,
+        gameSlug: gameSlug,
+        gameIcon: gameIcon,
+        score: bestSnellen,
+        unit: metricUnit,
+        metricLabel: metricLabel,
+        ratingLabel: rating.label,
+        ratingColor: rating.color
+      });
+    }
+  }
+
+  function renderHistory() {
+    var history = loadHistory();
+    if (history.length === 0) { attemptHistorySection.hidden = true; return; }
+    attemptHistorySection.hidden = false;
+    historyList.innerHTML = history.map(function (e) {
+      var r = getRating(e.score);
+      return '<div class="history-item">' +
+        '<span class="history-score">' + e.score + '</span>' +
+        '<span class="history-rating" style="background:' + r.color + '">' + r.label + '</span>' +
+        '<span class="history-time">' + formatDate(e.date) + '</span>' +
+        '</div>';
+    }).join('');
+  }
+
+  function formatDate(iso) {
+    try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    catch (e) { return ''; }
+  }
+
+  dirBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      handleDir(btn.getAttribute('data-dir'));
+    });
+  });
+
+  startBtn.addEventListener('click', startGame);
+  tryAgainBtn.addEventListener('click', startGame);
+  renderHistory();
+})();
+</script>

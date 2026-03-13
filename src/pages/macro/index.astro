@@ -1,0 +1,170 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import { getAllMacroPages } from '../../data/macros';
+import type { MacroPage } from '../../data/macros';
+
+const allPages = getAllMacroPages();
+const count = allPages.length;
+
+// Group by goal
+const goalOrder = ['weight-loss', 'maintenance', 'muscle-gain', 'balanced'];
+const goalLabels: Record<string, string> = {
+  'weight-loss': 'Weight Loss',
+  'maintenance': 'Maintenance',
+  'muscle-gain': 'Muscle Gain',
+  'balanced': 'Balanced',
+};
+const goalDescs: Record<string, string> = {
+  'weight-loss': 'High protein (40%), moderate carbs (30%) and fat (30%) to preserve muscle while cutting.',
+  'maintenance': 'Balanced protein (30%), higher carbs (40%), and moderate fat (30%) for sustaining your current weight.',
+  'muscle-gain': 'Higher carbs (45%) to fuel training, adequate protein (30%), and lower fat (25%) for lean gains.',
+  'balanced': 'Even distribution of protein (30%), carbs (35%), and fat (35%) for general health.',
+};
+
+function getPagesForGoal(goalKey: string): MacroPage[] {
+  return allPages
+    .filter(p => p.goal === goalKey)
+    .sort((a, b) => a.calories - b.calories);
+}
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Macro Calculator" },
+  ],
+};
+---
+
+<BaseLayout
+  title="Macronutrient Calculator - Macro Split by Calories & Goal | ToolCalcs"
+  description={'Calculate your ideal macros for ' + count + ' calorie and goal combinations. Get protein, carb, and fat grams for weight loss, maintenance, muscle gain, and balanced diets from 1,200 to 3,500 calories.'}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <span>Macro Calculator</span>
+  </nav>
+
+  <h1>Macronutrient Calculator</h1>
+  <p class="page-desc">Find the ideal protein, carb, and fat split for {count} calorie and goal combinations. Each page shows daily grams, per-meal breakdowns, food sources, and comparison tables. Click any row to see the full macro plan.</p>
+
+  <AdUnit slot="macro-idx-top" format="horizontal" />
+
+  {goalOrder.map(function (goalKey, idx) {
+    var pages = getPagesForGoal(goalKey);
+    if (pages.length === 0) return null;
+    var label = goalLabels[goalKey];
+    var desc = goalDescs[goalKey];
+    var midpoint = Math.floor(goalOrder.length / 2);
+    return (
+      <>
+        <section class="macro-goal-section">
+          <h2 class="macro-goal-heading">{label}</h2>
+          <p class="macro-goal-desc">{desc}</p>
+          <div class="table-container">
+            <table class="data-table macro-idx-table">
+              <thead>
+                <tr>
+                  <th>Calories</th>
+                  <th>Protein</th>
+                  <th>Carbs</th>
+                  <th>Fat</th>
+                  <th>Split</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pages.map(function (p) {
+                  return (
+                    <tr>
+                      <td><a href={'/macro/' + p.slug + '/'}>{p.calories.toLocaleString()} cal</a></td>
+                      <td class="macro-protein-cell">{p.proteinGrams}g</td>
+                      <td class="macro-carbs-cell">{p.carbsGrams}g</td>
+                      <td class="macro-fat-cell">{p.fatGrams}g</td>
+                      <td class="split-cell">{p.proteinPct}/{p.carbsPct}/{p.fatPct}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </section>
+        {idx === midpoint && <AdUnit slot="macro-idx-mid" format="rectangle" />}
+      </>
+    );
+  })}
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>What Are Macronutrients?</h2>
+    <p>
+      Macronutrients are the three types of nutrients that supply your body with energy: protein, carbohydrates, and fat. Each gram of protein provides 4 calories, each gram of carbohydrate provides 4 calories, and each gram of fat provides 9 calories. The proportion in which you consume these macros has a significant impact on body composition, energy levels, workout performance, and overall health.
+    </p>
+    <p>
+      Rather than simply counting calories, tracking macros ensures you get the right balance of nutrients to support your specific goal, whether that is losing body fat, gaining lean muscle, or maintaining a healthy weight. The {count} combinations on this page cover calorie intakes from 1,200 to 3,500 across four common fitness goals.
+    </p>
+
+    <h2>How to Choose the Right Macro Split</h2>
+    <p>
+      Your ideal macro split depends on your goal, activity level, and individual preferences. For weight loss, a higher protein percentage (35 to 40%) helps preserve muscle mass during a calorie deficit and increases satiety. For muscle gain, higher carbohydrates (40 to 45%) provide the energy needed for intense resistance training and post-workout recovery.
+    </p>
+    <p>
+      Maintenance and balanced splits work well for general health, active lifestyles, and body recomposition. Start with the recommended percentages, follow the plan for 2 to 4 weeks, then adjust based on your progress, energy levels, and how you feel during workouts.
+    </p>
+
+    <h2>Getting Started with Macro Tracking</h2>
+    <p>
+      Choose your calorie level from the tables above based on your daily calorie needs (use our <a href="/health-fitness-calculators/calorie-calculator/">daily calorie calculator</a> if you are unsure). Click the link to see your full macro breakdown, including how much protein, carbs, and fat to eat per meal. Pair this with a food tracking app for the best results.
+    </p>
+
+    <p><a href="/">Back to ToolCalcs Home &rarr;</a></p>
+  </article>
+
+  <AdUnit slot="macro-idx-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .macro-goal-section {
+    margin-bottom: 36px;
+  }
+  .macro-goal-heading {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--color-border);
+    color: var(--color-text);
+  }
+  .macro-goal-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+  .macro-idx-table a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .macro-idx-table a:hover {
+    text-decoration: underline;
+  }
+  .macro-protein-cell { color: #3b82f6; font-weight: 700; }
+  .macro-carbs-cell { color: #d97706; font-weight: 700; }
+  .macro-fat-cell { color: #ef4444; font-weight: 700; }
+  .split-cell {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+  }
+
+  @media (max-width: 640px) {
+    .macro-idx-table {
+      font-size: 0.82rem;
+    }
+    .macro-idx-table th,
+    .macro-idx-table td {
+      padding: 6px 8px;
+    }
+  }
+</style>

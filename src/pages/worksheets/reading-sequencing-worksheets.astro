@@ -1,0 +1,301 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getWorksheetBySlug } from '../../data/worksheets';
+import '../../styles/worksheet.css';
+
+const ws = getWorksheetBySlug('reading-sequencing-worksheets')!;
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://toolcalcs.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Worksheets",
+      "item": "https://toolcalcs.com/worksheets/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Sequencing Worksheets"
+    }
+  ]
+};
+---
+
+<BaseLayout
+  title="Free Sequencing Worksheets - Reading Comprehension Practice | ToolCalcs"
+  description={ws.description}
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/worksheets/">Worksheets</a> &rsaquo;
+    <span>Sequencing Worksheets</span>
+  </nav>
+
+  <h1>{ws.title}</h1>
+  <p class="page-desc">{ws.description}</p>
+
+  <div class="worksheet-box">
+    <div class="config-panel">
+      <h3>Settings</h3>
+      <div class="config-inputs">
+        <div class="config-group">
+          <label for="cfgProblems">Number of Problems</label>
+          <input type="number" id="cfgProblems" value="5" min="3" max="10" />
+        </div>
+        <div class="config-group">
+          <label for="cfgLevel">Difficulty Level</label>
+          <select id="cfgLevel">
+            <option value="easy">Easy</option>
+            <option value="medium" selected>Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="worksheet-actions">
+      <button class="ws-btn primary" id="btnGenerate">Generate New</button>
+      <button class="ws-btn print" id="btnPrint">Print</button>
+      <label class="toggle-label">
+        <input type="checkbox" id="toggleAnswers" />
+        Show Answers
+      </label>
+    </div>
+
+    <div class="worksheet-content" id="worksheetContent">
+      <div class="worksheet-header-print">
+        <h2>Sequencing Practice</h2>
+        <p><em>Put the events in the correct order by writing numbers (1, 2, 3...) next to each event.</em></p>
+        <div class="name-date">
+          <span>Name: ___________________</span>
+          <span>Date: ___________________</span>
+        </div>
+      </div>
+      <div class="problem-grid reading-grid" id="problemGrid"></div>
+      <div class="answer-key hidden" id="answerKey">
+        <h3>Answer Key</h3>
+        <div class="answer-grid" id="answerGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="ws-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>Why Sequencing Skills Matter</h2>
+    <p>Sequencing is the ability to put events, steps, or ideas in the correct order. This fundamental reading comprehension skill helps students understand the structure of stories, follow instructions, summarize texts, and retell events accurately. When students can identify the order in which things happen, they gain a deeper understanding of cause and effect, plot development, and logical progression in both fiction and nonfiction.</p>
+    <p>Sequencing is tested on standardized reading assessments at every grade level and is closely connected to other comprehension skills like summarizing and identifying cause and effect. Students who struggle with sequencing often have difficulty retelling stories, following multi-step directions, and writing organized paragraphs of their own.</p>
+
+    <h2>How to Practice Sequencing</h2>
+    <ul>
+      <li><strong>Look for signal words.</strong> Words like "first," "next," "then," "after," "before," "finally," and "last" help identify the order of events.</li>
+      <li><strong>Think about what makes sense.</strong> Even without signal words, ask yourself: "What had to happen before this could happen?"</li>
+      <li><strong>Read the whole passage first.</strong> Get the big picture before trying to number the events.</li>
+      <li><strong>Use a timeline.</strong> Drawing a simple timeline or numbered list can help organize events visually.</li>
+    </ul>
+
+    <h2>Types of Sequencing Activities</h2>
+    <p>These worksheets present sets of scrambled events from a short scenario. Students must read all the events and assign a number to each one to show the correct order. At the easy level, scenarios involve familiar daily activities with 4 steps. At the medium level, scenarios include 5 steps and less obvious ordering. At the hard level, scenarios have 6 steps and require careful reasoning about which event must precede or follow another.</p>
+
+    <h2>Tips for Teachers and Parents</h2>
+    <ul>
+      <li><strong>Start with familiar routines.</strong> Getting dressed, making a sandwich, or brushing teeth are great first sequencing activities because students know the correct order from experience.</li>
+      <li><strong>Progress to story events.</strong> Once students master sequencing routines, move to story-based sequences where they must rely on text comprehension rather than prior knowledge.</li>
+      <li><strong>Discuss wrong answers.</strong> When a student puts events in the wrong order, discuss why the correct order makes more sense rather than simply marking it wrong.</li>
+    </ul>
+
+    <h2>Related Worksheets</h2>
+    <ul>
+      <li><a href="/worksheets/reading-main-idea-worksheets/">Main Idea Worksheets</a> - Identify the central idea of reading passages.</li>
+      <li><a href="/worksheets/reading-cause-effect-worksheets/">Cause and Effect Worksheets</a> - Identify causes and effects in text.</li>
+      <li><a href="/worksheets/reading-inference-worksheets/">Making Inferences Worksheets</a> - Draw conclusions from text evidence.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="ws-bottom" format="horizontal" />
+</BaseLayout>
+
+<script is:inline>
+  var selected = [];
+
+  var passageBank = {
+    easy: [
+      { title: "Making a Sandwich", steps: ["Get two slices of bread from the bag.", "Spread peanut butter on one slice.", "Spread jelly on the other slice.", "Put the two slices together and eat."] },
+      { title: "Getting Ready for School", steps: ["Wake up when the alarm goes off.", "Brush your teeth and wash your face.", "Put on your clothes and shoes.", "Grab your backpack and walk to the bus stop."] },
+      { title: "Planting a Seed", steps: ["Fill a pot with soil.", "Dig a small hole in the soil.", "Place the seed in the hole and cover it.", "Water the soil and put the pot in sunlight."] },
+      { title: "Washing Your Hands", steps: ["Turn on the water.", "Put soap on your hands and rub them together.", "Rinse the soap off under the water.", "Dry your hands with a towel."] },
+      { title: "Sending a Letter", steps: ["Write a letter on a piece of paper.", "Put the letter in an envelope and seal it.", "Write the address on the front and add a stamp.", "Put the envelope in the mailbox."] },
+      { title: "Making Orange Juice", steps: ["Take oranges out of the refrigerator.", "Cut each orange in half.", "Squeeze the juice into a glass.", "Drink the fresh orange juice."] },
+      { title: "Building a Snowman", steps: ["Roll a large ball of snow for the body.", "Roll a medium ball and stack it on top.", "Roll a small ball for the head and place it on top.", "Add a carrot nose, button eyes, and stick arms."] },
+      { title: "Feeding the Dog", steps: ["Get the dog food bag from the closet.", "Scoop food into the dog's bowl.", "Fill the water dish with fresh water.", "Call the dog to come eat."] },
+      { title: "Borrowing a Library Book", steps: ["Walk to the library.", "Find a book you want to read.", "Bring the book to the front desk.", "Show your library card and check out the book."] },
+      { title: "Brushing Your Teeth", steps: ["Put toothpaste on your toothbrush.", "Brush all your teeth for two minutes.", "Spit out the toothpaste.", "Rinse your mouth with water."] },
+      { title: "Making Your Bed", steps: ["Pull the sheet up to the top of the bed.", "Spread the blanket evenly over the sheet.", "Put the pillows at the top of the bed.", "Smooth out any wrinkles."] },
+      { title: "Taking a Bath", steps: ["Fill the bathtub with warm water.", "Get in the tub carefully.", "Wash your body with soap and a washcloth.", "Drain the water and dry off with a towel."] },
+      { title: "Flying a Kite", steps: ["Take the kite to an open field on a windy day.", "Unroll the string and hold the kite up.", "Let the wind catch the kite and release it.", "Hold the string and watch the kite fly high."] },
+      { title: "Eating Cereal", steps: ["Get a bowl and a spoon from the kitchen.", "Pour cereal into the bowl.", "Add milk to the cereal.", "Sit down and eat your cereal."] },
+      { title: "Going Swimming", steps: ["Put on your swimsuit.", "Walk to the pool and put your towel on a chair.", "Check the water temperature with your foot.", "Jump in and start swimming."] },
+      { title: "Drawing a Picture", steps: ["Get paper and crayons.", "Draw the outline of your picture with a pencil.", "Color in the picture with crayons.", "Write your name on the paper and show it to someone."] },
+      { title: "Riding a Bicycle", steps: ["Put on your helmet.", "Get on the bicycle seat.", "Push the pedals with your feet to move forward.", "Use the brakes to stop when you are done."] },
+      { title: "Baking Cookies", steps: ["Mix butter, sugar, and eggs in a bowl.", "Add flour and stir until the dough is smooth.", "Scoop dough onto a baking sheet.", "Bake in the oven and let the cookies cool."] }
+    ],
+    medium: [
+      { title: "The Class Field Trip", steps: ["The teacher handed out permission slips to take home.", "Students returned their signed forms by Friday.", "Everyone boarded the bus early Monday morning.", "The class toured the science museum and took notes.", "Students wrote a report about their favorite exhibit."] },
+      { title: "The Thunderstorm", steps: ["Dark clouds gathered on the horizon during the afternoon.", "The wind picked up and the temperature dropped suddenly.", "Lightning flashed and thunder rumbled across the sky.", "Heavy rain poured down for about thirty minutes.", "The sun came back out and a rainbow appeared."] },
+      { title: "Adopting a Pet", steps: ["The family talked about what kind of pet they wanted.", "They visited the animal shelter and met several cats.", "They chose a gray kitten and filled out the adoption papers.", "They bought food, a litter box, and toys at the pet store.", "The kitten explored its new home and found a favorite spot on the couch."] },
+      { title: "The School Play", steps: ["The drama teacher announced auditions for the spring play.", "Students memorized lines and practiced their parts for weeks.", "The set crew painted backdrops and built props.", "On opening night, the auditorium was packed with families.", "The cast took a bow and received a standing ovation."] },
+      { title: "Growing a Garden", steps: ["The family planned what vegetables to plant and drew a garden map.", "They prepared the soil by digging and adding compost.", "Seeds were planted in neat rows and watered thoroughly.", "Over the next few weeks, small green sprouts appeared.", "By summer, the garden was full of tomatoes, peppers, and cucumbers."] },
+      { title: "A Trip to the Dentist", steps: ["Mom made a dentist appointment for Tuesday afternoon.", "In the waiting room, Lily read a magazine until her name was called.", "The hygienist cleaned her teeth and took X-rays.", "The dentist checked the X-rays and said everything looked healthy.", "Lily picked a sticker from the prize box on her way out."] },
+      { title: "The Science Experiment", steps: ["The students formed a hypothesis about which liquid dissolves sugar fastest.", "They measured equal amounts of sugar into three cups.", "They poured hot water, cold water, and vinegar into the cups.", "They timed how long it took the sugar to dissolve in each liquid.", "They recorded their results and compared them to their hypothesis."] },
+      { title: "Moving to a New House", steps: ["Mom and Dad found a new house closer to their jobs.", "The family packed all their belongings into boxes over the weekend.", "Movers loaded everything into a big truck.", "The family drove to the new neighborhood and met their neighbors.", "They unpacked boxes and arranged furniture in each room."] },
+      { title: "The Lemonade Stand", steps: ["The kids decided to sell lemonade to raise money for a charity.", "They squeezed lemons, added sugar and water, and made a big pitcher.", "They set up a table, chairs, and a colorful sign on the sidewalk.", "Neighbors stopped by throughout the afternoon to buy cups.", "At the end of the day, they counted the money and donated it."] },
+      { title: "Making a Book Report", steps: ["The teacher assigned a book report due in two weeks.", "Alex chose a book from the library and started reading it.", "She finished the book and took notes on the main characters and plot.", "She wrote a first draft of her report and revised it the next day.", "She turned in the final report and presented it to the class."] },
+      { title: "The Soccer Tournament", steps: ["The coach announced the team made it into the tournament.", "The team practiced extra hard every day after school for two weeks.", "On Saturday morning, they arrived at the tournament and warmed up.", "They won their first two games but lost in the semifinals.", "The coach praised their effort and they celebrated with pizza."] },
+      { title: "A Rainy Day Project", steps: ["It was raining outside, so the kids decided to build a blanket fort.", "They gathered pillows, blankets, and chairs from around the house.", "They draped blankets over the chairs to create a cozy space.", "They brought books, snacks, and a flashlight inside the fort.", "They spent the whole afternoon reading and telling stories."] },
+      { title: "Learning to Ride a Bike", steps: ["Dad put training wheels on the small bicycle.", "Emma practiced riding with training wheels for a few weeks.", "Dad removed the training wheels when Emma felt ready.", "Emma wobbled and fell a few times but kept trying.", "She finally rode all the way down the street without falling."] },
+      { title: "The Lost Dog", steps: ["Max the dog slipped through the gate when someone left it open.", "The family searched the neighborhood and called his name.", "They made posters with Max's photo and hung them on light poles.", "A neighbor two streets over called and said she had found Max.", "The family picked Max up and fixed the gate so he could not escape again."] },
+      { title: "Preparing for a Test", steps: ["The teacher announced a big math test for next Wednesday.", "Students reviewed their notes and completed a study guide.", "The night before, Sam practiced the hardest problems one more time.", "On Wednesday morning, the teacher handed out the test.", "Sam finished the test feeling confident and turned it in."] },
+      { title: "A Birthday Party", steps: ["Mom sent out invitations to ten of Tom's friends.", "She decorated the living room with balloons and streamers.", "The guests arrived and they played games in the backyard.", "Everyone sang happy birthday and Tom blew out the candles.", "Tom opened his presents and thanked each friend."] },
+      { title: "Cleaning the Aquarium", steps: ["Dad noticed the fish tank water was cloudy and green.", "He carefully moved the fish into a temporary bowl of clean water.", "He scrubbed the inside of the tank and rinsed the gravel.", "He refilled the tank with treated water and adjusted the temperature.", "He gently placed the fish back into their clean tank."] },
+      { title: "Writing a Letter to Grandma", steps: ["Ella decided to write a letter to her grandmother for her birthday.", "She found nice stationery and a pen in the desk drawer.", "She wrote about school, her friends, and how much she missed Grandma.", "She folded the letter, put it in an envelope, and addressed it.", "She walked to the mailbox and mailed it with a smile."] }
+    ],
+    hard: [
+      { title: "The Water Cycle", steps: ["The sun heats water in oceans, lakes, and rivers, causing it to evaporate.", "Water vapor rises into the atmosphere and cools as it reaches higher altitudes.", "The cooled vapor condenses into tiny water droplets that form clouds.", "When the droplets combine and become heavy enough, they fall as precipitation.", "The water flows into streams and rivers, eventually returning to the ocean.", "The cycle begins again as the sun heats the water once more."] },
+      { title: "How a Bill Becomes a Law", steps: ["A member of Congress writes a bill and introduces it in the House or Senate.", "The bill is assigned to a committee that studies and debates it.", "If the committee approves it, the full House or Senate votes on the bill.", "The other chamber of Congress debates and votes on the bill.", "If both chambers approve it, the bill is sent to the President.", "The President signs the bill into law or vetoes it."] },
+      { title: "The Butterfly Life Cycle", steps: ["A female butterfly lays tiny eggs on the leaves of a host plant.", "A caterpillar hatches from each egg and begins eating leaves constantly.", "The caterpillar grows larger and sheds its skin several times as it outgrows it.", "When fully grown, the caterpillar attaches itself to a branch and forms a chrysalis.", "Inside the chrysalis, the caterpillar transforms completely over one to two weeks.", "An adult butterfly emerges, dries its wings, and flies away to find flowers."] },
+      { title: "Building a House", steps: ["An architect draws blueprints based on the homeowner's requirements.", "Workers pour a concrete foundation and let it cure for several days.", "Carpenters build the wooden frame including walls, floors, and roof trusses.", "Electricians and plumbers install wiring, pipes, and ventilation systems.", "Drywall is hung, sanded, and painted in each room.", "The family receives the keys and moves into their new home."] },
+      { title: "A Criminal Trial", steps: ["Police investigate a crime and gather evidence including witness statements.", "The district attorney reviews the evidence and decides to file charges.", "The defendant appears in court for an arraignment and enters a plea.", "Both sides present their arguments and evidence to the jury during the trial.", "The jury deliberates in private and reaches a verdict.", "The judge announces the verdict and, if guilty, sets a sentencing date."] },
+      { title: "Publishing a Book", steps: ["The author writes a first draft of the manuscript over several months.", "The author revises the draft multiple times based on feedback from early readers.", "A literary agent submits the manuscript to publishers on the author's behalf.", "A publishing house accepts the manuscript and assigns an editor to work with the author.", "The book is designed, printed, and distributed to bookstores across the country.", "The author does a book tour with readings and signings to promote the release."] },
+      { title: "The Journey of a River", steps: ["Snow melts on a mountain peak and trickles into tiny streams.", "The streams join together and flow downhill as a small creek.", "The creek merges with other creeks to form a larger river.", "The river carves through valleys, picking up sediment along the way.", "As the land flattens, the river widens and slows down.", "The river empties into the ocean, depositing sediment at the delta."] },
+      { title: "The Scientific Method", steps: ["A scientist observes something in nature and asks a question about it.", "She researches existing knowledge and forms a testable hypothesis.", "She designs an experiment with a control group and variables.", "She conducts the experiment carefully and records all the data.", "She analyzes the data to determine whether it supports or contradicts her hypothesis.", "She writes a report and shares her findings for other scientists to review."] },
+      { title: "How Chocolate Is Made", steps: ["Cacao pods are harvested from trees in tropical regions near the equator.", "Workers crack open the pods and scoop out the cacao beans and pulp.", "The beans are fermented in wooden boxes for several days to develop flavor.", "The fermented beans are dried in the sun and then shipped to a factory.", "At the factory, the beans are roasted, shelled, and ground into a thick paste.", "The paste is mixed with sugar and milk, then molded into chocolate bars."] },
+      { title: "Preparing for a Hurricane", steps: ["Weather forecasters issue a hurricane watch for the coastal area.", "Residents buy supplies including water, batteries, canned food, and plywood.", "Families board up windows and move outdoor furniture inside.", "The governor orders a mandatory evacuation for low-lying zones.", "Residents drive inland and check into shelters or stay with relatives.", "After the hurricane passes, families return home to assess any damage."] },
+      { title: "The Life of a Star", steps: ["A dense cloud of gas and dust in space begins to collapse under its own gravity.", "The collapsing material heats up and forms a spinning disk called a protostar.", "When the core temperature reaches millions of degrees, nuclear fusion begins and a star is born.", "The star burns steadily for billions of years, converting hydrogen into helium.", "When the hydrogen fuel runs low, the star expands into a red giant.", "The star either sheds its outer layers as a nebula or explodes as a supernova."] },
+      { title: "How Bread Is Made", steps: ["The baker measures flour, water, yeast, and salt into a large mixing bowl.", "She kneads the dough by hand for about ten minutes until it is smooth and elastic.", "The dough is placed in a warm spot and left to rise for one hour.", "She punches down the risen dough and shapes it into loaves.", "The loaves are placed in greased pans and left to rise a second time.", "The bread is baked in a hot oven until golden brown and then cooled on a rack."] },
+      { title: "A Day at Court", steps: ["The attorney reviews case files and prepares arguments the night before.", "She arrives at the courthouse early and meets her client in the hallway.", "The bailiff calls the case number and both parties take their seats.", "The attorney presents her opening statement to the judge.", "Witnesses are called to the stand and cross-examined by both sides.", "The judge announces a ruling based on the evidence and arguments presented."] },
+      { title: "Recycling a Plastic Bottle", steps: ["A person finishes drinking water and places the empty bottle in a recycling bin.", "A recycling truck collects the bin contents and takes them to a sorting facility.", "Machines and workers sort the plastics by type and remove any contamination.", "The sorted plastic is shredded into small flakes and washed thoroughly.", "The flakes are melted and formed into small pellets of raw plastic material.", "The pellets are sold to manufacturers who mold them into new products."] },
+      { title: "Planning a School Dance", steps: ["The student council met and chose a theme for the spring dance.", "Committees were formed to handle decorations, music, food, and tickets.", "Students sold tickets during lunch periods for two weeks.", "The decorating committee transformed the gymnasium the afternoon before the dance.", "A DJ played music while students danced and enjoyed refreshments.", "The cleanup crew took down decorations and swept the gym the next morning."] },
+      { title: "How an Earthquake Is Measured", steps: ["Tectonic plates deep beneath Earth's surface shift and release stored energy.", "The energy travels outward as seismic waves through rock and soil.", "Seismograph stations around the world detect the vibrations.", "Scientists analyze the seismograph readings to determine the earthquake's magnitude.", "The data is compared across multiple stations to pinpoint the epicenter.", "An official report is issued with the magnitude, location, depth, and any tsunami risk."] },
+      { title: "From Farm to Table", steps: ["A farmer plants wheat seeds in prepared fields in early spring.", "The wheat grows through the summer and is harvested in late August.", "The harvested wheat is transported to a grain mill for processing.", "The mill grinds the wheat into flour and packages it in bags.", "A bakery buys the flour and uses it to make loaves of bread.", "A family purchases the bread at a grocery store and serves it at dinner."] },
+      { title: "Training for a Marathon", steps: ["The runner registered for the marathon and created a six-month training plan.", "She started with short daily runs and gradually increased her distance each week.", "She adjusted her diet to include more carbohydrates and protein for energy.", "She ran a half-marathon as a practice race to test her endurance.", "On race day, she stretched, warmed up, and joined thousands of runners at the start line.", "She crossed the finish line exhausted but proud, and received her completion medal."] }
+    ]
+  };
+
+  function shuffle(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var temp = arr[i]; arr[i] = arr[j]; arr[j] = temp;
+    }
+    return arr;
+  }
+
+  function generateProblems() {
+    var count = parseInt(document.getElementById('cfgProblems').value, 10);
+    var level = document.getElementById('cfgLevel').value;
+
+    if (isNaN(count) || count < 3) count = 3;
+    if (count > 10) count = 10;
+
+    var pool = passageBank[level].slice();
+    shuffle(pool);
+    selected = [];
+
+    var items = pool.slice(0, Math.min(count, pool.length));
+    for (var i = 0; i < items.length; i++) {
+      var item = items[i];
+      // Create scrambled version
+      var correctOrder = item.steps.slice();
+      var scrambled = item.steps.slice();
+      // Shuffle until different from original
+      var attempts = 0;
+      do {
+        shuffle(scrambled);
+        attempts++;
+      } while (scrambled.join('|') === correctOrder.join('|') && attempts < 50);
+
+      selected.push({
+        title: item.title,
+        scrambled: scrambled,
+        correctOrder: correctOrder
+      });
+    }
+
+    renderProblems();
+    renderAnswerKey();
+    updateAnswerVisibility();
+  }
+
+  function renderProblems() {
+    var grid = document.getElementById('problemGrid');
+    var showAnswers = document.getElementById('toggleAnswers').checked;
+    var html = '';
+
+    for (var i = 0; i < selected.length; i++) {
+      var p = selected[i];
+      html += '<div class="reading-passage">';
+      html += '<div class="problem-number">' + (i + 1) + ')</div>';
+      html += '<div class="passage-question"><strong>' + p.title + '</strong></div>';
+      html += '<div class="passage-text">Put these events in the correct order (1, 2, 3...):</div>';
+      html += '<div class="sequencing-events">';
+      for (var j = 0; j < p.scrambled.length; j++) {
+        var correctNum = '';
+        if (showAnswers) {
+          for (var k = 0; k < p.correctOrder.length; k++) {
+            if (p.correctOrder[k] === p.scrambled[j]) {
+              correctNum = k + 1;
+              break;
+            }
+          }
+        }
+        html += '<div class="sequence-item">';
+        html += '<span class="sequence-blank">' + (showAnswers ? correctNum : '___') + '</span>';
+        html += '<span class="sequence-text">' + p.scrambled[j] + '</span>';
+        html += '</div>';
+      }
+      html += '</div>';
+      html += '</div>';
+    }
+
+    grid.innerHTML = html;
+  }
+
+  function renderAnswerKey() {
+    var answerGrid = document.getElementById('answerGrid');
+    var html = '';
+    for (var i = 0; i < selected.length; i++) {
+      var p = selected[i];
+      html += '<div class="answer-item" style="display:block;margin-bottom:12px">';
+      html += '<strong>' + (i + 1) + '. ' + p.title + ':</strong><br>';
+      for (var j = 0; j < p.correctOrder.length; j++) {
+        html += (j + 1) + '. ' + p.correctOrder[j] + '<br>';
+      }
+      html += '</div>';
+    }
+    answerGrid.innerHTML = html;
+  }
+
+  function updateAnswerVisibility() {
+    var showAnswers = document.getElementById('toggleAnswers').checked;
+    var answerKey = document.getElementById('answerKey');
+    if (showAnswers) { answerKey.classList.remove('hidden'); }
+    else { answerKey.classList.add('hidden'); }
+    renderProblems();
+  }
+
+  document.getElementById('btnGenerate').addEventListener('click', generateProblems);
+  document.getElementById('btnPrint').addEventListener('click', function () { window.print(); });
+  document.getElementById('toggleAnswers').addEventListener('change', updateAnswerVisibility);
+  generateProblems();
+</script>

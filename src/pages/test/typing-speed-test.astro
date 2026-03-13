@@ -1,11 +1,9 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import AdUnit from '../../components/AdUnit.astro';
-import { getGameBySlug, getRating } from '../../data/games';
-import '../../styles/game.css';
 import GameShare from '../../components/GameShare.astro';
-
-const game = getGameBySlug('typing-speed-test')!;
+import CrossLinks from '../../components/CrossLinks.astro';
+import '../../styles/game.css';
 
 const structuredData = [
   {
@@ -30,36 +28,53 @@ const structuredData = [
       "price": "0",
       "priceCurrency": "USD"
     },
-    "description": "Test your typing speed in words per minute. Type the displayed text as quickly and accurately as you can."
+    "description": "Measure your typing speed in words per minute (WPM) and accuracy. Type a passage as fast and accurately as you can within 60 seconds."
   },
   {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: [
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
       {
-        '@type': 'Question',
-        name: 'What is a good typing speed?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'The average typing speed is about 40 WPM (words per minute). Office workers typically type 50-70 WPM, professional typists reach 80-100 WPM, and competitive typists can exceed 150 WPM. For most jobs, 60-80 WPM with high accuracy is considered proficient.',
-        },
+        "@type": "Question",
+        "name": "What is a good typing speed?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The average typing speed is around 40 WPM. A speed of 50-70 WPM is considered good for most purposes. Professional typists and programmers often type at 70-100 WPM, while competitive typists can exceed 150 WPM."
+        }
       },
       {
-        '@type': 'Question',
-        name: 'How is WPM (words per minute) calculated?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'WPM is calculated by dividing the total number of characters typed by 5 (the standard word length) and then dividing by the time in minutes. For example, typing 200 characters in 1 minute equals 40 WPM (200/5/1). Most tests also factor in accuracy by subtracting errors.',
-        },
+        "@type": "Question",
+        "name": "How is WPM calculated?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Words per minute (WPM) is calculated by dividing the total number of characters typed by 5 (the standard word length) and then dividing by the elapsed time in minutes. This standardized formula ensures fair comparison regardless of the actual word lengths in the passage."
+        }
       },
-    ],
+      {
+        "@type": "Question",
+        "name": "How can I improve my typing speed?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Practice touch typing by keeping your fingers on the home row (ASDF JKL;) and not looking at the keyboard. Start slowly with a focus on accuracy, and speed will increase naturally over time. Daily practice of 15-30 minutes is more effective than occasional long sessions."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does typing speed matter for programming?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "While programming involves more thinking than typing, a reasonable typing speed (50+ WPM) helps maintain flow and reduces the friction between thought and code. Fast typists spend less cognitive effort on the mechanical act of typing, freeing mental resources for problem-solving."
+        }
+      }
+    ]
   }
 ];
 ---
 
 <BaseLayout
-  title="Typing Speed Test - Measure Your WPM | ToolCalcs"
-  description="Free online typing speed test. Measure your words per minute (WPM) and accuracy. Practice with random passages and track your improvement over time."
+  title="Typing Speed Test - Check Your WPM Online Free | ToolCalcs"
+  description="Test your typing speed and accuracy. Type a passage as fast as you can in 60 seconds. Measure WPM, accuracy, and get a detailed assessment. Free online typing test."
+  type="article"
   structuredData={structuredData}
 >
   <nav class="breadcrumb" aria-label="Breadcrumb">
@@ -68,604 +83,413 @@ const structuredData = [
     <span>Typing Speed Test</span>
   </nav>
 
-  <h1>{game.icon} {game.title}</h1>
-  <p class="page-desc">{game.description}</p>
+  <h1>Typing Speed Test</h1>
+  <p class="page-desc">Type the passage below as quickly and accurately as you can. You have 60 seconds.</p>
 
   <div class="game-box">
-    <!-- Pre-start instructions -->
-    <div id="instructions" class="game-instructions">
-      <h2>Typing Speed Test</h2>
-      <p>Type the displayed passage as quickly and accurately as you can. Your timer starts on your first keystroke.</p>
-    </div>
-
-    <!-- Text display area -->
-    <div id="text-display" class="typing-display" aria-label="Text to type" hidden>
-      <!-- Words are rendered here by JS -->
-    </div>
-
-    <!-- Live stats bar -->
-    <div id="live-stats" class="typing-stats" style="display:none;">
-      <div class="stat-item">
-        <span class="stat-value" id="live-wpm">0</span>
-        <span class="stat-label">WPM</span>
+    <div class="game-area" id="gameArea" role="region" aria-label="Typing speed test area" aria-live="polite">
+      <div class="game-instructions" id="instructionsView">
+        <h2>Typing Speed Test</h2>
+        <p>A passage will appear on screen. Type it as fast and accurately as you can. The timer starts when you begin typing. The test ends after 60 seconds.</p>
+        <p style="font-size:0.85rem;color:var(--color-text-muted);">Your WPM, accuracy, and total characters are measured in real time.</p>
+        <button class="game-btn primary" id="startBtn" type="button" style="margin-top:16px;">Start Test</button>
       </div>
-      <div class="stat-item">
-        <span class="stat-value" id="live-accuracy">100</span>
-        <span class="stat-label">Accuracy %</span>
+
+      <div class="play-view" id="playView" style="display:none;">
+        <div class="status-bar">
+          <span class="level-info" id="wpmInfo">WPM: 0</span>
+          <span class="level-info" id="accInfo">Accuracy: 100%</span>
+          <span class="lives-info" id="timerInfo">60s</span>
+        </div>
+        <div class="typing-passage" id="passageDisplay"></div>
+        <textarea class="typing-input" id="typingInput" rows="4" placeholder="Start typing here..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
       </div>
-      <div class="stat-item">
-        <span class="stat-value" id="live-time">0.0</span>
-        <span class="stat-label">Seconds</span>
+
+      <div class="result-view" id="resultView" style="display:none;">
+        <div class="result-icon" aria-hidden="true">&#9000;</div>
+        <div class="result-label">Test Complete</div>
+        <div class="score-display">
+          <span class="score-value" id="finalWpm">0</span>
+          <span class="score-unit">WPM</span>
+        </div>
+        <div class="typing-result-details" id="resultDetails"></div>
+        <div class="rating-badge" id="ratingBadge">&mdash;</div>
+        <button class="game-btn primary" id="tryAgainBtn" type="button" style="margin-top:16px;">Try Again</button>
       </div>
-    </div>
-
-    <!-- Typing input -->
-    <div id="input-wrapper" class="typing-input-wrapper" hidden>
-      <label for="typing-input" class="sr-only">Type the passage here</label>
-      <textarea
-        id="typing-input"
-        class="typing-input"
-        rows="3"
-        placeholder="Start typing here..."
-        autocomplete="off"
-        autocorrect="off"
-        autocapitalize="off"
-        spellcheck="false"
-      ></textarea>
-    </div>
-
-    <!-- Score display (shown after completion) -->
-    <div id="score-section" class="score-display" hidden>
-      <span class="score-value" id="final-wpm"></span>
-      <span class="score-unit">Words Per Minute</span>
-      <div id="final-accuracy" class="typing-final-accuracy"></div>
-      <span id="rating-badge" class="rating-badge"></span>
-    </div>
-
-    <!-- Controls -->
-    <div class="game-controls">
-      <button id="btn-start" class="game-btn primary" type="button">Start Test</button>
-      <button id="btn-retry" class="game-btn primary" type="button" hidden>Try Again</button>
     </div>
 
     <GameShare />
 
-    <!-- Attempt history -->
-    <div id="history-section" class="attempt-history" hidden>
-      <h3>Recent Attempts</h3>
-      <div id="history-list" class="history-list"></div>
+    <div class="attempt-history" id="attemptHistory" hidden>
+      <h3>Attempt History</h3>
+      <div class="history-list" id="historyList"></div>
     </div>
   </div>
 
   <AdUnit slot="game-mid" format="horizontal" />
 
   <article class="content-section">
-    <h2>What Is a Typing Speed Test?</h2>
-    <p>A typing speed test measures how quickly and accurately you can type text on a keyboard. The result is expressed in words per minute (WPM), which is the standard metric used worldwide to evaluate typing proficiency. Whether you are a student, a professional, or simply curious about your keyboard skills, a typing test gives you a clear benchmark of your current ability and a starting point for improvement.</p>
-    <p>The concept of measuring typing speed dates back to the early days of typewriters in the late 1800s. Today, typing tests are used in job applications, school assessments, and personal skill development. This free online typing speed test presents you with a random passage of natural English text and tracks every keystroke in real time to produce an accurate WPM score and accuracy percentage.</p>
+    <h2>What Is the Typing Speed Test?</h2>
+    <p>The Typing Speed Test is an interactive assessment that measures how quickly and accurately you can type. A passage of text is displayed on screen, and you type it as fast as you can within a 60-second time limit. The test calculates your words per minute (WPM), accuracy percentage, and total characters typed, giving you a comprehensive snapshot of your typing ability.</p>
+    <p>Words per minute is the standard metric for typing speed. It is calculated by dividing the total number of characters typed (including spaces) by five, which represents a standardized word length, and then dividing by the elapsed time in minutes. This approach ensures that results are comparable across different passages, regardless of whether the text contains short or long words.</p>
+    <p>Accuracy is equally important. Typing fast but making frequent errors is less productive than typing at a moderate pace with high accuracy. Most employers and typing certification programs consider both speed and accuracy when evaluating typing proficiency. A combination of 60 WPM with 95 percent accuracy or higher is generally considered professional-grade typing.</p>
 
-    <h2>How WPM Is Calculated</h2>
-    <p>Words per minute is calculated using a standardized formula rather than counting actual words. In this standard approach, one "word" is defined as five characters, including spaces and punctuation. The formula is:</p>
-    <p><strong>WPM = (Correct Characters / 5) / Minutes Elapsed</strong></p>
-    <p>For example, if you correctly type 300 characters in 60 seconds, your WPM would be (300 / 5) / 1 = 60 WPM. This standardized method ensures fair comparisons regardless of the length of individual words in the passage. Accuracy is calculated separately as the percentage of correctly typed characters out of all characters you entered.</p>
+    <h2>The History and Science of Touch Typing</h2>
+    <p>Touch typing, the ability to type without looking at the keyboard, was developed alongside the typewriter itself. Christopher Latham Sholes patented the first practical typewriter in 1868, and the QWERTY layout was designed to prevent mechanical jamming by separating commonly paired letters. Despite numerous alternative layouts like Dvorak and Colemak that claim ergonomic advantages, QWERTY remains the dominant keyboard layout worldwide.</p>
+    <p>Frank Edward McGurrin is often credited as the first person to memorize the keyboard layout and type without looking at the keys, winning a typing competition in 1888 that demonstrated the clear advantage of touch typing over hunt-and-peck methods. Since then, touch typing has been taught in schools and training programs as an essential skill for office work and, more recently, for general computer literacy.</p>
+    <p>The motor learning principles behind touch typing are well understood. When you first learn to type, each keystroke requires conscious attention and deliberate finger movement. With practice, these movements become automated through a process called procedural memory formation. The basal ganglia and cerebellum play key roles in storing and executing these motor sequences. Eventually, experienced typists can type common words as single motor chunks rather than individual keystrokes, which is why familiar words flow effortlessly while unusual character combinations slow you down.</p>
 
-    <h2>Average Typing Speed Benchmarks</h2>
-    <p>Understanding where you fall on the typing speed spectrum can help you set realistic goals. Here are the commonly accepted benchmarks:</p>
+    <h2>Factors That Affect Typing Speed</h2>
+    <p>Several factors influence how fast you can type. Physical factors include finger dexterity, hand size, and the quality of your keyboard. Mechanical keyboards with tactile feedback often allow faster typing because they provide clear confirmation of each keystroke, reducing the need to bottom out keys. Ergonomic factors like desk height, chair posture, and wrist position also matter. Poor ergonomics can cause fatigue and repetitive strain injuries that limit both speed and endurance.</p>
+    <p>Cognitive factors play an equally important role. Reading speed affects typing speed because you need to process the source text before your fingers can reproduce it. Working memory capacity determines how many words you can buffer ahead while typing. Skilled typists typically read several words ahead of their current typing position, maintaining a mental queue that allows their fingers to move continuously without pausing to read the next word.</p>
+    <p>Language familiarity significantly impacts performance. You type faster in your native language because word patterns and letter combinations are deeply ingrained in your motor memory. Uncommon words, technical jargon, or text in a foreign language disrupts the automatic motor sequences and forces you back into a more deliberate, letter-by-letter typing mode. This is why typing tests use common English prose rather than specialized vocabulary.</p>
+
+    <h2>Typing Speed Benchmarks</h2>
+    <p>Understanding where your typing speed falls relative to others can help set realistic improvement goals. Beginners who use hunt-and-peck methods typically type at 15 to 30 WPM. The average adult types at approximately 40 WPM, though this varies by age, profession, and experience. Office workers who type daily usually range from 40 to 60 WPM, while professional typists and transcriptionists often exceed 70 WPM.</p>
+    <p>Competitive typing is a niche but active community. The Guinness World Record for typing speed on a standard keyboard is 216 WPM, set by Stella Pajunas in 1946 on an electric typewriter. In modern online typing competitions, top performers regularly exceed 180 WPM on short bursts and maintain 120 to 150 WPM over longer passages. These elite speeds require years of dedicated practice and optimized technique.</p>
+
+    <h2>How to Improve Your Typing Speed</h2>
     <ul>
-      <li><strong>Below 20 WPM</strong> - Learning stage. You are likely looking at the keyboard while typing and using a hunt-and-peck method.</li>
-      <li><strong>20-40 WPM</strong> - Beginner level. Sufficient for casual use but may feel slow during extended writing sessions.</li>
-      <li><strong>40-60 WPM</strong> - Average typist. This is the range most people fall into and is adequate for most office and academic tasks.</li>
-      <li><strong>60-80 WPM</strong> - Fast typist. You are above average and can handle demanding typing tasks efficiently.</li>
-      <li><strong>80+ WPM</strong> - Professional level. Typists in this range often work in roles where speed is critical, such as transcription, programming, or data entry.</li>
+      <li><strong>Learn proper finger placement:</strong> Keep your fingers on the home row (ASDF for the left hand, JKL; for the right). Each finger is responsible for specific keys, and maintaining this discipline prevents inefficient reaching and cross-hand movements.</li>
+      <li><strong>Focus on accuracy first:</strong> Speed follows accuracy, not the other way around. Typing slowly with zero errors builds correct muscle memory. Typing fast with many errors reinforces bad habits that are harder to unlearn later.</li>
+      <li><strong>Practice consistently:</strong> Short daily sessions of 15 to 30 minutes are more effective than occasional marathon sessions. Consistent practice leverages the spacing effect, allowing your brain to consolidate motor patterns between sessions.</li>
+      <li><strong>Avoid looking at the keyboard:</strong> Cover the keyboard with a cloth if necessary. The temporary slowdown from not looking is an investment that pays off rapidly as your fingers learn key positions through touch alone.</li>
+      <li><strong>Use typing training software:</strong> Programs that progressively introduce new keys and provide immediate feedback accelerate learning. Gamified typing trainers can also make practice more engaging and sustainable.</li>
+      <li><strong>Type real content:</strong> After mastering the basics, practice by typing real text such as articles, emails, or code. Real-world typing involves punctuation, numbers, and formatting that standard drills may not cover.</li>
     </ul>
 
-    <h2>Tips to Improve Your Typing Speed</h2>
-    <p>Improving your typing speed is a gradual process that requires consistent practice and proper technique. Here are proven strategies to help you get faster:</p>
-    <h3>Learn Proper Finger Placement</h3>
-    <p>Touch typing begins with placing your fingers on the home row: A, S, D, F for your left hand and J, K, L, and semicolon for your right hand. Each finger is responsible for specific keys, and learning this layout eliminates the need to look at the keyboard. The small bumps on the F and J keys help you find home position by feel.</p>
-    <h3>Focus on Accuracy First</h3>
-    <p>It may be tempting to type as fast as possible, but speed built on sloppy habits leads to frequent errors and actually slows you down. Focus on hitting the right keys consistently, and speed will follow naturally. Many professional typists recommend aiming for 98% accuracy or higher before pushing for faster speeds.</p>
-    <h3>Practice Regularly</h3>
-    <p>Even 10 to 15 minutes of daily practice can lead to significant improvement over weeks and months. Use typing tests like this one to track your progress. Consistency matters more than marathon sessions. Set a daily routine and stick with it.</p>
-    <h3>Use All Ten Fingers</h3>
-    <p>Hunt-and-peck typing using only a few fingers has a natural speed ceiling. Training all ten fingers to share the workload distributes effort evenly and unlocks much higher potential speeds. It may feel slower at first, but the long-term gains are substantial.</p>
+    <h2>Frequently Asked Questions</h2>
 
-    <h2>Why Typing Speed Matters</h2>
-    <p>In the modern digital world, typing is one of the most frequently used skills. Faster typing translates directly into higher productivity: emails are written sooner, documents are completed faster, and online communication becomes more fluid. For programmers, writers, customer support agents, and many other professionals, strong typing skills are a career advantage. Even in everyday life, being able to type quickly and accurately reduces frustration and saves time across countless daily tasks.</p>
-    <p>Take the test above, track your progress with the attempt history, and challenge yourself to improve your WPM score over time. Every practice session brings you closer to faster, more confident typing.</p>
+    <h3>What is a good typing speed?</h3>
+    <p>The average typing speed is around 40 WPM. A speed of 50 to 70 WPM is considered good for most purposes. Professional typists and programmers often type at 70 to 100 WPM, while competitive typists can exceed 150 WPM.</p>
+
+    <h3>How is WPM calculated?</h3>
+    <p>Words per minute is calculated by dividing the total number of characters typed by 5 (the standard word length) and then dividing by the elapsed time in minutes. This standardized formula ensures fair comparison regardless of the actual word lengths in the passage.</p>
+
+    <h3>How can I improve my typing speed?</h3>
+    <p>Practice touch typing by keeping your fingers on the home row and not looking at the keyboard. Start slowly with a focus on accuracy, and speed will increase naturally over time. Daily practice of 15 to 30 minutes is more effective than occasional long sessions.</p>
+
+    <h3>Does typing speed matter for programming?</h3>
+    <p>While programming involves more thinking than typing, a reasonable typing speed of 50 or more WPM helps maintain flow and reduces the friction between thought and code. Fast typists spend less cognitive effort on the mechanical act of typing, freeing mental resources for problem-solving.</p>
   </article>
 
+  <CrossLinks links={[
+    { href: '/test/reaction-time-test/', label: 'Reaction Time Test', icon: '\u26A1' },
+    { href: '/test/verbal-memory-test/', label: 'Verbal Memory Test', icon: '\uD83D\uDCDD' },
+    { href: '/test/number-memory-test/', label: 'Number Memory Test', icon: '\uD83E\uDDE0' },
+  ]} />
   <AdUnit slot="game-bottom" format="horizontal" />
 </BaseLayout>
 
 <style>
-  /* --- Typing Display --- */
-  .typing-display {
-    width: 100%;
-    max-width: 700px;
-    margin: 0 auto 20px;
-    padding: 20px 24px;
-    background: var(--color-bg);
-    border: 2px solid var(--color-border);
-    border-radius: var(--radius);
-    text-align: left;
-    font-family: 'Courier New', Consolas, monospace;
-    font-size: 1.15rem;
-    line-height: 2;
-    min-height: 100px;
-    user-select: none;
-    -webkit-user-select: none;
-  }
+  .game-area { cursor: default; user-select: auto; -webkit-user-select: auto; }
 
-  :global(.typing-display .word) {
-    display: inline;
-    position: relative;
-  }
-
-  :global(.typing-display .word.current) {
-    background: rgba(37, 99, 235, 0.1);
-    border-bottom: 2px solid var(--color-primary);
-    border-radius: 2px;
-  }
-
-  :global(.typing-display .char) {
-    position: relative;
-    transition: color 0.05s;
-  }
-
-  :global(.typing-display .char.correct) {
-    color: var(--color-success);
-  }
-
-  :global(.typing-display .char.incorrect) {
-    color: #fff;
-    background: #ef4444;
-    border-radius: 2px;
-  }
-
-  :global(.typing-display .char.cursor) {
-    border-left: 2px solid var(--color-primary);
-    animation: blink 1s step-end infinite;
-  }
-
-  @keyframes blink {
-    50% { border-left-color: transparent; }
-  }
-
-  /* --- Live Stats Bar --- */
-  .typing-stats {
+  .status-bar {
     display: flex;
-    justify-content: center;
-    gap: 32px;
-    margin-bottom: 16px;
-    padding: 12px 0;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .level-info { font-weight: 700; font-size: 1rem; color: var(--color-text); }
+  .lives-info { font-size: 0.95rem; font-weight: 600; color: var(--color-text-muted); }
+
+  .typing-passage {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    text-align: left;
+    padding: 16px 20px;
+    margin: 0 16px 12px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    min-height: 80px;
+    max-height: 160px;
+    overflow-y: auto;
+    color: var(--color-text-muted);
+    word-wrap: break-word;
+  }
+  :global(.char-correct) { color: var(--color-text); }
+  :global(.char-wrong) { color: #ef4444; background: rgba(239,68,68,0.15); border-radius: 2px; }
+  :global(.char-current) { border-bottom: 2px solid var(--color-primary); color: var(--color-text); }
+
+  .typing-input {
+    width: calc(100% - 40px);
+    margin: 0 20px 16px;
+    padding: 12px 16px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    border: 2px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-bg);
+    color: var(--color-text);
+    resize: none;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .typing-input:focus {
+    border-color: var(--color-primary);
   }
 
-  .stat-item {
+  .typing-result-details {
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+    line-height: 1.8;
+  }
+
+  .play-view {
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .result-view {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    min-height: 280px;
+    padding: 24px;
   }
-
-  .stat-value {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: var(--color-text);
-    line-height: 1.2;
-  }
-
-  .stat-label {
-    font-size: 0.75rem;
+  .result-icon { font-size: 3rem; margin-bottom: 8px; }
+  .result-label {
+    font-size: 1.1rem;
+    font-weight: 600;
     color: var(--color-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-top: 2px;
+    margin-bottom: 12px;
   }
 
-  /* --- Typing Input --- */
-  .typing-input-wrapper {
-    max-width: 700px;
-    margin: 0 auto 20px;
-  }
-
-  .typing-input {
-    width: 100%;
-    min-height: 80px;
-    padding: 12px 16px;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-    font-family: 'Courier New', Consolas, monospace;
-    font-size: 1rem;
-    line-height: 1.6;
-    background: var(--color-surface);
-    color: var(--color-text);
-    resize: none;
-    transition: border-color 0.15s, box-shadow 0.15s;
-  }
-
-  .typing-input:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-  }
-
-  .typing-input:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  /* --- Final Accuracy --- */
-  .typing-final-accuracy {
-    font-size: 1rem;
-    color: var(--color-text-muted);
-    margin-top: 4px;
-    margin-bottom: 4px;
-  }
-
-  /* --- SR Only (for labels) --- */
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-
-  /* --- Responsive --- */
   @media (max-width: 640px) {
-    .typing-display {
-      font-size: 1rem;
-      padding: 14px 16px;
-      line-height: 1.8;
-    }
-
-    .typing-stats {
-      gap: 16px;
-    }
-
-    .stat-value {
-      font-size: 1.2rem;
-    }
-
-    .typing-input {
-      font-size: 0.9rem;
-    }
+    .typing-passage { font-size: 0.9rem; padding: 12px 14px; margin: 0 8px 10px; }
+    .typing-input { width: calc(100% - 20px); margin: 0 10px 12px; font-size: 0.9rem; }
+    .status-bar { font-size: 0.85rem; }
   }
 </style>
 
-<script define:vars={{ gameName: game.title, gameSlug: game.slug, gameIcon: game.icon, metricLabel: game.metricLabel, metricUnit: game.metricUnit }}>
- (function () {
- // --- Passages ---
- const passages = [
- "The quick brown fox jumps over the lazy dog near the old stone wall by the river bank on a warm summer afternoon.",
- "She walked through the garden where flowers bloomed in every color and the gentle breeze carried the sweet scent of roses across the yard.",
- "Learning to type quickly is a valuable skill that can save you hours of time each week and make your work much more efficient.",
- "The morning sun cast long shadows across the kitchen floor as he poured a cup of coffee and opened the newspaper to read the headlines.",
- "Good communication skills are essential in the modern workplace because they help build trust and foster strong relationships with colleagues.",
- "The old library on the corner of Main Street had thousands of books covering every subject from ancient history to modern technology.",
- "Every great achievement begins with the decision to try something new and the courage to keep going even when the path seems difficult.",
- "The mountain trail wound through thick forests of pine and oak before opening up to reveal a stunning view of the valley far below.",
- "Practice makes progress and the best way to improve your typing speed is to set aside time each day to work on your technique.",
- "The chef prepared a delicious meal using fresh ingredients from the local market including ripe tomatoes basil and imported olive oil.",
- "Technology continues to change the way we live and work creating new opportunities and challenges that require us to adapt and learn constantly.",
- "Rain fell steadily against the window panes as she sat by the fireplace reading her favorite novel and sipping a cup of warm tea.",
- "A well organized desk can help you stay focused and productive throughout the day by reducing distractions and keeping important items within reach.",
- ];
+<script define:vars={{ gameName: "Typing Speed Test", gameSlug: "typing-speed-test", gameIcon: "\u2328", metricLabel: "Speed", metricUnit: "WPM" }}>
+(function () {
+  'use strict';
 
- // --- Rating scale (higher is better) ---
- const ratingScale = [
- { min: 80, label: 'Professional', color: '#9333ea' },
- { min: 60, label: 'Fast', color: '#16a34a' },
- { min: 40, label: 'Average', color: '#2563eb' },
- { min: 20, label: 'Beginner', color: '#ca8a04' },
- { min: 0, label: 'Learning', color: '#dc2626' },
- ];
+  var PASSAGES = [
+    "The quick brown fox jumps over the lazy dog near the riverbank. Sunlight filters through the tall oak trees as birds sing their morning songs. A gentle breeze carries the scent of wildflowers across the open meadow. The farmer walks along the dirt path toward the old red barn.",
+    "Technology has transformed the way people communicate and work in the modern world. Smartphones connect billions of people across continents in real time. Cloud computing allows businesses to store and process vast amounts of data without physical servers.",
+    "Learning a new skill requires patience, practice, and persistence. Whether you are studying a musical instrument, a foreign language, or a sport, the early stages often feel frustrating. Progress seems slow at first because your brain is building new neural pathways.",
+    "The ocean covers more than seventy percent of the surface of the Earth and remains largely unexplored. Deep beneath the waves, strange creatures thrive in total darkness near volcanic vents on the ocean floor. Marine biologists continue to discover new species every year.",
+    "Cooking is both an art and a science that brings people together around the table. A simple meal prepared with fresh ingredients can be more satisfying than an elaborate restaurant dish. Understanding basic techniques like roasting and braising opens up endless possibilities."
+  ];
 
- // --- DOM Elements ---
- const instructions = document.getElementById('instructions');
- const textDisplay = document.getElementById('text-display');
- const liveStats = document.getElementById('live-stats');
- const inputWrapper = document.getElementById('input-wrapper');
- const typingInput = document.getElementById('typing-input');
- const scoreSection = document.getElementById('score-section');
- const finalWpm = document.getElementById('final-wpm');
- const finalAccuracy = document.getElementById('final-accuracy');
- const ratingBadge = document.getElementById('rating-badge');
- const btnStart = document.getElementById('btn-start');
- const btnRetry = document.getElementById('btn-retry');
- const liveWpm = document.getElementById('live-wpm');
- const liveAccuracyEl = document.getElementById('live-accuracy');
- const liveTime = document.getElementById('live-time');
- const historySection = document.getElementById('history-section');
- const historyList = document.getElementById('history-list');
+  var TIME_LIMIT = 60;
 
- // --- State ---
- let currentPassage = '';
- let passageChars = [];
- let typedChars = [];
- let startTime = null;
- let timerInterval = null;
- let isActive = false;
- let isFinished = false;
+  var RATING_SCALE = [
+    { min: 100, label: 'Expert', color: '#16a34a' },
+    { min: 70, label: 'Fast', color: '#22c55e' },
+    { min: 50, label: 'Good', color: '#2563eb' },
+    { min: 30, label: 'Average', color: '#f59e0b' },
+    { min: 0, label: 'Beginner', color: '#ef4444' }
+  ];
 
- const STORAGE_KEY = 'toolcalcs_typing-speed-test_history';
- const MAX_HISTORY = 20;
+  function getRating(wpm) {
+    for (var i = 0; i < RATING_SCALE.length; i++) {
+      if (wpm >= RATING_SCALE[i].min) return RATING_SCALE[i];
+    }
+    return { label: 'Beginner', color: '#ef4444' };
+  }
 
- // --- Functions ---
- function pickRandomPassage() {
- return passages[Math.floor(Math.random() * passages.length)];
- }
+  var STORAGE_KEY = 'toolcalcs_typing-speed-test_history';
+  var MAX_HISTORY = 20;
 
- function getRatingForWpm(wpm) {
- for (const r of ratingScale) {
- if (wpm >= r.min) return { label: r.label, color: r.color };
- }
- return ratingScale[ratingScale.length - 1];
- }
+  function loadHistory() {
+    try { var r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch (e) {}
+    return [];
+  }
+  function saveHistory(h) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch (e) {}
+  }
+  function addToHistory(wpm) {
+    var h = loadHistory();
+    h.unshift({ score: wpm, date: new Date().toISOString(), rating: getRating(wpm).label });
+    saveHistory(h);
+  }
 
- function renderPassage() {
- textDisplay.innerHTML = '';
- const words = currentPassage.split(' ');
- let charIndex = 0;
+  var instructionsView = document.getElementById('instructionsView');
+  var playView = document.getElementById('playView');
+  var resultView = document.getElementById('resultView');
+  var startBtn = document.getElementById('startBtn');
+  var tryAgainBtn = document.getElementById('tryAgainBtn');
+  var wpmInfo = document.getElementById('wpmInfo');
+  var accInfo = document.getElementById('accInfo');
+  var timerInfo = document.getElementById('timerInfo');
+  var passageDisplay = document.getElementById('passageDisplay');
+  var typingInput = document.getElementById('typingInput');
+  var finalWpm = document.getElementById('finalWpm');
+  var resultDetails = document.getElementById('resultDetails');
+  var ratingBadge = document.getElementById('ratingBadge');
+  var attemptHistorySection = document.getElementById('attemptHistory');
+  var historyList = document.getElementById('historyList');
 
- words.forEach((word, wordIdx) => {
- const wordSpan = document.createElement('span');
- wordSpan.className = 'word';
- wordSpan.dataset.wordIdx = String(wordIdx);
+  var currentPassage = '';
+  var isPlaying = false;
+  var startTime = 0;
+  var timerInterval = null;
+  var timeLeft = TIME_LIMIT;
 
- for (let i = 0; i < word.length; i++) {
- const charSpan = document.createElement('span');
- charSpan.className = 'char';
- charSpan.dataset.charIdx = String(charIndex);
- charSpan.textContent = word[i];
- wordSpan.appendChild(charSpan);
- charIndex++;
- }
+  function showView(view) {
+    instructionsView.style.display = 'none';
+    playView.style.display = 'none';
+    resultView.style.display = 'none';
+    view.style.display = '';
+  }
 
- textDisplay.appendChild(wordSpan);
+  function renderPassage(typed) {
+    var html = '';
+    for (var i = 0; i < currentPassage.length; i++) {
+      var rawCh = currentPassage[i];
+      var ch = rawCh === ' ' ? '&nbsp;' : rawCh === '<' ? '&lt;' : rawCh === '>' ? '&gt;' : rawCh;
+      if (i < typed.length) {
+        if (typed[i] === currentPassage[i]) {
+          html += '<span class="char-correct">' + ch + '</span>';
+        } else {
+          html += '<span class="char-wrong">' + ch + '</span>';
+        }
+      } else if (i === typed.length) {
+        html += '<span class="char-current">' + ch + '</span>';
+      } else {
+        html += ch;
+      }
+    }
+    passageDisplay.innerHTML = html;
+  }
 
- // Add space between words (except after last word)
- if (wordIdx < words.length - 1) {
- const spaceSpan = document.createElement('span');
- spaceSpan.className = 'char';
- spaceSpan.dataset.charIdx = String(charIndex);
- spaceSpan.textContent = ' ';
- textDisplay.appendChild(spaceSpan);
- charIndex++;
- }
- });
+  function calcWpm(typed, elapsedSec) {
+    if (elapsedSec <= 0) return 0;
+    var correctChars = 0;
+    for (var i = 0; i < typed.length && i < currentPassage.length; i++) {
+      if (typed[i] === currentPassage[i]) correctChars++;
+    }
+    return Math.round((correctChars / 5) / (elapsedSec / 60));
+  }
 
- updateHighlighting();
- }
+  function calcAccuracy(typed) {
+    if (typed.length === 0) return 100;
+    var correct = 0;
+    var len = Math.min(typed.length, currentPassage.length);
+    for (var i = 0; i < len; i++) {
+      if (typed[i] === currentPassage[i]) correct++;
+    }
+    return Math.round((correct / typed.length) * 100);
+  }
 
- function updateHighlighting() {
- const charSpans = textDisplay.querySelectorAll('.char');
- const typedLen = typedChars.length;
+  function updateStats() {
+    if (!isPlaying) return;
+    var typed = typingInput.value;
+    var elapsed = (Date.now() - startTime) / 1000;
+    var wpm = calcWpm(typed, elapsed);
+    var acc = calcAccuracy(typed);
+    wpmInfo.textContent = 'WPM: ' + wpm;
+    accInfo.textContent = 'Accuracy: ' + acc + '%';
+  }
 
- // Remove all current-word highlighting
- textDisplay.querySelectorAll('.word.current').forEach(el => el.classList.remove('current'));
+  function tick() {
+    timeLeft--;
+    timerInfo.textContent = timeLeft + 's';
+    if (timeLeft <= 0) {
+      endGame();
+    }
+  }
 
- charSpans.forEach((span, idx) => {
- span.classList.remove('correct', 'incorrect', 'cursor');
+  function startGame() {
+    currentPassage = PASSAGES[Math.floor(Math.random() * PASSAGES.length)];
+    isPlaying = false;
+    startTime = 0;
+    timeLeft = TIME_LIMIT;
+    typingInput.value = '';
+    typingInput.disabled = false;
+    wpmInfo.textContent = 'WPM: 0';
+    accInfo.textContent = 'Accuracy: 100%';
+    timerInfo.textContent = TIME_LIMIT + 's';
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = null;
+    renderPassage('');
+    showView(playView);
+    typingInput.focus();
+  }
 
- if (idx < typedLen) {
- if (typedChars[idx] === passageChars[idx]) {
- span.classList.add('correct');
- } else {
- span.classList.add('incorrect');
- }
- } else if (idx === typedLen) {
- span.classList.add('cursor');
- // Highlight current word
- const parentWord = span.closest('.word');
- if (parentWord) {
- parentWord.classList.add('current');
- }
- }
- });
- }
+  function endGame() {
+    isPlaying = false;
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    typingInput.disabled = true;
 
- function calculateStats() {
- if (!startTime) return { wpm: 0, accuracy: 100, elapsed: 0 };
+    var typed = typingInput.value;
+    var elapsed = (Date.now() - startTime) / 1000;
+    var wpm = calcWpm(typed, elapsed);
+    var acc = calcAccuracy(typed);
+    var rating = getRating(wpm);
 
- const elapsed = (Date.now() - startTime) / 1000; // seconds
- const minutes = elapsed / 60;
- const typedLen = typedChars.length;
+    showView(resultView);
+    finalWpm.textContent = String(wpm);
+    resultDetails.innerHTML = 'Accuracy: ' + acc + '%<br>Characters: ' + typed.length + '<br>Time: ' + Math.round(elapsed) + 's';
+    ratingBadge.textContent = rating.label;
+    ratingBadge.style.background = rating.color;
 
- let correctCount = 0;
- for (let i = 0; i < typedLen; i++) {
- if (typedChars[i] === passageChars[i]) correctCount++;
- }
+    addToHistory(wpm);
+    renderHistory();
 
- const wpm = minutes > 0 ? Math.round((correctCount / 5) / minutes) : 0;
- const accuracy = typedLen > 0 ? Math.round((correctCount / typedLen) * 100) : 100;
+    if (window.GameShare) {
+      window.GameShare.show({
+        gameName: gameName,
+        gameSlug: gameSlug,
+        gameIcon: gameIcon,
+        score: wpm,
+        unit: metricUnit,
+        metricLabel: metricLabel,
+        ratingLabel: rating.label,
+        ratingColor: rating.color
+      });
+    }
+  }
 
- return { wpm, accuracy, elapsed };
- }
+  typingInput.addEventListener('input', function () {
+    if (!startTime) {
+      startTime = Date.now();
+      isPlaying = true;
+      timerInterval = setInterval(tick, 1000);
+    }
+    var typed = typingInput.value;
+    renderPassage(typed);
+    updateStats();
 
- function updateLiveStats() {
- const { wpm, accuracy, elapsed } = calculateStats();
- liveWpm.textContent = String(wpm);
- liveAccuracyEl.textContent = String(accuracy);
- liveTime.textContent = elapsed.toFixed(1);
- }
+    if (typed.length >= currentPassage.length) {
+      endGame();
+    }
+  });
 
- function startTimer() {
- if (timerInterval) return;
- startTime = Date.now();
- timerInterval = window.setInterval(() => {
- updateLiveStats();
- }, 100);
- }
+  function renderHistory() {
+    var history = loadHistory();
+    if (history.length === 0) { attemptHistorySection.hidden = true; return; }
+    attemptHistorySection.hidden = false;
+    historyList.innerHTML = history.map(function (e) {
+      var r = getRating(e.score);
+      return '<div class="history-item">' +
+        '<span class="history-score">' + e.score + ' WPM</span>' +
+        '<span class="history-rating" style="background:' + r.color + '">' + r.label + '</span>' +
+        '<span class="history-time">' + formatDate(e.date) + '</span>' +
+        '</div>';
+    }).join('');
+  }
 
- function stopTimer() {
- if (timerInterval) {
- clearInterval(timerInterval);
- timerInterval = null;
- }
- }
+  function formatDate(iso) {
+    try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    catch (e) { return ''; }
+  }
 
- function finishTest() {
- isActive = false;
- isFinished = true;
- stopTimer();
- typingInput.disabled = true;
-
- const { wpm, accuracy, elapsed } = calculateStats();
-
- // Show score
- finalWpm.textContent = String(wpm);
- finalAccuracy.textContent = `Accuracy: ${accuracy}% | Time: ${elapsed.toFixed(1)}s`;
- const rating = getRatingForWpm(wpm);
- ratingBadge.textContent = rating.label;
- ratingBadge.style.backgroundColor = rating.color;
-
- scoreSection.hidden = false;
- inputWrapper.hidden = true;
- liveStats.style.display = 'none';
- btnStart.hidden = true;
- btnRetry.hidden = false;
-
- // Save to history
- saveAttempt(wpm, accuracy);
- renderHistory();
-
- if (window.GameShare) {
- window.GameShare.show({
- gameName: gameName,
- gameSlug: gameSlug,
- gameIcon: gameIcon,
- score: wpm,
- unit: metricUnit,
- metricLabel: metricLabel,
- ratingLabel: rating.label,
- ratingColor: rating.color
- });
- }
- }
-
- function saveAttempt(wpm, accuracy) {
- let history = [];
- try {
- const raw = localStorage.getItem(STORAGE_KEY);
- if (raw) history = JSON.parse(raw);
- } catch {}
-
- history.unshift({
- wpm,
- accuracy,
- date: new Date().toLocaleString(),
- });
-
- if (history.length > MAX_HISTORY) history = history.slice(0, MAX_HISTORY);
-
- try {
- localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
- } catch {}
- }
-
- function renderHistory() {
- let history = [];
- try {
- const raw = localStorage.getItem(STORAGE_KEY);
- if (raw) history = JSON.parse(raw);
- } catch {}
-
- if (history.length === 0) {
- historySection.hidden = true;
- return;
- }
-
- historySection.hidden = false;
- historyList.innerHTML = '';
-
- history.forEach(entry => {
- const rating = getRatingForWpm(entry.wpm);
- const item = document.createElement('div');
- item.className = 'history-item';
- item.innerHTML = `
- <span class="history-score">${entry.wpm} WPM</span>
- <span class="history-rating" style="background:${rating.color}">${rating.label}</span>
- <span class="history-time">${entry.accuracy}% | ${entry.date}</span>
- `;
- historyList.appendChild(item);
- });
- }
-
- function resetGame() {
- stopTimer();
- isActive = false;
- isFinished = false;
- startTime = null;
- typedChars = [];
-
- currentPassage = pickRandomPassage();
- passageChars = currentPassage.split('');
-
- typingInput.value = '';
- typingInput.disabled = false;
-
- instructions.hidden = true;
- textDisplay.hidden = false;
- liveStats.style.display = '';
- inputWrapper.hidden = false;
- scoreSection.hidden = true;
- btnStart.hidden = true;
- btnRetry.hidden = true;
-
- liveWpm.textContent = '0';
- liveAccuracyEl.textContent = '100';
- liveTime.textContent = '0.0';
-
- renderPassage();
- typingInput.focus();
- }
-
- // --- Event Handlers ---
- btnStart.addEventListener('click', () => {
- resetGame();
- });
-
- btnRetry.addEventListener('click', () => {
- resetGame();
- });
-
- typingInput.addEventListener('input', () => {
- if (isFinished) return;
-
- const value = typingInput.value;
- typedChars = value.split('');
-
- // Start timer on first keystroke
- if (!isActive && typedChars.length > 0) {
- isActive = true;
- startTimer();
- }
-
- updateHighlighting();
- updateLiveStats();
-
- // Check if test is complete
- if (typedChars.length >= passageChars.length) {
- finishTest();
- }
- });
-
- // Prevent pasting into the input
- typingInput.addEventListener('paste', (e) => {
- e.preventDefault();
- });
-
- // Prevent drag-and-drop into the input
- typingInput.addEventListener('drop', (e) => {
- e.preventDefault();
- });
-
- // --- Initialize ---
- renderHistory();
- })();
+  startBtn.addEventListener('click', startGame);
+  tryAgainBtn.addEventListener('click', startGame);
+  renderHistory();
+})();
 </script>

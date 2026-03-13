@@ -1,0 +1,571 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import GameShare from '../../components/GameShare.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import '../../styles/game.css';
+import '../../styles/quiz.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tests & Games", "item": "https://toolcalcs.com/test/" },
+      { "@type": "ListItem", "position": 3, "name": "Stroop Effect Test" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Stroop Effect Test",
+    "url": "https://toolcalcs.com/test/stroop-effect-test/",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Test your cognitive speed with the Stroop Effect test. Identify the ink color of color words displayed in conflicting colors. Measures reaction time and cognitive interference."
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the Stroop Effect?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Stroop Effect is a cognitive phenomenon where naming the ink color of a word is slower and more error-prone when the word itself is a different color name. For example, the word 'RED' printed in blue ink takes longer to identify as blue because the brain automatically reads the word, creating interference with the color-naming task."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What does the Stroop test measure?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Stroop test measures cognitive flexibility, selective attention, and processing speed. It specifically evaluates your ability to inhibit an automatic response (reading the word) in favor of a controlled response (naming the ink color). It is widely used in neuropsychology to assess executive function and frontal lobe integrity."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is a good score on the Stroop test?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A good score combines high accuracy (90% or above) with fast reaction times. Average reaction times for incongruent trials (word and color conflict) are typically 700-900 milliseconds. Scores under 600ms with high accuracy indicate excellent cognitive control, while times over 1000ms may suggest difficulty with interference suppression."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why is the Stroop Effect important in psychology?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Stroop Effect is one of the most replicated findings in cognitive psychology, demonstrating the automaticity of reading and the limits of selective attention. It is clinically important because performance on Stroop tasks is sensitive to conditions affecting the frontal lobes, including ADHD, traumatic brain injury, and various forms of dementia."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Stroop Effect Test - Test Your Cognitive Speed | ToolCalcs"
+  description="Test your cognitive speed with the Stroop Effect test. Click the ink color, not the word. 20 timed trials measuring reaction time, accuracy, and cognitive interference."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/test/">Tests & Games</a> &rsaquo;
+    <span>Stroop Effect Test</span>
+  </nav>
+
+  <h1>Stroop Effect Test</h1>
+  <p class="page-desc">A color word appears in a different ink color. Click the button matching the INK COLOR, not the word. 20 timed trials measure your cognitive speed.</p>
+
+  <div class="game-box">
+    <div class="game-area" id="gameArea" role="region" aria-label="Stroop effect test area" aria-live="polite">
+      <div class="game-instructions" id="instructionsView">
+        <h2>Stroop Effect Test</h2>
+        <p>You will see a color word (like "RED") displayed in a <strong>different</strong> ink color (like <span style="color:#2563eb;font-weight:700;">blue</span>). Your task is to click the button matching the <strong>INK COLOR</strong>, not the word itself.</p>
+        <p style="font-size:0.85rem;color:var(--color-text-muted);">This tests your ability to suppress automatic reading and focus on color perception. Try to be fast and accurate.</p>
+        <button class="game-btn primary" id="startBtn" type="button" style="margin-top:16px;">Start Test</button>
+      </div>
+
+      <div class="play-view" id="playView" style="display:none;">
+        <div class="status-bar">
+          <span class="level-info" id="trialInfo">Trial 1 of 20</span>
+          <span class="lives-info" id="scoreInfo">0 correct</span>
+        </div>
+        <div class="stroop-word-area">
+          <div class="stroop-word" id="stroopWord">RED</div>
+        </div>
+        <div class="stroop-options" id="optionsWrap"></div>
+        <div class="stroop-feedback" id="feedbackArea" style="min-height:24px;text-align:center;padding:4px;font-size:0.85rem;font-weight:600;"></div>
+      </div>
+
+      <div class="result-view" id="resultView" style="display:none;">
+        <div class="result-icon" aria-hidden="true">&#x1F9EA;</div>
+        <div class="result-label">Test Complete!</div>
+        <div class="score-display">
+          <span class="score-value" id="finalAccuracy">0%</span>
+          <span class="score-unit">accuracy</span>
+        </div>
+        <div class="stroop-results-grid" id="resultsGrid"></div>
+        <div class="rating-badge" id="ratingBadge">&mdash;</div>
+        <button class="game-btn primary" id="tryAgainBtn" type="button" style="margin-top:16px;">Try Again</button>
+      </div>
+    </div>
+
+    <GameShare />
+
+    <div class="attempt-history" id="attemptHistory" hidden>
+      <h3>Attempt History</h3>
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is the Stroop Effect?</h2>
+    <p>The Stroop Effect, first described by John Ridley Stroop in 1935, is one of the most famous and frequently replicated phenomena in experimental psychology. It demonstrates a fundamental aspect of cognitive processing: the interference that occurs when the brain must resolve conflicting pieces of information.</p>
+    <p>In the classic Stroop task, participants are shown color words (such as "RED," "BLUE," or "GREEN") printed in ink of a different color. For example, the word "RED" might appear in blue ink. The task is to name the ink color while ignoring the word. Despite the apparent simplicity, this task reveals a powerful and reliable cognitive phenomenon: people are significantly slower and make more errors when the word and ink color conflict (incongruent condition) compared to when they match (congruent condition) or when a non-color word or symbol is used (neutral condition).</p>
+    <p>The magnitude of this interference, measured as the difference in response time between incongruent and congruent or neutral conditions, is called the Stroop interference score. This score is remarkably robust, appearing across languages, age groups, and testing conditions. It demonstrates that reading is such a highly practiced, automatic process that it cannot be easily suppressed, even when doing so would improve performance on the task.</p>
+
+    <h2>The Science Behind the Stroop Effect</h2>
+    <p>Several theoretical frameworks have been proposed to explain why the Stroop Effect occurs. The most influential is the speed of processing theory, which argues that reading is faster and more automatic than color naming. Because the word is processed more quickly than the ink color, it reaches the response stage first and must be actively suppressed, creating a bottleneck that slows the color-naming response.</p>
+    <p>The automaticity theory, closely related to the speed of processing account, emphasizes that reading has become so thoroughly practiced that it occurs without conscious intention or effort. When you see a word, you cannot help but read it, just as you cannot help hearing speech in a language you understand. This automatic reading generates a response that conflicts with the required color-naming response, creating interference.</p>
+    <p>A third perspective, the parallel distributed processing (PDP) model proposed by Jonathan Cohen, Kevin Dunbar, and James McClelland in 1990, frames the Stroop Effect in terms of competing neural pathways. In their model, both the word-reading and color-naming pathways process information simultaneously, but the word-reading pathway is stronger due to greater practice. When the two pathways produce conflicting outputs, additional processing is required in the response selection stage to resolve the conflict, resulting in slower reaction times.</p>
+    <p>Neuroimaging studies have confirmed that Stroop interference activates the anterior cingulate cortex (ACC), a brain region associated with conflict monitoring and error detection, as well as the dorsolateral prefrontal cortex (DLPFC), which is involved in cognitive control and response inhibition. These findings support the view that the Stroop Effect engages executive control mechanisms in the frontal lobes.</p>
+
+    <h2>Clinical Applications of the Stroop Test</h2>
+    <p>The Stroop test is one of the most widely used neuropsychological assessment tools. Its sensitivity to frontal lobe function makes it valuable for detecting and monitoring a range of clinical conditions. In the assessment of attention deficit hyperactivity disorder (ADHD), the Stroop test helps evaluate the inhibitory control deficits that are central to the condition. Children and adults with ADHD typically show larger Stroop interference scores than controls, reflecting their difficulty suppressing automatic but irrelevant responses.</p>
+    <p>In the evaluation of traumatic brain injury (TBI), the Stroop test provides information about the integrity of executive functions that are often affected by frontal lobe damage. Patients with frontal TBI typically show increased Stroop interference and more errors, particularly on incongruent trials, compared to patients with injuries in other brain regions.</p>
+    <p>The test is also used in the assessment of aging and dementia. Normal aging is associated with modest increases in Stroop interference, but patients with Alzheimer's disease and other forms of dementia show disproportionately large interference effects, reflecting their progressive loss of cognitive control abilities. Longitudinal tracking of Stroop performance can help monitor cognitive decline over time.</p>
+
+    <h2>Factors That Influence Stroop Performance</h2>
+    <p>Several factors affect how much Stroop interference a person experiences. Age is one of the most significant: interference tends to be larger in young children (who are still developing reading automaticity and cognitive control), decreases through adolescence and early adulthood as executive functions mature, and then gradually increases again in older adulthood as cognitive control abilities decline.</p>
+    <p>Practice with the Stroop task reduces interference, though it never eliminates it entirely. This improvement reflects the development of task-specific strategies for managing the conflict between word reading and color naming. Bilingual individuals often show smaller Stroop interference effects than monolinguals, possibly because the constant management of two language systems strengthens general cognitive control mechanisms.</p>
+    <p>Emotional variants of the Stroop test, known as the emotional Stroop task, use emotionally charged words instead of color words. Research has shown that people take longer to name the color of words that are relevant to their concerns: people with anxiety disorders show delays for threat-related words, people with depression show delays for negative self-referential words, and people with post-traumatic stress disorder show delays for trauma-related words. These findings have made the emotional Stroop a valuable tool in clinical psychology research.</p>
+
+    <h2>Tips for Better Stroop Performance</h2>
+    <ul>
+      <li><strong>Defocus from the word:</strong> Try not to read the word. Instead, focus on the overall visual appearance, letting the color come to you rather than actively reading the text.</li>
+      <li><strong>Respond to your first impression:</strong> Your initial perception of the color is often correct. Hesitation gives the word-reading response time to generate more interference.</li>
+      <li><strong>Maintain a steady rhythm:</strong> Rather than pausing to deliberate on each trial, try to maintain a consistent response pace. This reduces the opportunity for the word to interfere.</li>
+      <li><strong>Practice regularly:</strong> While practice cannot eliminate the Stroop Effect, it can reduce it significantly. Your brain learns to prioritize the color-naming pathway with repeated exposure.</li>
+      <li><strong>Stay calm:</strong> Anxiety and stress can worsen Stroop performance by impairing the executive control functions needed to manage the conflict. Take a deep breath before starting.</li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is the Stroop Effect?</h3>
+    <p>The Stroop Effect is a cognitive phenomenon where identifying the ink color of a word is slower and more error-prone when the word spells a different color name. For example, seeing "RED" printed in blue ink creates a conflict because your brain automatically reads the word, interfering with your ability to name the ink color. It was first described by John Ridley Stroop in 1935 and remains one of the most replicated findings in psychology.</p>
+
+    <h3>What does the Stroop test measure?</h3>
+    <p>The Stroop test measures several aspects of executive function, including selective attention (the ability to focus on relevant information while ignoring distractions), cognitive flexibility (switching between different processing demands), and inhibitory control (suppressing automatic but inappropriate responses). It is one of the most widely used neuropsychological tests for assessing frontal lobe function.</p>
+
+    <h3>What is a good score on the Stroop test?</h3>
+    <p>A good score combines high accuracy (90 percent or above) with fast reaction times. For incongruent trials where the word and ink color conflict, average response times are typically 700 to 900 milliseconds. Responses under 600 milliseconds with high accuracy indicate excellent cognitive control. The Stroop interference score (the difference between incongruent and congruent response times) is typically 100 to 200 milliseconds in healthy adults.</p>
+
+    <h3>Why is the Stroop Effect important in psychology?</h3>
+    <p>The Stroop Effect demonstrates fundamental principles about how the brain processes information, including the automaticity of reading, the limits of selective attention, and the role of executive control in managing cognitive conflicts. Clinically, it is important because Stroop performance is sensitive to conditions affecting the frontal lobes, including ADHD, traumatic brain injury, and various dementias, making it a valuable diagnostic and monitoring tool.</p>
+  </article>
+
+  <CrossLinks links={[
+    { href: '/test/reaction-time-test/', label: 'Reaction Time Test', icon: '⚡' },
+    { href: '/test/schulte-table-test/', label: 'Schulte Table Test', icon: '🔍' },
+    { href: '/test/color-vision-test/', label: 'Color Vision Test', icon: '👁' },
+  ]} />
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .game-area { cursor: default; user-select: auto; -webkit-user-select: auto; }
+
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    margin-bottom: 4px;
+  }
+  .level-info { font-weight: 700; font-size: 1rem; color: var(--color-text); }
+  .lives-info { font-size: 1rem; font-weight: 700; color: var(--color-primary); }
+
+  .stroop-word-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px 16px;
+    min-height: 120px;
+  }
+
+  .stroop-word {
+    font-size: 3.5rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: color 0.1s;
+  }
+
+  .stroop-options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 16px;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  :global(.stroop-color-btn) {
+    padding: 12px 20px;
+    border-radius: 8px;
+    border: 2px solid var(--color-border);
+    background: var(--color-surface);
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-text);
+    min-width: 80px;
+    text-transform: uppercase;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  }
+  :global(.stroop-color-btn:hover) {
+    border-color: var(--color-primary);
+    transform: scale(0.97);
+  }
+  :global(.stroop-color-btn.correct) {
+    background: #22c55e;
+    border-color: #22c55e;
+    color: #fff;
+  }
+  :global(.stroop-color-btn.wrong) {
+    background: #fecaca;
+    border-color: #ef4444;
+  }
+
+  .stroop-results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 16px;
+    margin-top: 8px;
+    max-width: 320px;
+    width: 100%;
+  }
+  :global(.stroop-stat) {
+    text-align: center;
+    padding: 8px;
+  }
+  :global(.stroop-stat-val) {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--color-text);
+    display: block;
+  }
+  :global(.stroop-stat-label) {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    display: block;
+    margin-top: 2px;
+  }
+
+  .play-view {
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .result-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 280px;
+    padding: 24px;
+  }
+  .result-icon { font-size: 3rem; margin-bottom: 8px; }
+  .result-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+
+  @media (max-width: 640px) {
+    .stroop-word { font-size: 2.5rem; }
+    .stroop-options { gap: 6px; padding: 8px 12px; }
+    :global(.stroop-color-btn) { font-size: 0.85rem; padding: 10px 14px; min-width: 64px; }
+  }
+</style>
+
+<script define:vars={{ gameName: "Stroop Effect Test", gameSlug: "stroop-effect-test", gameIcon: "\u{1F9EA}", metricLabel: "Avg Time", metricUnit: "ms" }}>
+(function () {
+  'use strict';
+
+  var COLORS = [
+    { name: 'RED',    hex: '#ef4444' },
+    { name: 'BLUE',   hex: '#2563eb' },
+    { name: 'GREEN',  hex: '#16a34a' },
+    { name: 'YELLOW', hex: '#ca8a04' },
+    { name: 'PURPLE', hex: '#9333ea' },
+    { name: 'ORANGE', hex: '#ea580c' }
+  ];
+
+  var TOTAL_TRIALS = 20;
+
+  var RATING_SCALE = [
+    { maxTime: 500,  label: 'Exceptional', color: '#16a34a' },
+    { maxTime: 700,  label: 'Fast', color: '#22c55e' },
+    { maxTime: 900,  label: 'Average', color: '#2563eb' },
+    { maxTime: 1200, label: 'Slow', color: '#f59e0b' },
+    { maxTime: Infinity, label: 'Very Slow', color: '#ef4444' }
+  ];
+
+  function getRating(avgTime) {
+    for (var i = 0; i < RATING_SCALE.length; i++) {
+      if (avgTime < RATING_SCALE[i].maxTime) return RATING_SCALE[i];
+    }
+    return RATING_SCALE[RATING_SCALE.length - 1];
+  }
+
+  var STORAGE_KEY = 'toolcalcs_stroop-effect-test_history';
+  var MAX_HISTORY = 20;
+
+  function loadHistory() {
+    try { var r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch (e) {}
+    return [];
+  }
+  function saveHistory(h) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch (e) {}
+  }
+  function addToHistory(entry) {
+    var h = loadHistory();
+    h.unshift(entry);
+    saveHistory(h);
+  }
+
+  var instructionsView = document.getElementById('instructionsView');
+  var playView = document.getElementById('playView');
+  var resultView = document.getElementById('resultView');
+  var startBtn = document.getElementById('startBtn');
+  var tryAgainBtn = document.getElementById('tryAgainBtn');
+  var trialInfo = document.getElementById('trialInfo');
+  var scoreInfo = document.getElementById('scoreInfo');
+  var stroopWord = document.getElementById('stroopWord');
+  var optionsWrap = document.getElementById('optionsWrap');
+  var feedbackArea = document.getElementById('feedbackArea');
+  var finalAccuracy = document.getElementById('finalAccuracy');
+  var resultsGrid = document.getElementById('resultsGrid');
+  var ratingBadge = document.getElementById('ratingBadge');
+  var attemptHistorySection = document.getElementById('attemptHistory');
+  var historyList = document.getElementById('historyList');
+
+  var currentTrial = 0;
+  var correctCount = 0;
+  var isWaiting = false;
+  var trialStartTime = 0;
+  var reactionTimes = [];
+  var trials = [];
+
+  // Current trial data
+  var currentWordIndex = -1;
+  var currentColorIndex = -1;
+
+  function showView(view) {
+    instructionsView.style.display = 'none';
+    playView.style.display = 'none';
+    resultView.style.display = 'none';
+    view.style.display = '';
+  }
+
+  function shuffleArray(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+  }
+
+  function generateTrials() {
+    trials = [];
+    for (var t = 0; t < TOTAL_TRIALS; t++) {
+      var wordIdx = Math.floor(Math.random() * COLORS.length);
+      var colorIdx;
+      // Ensure incongruent (word != ink color)
+      do {
+        colorIdx = Math.floor(Math.random() * COLORS.length);
+      } while (colorIdx === wordIdx);
+      trials.push({ wordIndex: wordIdx, colorIndex: colorIdx });
+    }
+  }
+
+  function showTrial(index) {
+    var trial = trials[index];
+    currentWordIndex = trial.wordIndex;
+    currentColorIndex = trial.colorIndex;
+
+    trialInfo.textContent = 'Trial ' + (index + 1) + ' of ' + TOTAL_TRIALS;
+    scoreInfo.textContent = correctCount + ' correct';
+    feedbackArea.textContent = '';
+    feedbackArea.style.color = '';
+
+    // Display word in ink color
+    stroopWord.textContent = COLORS[currentWordIndex].name;
+    stroopWord.style.color = COLORS[currentColorIndex].hex;
+
+    // Create color buttons (all 6 colors, shuffled)
+    var indices = [];
+    for (var i = 0; i < COLORS.length; i++) indices.push(i);
+    indices = shuffleArray(indices);
+
+    optionsWrap.innerHTML = '';
+    for (var j = 0; j < indices.length; j++) {
+      var btn = document.createElement('button');
+      btn.className = 'stroop-color-btn';
+      btn.type = 'button';
+      btn.textContent = COLORS[indices[j]].name;
+      btn.setAttribute('data-idx', String(indices[j]));
+      btn.style.borderBottomColor = COLORS[indices[j]].hex;
+      btn.style.borderBottomWidth = '4px';
+      optionsWrap.appendChild(btn);
+    }
+
+    trialStartTime = Date.now();
+  }
+
+  function handleOptionClick(e) {
+    var btn = e.target.closest('.stroop-color-btn');
+    if (!btn || isWaiting) return;
+
+    isWaiting = true;
+    var idx = parseInt(btn.getAttribute('data-idx'));
+    var rt = Date.now() - trialStartTime;
+    reactionTimes.push(rt);
+
+    if (idx === currentColorIndex) {
+      correctCount++;
+      btn.classList.add('correct');
+      feedbackArea.textContent = 'Correct! ' + rt + 'ms';
+      feedbackArea.style.color = '#16a34a';
+    } else {
+      btn.classList.add('wrong');
+      feedbackArea.textContent = 'Wrong! The ink color was ' + COLORS[currentColorIndex].name;
+      feedbackArea.style.color = '#ef4444';
+      // Highlight correct
+      var btns = optionsWrap.querySelectorAll('.stroop-color-btn');
+      for (var i = 0; i < btns.length; i++) {
+        if (parseInt(btns[i].getAttribute('data-idx')) === currentColorIndex) {
+          btns[i].classList.add('correct');
+        }
+      }
+    }
+
+    scoreInfo.textContent = correctCount + ' correct';
+
+    setTimeout(function () {
+      isWaiting = false;
+      currentTrial++;
+      if (currentTrial >= TOTAL_TRIALS) {
+        endGame();
+      } else {
+        showTrial(currentTrial);
+      }
+    }, 1000);
+  }
+
+  function startGame() {
+    currentTrial = 0;
+    correctCount = 0;
+    isWaiting = false;
+    reactionTimes = [];
+    generateTrials();
+    showView(playView);
+    showTrial(0);
+  }
+
+  function endGame() {
+    showView(resultView);
+
+    var accuracy = Math.round((correctCount / TOTAL_TRIALS) * 100);
+    var avgTime = 0;
+    if (reactionTimes.length > 0) {
+      var sum = 0;
+      for (var i = 0; i < reactionTimes.length; i++) sum += reactionTimes[i];
+      avgTime = Math.round(sum / reactionTimes.length);
+    }
+
+    var fastest = reactionTimes.length > 0 ? Math.min.apply(null, reactionTimes) : 0;
+    var slowest = reactionTimes.length > 0 ? Math.max.apply(null, reactionTimes) : 0;
+
+    finalAccuracy.textContent = accuracy + '%';
+
+    var rating = getRating(avgTime);
+    ratingBadge.textContent = rating.label;
+    ratingBadge.style.background = rating.color;
+
+    resultsGrid.innerHTML =
+      '<div class="stroop-stat"><span class="stroop-stat-val">' + avgTime + 'ms</span><span class="stroop-stat-label">Avg Reaction Time</span></div>' +
+      '<div class="stroop-stat"><span class="stroop-stat-val">' + correctCount + '/' + TOTAL_TRIALS + '</span><span class="stroop-stat-label">Correct Answers</span></div>' +
+      '<div class="stroop-stat"><span class="stroop-stat-val">' + fastest + 'ms</span><span class="stroop-stat-label">Fastest Response</span></div>' +
+      '<div class="stroop-stat"><span class="stroop-stat-val">' + slowest + 'ms</span><span class="stroop-stat-label">Slowest Response</span></div>';
+
+    addToHistory({
+      score: avgTime,
+      accuracy: accuracy,
+      correct: correctCount,
+      date: new Date().toISOString(),
+      rating: rating.label
+    });
+    renderHistory();
+
+    if (window.GameShare) {
+      window.GameShare.show({
+        gameName: gameName,
+        gameSlug: gameSlug,
+        gameIcon: gameIcon,
+        score: avgTime,
+        unit: metricUnit,
+        metricLabel: metricLabel,
+        ratingLabel: rating.label + ' (' + accuracy + '% accuracy)',
+        ratingColor: rating.color
+      });
+    }
+  }
+
+  function renderHistory() {
+    var history = loadHistory();
+    if (history.length === 0) { attemptHistorySection.hidden = true; return; }
+    attemptHistorySection.hidden = false;
+    historyList.innerHTML = history.map(function (e) {
+      var r = getRating(e.score);
+      return '<div class="history-item">' +
+        '<span class="history-score">' + e.score + 'ms / ' + (e.accuracy || '?') + '%</span>' +
+        '<span class="history-rating" style="background:' + r.color + '">' + r.label + '</span>' +
+        '<span class="history-time">' + formatDate(e.date) + '</span>' +
+        '</div>';
+    }).join('');
+  }
+
+  function formatDate(iso) {
+    try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    catch (e) { return ''; }
+  }
+
+  optionsWrap.addEventListener('click', handleOptionClick);
+  startBtn.addEventListener('click', startGame);
+  tryAgainBtn.addEventListener('click', startGame);
+  renderHistory();
+})();
+</script>

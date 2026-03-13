@@ -1,0 +1,208 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getAllPaycheckPages, STATES, SALARIES } from '../../data/paycheck';
+import '../../styles/category.css';
+
+const allPages = getAllPaycheckPages();
+
+function fmt(n: number): string {
+  return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function fmtShort(n: number): string {
+  if (n >= 1000) return '$' + (n / 1000).toLocaleString('en-US', { maximumFractionDigits: 0 }) + 'K';
+  return '$' + n.toLocaleString('en-US');
+}
+
+// Group pages by state
+const stateGroups = STATES.map((s) => {
+  var pages = allPages
+    .filter((p) => p.state === s.name)
+    .sort((a, b) => a.annualSalary - b.annualSalary);
+  return { state: s, pages: pages };
+});
+
+const noTaxStates = STATES.filter((s) => s.noIncomeTax).map((s) => s.name);
+const taxStates = STATES.filter((s) => !s.noIncomeTax);
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Financial Calculators", "item": "https://toolcalcs.com/financial-calculators/" },
+    { "@type": "ListItem", "position": 3, "name": "Paycheck Calculator" },
+  ],
+};
+---
+
+<BaseLayout
+  title="Paycheck Calculator - Take-Home Pay by State After Taxes | ToolCalcs"
+  description="Calculate your take-home pay after federal and state taxes. Compare paychecks across 10 US states for salaries from $30K to $75K. See tax breakdowns and net pay."
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/financial-calculators/">Financial Calculators</a> &rsaquo;
+    <span>Paycheck Calculator</span>
+  </nav>
+
+  <h1>Paycheck Calculator: Take-Home Pay by State</h1>
+  <p class="page-desc">
+    Calculate how much of your salary you actually keep after federal income tax, state income tax, and FICA deductions. Browse {allPages.length} take-home pay calculations across 10 US states.
+  </p>
+
+  <div class="intro-box">
+    <p>
+      Your take-home pay depends heavily on where you live. States like Texas, Florida, and Washington have <strong>no state income tax</strong>, while states like California and New York can take 5-6% or more. Use the breakdowns below to see exactly how much you keep at different salary levels.
+    </p>
+  </div>
+
+  <AdUnit slot="paycheck-idx-top" format="horizontal" />
+
+  {stateGroups.map((group, idx) => (
+    <section class="state-section">
+      <div class="state-header">
+        <h2 class="state-heading">
+          {group.state.name} ({group.state.abbr})
+          {group.state.noIncomeTax && <span class="no-tax-badge">No State Tax</span>}
+        </h2>
+        <p class="state-rate">
+          {group.state.noIncomeTax
+            ? 'State income tax: 0%'
+            : 'Effective state tax rate: ~' + (group.state.effectiveRate * 100).toFixed(1) + '%'
+          }
+        </p>
+      </div>
+      <div class="category-grid">
+        {group.pages.map((p) => {
+          var cardSalary = '$' + p.salaryDisplay;
+          return (
+            <a href={'/paycheck/' + p.slug + '/'} class="category-card">
+              <span class="category-val">{cardSalary}</span>
+              <span class="category-detail">Take-home: {fmt(p.annualTakeHome)}/yr</span>
+              <span class="category-sub">{fmt(p.monthlyTakeHome)}/mo</span>
+            </a>
+          );
+        })}
+      </div>
+      {idx === 2 && <AdUnit slot="paycheck-idx-mid1" format="rectangle" />}
+      {idx === 5 && <AdUnit slot="paycheck-idx-mid2" format="rectangle" />}
+    </section>
+  ))}
+
+  <AdUnit slot="paycheck-idx-bottom" format="horizontal" />
+
+  <article class="content-section">
+    <h2>Understanding Take-Home Pay</h2>
+    <p>
+      Your take-home pay (also called net pay) is the amount of money you receive in your paycheck after all tax deductions. The three main deductions from your gross salary are federal income tax, state income tax, and FICA taxes (Social Security and Medicare). The amount you owe in each category depends on your salary level, filing status, and state of residence.
+    </p>
+    <p>
+      The calculations on this page use 2025 federal tax brackets for a single filer with the standard deduction of $14,600. FICA taxes include Social Security (6.2% on income up to $168,600) and Medicare (1.45% on all income). State taxes use approximate effective rates for each state.
+    </p>
+    <h2>No Income Tax States</h2>
+    <p>
+      Three states featured here — Texas, Florida, and Washington — have no state income tax. Workers in these states keep more of each paycheck, though these states often have higher sales taxes or property taxes. Alaska, Nevada, South Dakota, Tennessee, and Wyoming also have no state income tax.
+    </p>
+    <p>
+      <a href="/salary/">Salary Calculator</a> |
+      <a href="/financial-calculators/">All Financial Calculators</a>
+    </p>
+  </article>
+</BaseLayout>
+
+<style>
+  .intro-box {
+    background: #eff6ff;
+    border-radius: var(--radius);
+    padding: 16px 24px;
+    margin-bottom: 28px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+  .intro-box p {
+    margin: 0;
+  }
+  .state-section {
+    margin-bottom: 32px;
+  }
+  .state-header {
+    margin-bottom: 12px;
+  }
+  .state-heading {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--color-border);
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .state-rate {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+  .no-tax-badge {
+    display: inline-block;
+    background: #dcfce7;
+    color: #166534;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+  }
+  .category-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 14px 10px;
+    background: var(--color-bg-alt);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--color-text);
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .category-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+  }
+  .category-val {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--color-primary);
+  }
+  .category-detail {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+  }
+  .category-sub {
+    font-size: 0.75rem;
+    color: #16a34a;
+    font-weight: 600;
+  }
+
+  @media (max-width: 640px) {
+    .category-grid {
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+    .category-val {
+      font-size: 1rem;
+    }
+  }
+</style>

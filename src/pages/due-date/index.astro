@@ -1,0 +1,170 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import { getAllPregnancyPages } from '../../data/due-date';
+import type { PregnancyWeekPage } from '../../data/due-date';
+
+const allPages = getAllPregnancyPages();
+const count = allPages.length;
+
+const t1Pages = allPages.filter(function (p) { return p.trimester === 1; });
+const t2Pages = allPages.filter(function (p) { return p.trimester === 2; });
+const t3Pages = allPages.filter(function (p) { return p.trimester === 3; });
+
+const trimesters = [
+  { name: 'First Trimester (Weeks 1-13)', weeks: 'Weeks 1-13', pages: t1Pages, color: '#ec4899' },
+  { name: 'Second Trimester (Weeks 14-26)', weeks: 'Weeks 14-26', pages: t2Pages, color: '#8b5cf6' },
+  { name: 'Third Trimester (Weeks 27-40)', weeks: 'Weeks 27-40', pages: t3Pages, color: '#3b82f6' },
+];
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://toolcalcs.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Pregnancy Week by Week"
+    }
+  ]
+};
+---
+
+<BaseLayout
+  title="Pregnancy Week by Week - Due Date & Baby Development Guide | ToolCalcs"
+  description={'Track your pregnancy week by week with our comprehensive guide covering ' + count + ' key weeks. See baby size comparisons, development milestones, symptoms, and tips for each stage of pregnancy.'}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <span>Pregnancy Week by Week</span>
+  </nav>
+
+  <h1>Pregnancy Week by Week</h1>
+  <p class="page-desc">Follow your baby's growth from a tiny poppy seed to a full-sized watermelon. Our week-by-week pregnancy guide covers {count} key weeks with baby size comparisons, development milestones, common symptoms, and helpful tips for each stage. Click any week to see the full details.</p>
+
+  <AdUnit slot="due-date-idx-top" format="horizontal" />
+
+  {trimesters.map(function (tri, idx) {
+    var midpoint = 1;
+    return (
+      <>
+        <section class="preg-trimester-section">
+          <h2 class="preg-trimester-heading" style={'border-color:' + tri.color}>{tri.name}</h2>
+          <div class="preg-timeline">
+            {tri.pages.map(function (p) {
+              return (
+                <a class="preg-week-card" href={'/due-date/' + p.slug + '/'}>
+                  <div class="preg-week-num">Week {p.week}</div>
+                  <div class="preg-week-size">{p.babySize}</div>
+                  <div class="preg-week-measure">{p.babySizeInches} in &middot; {p.babyWeightDisplay}</div>
+                  <div class="preg-week-dev">{p.developments[0]}</div>
+                </a>
+              );
+            })}
+          </div>
+        </section>
+        {idx === midpoint && <AdUnit slot="due-date-idx-mid" format="rectangle" />}
+      </>
+    );
+  })}
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>Understanding Your Pregnancy Timeline</h2>
+    <p>
+      A full-term pregnancy lasts about 40 weeks from the first day of your last menstrual period (LMP). These 40 weeks are divided into three trimesters, each with its own milestones and challenges. Our week-by-week guide covers {count} key weeks, giving you detailed information about your baby's development, the symptoms you may experience, and practical tips for each stage.
+    </p>
+
+    <h2>The Three Trimesters</h2>
+    <p>
+      The <strong>first trimester</strong> (weeks 1-13) is when the foundation is laid. Your baby develops from a single cell into a recognizable human form with all major organs beginning to function. This is also when many women experience morning sickness, fatigue, and breast tenderness.
+    </p>
+    <p>
+      The <strong>second trimester</strong> (weeks 14-26) is often called the "golden period" of pregnancy. Many early symptoms ease, energy returns, and you begin feeling your baby move. Your baby grows rapidly, developing hearing, vision, and distinct features.
+    </p>
+    <p>
+      The <strong>third trimester</strong> (weeks 27-40) is the home stretch. Your baby gains most of its weight, the lungs mature for breathing, and the body prepares for delivery. You may experience increased discomfort, Braxton Hicks contractions, and the nesting instinct.
+    </p>
+
+    <h2>Baby Size Comparisons by Week</h2>
+    <p>
+      One of the most popular ways to track baby growth is through fruit and vegetable comparisons. Starting as a tiny poppy seed at week 4, your baby grows to the size of a lime by week 12, a banana by week 20, an eggplant by week 28, and a full watermelon by week 40. These comparisons help visualize the incredible growth that happens over 40 weeks.
+    </p>
+
+    <h2>When to Call Your Doctor</h2>
+    <p>
+      While many pregnancy symptoms are normal, some require immediate medical attention. Contact your healthcare provider if you experience heavy bleeding, severe abdominal pain, sudden swelling of the face or hands, persistent headaches with vision changes, decreased fetal movement, or fluid leaking from the vagina before 37 weeks. Regular prenatal visits are essential for monitoring both your health and your baby's development.
+    </p>
+
+    <p><a href="/">Back to ToolCalcs Home &rarr;</a></p>
+  </article>
+
+  <AdUnit slot="due-date-idx-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .preg-trimester-section {
+    margin-bottom: 36px;
+  }
+  .preg-trimester-heading {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 3px solid #ec4899;
+    color: var(--color-text);
+  }
+  .preg-timeline {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+  .preg-week-card {
+    display: block;
+    background: var(--color-surface, #fff);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-decoration: none;
+    color: var(--color-text);
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+  .preg-week-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+  .preg-week-num {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--color-primary);
+    margin-bottom: 4px;
+  }
+  .preg-week-size {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .preg-week-measure {
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    margin-bottom: 8px;
+  }
+  .preg-week-dev {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    line-height: 1.4;
+  }
+
+  @media (max-width: 640px) {
+    .preg-timeline {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

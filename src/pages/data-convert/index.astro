@@ -1,0 +1,184 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import { getAllDataConvertPages, CONVERSIONS } from '../../data/data-conversions';
+import type { DataConvertPage } from '../../data/data-conversions';
+
+const allPages = getAllDataConvertPages();
+const count = allPages.length;
+
+// Group pages by conversion type (e.g., "MB to GB")
+interface ConversionGroup {
+  label: string;
+  fromUnit: string;
+  toUnit: string;
+  pages: DataConvertPage[];
+}
+
+const groups: ConversionGroup[] = [];
+for (var i = 0; i < CONVERSIONS.length; i++) {
+  var c = CONVERSIONS[i];
+  var label = c.fromUnit + ' to ' + c.toUnit;
+  var pages = allPages.filter(p => p.fromUnit === c.fromUnit && p.toUnit === c.toUnit);
+  pages.sort((a, b) => a.fromValue - b.fromValue);
+  groups.push({ label: label, fromUnit: c.fromUnit, toUnit: c.toUnit, pages: pages });
+}
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://toolcalcs.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Data Size Converter"
+    }
+  ]
+};
+---
+
+<BaseLayout
+  title="Data Size Converter - MB to GB, GB to TB & More | ToolCalcs"
+  description={"Convert between data storage units: Bytes, KB, MB, GB, TB, and PB. " + count + " pre-calculated conversions with binary (1024) and decimal (1000) values, formulas, and explanations."}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo; <span>Data Size Converter</span>
+  </nav>
+
+  <h1>Data Size Converter</h1>
+  <p class="page-desc">Convert between digital storage units with {count} pre-calculated conversions. Each page shows both binary (1024-based) and decimal (1000-based) results, conversion formulas, and quick reference tables. Click any conversion to see the full breakdown.</p>
+
+  <AdUnit slot="data-convert-idx-top" format="horizontal" />
+
+  {groups.map(function (group, idx) {
+    var midpoint = Math.floor(groups.length / 2);
+    return (
+      <>
+        <section class="dc-group-section">
+          <h2 class="dc-group-heading">{group.label}</h2>
+          <div class="dc-card-grid">
+            {group.pages.map(function (p) {
+              return (
+                <a class="dc-card" href={'/data-convert/' + p.slug + '/'}>
+                  <span class="dc-card-from">{p.fromValue.toLocaleString('en-US')} {p.fromUnit}</span>
+                  <span class="dc-card-arrow">&rarr;</span>
+                  <span class="dc-card-to">{p.resultDisplay} {p.toUnit}</span>
+                </a>
+              );
+            })}
+          </div>
+        </section>
+        {idx === midpoint && <AdUnit slot="data-convert-idx-mid" format="rectangle" />}
+      </>
+    );
+  })}
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>How to Convert Between Data Storage Units</h2>
+    <p>
+      Digital data is measured in bytes and its multiples: Kilobytes (KB), Megabytes (MB), Gigabytes (GB), Terabytes (TB), and Petabytes (PB). Converting between these units is straightforward once you know the base. In the binary system used by operating systems and computer memory, each unit is 1,024 times the previous one. In the decimal (SI) system used by storage manufacturers and ISPs, each unit is 1,000 times the previous one.
+    </p>
+    <p>
+      This page provides {count} pre-calculated conversions covering the most commonly searched data size conversions. Each conversion page shows both the binary and decimal result so you always have the right number, whether you are checking your hard drive capacity, planning cloud storage, or estimating download sizes.
+    </p>
+
+    <h2>Binary vs Decimal: Why the Difference Matters</h2>
+    <p>
+      The reason your 1 TB hard drive shows as 931 GB in Windows comes down to the binary vs decimal discrepancy. Storage manufacturers define 1 TB as exactly 1,000,000,000,000 bytes (decimal), but your operating system defines 1 TB as 1,099,511,627,776 bytes (binary). Since the decimal TB is smaller, the same number of bytes translates to fewer binary TB or GB.
+    </p>
+    <p>
+      The International Electrotechnical Commission (IEC) introduced binary prefixes &mdash; KiB (Kibibyte), MiB (Mebibyte), GiB (Gibibyte), TiB (Tebibyte) &mdash; to eliminate this ambiguity. However, most consumers and operating systems still use the traditional KB, MB, GB, and TB abbreviations for binary values, which can cause confusion when comparing specifications.
+    </p>
+
+    <h2>Quick Reference: Binary Conversion Factors</h2>
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Conversion</th>
+            <th>Factor</th>
+            <th>Example</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>1 KB</td><td>1,024 Bytes</td><td>A short text file</td></tr>
+          <tr><td>1 MB</td><td>1,024 KB</td><td>A high-res photo</td></tr>
+          <tr><td>1 GB</td><td>1,024 MB</td><td>A short HD video</td></tr>
+          <tr><td>1 TB</td><td>1,024 GB</td><td>~250 full-length movies</td></tr>
+          <tr><td>1 PB</td><td>1,024 TB</td><td>~500 billion pages of text</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p><a href="/">Back to ToolCalcs Home &rarr;</a></p>
+  </article>
+
+  <AdUnit slot="data-convert-idx-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .dc-group-section {
+    margin-bottom: 36px;
+  }
+  .dc-group-heading {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--color-border);
+    color: var(--color-text);
+  }
+  .dc-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 10px;
+  }
+  .dc-card {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 18px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--color-text);
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+  }
+  .dc-card:hover {
+    background: #f0f7ff;
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+  .dc-card-from {
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+  .dc-card-arrow {
+    color: var(--color-text-muted);
+    font-size: 1.1rem;
+  }
+  .dc-card-to {
+    color: #1d4ed8;
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+
+  @media (max-width: 640px) {
+    .dc-card-grid {
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    }
+    .dc-card {
+      padding: 10px 12px;
+      font-size: 0.85rem;
+    }
+  }
+</style>

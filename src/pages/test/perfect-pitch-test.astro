@@ -1,0 +1,565 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import GameShare from '../../components/GameShare.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import '../../styles/game.css';
+import '../../styles/quiz.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tests & Games", "item": "https://toolcalcs.com/test/" },
+      { "@type": "ListItem", "position": 3, "name": "Perfect Pitch Test" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Perfect Pitch Test",
+    "url": "https://toolcalcs.com/test/perfect-pitch-test/",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Test your absolute pitch by identifying musical notes played through your speakers. 12 rounds of progressively harder note identification."
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is perfect pitch?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Perfect pitch (absolute pitch) is the ability to identify or produce any musical note without a reference tone. It is estimated that only 1 in 10,000 people possess true perfect pitch, though it is more common among those who received early musical training, particularly before age 6."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between perfect pitch and relative pitch?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Perfect pitch is the ability to identify a note in isolation without any reference. Relative pitch is the ability to identify notes by comparing them to a known reference note, recognizing intervals between notes. Most trained musicians develop strong relative pitch, while true perfect pitch is rare and largely innate."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can you develop perfect pitch as an adult?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Research suggests that true perfect pitch is extremely difficult to develop after early childhood, as there appears to be a critical period (usually before age 6) for its acquisition. However, adults can develop very strong relative pitch and quasi-absolute pitch through dedicated training, which can functionally approximate perfect pitch in many situations."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does this perfect pitch test work?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The test plays a pure tone at the frequency of a musical note using the Web Audio API. You must identify which note is being played by selecting from multiple options. The test has 12 rounds that get progressively harder: early rounds offer 4 choices, while later rounds present up to 12 options including sharps and flats."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Perfect Pitch Test - Test Your Absolute Pitch Online | ToolCalcs"
+  description="Test your perfect pitch (absolute pitch) by identifying musical notes. 12 progressively harder rounds using Web Audio API. Free online ear training test."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/test/">Tests & Games</a> &rsaquo;
+    <span>Perfect Pitch Test</span>
+  </nav>
+
+  <h1>Perfect Pitch Test</h1>
+  <p class="page-desc">Listen to a musical note and identify it. 12 rounds of progressively harder note recognition to test your absolute pitch.</p>
+
+  <div class="game-box">
+    <div class="game-area" id="gameArea" role="region" aria-label="Perfect pitch test area" aria-live="polite">
+      <div class="game-instructions" id="instructionsView">
+        <h2>Perfect Pitch Test</h2>
+        <p>A musical note will be played through your speakers or headphones. Listen carefully and select which note you think it is. The test gets harder as you progress, with more options to choose from.</p>
+        <p style="font-size:0.85rem;color:var(--color-text-muted);">Make sure your volume is turned up. Headphones recommended for best results.</p>
+        <button class="game-btn primary" id="startBtn" type="button" style="margin-top:16px;">Start Test</button>
+      </div>
+
+      <div class="play-view" id="playView" style="display:none;">
+        <div class="status-bar">
+          <span class="level-info" id="roundInfo">Round 1 of 12</span>
+          <span class="lives-info" id="scoreInfo">Score: 0/0</span>
+        </div>
+        <div class="pp-play-area">
+          <button class="game-btn pp-play-btn" id="replayBtn" type="button">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            Play Again
+          </button>
+          <div class="pp-note-label" id="noteLabel" style="display:none;"></div>
+        </div>
+        <div class="pp-options" id="optionsWrap"></div>
+      </div>
+
+      <div class="result-view" id="resultView" style="display:none;">
+        <div class="result-icon" aria-hidden="true">&#x1F3B5;</div>
+        <div class="result-label">Test Complete!</div>
+        <div class="score-display">
+          <span class="score-value" id="finalScore">0</span>
+          <span class="score-unit">/ 12</span>
+        </div>
+        <div class="result-detail" id="resultDetail" style="font-size:0.95rem;color:var(--color-text-muted);margin-top:8px;text-align:center;max-width:400px;"></div>
+        <div class="rating-badge" id="ratingBadge">&mdash;</div>
+        <button class="game-btn primary" id="tryAgainBtn" type="button" style="margin-top:16px;">Try Again</button>
+      </div>
+    </div>
+
+    <GameShare />
+
+    <div class="attempt-history" id="attemptHistory" hidden>
+      <h3>Attempt History</h3>
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is Perfect Pitch?</h2>
+    <p>Perfect pitch, formally known as absolute pitch, is the rare ability to identify or reproduce any musical note without the aid of a reference tone. A person with perfect pitch can hear a car horn, a bird call, or a random piano key and immediately name the note. This ability is distinct from relative pitch, which is the capacity to identify notes by their relationship to other notes (recognizing intervals). While strong relative pitch can be trained, true perfect pitch appears to be largely innate, though early musical exposure plays a critical role.</p>
+    <p>Estimates of perfect pitch prevalence vary, but it is generally believed to occur in roughly 1 in 10,000 people in the general population. However, rates are significantly higher among professional musicians, particularly those who began formal training before age 6. Studies of students at elite music conservatories suggest prevalence rates of 5 to 15 percent, with even higher rates among those trained in tonal languages like Mandarin or Vietnamese, where pitch carries linguistic meaning.</p>
+    <p>The neuroscience of perfect pitch reveals fascinating differences in brain structure. People with perfect pitch tend to have a larger left planum temporale, a region of the temporal lobe involved in auditory processing. Functional imaging studies show that note identification in people with perfect pitch activates regions associated with categorical perception and memory retrieval, rather than the comparison-based processing seen in people using relative pitch.</p>
+
+    <h2>Perfect Pitch vs. Relative Pitch</h2>
+    <p>Understanding the distinction between perfect pitch and relative pitch is crucial for musicians. Relative pitch is the ability to determine the relationship between notes, to recognize that two notes are a perfect fifth apart, or that a melody moves up by a whole step. This is the skill that most ear training programs develop, and it is extremely valuable for practical musicianship.</p>
+    <p>A musician with strong relative pitch can, given a reference note, identify any subsequent note by calculating the interval. For example, if told that the first note is C, they can recognize that the next note is a major third higher (E) by hearing the characteristic sound of that interval. This is how most musicians function, and it works remarkably well for performance, composition, and improvisation.</p>
+    <p>Perfect pitch goes further by eliminating the need for a reference entirely. A person with perfect pitch hears each note as having a distinct, immediately recognizable quality, much like how most people can distinguish colors. To someone with perfect pitch, C sounds fundamentally different from D, not just higher or lower, but qualitatively distinct. This can be advantageous for tuning instruments, transcribing music by ear, and detecting wrong notes, but it can also be a disadvantage when encountering music played at non-standard tuning.</p>
+    <p>Some researchers identify a middle ground called quasi-absolute pitch or pitch memory. People with this ability can reliably identify one or two reference notes (often A440 or middle C) from memory and use relative pitch to find other notes. With enough training, this approach can functionally approximate perfect pitch for many practical purposes.</p>
+
+    <h2>Can Perfect Pitch Be Learned?</h2>
+    <p>The question of whether perfect pitch can be acquired through training is one of the most debated topics in music psychology. The consensus among researchers is that there appears to be a critical period for developing perfect pitch, typically before age 6. Children who receive intensive musical training during this window are significantly more likely to develop the ability than those who start later.</p>
+    <p>Several training programs have claimed to teach perfect pitch to adults, but the evidence for their effectiveness is mixed. Some adults can learn to identify notes with moderate accuracy after extensive training, but they rarely achieve the effortless, instantaneous recognition that characterizes true perfect pitch. Their performance often deteriorates when notes are presented in unfamiliar timbres or at octave extremes, suggesting they have learned associations rather than developed genuine absolute perception.</p>
+    <p>Interestingly, research by Diana Deutsch at the University of California has shown that speakers of tonal languages like Mandarin Chinese are significantly more likely to possess perfect pitch, even without formal musical training. This suggests that the critical period for absolute pitch development overlaps with the language acquisition period, and that early exposure to pitch-meaningful sounds may be more important than musical training per se.</p>
+
+    <h2>The Web Audio API and Sound Generation</h2>
+    <p>This test uses the Web Audio API, a powerful JavaScript interface for generating and processing audio in the browser. The API creates pure sine wave tones at the exact frequencies corresponding to each musical note in equal temperament tuning. The standard reference pitch is A4 at 440 Hz, and all other notes are calculated using the equal temperament formula where each semitone is separated by a factor of the twelfth root of 2 (approximately 1.05946).</p>
+    <p>The notes in the fourth octave range from C4 (261.63 Hz, middle C) through B4 (493.88 Hz). Pure sine waves sound different from real musical instruments because instruments produce complex tones with harmonics (overtones) that give each instrument its characteristic timbre. By using pure tones, this test focuses purely on pitch discrimination ability without the additional cues that instrument timbre would provide.</p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is perfect pitch?</h3>
+    <p>Perfect pitch, or absolute pitch, is the ability to identify or produce any musical note without a reference tone. It is estimated to occur in roughly 1 in 10,000 people in the general population, though rates are higher among professional musicians who began training early. Research suggests it involves distinct neural processing patterns compared to relative pitch.</p>
+
+    <h3>What is the difference between perfect pitch and relative pitch?</h3>
+    <p>Perfect pitch allows you to identify any note in isolation without comparison. Relative pitch allows you to identify notes by comparing them to a known reference, recognizing the intervals between them. Most trained musicians develop strong relative pitch through ear training, while perfect pitch is much rarer and appears to require early childhood exposure to music or tonal languages.</p>
+
+    <h3>Can you develop perfect pitch as an adult?</h3>
+    <p>True perfect pitch is very difficult to develop after early childhood due to a critical period in neural development, typically before age 6. However, adults can develop strong quasi-absolute pitch through intensive training, learning to reliably remember one or two reference pitches and using relative pitch from there. While not identical to innate perfect pitch, this can be highly functional for practical musicianship.</p>
+
+    <h3>How does this perfect pitch test work?</h3>
+    <p>The test generates pure sine wave tones at specific note frequencies using the Web Audio API. You hear a note and must identify it from multiple options. The 12 rounds get progressively harder: early rounds show 4 options from the natural notes (C, D, E, F, G, A, B), while later rounds include sharps and flats with up to 12 options, testing finer pitch discrimination.</p>
+  </article>
+
+  <CrossLinks links={[
+    { href: '/test/reaction-time-test/', label: 'Reaction Time Test', icon: '⚡' },
+    { href: '/test/color-vision-test/', label: 'Color Vision Test', icon: '👁' },
+    { href: '/test/stroop-effect-test/', label: 'Stroop Effect Test', icon: '🧪' },
+  ]} />
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .game-area { cursor: default; user-select: auto; -webkit-user-select: auto; }
+
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    margin-bottom: 4px;
+  }
+  .level-info { font-weight: 700; font-size: 1rem; color: var(--color-text); }
+  .lives-info { font-size: 1rem; font-weight: 700; color: var(--color-primary); }
+
+  .pp-play-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 24px 16px;
+  }
+
+  .pp-play-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.05rem;
+    padding: 12px 28px;
+  }
+
+  .pp-note-label {
+    font-size: 1.3rem;
+    font-weight: 700;
+    padding: 8px 20px;
+    border-radius: 8px;
+    text-align: center;
+  }
+
+  .pp-options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 16px;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  :global(.pp-opt-btn) {
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 2px solid var(--color-border);
+    background: var(--color-surface);
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text);
+    min-width: 52px;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  :global(.pp-opt-btn:hover) {
+    border-color: var(--color-primary);
+  }
+  :global(.pp-opt-btn.correct) {
+    background: #22c55e;
+    border-color: #22c55e;
+    color: #fff;
+  }
+  :global(.pp-opt-btn.wrong) {
+    background: #fecaca;
+    border-color: #ef4444;
+  }
+
+  .play-view {
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .result-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 280px;
+    padding: 24px;
+  }
+  .result-icon { font-size: 3rem; margin-bottom: 8px; }
+  .result-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+
+  @media (max-width: 640px) {
+    .pp-options { gap: 6px; padding: 8px 12px; }
+    :global(.pp-opt-btn) { font-size: 0.9rem; padding: 8px 12px; min-width: 44px; }
+  }
+</style>
+
+<script define:vars={{ gameName: "Perfect Pitch Test", gameSlug: "perfect-pitch-test", gameIcon: "\u{1F3B5}", metricLabel: "Score", metricUnit: "/ 12" }}>
+(function () {
+  'use strict';
+
+  var NOTES = [
+    { name: 'C',  freq: 261.63 },
+    { name: 'C#', freq: 277.18 },
+    { name: 'D',  freq: 293.66 },
+    { name: 'D#', freq: 311.13 },
+    { name: 'E',  freq: 329.63 },
+    { name: 'F',  freq: 349.23 },
+    { name: 'F#', freq: 369.99 },
+    { name: 'G',  freq: 392.00 },
+    { name: 'G#', freq: 415.30 },
+    { name: 'A',  freq: 440.00 },
+    { name: 'A#', freq: 466.16 },
+    { name: 'B',  freq: 493.88 }
+  ];
+
+  // Round configs: which note indices can appear and how many options
+  // Rounds 1-4: natural notes only, 4 options
+  // Rounds 5-8: natural notes, 7 options
+  // Rounds 9-12: all notes including sharps/flats, 12 options
+  var NATURAL_INDICES = [0, 2, 4, 5, 7, 9, 11]; // C D E F G A B
+  var ALL_INDICES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+
+  function getRoundConfig(round) {
+    if (round < 4) return { pool: NATURAL_INDICES, numOptions: 4 };
+    if (round < 8) return { pool: NATURAL_INDICES, numOptions: 7 };
+    return { pool: ALL_INDICES, numOptions: 12 };
+  }
+
+  var RATING_SCALE = [
+    { min: 12, label: 'Perfect Pitch', color: '#16a34a' },
+    { min: 10, label: 'Near-Perfect', color: '#22c55e' },
+    { min: 7,  label: 'Good Relative Pitch', color: '#2563eb' },
+    { min: 4,  label: 'Developing', color: '#f59e0b' },
+    { min: 0,  label: 'Beginner', color: '#ef4444' }
+  ];
+
+  function getRating(score) {
+    for (var i = 0; i < RATING_SCALE.length; i++) {
+      if (score >= RATING_SCALE[i].min) return RATING_SCALE[i];
+    }
+    return RATING_SCALE[RATING_SCALE.length - 1];
+  }
+
+  var STORAGE_KEY = 'toolcalcs_perfect-pitch-test_history';
+  var MAX_HISTORY = 20;
+
+  function loadHistory() {
+    try { var r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch (e) {}
+    return [];
+  }
+  function saveHistory(h) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch (e) {}
+  }
+  function addToHistory(score) {
+    var h = loadHistory();
+    h.unshift({ score: score, date: new Date().toISOString(), rating: getRating(score).label });
+    saveHistory(h);
+  }
+
+  var instructionsView = document.getElementById('instructionsView');
+  var playView = document.getElementById('playView');
+  var resultView = document.getElementById('resultView');
+  var startBtn = document.getElementById('startBtn');
+  var tryAgainBtn = document.getElementById('tryAgainBtn');
+  var replayBtn = document.getElementById('replayBtn');
+  var roundInfo = document.getElementById('roundInfo');
+  var scoreInfo = document.getElementById('scoreInfo');
+  var noteLabel = document.getElementById('noteLabel');
+  var optionsWrap = document.getElementById('optionsWrap');
+  var finalScore = document.getElementById('finalScore');
+  var resultDetail = document.getElementById('resultDetail');
+  var ratingBadge = document.getElementById('ratingBadge');
+  var attemptHistorySection = document.getElementById('attemptHistory');
+  var historyList = document.getElementById('historyList');
+
+  var currentRound = 0;
+  var correctCount = 0;
+  var answered = 0;
+  var isWaiting = false;
+  var audioCtx = null;
+  var currentNoteIndex = -1;
+  var rounds = [];
+
+  function showView(view) {
+    instructionsView.style.display = 'none';
+    playView.style.display = 'none';
+    resultView.style.display = 'none';
+    view.style.display = '';
+  }
+
+  function shuffleArray(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+  }
+
+  function playNote(freq) {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    var osc = audioCtx.createOscillator();
+    var gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.5);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(audioCtx.currentTime);
+    osc.stop(audioCtx.currentTime + 1.5);
+  }
+
+  function generateRounds() {
+    rounds = [];
+    for (var r = 0; r < 12; r++) {
+      var config = getRoundConfig(r);
+      var pool = config.pool;
+      // Pick a random note from pool
+      var noteIdx = pool[Math.floor(Math.random() * pool.length)];
+
+      // Build options: always include correct answer
+      var options = [noteIdx];
+      var shuffled = shuffleArray(pool);
+      for (var i = 0; i < shuffled.length && options.length < config.numOptions; i++) {
+        if (shuffled[i] !== noteIdx) {
+          options.push(shuffled[i]);
+        }
+      }
+      options = shuffleArray(options);
+      rounds.push({ noteIndex: noteIdx, options: options });
+    }
+  }
+
+  function showRound(index) {
+    var round = rounds[index];
+    currentNoteIndex = round.noteIndex;
+    roundInfo.textContent = 'Round ' + (index + 1) + ' of 12';
+    scoreInfo.textContent = 'Score: ' + correctCount + '/' + answered;
+    noteLabel.style.display = 'none';
+
+    optionsWrap.innerHTML = '';
+    for (var i = 0; i < round.options.length; i++) {
+      var btn = document.createElement('button');
+      btn.className = 'pp-opt-btn';
+      btn.type = 'button';
+      btn.textContent = NOTES[round.options[i]].name;
+      btn.setAttribute('data-idx', String(round.options[i]));
+      optionsWrap.appendChild(btn);
+    }
+
+    // Play the note
+    setTimeout(function () {
+      playNote(NOTES[currentNoteIndex].freq);
+    }, 300);
+  }
+
+  function handleOptionClick(e) {
+    var btn = e.target.closest('.pp-opt-btn');
+    if (!btn || isWaiting) return;
+
+    isWaiting = true;
+    var idx = parseInt(btn.getAttribute('data-idx'));
+    answered++;
+
+    // Show correct answer label
+    noteLabel.textContent = 'Answer: ' + NOTES[currentNoteIndex].name;
+    noteLabel.style.display = '';
+
+    if (idx === currentNoteIndex) {
+      correctCount++;
+      btn.classList.add('correct');
+      noteLabel.style.background = '#dcfce7';
+      noteLabel.style.color = '#166534';
+    } else {
+      btn.classList.add('wrong');
+      noteLabel.style.background = '#fef2f2';
+      noteLabel.style.color = '#991b1b';
+      // Highlight correct
+      var btns = optionsWrap.querySelectorAll('.pp-opt-btn');
+      for (var i = 0; i < btns.length; i++) {
+        if (parseInt(btns[i].getAttribute('data-idx')) === currentNoteIndex) {
+          btns[i].classList.add('correct');
+        }
+      }
+    }
+
+    scoreInfo.textContent = 'Score: ' + correctCount + '/' + answered;
+
+    setTimeout(function () {
+      isWaiting = false;
+      currentRound++;
+      if (currentRound >= 12) {
+        endGame();
+      } else {
+        showRound(currentRound);
+      }
+    }, 1500);
+  }
+
+  function startGame() {
+    currentRound = 0;
+    correctCount = 0;
+    answered = 0;
+    isWaiting = false;
+    generateRounds();
+    showView(playView);
+    showRound(0);
+  }
+
+  function endGame() {
+    showView(resultView);
+    finalScore.textContent = String(correctCount);
+    var rating = getRating(correctCount);
+    ratingBadge.textContent = rating.label;
+    ratingBadge.style.background = rating.color;
+
+    var details = '';
+    if (correctCount === 12) {
+      details = 'Incredible! You identified all 12 notes correctly. You may possess true perfect pitch.';
+    } else if (correctCount >= 10) {
+      details = 'Excellent! You got ' + correctCount + ' out of 12. You have near-perfect pitch ability.';
+    } else if (correctCount >= 7) {
+      details = 'Good job! ' + correctCount + ' out of 12 correct. You have solid relative pitch skills.';
+    } else if (correctCount >= 4) {
+      details = correctCount + ' out of 12 correct. Your pitch recognition is developing. Regular ear training can help improve.';
+    } else {
+      details = correctCount + ' out of 12 correct. Pitch recognition is a trainable skill. Consider starting with interval recognition exercises.';
+    }
+    resultDetail.textContent = details;
+
+    addToHistory(correctCount);
+    renderHistory();
+
+    if (window.GameShare) {
+      window.GameShare.show({
+        gameName: gameName,
+        gameSlug: gameSlug,
+        gameIcon: gameIcon,
+        score: correctCount,
+        unit: metricUnit,
+        metricLabel: metricLabel,
+        ratingLabel: rating.label,
+        ratingColor: rating.color
+      });
+    }
+  }
+
+  function renderHistory() {
+    var history = loadHistory();
+    if (history.length === 0) { attemptHistorySection.hidden = true; return; }
+    attemptHistorySection.hidden = false;
+    historyList.innerHTML = history.map(function (e) {
+      var r = getRating(e.score);
+      return '<div class="history-item">' +
+        '<span class="history-score">' + e.score + '/12</span>' +
+        '<span class="history-rating" style="background:' + r.color + '">' + r.label + '</span>' +
+        '<span class="history-time">' + formatDate(e.date) + '</span>' +
+        '</div>';
+    }).join('');
+  }
+
+  function formatDate(iso) {
+    try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    catch (e) { return ''; }
+  }
+
+  optionsWrap.addEventListener('click', handleOptionClick);
+  startBtn.addEventListener('click', startGame);
+  tryAgainBtn.addEventListener('click', startGame);
+  replayBtn.addEventListener('click', function () {
+    if (currentNoteIndex >= 0 && !isWaiting) {
+      playNote(NOTES[currentNoteIndex].freq);
+    }
+  });
+  renderHistory();
+})();
+</script>

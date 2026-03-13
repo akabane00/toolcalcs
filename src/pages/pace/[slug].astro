@@ -1,0 +1,382 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import '../../styles/calculator.css';
+import { getAllPacePages, type PacePage } from '../../data/running-pace';
+
+export function getStaticPaths() {
+  return getAllPacePages().map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: PacePage };
+const {
+  slug,
+  paceMinPerMile,
+  paceDisplay,
+  paceMinPerKm,
+  paceKmDisplay,
+  speedMph,
+  speedKph,
+  race5k,
+  race10k,
+  raceHalf,
+  raceMarathon,
+  category,
+  description,
+  pageType,
+  title: pageTitle,
+} = page;
+
+// --- SEO ---
+const title = pageTitle + ' - Speed, Race Times & Training | ToolCalcs';
+const seoDescription = pageTitle + ': ' + paceDisplay + ' equals ' + paceKmDisplay + ', ' + speedMph + ' mph. 5K in ' + race5k + ', 10K in ' + race10k + ', half marathon in ' + raceHalf + ', marathon in ' + raceMarathon + '. Free pace chart and training tips.';
+
+// --- Nearby paces for comparison ---
+const allPages = getAllPacePages();
+const pacePages = allPages.filter(function (p) { return p.pageType === 'pace'; });
+const nearbyPaces = pacePages
+  .filter(function (p) { return p.slug !== slug && Math.abs(p.paceMinPerMile - paceMinPerMile) <= 2.5; })
+  .sort(function (a, b) { return a.paceMinPerMile - b.paceMinPerMile; })
+  .slice(0, 6);
+
+// --- Race target pages for cross-linking ---
+const raceTargetPages = allPages
+  .filter(function (p) { return p.pageType === 'race-target'; })
+  .slice(0, 6);
+
+// --- FAQ content ---
+const faq1Q = 'What is a ' + paceDisplay + ' in kilometers?';
+const faq1A = 'A pace of ' + paceDisplay + ' converts to ' + paceKmDisplay + '. This means you cover one kilometer every ' + paceKmDisplay.replace(' min/km', '') + ' minutes. At this pace, your speed is ' + speedMph + ' mph or ' + speedKph + ' kph.';
+
+const faq2Q = 'How fast can I run a 5K at ' + paceDisplay + '?';
+const faq2A = 'At a pace of ' + paceDisplay + ', you would finish a 5K (3.1 miles) in approximately ' + race5k + '. A 10K would take ' + race10k + ', a half marathon would take ' + raceHalf + ', and a full marathon would take ' + raceMarathon + '.';
+
+const faq3Q = 'Is ' + paceDisplay + ' a good running pace?';
+const faq3A = 'A pace of ' + paceDisplay + ' is considered a ' + category.toLowerCase() + ' pace. ' + (
+  category === 'Elite' ? 'This is an exceptionally fast pace achieved by competitive and professional runners. Very few recreational runners reach this level.'
+  : category === 'Advanced' ? 'This is a strong pace that indicates a high level of fitness and dedicated training. Runners at this pace are typically experienced competitors.'
+  : category === 'Intermediate' ? 'This is a solid pace that reflects good cardiovascular fitness and consistent training. Many dedicated recreational runners comfortably reach this level.'
+  : category === 'Recreational' ? 'This is a comfortable pace suitable for regular runners focused on health and enjoyment. It provides excellent cardiovascular benefits while being sustainable for longer distances.'
+  : 'This is a great pace for new runners or those focused on building endurance. It allows you to enjoy running while building fitness gradually.');
+
+const faq4Q = 'How do I improve my pace from ' + paceDisplay + '?';
+const faq4A = 'To run faster, incorporate interval training (e.g., 400m repeats at a faster pace with recovery jogs), tempo runs at a pace slightly faster than your current comfortable pace, and hill workouts to build strength. Consistent weekly mileage is the foundation — aim to increase your total weekly distance by no more than 10% per week. Strength training, proper nutrition, and adequate sleep also play important roles in improving running speed.';
+
+// --- Structured Data ---
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Running Pace Calculator", "item": "https://toolcalcs.com/pace/" },
+      { "@type": "ListItem", "position": 3, "name": pageTitle },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      { "@type": "Question", "name": faq1Q, "acceptedAnswer": { "@type": "Answer", "text": faq1A } },
+      { "@type": "Question", "name": faq2Q, "acceptedAnswer": { "@type": "Answer", "text": faq2A } },
+      { "@type": "Question", "name": faq3Q, "acceptedAnswer": { "@type": "Answer", "text": faq3A } },
+      { "@type": "Question", "name": faq4Q, "acceptedAnswer": { "@type": "Answer", "text": faq4A } },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title={title} description={seoDescription} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/pace/">Running Pace Calculator</a> &rsaquo;
+    <span>{pageTitle}</span>
+  </nav>
+
+  <h1>{pageTitle}</h1>
+  <p class="page-desc">
+    Complete pace conversion for {paceDisplay} including km pace, speed, and estimated race finish times for 5K, 10K, half marathon, and marathon distances.
+  </p>
+
+  <!-- Quick Fact -->
+  <div class="quick-fact">
+    <span class="quick-fact-label">Quick Fact:</span>
+    <strong>{paceDisplay} = {paceKmDisplay} = {speedMph} mph</strong>
+  </div>
+
+  <!-- Result Cards -->
+  <div class="result-cards pace-result-cards">
+    <div class="result-card primary">
+      <span class="result-label">Pace (per mile)</span>
+      <span class="result-value">{paceDisplay.replace(' min/mile', '')}</span>
+      <span class="result-unit">min/mile</span>
+    </div>
+    <div class="result-card success">
+      <span class="result-label">Pace (per km)</span>
+      <span class="result-value">{paceKmDisplay.replace(' min/km', '')}</span>
+      <span class="result-unit">min/km</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Speed (mph)</span>
+      <span class="result-value">{speedMph}</span>
+      <span class="result-unit">miles/hour</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Speed (kph)</span>
+      <span class="result-value">{speedKph}</span>
+      <span class="result-unit">km/hour</span>
+    </div>
+  </div>
+
+  <!-- Race Times Table -->
+  <h2 class="section-heading">Estimated Race Finish Times</h2>
+  <p class="table-note">Projected finish times at {paceDisplay} for standard race distances:</p>
+  <div class="table-container">
+    <table class="data-table pace-table">
+      <thead>
+        <tr>
+          <th>Race Distance</th>
+          <th>Distance (miles)</th>
+          <th>Estimated Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>5K</td>
+          <td>3.107 mi</td>
+          <td class="pace-time">{race5k}</td>
+        </tr>
+        <tr>
+          <td>10K</td>
+          <td>6.214 mi</td>
+          <td class="pace-time">{race10k}</td>
+        </tr>
+        <tr>
+          <td>Half Marathon</td>
+          <td>13.109 mi</td>
+          <td class="pace-time">{raceHalf}</td>
+        </tr>
+        <tr>
+          <td>Marathon</td>
+          <td>26.219 mi</td>
+          <td class="pace-time">{raceMarathon}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <AdUnit slot="pace-mid" format="horizontal" />
+
+  <!-- Pace Comparison Table -->
+  {nearbyPaces.length > 0 && (
+    <h2 class="section-heading">Compare Nearby Paces</h2>
+    <p class="compare-desc">See how similar paces compare in speed and race finish times.</p>
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Pace</th>
+            <th>Speed (mph)</th>
+            <th>5K Time</th>
+            <th>10K Time</th>
+            <th>Marathon</th>
+          </tr>
+        </thead>
+        <tbody>
+          {nearbyPaces.map(function (p) {
+            return (
+              <tr>
+                <td><a class="compare-link" href={'/pace/' + p.slug + '/'}>{p.paceDisplay}</a></td>
+                <td>{p.speedMph}</td>
+                <td>{p.race5k}</td>
+                <td>{p.race10k}</td>
+                <td>{p.raceMarathon}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  )}
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>Running at {paceDisplay}</h2>
+    <p>
+      {description}
+    </p>
+    <p>
+      At a pace of {paceDisplay}, you are covering each mile in {paceDisplay.replace(' min/mile', '')} minutes and each kilometer in {paceKmDisplay.replace(' min/km', '')} minutes. Your ground speed is {speedMph} miles per hour ({speedKph} km/h). This pace falls into the <strong>{category.toLowerCase()}</strong> category for runners.
+    </p>
+
+    <h2>Race Time Predictions at This Pace</h2>
+    <p>
+      If you can maintain {paceDisplay} consistently, your predicted 5K finish time is <strong>{race5k}</strong> and your 10K time would be <strong>{race10k}</strong>. For longer distances, you would complete a half marathon in approximately <strong>{raceHalf}</strong> and a full marathon in <strong>{raceMarathon}</strong>. Keep in mind that most runners slow down over longer distances, so your actual marathon time may be slower than the pace-based prediction unless you have trained specifically for the distance.
+    </p>
+
+    <h2>Pace Conversion Formula</h2>
+    <div class="calculator-box">
+      <p class="formula-intro">Converting between pace units and speed:</p>
+      <div class="formula-box">
+        Speed (mph) = 60 &divide; Pace (min/mile)
+      </div>
+      <ul class="formula-steps">
+        <li><strong>Pace per mile:</strong> {paceDisplay}</li>
+        <li><strong>Speed:</strong> 60 &divide; {paceMinPerMile.toFixed(2)} = <strong>{speedMph} mph</strong></li>
+        <li><strong>Pace per km:</strong> {paceDisplay.replace(' min/mile', '')} &divide; 1.609 = <strong>{paceKmDisplay}</strong></li>
+        <li><strong>Speed (metric):</strong> {speedMph} &times; 1.609 = <strong>{speedKph} kph</strong></li>
+      </ul>
+      <div class="disclaimer">
+        Race time estimates assume even pacing throughout the race. Actual results depend on terrain, weather, training, and race-day strategy.
+      </div>
+    </div>
+
+    <h2>Training Tips for {category} Runners</h2>
+    <p>
+      {category === 'Elite' || category === 'Advanced'
+        ? 'At this level, marginal gains matter. Focus on running economy through drills, cadence optimization (aim for 180+ steps per minute), and race-specific workouts. Periodize your training into base-building, strength, speed, and taper phases. Recovery days should truly be easy — many advanced runners make the mistake of running too hard on easy days, which compromises their ability to go hard on quality days.'
+        : category === 'Intermediate'
+          ? 'To maintain and improve at this pace, build a strong aerobic base with easy runs making up 80% of your weekly mileage. Add one tempo run and one interval session per week. Long runs should be 20-30% of your weekly mileage at a comfortable, conversational pace. Consider joining a running group for motivation and accountability.'
+          : 'Focus on consistency over speed. Run 3-4 times per week and gradually build your endurance by adding 5-10 minutes to your longest run each week. Include one slightly faster effort per week, whether that is a tempo segment within an easy run or a few short pickups. The majority of your running should feel comfortable and conversational.'}
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>{faq1Q}</h3>
+    <p>{faq1A}</p>
+
+    <h3>{faq2Q}</h3>
+    <p>{faq2A}</p>
+
+    <h3>{faq3Q}</h3>
+    <p>{faq3A}</p>
+
+    <h3>{faq4Q}</h3>
+    <p>{faq4A}</p>
+
+    <h2>Related Pace Calculations</h2>
+    <ul>
+      {nearbyPaces.slice(0, 4).map(function (p) {
+        return (
+          <li>
+            <a href={'/pace/' + p.slug + '/'}>
+              {p.paceDisplay} &rarr; {p.speedMph} mph, 5K in {p.race5k}
+            </a>
+          </li>
+        );
+      })}
+      {raceTargetPages.slice(0, 3).map(function (p) {
+        return (
+          <li>
+            <a href={'/pace/' + p.slug + '/'}>
+              {p.title} &rarr; {p.paceDisplay}
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+
+    <p><a href="/pace/">&larr; Running Pace Calculator</a> | <a href="/health-fitness-calculators/">Health &amp; Fitness Calculators</a></p>
+
+    <CrossLinks links={[
+      { href: '/pace/', label: 'Running Pace Calculator', icon: '\uD83C\uDFC3' },
+      { href: '/calorie/', label: 'Calorie Burn Calculator', icon: '\uD83D\uDD25' },
+      { href: '/bmi/', label: 'BMI Calculator', icon: '\u2696\uFE0F' },
+      { href: '/health-fitness-calculators/', label: 'Health & Fitness Calculators', icon: '\uD83C\uDFCB\uFE0F' },
+    ]} />
+  </article>
+
+  <AdUnit slot="pace-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .quick-fact {
+    background: #eef6ff;
+    border-radius: var(--radius);
+    padding: 16px 24px;
+    margin-bottom: 24px;
+    font-size: 1.1rem;
+  }
+  .quick-fact-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .quick-fact strong {
+    color: #1d4ed8;
+    font-size: 1.15rem;
+  }
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+  .pace-result-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .pace-result-cards .result-card.primary .result-value {
+    font-size: 1.6rem;
+  }
+  .result-unit {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    display: block;
+    margin-top: 2px;
+  }
+  .table-note {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+  .pace-time {
+    font-weight: 700;
+    color: #1d4ed8;
+  }
+  .formula-intro {
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    margin-bottom: 16px;
+  }
+  .formula-steps {
+    margin-top: 12px;
+    padding-left: 20px;
+  }
+  .formula-steps li {
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  .disclaimer {
+    background: #dbeafe;
+    border-radius: var(--radius);
+    padding: 10px 16px;
+    font-size: 0.85rem;
+    color: #1e40af;
+    margin-top: 16px;
+    line-height: 1.5;
+  }
+  .compare-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+  .compare-link {
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .compare-link:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 480px) {
+    .pace-result-cards {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

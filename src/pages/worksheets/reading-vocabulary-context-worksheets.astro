@@ -1,0 +1,265 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getWorksheetBySlug } from '../../data/worksheets';
+import '../../styles/worksheet.css';
+
+const ws = getWorksheetBySlug('reading-vocabulary-context-worksheets')!;
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://toolcalcs.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Worksheets",
+      "item": "https://toolcalcs.com/worksheets/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Vocabulary in Context Worksheets"
+    }
+  ]
+};
+---
+
+<BaseLayout
+  title="Free Vocabulary in Context Worksheets - Reading Practice | ToolCalcs"
+  description={ws.description}
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/worksheets/">Worksheets</a> &rsaquo;
+    <span>Vocabulary in Context Worksheets</span>
+  </nav>
+
+  <h1>{ws.title}</h1>
+  <p class="page-desc">{ws.description}</p>
+
+  <div class="worksheet-box">
+    <div class="config-panel">
+      <h3>Settings</h3>
+      <div class="config-inputs">
+        <div class="config-group">
+          <label for="cfgProblems">Number of Problems</label>
+          <input type="number" id="cfgProblems" value="10" min="5" max="20" />
+        </div>
+        <div class="config-group">
+          <label for="cfgLevel">Difficulty Level</label>
+          <select id="cfgLevel">
+            <option value="easy">Easy</option>
+            <option value="medium" selected>Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="worksheet-actions">
+      <button class="ws-btn primary" id="btnGenerate">Generate New</button>
+      <button class="ws-btn print" id="btnPrint">Print</button>
+      <label class="toggle-label">
+        <input type="checkbox" id="toggleAnswers" />
+        Show Answers
+      </label>
+    </div>
+
+    <div class="worksheet-content" id="worksheetContent">
+      <div class="worksheet-header-print">
+        <h2>Vocabulary in Context Practice</h2>
+        <div class="name-date">
+          <span>Name: ___________________</span>
+          <span>Date: ___________________</span>
+        </div>
+      </div>
+      <div class="problem-grid reading-grid" id="problemGrid"></div>
+      <div class="answer-key hidden" id="answerKey">
+        <h3>Answer Key</h3>
+        <div class="answer-grid" id="answerGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="ws-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>Why Vocabulary in Context Matters</h2>
+    <p>Understanding vocabulary through context clues is one of the most practical reading skills a student can develop. Rather than memorizing dictionary definitions, students learn to figure out the meaning of unfamiliar words by examining the surrounding text. This skill is essential for reading comprehension, standardized test performance, and lifelong learning. Every time a student encounters an unknown word in a book, article, or assignment, context clue strategies give them a tool to keep reading without stopping.</p>
+    <p>These worksheets present sentences or short passages with a target word underlined. Students must use the surrounding context to determine the word's meaning from four answer choices. The distractors are designed to be plausible, helping students learn to think critically about which meaning truly fits the context rather than guessing based on partial familiarity with the word.</p>
+
+    <h2>Types of Context Clues</h2>
+    <ul>
+      <li><strong>Definition clues:</strong> The author directly defines the word in the sentence. ("An archipelago, a chain of islands, stretches across the sea.")</li>
+      <li><strong>Synonym clues:</strong> A familiar word with a similar meaning appears nearby. ("The meticulous, or careful, scientist double-checked every measurement.")</li>
+      <li><strong>Antonym clues:</strong> A word with the opposite meaning provides contrast. ("Unlike her timid sister, Maya was bold and outspoken.")</li>
+      <li><strong>Example clues:</strong> Examples in the sentence help clarify the word. ("Nocturnal animals, such as owls and bats, are active at night.")</li>
+      <li><strong>Inference clues:</strong> The overall meaning of the sentence or passage suggests the word's definition.</li>
+    </ul>
+
+    <h2>Tips for Using Context Clues</h2>
+    <ul>
+      <li><strong>Read the entire sentence.</strong> Do not stop at the unfamiliar word. The clue is usually in the words around it.</li>
+      <li><strong>Look for signal words.</strong> Words like "such as," "for example," "unlike," "or," and "which means" often introduce context clues.</li>
+      <li><strong>Try each answer choice.</strong> Substitute each option into the sentence and see which one makes the most sense.</li>
+      <li><strong>Consider the tone.</strong> Is the passage positive or negative? This can help narrow down whether the word has a positive or negative connotation.</li>
+    </ul>
+
+    <h2>Related Worksheets</h2>
+    <ul>
+      <li><a href="/worksheets/reading-main-idea-worksheets/">Main Idea Worksheets</a> - Identify the central idea of reading passages.</li>
+      <li><a href="/worksheets/reading-inference-worksheets/">Making Inferences Worksheets</a> - Draw conclusions from text evidence.</li>
+      <li><a href="/worksheets/reading-cause-effect-worksheets/">Cause and Effect Worksheets</a> - Identify causes and effects in text.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="ws-bottom" format="horizontal" />
+</BaseLayout>
+
+<script is:inline>
+  var selected = [];
+
+  var passageBank = {
+    easy: [
+      { text: "The <u>enormous</u> elephant towered over all the other animals at the zoo. It was the biggest creature the children had ever seen.", question: "What does 'enormous' mean?", choices: ["A) Tiny", "B) Very large", "C) Fast", "D) Colorful"], answer: "B" },
+      { text: "After playing outside in the hot sun all day, Marcus was completely <u>exhausted</u>. He could barely keep his eyes open at dinner.", question: "What does 'exhausted' mean?", choices: ["A) Excited", "B) Hungry", "C) Very tired", "D) Happy"], answer: "C" },
+      { text: "The teacher asked the students to <u>observe</u> the butterfly carefully and draw what they saw in their science notebooks.", question: "What does 'observe' mean?", choices: ["A) Catch", "B) Watch closely", "C) Release", "D) Count"], answer: "B" },
+      { text: "The <u>fragile</u> glass ornament broke into pieces when it fell off the shelf. Mom always told us to handle it with care.", question: "What does 'fragile' mean?", choices: ["A) Heavy", "B) Ugly", "C) Easily broken", "D) Expensive"], answer: "C" },
+      { text: "Sarah was <u>delighted</u> when she opened her birthday present. She jumped up and down with a big smile on her face.", question: "What does 'delighted' mean?", choices: ["A) Confused", "B) Disappointed", "C) Very happy", "D) Surprised"], answer: "C" },
+      { text: "The <u>courageous</u> firefighter ran into the burning building to save the family trapped inside. Everyone called her a hero.", question: "What does 'courageous' mean?", choices: ["A) Scared", "B) Brave", "C) Careless", "D) Strong"], answer: "B" },
+      { text: "We need to <u>preserve</u> the rainforest so that animals have a safe place to live. If we cut down all the trees, many species will disappear.", question: "What does 'preserve' mean?", choices: ["A) Destroy", "B) Explore", "C) Protect and keep safe", "D) Photograph"], answer: "C" },
+      { text: "The <u>ancient</u> ruins were thousands of years old. Archaeologists carefully studied the crumbling walls and worn stone steps.", question: "What does 'ancient' mean?", choices: ["A) Modern", "B) Beautiful", "C) Very old", "D) Hidden"], answer: "C" },
+      { text: "The medicine helped <u>soothe</u> the baby's sore throat. She stopped crying and finally fell asleep peacefully.", question: "What does 'soothe' mean?", choices: ["A) Cure completely", "B) Make worse", "C) Calm and comfort", "D) Prevent"], answer: "C" },
+      { text: "Dad told us not to <u>waste</u> food. He said we should only put as much on our plates as we can eat.", question: "What does 'waste' mean?", choices: ["A) Cook", "B) Share", "C) Use carelessly or throw away", "D) Buy"], answer: "C" },
+      { text: "The <u>swift</u> rabbit darted across the field before the fox could catch it. It moved so fast it was just a blur.", question: "What does 'swift' mean?", choices: ["A) Clever", "B) Small", "C) Very fast", "D) Quiet"], answer: "C" },
+      { text: "The instructions were very <u>simple</u>. Even the youngest students could follow them without help.", question: "What does 'simple' mean?", choices: ["A) Boring", "B) Long", "C) Easy to understand", "D) Incorrect"], answer: "C" },
+      { text: "My sister has a <u>generous</u> spirit. She always shares her snacks and gives away her old toys to children who need them.", question: "What does 'generous' mean?", choices: ["A) Selfish", "B) Willing to give and share", "C) Wealthy", "D) Quiet"], answer: "B" },
+      { text: "The magician performed an <u>astonishing</u> trick. The audience gasped and could not figure out how he made the rabbit disappear.", question: "What does 'astonishing' mean?", choices: ["A) Boring", "B) Simple", "C) Very surprising and impressive", "D) Scary"], answer: "C" },
+      { text: "The two friends had a <u>disagreement</u> about which movie to watch. They each wanted something different, but they talked it out and found a compromise.", question: "What does 'disagreement' mean?", choices: ["A) A plan", "B) A fight that ends a friendship", "C) A difference of opinion", "D) A conversation"], answer: "C" },
+      { text: "The frozen pond began to <u>thaw</u> when the temperature rose above freezing. Puddles of water formed on the surface.", question: "What does 'thaw' mean?", choices: ["A) Freeze solid", "B) Crack apart", "C) Melt or warm up", "D) Overflow"], answer: "C" },
+      { text: "Please <u>assist</u> your brother with his homework. He is having trouble with the math problems and could use some help.", question: "What does 'assist' mean?", choices: ["A) Watch", "B) Help", "C) Grade", "D) Ignore"], answer: "B" },
+      { text: "The sky looked <u>gloomy</u> and gray all afternoon. Dark clouds blocked the sun, and it felt like rain could start at any moment.", question: "What does 'gloomy' mean?", choices: ["A) Bright and cheerful", "B) Dark and dreary", "C) Windy", "D) Cold"], answer: "B" }
+    ],
+    medium: [
+      { text: "The detective scrutinized every piece of evidence at the crime scene. She examined fingerprints, footprints, and fibers with a magnifying glass, refusing to <u>overlook</u> even the smallest detail.", question: "What does 'scrutinized' mean in this context?", choices: ["A) Collected and stored", "B) Examined very carefully", "C) Photographed", "D) Threw away"], answer: "B" },
+      { text: "The drought caused a severe <u>scarcity</u> of water in the region. Wells dried up, crops withered, and families were forced to ration every drop.", question: "What does 'scarcity' mean?", choices: ["A) Overflow", "B) Shortage or lack", "C) Pollution", "D) Variety"], answer: "B" },
+      { text: "The politician's speech was intentionally <u>ambiguous</u>. Supporters and opponents both claimed it supported their position because the language could be interpreted in different ways.", question: "What does 'ambiguous' mean?", choices: ["A) Inspiring and powerful", "B) Open to more than one interpretation", "C) Carefully rehearsed", "D) Short and direct"], answer: "B" },
+      { text: "Unlike her outgoing and talkative sister, Emma was <u>reserved</u>. She preferred to listen quietly and think before speaking in group conversations.", question: "What does 'reserved' mean?", choices: ["A) Rude", "B) Shy and quiet", "C) Bored", "D) Unfriendly"], answer: "B" },
+      { text: "The <u>innovative</u> design won first place at the science fair. The judges said they had never seen anything like it before and praised the student's original thinking.", question: "What does 'innovative' mean?", choices: ["A) Expensive", "B) Simple", "C) New and creative", "D) Colorful"], answer: "C" },
+      { text: "The committee reached a <u>consensus</u> after hours of discussion. Every member finally agreed on the same plan, and the vote was unanimous.", question: "What does 'consensus' mean?", choices: ["A) Argument", "B) General agreement", "C) Compromise", "D) Deadline"], answer: "B" },
+      { text: "The old bridge was <u>deteriorating</u> rapidly. Cracks spread across the concrete, rust ate through the metal supports, and engineers warned it could collapse within a year.", question: "What does 'deteriorating' mean?", choices: ["A) Improving slowly", "B) Getting worse or falling apart", "C) Being rebuilt", "D) Becoming stronger"], answer: "B" },
+      { text: "The teacher tried to <u>motivate</u> her students by offering extra credit and prizes for the highest scores. She believed that encouragement was more effective than punishment.", question: "What does 'motivate' mean?", choices: ["A) Punish", "B) Test", "C) Encourage or inspire to act", "D) Confuse"], answer: "C" },
+      { text: "The new policy was met with <u>skepticism</u> by many residents. They doubted the mayor's promises because similar plans had failed in the past.", question: "What does 'skepticism' mean?", choices: ["A) Enthusiasm", "B) Anger", "C) Doubt or disbelief", "D) Confusion"], answer: "C" },
+      { text: "The artist's work was highly <u>versatile</u>. She created paintings, sculptures, digital art, and even designed clothing, showing skill in many different areas.", question: "What does 'versatile' mean?", choices: ["A) Expensive", "B) Able to do many different things well", "C) Traditional", "D) Famous"], answer: "B" },
+      { text: "The refugees were forced to <u>flee</u> their homeland when the conflict intensified. They left with only what they could carry and walked for days to reach the border.", question: "What does 'flee' mean?", choices: ["A) Stay and fight", "B) Run away from danger", "C) Migrate for work", "D) Travel for vacation"], answer: "B" },
+      { text: "The evidence against the suspect was <u>compelling</u>. Eyewitness accounts, security footage, and DNA all pointed to the same person, leaving little room for doubt.", question: "What does 'compelling' mean?", choices: ["A) Weak and questionable", "B) Confusing and contradictory", "C) Convincing and persuasive", "D) Incomplete"], answer: "C" },
+      { text: "The charity event was a <u>triumph</u>. It raised three times more money than expected, attracted media coverage, and brought the community together in a way no one had anticipated.", question: "What does 'triumph' mean?", choices: ["A) Disaster", "B) A great success", "C) A surprise", "D) An average result"], answer: "B" },
+      { text: "The scientist's <u>hypothesis</u> was that plants grow faster with classical music. She designed an experiment to test this idea by growing two groups of plants under different conditions.", question: "What does 'hypothesis' mean?", choices: ["A) A proven fact", "B) A testable prediction or educated guess", "C) A type of experiment", "D) A conclusion"], answer: "B" },
+      { text: "The movie received <u>rave</u> reviews from critics. Every major newspaper praised the acting, the screenplay, and the stunning visual effects.", question: "What does 'rave' mean in this context?", choices: ["A) Mixed", "B) Extremely positive and enthusiastic", "C) Angry", "D) Brief"], answer: "B" },
+      { text: "The company decided to <u>postpone</u> the product launch because the software still had bugs. They moved the release date to next month to allow more time for testing.", question: "What does 'postpone' mean?", choices: ["A) Cancel permanently", "B) Delay to a later time", "C) Speed up", "D) Announce early"], answer: "B" },
+      { text: "Living conditions in the <u>remote</u> village were challenging. The nearest hospital was two hours away, there was no internet, and supplies had to be delivered by helicopter during winter.", question: "What does 'remote' mean?", choices: ["A) Crowded", "B) Modern", "C) Far from cities and hard to reach", "D) Dangerous"], answer: "C" },
+      { text: "The spy operated in complete <u>secrecy</u>. Not even her own family knew her real profession, and she used a different name in every country she visited.", question: "What does 'secrecy' mean?", choices: ["A) Openness and honesty", "B) The state of being hidden or kept secret", "C) Loneliness", "D) Danger"], answer: "B" }
+    ],
+    hard: [
+      { text: "The professor's <u>eloquent</u> lecture captivated the entire auditorium. Her words flowed with such grace and precision that even the most complex ideas felt accessible and compelling to every listener.", question: "What does 'eloquent' mean?", choices: ["A) Long and boring", "B) Fluent, persuasive, and expressive in speech", "C) Scientifically accurate", "D) Emotionally charged"], answer: "B" },
+      { text: "The <u>ubiquitous</u> smartphone has transformed nearly every aspect of modern life. Whether in rural villages or major cities, on trains or in classrooms, these devices are found everywhere.", question: "What does 'ubiquitous' mean?", choices: ["A) Expensive", "B) Present everywhere", "C) Controversial", "D) Outdated"], answer: "B" },
+      { text: "The negotiations reached an <u>impasse</u> when neither side would budge on the key issue. Talks stalled for weeks, and mediators were brought in to try to break the deadlock.", question: "What does 'impasse' mean?", choices: ["A) A successful conclusion", "B) A point where no progress can be made", "C) A compromise", "D) A misunderstanding"], answer: "B" },
+      { text: "Her <u>pragmatic</u> approach to problem-solving impressed her colleagues. Rather than debating abstract theories, she focused on practical solutions that could be implemented immediately.", question: "What does 'pragmatic' mean?", choices: ["A) Theoretical and idealistic", "B) Practical and focused on results", "C) Creative and artistic", "D) Cautious and slow"], answer: "B" },
+      { text: "The dictator's regime was known for its <u>oppressive</u> policies. Citizens were denied basic freedoms, dissent was punished harshly, and the media was controlled by the state.", question: "What does 'oppressive' mean?", choices: ["A) Democratic and fair", "B) Cruelly controlling and restricting freedoms", "C) Disorganized", "D) Wealthy"], answer: "B" },
+      { text: "The author's writing style was deliberately <u>austere</u>. She used short sentences, avoided flowery descriptions, and let the bare facts of the story speak for themselves.", question: "What does 'austere' mean?", choices: ["A) Elaborate and decorative", "B) Plain, simple, and without extras", "C) Humorous and lighthearted", "D) Poetic and musical"], answer: "B" },
+      { text: "The evidence was entirely <u>circumstantial</u>. While several facts pointed toward the suspect, none of them directly proved he had committed the crime, and the jury had to decide whether the pattern was convincing enough.", question: "What does 'circumstantial' mean?", choices: ["A) Overwhelming and conclusive", "B) Based on indirect evidence rather than direct proof", "C) Fabricated and false", "D) Eyewitness-based"], answer: "B" },
+      { text: "The treaty was designed to <u>mitigate</u> the effects of climate change rather than eliminate them entirely. Negotiators acknowledged that some warming was inevitable but aimed to reduce its severity through emission caps.", question: "What does 'mitigate' mean?", choices: ["A) Completely prevent", "B) Make less severe or reduce", "C) Ignore", "D) Measure accurately"], answer: "B" },
+      { text: "The CEO's <u>candid</u> remarks at the press conference surprised everyone. Instead of using corporate jargon and prepared statements, she spoke honestly and directly about the company's failures.", question: "What does 'candid' mean?", choices: ["A) Carefully rehearsed", "B) Honest and straightforward", "C) Inappropriate", "D) Vague and evasive"], answer: "B" },
+      { text: "The community's <u>resilience</u> was evident after the hurricane. Within days, neighbors organized cleanup crews, set up shelters, and began rebuilding, refusing to be defeated by the disaster.", question: "What does 'resilience' mean?", choices: ["A) Wealth and resources", "B) The ability to recover quickly from difficulties", "C) Stubbornness", "D) Organization"], answer: "B" },
+      { text: "The new law was seen as a <u>precedent</u> that could affect similar cases in the future. Legal scholars noted that courts would likely reference this decision when ruling on related issues.", question: "What does 'precedent' mean?", choices: ["A) A mistake that should not be repeated", "B) An earlier example or decision that serves as a guide for future cases", "C) A temporary solution", "D) A controversial opinion"], answer: "B" },
+      { text: "The journalist's investigation revealed a pattern of <u>corruption</u> within the city government. Officials had accepted bribes, awarded contracts to friends, and diverted public funds for personal use.", question: "What does 'corruption' mean?", choices: ["A) Inefficiency and slow processes", "B) Dishonest and illegal behavior by people in power", "C) Strict law enforcement", "D) Budget cuts"], answer: "B" },
+      { text: "The philosopher argued that true happiness is <u>ephemeral</u>. Like a flower that blooms brilliantly but wilts within days, moments of pure joy are beautiful precisely because they do not last.", question: "What does 'ephemeral' mean?", choices: ["A) Permanent and unchanging", "B) Lasting only a short time", "C) Imaginary and unreal", "D) Difficult to achieve"], answer: "B" },
+      { text: "The <u>proliferation</u> of social media platforms has fragmented online attention. Where once a few major sites dominated, now dozens compete for users, each offering slightly different features and communities.", question: "What does 'proliferation' mean?", choices: ["A) Decline and disappearance", "B) Rapid increase in number", "C) Consolidation into fewer options", "D) Regulation by government"], answer: "B" },
+      { text: "The architect's design was both functional and <u>aesthetic</u>. The building not only served its practical purpose efficiently but was also visually striking, with clean lines and harmonious proportions.", question: "What does 'aesthetic' mean?", choices: ["A) Cheap to build", "B) Concerned with beauty and visual appeal", "C) Structurally sound", "D) Traditional in style"], answer: "B" },
+      { text: "The witness's testimony was <u>corroborated</u> by security camera footage. The video showed exactly what the witness described, confirming her account of events.", question: "What does 'corroborated' mean?", choices: ["A) Contradicted", "B) Supported and confirmed by additional evidence", "C) Recorded", "D) Questioned by the defense"], answer: "B" },
+      { text: "The company's <u>proprietary</u> software gave it a competitive edge. Because no other firm had access to the same technology, customers who needed those specific capabilities had no alternative supplier.", question: "What does 'proprietary' mean?", choices: ["A) Free and open-source", "B) Owned exclusively by one company", "C) Outdated", "D) Commonly available"], answer: "B" },
+      { text: "The student's argument was logically <u>cogent</u>. Each point followed naturally from the previous one, the evidence was strong, and the conclusion was difficult to dispute.", question: "What does 'cogent' mean?", choices: ["A) Weak and unconvincing", "B) Clear, logical, and convincing", "C) Original but unproven", "D) Emotional and passionate"], answer: "B" }
+    ]
+  };
+
+  function shuffle(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var temp = arr[i]; arr[i] = arr[j]; arr[j] = temp;
+    }
+    return arr;
+  }
+
+  function generateProblems() {
+    var count = parseInt(document.getElementById('cfgProblems').value, 10);
+    var level = document.getElementById('cfgLevel').value;
+
+    if (isNaN(count) || count < 5) count = 5;
+    if (count > 20) count = 20;
+
+    var pool = passageBank[level].slice();
+    shuffle(pool);
+    selected = pool.slice(0, Math.min(count, pool.length));
+
+    renderProblems();
+    renderAnswerKey();
+    updateAnswerVisibility();
+  }
+
+  function renderProblems() {
+    var grid = document.getElementById('problemGrid');
+    var showAnswers = document.getElementById('toggleAnswers').checked;
+    var html = '';
+
+    for (var i = 0; i < selected.length; i++) {
+      var p = selected[i];
+      html += '<div class="reading-passage">';
+      html += '<div class="problem-number">' + (i + 1) + ')</div>';
+      html += '<div class="passage-text">' + p.text + '</div>';
+      html += '<div class="passage-question"><strong>' + p.question + '</strong></div>';
+      html += '<div class="passage-choices">';
+      for (var j = 0; j < p.choices.length; j++) {
+        var isCorrect = showAnswers && p.choices[j].charAt(0) === p.answer;
+        html += '<div class="choice' + (isCorrect ? ' correct' : '') + '">' + p.choices[j] + '</div>';
+      }
+      html += '</div>';
+      html += '</div>';
+    }
+
+    grid.innerHTML = html;
+  }
+
+  function renderAnswerKey() {
+    var answerGrid = document.getElementById('answerGrid');
+    var html = '';
+    for (var i = 0; i < selected.length; i++) {
+      html += '<div class="answer-item">';
+      html += '<span class="q">' + (i + 1) + '.</span>';
+      html += '<span class="a">' + selected[i].answer + '</span>';
+      html += '</div>';
+    }
+    answerGrid.innerHTML = html;
+  }
+
+  function updateAnswerVisibility() {
+    var showAnswers = document.getElementById('toggleAnswers').checked;
+    var answerKey = document.getElementById('answerKey');
+    if (showAnswers) { answerKey.classList.remove('hidden'); }
+    else { answerKey.classList.add('hidden'); }
+    renderProblems();
+  }
+
+  document.getElementById('btnGenerate').addEventListener('click', generateProblems);
+  document.getElementById('btnPrint').addEventListener('click', function () { window.print(); });
+  document.getElementById('toggleAnswers').addEventListener('change', updateAnswerVisibility);
+  generateProblems();
+</script>

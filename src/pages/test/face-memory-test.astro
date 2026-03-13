@@ -1,0 +1,687 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import GameShare from '../../components/GameShare.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import '../../styles/game.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tests & Games", "item": "https://toolcalcs.com/test/" },
+      { "@type": "ListItem", "position": 3, "name": "Face Memory Test" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Face Memory Test",
+    "url": "https://toolcalcs.com/test/face-memory-test/",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Test your face recognition memory. Study a set of faces, then identify which ones you saw among a mix of seen and new faces. 3 rounds of increasing difficulty."
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the Face Memory Test?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Face Memory Test measures your ability to remember and recognize faces. You study a set of faces during a memorization phase, then identify which faces you saw among a mix of old and new faces. The test includes 3 rounds with increasing numbers of faces to remember."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is prosopagnosia?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Prosopagnosia, also called face blindness, is a neurological condition where a person has difficulty recognizing faces. It can be acquired through brain injury or present from birth (developmental prosopagnosia). About 2-3% of the population experiences some degree of face recognition difficulty."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why are some people better at remembering faces?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Face recognition ability varies widely and is influenced by both genetics and experience. Some people are super-recognizers who can identify faces they saw only briefly years ago. The fusiform face area in the brain specializes in face processing, and individual differences in this region correlate with recognition ability."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can face memory be improved?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "While face recognition has a strong genetic component, practice and specific strategies can help. Paying attention to distinctive features, making verbal descriptions of faces, and actively engaging with faces during encoding all improve subsequent recognition. However, the degree of improvement is more limited compared to other memory domains."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Face Memory Test - How Well Do You Remember Faces? | ToolCalcs"
+  description="Test your face recognition memory. Study CSS-drawn faces, then identify which ones you saw. 3 rounds of increasing difficulty. Free online face memory test."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/test/">Tests & Games</a> &rsaquo;
+    <span>Face Memory Test</span>
+  </nav>
+
+  <h1>Face Memory Test</h1>
+  <p class="page-desc">Study the faces carefully, then identify which ones you saw among a mix of familiar and new faces.</p>
+
+  <div class="game-box">
+    <div class="game-area" id="gameArea" role="region" aria-label="Face memory test area" aria-live="polite">
+      <div class="game-instructions" id="instructionsView">
+        <h2>Face Memory Test</h2>
+        <p>In each round, you will study a set of faces for 15 seconds. Then you will see a mix of seen and new faces and must decide which ones you remember.</p>
+        <p style="font-size:0.85rem;color:var(--color-text-muted);">3 rounds with increasing difficulty. Pay attention to unique features like hair color, expression, and accessories.</p>
+        <button class="game-btn primary" id="startBtn" type="button" style="margin-top:16px;">Start Test</button>
+      </div>
+
+      <div class="play-view" id="playView" style="display:none;">
+        <div class="status-bar">
+          <span class="level-info" id="roundInfo">Round 1 / 3</span>
+          <span class="level-info" id="phaseInfo">Study Phase</span>
+          <span class="lives-info" id="timerInfo">15s</span>
+        </div>
+        <div class="fm-instruction" id="phaseInstruction">Memorize these faces</div>
+        <div class="fm-faces-grid" id="facesGrid"></div>
+        <div class="fm-buttons" id="answerButtons" style="display:none;">
+          <button class="game-btn fm-answer-btn seen-btn" id="seenFaceBtn" type="button">Seen</button>
+          <button class="game-btn fm-answer-btn new-btn" id="newFaceBtn" type="button">New</button>
+        </div>
+        <div class="fm-feedback" id="fmFeedback">&nbsp;</div>
+      </div>
+
+      <div class="result-view" id="resultView" style="display:none;">
+        <div class="result-icon" aria-hidden="true">&#128100;</div>
+        <div class="result-label">Test Complete</div>
+        <div class="score-display">
+          <span class="score-value" id="finalScore">0%</span>
+          <span class="score-unit">accuracy</span>
+        </div>
+        <div class="fm-result-detail" id="resultDetail"></div>
+        <div class="rating-badge" id="ratingBadge">&mdash;</div>
+        <button class="game-btn primary" id="tryAgainBtn" type="button" style="margin-top:16px;">Try Again</button>
+      </div>
+    </div>
+
+    <GameShare />
+
+    <div class="attempt-history" id="attemptHistory" hidden>
+      <h3>Attempt History</h3>
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is the Face Memory Test?</h2>
+    <p>The Face Memory Test is an interactive cognitive assessment that measures your ability to encode, store, and retrieve facial information from memory. Faces are among the most important visual stimuli that humans process, and the brain has dedicated neural machinery for recognizing them. This test evaluates how well your face processing system works by presenting faces during a study phase and then challenging you to distinguish previously seen faces from new ones.</p>
+    <p>The test follows a classic recognition memory paradigm used in cognitive psychology research. During the study phase, a set of faces is displayed for 15 seconds, giving you time to encode their features into memory. In the test phase, faces appear one at a time, mixing the previously studied faces with an equal number of novel faces. For each face, you must decide whether you saw it during the study phase or if it is new. The test includes three rounds with increasing numbers of faces, making each round progressively more challenging.</p>
+    <p>Face recognition is a remarkably sophisticated cognitive ability. Unlike object recognition, which relies heavily on identifying specific features and parts, face recognition depends on holistic processing, where the spatial relationships between features matter as much as the features themselves. This is why inverting a face (turning it upside down) dramatically impairs recognition, a phenomenon known as the face inversion effect, while inverting other objects causes relatively little disruption.</p>
+
+    <h2>The Neuroscience of Face Recognition</h2>
+    <p>The human brain contains specialized regions dedicated to face processing, most notably the fusiform face area (FFA) located in the fusiform gyrus on the underside of the temporal lobe. Neuroimaging studies consistently show that the FFA responds more strongly to faces than to other categories of objects, suggesting it plays a critical role in face perception and recognition.</p>
+    <p>Beyond the FFA, face processing involves a distributed network of brain regions. The occipital face area handles early perceptual processing of face-like stimuli. The superior temporal sulcus processes changeable aspects of faces such as expression and gaze direction. The anterior temporal lobe stores long-term representations of familiar faces, linking visual appearance with biographical knowledge and names. Damage to different parts of this network produces distinct patterns of face recognition impairment.</p>
+    <p>The development of face processing abilities begins in infancy. Newborns preferentially orient toward face-like patterns within hours of birth, suggesting an innate predisposition for face processing. Through the first year of life, face recognition abilities become increasingly refined, and by approximately 9 months, infants show a perceptual narrowing effect: they become better at discriminating faces from their own racial group while losing sensitivity to faces from other groups, a phenomenon that persists into adulthood and is known as the other-race effect.</p>
+
+    <h2>Understanding Prosopagnosia</h2>
+    <p>Prosopagnosia, commonly called face blindness, is a neurological condition characterized by a severe impairment in recognizing faces. The term comes from the Greek words prosopon (face) and agnosia (not knowing). People with prosopagnosia can see faces perfectly well, they simply cannot use facial information to identify individuals. They often rely on alternative cues such as voice, hairstyle, clothing, gait, or context to recognize people.</p>
+    <p>There are two main forms of prosopagnosia. Acquired prosopagnosia results from brain damage, typically to the fusiform gyrus or surrounding regions, caused by stroke, traumatic brain injury, or neurodegenerative disease. Developmental prosopagnosia (also called congenital prosopagnosia) is present from birth without any apparent brain damage and is estimated to affect approximately 2 to 3 percent of the population. Recent research suggests that developmental prosopagnosia has a strong genetic component, as it often runs in families.</p>
+    <p>At the other end of the spectrum, some individuals are super-recognizers who possess exceptional face recognition abilities. Super-recognizers can identify people they saw only briefly, even years later, and can recognize faces across dramatic changes in age, hairstyle, or viewing conditions. Some police forces have begun employing super-recognizers for tasks such as identifying suspects from surveillance footage, where their abilities significantly outperform both average observers and automated face recognition systems.</p>
+
+    <h2>Factors Affecting Face Memory</h2>
+    <p>Several factors influence how well you remember faces. Attention during encoding is paramount: faces that receive focused attention are remembered far better than those processed passively. Emotional expressions also affect memory, with emotional faces (particularly threatening or fearful expressions) typically being better remembered than neutral faces, reflecting the survival value of remembering potentially dangerous individuals.</p>
+    <p>The depth of processing during encoding matters significantly. Simply looking at a face produces weaker memory traces than actively engaging with it. Making judgments about a face, such as whether the person looks friendly, how old they might be, or what occupation they might have, creates deeper encoding and stronger subsequent recognition. This elaborative encoding strategy is one of the few interventions that reliably improves face memory performance.</p>
+
+    <h2>Strategies to Improve Face Recognition</h2>
+    <ul>
+      <li><strong>Focus on distinctive features:</strong> Look for what makes each face unique rather than trying to memorize the entire face. An unusual nose, prominent chin, or distinctive eyebrows can serve as effective retrieval cues.</li>
+      <li><strong>Make verbal descriptions:</strong> Describing a face in words (even silently) creates a dual code that strengthens the memory trace. This leverages both visual and verbal memory systems.</li>
+      <li><strong>Create associations:</strong> Connect the face to someone you already know, a celebrity, or a character. These associations create additional retrieval pathways.</li>
+      <li><strong>Pay attention to spatial relationships:</strong> Note the distance between eyes, the proportions of the face, and how features relate to each other. This holistic information is central to how the brain naturally processes faces.</li>
+      <li><strong>Engage actively:</strong> Make a judgment about each face, such as estimating the age or imagining the personality. Active engagement produces deeper encoding than passive viewing.</li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is the Face Memory Test?</h3>
+    <p>The Face Memory Test measures your ability to remember and recognize faces. You study a set of faces during a memorization phase, then identify which faces you saw among a mix of old and new faces. The test includes 3 rounds with increasing numbers of faces to remember.</p>
+
+    <h3>What is prosopagnosia?</h3>
+    <p>Prosopagnosia, also called face blindness, is a neurological condition where a person has difficulty recognizing faces. It can be acquired through brain injury or present from birth. About 2 to 3 percent of the population experiences some degree of face recognition difficulty.</p>
+
+    <h3>Why are some people better at remembering faces?</h3>
+    <p>Face recognition ability varies widely and is influenced by both genetics and experience. Some people are super-recognizers who can identify faces they saw only briefly years ago. The fusiform face area in the brain specializes in face processing, and individual differences in this region correlate with recognition ability.</p>
+
+    <h3>Can face memory be improved?</h3>
+    <p>While face recognition has a strong genetic component, practice and specific strategies can help. Paying attention to distinctive features, making verbal descriptions of faces, and actively engaging with faces during encoding all improve subsequent recognition. However, the degree of improvement is more limited compared to other memory domains.</p>
+  </article>
+
+  <CrossLinks links={[
+    { href: '/test/verbal-memory-test/', label: 'Verbal Memory Test', icon: '\uD83D\uDCDD' },
+    { href: '/test/visual-memory-test/', label: 'Visual Memory Test', icon: '\uD83D\uDFE6' },
+    { href: '/test/sequence-memory-test/', label: 'Sequence Memory Test', icon: '\uD83D\uDD22' },
+  ]} />
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .game-area { cursor: default; user-select: auto; -webkit-user-select: auto; }
+
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .level-info { font-weight: 700; font-size: 1rem; color: var(--color-text); }
+  .lives-info { font-size: 0.95rem; font-weight: 600; color: var(--color-text-muted); }
+
+  .fm-instruction {
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 4px 16px 12px;
+    color: var(--color-text);
+  }
+
+  .fm-faces-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    padding: 8px 16px 16px;
+  }
+
+  :global(.fm-face) {
+    width: 72px;
+    height: 88px;
+    border-radius: 12px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    overflow: hidden;
+    border: 3px solid var(--color-border);
+    transition: border-color 0.2s, transform 0.15s;
+    cursor: default;
+  }
+  :global(.fm-face.clickable) {
+    cursor: pointer;
+  }
+  :global(.fm-face.clickable:hover) {
+    border-color: var(--color-primary);
+    transform: scale(1.05);
+  }
+  :global(.fm-face.flash-correct) {
+    border-color: #22c55e !important;
+  }
+  :global(.fm-face.flash-wrong) {
+    border-color: #ef4444 !important;
+  }
+
+  :global(.fm-head) {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    position: relative;
+    margin-top: 6px;
+  }
+  :global(.fm-eye) {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #1e293b;
+    position: absolute;
+    top: 14px;
+  }
+  :global(.fm-eye-left) { left: 8px; }
+  :global(.fm-eye-right) { right: 8px; }
+  :global(.fm-mouth) {
+    width: 12px;
+    height: 6px;
+    position: absolute;
+    bottom: 7px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 0 0 6px 6px;
+  }
+  :global(.fm-hair) {
+    position: absolute;
+    top: -2px;
+    left: 0;
+    right: 0;
+    height: 16px;
+    border-radius: 18px 18px 0 0;
+  }
+  :global(.fm-accessory) {
+    position: absolute;
+    z-index: 2;
+  }
+  :global(.fm-body) {
+    width: 48px;
+    height: 24px;
+    border-radius: 24px 24px 0 0;
+    margin-top: 4px;
+  }
+
+  .fm-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    padding: 0 24px 8px;
+  }
+  :global(.fm-answer-btn) {
+    min-width: 100px;
+    padding: 12px 28px;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+  }
+  :global(.fm-answer-btn:active) { transform: scale(0.95); }
+  :global(.fm-answer-btn.seen-btn) { background: #2563eb; color: #fff; border: 2px solid #2563eb; }
+  :global(.fm-answer-btn.seen-btn:hover) { background: #1d4ed8; }
+  :global(.fm-answer-btn.new-btn) { background: #16a34a; color: #fff; border: 2px solid #16a34a; }
+  :global(.fm-answer-btn.new-btn:hover) { background: #15803d; }
+
+  .fm-feedback {
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 8px 16px 16px;
+    min-height: 36px;
+    color: var(--color-text-muted);
+  }
+
+  .fm-result-detail {
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+
+  .play-view {
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .result-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 280px;
+    padding: 24px;
+  }
+  .result-icon { font-size: 3rem; margin-bottom: 8px; }
+  .result-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+
+  @media (max-width: 640px) {
+    :global(.fm-face) { width: 60px; height: 76px; }
+    :global(.fm-head) { width: 30px; height: 30px; }
+    :global(.fm-eye) { width: 4px; height: 4px; top: 12px; }
+    :global(.fm-eye-left) { left: 6px; }
+    :global(.fm-eye-right) { right: 6px; }
+    :global(.fm-mouth) { width: 10px; height: 5px; bottom: 5px; }
+    :global(.fm-hair) { height: 13px; }
+    :global(.fm-body) { width: 40px; height: 20px; }
+    .fm-faces-grid { gap: 8px; }
+    .fm-buttons { gap: 10px; }
+    :global(.fm-answer-btn) { min-width: 80px; padding: 10px 20px; font-size: 0.9rem; }
+  }
+</style>
+
+<script define:vars={{ gameName: "Face Memory Test", gameSlug: "face-memory-test", gameIcon: "\uD83D\uDC64", metricLabel: "Accuracy", metricUnit: "percent" }}>
+(function () {
+  'use strict';
+
+  var SKIN_COLORS = ['#FFDAB9', '#F5CBA7', '#D2B48C', '#C68642', '#8D5524', '#FFDBAC'];
+  var HAIR_COLORS = ['#2C1B0E', '#5C3317', '#D4A76A', '#C0392B', '#E67E22', '#7D3C98', '#2E86C1', '#1ABC9C', '#515A5A'];
+  var BODY_COLORS = ['#3498DB', '#E74C3C', '#2ECC71', '#9B59B6', '#F39C12', '#1ABC9C', '#E91E63', '#FF5722', '#607D8B', '#795548'];
+  var MOUTH_STYLES = ['smile', 'neutral', 'open', 'frown'];
+  var MOUTH_COLORS = ['#C0392B', '#E74C3C', '#D35400', '#A93226'];
+  var ACCESSORY_TYPES = ['none', 'glasses', 'hat', 'earring'];
+  var EYE_STYLES = ['normal', 'wide', 'narrow'];
+
+  var ROUNDS = [
+    { study: 6, total: 12 },
+    { study: 8, total: 16 },
+    { study: 10, total: 20 }
+  ];
+  var STUDY_TIME = 15;
+
+  var RATING_SCALE = [
+    { min: 90, label: 'Excellent', color: '#16a34a' },
+    { min: 75, label: 'Good', color: '#22c55e' },
+    { min: 60, label: 'Average', color: '#2563eb' },
+    { min: 0, label: 'Below Average', color: '#ef4444' }
+  ];
+
+  function getRating(pct) {
+    for (var i = 0; i < RATING_SCALE.length; i++) {
+      if (pct >= RATING_SCALE[i].min) return RATING_SCALE[i];
+    }
+    return { label: 'Below Average', color: '#ef4444' };
+  }
+
+  var STORAGE_KEY = 'toolcalcs_face-memory-test_history';
+  var MAX_HISTORY = 20;
+
+  function loadHistory() {
+    try { var r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch (e) {}
+    return [];
+  }
+  function saveHistory(h) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch (e) {}
+  }
+  function addToHistory(pct) {
+    var h = loadHistory();
+    h.unshift({ score: pct, date: new Date().toISOString(), rating: getRating(pct).label });
+    saveHistory(h);
+  }
+
+  var usedCombos = {};
+
+  function generateFace(id) {
+    var attempts = 0;
+    var face;
+    do {
+      face = {
+        id: id,
+        skin: SKIN_COLORS[Math.floor(Math.random() * SKIN_COLORS.length)],
+        hair: HAIR_COLORS[Math.floor(Math.random() * HAIR_COLORS.length)],
+        body: BODY_COLORS[Math.floor(Math.random() * BODY_COLORS.length)],
+        mouth: MOUTH_STYLES[Math.floor(Math.random() * MOUTH_STYLES.length)],
+        mouthColor: MOUTH_COLORS[Math.floor(Math.random() * MOUTH_COLORS.length)],
+        accessory: ACCESSORY_TYPES[Math.floor(Math.random() * ACCESSORY_TYPES.length)],
+        eyeStyle: EYE_STYLES[Math.floor(Math.random() * EYE_STYLES.length)]
+      };
+      var key = face.skin + '|' + face.hair + '|' + face.body + '|' + face.mouth + '|' + face.accessory + '|' + face.eyeStyle;
+      attempts++;
+    } while (usedCombos[key] && attempts < 50);
+    usedCombos[key] = true;
+    return face;
+  }
+
+  function renderFaceHTML(face, clickable) {
+    var eyeW = face.eyeStyle === 'wide' ? 7 : face.eyeStyle === 'narrow' ? 4 : 5;
+    var eyeH = face.eyeStyle === 'wide' ? 7 : face.eyeStyle === 'narrow' ? 3 : 5;
+    var mouthHTML = '';
+    if (face.mouth === 'smile') {
+      mouthHTML = '<div class="fm-mouth" style="background:transparent;border-bottom:3px solid ' + face.mouthColor + ';border-radius:0 0 6px 6px;height:4px;"></div>';
+    } else if (face.mouth === 'frown') {
+      mouthHTML = '<div class="fm-mouth" style="background:transparent;border-top:3px solid ' + face.mouthColor + ';border-radius:6px 6px 0 0;height:4px;bottom:5px;"></div>';
+    } else if (face.mouth === 'open') {
+      mouthHTML = '<div class="fm-mouth" style="background:' + face.mouthColor + ';border-radius:50%;width:8px;height:8px;"></div>';
+    } else {
+      mouthHTML = '<div class="fm-mouth" style="background:' + face.mouthColor + ';height:3px;border-radius:2px;"></div>';
+    }
+
+    var accHTML = '';
+    if (face.accessory === 'glasses') {
+      accHTML = '<div class="fm-accessory" style="top:11px;left:3px;width:30px;height:10px;border:2px solid #1e293b;border-radius:4px;background:rgba(100,150,255,0.15);"></div>';
+    } else if (face.accessory === 'hat') {
+      accHTML = '<div class="fm-accessory" style="top:-8px;left:2px;right:2px;height:10px;background:#1e293b;border-radius:4px 4px 0 0;"></div><div class="fm-accessory" style="top:0px;left:-2px;right:-2px;height:4px;background:#1e293b;border-radius:2px;"></div>';
+    } else if (face.accessory === 'earring') {
+      accHTML = '<div class="fm-accessory" style="top:20px;left:-4px;width:5px;height:5px;border-radius:50%;background:#F1C40F;"></div>';
+    }
+
+    var cls = 'fm-face' + (clickable ? ' clickable' : '');
+    return '<div class="' + cls + '" data-face-id="' + face.id + '" style="background:' + face.skin + ';">' +
+      '<div class="fm-head" style="background:' + face.skin + ';">' +
+        '<div class="fm-hair" style="background:' + face.hair + ';"></div>' +
+        '<div class="fm-eye fm-eye-left" style="width:' + eyeW + 'px;height:' + eyeH + 'px;"></div>' +
+        '<div class="fm-eye fm-eye-right" style="width:' + eyeW + 'px;height:' + eyeH + 'px;"></div>' +
+        mouthHTML +
+        accHTML +
+      '</div>' +
+      '<div class="fm-body" style="background:' + face.body + ';"></div>' +
+    '</div>';
+  }
+
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+  }
+
+  var instructionsView = document.getElementById('instructionsView');
+  var playView = document.getElementById('playView');
+  var resultView = document.getElementById('resultView');
+  var startBtn = document.getElementById('startBtn');
+  var tryAgainBtn = document.getElementById('tryAgainBtn');
+  var roundInfo = document.getElementById('roundInfo');
+  var phaseInfo = document.getElementById('phaseInfo');
+  var timerInfo = document.getElementById('timerInfo');
+  var phaseInstruction = document.getElementById('phaseInstruction');
+  var facesGrid = document.getElementById('facesGrid');
+  var answerButtons = document.getElementById('answerButtons');
+  var seenFaceBtn = document.getElementById('seenFaceBtn');
+  var newFaceBtn = document.getElementById('newFaceBtn');
+  var fmFeedback = document.getElementById('fmFeedback');
+  var finalScore = document.getElementById('finalScore');
+  var resultDetail = document.getElementById('resultDetail');
+  var ratingBadge = document.getElementById('ratingBadge');
+  var attemptHistorySection = document.getElementById('attemptHistory');
+  var historyList = document.getElementById('historyList');
+
+  var currentRound = 0;
+  var totalCorrect = 0;
+  var totalAnswered = 0;
+  var studyFaces = [];
+  var testFaces = [];
+  var testIndex = 0;
+  var canAnswer = false;
+  var studyTimer = null;
+  var studyTimeLeft = 0;
+  var faceIdCounter = 0;
+
+  function showView(view) {
+    instructionsView.style.display = 'none';
+    playView.style.display = 'none';
+    resultView.style.display = 'none';
+    view.style.display = '';
+  }
+
+  function startGame() {
+    currentRound = 0;
+    totalCorrect = 0;
+    totalAnswered = 0;
+    faceIdCounter = 0;
+    usedCombos = {};
+    showView(playView);
+    startRound();
+  }
+
+  function startRound() {
+    var cfg = ROUNDS[currentRound];
+    roundInfo.textContent = 'Round ' + (currentRound + 1) + ' / ' + ROUNDS.length;
+    phaseInfo.textContent = 'Study Phase';
+    phaseInstruction.textContent = 'Memorize these faces';
+    answerButtons.style.display = 'none';
+    fmFeedback.innerHTML = '&nbsp;';
+
+    studyFaces = [];
+    for (var i = 0; i < cfg.study; i++) {
+      studyFaces.push(generateFace(faceIdCounter++));
+    }
+
+    var html = '';
+    for (var i = 0; i < studyFaces.length; i++) {
+      html += renderFaceHTML(studyFaces[i], false);
+    }
+    facesGrid.innerHTML = html;
+
+    studyTimeLeft = STUDY_TIME;
+    timerInfo.textContent = studyTimeLeft + 's';
+    studyTimer = setInterval(function () {
+      studyTimeLeft--;
+      timerInfo.textContent = studyTimeLeft + 's';
+      if (studyTimeLeft <= 0) {
+        clearInterval(studyTimer);
+        startTestPhase();
+      }
+    }, 1000);
+  }
+
+  function startTestPhase() {
+    var cfg = ROUNDS[currentRound];
+    var newCount = cfg.total - cfg.study;
+    var newFaces = [];
+    for (var i = 0; i < newCount; i++) {
+      newFaces.push(generateFace(faceIdCounter++));
+    }
+
+    testFaces = [];
+    for (var i = 0; i < studyFaces.length; i++) {
+      testFaces.push({ face: studyFaces[i], isSeen: true });
+    }
+    for (var i = 0; i < newFaces.length; i++) {
+      testFaces.push({ face: newFaces[i], isSeen: false });
+    }
+    testFaces = shuffle(testFaces);
+    testIndex = 0;
+
+    phaseInfo.textContent = 'Test Phase';
+    timerInfo.textContent = (testIndex + 1) + ' / ' + testFaces.length;
+    phaseInstruction.textContent = 'Have you seen this face before?';
+    answerButtons.style.display = '';
+    showTestFace();
+  }
+
+  function showTestFace() {
+    if (testIndex >= testFaces.length) {
+      finishRound();
+      return;
+    }
+    var entry = testFaces[testIndex];
+    facesGrid.innerHTML = renderFaceHTML(entry.face, false);
+    timerInfo.textContent = (testIndex + 1) + ' / ' + testFaces.length;
+    fmFeedback.innerHTML = '&nbsp;';
+    canAnswer = true;
+  }
+
+  function handleAnswer(answeredSeen) {
+    if (!canAnswer) return;
+    canAnswer = false;
+
+    var entry = testFaces[testIndex];
+    var isCorrect = (answeredSeen && entry.isSeen) || (!answeredSeen && !entry.isSeen);
+    totalAnswered++;
+
+    var faceEl = facesGrid.querySelector('.fm-face');
+    if (isCorrect) {
+      totalCorrect++;
+      if (faceEl) faceEl.classList.add('flash-correct');
+      fmFeedback.textContent = 'Correct!';
+      fmFeedback.style.color = '#22c55e';
+    } else {
+      if (faceEl) faceEl.classList.add('flash-wrong');
+      fmFeedback.textContent = 'Wrong! This face was ' + (entry.isSeen ? 'SEEN' : 'NEW') + '.';
+      fmFeedback.style.color = '#ef4444';
+    }
+
+    testIndex++;
+    setTimeout(showTestFace, 600);
+  }
+
+  function finishRound() {
+    currentRound++;
+    if (currentRound < ROUNDS.length) {
+      phaseInstruction.textContent = 'Get ready for round ' + (currentRound + 1) + '...';
+      facesGrid.innerHTML = '';
+      answerButtons.style.display = 'none';
+      fmFeedback.innerHTML = '&nbsp;';
+      setTimeout(startRound, 1500);
+    } else {
+      endGame();
+    }
+  }
+
+  function endGame() {
+    var pct = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
+    var rating = getRating(pct);
+
+    showView(resultView);
+    finalScore.textContent = pct + '%';
+    resultDetail.textContent = totalCorrect + ' of ' + totalAnswered + ' correct across ' + ROUNDS.length + ' rounds';
+    ratingBadge.textContent = rating.label;
+    ratingBadge.style.background = rating.color;
+
+    addToHistory(pct);
+    renderHistory();
+
+    if (window.GameShare) {
+      window.GameShare.show({
+        gameName: gameName,
+        gameSlug: gameSlug,
+        gameIcon: gameIcon,
+        score: pct,
+        unit: '%',
+        metricLabel: metricLabel,
+        ratingLabel: rating.label,
+        ratingColor: rating.color
+      });
+    }
+  }
+
+  function renderHistory() {
+    var history = loadHistory();
+    if (history.length === 0) { attemptHistorySection.hidden = true; return; }
+    attemptHistorySection.hidden = false;
+    historyList.innerHTML = history.map(function (e) {
+      var r = getRating(e.score);
+      return '<div class="history-item">' +
+        '<span class="history-score">' + e.score + '%</span>' +
+        '<span class="history-rating" style="background:' + r.color + '">' + r.label + '</span>' +
+        '<span class="history-time">' + formatDate(e.date) + '</span>' +
+        '</div>';
+    }).join('');
+  }
+
+  function formatDate(iso) {
+    try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    catch (e) { return ''; }
+  }
+
+  seenFaceBtn.addEventListener('click', function () { handleAnswer(true); });
+  newFaceBtn.addEventListener('click', function () { handleAnswer(false); });
+  startBtn.addEventListener('click', startGame);
+  tryAgainBtn.addEventListener('click', startGame);
+  renderHistory();
+})();
+</script>

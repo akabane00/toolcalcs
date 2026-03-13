@@ -52,7 +52,7 @@ const structuredData = {
       <div class="config-inputs">
         <div class="config-group">
           <label for="cfgProblems">Number of Problems</label>
-          <input type="number" id="cfgProblems" value="20" min="15" max="30" />
+          <input type="number" id="cfgProblems" value="20" min="5" max="50" />
         </div>
         <div class="config-group">
           <label for="cfgOperation">Operation</label>
@@ -60,16 +60,15 @@ const structuredData = {
             <option value="add">Addition</option>
             <option value="subtract">Subtraction</option>
             <option value="multiply">Multiplication</option>
-            <option value="divide">Division</option>
             <option value="mixed" selected>Mixed</option>
           </select>
         </div>
         <div class="config-group">
           <label for="cfgRange">Range</label>
           <select id="cfgRange">
-            <option value="10">Small (&ndash;10 to 10)</option>
-            <option value="50">Medium (&ndash;50 to 50)</option>
-            <option value="100">Large (&ndash;100 to 100)</option>
+            <option value="20" selected>&ndash;20 to 20</option>
+            <option value="50">&ndash;50 to 50</option>
+            <option value="100">&ndash;100 to 100</option>
           </select>
         </div>
       </div>
@@ -192,14 +191,14 @@ const structuredData = {
     var operation = document.getElementById('cfgOperation').value;
     var range = parseInt(document.getElementById('cfgRange').value, 10);
 
-    if (isNaN(count) || count < 15) count = 15;
-    if (count > 30) count = 30;
+    if (isNaN(count) || count < 5) count = 5;
+    if (count > 50) count = 50;
 
     problems = [];
-    var ops = ['add', 'subtract', 'multiply', 'divide'];
+    var ops = ['add', 'subtract', 'multiply'];
 
     for (var i = 0; i < count; i++) {
-      var op = operation === 'mixed' ? ops[randInt(0, 3)] : operation;
+      var op = operation === 'mixed' ? ops[randInt(0, 2)] : operation;
       var a, b, answer, text;
 
       if (op === 'add') {
@@ -212,25 +211,15 @@ const structuredData = {
         b = randInt(-range, range);
         answer = a - b;
         text = formatNum(a) + ' &ndash; ' + formatNum(b) + ' =';
-      } else if (op === 'multiply') {
-        // Keep multiplication range smaller so answers stay reasonable
+      } else {
+        // Multiplication: keep range smaller so answers stay reasonable
         var mulRange = Math.min(range, 12);
         a = randInt(-mulRange, mulRange);
         b = randInt(-mulRange, mulRange);
-        // Avoid trivial 0 * x too often
         if (a === 0 && Math.random() > 0.2) a = randInt(1, mulRange) * (Math.random() > 0.5 ? 1 : -1);
         if (b === 0 && Math.random() > 0.2) b = randInt(1, mulRange) * (Math.random() > 0.5 ? 1 : -1);
         answer = a * b;
         text = formatNum(a) + ' &times; ' + formatNum(b) + ' =';
-      } else {
-        // Division: generate so answer is always an integer (no remainder)
-        var divRange = Math.min(range, 12);
-        b = randInt(1, divRange) * (Math.random() > 0.5 ? 1 : -1);
-        answer = randInt(-divRange, divRange);
-        // Avoid 0 quotient too often
-        if (answer === 0 && Math.random() > 0.3) answer = randInt(1, divRange) * (Math.random() > 0.5 ? 1 : -1);
-        a = b * answer;
-        text = formatNum(a) + ' &div; ' + formatNum(b) + ' =';
       }
 
       problems.push({ text: text, answer: answer });

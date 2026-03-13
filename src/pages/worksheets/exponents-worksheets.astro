@@ -52,14 +52,14 @@ const structuredData = {
       <div class="config-inputs">
         <div class="config-group">
           <label for="cfgProblems">Number of Problems</label>
-          <input type="number" id="cfgProblems" value="20" min="10" max="40" />
+          <input type="number" id="cfgProblems" value="15" min="5" max="30" />
         </div>
         <div class="config-group">
           <label for="cfgType">Problem Type</label>
           <select id="cfgType">
-            <option value="evaluate">Evaluate</option>
-            <option value="product">Product Rule</option>
-            <option value="quotient">Quotient Rule</option>
+            <option value="evaluate">Evaluate Powers</option>
+            <option value="simplify">Simplify Expressions</option>
+            <option value="negative">Negative Exponents</option>
           </select>
         </div>
         <div class="config-group">
@@ -67,7 +67,7 @@ const structuredData = {
           <select id="cfgMaxBase">
             <option value="5">Up to 5</option>
             <option value="10" selected>Up to 10</option>
-            <option value="15">Up to 15</option>
+            <option value="12">Up to 12</option>
           </select>
         </div>
       </div>
@@ -232,8 +232,8 @@ const structuredData = {
     var type = document.getElementById('cfgType').value;
     var maxBase = parseInt(document.getElementById('cfgMaxBase').value, 10);
 
-    if (isNaN(count) || count < 10) count = 10;
-    if (count > 40) count = 40;
+    if (isNaN(count) || count < 5) count = 5;
+    if (count > 30) count = 30;
 
     problems = [];
     var attempts = 0;
@@ -254,23 +254,34 @@ const structuredData = {
           html: base + '<sup>' + exp + '</sup> = ___',
           answer: String(answer)
         };
-      } else if (type === 'product') {
+      } else if (type === 'simplify') {
+        // Simplify using product or quotient rule
         var base = randInt(2, Math.min(maxBase, 10));
-        var exp1 = randInt(1, 4);
-        var exp2 = randInt(1, 4);
-
-        prob = {
-          html: base + '<sup>' + exp1 + '</sup> &times; ' + base + '<sup>' + exp2 + '</sup> = ' + base + '<sup>___</sup>',
-          answer: String(exp1 + exp2)
-        };
-      } else if (type === 'quotient') {
+        if (Math.random() > 0.5) {
+          // Product rule: a^m * a^n = a^(m+n)
+          var exp1 = randInt(1, 4);
+          var exp2 = randInt(1, 4);
+          prob = {
+            html: base + '<sup>' + exp1 + '</sup> &times; ' + base + '<sup>' + exp2 + '</sup> = ' + base + '<sup>___</sup>',
+            answer: String(exp1 + exp2)
+          };
+        } else {
+          // Quotient rule: a^m / a^n = a^(m-n)
+          var exp1 = randInt(3, 6);
+          var exp2 = randInt(1, exp1 - 1);
+          prob = {
+            html: base + '<sup>' + exp1 + '</sup> &divide; ' + base + '<sup>' + exp2 + '</sup> = ' + base + '<sup>___</sup>',
+            answer: String(exp1 - exp2)
+          };
+        }
+      } else if (type === 'negative') {
+        // Negative exponents: a^(-n) = 1/a^n
         var base = randInt(2, Math.min(maxBase, 10));
-        var exp1 = randInt(3, 6);
-        var exp2 = randInt(1, exp1 - 1);
-
+        var exp = randInt(1, 3);
+        var denom = Math.pow(base, exp);
         prob = {
-          html: base + '<sup>' + exp1 + '</sup> &divide; ' + base + '<sup>' + exp2 + '</sup> = ' + base + '<sup>___</sup>',
-          answer: String(exp1 - exp2)
+          html: base + '<sup>&ndash;' + exp + '</sup> = ___',
+          answer: '1/' + denom
         };
       }
 

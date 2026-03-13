@@ -1,0 +1,502 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import '../../styles/calculator.css';
+import { getAllMacroPages, type MacroPage } from '../../data/macros';
+
+export function getStaticPaths() {
+  return getAllMacroPages().map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: MacroPage };
+const {
+  slug, calories, goal, goalDisplay,
+  proteinPct, carbsPct, fatPct,
+  proteinGrams, carbsGrams, fatGrams,
+  proteinCals, carbsCals, fatCals,
+  meals3, meals4, meals5,
+} = page;
+
+// --- Precomputed display strings (avoid $ in JSX) ---
+const calStr = calories.toLocaleString();
+const titleStr = calStr + ' Calorie ' + goalDisplay + ' Macros - Daily Macro Split | ToolCalcs';
+const h1Str = calStr + ' Calorie ' + goalDisplay + ' Macros';
+const seoDesc = 'Get the ideal macronutrient split for a ' + calStr + ' calorie ' + goalDisplay.toLowerCase() + ' diet. ' + proteinGrams + 'g protein, ' + carbsGrams + 'g carbs, ' + fatGrams + 'g fat. Per-meal breakdowns and food sources.';
+
+// --- Format helpers ---
+const fmt = (n: number) => n.toLocaleString();
+const pctBar = (pct: number) => pct + '%';
+
+// --- Related pages: same calories, different goals ---
+const allPages = getAllMacroPages();
+const sameCalDiffGoal = allPages.filter(p => p.calories === calories && p.goal !== goal);
+
+// --- Related pages: same goal, different calorie levels ---
+const sameGoalDiffCal = allPages
+  .filter(p => p.goal === goal && p.calories !== calories)
+  .sort((a, b) => a.calories - b.calories);
+
+// --- Protein per lb body weight estimate (assuming 150 lb person) ---
+const proteinPerLb = (proteinGrams / 150).toFixed(2);
+
+// --- Goal-specific content ---
+const goalAdvice = goal === 'weight-loss'
+  ? 'A higher protein intake of ' + proteinPct + '% helps preserve lean muscle mass while in a calorie deficit. The moderate fat and carb allocation ensures you stay satiated and have energy for daily activities and exercise. This split is ideal for sustainable fat loss without sacrificing muscle.'
+  : goal === 'muscle-gain'
+  ? 'With ' + carbsPct + '% of calories from carbs, this split fuels intense training sessions and promotes glycogen replenishment. The ' + proteinPct + '% protein allocation supports muscle protein synthesis, while ' + fatPct + '% fat ensures adequate hormone production for muscle growth.'
+  : goal === 'maintenance'
+  ? 'This balanced approach with ' + carbsPct + '% carbs provides ample energy for an active lifestyle. The ' + proteinPct + '% protein supports tissue repair and immune function, while ' + fatPct + '% fat covers essential fatty acid needs and vitamin absorption.'
+  : 'A balanced macro split distributes calories evenly across all three macronutrients. With ' + proteinPct + '% protein, ' + carbsPct + '% carbs, and ' + fatPct + '% fat, this approach works well for general health and fitness without a specific body composition goal.';
+
+// --- FAQ content ---
+const faq1Q = 'What are the best macros for a ' + calStr + ' calorie ' + goalDisplay.toLowerCase() + ' diet?';
+const faq1A = 'For a ' + calStr + ' calorie ' + goalDisplay.toLowerCase() + ' diet, an effective macro split is ' + proteinPct + '% protein (' + proteinGrams + 'g), ' + carbsPct + '% carbs (' + carbsGrams + 'g), and ' + fatPct + '% fat (' + fatGrams + 'g). This provides ' + proteinCals + ' calories from protein, ' + carbsCals + ' calories from carbs, and ' + fatCals + ' calories from fat.';
+
+const faq2Q = 'How do I calculate macros from calories?';
+const faq2A = 'Multiply your total calories by each macro percentage, then divide by the calories per gram: protein has 4 calories per gram, carbs have 4 calories per gram, and fat has 9 calories per gram. For example, ' + proteinPct + '% of ' + calStr + ' calories = ' + proteinCals + ' calories from protein, divided by 4 = ' + proteinGrams + 'g of protein per day.';
+
+const faq3Q = 'How many meals should I split my macros into?';
+const faq3A = 'Most people do well with 3 to 5 meals per day. With ' + calStr + ' calories, eating 4 meals gives you roughly ' + meals4.protein + 'g protein, ' + meals4.carbs + 'g carbs, and ' + meals4.fat + 'g fat per meal. The key is consistency rather than meal frequency; choose whatever schedule helps you hit your daily macro targets.';
+
+const faq4Q = 'Can I adjust the macro percentages?';
+const faq4A = 'Yes. These percentages are evidence-based starting points for ' + goalDisplay.toLowerCase() + '. You can adjust based on personal preference, training intensity, and how your body responds. Some people thrive on higher carbs, while others prefer higher fat. The most important factor is hitting your total calorie target and getting adequate protein (at least 0.7g per pound of body weight).';
+
+// --- Structured data ---
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Macro Calculator", "item": "https://toolcalcs.com/macro/" },
+      { "@type": "ListItem", "position": 3, "name": h1Str },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      { "@type": "Question", "name": faq1Q, "acceptedAnswer": { "@type": "Answer", "text": faq1A } },
+      { "@type": "Question", "name": faq2Q, "acceptedAnswer": { "@type": "Answer", "text": faq2A } },
+      { "@type": "Question", "name": faq3Q, "acceptedAnswer": { "@type": "Answer", "text": faq3A } },
+      { "@type": "Question", "name": faq4Q, "acceptedAnswer": { "@type": "Answer", "text": faq4A } },
+    ],
+  },
+];
+
+// --- Color mapping ---
+const proteinColor = '#3b82f6';
+const carbsColor = '#f59e0b';
+const fatColor = '#ef4444';
+---
+
+<BaseLayout title={titleStr} description={seoDesc} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/macro/">Macro Calculator</a> &rsaquo;
+    <span>{h1Str}</span>
+  </nav>
+
+  <h1>{h1Str}</h1>
+  <p class="page-desc">
+    The optimal macronutrient breakdown for a {calStr} calorie {goalDisplay.toLowerCase()} diet, with per-meal splits, food sources, and comparison tables.
+  </p>
+
+  <!-- Result Cards -->
+  <div class="result-cards macro-result-cards">
+    <div class="result-card primary">
+      <span class="result-label">Protein</span>
+      <span class="result-value macro-protein">{fmt(proteinGrams)}g</span>
+      <span class="result-sub">{proteinPct}% &middot; {fmt(proteinCals)} cal</span>
+    </div>
+    <div class="result-card success">
+      <span class="result-label">Carbs</span>
+      <span class="result-value macro-carbs">{fmt(carbsGrams)}g</span>
+      <span class="result-sub">{carbsPct}% &middot; {fmt(carbsCals)} cal</span>
+    </div>
+    <div class="result-card warning">
+      <span class="result-label">Fat</span>
+      <span class="result-value macro-fat">{fmt(fatGrams)}g</span>
+      <span class="result-sub">{fatPct}% &middot; {fmt(fatCals)} cal</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Total Calories</span>
+      <span class="result-value">{calStr}</span>
+      <span class="result-sub">{goalDisplay}</span>
+    </div>
+  </div>
+
+  <!-- Visual Macro Bar -->
+  <h2 class="section-heading">Macro Split Breakdown</h2>
+  <div class="macro-bar-container">
+    <div class="macro-bar">
+      <div class="macro-bar-segment macro-bar-protein" style={'width:' + proteinPct + '%'}>
+        {pctBar(proteinPct)}
+      </div>
+      <div class="macro-bar-segment macro-bar-carbs" style={'width:' + carbsPct + '%'}>
+        {pctBar(carbsPct)}
+      </div>
+      <div class="macro-bar-segment macro-bar-fat" style={'width:' + fatPct + '%'}>
+        {pctBar(fatPct)}
+      </div>
+    </div>
+    <div class="macro-bar-legend">
+      <span class="legend-item"><span class="legend-dot" style={'background:' + proteinColor}></span> Protein</span>
+      <span class="legend-item"><span class="legend-dot" style={'background:' + carbsColor}></span> Carbs</span>
+      <span class="legend-item"><span class="legend-dot" style={'background:' + fatColor}></span> Fat</span>
+    </div>
+  </div>
+
+  <!-- Per-Meal Breakdown -->
+  <h2 class="section-heading">Per-Meal Breakdown</h2>
+  <p class="table-note">How to split your daily macros across 3, 4, or 5 meals:</p>
+  <div class="table-container">
+    <table class="data-table macro-table">
+      <thead>
+        <tr>
+          <th>Meals/Day</th>
+          <th>Protein per Meal</th>
+          <th>Carbs per Meal</th>
+          <th>Fat per Meal</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>3 meals</td>
+          <td class="macro-protein-cell">{meals3.protein}g</td>
+          <td class="macro-carbs-cell">{meals3.carbs}g</td>
+          <td class="macro-fat-cell">{meals3.fat}g</td>
+        </tr>
+        <tr>
+          <td>4 meals</td>
+          <td class="macro-protein-cell">{meals4.protein}g</td>
+          <td class="macro-carbs-cell">{meals4.carbs}g</td>
+          <td class="macro-fat-cell">{meals4.fat}g</td>
+        </tr>
+        <tr>
+          <td>5 meals</td>
+          <td class="macro-protein-cell">{meals5.protein}g</td>
+          <td class="macro-carbs-cell">{meals5.carbs}g</td>
+          <td class="macro-fat-cell">{meals5.fat}g</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Sample Food Sources -->
+  <h2 class="section-heading">Sample Food Sources</h2>
+  <div class="food-sources">
+    <div class="food-card">
+      <h3 class="food-card-title food-protein-title">Protein Sources</h3>
+      <ul class="food-list">
+        <li>Chicken breast (31g per 100g)</li>
+        <li>Greek yogurt (10g per 100g)</li>
+        <li>Eggs (6g per egg)</li>
+        <li>Salmon (25g per 100g)</li>
+        <li>Tofu (8g per 100g)</li>
+        <li>Whey protein (24g per scoop)</li>
+      </ul>
+    </div>
+    <div class="food-card">
+      <h3 class="food-card-title food-carbs-title">Carb Sources</h3>
+      <ul class="food-list">
+        <li>Brown rice (45g per cup cooked)</li>
+        <li>Oats (27g per 1/2 cup dry)</li>
+        <li>Sweet potato (26g per medium)</li>
+        <li>Banana (27g per medium)</li>
+        <li>Quinoa (39g per cup cooked)</li>
+        <li>Whole wheat bread (12g per slice)</li>
+      </ul>
+    </div>
+    <div class="food-card">
+      <h3 class="food-card-title food-fat-title">Fat Sources</h3>
+      <ul class="food-list">
+        <li>Avocado (15g per half)</li>
+        <li>Olive oil (14g per tbsp)</li>
+        <li>Almonds (14g per oz)</li>
+        <li>Peanut butter (16g per 2 tbsp)</li>
+        <li>Chia seeds (9g per oz)</li>
+        <li>Dark chocolate (9g per oz)</li>
+      </ul>
+    </div>
+  </div>
+
+  <AdUnit slot="macro-mid" format="horizontal" />
+
+  <!-- Same Calories, Different Goals -->
+  {sameCalDiffGoal.length > 0 && (
+    <h2 class="section-heading">{calStr} Calories &ndash; Different Goals</h2>
+    <p class="compare-desc">Compare macro splits for {calStr} calories across different fitness goals:</p>
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Goal</th>
+            <th>Protein</th>
+            <th>Carbs</th>
+            <th>Fat</th>
+            <th>Split</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td><strong>{goalDisplay}</strong></td>
+            <td class="macro-protein-cell">{proteinGrams}g</td>
+            <td class="macro-carbs-cell">{carbsGrams}g</td>
+            <td class="macro-fat-cell">{fatGrams}g</td>
+            <td>{proteinPct}/{carbsPct}/{fatPct}</td>
+          </tr>
+          {sameCalDiffGoal.map(function (p) {
+            return (
+              <tr>
+                <td><a class="compare-link" href={'/macro/' + p.slug + '/'}>{p.goalDisplay}</a></td>
+                <td class="macro-protein-cell">{p.proteinGrams}g</td>
+                <td class="macro-carbs-cell">{p.carbsGrams}g</td>
+                <td class="macro-fat-cell">{p.fatGrams}g</td>
+                <td>{p.proteinPct}/{p.carbsPct}/{p.fatPct}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  )}
+
+  <!-- Same Goal, Different Calories -->
+  {sameGoalDiffCal.length > 0 && (
+    <h2 class="section-heading">{goalDisplay} Macros at Different Calorie Levels</h2>
+    <p class="compare-desc">See how macro grams change as calorie intake increases for {goalDisplay.toLowerCase()}:</p>
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Calories</th>
+            <th>Protein</th>
+            <th>Carbs</th>
+            <th>Fat</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sameGoalDiffCal.map(function (p) {
+            var isCurrent = p.calories === calories;
+            return (
+              <tr class={isCurrent ? 'highlight-row' : ''}>
+                <td>
+                  {isCurrent
+                    ? <strong>{p.calories.toLocaleString()}</strong>
+                    : <a class="compare-link" href={'/macro/' + p.slug + '/'}>{p.calories.toLocaleString()}</a>
+                  }
+                </td>
+                <td class="macro-protein-cell">{p.proteinGrams}g</td>
+                <td class="macro-carbs-cell">{p.carbsGrams}g</td>
+                <td class="macro-fat-cell">{p.fatGrams}g</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  )}
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>Understanding Your {calStr} Calorie {goalDisplay} Macros</h2>
+    <p>
+      Macronutrients, commonly known as macros, are the three categories of nutrients that provide energy: protein, carbohydrates, and fat. Each plays a distinct role in your body, and the ratio in which you consume them significantly impacts your results, whether your goal is losing fat, building muscle, or maintaining a healthy weight.
+    </p>
+    <p>
+      {goalAdvice}
+    </p>
+    <p>
+      At {calStr} calories per day with this {proteinPct}/{carbsPct}/{fatPct} split, you will consume {proteinGrams}g of protein ({proteinCals} calories), {carbsGrams}g of carbohydrates ({carbsCals} calories), and {fatGrams}g of fat ({fatCals} calories). That is roughly {proteinPerLb}g of protein per pound of body weight for a 150 lb individual, which falls within the recommended range for {goalDisplay.toLowerCase()}.
+    </p>
+
+    <h2>Why Macro Ratios Matter</h2>
+    <p>
+      Two people eating the same number of calories can have vastly different body composition outcomes depending on their macro split. A diet skewed heavily toward carbs and fat with insufficient protein may lead to muscle loss during a deficit or suboptimal gains during a surplus. Conversely, adequate protein intake (0.7 to 1.0g per pound of body weight) supports muscle preservation, satiety, and a higher thermic effect of food.
+    </p>
+    <p>
+      Carbohydrates are your body's preferred fuel source during moderate to high-intensity exercise. Reducing carbs too aggressively can impair workout performance and recovery. Fat is essential for hormone production, cell membrane integrity, and absorption of fat-soluble vitamins (A, D, E, K). A minimum of 20% of total calories from fat is generally recommended for health.
+    </p>
+
+    <h2>How to Track Your Macros</h2>
+    <p>
+      Start by weighing your food with a kitchen scale for accuracy, at least for the first few weeks until you develop an intuitive sense of portion sizes. Use a food tracking app to log meals and compare your actual intake against your targets. Focus on hitting your protein target first, then fill in carbs and fat to reach your calorie goal.
+    </p>
+    <p>
+      You do not need to hit your macro targets perfectly every day. Aim for a weekly average within 5 to 10 grams of each target. Consistency over time matters far more than daily precision. If you find the numbers difficult to hit, try adjusting your meal timing or food choices rather than forcing foods you do not enjoy.
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>{faq1Q}</h3>
+    <p>{faq1A}</p>
+    <h3>{faq2Q}</h3>
+    <p>{faq2A}</p>
+    <h3>{faq3Q}</h3>
+    <p>{faq3A}</p>
+    <h3>{faq4Q}</h3>
+    <p>{faq4A}</p>
+
+    <h2>Related Calculations</h2>
+    <ul>
+      {sameCalDiffGoal.map(function (p) {
+        return (
+          <li>
+            <a href={'/macro/' + p.slug + '/'}>
+              {p.calories.toLocaleString()} Calorie {p.goalDisplay} Macros &rarr; {p.proteinGrams}g P / {p.carbsGrams}g C / {p.fatGrams}g F
+            </a>
+          </li>
+        );
+      })}
+      {sameGoalDiffCal.slice(0, 4).map(function (p) {
+        return (
+          <li>
+            <a href={'/macro/' + p.slug + '/'}>
+              {p.calories.toLocaleString()} Calorie {p.goalDisplay} Macros &rarr; {p.proteinGrams}g P / {p.carbsGrams}g C / {p.fatGrams}g F
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+
+    <p><a href="/macro/">&larr; Macro Calculator</a> | <a href="/health-fitness-calculators/">Health &amp; Fitness Calculators</a></p>
+
+    <CrossLinks links={[
+      { href: '/macro/', label: 'Macro Calculator', icon: '\uD83E\uDD69' },
+      { href: '/calorie/', label: 'Calorie Burn Calculator', icon: '\uD83D\uDD25' },
+      { href: '/bmi/', label: 'BMI Calculator', icon: '\u2696\uFE0F' },
+      { href: '/health-fitness-calculators/calorie-calculator/', label: 'Daily Calorie Calculator', icon: '\uD83C\uDF4E' },
+      { href: '/health-fitness-calculators/bmr-calculator/', label: 'BMR Calculator', icon: '\u26A1' },
+    ]} />
+  </article>
+
+  <AdUnit slot="macro-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .macro-result-cards {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .result-sub {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+  }
+  .macro-protein { color: #3b82f6; }
+  .macro-carbs { color: #d97706; }
+  .macro-fat { color: #ef4444; }
+  .result-card.warning {
+    border-top-color: #ef4444;
+  }
+
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+  .table-note {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+
+  /* Macro bar */
+  .macro-bar-container { margin-bottom: 24px; }
+  .macro-bar {
+    display: flex;
+    height: 36px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #fff;
+  }
+  .macro-bar-segment {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+  }
+  .macro-bar-protein { background: #3b82f6; }
+  .macro-bar-carbs { background: #f59e0b; }
+  .macro-bar-fat { background: #ef4444; }
+  .macro-bar-legend {
+    display: flex;
+    gap: 20px;
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  /* Macro table cells */
+  .macro-protein-cell { color: #3b82f6; font-weight: 700; }
+  .macro-carbs-cell { color: #d97706; font-weight: 700; }
+  .macro-fat-cell { color: #ef4444; font-weight: 700; }
+  .highlight-row { background: #eff6ff; font-weight: 600; }
+
+  /* Food sources */
+  .food-sources {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .food-card {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  .food-card-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--color-border);
+  }
+  .food-protein-title { color: #3b82f6; border-bottom-color: #3b82f6; }
+  .food-carbs-title { color: #d97706; border-bottom-color: #f59e0b; }
+  .food-fat-title { color: #ef4444; border-bottom-color: #ef4444; }
+  .food-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .food-list li {
+    padding: 4px 0;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .food-list li:last-child { border-bottom: none; }
+
+  .compare-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+  .compare-link {
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .compare-link:hover { text-decoration: underline; }
+
+  @media (max-width: 768px) {
+    .macro-result-cards { grid-template-columns: repeat(2, 1fr); }
+    .food-sources { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) {
+    .macro-result-cards { grid-template-columns: 1fr; }
+  }
+</style>

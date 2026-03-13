@@ -1,0 +1,492 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import '../../styles/calculator.css';
+import { getAllPregnancyPages, type PregnancyWeekPage } from '../../data/due-date';
+
+export function getStaticPaths() {
+  return getAllPregnancyPages().map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: PregnancyWeekPage };
+const {
+  slug,
+  week,
+  trimester,
+  trimesterName,
+  babySize,
+  babySizeInches,
+  babyWeightOz,
+  babyWeightDisplay,
+  developments,
+  symptoms,
+  tips,
+  weeksleft,
+  daysLeft,
+  percentComplete,
+} = page;
+
+// --- Navigation ---
+const allPages = getAllPregnancyPages();
+const currentIdx = allPages.findIndex(function (p) { return p.slug === slug; });
+const prevPage = currentIdx > 0 ? allPages[currentIdx - 1] : null;
+const nextPage = currentIdx < allPages.length - 1 ? allPages[currentIdx + 1] : null;
+
+// --- Nearby weeks for comparison table ---
+const nearbyPages = allPages.filter(function (p) {
+  return Math.abs(p.week - week) > 0 && Math.abs(p.week - week) <= 4;
+});
+
+// --- Fruit emoji map ---
+function getFruitEmoji(size: string): string {
+  var lower = size.toLowerCase();
+  if (lower.indexOf('poppy') >= 0) return '🌱';
+  if (lower.indexOf('sesame') >= 0) return '🌱';
+  if (lower.indexOf('lentil') >= 0) return '🫘';
+  if (lower.indexOf('blueberry') >= 0) return '🫐';
+  if (lower.indexOf('raspberry') >= 0) return '🫐';
+  if (lower.indexOf('cherry') >= 0) return '🍒';
+  if (lower.indexOf('strawberry') >= 0) return '🍓';
+  if (lower.indexOf('fig') >= 0) return '🍐';
+  if (lower.indexOf('lime') >= 0) return '🍋';
+  if (lower.indexOf('peach') >= 0) return '🍑';
+  if (lower.indexOf('lemon') >= 0) return '🍋';
+  if (lower.indexOf('avocado') >= 0) return '🥑';
+  if (lower.indexOf('pepper') >= 0) return '🫑';
+  if (lower.indexOf('banana') >= 0) return '🍌';
+  if (lower.indexOf('papaya') >= 0) return '🥭';
+  if (lower.indexOf('corn') >= 0) return '🌽';
+  if (lower.indexOf('cauliflower') >= 0) return '🥦';
+  if (lower.indexOf('zucchini') >= 0) return '🥒';
+  if (lower.indexOf('lettuce') >= 0) return '🥬';
+  if (lower.indexOf('eggplant') >= 0) return '🍆';
+  if (lower.indexOf('cabbage') >= 0) return '🥬';
+  if (lower.indexOf('squash') >= 0) return '🎃';
+  if (lower.indexOf('cantaloupe') >= 0) return '🍈';
+  if (lower.indexOf('chard') >= 0) return '🥬';
+  if (lower.indexOf('watermelon') >= 0) return '🍉';
+  if (lower.indexOf('pumpkin') >= 0) return '🎃';
+  return '👶';
+}
+const fruitEmoji = getFruitEmoji(babySize);
+
+// --- SEO ---
+const title = week + ' Weeks Pregnant - Baby Size, Symptoms & Tips | ToolCalcs';
+const seoDescription = 'At ' + week + ' weeks pregnant, your baby is the size of a ' + babySize.toLowerCase() + ' (' + babySizeInches + ' inches). Learn about baby development, common symptoms, and helpful tips for week ' + week + ' of pregnancy.';
+const breadcrumbShort = week + ' Weeks Pregnant';
+
+// --- FAQ content ---
+const faq1Q = 'How big is my baby at ' + week + ' weeks pregnant?';
+const faq1A = 'At ' + week + ' weeks pregnant, your baby is about the size of a ' + babySize.toLowerCase() + ', measuring approximately ' + babySizeInches + ' inches. ' + (babyWeightOz >= 1 ? 'The baby weighs about ' + babyWeightDisplay + '.' : 'The baby is still too small to measure weight accurately.');
+
+const faq2Q = 'What are common symptoms at ' + week + ' weeks pregnant?';
+const faq2A = 'Common symptoms at ' + week + ' weeks of pregnancy include ' + symptoms[0].toLowerCase() + ', ' + symptoms[1].toLowerCase() + ', and ' + symptoms[2].toLowerCase() + '. Every pregnancy is different, so you may experience all, some, or none of these symptoms. Contact your healthcare provider if you have concerns about any symptoms.';
+
+const faq3Q = 'What trimester is ' + week + ' weeks pregnant?';
+const faq3A = 'At ' + week + ' weeks, you are in the ' + trimesterName.toLowerCase() + ' (trimester ' + trimester + ' of 3). ' + (trimester === 1 ? 'The first trimester spans weeks 1-13 and is when the baby\'s major organs begin to form.' : trimester === 2 ? 'The second trimester spans weeks 14-26 and is often called the "golden period" as many early symptoms ease.' : 'The third trimester spans weeks 27-40 and is when the baby gains most of its weight in preparation for birth.');
+
+const faq4Q = 'How many weeks are left at ' + week + ' weeks pregnant?';
+const faq4A = 'At ' + week + ' weeks pregnant, you have ' + weeksleft + ' weeks remaining (' + daysLeft + ' days) until your estimated due date at 40 weeks. You are ' + percentComplete + '% through your pregnancy. Keep in mind that only about 5% of babies arrive on their exact due date.';
+
+// --- Structured Data ---
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Pregnancy Due Date", "item": "https://toolcalcs.com/due-date/" },
+      { "@type": "ListItem", "position": 3, "name": breadcrumbShort },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": faq1Q,
+        "acceptedAnswer": { "@type": "Answer", "text": faq1A },
+      },
+      {
+        "@type": "Question",
+        "name": faq2Q,
+        "acceptedAnswer": { "@type": "Answer", "text": faq2A },
+      },
+      {
+        "@type": "Question",
+        "name": faq3Q,
+        "acceptedAnswer": { "@type": "Answer", "text": faq3A },
+      },
+      {
+        "@type": "Question",
+        "name": faq4Q,
+        "acceptedAnswer": { "@type": "Answer", "text": faq4A },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title={title} description={seoDescription} type="article" structuredData={structuredData}>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/due-date/">Pregnancy Week by Week</a> &rsaquo;
+    <span>{breadcrumbShort}</span>
+  </nav>
+
+  <h1>{week} Weeks Pregnant: What to Expect</h1>
+  <p class="page-desc">
+    At {week} weeks pregnant, your baby is the size of a {babySize.toLowerCase()}. Learn about your baby's development, common symptoms, and helpful tips for this stage of pregnancy.
+  </p>
+
+  <!-- Quick Fact -->
+  <div class="quick-fact">
+    <span class="quick-fact-label">Week {week} Snapshot:</span>
+    <strong>{fruitEmoji} Baby is the size of a {babySize.toLowerCase()} &mdash; {babySizeInches} inches, {babyWeightDisplay}</strong>
+  </div>
+
+  <!-- Result Cards -->
+  <div class="result-cards preg-result-cards">
+    <div class="result-card primary">
+      <span class="result-label">Week</span>
+      <span class="result-value">{week} of 40</span>
+    </div>
+    <div class="result-card success">
+      <span class="result-label">Trimester</span>
+      <span class="result-value">{trimesterName}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Baby Size</span>
+      <span class="result-value">{fruitEmoji} {babySize}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Baby Weight</span>
+      <span class="result-value">{babyWeightDisplay}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Weeks Left</span>
+      <span class="result-value">{weeksleft} weeks</span>
+    </div>
+    <div class="result-card">
+      <span class="result-label">Progress</span>
+      <span class="result-value">{percentComplete}%</span>
+    </div>
+  </div>
+
+  <!-- Progress Bar -->
+  <div class="preg-progress-wrapper">
+    <div class="preg-progress-label">Pregnancy Progress: {percentComplete}% complete</div>
+    <div class="preg-progress-bar">
+      <div class="preg-progress-fill" style={'width:' + percentComplete + '%'}></div>
+      <div class="preg-progress-markers">
+        <span class="preg-marker" style="left:33%">T1</span>
+        <span class="preg-marker" style="left:65%">T2</span>
+        <span class="preg-marker" style="left:100%">T3</span>
+      </div>
+    </div>
+    <div class="preg-progress-meta">
+      <span>Week {week}</span>
+      <span>{daysLeft} days to go</span>
+    </div>
+  </div>
+
+  <!-- Baby Development -->
+  <h2 class="section-heading">Baby Development at Week {week}</h2>
+  <p class="table-note">Key milestones and developments happening this week:</p>
+  <ul class="preg-list preg-dev-list">
+    {developments.map(function (d) {
+      return <li>{d}</li>;
+    })}
+  </ul>
+
+  <AdUnit slot="due-date-mid" format="horizontal" />
+
+  <!-- Symptoms -->
+  <h2 class="section-heading">Common Symptoms at {week} Weeks</h2>
+  <p class="table-note">You may experience some or all of these symptoms during week {week}:</p>
+  <ul class="preg-list preg-symptom-list">
+    {symptoms.map(function (s) {
+      return <li>{s}</li>;
+    })}
+  </ul>
+
+  <!-- Tips -->
+  <h2 class="section-heading">Tips for Week {week}</h2>
+  <ul class="preg-list preg-tips-list">
+    {tips.map(function (t) {
+      return <li>{t}</li>;
+    })}
+  </ul>
+
+  <!-- Nearby Weeks Table -->
+  {nearbyPages.length > 0 && (
+    <h2 class="section-heading">Nearby Weeks Comparison</h2>
+    <p class="compare-desc">See how your baby grows in the weeks around week {week}:</p>
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Week</th>
+            <th>Baby Size</th>
+            <th>Length</th>
+            <th>Weight</th>
+            <th>Trimester</th>
+          </tr>
+        </thead>
+        <tbody>
+          {nearbyPages.map(function (p) {
+            var isCurrent = p.week === week;
+            return (
+              <tr class={isCurrent ? 'highlight-row' : ''}>
+                <td><a class="compare-link" href={'/due-date/' + p.slug + '/'}>Week {p.week}</a></td>
+                <td>{p.babySize}</td>
+                <td>{p.babySizeInches} in</td>
+                <td>{p.babyWeightDisplay}</td>
+                <td>{p.trimesterName}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  )}
+
+  <!-- Navigation -->
+  <div class="preg-nav">
+    {prevPage && (
+      <a class="preg-nav-link preg-nav-prev" href={'/due-date/' + prevPage.slug + '/'}>
+        &larr; Week {prevPage.week}
+      </a>
+    )}
+    {nextPage && (
+      <a class="preg-nav-link preg-nav-next" href={'/due-date/' + nextPage.slug + '/'}>
+        Week {nextPage.week} &rarr;
+      </a>
+    )}
+  </div>
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>What Happens at {week} Weeks Pregnant?</h2>
+    <p>
+      At {week} weeks pregnant, you are in the {trimesterName.toLowerCase()} of your pregnancy. Your baby is about the size of a {babySize.toLowerCase()}, measuring approximately {babySizeInches} inches{babyWeightOz >= 1 ? ' and weighing about ' + babyWeightDisplay : ''}. This is an exciting time as your baby continues to grow and develop new capabilities each week.
+    </p>
+    <p>
+      During week {week}, your body is working hard to support your growing baby. The placenta continues to provide essential nutrients and oxygen through the umbilical cord. Your blood volume has increased significantly to support the pregnancy, and your body is producing hormones that help maintain the pregnancy and prepare for delivery.
+    </p>
+    <p>
+      With {weeksleft} weeks remaining until your estimated due date, you are {percentComplete}% of the way through your pregnancy. Remember that a full-term pregnancy is considered 39 to 40 weeks, but babies can arrive anywhere from 37 to 42 weeks. Only about 5% of babies are born on their exact due date, so think of your due date as an estimate rather than a deadline.
+    </p>
+    <p>
+      Regular prenatal care is essential throughout your pregnancy. Your healthcare provider will monitor your baby's growth, check for any complications, and help you prepare for a healthy delivery. Do not hesitate to contact your provider if you experience any concerning symptoms or have questions about your pregnancy.
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>{faq1Q}</h3>
+    <p>{faq1A}</p>
+
+    <h3>{faq2Q}</h3>
+    <p>{faq2A}</p>
+
+    <h3>{faq3Q}</h3>
+    <p>{faq3A}</p>
+
+    <h3>{faq4Q}</h3>
+    <p>{faq4A}</p>
+
+    <h2>Related Pregnancy Resources</h2>
+    <ul>
+      {prevPage && (
+        <li>
+          <a href={'/due-date/' + prevPage.slug + '/'}>
+            {prevPage.week} Weeks Pregnant: What to Expect
+          </a>
+        </li>
+      )}
+      {nextPage && (
+        <li>
+          <a href={'/due-date/' + nextPage.slug + '/'}>
+            {nextPage.week} Weeks Pregnant: What to Expect
+          </a>
+        </li>
+      )}
+      <li><a href="/due-date/">Full Pregnancy Week-by-Week Timeline</a></li>
+    </ul>
+
+    <p><a href="/due-date/">&larr; Pregnancy Week by Week</a> | <a href="/health-fitness-calculators/">Health &amp; Fitness Calculators</a></p>
+
+    <CrossLinks links={[
+      { href: '/due-date/', label: 'Pregnancy Timeline', icon: '\uD83E\uDD30' },
+      { href: '/bmi/', label: 'BMI Calculator', icon: '\u2696\uFE0F' },
+      { href: '/calorie/', label: 'Calorie Burn Calculator', icon: '\uD83D\uDD25' },
+      { href: '/health-fitness-calculators/', label: 'Health & Fitness Calculators', icon: '\uD83C\uDFCB\uFE0F' },
+    ]} />
+  </article>
+
+  <AdUnit slot="due-date-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .quick-fact {
+    background: #fce7f3;
+    border-radius: var(--radius);
+    padding: 16px 24px;
+    margin-bottom: 24px;
+    font-size: 1.1rem;
+  }
+  .quick-fact-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .quick-fact strong {
+    color: #be185d;
+    font-size: 1.15rem;
+  }
+  .section-heading {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+  }
+  .preg-result-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .preg-result-cards .result-card.primary .result-value {
+    font-size: 1.6rem;
+  }
+  .table-note {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+  .compare-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+  .compare-link {
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .compare-link:hover {
+    text-decoration: underline;
+  }
+  .highlight-row {
+    background: #fce7f3;
+    font-weight: 600;
+  }
+
+  /* Progress bar */
+  .preg-progress-wrapper {
+    margin: 24px 0 32px;
+  }
+  .preg-progress-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--color-text);
+  }
+  .preg-progress-bar {
+    position: relative;
+    height: 24px;
+    background: var(--color-surface, #f1f5f9);
+    border-radius: 12px;
+    overflow: visible;
+    border: 1px solid var(--color-border);
+  }
+  .preg-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f472b6, #ec4899, #be185d);
+    border-radius: 12px;
+    transition: width 0.5s ease;
+    min-width: 8px;
+  }
+  .preg-progress-markers {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    pointer-events: none;
+  }
+  .preg-marker {
+    position: absolute;
+    top: -18px;
+    transform: translateX(-50%);
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    font-weight: 600;
+  }
+  .preg-progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-top: 6px;
+  }
+
+  /* Lists */
+  .preg-list {
+    padding-left: 20px;
+    margin-bottom: 24px;
+  }
+  .preg-list li {
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+  .preg-dev-list li::marker {
+    color: #ec4899;
+  }
+  .preg-symptom-list li::marker {
+    color: #f59e0b;
+  }
+  .preg-tips-list li::marker {
+    color: #10b981;
+  }
+
+  /* Navigation */
+  .preg-nav {
+    display: flex;
+    justify-content: space-between;
+    margin: 32px 0;
+    gap: 16px;
+  }
+  .preg-nav-link {
+    display: inline-block;
+    padding: 10px 20px;
+    background: var(--color-surface, #f1f5f9);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .preg-nav-link:hover {
+    background: var(--color-primary);
+    color: #fff;
+  }
+  .preg-nav-next {
+    margin-left: auto;
+  }
+
+  @media (max-width: 768px) {
+    .preg-result-cards {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 480px) {
+    .preg-result-cards {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
