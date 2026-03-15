@@ -8,9 +8,9 @@ ERRORS=0
 
 echo "=== Post-Build SEO Safety Check ==="
 
-# 1. Count noindex pages (should be minimal — only 404, zodiac/*, angel-number/*)
+# 1. Count noindex pages (should be minimal — only 404, search, sitemap)
 NOINDEX_COUNT=$(grep -rl 'noindex' "$DIST" --include="*.html" | wc -l)
-NOINDEX_LIMIT=650  # ~12 zodiac + ~600 angel-number + 404 + small buffer
+NOINDEX_LIMIT=10  # 404 + search + sitemap + small buffer
 
 echo "[1] noindex pages: $NOINDEX_COUNT (limit: $NOINDEX_LIMIT)"
 if [ "$NOINDEX_COUNT" -gt "$NOINDEX_LIMIT" ]; then

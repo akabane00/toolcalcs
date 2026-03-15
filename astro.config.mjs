@@ -6,15 +6,15 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://toolcalcs.com',
   integrations: [sitemap({
+    entryLimit: 2000,
     filter(page) {
-      // Keep noindex only for zodiac & angel-number (low-quality bulk content)
-      const noindexRoutes = ['/zodiac/', '/angel-number/'];
-      for (const route of noindexRoutes) {
-        if (page.includes(route) && page !== `https://toolcalcs.com${route}`) {
-          return false;
-        }
-      }
-      return true;
+      // Exclude only non-content pages
+      const excludeExact = [
+        'https://toolcalcs.com/404/',
+        'https://toolcalcs.com/search/',
+        'https://toolcalcs.com/sitemap/',
+      ];
+      return !excludeExact.includes(page);
     },
     serialize(item) {
       const url = item.url;
