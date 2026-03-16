@@ -1,0 +1,533 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Everyday Calculators",
+        "item": "https://toolcalcs.com/everyday-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Time Card Calculator"
+      }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How do I calculate hours worked from a time card?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'To calculate hours worked, subtract your clock-in time from your clock-out time to get gross hours, then subtract any unpaid break time. Convert the result to decimal hours by dividing remaining minutes by 60. For example, clocking in at 8:30 AM and out at 5:00 PM with a 30-minute break gives 8 gross hours minus 0.5 hours break, equaling 7.5 net hours worked.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'When does overtime pay start?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Under the federal Fair Labor Standards Act (FLSA), overtime begins after 40 hours worked in a single workweek. Hours beyond 40 must be paid at 1.5 times the regular hourly rate. Some states like California also require daily overtime for hours worked beyond 8 in a single day, and double time for hours beyond 12 in a day.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Are meal breaks deducted from hours worked?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Under federal law, bona fide meal periods of 30 minutes or longer are not considered compensable work time and should be deducted from hours worked, provided the employee is completely relieved of duties. Short rest breaks of 5 to 20 minutes are considered paid work time and should not be deducted. State laws may impose additional break requirements.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How is time-and-a-half calculated?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Time-and-a-half means multiplying your regular hourly rate by 1.5 to get the overtime rate. For example, if you earn $20 per hour, your overtime rate is $30 per hour ($20 x 1.5). This rate applies to all hours worked beyond 40 in a workweek under federal law. Some employers offer double time (2x) for holidays or excessive hours.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Do I need to track hours if I am a salaried employee?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'It depends on your exemption status. Salaried employees classified as "exempt" under the FLSA are not entitled to overtime pay and typically do not need to track hours. However, salaried "non-exempt" employees must still receive overtime for hours over 40 per week and should track their time. Employers are legally required to keep records of hours worked for all non-exempt employees regardless of pay structure.',
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Time Card Calculator - Calculate Hours Worked & Pay | ToolCalcs"
+  description="Free time card calculator. Enter clock-in and clock-out times for each day of the week to calculate total hours worked, overtime, and gross pay."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/everyday-calculators/">Everyday Calculators</a> &rsaquo;
+    <span>Time Card Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Time Card Calculator</h1>
+  <p class="page-desc">Enter your clock-in and clock-out times for each day of the week to calculate total hours worked, overtime hours, and estimated gross pay.</p>
+
+  <div class="calculator-box">
+    <div class="tc-settings">
+      <div class="input-group">
+        <label for="hourlyRate">Hourly Rate ($)</label>
+        <input type="number" id="hourlyRate" value="15" min="0" step="0.25" />
+      </div>
+      <div class="input-group">
+        <label for="otThreshold">Overtime After (hrs/week)</label>
+        <input type="number" id="otThreshold" value="40" min="0" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="otMultiplier">Overtime Rate Multiplier</label>
+        <input type="number" id="otMultiplier" value="1.5" min="1" step="0.1" />
+      </div>
+    </div>
+
+    <div class="tc-table-wrap">
+      <div class="tc-row tc-header">
+        <span class="tc-day">Day</span>
+        <span>Clock In</span>
+        <span>Clock Out</span>
+        <span>Break (min)</span>
+        <span>Hours</span>
+      </div>
+      <div class="tc-row" data-day="mon">
+        <span class="tc-day">Monday</span>
+        <div class="input-group"><input type="time" class="clock-in" /></div>
+        <div class="input-group"><input type="time" class="clock-out" /></div>
+        <div class="input-group"><input type="number" class="break-min" value="0" min="0" max="480" step="5" /></div>
+        <span class="day-hours">0.00</span>
+      </div>
+      <div class="tc-row" data-day="tue">
+        <span class="tc-day">Tuesday</span>
+        <div class="input-group"><input type="time" class="clock-in" /></div>
+        <div class="input-group"><input type="time" class="clock-out" /></div>
+        <div class="input-group"><input type="number" class="break-min" value="0" min="0" max="480" step="5" /></div>
+        <span class="day-hours">0.00</span>
+      </div>
+      <div class="tc-row" data-day="wed">
+        <span class="tc-day">Wednesday</span>
+        <div class="input-group"><input type="time" class="clock-in" /></div>
+        <div class="input-group"><input type="time" class="clock-out" /></div>
+        <div class="input-group"><input type="number" class="break-min" value="0" min="0" max="480" step="5" /></div>
+        <span class="day-hours">0.00</span>
+      </div>
+      <div class="tc-row" data-day="thu">
+        <span class="tc-day">Thursday</span>
+        <div class="input-group"><input type="time" class="clock-in" /></div>
+        <div class="input-group"><input type="time" class="clock-out" /></div>
+        <div class="input-group"><input type="number" class="break-min" value="0" min="0" max="480" step="5" /></div>
+        <span class="day-hours">0.00</span>
+      </div>
+      <div class="tc-row" data-day="fri">
+        <span class="tc-day">Friday</span>
+        <div class="input-group"><input type="time" class="clock-in" /></div>
+        <div class="input-group"><input type="time" class="clock-out" /></div>
+        <div class="input-group"><input type="number" class="break-min" value="0" min="0" max="480" step="5" /></div>
+        <span class="day-hours">0.00</span>
+      </div>
+      <div class="tc-row" data-day="sat">
+        <span class="tc-day">Saturday</span>
+        <div class="input-group"><input type="time" class="clock-in" /></div>
+        <div class="input-group"><input type="time" class="clock-out" /></div>
+        <div class="input-group"><input type="number" class="break-min" value="0" min="0" max="480" step="5" /></div>
+        <span class="day-hours">0.00</span>
+      </div>
+      <div class="tc-row" data-day="sun">
+        <span class="tc-day">Sunday</span>
+        <div class="input-group"><input type="time" class="clock-in" /></div>
+        <div class="input-group"><input type="time" class="clock-out" /></div>
+        <div class="input-group"><input type="number" class="break-min" value="0" min="0" max="480" step="5" /></div>
+        <span class="day-hours">0.00</span>
+      </div>
+    </div>
+
+    <div class="tc-buttons">
+      <button class="calc-btn" id="calculateBtn">Calculate</button>
+      <button class="calc-btn secondary" id="clearBtn">Clear All</button>
+      <button class="calc-btn secondary" id="defaultBtn">Set Default 9-5</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Total Hours Worked</span>
+          <span class="result-value" id="totalHours">0.00</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Regular Hours</span>
+          <span class="result-value" id="regularHours">0.00</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Overtime Hours</span>
+          <span class="result-value" id="overtimeHours">0.00</span>
+        </div>
+        <div class="result-card primary">
+          <span class="result-label">Regular Pay</span>
+          <span class="result-value" id="regularPay">$0.00</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Overtime Pay</span>
+          <span class="result-value" id="overtimePay">$0.00</span>
+        </div>
+        <div class="result-card primary">
+          <span class="result-label">Total Gross Pay</span>
+          <span class="result-value" id="totalPay">$0.00</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="content-section">
+    <h2>How to Calculate Hours Worked from a Time Card</h2>
+    <p>Calculating hours worked from a time card is a fundamental skill for employees, freelancers, and employers alike. The process involves determining the elapsed time between when you clock in and when you clock out, then subtracting any unpaid break time to arrive at your net hours worked for the day. By repeating this for every day of the workweek and summing the results, you get your total weekly hours.</p>
+    <div class="formula-box">
+      <code>Daily Net Hours = (Clock Out Time &minus; Clock In Time) &minus; Break Duration</code>
+    </div>
+    <p>For example, suppose you clock in at 8:15 AM and clock out at 4:45 PM, taking a 30-minute unpaid lunch break. The gross time from 8:15 AM to 4:45 PM is 8 hours and 30 minutes. Subtracting the 30-minute break gives you 8.0 net hours for that day. If you follow this same schedule for five days, your weekly total would be 40.0 hours.</p>
+    <p>When performing time card calculations, it is helpful to convert times into decimal format rather than working with hours and minutes. To convert minutes to a decimal, divide the minutes by 60. For instance, 15 minutes is 0.25 hours, 30 minutes is 0.50 hours, and 45 minutes is 0.75 hours. This makes it far easier to add daily totals and multiply by hourly rates for payroll purposes. Our calculator above handles this conversion automatically, displaying all results in decimal hours.</p>
+    <p>One important consideration is how to handle overnight shifts. If you clock in at 10:00 PM and clock out at 6:00 AM the next day, the gross time is 8 hours. Many time card calculators and payroll systems handle this by recognizing when the clock-out time is earlier than the clock-in time and automatically adding 24 hours to the calculation. This calculator supports overnight shifts as well, correctly computing the elapsed time when the clock-out time falls on the following day.</p>
+
+    <h2>Understanding Overtime Rules Under the FLSA</h2>
+    <p>The Fair Labor Standards Act (FLSA) is the primary federal law governing overtime pay in the United States. Enacted in 1938, the FLSA establishes that non-exempt employees must receive overtime compensation at a rate of at least one and one-half times their regular hourly rate for all hours worked beyond 40 in a single workweek. This rate is commonly referred to as "time-and-a-half."</p>
+    <p>A workweek under the FLSA is defined as any fixed, recurring period of 168 hours, equivalent to seven consecutive 24-hour periods. The employer may designate the workweek to begin on any day and at any hour. Once established, the workweek definition must remain consistent and cannot be manipulated to avoid overtime obligations. For example, an employer cannot shift the workweek start day to split an employee's hours across two workweeks to keep each below 40 hours.</p>
+    <p>The overtime calculation itself is straightforward. First, add up all net hours worked during the workweek. If the total exceeds the overtime threshold (typically 40 hours), the excess is classified as overtime. Multiply the regular hours by the regular rate, then multiply the overtime hours by the overtime rate. The sum of these two amounts is the total gross pay for the week.</p>
+    <div class="formula-box">
+      <code>Total Pay = (Regular Hours &times; Hourly Rate) + (Overtime Hours &times; Hourly Rate &times; OT Multiplier)</code>
+    </div>
+    <p>Consider an employee earning $18 per hour who works 47 hours in a week. The regular pay is 40 hours times $18, which equals $720. The overtime pay is 7 hours times $27 (which is $18 times 1.5), equaling $189. The total gross pay for the week is $909. This is precisely the type of calculation this time card calculator performs automatically.</p>
+    <p>It is important to note that not all employees qualify for overtime. The FLSA provides exemptions for executive, administrative, professional, computer, and outside sales employees who meet certain salary and duties tests. As of 2024, most white-collar exemptions require a minimum salary of $684 per week ($35,568 annually). Employees earning above this threshold who also satisfy the duties test for their exemption category are classified as "exempt" and are not entitled to overtime pay regardless of hours worked.</p>
+
+    <h2>Time-and-a-Half Explained</h2>
+    <p>Time-and-a-half is the most common overtime premium in the United States. It means that for each hour of overtime worked, the employee receives 150 percent of their regular hourly rate instead of the standard 100 percent. The additional 50 percent serves as both compensation for the extra effort and an incentive for employers to limit excessive work hours.</p>
+    <p>To calculate your time-and-a-half rate, simply multiply your regular hourly rate by 1.5. If your regular rate is $20 per hour, your overtime rate is $30 per hour. If your regular rate is $15.50, your overtime rate is $23.25. This multiplier is the federal minimum for overtime; some employers voluntarily offer higher overtime premiums, such as double time (2x) for holidays, weekends, or hours worked beyond a certain daily threshold.</p>
+    <p>Some states impose additional overtime requirements beyond the federal standard. California is the most notable example, requiring daily overtime at 1.5 times the regular rate for hours worked beyond 8 in a single day, and double time (2x) for hours beyond 12 in a single day. California also mandates double time for all hours worked beyond 8 on the seventh consecutive day of work in a workweek. Alaska requires overtime for hours exceeding 8 in a day for employees at establishments with four or more employees. Colorado requires overtime after 12 hours in a day or 40 hours in a week. Always check your state's specific rules, as they may provide greater protections than federal law.</p>
+
+    <h2>Common Work Schedules and Weekly Hours</h2>
+    <p>Understanding common work schedule patterns helps employees estimate their expected weekly hours and pay. The most prevalent schedules in the United States include the following.</p>
+    <p><strong>The standard 9-to-5 schedule</strong> remains the most common arrangement for office workers. Employees work from 9:00 AM to 5:00 PM, Monday through Friday, totaling 40 hours per week before breaks. With a typical 30-minute unpaid lunch break each day, the net working hours are 37.5 per week. Some employers define the standard schedule as 8:00 AM to 5:00 PM with a one-hour lunch, which also nets 40 hours per week.</p>
+    <p><strong>The 4/10 compressed schedule</strong> condenses 40 hours into four 10-hour days, giving employees a three-day weekend every week. A typical example would be working Monday through Thursday from 7:00 AM to 5:30 PM with a 30-minute lunch break. This schedule is popular in government agencies, construction, and manufacturing because it reduces commuting costs and can improve employee morale.</p>
+    <p><strong>Shift work schedules</strong> are standard in healthcare, manufacturing, emergency services, and hospitality. Common patterns include three 8-hour shifts (such as 7 AM to 3 PM, 3 PM to 11 PM, and 11 PM to 7 AM) or two 12-hour shifts (7 AM to 7 PM and 7 PM to 7 AM). Workers on 12-hour shifts typically work three or four days per week, alternating to average 40 hours over a two-week period.</p>
+    <p><strong>Part-time and variable schedules</strong> involve fewer than 35 hours per week and may change from week to week. Retail, food service, and gig economy workers often have variable schedules, making time tracking particularly important to ensure accurate pay. For these workers, a time card calculator is essential for verifying that each paycheck reflects the actual hours worked.</p>
+
+    <h2>Tracking Hours for Freelancers and Independent Contractors</h2>
+    <p>Freelancers and independent contractors face unique time-tracking challenges compared to traditional employees. While they are generally not covered by overtime laws (since the FLSA applies to employees, not independent contractors), accurate time tracking remains crucial for billing clients, estimating project costs, and managing profitability.</p>
+    <p>For freelancers who bill by the hour, detailed time records serve as the foundation for invoicing. Many clients expect itemized time entries showing the date, hours worked, and a description of tasks completed. Without accurate records, disputes over billing are common and difficult to resolve. A weekly time card provides a clear, organized format for tracking these hours.</p>
+    <p>Even freelancers who charge flat fees or project-based rates benefit from tracking their time. By recording how many hours each project actually takes, freelancers can calculate their effective hourly rate and make better pricing decisions for future work. If a project quoted at $2,000 takes 50 hours to complete, the effective hourly rate is only $40. Knowing this helps the freelancer adjust pricing or improve efficiency for similar projects.</p>
+    <p>Freelancers should also track hours for tax purposes. While independent contractors cannot deduct a standard hourly wage, time records support deductions for home office use, business travel, and other expenses that are tied to work activities. Additionally, if there is ever a question about whether a worker is truly an independent contractor or should be classified as an employee, detailed time records showing irregular hours and multiple clients can help establish independent contractor status.</p>
+
+    <h2>Payroll Basics and Time Card Accuracy</h2>
+    <p>Accurate time cards are the foundation of proper payroll processing. Errors in time tracking can lead to underpayment (which violates labor laws) or overpayment (which affects the employer's budget). Understanding common sources of error and how to avoid them helps ensure that everyone gets paid correctly.</p>
+    <p><strong>Rounding rules</strong> are a frequent source of confusion. The FLSA permits employers to round employee time to the nearest 5 minutes, 6 minutes (one-tenth of an hour), or 15 minutes (one-quarter of an hour). The most common method is the 7-minute rule for quarter-hour rounding: if an employee clocks in 7 minutes or fewer before or after the quarter hour, the time rounds to the nearest quarter. If the employee is more than 7 minutes off, the time rounds to the next quarter in the employee's favor. For example, clocking in at 8:07 rounds to 8:00, but clocking in at 8:08 rounds to 8:15. This rounding must be applied consistently and cannot systematically benefit the employer over time.</p>
+    <p><strong>Common time card errors</strong> include forgetting to clock in or out, accidentally entering the wrong AM/PM designation, recording hours on the wrong date, and failing to account for unpaid meal breaks. Many electronic timekeeping systems have built-in alerts for missing punches and unusually long or short shifts, which help catch errors before they reach payroll processing.</p>
+    <p><strong>Payroll frequency</strong> varies by employer and state law. Common pay periods include weekly (52 pay periods per year), biweekly (26 pay periods), semi-monthly (24 pay periods), and monthly (12 pay periods). Overtime is always calculated on a workweek basis regardless of the pay period frequency. For biweekly payrolls, this means overtime must be calculated separately for each of the two workweeks in the pay period, not across the combined two-week total.</p>
+    <p><strong>Record retention</strong> requirements under the FLSA mandate that employers keep payroll records for at least three years and time cards and wage computation records for at least two years. Employees should also maintain their own records of hours worked as a safeguard against errors or disputes. A simple habit of photographing your time card or keeping a personal log can be invaluable if a discrepancy arises months later.</p>
+
+    <h2>Rounding Rules in Timekeeping</h2>
+    <p>Payroll rounding is a common practice that simplifies time card calculations. Under federal guidelines, employers may round employee clock-in and clock-out times to the nearest 5, 6, or 15 minutes, provided the rounding practice is neutral over time and does not consistently favor the employer. The most widely used method is quarter-hour rounding with the 7-minute rule.</p>
+    <p>Under the 7-minute rule, times within 1 to 7 minutes past a quarter hour round down, while times 8 to 14 minutes past round up to the next quarter. For example, an employee who clocks in at 7:53 AM would be rounded to 8:00 AM (7 minutes before the hour rounds to the nearest quarter). An employee clocking in at 7:52 AM would be rounded to 7:45 AM (8 minutes before the hour rounds down to the prior quarter). The principle is the same for clock-out times.</p>
+    <p>Sixth-of-an-hour rounding (to the nearest 6 minutes, or 0.1 hours) is also popular because it aligns neatly with decimal time. Under this method, the cutoff is 3 minutes: times within 0 to 2 minutes of a 6-minute mark round to that mark, while times 3 to 5 minutes past round to the next mark. This system produces clean decimal values (7.0, 7.1, 7.2, etc.) that simplify payroll multiplication.</p>
+    <p>While rounding is legal, it has been the subject of numerous lawsuits when employees demonstrate that the rounding practice systematically underpaid them. Courts examine rounding policies on a neutral-on-its-face basis and may rule against employers if the actual application consistently favors the employer. Some employers have moved away from rounding entirely, using electronic systems that capture exact clock times and calculate pay to the minute.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>How do I calculate hours worked from a time card?</summary>
+        <p>To calculate hours worked, subtract your clock-in time from your clock-out time to get gross hours, then subtract any unpaid break time. For example, if you clock in at 8:30 AM and clock out at 5:00 PM with a 30-minute unpaid lunch, your gross time is 8.5 hours minus 0.5 hours break, equaling 8.0 net hours. Repeat for each day of the week and add up the daily totals to get your weekly hours. This calculator performs all these steps automatically when you enter your times.</p>
+      </details>
+      <details class="faq-item">
+        <summary>When does overtime pay start?</summary>
+        <p>Under the federal Fair Labor Standards Act, overtime begins after 40 hours worked in a single workweek for non-exempt employees. All hours beyond 40 must be compensated at a minimum of 1.5 times the regular hourly rate. Some states have stricter rules: California requires daily overtime after 8 hours in a single day and double time after 12 hours. You can adjust the overtime threshold in this calculator to match your state's requirements or your employer's policy.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Are meal breaks deducted from hours worked?</summary>
+        <p>Under federal law, bona fide meal periods of 30 minutes or longer are not considered compensable work time and should be deducted from your total hours, provided you are completely relieved of all duties during the break. Short rest breaks of 5 to 20 minutes are considered paid work time and should not be deducted. If you are required to remain at your workstation or perform any tasks during a meal break, the entire break must be counted as paid time. Enter your unpaid break duration in the "Break" column for each day.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How is time-and-a-half calculated?</summary>
+        <p>Time-and-a-half means your overtime rate is 1.5 times your regular hourly rate. To find your overtime rate, multiply your hourly pay by 1.5. For example, at $20 per hour, your overtime rate is $30 per hour. If you worked 45 hours in a week, you would earn 40 regular hours at $20 ($800) plus 5 overtime hours at $30 ($150), for a total of $950. You can change the overtime multiplier in this calculator if your employer uses a different rate such as double time (2.0).</p>
+      </details>
+      <details class="faq-item">
+        <summary>Do salaried employees need to track their hours?</summary>
+        <p>It depends on whether you are classified as "exempt" or "non-exempt" under the FLSA. Exempt salaried employees (those meeting salary and duties tests for executive, administrative, or professional exemptions) are not entitled to overtime and generally do not need to track hours for pay purposes. However, non-exempt salaried employees must still receive overtime for hours over 40 per week and should track their time accordingly. Employers are legally required to maintain accurate time records for all non-exempt employees regardless of their pay structure.</p>
+      </details>
+    </div>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/everyday-calculators/hours-calculator/">Hours Calculator</a> - Calculate daily and weekly work hours from time cards.</li>
+      <li><a href="/financial-calculators/take-home-pay-calculator/">Take-Home Pay Calculator</a> - Estimate your net pay after taxes and deductions.</li>
+      <li><a href="/everyday-calculators/tip-calculator/">Tip Calculator</a> - Quickly calculate tips for dining and services.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+  <RelatedArticles calculatorSlug="time-card-calculator" />
+  <RelatedCalculators currentSlug="time-card-calculator" />
+</BaseLayout>
+
+<style>
+  .tc-settings {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--color-border);
+  }
+
+  .tc-table-wrap {
+    margin-bottom: 16px;
+  }
+
+  .tc-row {
+    display: grid;
+    grid-template-columns: 100px 1fr 1fr 100px 80px;
+    gap: 12px;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .tc-row:last-child {
+    border-bottom: none;
+  }
+
+  .tc-header {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid var(--color-border);
+    padding-bottom: 10px;
+  }
+
+  .tc-day {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--color-text);
+  }
+  .tc-header .tc-day {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+  }
+
+  .tc-row .input-group input {
+    padding: 8px 10px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    background: var(--color-bg);
+    color: var(--color-text);
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .day-hours {
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-align: center;
+    color: var(--color-text);
+  }
+
+  .tc-buttons {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .calc-btn.secondary {
+    background: var(--color-bg-alt, #f0f0f0);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+  }
+  .calc-btn.secondary:hover {
+    background: var(--color-border);
+  }
+
+  .last-updated {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin: 4px 0 0;
+  }
+
+  @media (max-width: 640px) {
+    .tc-settings {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .tc-header {
+      display: none;
+    }
+    .tc-row {
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 12px 0;
+    }
+    .tc-day {
+      grid-column: 1 / -1;
+      font-size: 1rem;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: 4px;
+    }
+    .tc-row .input-group::before {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .tc-row .input-group:nth-child(2)::before { content: 'Clock In'; }
+    .tc-row .input-group:nth-child(3)::before { content: 'Clock Out'; }
+    .tc-row .input-group:nth-child(4)::before { content: 'Break (min)'; }
+    .day-hours {
+      text-align: left;
+      font-size: 1rem;
+    }
+    .day-hours::before {
+      content: 'Hours: ';
+      font-weight: 500;
+      color: var(--color-text-muted);
+      font-size: 0.85rem;
+    }
+    .result-cards {
+      grid-template-columns: 1fr;
+    }
+    .tc-buttons {
+      flex-direction: column;
+    }
+    .tc-buttons .calc-btn {
+      width: 100%;
+    }
+  }
+</style>
+
+<script is:inline>
+  function formatMoney(n) {
+    return '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
+  function calculateTimeCard() {
+    var rows = document.querySelectorAll('.tc-row[data-day]');
+    var hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 0;
+    var otThreshold = parseFloat(document.getElementById('otThreshold').value) || 40;
+    var otMultiplier = parseFloat(document.getElementById('otMultiplier').value) || 1.5;
+    var totalMinutes = 0;
+
+    rows.forEach(function(row) {
+      var clockIn = row.querySelector('.clock-in');
+      var clockOut = row.querySelector('.clock-out');
+      var breakInput = row.querySelector('.break-min');
+      var dayDisplay = row.querySelector('.day-hours');
+
+      var inVal = clockIn.value;
+      var outVal = clockOut.value;
+      var breakMin = parseInt(breakInput.value) || 0;
+
+      if (!inVal || !outVal) {
+        dayDisplay.textContent = '0.00';
+        return;
+      }
+
+      var inParts = inVal.split(':');
+      var outParts = outVal.split(':');
+      var inMinutes = parseInt(inParts[0]) * 60 + parseInt(inParts[1]);
+      var outMinutes = parseInt(outParts[0]) * 60 + parseInt(outParts[1]);
+
+      // Handle overnight shifts
+      if (outMinutes <= inMinutes) {
+        outMinutes += 1440; // add 24 hours
+      }
+
+      var worked = outMinutes - inMinutes - breakMin;
+      if (worked < 0) worked = 0;
+
+      var dayHours = worked / 60;
+      dayDisplay.textContent = dayHours.toFixed(2);
+      totalMinutes += worked;
+    });
+
+    var totalHours = totalMinutes / 60;
+    var regularHours = Math.min(totalHours, otThreshold);
+    var overtimeHours = Math.max(totalHours - otThreshold, 0);
+    var regPay = regularHours * hourlyRate;
+    var otPay = overtimeHours * hourlyRate * otMultiplier;
+    var totalPay = regPay + otPay;
+
+    document.getElementById('totalHours').textContent = totalHours.toFixed(2);
+    document.getElementById('regularHours').textContent = regularHours.toFixed(2);
+    document.getElementById('overtimeHours').textContent = overtimeHours.toFixed(2);
+    document.getElementById('regularPay').textContent = formatMoney(regPay);
+    document.getElementById('overtimePay').textContent = formatMoney(otPay);
+    document.getElementById('totalPay').textContent = formatMoney(totalPay);
+  }
+
+  function clearAll() {
+    var rows = document.querySelectorAll('.tc-row[data-day]');
+    rows.forEach(function(row) {
+      row.querySelector('.clock-in').value = '';
+      row.querySelector('.clock-out').value = '';
+      row.querySelector('.break-min').value = '0';
+      row.querySelector('.day-hours').textContent = '0.00';
+    });
+    document.getElementById('totalHours').textContent = '0.00';
+    document.getElementById('regularHours').textContent = '0.00';
+    document.getElementById('overtimeHours').textContent = '0.00';
+    document.getElementById('regularPay').textContent = '$0.00';
+    document.getElementById('overtimePay').textContent = '$0.00';
+    document.getElementById('totalPay').textContent = '$0.00';
+  }
+
+  function setDefault95() {
+    var rows = document.querySelectorAll('.tc-row[data-day]');
+    var weekdays = ['mon', 'tue', 'wed', 'thu', 'fri'];
+    rows.forEach(function(row) {
+      var day = row.getAttribute('data-day');
+      if (weekdays.indexOf(day) !== -1) {
+        row.querySelector('.clock-in').value = '09:00';
+        row.querySelector('.clock-out').value = '17:00';
+        row.querySelector('.break-min').value = '30';
+      } else {
+        row.querySelector('.clock-in').value = '';
+        row.querySelector('.clock-out').value = '';
+        row.querySelector('.break-min').value = '0';
+      }
+    });
+    calculateTimeCard();
+  }
+
+  document.getElementById('calculateBtn').addEventListener('click', calculateTimeCard);
+  document.getElementById('clearBtn').addEventListener('click', clearAll);
+  document.getElementById('defaultBtn').addEventListener('click', setDefault95);
+</script>

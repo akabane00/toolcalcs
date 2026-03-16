@@ -1,0 +1,384 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Everyday Calculators",
+        "item": "https://toolcalcs.com/everyday-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Hourly to Salary Calculator"
+      }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How do you convert an hourly wage to an annual salary?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'To convert an hourly wage to an annual salary, multiply the hourly rate by the number of hours you work per week, then multiply by the number of weeks you work per year. For a standard full-time schedule, the formula is: Annual Salary = Hourly Rate x 40 hours x 52 weeks. For example, a $25 per hour wage equals $52,000 per year.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Does overtime affect the hourly-to-salary conversion?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes, overtime significantly affects the conversion. Under the Fair Labor Standards Act (FLSA), non-exempt hourly employees must be paid 1.5 times their regular rate for hours worked beyond 40 in a week. If you regularly work overtime, your actual annual earnings will be higher than the base salary calculation. For example, someone earning $20/hour who works 50 hours per week earns $20 x 40 + $30 x 10 = $1,100 per week, or $57,200 per year.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How much is $15 an hour annually?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'At $15 per hour working 40 hours per week for 52 weeks, your annual salary would be $31,200. Your monthly pay would be $2,600, biweekly pay would be $1,200, and weekly pay would be $600. Keep in mind this is gross pay before taxes and deductions.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Should I factor in benefits when comparing hourly wages to salary?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Absolutely. Salaried positions often include benefits such as health insurance, retirement contributions, paid time off, and bonuses that can add 20% to 40% to the total compensation value. When comparing an hourly wage to a salary offer, consider the full compensation package. For example, a $50,000 salary with $15,000 in benefits equals $65,000 in total compensation, equivalent to about $31.25 per hour.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why do some calculations use 50 weeks instead of 52?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Some calculations use 50 weeks to account for two weeks of unpaid vacation or time off. If you receive paid time off (PTO), you should use 52 weeks since you are still being compensated during your vacation. If you do not receive PTO, using 50 weeks gives a more accurate picture of your actual annual earnings. The difference can be significant: at $25/hour, 52 weeks yields $52,000 while 50 weeks yields $50,000.',
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Hourly to Salary Calculator - Convert Hourly Wage to Annual Salary | ToolCalcs"
+  description="Convert hourly wages to annual salary, monthly, biweekly, and weekly pay. Adjust for hours per week and weeks per year."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/everyday-calculators/">Everyday Calculators</a> &rsaquo;
+    <span>Hourly to Salary Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Hourly to Salary Calculator</h1>
+  <p class="page-desc">Convert your hourly wage to an annual salary, monthly income, biweekly pay, weekly earnings, and daily rate instantly.</p>
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="hourlyRate">Hourly Rate ($)</label>
+        <input type="number" id="hourlyRate" value="25" min="0" step="0.01" />
+      </div>
+      <div class="input-group">
+        <label for="hoursPerWeek">Hours per Week</label>
+        <input type="number" id="hoursPerWeek" value="40" min="1" max="168" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="weeksPerYear">Weeks per Year</label>
+        <input type="number" id="weeksPerYear" value="52" min="1" max="52" step="1" />
+      </div>
+    </div>
+
+    <div class="quick-rates">
+      <button class="quick-rate-btn" data-rate="15">$15</button>
+      <button class="quick-rate-btn" data-rate="20">$20</button>
+      <button class="quick-rate-btn active" data-rate="25">$25</button>
+      <button class="quick-rate-btn" data-rate="30">$30</button>
+      <button class="quick-rate-btn" data-rate="40">$40</button>
+    </div>
+
+    <div class="calc-results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Annual Salary</span>
+          <span class="result-value" id="annualSalary">$52,000.00</span>
+        </div>
+        <div class="result-card primary">
+          <span class="result-label">Monthly Pay</span>
+          <span class="result-value" id="monthlyPay">$4,333.33</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Biweekly Pay</span>
+          <span class="result-value" id="biweeklyPay">$2,000.00</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Weekly Pay</span>
+          <span class="result-value" id="weeklyPay">$1,000.00</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Daily Pay (8-hr day)</span>
+          <span class="result-value" id="dailyPay">$200.00</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>How to Convert Hourly Wage to Annual Salary</h2>
+    <p>Converting an hourly wage to an annual salary is one of the most common financial calculations workers need to make. Whether you are evaluating a new job offer, negotiating a raise, or simply trying to understand how your hourly pay translates to yearly income, the conversion formula is straightforward and essential to know.</p>
+    <p>The basic formula multiplies your hourly rate by the number of hours you work each week, then multiplies that weekly total by the number of weeks you work in a year. For a standard full-time employee working 40 hours per week for all 52 weeks in a year, the math looks like this:</p>
+    <div class="formula-box">
+      <code>Annual Salary = Hourly Rate &times; Hours per Week &times; Weeks per Year</code>
+    </div>
+    <p>For example, if you earn $25 per hour and work a standard 40-hour week for 52 weeks, your annual salary is $25 &times; 40 &times; 52 = $52,000. From there, you can break your income down into other pay periods:</p>
+    <div class="formula-box">
+      <code>Monthly Pay = Annual Salary &divide; 12</code><br />
+      <code>Biweekly Pay = Annual Salary &divide; 26</code><br />
+      <code>Weekly Pay = Hourly Rate &times; Hours per Week</code><br />
+      <code>Daily Pay = Hourly Rate &times; 8</code>
+    </div>
+    <p>These formulas assume a consistent schedule without overtime. If your hours fluctuate from week to week, you can use an average number of hours per week for a more realistic estimate. The calculator above lets you adjust both hours per week and weeks per year to match your actual work schedule.</p>
+
+    <h2>Why Knowing Your Salary Equivalent Matters</h2>
+    <p>Understanding the annual salary equivalent of your hourly wage is critical for several financial planning purposes. First, it allows you to compare job offers on an equal basis. Many positions are listed as either hourly or salaried, making direct comparisons difficult without converting one to the other. When a company offers you $28 per hour, you need to know that equals roughly $58,240 per year to compare it against a salaried position offering $55,000.</p>
+    <p>Second, knowing your annual income helps you create accurate budgets. Lenders, landlords, and financial institutions typically ask for your annual income when you apply for mortgages, car loans, credit cards, or rental agreements. Having a clear understanding of your yearly earnings prevents surprises and helps you qualify for the right amounts.</p>
+    <p>Third, salary awareness plays a key role in tax planning. Federal and state income taxes are calculated on annual earnings, and knowing where you fall in the tax brackets helps you estimate your tax liability, plan for deductions, and maximize contributions to tax-advantaged accounts like 401(k) plans and IRAs.</p>
+    <p>Finally, understanding your salary equivalent empowers you during negotiations. Workers who can articulate their total annual compensation are better positioned to advocate for raises, negotiate starting salaries, and evaluate whether a role change would be financially beneficial.</p>
+
+    <h2>How to Account for Benefits and Paid Time Off</h2>
+    <p>One of the biggest mistakes people make when comparing hourly wages to salaried positions is ignoring the value of benefits. A salaried position that pays $50,000 per year with a comprehensive benefits package may actually be worth more than an hourly job paying $30 per hour with no benefits.</p>
+    <p>Common employer-provided benefits and their approximate annual values include:</p>
+    <ul>
+      <li><strong>Health insurance:</strong> Employer contributions to health, dental, and vision plans can be worth $5,000 to $15,000 or more per year for family coverage.</li>
+      <li><strong>Retirement contributions:</strong> A 401(k) match of 3% to 6% of your salary adds $1,500 to $3,000 per year on a $50,000 salary.</li>
+      <li><strong>Paid time off (PTO):</strong> Two weeks of paid vacation is worth approximately 4% of your salary. For a $50,000 salary, that is about $2,000 in paid time you would not receive as an hourly worker without PTO.</li>
+      <li><strong>Life and disability insurance:</strong> Employer-provided policies can save you $500 to $2,000 per year compared to purchasing individual coverage.</li>
+      <li><strong>Tuition reimbursement:</strong> Some employers offer $3,000 to $10,000 per year for continuing education.</li>
+      <li><strong>Other perks:</strong> Commuter benefits, gym memberships, employee discounts, and stock options can add hundreds to thousands more in total compensation.</li>
+    </ul>
+    <p>When benefits are factored in, a salaried position worth $50,000 in base pay might carry a total compensation value of $60,000 to $70,000. To compare fairly with an hourly position, divide the total compensation by 2,080 (40 hours &times; 52 weeks) to find the equivalent hourly rate. A $65,000 total compensation package equals about $31.25 per hour.</p>
+    <p>If you are an hourly worker without benefits, you should consider the cost of purchasing your own health insurance, funding your own retirement, and the income lost during any unpaid time off. These costs can easily total $10,000 to $20,000 per year, which significantly reduces the effective value of your hourly wage.</p>
+
+    <h2>Salary vs. Hourly: Pros and Cons</h2>
+    <p>Both hourly and salaried compensation structures have distinct advantages and disadvantages. The best choice depends on your career, industry, lifestyle, and financial goals.</p>
+
+    <h3>Advantages of Hourly Pay</h3>
+    <ul>
+      <li><strong>Overtime pay:</strong> Hourly workers are typically entitled to time-and-a-half for hours worked beyond 40 per week under the FLSA. This can significantly boost earnings during busy periods.</li>
+      <li><strong>Clear boundaries:</strong> When you clock out, your work obligation ends. You are compensated for every minute of labor, which creates a clean separation between work and personal time.</li>
+      <li><strong>Flexibility:</strong> Many hourly positions offer flexible scheduling, allowing you to pick up extra shifts when you need more income or reduce hours when other commitments arise.</li>
+      <li><strong>Transparency:</strong> There is no ambiguity about what you earn. Your pay is directly tied to the hours you work, making it easy to track and predict your income.</li>
+    </ul>
+
+    <h3>Disadvantages of Hourly Pay</h3>
+    <ul>
+      <li><strong>Income variability:</strong> If your hours are cut or a business slows down, your paycheck shrinks. This can make budgeting challenging.</li>
+      <li><strong>Fewer benefits:</strong> Part-time hourly workers often do not qualify for health insurance, retirement plans, or paid time off.</li>
+      <li><strong>No pay for time off:</strong> Missing work due to illness, vacation, or personal matters directly reduces your income unless you have paid leave benefits.</li>
+    </ul>
+
+    <h3>Advantages of Salaried Pay</h3>
+    <ul>
+      <li><strong>Predictable income:</strong> Your paycheck is the same amount every pay period, making it easier to budget, save, and plan finances.</li>
+      <li><strong>Better benefits:</strong> Salaried positions typically include health insurance, retirement plans, paid vacation, and other perks.</li>
+      <li><strong>Career advancement:</strong> Salaried roles often come with greater opportunities for promotions, raises, and professional development.</li>
+      <li><strong>Job stability:</strong> Salaried employees are generally perceived as having more job security compared to hourly workers, though this is not always the case.</li>
+    </ul>
+
+    <h3>Disadvantages of Salaried Pay</h3>
+    <ul>
+      <li><strong>No overtime pay:</strong> Exempt salaried employees do not receive overtime, meaning extra hours worked are essentially unpaid labor.</li>
+      <li><strong>Longer hours:</strong> Many salaried positions carry an expectation of working 45 to 50 or more hours per week without additional compensation.</li>
+      <li><strong>Less flexibility:</strong> Salaried roles may come with stricter schedule expectations and less ability to adjust your working hours.</li>
+    </ul>
+
+    <h2>Overtime Considerations for Hourly Workers</h2>
+    <p>Overtime is one of the most significant factors that can cause your actual annual earnings to differ from the base salary conversion. Under the Fair Labor Standards Act (FLSA), non-exempt employees must be paid at least 1.5 times their regular hourly rate for all hours worked beyond 40 in a single workweek.</p>
+    <p>If you regularly work overtime, here is how to calculate your true annual income. Suppose you earn $20 per hour and consistently work 50 hours per week. Your weekly pay would be:</p>
+    <div class="formula-box">
+      <code>Regular Pay: $20 &times; 40 hours = $800</code><br />
+      <code>Overtime Pay: $30 &times; 10 hours = $300</code><br />
+      <code>Total Weekly Pay: $800 + $300 = $1,100</code><br />
+      <code>Annual Pay: $1,100 &times; 52 weeks = $57,200</code>
+    </div>
+    <p>Without overtime, the same $20/hour wage would yield $41,600 per year. The 10 hours of weekly overtime adds $15,600 annually, an increase of 37.5 percent. This is why many hourly workers actively seek overtime opportunities and why some hourly positions can be more lucrative than comparable salaried roles.</p>
+    <p>Some states have additional overtime rules. California, for example, requires overtime pay for hours worked beyond 8 in a single day, not just beyond 40 in a week. Alaska and Nevada have similar daily overtime provisions. Always check your state labor laws to understand what overtime protections apply to you.</p>
+    <p>It is also worth noting that some employers classify workers as "exempt" to avoid paying overtime. To be legally exempt from overtime, an employee generally must meet three criteria: be paid on a salary basis, earn above a minimum salary threshold (currently $35,568 per year under federal law), and perform duties that qualify under executive, administrative, professional, or other specific exemptions. If you believe you are misclassified, consult your state labor department or an employment attorney.</p>
+
+    <h2>Common Hourly Rates by Industry</h2>
+    <p>Hourly wages vary dramatically across industries, regions, and experience levels. Here is a general overview of common hourly rate ranges for popular job categories in the United States as of 2025:</p>
+    <ul>
+      <li><strong>Retail and food service:</strong> $12 to $18 per hour ($24,960 to $37,440 annually)</li>
+      <li><strong>Administrative and office support:</strong> $16 to $25 per hour ($33,280 to $52,000 annually)</li>
+      <li><strong>Healthcare support (CNAs, medical assistants):</strong> $15 to $22 per hour ($31,200 to $45,760 annually)</li>
+      <li><strong>Skilled trades (electricians, plumbers, HVAC):</strong> $22 to $45 per hour ($45,760 to $93,600 annually)</li>
+      <li><strong>Registered nurses:</strong> $30 to $55 per hour ($62,400 to $114,400 annually)</li>
+      <li><strong>Information technology:</strong> $25 to $75 per hour ($52,000 to $156,000 annually)</li>
+      <li><strong>Engineering:</strong> $30 to $65 per hour ($62,400 to $135,200 annually)</li>
+      <li><strong>Construction and labor:</strong> $15 to $35 per hour ($31,200 to $72,800 annually)</li>
+      <li><strong>Education (tutors, teaching assistants):</strong> $14 to $30 per hour ($29,120 to $62,400 annually)</li>
+      <li><strong>Transportation and delivery:</strong> $16 to $28 per hour ($33,280 to $58,240 annually)</li>
+    </ul>
+    <p>These ranges represent national averages and can vary significantly based on geographic location. Workers in high-cost-of-living areas such as San Francisco, New York City, and Seattle typically earn 20 to 40 percent more than the national average for the same role. Conversely, workers in rural areas or states with lower costs of living may earn below these ranges.</p>
+    <p>The federal minimum wage remains $7.25 per hour as of 2025, but many states and cities have enacted higher minimum wages. As of early 2025, over 30 states have minimum wages above the federal level, with several states exceeding $15 per hour. When using the hourly to salary calculator, be sure to input your actual hourly rate rather than a base minimum to get an accurate picture of your annual income.</p>
+
+    <h2>Tips for Maximizing Your Hourly Earnings</h2>
+    <p>If you are paid hourly and want to increase your annual income, there are several strategies to consider beyond simply asking for a raise:</p>
+    <ul>
+      <li><strong>Negotiate your starting rate:</strong> Research market rates for your role using resources like the Bureau of Labor Statistics, Glassdoor, or PayScale. Come to negotiations with data to support a higher hourly rate.</li>
+      <li><strong>Seek overtime opportunities:</strong> As shown above, regular overtime hours can increase your annual income by 20 to 40 percent or more.</li>
+      <li><strong>Pursue certifications:</strong> Industry-specific certifications can qualify you for higher-paying positions. Many employers will even cover the cost of certification programs.</li>
+      <li><strong>Consider shift differentials:</strong> Many employers pay premiums of $1 to $5 per hour for evening, night, weekend, or holiday shifts.</li>
+      <li><strong>Evaluate the full package:</strong> Sometimes a slightly lower hourly rate with better benefits, more PTO, or a shorter commute provides greater overall value than a higher rate without those perks.</li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>How do you convert an hourly wage to an annual salary?</summary>
+        <p>Multiply your hourly rate by the number of hours you work per week, then multiply by the number of weeks you work per year. For a standard full-time schedule, the formula is: Annual Salary = Hourly Rate &times; 40 hours &times; 52 weeks. For example, $25 per hour equals $52,000 per year. If you work fewer than 52 weeks due to unpaid time off, adjust the weeks accordingly.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Does overtime affect the hourly-to-salary conversion?</summary>
+        <p>Yes, overtime has a major impact. Under the FLSA, non-exempt employees earn 1.5 times their regular hourly rate for hours worked beyond 40 in a week. If you regularly work overtime, your actual annual income will be significantly higher than the base calculation. For instance, someone earning $20/hour who works 50 hours per week earns $57,200 per year rather than $41,600, a difference of $15,600.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How much is $15 an hour annually?</summary>
+        <p>At $15 per hour working a standard 40-hour week for 52 weeks, your annual gross salary is $31,200. That breaks down to approximately $2,600 per month, $1,200 per biweekly pay period, $600 per week, and $120 per day. Remember, this is before taxes and deductions, so your take-home pay will be lower.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Should I factor in benefits when comparing hourly wages to a salary?</summary>
+        <p>Absolutely. Benefits such as health insurance, retirement contributions, paid time off, and bonuses can add 20 to 40 percent to the value of a salaried position. A $50,000 salary with $15,000 in benefits provides total compensation of $65,000, equivalent to roughly $31.25 per hour. Without benefits, an hourly worker would need to earn significantly more per hour to achieve the same total compensation value.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Why do some calculations use 50 weeks instead of 52?</summary>
+        <p>Using 50 weeks accounts for two weeks of unpaid vacation or time off during the year. If you receive paid time off (PTO), you should use 52 weeks in your calculation because you are still being compensated during your vacation. If you do not receive PTO, using 50 weeks provides a more realistic estimate of your actual annual earnings. At $25 per hour, the difference between 52 and 50 weeks is $2,000 per year.</p>
+      </details>
+    </div>
+
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/financial-calculators/take-home-pay-calculator/">Take-Home Pay Calculator</a> - Estimate your net paycheck after taxes and deductions.</li>
+      <li><a href="/paycheck/">Paycheck Calculator</a> - Calculate your paycheck breakdown for any pay period.</li>
+      <li><a href="/financial-calculators/income-tax-calculator/">Income Tax Calculator</a> - Estimate your federal and state income tax liability.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+  <RelatedArticles calculatorSlug="hourly-to-salary-calculator" />
+  <RelatedCalculators currentSlug="hourly-to-salary-calculator" />
+</BaseLayout>
+
+<style>
+  .quick-rates {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .quick-rate-btn {
+    padding: 8px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: transparent;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--color-text);
+    transition: all 0.15s;
+  }
+  .quick-rate-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  .quick-rate-btn.active {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+  }
+  .last-updated { font-size: 0.75rem; color: var(--color-text-muted); margin: 4px 0 0; }
+</style>
+
+<script is:inline>
+  function formatCurrency(n) {
+    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function calculate() {
+    var rateInput = document.getElementById('hourlyRate');
+    var hoursInput = document.getElementById('hoursPerWeek');
+    var weeksInput = document.getElementById('weeksPerYear');
+
+    var hourly = parseFloat(rateInput.value) || 0;
+    var hoursPerWeek = parseFloat(hoursInput.value) || 40;
+    var weeksPerYear = parseFloat(weeksInput.value) || 52;
+
+    if (hourly < 0) hourly = 0;
+    if (hoursPerWeek < 1) hoursPerWeek = 1;
+    if (weeksPerYear < 1) weeksPerYear = 1;
+
+    var annual = hourly * hoursPerWeek * weeksPerYear;
+    var monthly = annual / 12;
+    var biweekly = annual / 26;
+    var weekly = hourly * hoursPerWeek;
+    var daily = hourly * 8;
+
+    document.getElementById('annualSalary').textContent = formatCurrency(annual);
+    document.getElementById('monthlyPay').textContent = formatCurrency(monthly);
+    document.getElementById('biweeklyPay').textContent = formatCurrency(biweekly);
+    document.getElementById('weeklyPay').textContent = formatCurrency(weekly);
+    document.getElementById('dailyPay').textContent = formatCurrency(daily);
+  }
+
+  document.getElementById('hourlyRate').addEventListener('input', function() {
+    var val = parseFloat(this.value) || 0;
+    document.querySelectorAll('.quick-rate-btn').forEach(function(btn) {
+      var btnRate = parseInt(btn.getAttribute('data-rate'));
+      if (btnRate === val) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+    calculate();
+  });
+  document.getElementById('hoursPerWeek').addEventListener('input', calculate);
+  document.getElementById('weeksPerYear').addEventListener('input', calculate);
+
+  document.querySelectorAll('.quick-rate-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var rateVal = parseInt(this.getAttribute('data-rate'));
+      document.getElementById('hourlyRate').value = rateVal;
+      document.querySelectorAll('.quick-rate-btn').forEach(function(b) {
+        b.classList.remove('active');
+      });
+      this.classList.add('active');
+      calculate();
+    });
+  });
+
+  calculate();
+</script>

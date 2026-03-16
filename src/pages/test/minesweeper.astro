@@ -1,0 +1,826 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getGameBySlug, getRating } from '../../data/games';
+import '../../styles/game.css';
+import GameShare from '../../components/GameShare.astro';
+
+const game = getGameBySlug('minesweeper')!;
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Tests & Games",
+        "item": "https://toolcalcs.com/test/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Minesweeper"
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Minesweeper",
+    "url": "https://toolcalcs.com/test/minesweeper/",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Play free online Minesweeper with Beginner, Intermediate, and Expert difficulty levels. Classic mine-clearing puzzle game with timer and flagging."
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How do you play Minesweeper?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Left-click to reveal a cell. If it shows a number, that number tells you how many of the 8 surrounding cells contain mines. Right-click (or long-press on mobile) to place a flag where you think a mine is. Reveal all non-mine cells to win. If you click on a mine, the game is over.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is a good Minesweeper time?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'For Beginner (9x9, 10 mines), under 30 seconds is excellent. For Intermediate (16x16, 40 mines), under 60 seconds is fast. For Expert (30x16, 99 mines), under 120 seconds is considered very skilled. World records for Expert are under 30 seconds.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Is the first click in Minesweeper always safe?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes. In this version, mines are generated after your first click, ensuring that your first revealed cell is never a mine. This is consistent with the behavior of the classic Windows Minesweeper.',
+        },
+      },
+    ],
+  }
+];
+---
+
+<BaseLayout
+  title="Minesweeper - Free Online Classic Game | ToolCalcs"
+  description="Play free online Minesweeper with Beginner, Intermediate, and Expert modes. Classic mine-clearing puzzle with timer, flags, and auto-reveal. No download needed."
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/test/">Tests & Games</a> &rsaquo; <span>Minesweeper</span>
+  </nav>
+
+  <h1>{game.title}</h1>
+  <p class="page-desc">{game.description}</p>
+
+  <div class="game-box">
+    <div class="ms-controls-top">
+      <div class="ms-difficulty">
+        <button class="ms-diff-btn active" data-diff="beginner" type="button">Beginner</button>
+        <button class="ms-diff-btn" data-diff="intermediate" type="button">Intermediate</button>
+        <button class="ms-diff-btn" data-diff="expert" type="button">Expert</button>
+      </div>
+    </div>
+
+    <div class="ms-header">
+      <div class="ms-mine-count" id="mineCount">010</div>
+      <button class="ms-smiley" id="smileyBtn" type="button" aria-label="New game">&#128578;</button>
+      <div class="ms-timer" id="timer">000</div>
+    </div>
+
+    <div class="ms-board-wrapper" id="boardWrapper">
+      <div class="ms-board" id="board" role="application" aria-label="Minesweeper game board"></div>
+    </div>
+
+    <div class="score-display" id="score-display" style="display:none;">
+      <span class="score-value" id="score-value">0</span>
+      <span class="score-unit">seconds</span>
+      <span class="rating-badge" id="rating-badge"></span>
+    </div>
+
+    <div class="game-controls">
+      <button class="game-btn primary" id="btn-retry" type="button" style="display:none;">Play Again</button>
+    </div>
+
+    <GameShare />
+
+    <div class="attempt-history" id="attempt-history" style="display:none;">
+      <h3>Attempt History</h3>
+      <div class="history-list" id="history-list"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is Minesweeper?</h2>
+    <p>Minesweeper is one of the most iconic puzzle games in computing history. Originally bundled with Microsoft Windows 3.1 in 1992, it quickly became one of the most-played computer games in the world, with hundreds of millions of people discovering it through their Windows desktops. The game presents a deceptively simple premise: clear a rectangular grid of cells without detonating any hidden mines. Each revealed cell either contains a mine (ending the game) or displays a number indicating how many adjacent cells contain mines. Using logic, deduction, and occasionally educated guesses, players work through the board to identify every safe cell.</p>
+    <p>This free online version faithfully recreates the classic Minesweeper experience with three difficulty levels: Beginner (9x9 grid with 10 mines), Intermediate (16x16 grid with 40 mines), and Expert (30x16 grid with 99 mines). The game includes a mine counter, a timer, flagging capability, and the beloved smiley face button. It works on both desktop and mobile browsers with no downloads or installations required.</p>
+
+    <h2>How to Play Minesweeper</h2>
+    <p>If you have never played Minesweeper before, the rules are straightforward but mastering them takes practice. Here is a complete guide to playing:</p>
+    <ul>
+      <li><strong>Left-click</strong> on any cell to reveal it. Your very first click is always safe and will never be a mine.</li>
+      <li>If a revealed cell shows a <strong>number (1 through 8)</strong>, that number tells you exactly how many of the surrounding eight cells contain mines.</li>
+      <li>If a revealed cell is <strong>blank (zero adjacent mines)</strong>, all neighboring cells are automatically revealed in a cascading "flood fill" until numbered cells are reached.</li>
+      <li><strong>Right-click</strong> (or long-press on mobile) to place a flag on a cell you believe contains a mine. Flagged cells cannot be accidentally clicked.</li>
+      <li>The <strong>mine counter</strong> in the top left shows the total number of mines minus the number of flags you have placed.</li>
+      <li>The <strong>timer</strong> starts when you make your first click and counts up in seconds.</li>
+      <li>You <strong>win</strong> when every non-mine cell has been revealed. You do not need to flag all mines to win.</li>
+      <li>You <strong>lose</strong> if you click on a cell that contains a mine. All mines are then revealed, and any incorrectly placed flags are marked.</li>
+    </ul>
+    <p>Click the smiley face button at any time to start a new game at the current difficulty level.</p>
+
+    <h2>The History of Minesweeper</h2>
+    <p>The concept behind Minesweeper predates personal computing. Games involving hidden hazards on grids appeared in mainframe computing as early as the 1960s and 1970s, with titles like "Cube" and "Relentless Logic" exploring similar mechanics. However, the version most people know was created by Robert Donner and Curt Johnson for Microsoft. It was first included in the Microsoft Entertainment Pack in 1990 and later bundled with Windows 3.1 in 1992.</p>
+    <p>Microsoft's original intent was partly educational: Minesweeper was designed to help users become comfortable with left-clicking, right-clicking, and mouse precision, skills that were genuinely new to many computer users in the early 1990s. The game succeeded spectacularly at this secondary goal while becoming a beloved pastime in its own right.</p>
+    <p>Minesweeper remained a default Windows application through Windows 7. In Windows 8, Microsoft replaced the classic version with a redesigned "Microsoft Minesweeper" available through the Windows Store. The original version's simplicity and clean design, however, have inspired countless web-based recreations (including this one) that preserve the classic experience.</p>
+    <p>The game has also spawned a competitive community. The International Minesweeper community tracks world records through dedicated websites, with the fastest Expert completion times dropping below 30 seconds. Players from around the world compete to achieve the fastest times, developing advanced techniques and pattern recognition skills.</p>
+
+    <h2>Minesweeper Strategy Guide</h2>
+    <p>While Minesweeper involves occasional guessing (particularly in Expert mode), the vast majority of cells can be determined through logical deduction. Here are the key strategies used by experienced players:</p>
+    <h3>Basic Number Logic</h3>
+    <p>The foundation of Minesweeper strategy is understanding what each number means. A "1" cell has exactly one mine among its eight neighbors. A "3" cell has exactly three. When you can see that a numbered cell already has the correct number of adjacent flags (or identified mines), all remaining unrevealed neighbors are safe to click. Conversely, if the number of unrevealed cells equals the number of remaining mines around a numbered cell, all unrevealed neighbors must be mines.</p>
+    <h3>The 1-2-1 Pattern</h3>
+    <p>One of the most common and useful patterns is the "1-2-1" sequence along the edge of the revealed area. When you see three numbers in a row reading 1-2-1 with unrevealed cells behind them, the mines are always behind the two "1" cells, and the cell behind the "2" is always safe. Recognizing this pattern instantly can save significant time.</p>
+    <h3>The 1-2 Pattern</h3>
+    <p>When a "1" and a "2" appear adjacent to each other along the boundary with exactly three unrevealed cells behind them, the mine must be behind the cell adjacent only to the "2" (not shared with the "1"). This pattern appears frequently and becomes second nature with practice.</p>
+    <h3>Edge and Corner Cells</h3>
+    <p>Cells along the edges and corners of the board have fewer neighbors (five for edge cells, three for corner cells), which often makes them easier to solve. The reduced number of adjacent cells means numbers carry more information relative to the total neighbor count. Many experienced players start from corners and edges when possible.</p>
+    <h3>Counting Remaining Mines</h3>
+    <p>As the game progresses, keep track of the mine counter. When only a few mines remain, previously ambiguous situations often become solvable. If you know there is only one mine left in a particular region, cells that would require two mines to satisfy all adjacent numbers are guaranteed safe.</p>
+
+    <h2>Probability and Guessing in Minesweeper</h2>
+    <p>Despite its logical nature, Minesweeper sometimes presents situations where no cell can be determined with certainty. This occurs most often in Expert mode and typically manifests as a "50-50" situation where two cells are equally likely to contain a mine. Advanced players develop an intuition for which situations require guessing and try to resolve ambiguous areas early before they become critical.</p>
+    <p>Statistical analysis of Minesweeper boards shows that approximately 10-15 percent of Expert games are unsolvable without guessing at some point. Beginner boards, by contrast, are almost always solvable through pure logic due to the lower mine density. Intermediate falls between the two extremes.</p>
+    <p>When forced to guess, experienced players apply probability reasoning. A cell surrounded by low numbers is less likely to be a mine than a cell in a dense, heavily mined region. Corner cells and edge cells in unexplored regions have slightly different probabilities than interior cells, which can inform your guessing strategy.</p>
+
+    <h2>Speedrunning Tips</h2>
+    <p>Minesweeper speedrunning is a well-established competitive endeavor with a global leaderboard community. Here are tips to improve your completion times:</p>
+    <ul>
+      <li><strong>Use both mouse buttons:</strong> On desktop, develop the ability to left-click and right-click rapidly without repositioning your hand. Some players use both mouse buttons simultaneously (chording) to auto-reveal cells around a satisfied number.</li>
+      <li><strong>Minimize flag usage:</strong> Many top players avoid flagging entirely in Beginner and Intermediate modes, as placing flags costs time. They mentally track mine locations and focus purely on revealing safe cells. This technique is called "non-flagging" or "NF" style.</li>
+      <li><strong>Develop pattern recognition:</strong> With enough practice, common patterns (1-2-1, 1-2, 1-1, and others) become instantly recognizable, allowing you to make decisions without conscious calculation.</li>
+      <li><strong>Work from openings:</strong> When the first click creates a large opening, work outward from its edges rather than jumping to distant corners. This minimizes mouse travel distance.</li>
+      <li><strong>Stay calm under pressure:</strong> Speed comes from efficient pattern recognition, not frantic clicking. Smooth, deliberate movements are faster than rushed, error-prone ones.</li>
+      <li><strong>Practice specific difficulty levels:</strong> If you want to improve your Beginner time, play 50 Beginner games in a row rather than switching between difficulties. Focused practice builds pattern recognition for that specific mine density.</li>
+    </ul>
+
+    <h2>Mental Benefits of Playing Minesweeper</h2>
+    <p>Beyond entertainment, Minesweeper offers genuine cognitive benefits. The game exercises several important mental faculties:</p>
+    <ul>
+      <li><strong>Logical reasoning:</strong> Every move in Minesweeper requires deductive logic, strengthening your ability to draw conclusions from available evidence.</li>
+      <li><strong>Spatial awareness:</strong> Tracking relationships between numbered cells and their neighbors develops spatial reasoning skills that transfer to other activities.</li>
+      <li><strong>Risk assessment:</strong> Deciding when to guess and which cells to prioritize builds practical decision-making skills under uncertainty.</li>
+      <li><strong>Concentration and focus:</strong> A single misclick can end the game, training sustained attention and careful deliberation.</li>
+      <li><strong>Pattern recognition:</strong> Regular play dramatically improves your ability to spot recurring patterns quickly, a skill valuable in mathematics, programming, and everyday problem-solving.</li>
+    </ul>
+    <p>Studies on puzzle games suggest that regular engagement with logic puzzles can help maintain cognitive function over time. While Minesweeper alone is not a comprehensive brain training program, it provides an enjoyable way to exercise important mental skills during brief breaks throughout the day.</p>
+
+    <h2>Difficulty Level Comparison</h2>
+    <p>Understanding the differences between difficulty levels helps you choose the right challenge for your skill level and set appropriate time goals:</p>
+    <ul>
+      <li><strong>Beginner (9x9, 10 mines):</strong> The grid contains 81 cells with a mine density of about 12 percent. Most games can be solved without guessing. A good target time is under 30 seconds, with experienced players finishing in under 10 seconds.</li>
+      <li><strong>Intermediate (16x16, 40 mines):</strong> The grid contains 256 cells with approximately 16 percent mine density. Games occasionally require a guess but are mostly solvable through logic. A good target time is under 60 seconds, with top players finishing in under 30 seconds.</li>
+      <li><strong>Expert (30x16, 99 mines):</strong> The grid contains 480 cells with approximately 21 percent mine density. Many games require at least one guess. A good target time is under 120 seconds. The world record is under 30 seconds, achieved through extraordinary pattern recognition and mouse control.</li>
+    </ul>
+    <p>New players should start with Beginner to learn the number patterns, then graduate to Intermediate once they can consistently win. Expert mode is a significant step up and rewards patience, practice, and the ability to handle ambiguity gracefully.</p>
+  </article>
+
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  /* --- Minesweeper Specific Styles --- */
+  .ms-controls-top {
+    margin-bottom: 12px;
+  }
+  .ms-difficulty {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .ms-diff-btn {
+    padding: 6px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-bg);
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .ms-diff-btn:hover {
+    background: var(--color-border);
+    color: var(--color-text);
+  }
+  .ms-diff-btn.active {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+  }
+
+  .ms-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 500px;
+    margin: 0 auto 8px;
+    padding: 6px 12px;
+    background: #c0c0c0;
+    border: 2px solid;
+    border-color: #808080 #fff #fff #808080;
+    border-radius: 2px;
+  }
+  .ms-mine-count,
+  .ms-timer {
+    background: #300;
+    color: #f00;
+    font-family: 'Courier New', monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    min-width: 48px;
+    text-align: center;
+    border: 1px inset #666;
+    letter-spacing: 2px;
+  }
+  .ms-smiley {
+    font-size: 1.5rem;
+    width: 36px;
+    height: 36px;
+    border: 2px solid;
+    border-color: #fff #808080 #808080 #fff;
+    background: #c0c0c0;
+    cursor: pointer;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+  .ms-smiley:active {
+    border-color: #808080 #fff #fff #808080;
+  }
+
+  .ms-board-wrapper {
+    overflow-x: auto;
+    padding: 4px 0;
+    margin-bottom: 12px;
+  }
+  .ms-board {
+    display: inline-grid;
+    border: 3px solid;
+    border-color: #808080 #fff #fff #808080;
+    background: #c0c0c0;
+    gap: 0;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  :global(.ms-cell) {
+    width: 26px;
+    height: 26px;
+    border: 2px solid;
+    border-color: #fff #808080 #808080 #fff;
+    background: #c0c0c0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  :global(.ms-cell.revealed) {
+    border: 1px solid #999;
+    background: #d0d0d0;
+    cursor: default;
+  }
+  :global(.ms-cell.mine-hit) {
+    background: #f44336;
+  }
+  :global(.ms-cell.wrong-flag) {
+    background: #ffcdd2;
+  }
+  :global(.ms-cell .flag) {
+    color: #d32f2f;
+    font-size: 0.9rem;
+  }
+  :global(.ms-cell .mine) {
+    font-size: 0.9rem;
+  }
+  :global(.ms-cell.n1) { color: #0000ff; }
+  :global(.ms-cell.n2) { color: #008000; }
+  :global(.ms-cell.n3) { color: #ff0000; }
+  :global(.ms-cell.n4) { color: #000080; }
+  :global(.ms-cell.n5) { color: #800000; }
+  :global(.ms-cell.n6) { color: #008080; }
+  :global(.ms-cell.n7) { color: #000000; }
+  :global(.ms-cell.n8) { color: #808080; }
+
+  @media (max-width: 480px) {
+    :global(.ms-cell) {
+      width: 30px;
+      height: 30px;
+      font-size: 0.85rem;
+    }
+    .ms-header {
+      padding: 4px 8px;
+    }
+    .ms-mine-count,
+    .ms-timer {
+      font-size: 1.1rem;
+      min-width: 40px;
+    }
+  }
+</style>
+
+<script is:inline>
+(function() {
+  var DIFFICULTIES = {
+    beginner:     { rows: 9,  cols: 9,  mines: 10 },
+    intermediate: { rows: 16, cols: 16, mines: 40 },
+    expert:       { rows: 16, cols: 30, mines: 99 }
+  };
+
+  var ratingScale = [
+    { max: 30,       label: 'Speed Demon!',   color: '#16a34a' },
+    { max: 60,       label: 'Fast!',          color: '#22c55e' },
+    { max: 120,      label: 'Good',           color: '#2563eb' },
+    { max: 300,      label: 'Average',        color: '#f59e0b' },
+    { max: Infinity, label: 'Careful Player',  color: '#ef4444' }
+  ];
+
+  var currentDiff = 'beginner';
+  var board = [];       // 2D array of cell objects
+  var rows = 9;
+  var cols = 9;
+  var totalMines = 10;
+  var minesLeft = 10;
+  var revealedCount = 0;
+  var gameState = 'idle'; // idle | playing | won | lost
+  var timerVal = 0;
+  var timerInterval = null;
+  var firstClick = true;
+  var attempts = [];
+  var longPressTimer = null;
+  var longPressTriggered = false;
+
+  var boardEl = document.getElementById('board');
+  var mineCountEl = document.getElementById('mineCount');
+  var timerEl = document.getElementById('timer');
+  var smileyBtn = document.getElementById('smileyBtn');
+  var scoreDisplay = document.getElementById('score-display');
+  var scoreValue = document.getElementById('score-value');
+  var ratingBadge = document.getElementById('rating-badge');
+  var btnRetry = document.getElementById('btn-retry');
+  var historyDiv = document.getElementById('attempt-history');
+  var historyList = document.getElementById('history-list');
+  var diffBtns = document.querySelectorAll('.ms-diff-btn');
+
+  // Load history
+  try {
+    var saved = localStorage.getItem('ms_history');
+    if (saved) attempts = JSON.parse(saved);
+  } catch(e) {}
+
+  function padNum(n, len) {
+    var s = String(n);
+    while (s.length < len) s = '0' + s;
+    return s;
+  }
+
+  function getRatingForTime(t) {
+    for (var i = 0; i < ratingScale.length; i++) {
+      if (t <= ratingScale[i].max) return ratingScale[i];
+    }
+    return ratingScale[ratingScale.length - 1];
+  }
+
+  function updateMineCount() {
+    var val = Math.max(-99, Math.min(999, minesLeft));
+    mineCountEl.textContent = val < 0 ? '-' + padNum(Math.abs(val), 2) : padNum(val, 3);
+  }
+
+  function updateTimer() {
+    timerEl.textContent = padNum(Math.min(timerVal, 999), 3);
+  }
+
+  function startTimer() {
+    if (timerInterval) return;
+    timerVal = 0;
+    updateTimer();
+    timerInterval = setInterval(function() {
+      timerVal++;
+      updateTimer();
+    }, 1000);
+  }
+
+  function stopTimer() {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+  }
+
+  function initBoard() {
+    stopTimer();
+    var diff = DIFFICULTIES[currentDiff];
+    rows = diff.rows;
+    cols = diff.cols;
+    totalMines = diff.mines;
+    minesLeft = totalMines;
+    revealedCount = 0;
+    gameState = 'idle';
+    firstClick = true;
+    timerVal = 0;
+
+    board = [];
+    for (var r = 0; r < rows; r++) {
+      board[r] = [];
+      for (var c = 0; c < cols; c++) {
+        board[r][c] = {
+          isMine: false,
+          isRevealed: false,
+          isFlagged: false,
+          adjacentMines: 0
+        };
+      }
+    }
+
+    updateMineCount();
+    updateTimer();
+    smileyBtn.innerHTML = '&#128578;';
+    scoreDisplay.style.display = 'none';
+    btnRetry.style.display = 'none';
+    if (window.GameShare) window.GameShare.hide();
+
+    renderBoard();
+  }
+
+  function placeMines(safeRow, safeCol) {
+    var placed = 0;
+    while (placed < totalMines) {
+      var r = Math.floor(Math.random() * rows);
+      var c = Math.floor(Math.random() * cols);
+      // Ensure not on safe cell or its neighbors
+      if (Math.abs(r - safeRow) <= 1 && Math.abs(c - safeCol) <= 1) continue;
+      if (board[r][c].isMine) continue;
+      board[r][c].isMine = true;
+      placed++;
+    }
+    // Calculate adjacent mine counts
+    for (var r = 0; r < rows; r++) {
+      for (var c = 0; c < cols; c++) {
+        if (board[r][c].isMine) continue;
+        var count = 0;
+        forNeighbors(r, c, function(nr, nc) {
+          if (board[nr][nc].isMine) count++;
+        });
+        board[r][c].adjacentMines = count;
+      }
+    }
+  }
+
+  function forNeighbors(r, c, fn) {
+    for (var dr = -1; dr <= 1; dr++) {
+      for (var dc = -1; dc <= 1; dc++) {
+        if (dr === 0 && dc === 0) continue;
+        var nr = r + dr;
+        var nc = c + dc;
+        if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
+          fn(nr, nc);
+        }
+      }
+    }
+  }
+
+  function renderBoard() {
+    boardEl.style.gridTemplateColumns = 'repeat(' + cols + ', auto)';
+    boardEl.innerHTML = '';
+
+    for (var r = 0; r < rows; r++) {
+      for (var c = 0; c < cols; c++) {
+        var cell = document.createElement('div');
+        cell.className = 'ms-cell';
+        cell.dataset.r = r;
+        cell.dataset.c = c;
+        updateCellEl(cell, r, c);
+        boardEl.appendChild(cell);
+      }
+    }
+  }
+
+  function getCellEl(r, c) {
+    return boardEl.children[r * cols + c];
+  }
+
+  function updateCellEl(el, r, c) {
+    var cell = board[r][c];
+    el.innerHTML = '';
+    el.className = 'ms-cell';
+
+    if (cell.isRevealed) {
+      el.classList.add('revealed');
+      if (cell.isMine) {
+        el.innerHTML = '<span class="mine">💣</span>';
+      } else if (cell.adjacentMines > 0) {
+        el.classList.add('n' + cell.adjacentMines);
+        el.textContent = cell.adjacentMines;
+      }
+    } else if (cell.isFlagged) {
+      el.innerHTML = '<span class="flag">🚩</span>';
+    }
+  }
+
+  function revealCell(r, c) {
+    var cell = board[r][c];
+    if (cell.isRevealed || cell.isFlagged) return;
+
+    cell.isRevealed = true;
+    revealedCount++;
+
+    if (cell.isMine) {
+      gameOver(r, c);
+      return;
+    }
+
+    var el = getCellEl(r, c);
+    updateCellEl(el, r, c);
+
+    // Flood fill if zero adjacent mines
+    if (cell.adjacentMines === 0) {
+      forNeighbors(r, c, function(nr, nc) {
+        if (!board[nr][nc].isRevealed && !board[nr][nc].isFlagged) {
+          revealCell(nr, nc);
+        }
+      });
+    }
+
+    // Check win
+    if (revealedCount === rows * cols - totalMines) {
+      winGame();
+    }
+  }
+
+  function toggleFlag(r, c) {
+    if (gameState === 'won' || gameState === 'lost') return;
+    var cell = board[r][c];
+    if (cell.isRevealed) return;
+
+    if (gameState === 'idle') {
+      gameState = 'playing';
+      startTimer();
+    }
+
+    cell.isFlagged = !cell.isFlagged;
+    minesLeft += cell.isFlagged ? -1 : 1;
+    updateMineCount();
+
+    var el = getCellEl(r, c);
+    updateCellEl(el, r, c);
+  }
+
+  function handleCellClick(r, c) {
+    if (gameState === 'won' || gameState === 'lost') return;
+    var cell = board[r][c];
+    if (cell.isFlagged || cell.isRevealed) return;
+
+    if (firstClick) {
+      firstClick = false;
+      gameState = 'playing';
+      placeMines(r, c);
+      startTimer();
+    }
+
+    revealCell(r, c);
+  }
+
+  function gameOver(hitR, hitC) {
+    gameState = 'lost';
+    stopTimer();
+    smileyBtn.innerHTML = '&#128565;';
+
+    // Reveal all mines and mark wrong flags
+    for (var r = 0; r < rows; r++) {
+      for (var c = 0; c < cols; c++) {
+        var cell = board[r][c];
+        var el = getCellEl(r, c);
+        if (cell.isMine && !cell.isFlagged) {
+          cell.isRevealed = true;
+          updateCellEl(el, r, c);
+          if (r === hitR && c === hitC) {
+            el.classList.add('mine-hit');
+          }
+        } else if (!cell.isMine && cell.isFlagged) {
+          cell.isRevealed = true;
+          el.classList.add('revealed', 'wrong-flag');
+          el.innerHTML = '<span class="mine">💣</span>';
+          el.style.textDecoration = 'line-through';
+        }
+      }
+    }
+
+    btnRetry.style.display = '';
+  }
+
+  function winGame() {
+    gameState = 'won';
+    stopTimer();
+    smileyBtn.innerHTML = '&#128526;';
+
+    // Flag all remaining mines
+    for (var r = 0; r < rows; r++) {
+      for (var c = 0; c < cols; c++) {
+        var cell = board[r][c];
+        if (cell.isMine && !cell.isFlagged) {
+          cell.isFlagged = true;
+          var el = getCellEl(r, c);
+          updateCellEl(el, r, c);
+        }
+      }
+    }
+    minesLeft = 0;
+    updateMineCount();
+
+    var time = timerVal;
+    var rating = getRatingForTime(time);
+
+    scoreDisplay.style.display = '';
+    scoreValue.textContent = time;
+    ratingBadge.textContent = rating.label;
+    ratingBadge.style.background = rating.color;
+    ratingBadge.style.color = '#fff';
+    btnRetry.style.display = '';
+
+    // Save attempt
+    attempts.unshift({
+      diff: currentDiff,
+      time: time,
+      label: rating.label,
+      date: new Date().toLocaleDateString()
+    });
+    if (attempts.length > 20) attempts = attempts.slice(0, 20);
+    try {
+      localStorage.setItem('ms_history', JSON.stringify(attempts));
+    } catch(e) {}
+    renderHistory();
+
+    // GameShare
+    if (window.GameShare) {
+      window.GameShare.show({
+        gameName: 'Minesweeper (' + currentDiff.charAt(0).toUpperCase() + currentDiff.slice(1) + ')',
+        gameSlug: 'minesweeper',
+        gameIcon: '💣',
+        score: time,
+        unit: 'sec',
+        metricLabel: 'Completion Time',
+        ratingLabel: rating.label,
+        ratingColor: rating.color
+      });
+    }
+  }
+
+  function renderHistory() {
+    if (attempts.length === 0) {
+      historyDiv.style.display = 'none';
+      return;
+    }
+    historyDiv.style.display = '';
+    var html = '';
+    for (var i = 0; i < attempts.length; i++) {
+      var a = attempts[i];
+      var diffLabel = a.diff.charAt(0).toUpperCase() + a.diff.slice(1);
+      html += '<div class="history-row">' +
+        '<span class="history-num">#' + (i + 1) + '</span>' +
+        '<span class="history-score">' + a.time + ' sec</span>' +
+        '<span class="history-label">' + diffLabel + '</span>' +
+        '<span class="history-rating" style="color:' + (getRatingForTime(a.time).color) + '">' + a.label + '</span>' +
+        '<span class="history-date">' + a.date + '</span>' +
+        '</div>';
+    }
+    historyList.innerHTML = html;
+  }
+
+  // --- Event Listeners ---
+
+  // Difficulty buttons
+  for (var i = 0; i < diffBtns.length; i++) {
+    diffBtns[i].addEventListener('click', function() {
+      for (var j = 0; j < diffBtns.length; j++) {
+        diffBtns[j].classList.remove('active');
+      }
+      this.classList.add('active');
+      currentDiff = this.dataset.diff;
+      initBoard();
+    });
+  }
+
+  // Smiley / new game
+  smileyBtn.addEventListener('click', function() {
+    initBoard();
+  });
+
+  // Retry button
+  btnRetry.addEventListener('click', function() {
+    initBoard();
+  });
+
+  // Prevent context menu on the board
+  boardEl.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+  });
+
+  // Click handler
+  boardEl.addEventListener('mousedown', function(e) {
+    if (e.button === 2) {
+      // Right click = flag
+      var cell = e.target.closest('.ms-cell');
+      if (!cell) return;
+      var r = parseInt(cell.dataset.r, 10);
+      var c = parseInt(cell.dataset.c, 10);
+      toggleFlag(r, c);
+    }
+  });
+
+  boardEl.addEventListener('click', function(e) {
+    var cell = e.target.closest('.ms-cell');
+    if (!cell) return;
+    if (longPressTriggered) {
+      longPressTriggered = false;
+      return;
+    }
+    var r = parseInt(cell.dataset.r, 10);
+    var c = parseInt(cell.dataset.c, 10);
+    handleCellClick(r, c);
+  });
+
+  // Long press for mobile flagging
+  boardEl.addEventListener('touchstart', function(e) {
+    var cell = e.target.closest('.ms-cell');
+    if (!cell) return;
+    longPressTriggered = false;
+    var r = parseInt(cell.dataset.r, 10);
+    var c = parseInt(cell.dataset.c, 10);
+    longPressTimer = setTimeout(function() {
+      longPressTriggered = true;
+      toggleFlag(r, c);
+    }, 400);
+  }, { passive: true });
+
+  boardEl.addEventListener('touchend', function(e) {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      longPressTimer = null;
+    }
+  });
+
+  boardEl.addEventListener('touchmove', function(e) {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      longPressTimer = null;
+    }
+  });
+
+  // Prevent double-tap zoom on mobile
+  boardEl.addEventListener('touchend', function(e) {
+    e.preventDefault();
+    if (longPressTriggered) {
+      longPressTriggered = false;
+      return;
+    }
+    var cell = e.target.closest('.ms-cell');
+    if (!cell) return;
+    var r = parseInt(cell.dataset.r, 10);
+    var c = parseInt(cell.dataset.c, 10);
+    handleCellClick(r, c);
+  });
+
+  // Init
+  renderHistory();
+  initBoard();
+})();
+</script>

@@ -1,0 +1,741 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import GameShare from '../../components/GameShare.astro';
+import { getGameBySlug, getRating } from '../../data/games';
+import '../../styles/game.css';
+
+const game = getGameBySlug('snake-game')!;
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Tests & Games",
+        "item": "https://toolcalcs.com/test/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Snake Game"
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Snake Game",
+    "url": "https://toolcalcs.com/test/snake-game/",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Play the classic Snake arcade game online for free. Control the snake, eat food, grow longer, and try to beat your high score."
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How do you play the Snake game?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Use the arrow keys or WASD on desktop, or the on-screen D-pad buttons on mobile, to control the direction of the snake. Guide it toward the red food dot to eat it and grow longer. Avoid hitting the walls or your own tail. The game speeds up as your snake grows, making it progressively more challenging.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is a good score in Snake?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Beginners typically score between 1 and 5 points. Average players reach 6 to 15 points. Good players can score 16 to 30, and experienced players often surpass 50 points. Scores above 50 require strong spatial awareness, planning, and quick reflexes.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What was the original Snake game?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The Snake game became widely famous when it was pre-installed on Nokia mobile phones starting with the Nokia 6110 in 1997. However, the concept dates back to the 1976 arcade game Blockade by Gremlin Industries. Nokia\'s version, programmed by Taneli Armanto, introduced Snake to hundreds of millions of players worldwide.',
+        },
+      },
+    ],
+  }
+];
+---
+
+<BaseLayout
+  title="Snake Game - Classic Arcade Game Online | ToolCalcs"
+  description="Play the classic Snake game online for free. Control the snake, eat food, grow longer, and beat your high score. Arrow keys, WASD, and mobile touch controls supported."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/test/">Tests & Games</a> &rsaquo;
+    <span>Snake Game</span>
+  </nav>
+
+  <h1>Snake Game - Classic Arcade Game Online</h1>
+  <p class="page-desc">Guide the snake to eat food and grow as long as possible without crashing. Use arrow keys, WASD, or the on-screen buttons to play.</p>
+
+  <div class="game-box">
+    <!-- Score Bar -->
+    <div class="snake-score-bar">
+      <div class="snake-score-item">
+        <span class="snake-score-label">Score</span>
+        <span class="snake-score-value" id="snakeScore">0</span>
+      </div>
+      <div class="snake-score-item">
+        <span class="snake-score-label">High Score</span>
+        <span class="snake-score-value" id="snakeHighScore">0</span>
+      </div>
+    </div>
+
+    <!-- Canvas Area -->
+    <div class="snake-canvas-wrap" id="snakeCanvasWrap">
+      <canvas id="snakeCanvas" width="400" height="400"></canvas>
+      <!-- Start Overlay -->
+      <div class="snake-overlay" id="snakeStartOverlay">
+        <span class="snake-icon" aria-hidden="true">🐍</span>
+        <h2>Snake Game</h2>
+        <p>Press Start or any arrow key to begin</p>
+      </div>
+      <!-- Game Over Overlay -->
+      <div class="snake-overlay" id="snakeGameOverOverlay" style="display:none;">
+        <h2>Game Over</h2>
+        <p class="snake-final-score">Score: <strong id="snakeFinalScore">0</strong></p>
+        <button class="game-btn primary" id="snakeRetryBtn" type="button">Play Again</button>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="game-controls snake-controls">
+      <button class="game-btn primary" id="snakeStartBtn" type="button">Start Game</button>
+      <button class="game-btn secondary" id="snakePauseBtn" type="button" style="display:none;">Pause</button>
+    </div>
+
+    <!-- Mobile D-pad -->
+    <div class="snake-dpad" id="snakeDpad">
+      <button class="dpad-btn dpad-up" id="dpadUp" type="button" aria-label="Move Up">&#9650;</button>
+      <div class="dpad-middle-row">
+        <button class="dpad-btn dpad-left" id="dpadLeft" type="button" aria-label="Move Left">&#9664;</button>
+        <div class="dpad-center"></div>
+        <button class="dpad-btn dpad-right" id="dpadRight" type="button" aria-label="Move Right">&#9654;</button>
+      </div>
+      <button class="dpad-btn dpad-down" id="dpadDown" type="button" aria-label="Move Down">&#9660;</button>
+    </div>
+
+    <!-- Score Display (shown after game over) -->
+    <div class="score-display" id="snakeScoreDisplay" hidden>
+      <span class="score-value" id="snakeScoreValue"></span>
+      <span class="score-unit">Points</span>
+      <div class="rating-badge" id="snakeRating"></div>
+    </div>
+
+    <GameShare />
+
+    <!-- Attempt History -->
+    <div class="attempt-history" id="snakeHistory" hidden>
+      <h3>Recent Attempts</h3>
+      <div class="history-list" id="snakeHistoryList"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is the Snake Game?</h2>
+    <p>The Snake game is one of the most recognizable and enduring video games ever created. In this deceptively simple game, you control a snake that moves around a bordered playing field. The objective is to eat food items that appear at random positions on the screen. Each time the snake eats a piece of food, it grows longer by one segment and your score increases. The challenge comes from the fact that you must avoid running into the walls surrounding the playing field and, crucially, you must avoid running into your own growing tail. As the snake gets longer, navigating the confined space becomes increasingly difficult, and the game gradually speeds up, demanding faster reflexes and better planning with each passing moment.</p>
+    <p>The rules are elegantly simple, yet mastering the game requires a combination of spatial awareness, forward planning, reaction speed, and patience. This blend of simplicity and depth is precisely what has made Snake a beloved classic for decades. Whether you played it on a Nokia phone during a boring commute or discovered it on a modern website, the core experience remains as compelling today as it was when it first captivated millions of players around the world.</p>
+
+    <h2>The History of Snake: From Arcade Cabinets to Nokia Phones</h2>
+    <p>The concept behind the Snake game has roots that stretch back to the mid-1970s. The earliest known ancestor is Blockade, an arcade game released in 1976 by Gremlin Industries. In Blockade, two players each controlled a line that grew as it moved, and the goal was to force your opponent to crash into a trail. This simple mechanic of a growing line that creates obstacles for itself became the foundation for the entire genre.</p>
+    <p>Throughout the late 1970s and 1980s, various versions of the growing-line game appeared on different platforms. Nibbler, released in 1982, brought the single-player snake concept to arcades with a maze-based format. Home computers like the Commodore 64, ZX Spectrum, and Apple II all had their own versions of snake-style games throughout the 1980s and early 1990s. These versions refined the gameplay but remained niche titles known primarily to dedicated gamers.</p>
+    <p>Everything changed in 1997 when Finnish programmer Taneli Armanto created a version of Snake for the Nokia 6110 mobile phone. This version, simply called Snake, was pre-installed on the device and became an instant cultural phenomenon. Nokia went on to include Snake on virtually all of its subsequent phone models, and by some estimates, over 400 million Nokia devices shipped with the game pre-loaded. Snake became the default time-killer for an entire generation, played during bus rides, waiting rooms, and lunch breaks across the globe. It was, for many people, their very first video game experience on a mobile device.</p>
+    <p>The Nokia version featured a simple monochrome display with a small playing field. The snake moved in four directions controlled by the phone's number keys, and the game had a distinctive pixel-art aesthetic that became iconic. Several sequels followed, including Snake II (which added obstacles and multiple levels), Snake III (with improved graphics), and Snake EX (the first color version). Each iteration built upon the core formula while adding new elements to keep the gameplay fresh.</p>
+
+    <h2>How to Play Snake: Rules and Controls</h2>
+    <p>Playing our online Snake game is straightforward. The game takes place on a 20 by 20 grid where each cell is one unit of space. Your snake starts as a small three-segment creature near the center of the grid, moving to the right. A red food dot appears at a random location on the grid. Your job is to steer the snake to eat the food.</p>
+    <p>On desktop computers, you can control the snake using the arrow keys (Up, Down, Left, Right) or the WASD keys (W for up, A for left, S for down, D for right). On mobile devices and tablets, use the on-screen D-pad buttons located below the game canvas. The snake moves continuously in its current direction, so you only need to press a key or button when you want to change direction.</p>
+    <p>There is one important movement rule: the snake cannot reverse direction. If the snake is moving to the right, you cannot immediately turn it to the left. Similarly, if it is moving upward, pressing down will have no effect. This prevents you from accidentally running into your own neck and adds a layer of strategic planning to your movements. You must always think one or two turns ahead.</p>
+    <p>Each time the snake eats a food item, three things happen: your score increases by one point, the snake grows by one segment (its tail extends), and a new food item appears at a random empty position on the grid. The game also increases speed slightly with each food eaten, starting at a comfortable 150 milliseconds between moves and decreasing by 2 milliseconds per food item down to a minimum of 60 milliseconds. This gradual acceleration is what transforms the early game from a relaxing exercise into a frantic test of reflexes.</p>
+    <p>The game ends when the snake collides with either a wall (the edge of the playing field) or its own body. When this happens, the Game Over screen appears showing your final score, and your result is compared against your personal high score. High scores are saved in your browser so you can track your progress across sessions. You can press the Play Again button or hit any arrow key to start a new game immediately.</p>
+
+    <h2>Snake Game Strategies and Tips</h2>
+    <p>While the Snake game appears simple, achieving high scores requires deliberate strategy. Here are proven techniques used by experienced players to consistently reach higher scores.</p>
+    <h3>Hug the Walls</h3>
+    <p>One of the most effective beginner strategies is to move along the edges of the playing field. By running the snake along the perimeter, you keep the center of the grid open for maneuvering. This approach gives you a clear view of where the food is and provides plenty of escape routes when the snake starts to fill the screen. Wall-hugging works especially well in the early and middle stages of the game when the snake is not yet long enough to block its own paths along the edges.</p>
+    <h3>Plan Your Path Ahead</h3>
+    <p>Never chase food blindly. Before turning toward a food item, mentally trace the path you will take and consider where the snake's body will be when you arrive. The most common cause of death in Snake is turning toward food only to realize that your tail has blocked the exit. Always ensure you have a clear escape route after eating the food. If the food is in a risky position, sometimes it is better to loop around and approach from a different angle rather than taking the most direct path.</p>
+    <h3>Keep a Predictable Pattern</h3>
+    <p>As the snake grows longer, maintaining a systematic movement pattern becomes essential. Many high-score players use a zigzag or lawn-mower pattern, moving back and forth across the grid in orderly rows. This approach maximizes the use of available space and minimizes the chance of trapping yourself. While you may need to break the pattern occasionally to reach food, returning to a systematic movement style as quickly as possible will keep you alive longer.</p>
+    <h3>Avoid the Center Early On</h3>
+    <p>In the early game, moving through the center of the grid might seem efficient, but it can create problems as the snake grows. The center is the hardest area to escape from because you are surrounded by potential obstacles on all sides. Experienced players prefer to work around the edges and only venture into the center when necessary to collect food, immediately returning to the perimeter afterward.</p>
+    <h3>Slow Down Your Decision-Making</h3>
+    <p>The game speeds up as you eat more food, but your brain needs to stay calm. Panicked decisions lead to crashes. When the game reaches higher speeds, focus on making one safe turn at a time rather than trying to plan complex routes. Sometimes the best move is simply to continue in your current direction and loop back around rather than making a risky turn toward nearby food. Patience is often more valuable than speed in Snake.</p>
+    <h3>Use the Pause Button</h3>
+    <p>If you need a moment to think, use the pause button. There is no penalty for pausing, and a brief pause to assess the situation and plan your next few moves can prevent a careless crash. This is especially useful when you are on a high-score run and the stakes are high. Take a breath, look at the layout, plan your route, then unpause and execute.</p>
+
+    <h2>Benefits of Playing Classic Arcade Games</h2>
+    <p>Playing games like Snake is not just entertainment. Research has shown that classic arcade games offer several cognitive and psychological benefits that make them more than simple time-killers.</p>
+    <p><strong>Improved reaction time:</strong> The progressively increasing speed in Snake forces your brain to process visual information and respond with motor commands faster. Over time, regular play can measurably improve your reaction time, a skill that transfers to driving, sports, and other real-world activities that require quick responses.</p>
+    <p><strong>Enhanced spatial reasoning:</strong> Navigating a growing snake through a confined grid is fundamentally an exercise in spatial reasoning. You must constantly visualize where your snake's body segments are, predict where they will be after your next turn, and identify safe paths through the remaining open space. This kind of spatial thinking strengthens neural pathways associated with geometry, navigation, and mental rotation.</p>
+    <p><strong>Better planning and foresight:</strong> Success in Snake requires thinking several moves ahead. This kind of sequential planning activates the prefrontal cortex, the brain region responsible for executive function, decision-making, and impulse control. The more you practice planning in a game context, the stronger these cognitive skills become in everyday life.</p>
+    <p><strong>Stress relief:</strong> Simple, repetitive games provide a form of active meditation. The focused attention required to play Snake crowds out anxious thoughts and rumination, giving your mind a break from stressors. The clear rules and immediate feedback also create a sense of control and accomplishment that can boost mood and reduce feelings of helplessness.</p>
+    <p><strong>Hand-eye coordination:</strong> Controlling the snake with keyboard inputs while tracking its movement on screen trains the connection between visual perception and motor control. This coordination is valuable for typing, gaming, playing musical instruments, and many professional tasks that require precise manual input guided by visual feedback.</p>
+
+    <h2>How This Snake Game Works</h2>
+    <p>This browser-based Snake game runs entirely in your web browser using HTML5 Canvas for rendering and JavaScript for game logic. No downloads, plugins, or installations are required. The game state updates at a fixed interval that starts at 150 milliseconds and gradually decreases as the snake eats more food. Each update cycle moves the snake one cell in its current direction, checks for collisions, and redraws the entire game board.</p>
+    <p>The playing field is a 20 by 20 grid rendered on a 400 by 400 pixel canvas. On smaller screens, the canvas automatically scales down to fit the viewport width while maintaining its square aspect ratio, so the game plays correctly on phones, tablets, and desktop monitors alike. Touch controls are provided through an on-screen directional pad that appears below the canvas, giving mobile users the same level of control as desktop players with keyboards.</p>
+    <p>Your high score is stored locally in your browser using localStorage, meaning it persists between sessions without requiring any account creation or data transmission to a server. Your game data stays on your device and is never shared with anyone. This privacy-first approach ensures you can enjoy the game without any tracking concerns.</p>
+
+    <h2>Snake Game Variations Throughout History</h2>
+    <p>The basic Snake concept has spawned countless variations over the years. Some versions add obstacles like rocks or walls within the playing field, creating maze-like challenges that demand more complex pathfinding. Others introduce multiple food types with different point values or special effects, such as speed boosts, temporary invincibility, or bonus multipliers. Multiplayer versions pit two or more snakes against each other on the same grid, adding competitive strategy to the mix.</p>
+    <p>Modern interpretations like Slither.io brought the Snake concept into the massively multiplayer online arena, where thousands of players compete simultaneously on a shared server. In these games, you can eliminate other players by causing them to crash into your snake's body, absorbing their mass to grow even larger. This competitive twist transformed the solitary Snake experience into a social phenomenon that attracted millions of concurrent players at its peak.</p>
+    <p>Despite all these variations, the core appeal of the original Snake remains unmatched. There is a purity to the single-player, single-food, bounded-grid format that makes it endlessly replayable. Every game is a fresh start, every run is a new chance to beat your personal best, and the simplicity of the rules means anyone can pick it up and start playing within seconds.</p>
+
+    <h2>Tips for Beating Your High Score</h2>
+    <p>If you are looking to push past your current personal best, here are some focused tips. First, warm up with a few casual games before attempting a serious run. Your reflexes and spatial awareness improve after a few minutes of play, so your first game of a session is rarely your best. Second, pay attention to the speed increase curve. The game becomes noticeably harder after about 20 points, so prepare mentally for the transition from a comfortable pace to a demanding one. Third, practice specific situations by deliberately putting yourself in tight spots during low-stakes games. Learning to navigate out of corners and tight loops builds the skills you need when those situations arise during a high-score attempt. Finally, take breaks. Fatigue degrades reaction time and decision-making, so step away after a few intense runs and come back refreshed.</p>
+  </article>
+
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  /* Snake Score Bar */
+  .snake-score-bar {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-bottom: 16px;
+    padding: 12px 24px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+  }
+  .snake-score-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  .snake-score-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+  }
+  .snake-score-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--color-text);
+  }
+
+  /* Canvas Wrap */
+  .snake-canvas-wrap {
+    position: relative;
+    width: 400px;
+    max-width: 100%;
+    margin: 0 auto 16px;
+    aspect-ratio: 1 / 1;
+  }
+  .snake-canvas-wrap canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--radius);
+    border: 2px solid var(--color-border);
+    background: #111;
+  }
+
+  /* Overlays */
+  .snake-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: var(--radius);
+    color: #fff;
+    z-index: 2;
+  }
+  .snake-overlay h2 {
+    font-size: 1.6rem;
+    margin-bottom: 8px;
+    color: #fff;
+  }
+  .snake-overlay p {
+    color: rgba(255, 255, 255, 0.75);
+    margin-bottom: 16px;
+    font-size: 0.95rem;
+  }
+  .snake-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 12px;
+  }
+  .snake-final-score {
+    font-size: 1.3rem;
+  }
+  .snake-final-score strong {
+    font-size: 2rem;
+    color: #22c55e;
+  }
+
+  /* Controls */
+  .snake-controls {
+    margin-bottom: 16px;
+  }
+
+  /* D-pad */
+  .snake-dpad {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    margin: 12px auto 16px;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .dpad-middle-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .dpad-btn {
+    width: 56px;
+    height: 56px;
+    border: 2px solid var(--color-border);
+    border-radius: 50%;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.1s, transform 0.1s;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  .dpad-btn:active {
+    background: var(--color-primary);
+    color: #fff;
+    transform: scale(0.92);
+  }
+  .dpad-center {
+    width: 56px;
+    height: 56px;
+  }
+
+  /* Show D-pad on touch devices */
+  @media (hover: none) and (pointer: coarse) {
+    .snake-dpad {
+      display: flex;
+    }
+  }
+
+  /* Responsive canvas */
+  @media (max-width: 440px) {
+    .snake-canvas-wrap {
+      width: 100%;
+    }
+    .snake-score-bar {
+      gap: 20px;
+      padding: 10px 16px;
+    }
+    .snake-score-value {
+      font-size: 1.2rem;
+    }
+    .dpad-btn {
+      width: 50px;
+      height: 50px;
+      font-size: 1.1rem;
+    }
+    .dpad-center {
+      width: 50px;
+      height: 50px;
+    }
+  }
+</style>
+
+<script is:inline>
+(function() {
+  var canvas = document.getElementById('snakeCanvas');
+  var ctx = canvas.getContext('2d');
+  var scoreEl = document.getElementById('snakeScore');
+  var highScoreEl = document.getElementById('snakeHighScore');
+  var startOverlay = document.getElementById('snakeStartOverlay');
+  var gameOverOverlay = document.getElementById('snakeGameOverOverlay');
+  var finalScoreEl = document.getElementById('snakeFinalScore');
+  var startBtn = document.getElementById('snakeStartBtn');
+  var pauseBtn = document.getElementById('snakePauseBtn');
+  var retryBtn = document.getElementById('snakeRetryBtn');
+  var scoreDisplay = document.getElementById('snakeScoreDisplay');
+  var scoreValue = document.getElementById('snakeScoreValue');
+  var ratingBadge = document.getElementById('snakeRating');
+  var historyWrap = document.getElementById('snakeHistory');
+  var historyList = document.getElementById('snakeHistoryList');
+
+  // D-pad
+  var dpadUp = document.getElementById('dpadUp');
+  var dpadDown = document.getElementById('dpadDown');
+  var dpadLeft = document.getElementById('dpadLeft');
+  var dpadRight = document.getElementById('dpadRight');
+
+  var GRID = 20;
+  var CELL = 20;
+  var BASE_SPEED = 150;
+  var MIN_SPEED = 60;
+  var SPEED_DEC = 2;
+
+  var snake, food, direction, nextDirection, score, highScore, speed, gameLoop, paused, running;
+
+  // Rating scale (matches games.ts)
+  var ratingScale = [
+    { max: 5, label: 'Beginner', color: '#ef4444' },
+    { max: 15, label: 'Average', color: '#f59e0b' },
+    { max: 30, label: 'Good', color: '#2563eb' },
+    { max: 50, label: 'Great!', color: '#22c55e' },
+    { max: Infinity, label: 'Master!', color: '#16a34a' }
+  ];
+
+  function getRatingForScore(s) {
+    for (var i = ratingScale.length - 1; i >= 0; i--) {
+      if (i === 0) return ratingScale[0];
+      var prev = ratingScale[i - 1];
+      if (s >= prev.max) return ratingScale[i];
+    }
+    return ratingScale[0];
+  }
+
+  // Load high score
+  highScore = parseInt(localStorage.getItem('snake-high-score') || '0', 10);
+  highScoreEl.textContent = highScore;
+
+  function init() {
+    snake = [
+      { x: 12, y: 10 },
+      { x: 11, y: 10 },
+      { x: 10, y: 10 }
+    ];
+    direction = 'right';
+    nextDirection = 'right';
+    score = 0;
+    speed = BASE_SPEED;
+    paused = false;
+    running = true;
+    scoreEl.textContent = '0';
+    scoreDisplay.hidden = true;
+    placeFood();
+    draw();
+  }
+
+  function placeFood() {
+    var empty = [];
+    for (var x = 0; x < GRID; x++) {
+      for (var y = 0; y < GRID; y++) {
+        var onSnake = false;
+        for (var i = 0; i < snake.length; i++) {
+          if (snake[i].x === x && snake[i].y === y) {
+            onSnake = true;
+            break;
+          }
+        }
+        if (!onSnake) empty.push({ x: x, y: y });
+      }
+    }
+    if (empty.length === 0) {
+      // Snake fills entire grid — you win
+      gameOver();
+      return;
+    }
+    food = empty[Math.floor(Math.random() * empty.length)];
+  }
+
+  function draw() {
+    // Get actual canvas pixel dimensions
+    var cw = canvas.width;
+    var ch = canvas.height;
+    var cellW = cw / GRID;
+    var cellH = ch / GRID;
+
+    // Background
+    ctx.fillStyle = '#111';
+    ctx.fillRect(0, 0, cw, ch);
+
+    // Grid lines (subtle)
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+    ctx.lineWidth = 1;
+    for (var i = 1; i < GRID; i++) {
+      ctx.beginPath();
+      ctx.moveTo(i * cellW, 0);
+      ctx.lineTo(i * cellW, ch);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(0, i * cellH);
+      ctx.lineTo(cw, i * cellH);
+      ctx.stroke();
+    }
+
+    // Food
+    if (food) {
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(
+        food.x * cellW + cellW / 2,
+        food.y * cellH + cellH / 2,
+        cellW * 0.4,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+    }
+
+    // Snake
+    for (var i = 0; i < snake.length; i++) {
+      var seg = snake[i];
+      if (i === 0) {
+        // Head
+        ctx.fillStyle = '#22c55e';
+      } else {
+        ctx.fillStyle = '#16a34a';
+      }
+      ctx.beginPath();
+      ctx.roundRect(
+        seg.x * cellW + 1,
+        seg.y * cellH + 1,
+        cellW - 2,
+        cellH - 2,
+        4
+      );
+      ctx.fill();
+    }
+  }
+
+  function update() {
+    if (paused || !running) return;
+
+    direction = nextDirection;
+
+    var head = { x: snake[0].x, y: snake[0].y };
+
+    if (direction === 'up') head.y--;
+    else if (direction === 'down') head.y++;
+    else if (direction === 'left') head.x--;
+    else if (direction === 'right') head.x++;
+
+    // Wall collision
+    if (head.x < 0 || head.x >= GRID || head.y < 0 || head.y >= GRID) {
+      gameOver();
+      return;
+    }
+
+    // Self collision
+    for (var i = 0; i < snake.length; i++) {
+      if (snake[i].x === head.x && snake[i].y === head.y) {
+        gameOver();
+        return;
+      }
+    }
+
+    snake.unshift(head);
+
+    // Eat food
+    if (food && head.x === food.x && head.y === food.y) {
+      score++;
+      scoreEl.textContent = score;
+      if (score > highScore) {
+        highScore = score;
+        highScoreEl.textContent = highScore;
+        localStorage.setItem('snake-high-score', String(highScore));
+      }
+      // Speed up
+      speed = Math.max(MIN_SPEED, BASE_SPEED - score * SPEED_DEC);
+      clearInterval(gameLoop);
+      gameLoop = setInterval(update, speed);
+      placeFood();
+    } else {
+      snake.pop();
+    }
+
+    draw();
+  }
+
+  function gameOver() {
+    running = false;
+    clearInterval(gameLoop);
+    gameLoop = null;
+
+    finalScoreEl.textContent = score;
+    gameOverOverlay.style.display = '';
+    startBtn.textContent = 'Play Again';
+    startBtn.style.display = '';
+    pauseBtn.style.display = 'none';
+
+    // Show score display and rating
+    var rating = getRatingForScore(score);
+    scoreValue.textContent = score;
+    ratingBadge.textContent = rating.label;
+    ratingBadge.style.background = rating.color;
+    scoreDisplay.hidden = false;
+
+    // GameShare
+    if (window.GameShare) {
+      window.GameShare.show({
+        gameName: 'Snake Game',
+        gameSlug: 'snake-game',
+        gameIcon: '\uD83D\uDC0D',
+        score: score,
+        unit: 'pts',
+        metricLabel: 'Score',
+        ratingLabel: rating.label,
+        ratingColor: rating.color
+      });
+    }
+
+    // Save to history
+    saveHistory(score, rating);
+  }
+
+  function saveHistory(s, rating) {
+    var key = 'snake-history';
+    var history = [];
+    try { history = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
+    history.unshift({
+      score: s,
+      rating: rating.label,
+      color: rating.color,
+      time: new Date().toLocaleTimeString()
+    });
+    if (history.length > 10) history = history.slice(0, 10);
+    localStorage.setItem(key, JSON.stringify(history));
+    renderHistory(history);
+  }
+
+  function renderHistory(history) {
+    if (!history || history.length === 0) {
+      historyWrap.hidden = true;
+      return;
+    }
+    historyWrap.hidden = false;
+    var html = '';
+    for (var i = 0; i < history.length; i++) {
+      var h = history[i];
+      html += '<div class="history-item">' +
+        '<span class="history-score">' + h.score + ' pts</span>' +
+        '<span class="history-rating" style="background:' + h.color + '">' + h.rating + '</span>' +
+        '<span class="history-time">' + h.time + '</span>' +
+        '</div>';
+    }
+    historyList.innerHTML = html;
+  }
+
+  // Load history on page load
+  try {
+    var saved = JSON.parse(localStorage.getItem('snake-history') || '[]');
+    if (saved.length > 0) renderHistory(saved);
+  } catch(e) {}
+
+  function startGame() {
+    startOverlay.style.display = 'none';
+    gameOverOverlay.style.display = 'none';
+    startBtn.style.display = 'none';
+    pauseBtn.style.display = '';
+    pauseBtn.textContent = 'Pause';
+
+    if (window.GameShare) window.GameShare.hide();
+
+    init();
+    gameLoop = setInterval(update, speed);
+  }
+
+  function togglePause() {
+    if (!running) return;
+    paused = !paused;
+    pauseBtn.textContent = paused ? 'Resume' : 'Pause';
+  }
+
+  // Direction helpers
+  var opposites = { up: 'down', down: 'up', left: 'right', right: 'left' };
+
+  function setDirection(dir) {
+    if (opposites[dir] === direction) return;
+    nextDirection = dir;
+  }
+
+  // Keyboard
+  document.addEventListener('keydown', function(e) {
+    var key = e.key;
+    if (key === 'ArrowUp' || key === 'w' || key === 'W') {
+      e.preventDefault();
+      if (!running && !gameLoop) { startGame(); return; }
+      setDirection('up');
+    } else if (key === 'ArrowDown' || key === 's' || key === 'S') {
+      e.preventDefault();
+      if (!running && !gameLoop) { startGame(); return; }
+      setDirection('down');
+    } else if (key === 'ArrowLeft' || key === 'a' || key === 'A') {
+      e.preventDefault();
+      if (!running && !gameLoop) { startGame(); return; }
+      setDirection('left');
+    } else if (key === 'ArrowRight' || key === 'd' || key === 'D') {
+      e.preventDefault();
+      if (!running && !gameLoop) { startGame(); return; }
+      setDirection('right');
+    } else if (key === ' ' || key === 'Escape') {
+      e.preventDefault();
+      if (running) togglePause();
+    }
+  });
+
+  // Buttons
+  startBtn.addEventListener('click', startGame);
+  pauseBtn.addEventListener('click', togglePause);
+  retryBtn.addEventListener('click', startGame);
+
+  // D-pad
+  function dpadHandler(dir) {
+    return function(e) {
+      e.preventDefault();
+      if (!running && !gameLoop) { startGame(); return; }
+      setDirection(dir);
+    };
+  }
+  dpadUp.addEventListener('touchstart', dpadHandler('up'), { passive: false });
+  dpadDown.addEventListener('touchstart', dpadHandler('down'), { passive: false });
+  dpadLeft.addEventListener('touchstart', dpadHandler('left'), { passive: false });
+  dpadRight.addEventListener('touchstart', dpadHandler('right'), { passive: false });
+  dpadUp.addEventListener('click', dpadHandler('up'));
+  dpadDown.addEventListener('click', dpadHandler('down'));
+  dpadLeft.addEventListener('click', dpadHandler('left'));
+  dpadRight.addEventListener('click', dpadHandler('right'));
+
+  // Prevent scrolling on arrow keys when game is active
+  canvas.setAttribute('tabindex', '0');
+
+  // Initial draw
+  init();
+  running = false;
+  draw();
+})();
+</script>
+</BaseLayout>

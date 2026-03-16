@@ -1,0 +1,805 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import { getGameBySlug, getRating } from '../../data/games';
+import '../../styles/game.css';
+import GameShare from '../../components/GameShare.astro';
+
+const game = getGameBySlug('2048-game')!;
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Tests & Games",
+        "item": "https://toolcalcs.com/test/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "2048 Game"
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "2048 Game",
+    "url": "https://toolcalcs.com/test/2048-game/",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Play 2048 online for free. Slide numbered tiles on a 4x4 grid, merge matching numbers, and try to reach the 2048 tile."
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is the best strategy for 2048?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The most effective strategy is the corner strategy: keep your highest-value tile in one corner (typically the top-left or bottom-right) and build a chain of descending values along one edge. Avoid pushing tiles away from your chosen corner, and try to keep one row or column full to maintain control. Never press the direction that moves your highest tile away from the corner.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Is it possible to beat 2048 every time?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'No, it is not possible to win every game of 2048. The game involves a random element (new tiles appearing in random empty cells), which means some games will be unwinnable regardless of strategy. However, skilled players using the corner strategy can reach the 2048 tile in roughly 50 to 80 percent of their games, and experienced players can consistently reach higher tiles like 4096 or 8192.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is the highest possible tile in 2048?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Theoretically, the highest possible tile on a 4x4 grid is 131,072 (2 to the power of 17). However, reaching this tile is virtually impossible in normal gameplay. The practical highest tile most skilled players reach is 8192 or 16384. The world record scores typically involve reaching the 32768 tile with extremely careful play and some luck with tile spawns.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Does 2048 improve cognitive skills?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes, playing 2048 can help improve several cognitive abilities. The game exercises spatial reasoning, pattern recognition, strategic planning, and decision-making under uncertainty. Regular play can strengthen working memory and the ability to think several moves ahead. Like other puzzle games, 2048 provides mental stimulation that contributes to overall cognitive fitness.',
+        },
+      },
+    ],
+  }
+];
+---
+
+<BaseLayout
+  title="2048 Game - Free Online Puzzle Game | ToolCalcs"
+  description="Play 2048 online for free. Slide numbered tiles to merge them and reach 2048. Use arrow keys or swipe on mobile. Track your best score."
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/test/">Tests & Games</a> &rsaquo; <span>2048 Game</span>
+  </nav>
+
+  <h1>{game.title}</h1>
+  <p class="page-desc">{game.description}</p>
+
+  <div class="game-box">
+    <div class="game-area" id="game-area" role="application" aria-label="2048 puzzle game. Use arrow keys or swipe to move tiles.">
+      <div class="g-header">
+        <div class="g-scores">
+          <div class="g-score-box">
+            <span class="g-score-label">Score</span>
+            <span class="g-score-value" id="score">0</span>
+          </div>
+          <div class="g-score-box">
+            <span class="g-score-label">Best</span>
+            <span class="g-score-value" id="best-score">0</span>
+          </div>
+        </div>
+      </div>
+      <div class="g-board" id="board">
+        <div class="g-grid-bg">
+          <div class="g-cell-bg"></div><div class="g-cell-bg"></div><div class="g-cell-bg"></div><div class="g-cell-bg"></div>
+          <div class="g-cell-bg"></div><div class="g-cell-bg"></div><div class="g-cell-bg"></div><div class="g-cell-bg"></div>
+          <div class="g-cell-bg"></div><div class="g-cell-bg"></div><div class="g-cell-bg"></div><div class="g-cell-bg"></div>
+          <div class="g-cell-bg"></div><div class="g-cell-bg"></div><div class="g-cell-bg"></div><div class="g-cell-bg"></div>
+        </div>
+        <div class="g-tile-container" id="tile-container"></div>
+      </div>
+      <div class="g-overlay" id="game-overlay" style="display:none;">
+        <div class="g-overlay-msg" id="overlay-msg">Game Over!</div>
+      </div>
+    </div>
+
+    <div class="score-display" id="score-display" style="display:none;">
+      <span class="score-value" id="score-value">0</span>
+      <span class="score-unit">points</span>
+      <span class="rating-badge" id="rating-badge"></span>
+    </div>
+
+    <div class="game-controls">
+      <button class="game-btn primary" id="btn-new" type="button">New Game</button>
+    </div>
+
+    <GameShare />
+
+    <div class="attempt-history" id="attempt-history" style="display:none;">
+      <h3>Game History</h3>
+      <div class="history-list" id="history-list"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is 2048?</h2>
+    <p>2048 is a single-player sliding tile puzzle game created by Italian web developer Gabriele Cirulli in March 2014. The game is played on a 4x4 grid where numbered tiles slide in four directions. When two tiles with the same number collide during a move, they merge into a single tile with double the value. The objective is to combine tiles strategically until you create a tile with the value 2048, though gameplay can continue beyond that milestone to achieve even higher scores.</p>
+    <p>The game became a viral sensation within days of its release, attracting millions of players worldwide. Cirulli originally created 2048 as a weekend project, inspired by two earlier games: "1024" by Veewo Studio and "Threes" by Asher Vollmer. What made 2048 stand out was its elegant simplicity, addictive gameplay loop, and the fact that Cirulli released it as open-source software, allowing anyone to play it for free in their web browser.</p>
+    <p>Despite its simple rules, 2048 is a game of surprising depth. Each move requires careful consideration of how tiles will shift and merge, and a single careless swipe can ruin a promising game. The combination of randomness (new tiles appear in random positions) and strategic planning creates a compelling challenge that keeps players coming back to improve their scores.</p>
+
+    <h2>How to Play 2048</h2>
+    <p>Playing 2048 is straightforward, but mastering it takes practice and strategic thinking. The game begins with two tiles on the 4x4 board, each showing either the number 2 or occasionally 4. On each turn, you choose a direction to move all tiles: up, down, left, or right. On desktop, use the arrow keys; on mobile devices, swipe in your chosen direction.</p>
+    <p>When you make a move, every tile on the board slides as far as possible in that direction. If two tiles with the same number end up adjacent along the direction of movement, they merge into one tile with their combined value. For example, two 4-tiles merge into a single 8-tile, and two 128-tiles become a 256-tile. Each merge adds the resulting tile's value to your score.</p>
+    <p>After every valid move (one where at least one tile moves or merges), a new tile appears in a random empty cell. New tiles have a 90 percent chance of being a 2 and a 10 percent chance of being a 4. The game ends when the board is completely full and no adjacent tiles share the same value, meaning no more moves are possible. You win by creating a 2048 tile, but you can choose to continue playing to chase higher scores and larger tiles.</p>
+
+    <h2>Winning Strategy: The Corner Technique</h2>
+    <p>The most widely used and effective strategy in 2048 is the corner technique. The core idea is to pick one corner of the board (most players choose the top-left or bottom-right) and keep your highest-value tile anchored there at all times. This creates a structured cascade of descending values that makes merging efficient and predictable.</p>
+    <p>To implement the corner strategy, follow these principles:</p>
+    <ul>
+      <li><strong>Choose a corner and commit to it:</strong> Pick one corner and never intentionally move your highest tile away from it. If your highest tile is in the top-left corner, avoid pressing the "down" or "right" arrow keys unless absolutely necessary.</li>
+      <li><strong>Build a snake pattern:</strong> Arrange your tiles in a descending snake pattern starting from your corner. For example, with the top-left corner, your top row should have your highest values from left to right, and the second row should flow right to left, creating a zigzag of descending values.</li>
+      <li><strong>Keep one edge row full:</strong> Try to keep the row or column along your chosen edge completely filled. This prevents your high-value tile from sliding away from the corner when you make lateral moves.</li>
+      <li><strong>Merge from the bottom up:</strong> Build small tiles at the opposite end of the board from your high tile, then cascade merges upward toward your corner to create larger combinations.</li>
+      <li><strong>Avoid unnecessary moves:</strong> Before each move, consider whether it will disrupt your tile arrangement. Random moves are the enemy of the corner strategy.</li>
+    </ul>
+
+    <h2>Advanced Tips for Higher Scores</h2>
+    <p>Once you are comfortable with the basic corner strategy, several advanced techniques can push your scores significantly higher:</p>
+    <ul>
+      <li><strong>Think multiple moves ahead:</strong> Before pressing an arrow key, visualize where every tile will end up and what merges will occur. Planning two or three moves ahead prevents situations where you are forced into a bad move.</li>
+      <li><strong>Maintain tile order:</strong> Ensure that tiles are always arranged in descending order from your high-value corner. Having a 32 tile between a 256 and a 128 creates a blockage that is difficult to resolve.</li>
+      <li><strong>Use the wall technique:</strong> When your chosen edge row is full, use the wall it creates to safely merge tiles on the interior rows without disturbing your highest tiles.</li>
+      <li><strong>Manage the 2s and 4s:</strong> New tiles spawn randomly, and a 4 appearing in a critical position can disrupt your layout. Keep backup empty cells near your high-value area so random spawns cause minimal damage.</li>
+      <li><strong>Know when to break the rules:</strong> Occasionally, you will be forced to move in a direction you would normally avoid. When this happens, have a plan to recover your tile arrangement as quickly as possible.</li>
+      <li><strong>Practice pattern recognition:</strong> Over time, you will recognize common board states and know the optimal sequence of moves to resolve them. This pattern recognition is what separates average players from experts.</li>
+    </ul>
+
+    <h2>The Mathematics Behind 2048</h2>
+    <p>2048 is fundamentally a game about powers of 2. Every tile value in the game is a power of 2, starting from 2 (which is 2 to the power of 1) up through 4, 8, 16, 32, 64, 128, 256, 512, 1024, and finally 2048 (which is 2 to the power of 11). To create a 2048 tile, you need to merge two 1024 tiles, which each require two 512 tiles, and so on down the chain.</p>
+    <p>A simple calculation reveals the minimum number of moves needed to create a 2048 tile. Since 2048 equals 2 raised to the 11th power, and most new tiles are 2s (2 to the 1st power), you need at least 1024 individual 2-tiles to merge all the way up to a single 2048. However, the 4x4 grid only has 16 cells, so efficient merging is essential. In practice, skilled players can reach 2048 in roughly 500 to 1000 moves.</p>
+    <p>The theoretical maximum score on a 4x4 board is calculated based on filling every cell with the highest possible tile values. Research by mathematicians and computer scientists has shown that the theoretical maximum tile is 131,072, though achieving this would require extraordinary luck with tile spawns. The practical ceiling for human players typically falls around 16,384 or 32,768.</p>
+    <p>Computer scientists have used artificial intelligence algorithms to analyze 2048 extensively. Expectimax algorithms, which account for the random tile spawns, can achieve the 2048 tile in over 99 percent of games and regularly reach much higher tiles. These AI analyses have confirmed that the corner strategy is mathematically optimal and have revealed that maintaining monotonicity (tiles arranged in ascending or descending order along rows and columns) is the single most important factor for high scores.</p>
+
+    <h2>History and Cultural Impact of 2048</h2>
+    <p>When Gabriele Cirulli published 2048 on GitHub on March 9, 2014, he could not have predicted the cultural phenomenon it would become. Within two weeks, the game had been played over 23 million times in browsers alone. App store clones and variations appeared almost immediately, with some reaching the top of the download charts before Cirulli himself released an official mobile version.</p>
+    <p>The game's success sparked important discussions about game design, intellectual property, and open-source software. Cirulli was transparent about 2048's inspirations, crediting both "1024" and "Threes" as predecessors. The developers of Threes, who had spent over a year perfecting their game, published a detailed account of their development process, expressing frustration that a simplified clone had overshadowed their original creation.</p>
+    <p>Despite the controversy, 2048's impact on puzzle gaming has been overwhelmingly positive. It introduced millions of people to the joy of mathematical puzzle games and inspired hundreds of creative variations. These include 3D versions, hexagonal grids, multiplayer modes, versions with Fibonacci numbers instead of powers of 2, and even a version called "2048 Cupcakes" where tiles are replaced with increasingly elaborate cupcake images.</p>
+
+    <h2>Mental Benefits of Playing Puzzle Games</h2>
+    <p>Playing 2048 and similar puzzle games offers a range of cognitive benefits that extend beyond entertainment. Research in cognitive psychology has shown that regularly engaging with strategic puzzle games can strengthen several mental faculties:</p>
+    <ul>
+      <li><strong>Spatial reasoning:</strong> Manipulating tiles on a grid exercises your ability to visualize spatial relationships and predict how objects will move and interact, a skill valuable in fields from architecture to surgery.</li>
+      <li><strong>Working memory:</strong> Keeping track of tile positions and planning future moves taxes your working memory, which is the mental workspace where you hold and manipulate information in real time.</li>
+      <li><strong>Decision-making under uncertainty:</strong> Because new tiles appear randomly, every move in 2048 involves weighing probabilities and making decisions with incomplete information, a skill that transfers directly to real-world problem-solving.</li>
+      <li><strong>Pattern recognition:</strong> Experienced 2048 players develop the ability to quickly recognize common board configurations and recall the optimal response, a form of expert intuition that develops with practice.</li>
+      <li><strong>Delayed gratification:</strong> Good 2048 strategy requires patience and long-term thinking. Resisting the urge to make a quick merge in favor of setting up a larger combination exercises impulse control and strategic patience.</li>
+    </ul>
+    <p>A 2019 study published in the journal PLOS ONE found that participants who regularly played strategic puzzle games showed improvements in cognitive flexibility and processing speed compared to a control group. While 2048 alone will not dramatically change your cognitive abilities, it provides enjoyable mental exercise that complements an active, intellectually engaged lifestyle.</p>
+
+    <h2>Popular 2048 Variations</h2>
+    <p>The open-source nature of 2048 has led to a thriving ecosystem of creative variations. Some noteworthy versions include 4096 and 8192, which extend the target tile beyond 2048, as well as 3x3 and 5x5 grid sizes that change the difficulty curve. Threes, the game that inspired 2048, uses a different merging system where 1s and 2s combine to make 3, and only equal tiles of 3 or above can merge. Hexagonal 2048 replaces the square grid with a honeycomb pattern and six movement directions. Multiplayer 2048 pits two players against each other on shared or separate boards, adding a competitive element to the otherwise solitary puzzle.</p>
+    <p>These variations demonstrate the versatility of the core 2048 mechanic and continue to find new audiences years after the original game's release. Whether you prefer the classic 4x4 experience or want to explore creative twists on the formula, the 2048 family of games offers endless puzzle-solving entertainment.</p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is the best strategy for 2048?</h3>
+    <p>The most effective strategy is the corner strategy: keep your highest-value tile in one corner (typically the top-left or bottom-right) and build a chain of descending values along one edge. Avoid pushing tiles away from your chosen corner, and try to keep one row or column full to maintain control. Never press the direction that moves your highest tile away from the corner.</p>
+
+    <h3>Is it possible to beat 2048 every time?</h3>
+    <p>No, it is not possible to win every game of 2048. The game involves a random element (new tiles appearing in random empty cells), which means some games will be unwinnable regardless of strategy. However, skilled players using the corner strategy can reach the 2048 tile in roughly 50 to 80 percent of their games, and experienced players can consistently reach higher tiles like 4096 or 8192.</p>
+
+    <h3>What is the highest possible tile in 2048?</h3>
+    <p>Theoretically, the highest possible tile on a 4x4 grid is 131,072 (2 to the power of 17). However, reaching this tile is virtually impossible in normal gameplay. The practical highest tile most skilled players reach is 8192 or 16384. The world record scores typically involve reaching the 32768 tile with extremely careful play and some luck with tile spawns.</p>
+
+    <h3>Does 2048 improve cognitive skills?</h3>
+    <p>Yes, playing 2048 can help improve several cognitive abilities. The game exercises spatial reasoning, pattern recognition, strategic planning, and decision-making under uncertainty. Regular play can strengthen working memory and the ability to think several moves ahead. Like other puzzle games, 2048 provides mental stimulation that contributes to overall cognitive fitness.</p>
+  </article>
+
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .game-area {
+    min-height: auto;
+    cursor: default;
+    user-select: none;
+    -webkit-user-select: none;
+    padding: 16px;
+    touch-action: none;
+  }
+
+  .g-header {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+
+  .g-scores {
+    display: flex;
+    gap: 12px;
+  }
+
+  .g-score-box {
+    background: #bbada0;
+    border-radius: 6px;
+    padding: 6px 20px;
+    text-align: center;
+    min-width: 80px;
+  }
+
+  .g-score-label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #eee4da;
+    letter-spacing: 0.5px;
+  }
+
+  .g-score-value {
+    display: block;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.2;
+  }
+
+  .g-board {
+    position: relative;
+    width: 100%;
+    max-width: 380px;
+    aspect-ratio: 1;
+    margin: 0 auto;
+    background: #bbada0;
+    border-radius: 8px;
+    padding: 8px;
+    box-sizing: border-box;
+  }
+
+  .g-grid-bg {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 8px;
+    width: 100%;
+    height: 100%;
+  }
+
+  .g-cell-bg {
+    background: rgba(238, 228, 218, 0.35);
+    border-radius: 6px;
+  }
+
+  .g-tile-container {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+  }
+
+  :global(.g-tile) {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    border-radius: 6px;
+    transition: top 0.12s ease, left 0.12s ease;
+    z-index: 10;
+  }
+
+  :global(.g-tile-new) {
+    animation: g-tile-appear 0.2s ease;
+  }
+
+  :global(.g-tile-merged) {
+    animation: g-tile-pop 0.2s ease;
+    z-index: 20;
+  }
+
+  @keyframes g-tile-appear {
+    0% { transform: scale(0); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  @keyframes g-tile-pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+
+  .g-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(238, 228, 218, 0.73);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    z-index: 100;
+  }
+
+  .g-overlay-msg {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #776e65;
+    text-align: center;
+    padding: 20px;
+  }
+
+  @media (max-width: 480px) {
+    .game-area { padding: 10px; }
+    .g-board { max-width: 320px; padding: 6px; }
+    .g-grid-bg { gap: 6px; }
+    .g-score-box { padding: 4px 14px; min-width: 65px; }
+    .g-score-value { font-size: 1.1rem; }
+    .g-overlay-msg { font-size: 1.5rem; }
+  }
+
+  @media (max-width: 360px) {
+    .g-board { max-width: 280px; padding: 5px; }
+    .g-grid-bg { gap: 5px; }
+  }
+</style>
+
+<script is:inline>
+(function() {
+  var SIZE = 4;
+  var STORAGE_BEST = 'toolcalcs_2048_best';
+  var STORAGE_HISTORY = 'toolcalcs_2048_history';
+  var MAX_HISTORY = 20;
+
+  var grid = [];
+  var score = 0;
+  var bestScore = 0;
+  var gameOver = false;
+  var won = false;
+  var keepPlaying = false;
+
+  var scoreEl = document.getElementById('score');
+  var bestEl = document.getElementById('best-score');
+  var boardEl = document.getElementById('board');
+  var tileContainer = document.getElementById('tile-container');
+  var overlay = document.getElementById('game-overlay');
+  var overlayMsg = document.getElementById('overlay-msg');
+  var btnNew = document.getElementById('btn-new');
+  var scoreDisplay = document.getElementById('score-display');
+  var scoreValue = document.getElementById('score-value');
+  var ratingBadge = document.getElementById('rating-badge');
+  var attemptHistory = document.getElementById('attempt-history');
+  var historyList = document.getElementById('history-list');
+
+  var ratingScale = [
+    { max: 500, label: 'Beginner', color: '#ef4444' },
+    { max: 2000, label: 'Learning', color: '#f59e0b' },
+    { max: 5000, label: 'Good', color: '#2563eb' },
+    { max: 10000, label: 'Great!', color: '#22c55e' },
+    { max: Infinity, label: 'Master!', color: '#16a34a' }
+  ];
+
+  var tileColors = {
+    2:     { bg: '#eee4da', color: '#776e65' },
+    4:     { bg: '#ede0c8', color: '#776e65' },
+    8:     { bg: '#f2b179', color: '#f9f6f2' },
+    16:    { bg: '#f59563', color: '#f9f6f2' },
+    32:    { bg: '#f67c5f', color: '#f9f6f2' },
+    64:    { bg: '#f65e3b', color: '#f9f6f2' },
+    128:   { bg: '#edcf72', color: '#f9f6f2' },
+    256:   { bg: '#edcc61', color: '#f9f6f2' },
+    512:   { bg: '#edc850', color: '#f9f6f2' },
+    1024:  { bg: '#edc53f', color: '#f9f6f2' },
+    2048:  { bg: '#edc22e', color: '#f9f6f2' },
+    4096:  { bg: '#3c3a32', color: '#f9f6f2' },
+    8192:  { bg: '#3c3a32', color: '#f9f6f2' }
+  };
+
+  function getRatingForScore(s) {
+    for (var i = 0; i < ratingScale.length; i++) {
+      if (s <= ratingScale[i].max) return ratingScale[i];
+    }
+    return ratingScale[ratingScale.length - 1];
+  }
+
+  function loadBest() {
+    try { bestScore = parseInt(localStorage.getItem(STORAGE_BEST)) || 0; } catch(e) { bestScore = 0; }
+    bestEl.textContent = bestScore;
+  }
+
+  function saveBest() {
+    if (score > bestScore) {
+      bestScore = score;
+      try { localStorage.setItem(STORAGE_BEST, String(bestScore)); } catch(e) {}
+      bestEl.textContent = bestScore;
+    }
+  }
+
+  function loadHistory() {
+    try {
+      var raw = localStorage.getItem(STORAGE_HISTORY);
+      return raw ? JSON.parse(raw) : [];
+    } catch(e) { return []; }
+  }
+
+  function saveHistory(s) {
+    var r = getRatingForScore(s);
+    var history = loadHistory();
+    history.unshift({
+      score: s,
+      rating: r.label,
+      color: r.color,
+      date: new Date().toLocaleDateString()
+    });
+    if (history.length > MAX_HISTORY) history.length = MAX_HISTORY;
+    try { localStorage.setItem(STORAGE_HISTORY, JSON.stringify(history)); } catch(e) {}
+  }
+
+  function renderHistory() {
+    var history = loadHistory();
+    if (history.length === 0) {
+      attemptHistory.style.display = 'none';
+      return;
+    }
+    attemptHistory.style.display = '';
+    var html = '';
+    for (var i = 0; i < history.length; i++) {
+      var h = history[i];
+      html += '<div class="history-item"><span class="history-score">' + h.score + ' pts</span>' +
+              '<span class="history-rating" style="color:' + h.color + '">' + h.rating + '</span>' +
+              '<span class="history-date">' + h.date + '</span></div>';
+    }
+    historyList.innerHTML = html;
+  }
+
+  function initGrid() {
+    grid = [];
+    for (var r = 0; r < SIZE; r++) {
+      grid[r] = [];
+      for (var c = 0; c < SIZE; c++) {
+        grid[r][c] = 0;
+      }
+    }
+  }
+
+  function emptyCells() {
+    var cells = [];
+    for (var r = 0; r < SIZE; r++) {
+      for (var c = 0; c < SIZE; c++) {
+        if (grid[r][c] === 0) cells.push({ r: r, c: c });
+      }
+    }
+    return cells;
+  }
+
+  function addRandomTile() {
+    var cells = emptyCells();
+    if (cells.length === 0) return null;
+    var cell = cells[Math.floor(Math.random() * cells.length)];
+    var value = Math.random() < 0.9 ? 2 : 4;
+    grid[cell.r][cell.c] = value;
+    return { r: cell.r, c: cell.c, value: value };
+  }
+
+  function getTileSize() {
+    var containerWidth = tileContainer.offsetWidth;
+    var gap = containerWidth < 300 ? 5 : (containerWidth < 350 ? 6 : 8);
+    var tileSize = (containerWidth - gap * (SIZE - 1)) / SIZE;
+    return { size: tileSize, gap: gap };
+  }
+
+  function tilePos(row, col, dims) {
+    var x = col * (dims.size + dims.gap);
+    var y = row * (dims.size + dims.gap);
+    return { x: x, y: y };
+  }
+
+  function tileFontSize(value, size) {
+    if (value >= 1024) return Math.floor(size * 0.28) + 'px';
+    if (value >= 128) return Math.floor(size * 0.33) + 'px';
+    return Math.floor(size * 0.4) + 'px';
+  }
+
+  function renderTiles(newTiles, mergedTiles) {
+    tileContainer.innerHTML = '';
+    var dims = getTileSize();
+
+    for (var r = 0; r < SIZE; r++) {
+      for (var c = 0; c < SIZE; c++) {
+        var val = grid[r][c];
+        if (val === 0) continue;
+
+        var tile = document.createElement('div');
+        tile.className = 'g-tile';
+        var pos = tilePos(r, c, dims);
+        tile.style.width = dims.size + 'px';
+        tile.style.height = dims.size + 'px';
+        tile.style.left = pos.x + 'px';
+        tile.style.top = pos.y + 'px';
+        tile.style.fontSize = tileFontSize(val, dims.size);
+
+        var colors = tileColors[val] || { bg: '#3c3a32', color: '#f9f6f2' };
+        tile.style.background = colors.bg;
+        tile.style.color = colors.color;
+        tile.textContent = val;
+
+        var isNew = false;
+        var isMerged = false;
+        if (newTiles) {
+          for (var n = 0; n < newTiles.length; n++) {
+            if (newTiles[n] && newTiles[n].r === r && newTiles[n].c === c) { isNew = true; break; }
+          }
+        }
+        if (mergedTiles) {
+          for (var m = 0; m < mergedTiles.length; m++) {
+            if (mergedTiles[m].r === r && mergedTiles[m].c === c) { isMerged = true; break; }
+          }
+        }
+
+        if (isMerged) tile.classList.add('g-tile-merged');
+        else if (isNew) tile.classList.add('g-tile-new');
+
+        tileContainer.appendChild(tile);
+      }
+    }
+  }
+
+  function canMove() {
+    for (var r = 0; r < SIZE; r++) {
+      for (var c = 0; c < SIZE; c++) {
+        if (grid[r][c] === 0) return true;
+        if (c < SIZE - 1 && grid[r][c] === grid[r][c + 1]) return true;
+        if (r < SIZE - 1 && grid[r][c] === grid[r + 1][c]) return true;
+      }
+    }
+    return false;
+  }
+
+  function slide(row) {
+    var arr = row.filter(function(v) { return v !== 0; });
+    var merged = [];
+    for (var i = 0; i < arr.length - 1; i++) {
+      if (arr[i] === arr[i + 1]) {
+        arr[i] *= 2;
+        score += arr[i];
+        merged.push(i);
+        arr.splice(i + 1, 1);
+      }
+    }
+    while (arr.length < SIZE) arr.push(0);
+    return { row: arr, merged: merged };
+  }
+
+  function move(direction) {
+    if (gameOver) return false;
+
+    var oldGrid = [];
+    for (var r = 0; r < SIZE; r++) {
+      oldGrid[r] = grid[r].slice();
+    }
+
+    var mergedCells = [];
+
+    if (direction === 'left') {
+      for (var r = 0; r < SIZE; r++) {
+        var result = slide(grid[r]);
+        grid[r] = result.row;
+        for (var m = 0; m < result.merged.length; m++) {
+          mergedCells.push({ r: r, c: result.merged[m] });
+        }
+      }
+    } else if (direction === 'right') {
+      for (var r = 0; r < SIZE; r++) {
+        var reversed = grid[r].slice().reverse();
+        var result = slide(reversed);
+        grid[r] = result.row.reverse();
+        for (var m = 0; m < result.merged.length; m++) {
+          mergedCells.push({ r: r, c: SIZE - 1 - result.merged[m] });
+        }
+      }
+    } else if (direction === 'up') {
+      for (var c = 0; c < SIZE; c++) {
+        var col = [];
+        for (var r = 0; r < SIZE; r++) col.push(grid[r][c]);
+        var result = slide(col);
+        for (var r = 0; r < SIZE; r++) grid[r][c] = result.row[r];
+        for (var m = 0; m < result.merged.length; m++) {
+          mergedCells.push({ r: result.merged[m], c: c });
+        }
+      }
+    } else if (direction === 'down') {
+      for (var c = 0; c < SIZE; c++) {
+        var col = [];
+        for (var r = SIZE - 1; r >= 0; r--) col.push(grid[r][c]);
+        var result = slide(col);
+        for (var r = 0; r < SIZE; r++) grid[SIZE - 1 - r][c] = result.row[r];
+        for (var m = 0; m < result.merged.length; m++) {
+          mergedCells.push({ r: SIZE - 1 - result.merged[m], c: c });
+        }
+      }
+    }
+
+    var moved = false;
+    for (var r = 0; r < SIZE; r++) {
+      for (var c = 0; c < SIZE; c++) {
+        if (grid[r][c] !== oldGrid[r][c]) { moved = true; break; }
+      }
+      if (moved) break;
+    }
+
+    if (!moved) return false;
+
+    scoreEl.textContent = score;
+    saveBest();
+
+    var newTile = addRandomTile();
+    renderTiles(newTile ? [newTile] : [], mergedCells);
+
+    if (!won && !keepPlaying) {
+      for (var r = 0; r < SIZE; r++) {
+        for (var c = 0; c < SIZE; c++) {
+          if (grid[r][c] === 2048) {
+            won = true;
+            showWin();
+            return true;
+          }
+        }
+      }
+    }
+
+    if (!canMove()) {
+      gameOver = true;
+      showGameOver();
+    }
+
+    return true;
+  }
+
+  function showWin() {
+    overlay.style.display = 'flex';
+    overlayMsg.innerHTML = 'You Win!<br><span style="font-size:0.9rem;font-weight:400;">Press New Game or keep playing</span>';
+    keepPlaying = true;
+    showResult();
+  }
+
+  function showGameOver() {
+    overlay.style.display = 'flex';
+    overlayMsg.textContent = 'Game Over!';
+    showResult();
+  }
+
+  function showResult() {
+    var r = getRatingForScore(score);
+    scoreDisplay.style.display = '';
+    scoreValue.textContent = score;
+    ratingBadge.textContent = r.label;
+    ratingBadge.style.background = r.color;
+    ratingBadge.style.color = '#fff';
+
+    saveHistory(score);
+    renderHistory();
+
+    if (window.GameShare) {
+      window.GameShare.show({
+        gameName: '2048 Game',
+        gameSlug: '2048-game',
+        gameIcon: '\uD83D\uDD22',
+        score: score,
+        unit: 'pts',
+        metricLabel: 'High Score',
+        ratingLabel: r.label,
+        ratingColor: r.color
+      });
+    }
+  }
+
+  function newGame() {
+    score = 0;
+    gameOver = false;
+    won = false;
+    keepPlaying = false;
+    scoreEl.textContent = '0';
+    overlay.style.display = 'none';
+    scoreDisplay.style.display = 'none';
+    if (window.GameShare) window.GameShare.hide();
+
+    initGrid();
+    var t1 = addRandomTile();
+    var t2 = addRandomTile();
+    renderTiles([t1, t2], []);
+  }
+
+  btnNew.addEventListener('click', newGame);
+
+  // Keyboard controls
+  document.addEventListener('keydown', function(e) {
+    var dir = null;
+    switch (e.key) {
+      case 'ArrowUp': dir = 'up'; break;
+      case 'ArrowDown': dir = 'down'; break;
+      case 'ArrowLeft': dir = 'left'; break;
+      case 'ArrowRight': dir = 'right'; break;
+    }
+    if (dir) {
+      e.preventDefault();
+      if (gameOver && !keepPlaying) return;
+      if (won && keepPlaying && gameOver) return;
+      move(dir);
+    }
+  });
+
+  // Touch / swipe controls
+  var touchStartX = 0;
+  var touchStartY = 0;
+  var gameArea = document.getElementById('game-area');
+
+  gameArea.addEventListener('touchstart', function(e) {
+    var touch = e.touches[0];
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+  }, { passive: true });
+
+  gameArea.addEventListener('touchend', function(e) {
+    if (gameOver && !keepPlaying) return;
+    if (won && keepPlaying && gameOver) return;
+
+    var touch = e.changedTouches[0];
+    var dx = touch.clientX - touchStartX;
+    var dy = touch.clientY - touchStartY;
+    var absDx = Math.abs(dx);
+    var absDy = Math.abs(dy);
+
+    if (Math.max(absDx, absDy) < 30) return;
+
+    var dir;
+    if (absDx > absDy) {
+      dir = dx > 0 ? 'right' : 'left';
+    } else {
+      dir = dy > 0 ? 'down' : 'up';
+    }
+
+    e.preventDefault();
+    move(dir);
+  }, { passive: false });
+
+  // Handle window resize
+  var resizeTimer;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function() { renderTiles([], []); }, 100);
+  });
+
+  // Init
+  loadBest();
+  renderHistory();
+  newGame();
+})();
+</script>

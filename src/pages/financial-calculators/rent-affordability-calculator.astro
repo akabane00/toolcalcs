@@ -1,0 +1,450 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Financial Calculators",
+        "item": "https://toolcalcs.com/financial-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Rent Affordability Calculator"
+      }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How much rent can I afford on my salary?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The most common guideline is the 30 percent rule, which recommends spending no more than 30 percent of your gross monthly income on rent. For example, if you earn $5,000 per month before taxes, your maximum rent should be $1,500. However, this is a general guideline and your actual affordable rent depends on your debts, savings goals, and local cost of living.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is the 30 percent rule for rent?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The 30 percent rule states that you should spend no more than 30 percent of your gross monthly income on housing costs including rent and renter\'s insurance. This guideline originated from the United States National Housing Act and has been widely adopted by financial advisors and landlords as a benchmark for housing affordability.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Should I use gross or net income for the rent calculation?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The traditional 30 percent rule uses gross income (before taxes), which is also what most landlords use when screening tenants. However, for a more conservative and realistic assessment of what you can actually afford, many financial advisors recommend calculating based on your net (take-home) income instead. Using net income gives you a clearer picture of your true budget.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What rent-to-income ratio do landlords require?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Most landlords require that your gross annual income is at least 40 times the monthly rent, which translates to a rent-to-income ratio of about 30 percent or less. Some landlords in competitive markets may require income of 50 times the monthly rent. If you have a co-signer or guarantor, the combined income requirement may be 80 times the monthly rent.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Is the 50/30/20 rule better than the 30 percent rule for rent?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The 50/30/20 rule is a broader budgeting framework that allocates 50 percent of after-tax income to needs (including rent), 30 percent to wants, and 20 percent to savings and debt repayment. Under this rule, rent is just one part of your needs category, so your rent would typically be less than 50 percent of net income. Both rules are useful guidelines, and the best approach depends on your individual financial situation and goals.',
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Rent Affordability Calculator - How Much Rent Can I Afford? | ToolCalcs"
+  description="Free rent affordability calculator. Find out how much rent you can afford based on income, debts, and savings goals. Uses the 30% rule and other budgeting methods."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/financial-calculators/">Financial Calculators</a> &rsaquo;
+    <span>Rent Affordability Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Rent Affordability Calculator</h1>
+  <p class="page-desc">Calculate how much rent you can afford based on your income, debt payments, and savings goals.</p>
+
+  <!-- Calculator Tool -->
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="grossIncome">Monthly Gross Income ($)</label>
+        <input type="number" id="grossIncome" value="5000" min="0" step="100" />
+      </div>
+      <div class="input-group">
+        <label for="debtPayments">Monthly Debt Payments ($)</label>
+        <input type="number" id="debtPayments" value="500" min="0" step="50" />
+      </div>
+      <div class="input-group">
+        <label for="savingsGoal">Monthly Savings Goal ($)</label>
+        <input type="number" id="savingsGoal" value="500" min="0" step="50" />
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate</button>
+
+      <div class="rule-buttons">
+        <span class="rule-buttons-label">Quick rules:</span>
+        <button class="rule-btn" data-rule="25">25% Rule</button>
+        <button class="rule-btn active" data-rule="30">30% Rule</button>
+        <button class="rule-btn" data-rule="35">35% Rule</button>
+        <button class="rule-btn" data-rule="40">40% Rule</button>
+      </div>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Max Rent (<span id="ruleLabel">30%</span> Rule)</span>
+          <span class="result-value" id="maxRentRule">$0</span>
+        </div>
+        <div class="result-card primary">
+          <span class="result-label">Max Rent (After Debts)</span>
+          <span class="result-value" id="maxRentDebts">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Comfortable Rent</span>
+          <span class="result-value" id="comfortableRent">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Rent-to-Income Ratio</span>
+          <span class="result-value" id="rentRatio">0%</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Remaining After Rent + Debts</span>
+          <span class="result-value" id="remaining">$0</span>
+        </div>
+      </div>
+
+      <!-- Breakdown Table -->
+      <div class="breakdown-container">
+        <h4>Monthly Budget Breakdown</h4>
+        <table class="breakdown-table">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Amount</th>
+              <th>% of Income</th>
+            </tr>
+          </thead>
+          <tbody id="breakdownBody">
+            <tr><td>Rent</td><td id="bkRent">$0</td><td id="bkRentPct">0%</td></tr>
+            <tr><td>Debt Payments</td><td id="bkDebt">$0</td><td id="bkDebtPct">0%</td></tr>
+            <tr><td>Savings</td><td id="bkSave">$0</td><td id="bkSavePct">0%</td></tr>
+            <tr><td>Remaining for Living</td><td id="bkLiving">$0</td><td id="bkLivingPct">0%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <!-- SEO Content -->
+  <article class="content-section">
+    <h2>How Much Rent Can I Afford?</h2>
+    <p>Figuring out how much rent you can afford is one of the most important financial decisions you will face, whether you are renting your first apartment, relocating to a new city, or simply reassessing your budget. Spending too much on rent can leave you unable to save for emergencies, pay down debt, or invest for the future. Spending too little might mean sacrificing comfort, safety, or a reasonable commute. The goal is to find the sweet spot where your housing costs are manageable and your overall financial health remains strong.</p>
+    <p>This rent affordability calculator helps you determine a realistic rent budget based on your gross monthly income, existing debt payments, and savings goals. It uses several widely accepted financial guidelines including the 30 percent rule, post-debt affordability, and a comfortable rent estimate that accounts for both debts and savings. By adjusting the inputs and exploring different percentage rules, you can find a rent amount that fits your unique financial situation.</p>
+    <p>Unlike a simple rule-of-thumb calculation, this tool provides multiple perspectives on affordability. The 30 percent rule gives you a quick baseline, but the after-debts calculation and comfortable rent estimate paint a more realistic picture by factoring in your actual financial obligations. The breakdown table shows exactly how your income would be divided across rent, debts, savings, and remaining living expenses, helping you visualize the impact of different rent levels on your overall budget.</p>
+
+    <h2>The 30 Percent Rule Explained</h2>
+    <p>The 30 percent rule is the most widely cited guideline for housing affordability. It states that you should spend no more than 30 percent of your gross monthly income on rent and housing-related costs. This rule has its origins in the United States National Housing Act of 1937 and was later formalized in 1981 when the government set 30 percent of income as the threshold for defining housing cost burden.</p>
+    <p>Here is how the 30 percent rule works in practice. If your gross monthly income is $5,000, the rule suggests your maximum rent should be $1,500. If you earn $4,000 per month, your rent should not exceed $1,200. The calculation is straightforward: multiply your gross monthly income by 0.30 to get your maximum recommended rent payment.</p>
+    <div class="formula-box">
+      <code>Max Rent = Gross Monthly Income &times; 0.30</code>
+    </div>
+    <p>While the 30 percent rule is a useful starting point, it has significant limitations. It uses gross income rather than take-home pay, which means it does not account for taxes, retirement contributions, or health insurance premiums that reduce your actual available cash. It also ignores individual circumstances like existing debt levels, savings goals, local cost of living, and lifestyle priorities.</p>
+    <p>For someone with no debt and minimal expenses, spending 30 percent of gross income on rent might leave plenty of room for savings and discretionary spending. But for someone with significant student loan payments, a car note, and child care costs, 30 percent of gross income may be far more than they can comfortably afford. This is why our calculator provides multiple affordability estimates rather than relying on a single rule.</p>
+    <p>Despite its limitations, the 30 percent rule remains valuable as a quick screening tool. Most landlords and property management companies use it (or the equivalent requirement that annual income be at least 40 times the monthly rent) when evaluating rental applications. If your rent would exceed 30 percent of your gross income, you may face difficulty qualifying for an apartment without a co-signer or guarantor.</p>
+
+    <h2>The 50/30/20 Budget Rule and Rent</h2>
+    <p>The 50/30/20 rule is a popular budgeting framework that divides your after-tax (net) income into three categories: 50 percent for needs, 30 percent for wants, and 20 percent for savings and debt repayment. Under this system, rent falls into the needs category along with utilities, groceries, transportation, insurance, and minimum debt payments.</p>
+    <p>Since rent is just one of several needs, the 50/30/20 rule implies that rent should be well below 50 percent of your net income to leave room for other essential expenses. In practice, most financial advisors suggest that rent should consume roughly 25 to 30 percent of your net income under this framework, depending on how expensive your other needs are.</p>
+    <p>Here is an example of the 50/30/20 rule in action. If your monthly take-home pay is $4,000:</p>
+    <ul>
+      <li><strong>Needs (50 percent):</strong> $2,000 for rent, utilities, groceries, transportation, insurance, and minimum debt payments</li>
+      <li><strong>Wants (30 percent):</strong> $1,200 for dining out, entertainment, hobbies, subscriptions, and non-essential shopping</li>
+      <li><strong>Savings (20 percent):</strong> $800 for emergency fund, retirement contributions, extra debt payments, and investment accounts</li>
+    </ul>
+    <p>If your other needs (utilities, groceries, transportation, insurance) total $800 per month, that leaves $1,200 for rent within the needs category. This would put your rent at 30 percent of your net income, which is a comfortable and sustainable level for most people.</p>
+    <p>The advantage of the 50/30/20 approach over the simple 30 percent rule is that it considers your entire financial picture, not just housing. It ensures that you are allocating enough money for savings and debt repayment, which are critical for long-term financial health. The disadvantage is that it requires more detailed budgeting and may not be practical in high-cost cities where housing alone can consume more than 50 percent of net income.</p>
+
+    <h2>Understanding Rent-to-Income Ratio</h2>
+    <p>Your rent-to-income ratio is the percentage of your gross monthly income that goes toward rent. It is the primary metric landlords use to evaluate whether you can afford a rental property, and it is also a useful personal finance indicator of how much of your income is consumed by housing.</p>
+    <p>To calculate your rent-to-income ratio, divide your monthly rent by your gross monthly income and multiply by 100. For example, if you pay $1,200 in rent and earn $5,000 per month, your rent-to-income ratio is 24 percent. This is calculated as ($1,200 / $5,000) times 100 equals 24 percent.</p>
+    <div class="formula-box">
+      <code>Rent-to-Income Ratio = (Monthly Rent / Gross Monthly Income) &times; 100</code>
+    </div>
+    <p>Here is a general guide to rent-to-income ratios and what they mean for your financial health:</p>
+    <ul>
+      <li><strong>Under 20 percent:</strong> Excellent. You have significant financial flexibility for savings, investments, and discretionary spending. This ratio is ideal but may only be achievable in lower-cost areas or with higher incomes.</li>
+      <li><strong>20 to 30 percent:</strong> Good. This is the recommended range for most renters. You should have enough income left for other expenses, savings, and a comfortable lifestyle.</li>
+      <li><strong>30 to 40 percent:</strong> Moderate. You are above the recommended threshold and may need to be more disciplined with other spending. Building savings may be challenging at this level.</li>
+      <li><strong>Over 40 percent:</strong> Cost-burdened. A significant portion of your income is going to housing, leaving limited room for other expenses and savings. Financial stress is common at this level, and unexpected expenses can create serious problems.</li>
+    </ul>
+    <p>According to the U.S. Census Bureau, approximately 46 percent of renters in the United States are considered cost-burdened, meaning they spend more than 30 percent of their income on housing. In expensive metropolitan areas like New York, San Francisco, and Los Angeles, the percentage is even higher. While spending more than 30 percent on rent is common, it does not mean it is financially healthy or sustainable in the long term.</p>
+
+    <h2>Factors Beyond Rent to Consider</h2>
+    <p>When calculating how much rent you can afford, it is crucial to consider the full cost of renting, not just the base monthly rent. Several additional expenses can significantly increase your total housing costs and should be factored into your affordability calculation.</p>
+    <p><strong>Utilities</strong> are often the largest additional cost beyond rent. Depending on your location and the size of your apartment, electricity, gas, water, sewer, and trash collection can add $100 to $300 per month. Some rentals include certain utilities in the rent, but many do not. Always ask what is included before signing a lease so you can budget accurately.</p>
+    <p><strong>Renter's insurance</strong> is typically required by landlords and costs $15 to $30 per month for a standard policy. While this is a relatively small expense, it provides important protection for your personal belongings against theft, fire, water damage, and liability claims. Some policies also cover temporary housing costs if your apartment becomes uninhabitable.</p>
+    <p><strong>Parking</strong> can be a significant expense in urban areas. Monthly parking fees at apartment complexes range from $50 to $300 or more, depending on the city and whether the spot is in a garage or surface lot. If street parking is available but limited, consider the time and stress costs of finding a spot each day.</p>
+    <p><strong>Internet and cable</strong> are not always included in rent and typically cost $50 to $150 per month. In the age of remote work, reliable high-speed internet is essential for many renters and should be considered a fixed housing cost rather than a discretionary expense.</p>
+    <p><strong>Pet deposits and pet rent</strong> are common in pet-friendly apartments. A one-time pet deposit of $200 to $500 plus monthly pet rent of $25 to $75 per pet can add meaningful costs over the life of a lease. Some breeds or larger animals may face additional restrictions or higher fees.</p>
+    <p><strong>Moving costs</strong> are a one-time expense but can be substantial. First month's rent, last month's rent, and a security deposit can require three months' worth of rent upfront. Professional movers, truck rental, and utility setup fees add to the initial cost of moving into a new rental.</p>
+    <p>As a general rule, add 20 to 30 percent to the base rent amount to estimate your true total monthly housing cost. If the apartment rents for $1,500 per month, your total housing costs may be closer to $1,800 to $1,950 when you include utilities, insurance, parking, and internet.</p>
+
+    <h2>When You Can Spend More on Rent</h2>
+    <p>While the 30 percent rule is a useful guideline, there are situations where spending a higher percentage of your income on rent may be reasonable and financially sound. Personal finance is not one-size-fits-all, and context matters when making housing decisions.</p>
+    <p><strong>You have no debt.</strong> If you have paid off your student loans, car loan, and credit cards, you have more available income for housing. Without monthly debt payments consuming a portion of your budget, spending 35 to 40 percent of gross income on rent may still leave you with adequate savings and spending money.</p>
+    <p><strong>You live in a high-cost city.</strong> In cities like New York, San Francisco, Boston, and Washington D.C., finding quality housing at 30 percent of income can be extremely difficult, especially for young professionals and entry-level workers. In these markets, spending up to 40 percent on rent may be a practical necessity, though you should compensate by being more frugal in other spending categories.</p>
+    <p><strong>You can walk or bike to work.</strong> If a more expensive apartment eliminates the need for a car, car insurance, gas, parking, and maintenance, the savings from going car-free ($500 to $800 per month in many cases) can more than offset higher rent. In this scenario, the total transportation-plus-housing cost may actually be lower in the more expensive apartment.</p>
+    <p><strong>Your income is likely to increase.</strong> If you are early in a career with strong earnings growth potential (such as medicine, law, technology, or finance), temporarily spending a higher percentage on rent while your income catches up to your cost of living can be a reasonable strategy. Just be careful not to overestimate future income or lock into expenses that will be difficult to reduce if your income growth does not materialize as expected.</p>
+
+    <h2>When You Should Spend Less on Rent</h2>
+    <p>Conversely, there are situations where the 30 percent rule is too generous and you should aim for a lower rent-to-income ratio to protect your financial health.</p>
+    <p><strong>You have significant debt.</strong> If you are carrying large student loan balances, credit card debt, or other obligations, reducing your rent frees up more money for aggressive debt repayment. The interest savings from paying off high-rate debt faster often exceed the benefits of living in a nicer or more convenient apartment.</p>
+    <p><strong>You have irregular income.</strong> Freelancers, commission-based workers, seasonal employees, and gig economy workers should keep housing costs as low as possible because their income can fluctuate dramatically from month to month. Aiming for 20 to 25 percent of average income provides a buffer during lean months.</p>
+    <p><strong>You are saving for a major goal.</strong> If you are aggressively saving for a home down payment, building an emergency fund, or pursuing financial independence, keeping rent low is one of the most impactful strategies. Housing is typically the largest expense in most budgets, so even a $200 per month reduction in rent translates to $2,400 per year in additional savings.</p>
+    <p><strong>You have dependents.</strong> Supporting children, aging parents, or other family members creates additional financial obligations that are not captured in a simple rent-to-income calculation. Child care, medical expenses, education costs, and other family-related spending can easily consume 20 to 30 percent of your income, making it essential to keep housing costs lower to maintain financial balance.</p>
+
+    <h2>Renting vs. Buying: A Quick Comparison</h2>
+    <p>Many renters eventually consider whether buying a home would be a better financial decision. While homeownership has long been considered part of the American Dream, the answer depends on your specific circumstances, timeline, and financial goals.</p>
+    <p><strong>Advantages of renting</strong> include flexibility to move easily, no responsibility for maintenance and repairs, lower upfront costs (no down payment or closing costs), protection from declining property values, and the ability to invest the money you would otherwise put toward a down payment. Renting also provides predictable monthly costs since your landlord handles property taxes, insurance increases, and major repairs.</p>
+    <p><strong>Advantages of buying</strong> include building equity over time, potential tax deductions for mortgage interest and property taxes, protection from rent increases, the ability to customize your home, and the forced savings effect of paying down a mortgage. Over long periods (typically 7 or more years), homeownership usually builds more wealth than renting, assuming property values appreciate at or near historical averages.</p>
+    <p>The breakeven point where buying becomes cheaper than renting depends on many factors including home prices, interest rates, property taxes, maintenance costs, how long you plan to stay, and local rent growth rates. In some markets, buying is clearly more affordable. In others, the high cost of housing makes renting the better financial choice for years or even decades.</p>
+    <p>A common rule of thumb is the price-to-rent ratio. Divide the purchase price of a comparable home by the annual rent for a similar property. If the ratio is below 15, buying is generally favored. If it is above 20, renting is usually the better deal. Ratios between 15 and 20 could go either way depending on the specifics.</p>
+    <p>If you are currently renting and considering buying, use our <a href="/financial-calculators/rent-vs-buy-calculator/">Rent vs. Buy Calculator</a> and <a href="/financial-calculators/home-affordability-calculator/">Home Affordability Calculator</a> to compare the long-term costs of each option based on your specific situation.</p>
+
+    <h2>Tips for Finding Affordable Rent</h2>
+    <p>If your rent affordability calculation shows that housing costs are stretching your budget too thin, here are practical strategies to find more affordable options without sacrificing safety or quality of life.</p>
+    <ol>
+      <li><strong>Consider a roommate.</strong> Splitting rent and utilities with one or more roommates can cut your housing costs by 30 to 50 percent. A two-bedroom apartment split between two people is almost always cheaper per person than a one-bedroom.</li>
+      <li><strong>Look at slightly less popular neighborhoods.</strong> Areas one or two neighborhoods away from the trendiest locations often offer significantly lower rents with similar access to amenities, transit, and employment centers.</li>
+      <li><strong>Negotiate your lease.</strong> Many landlords are willing to offer lower rent in exchange for a longer lease term (18 or 24 months instead of 12), paying several months upfront, or agreeing to handle minor maintenance yourself.</li>
+      <li><strong>Time your search strategically.</strong> Rental prices are typically lowest during winter months (November through February) when demand is lower. Landlords are more motivated to fill vacancies during the off-season and may offer move-in specials or reduced rent.</li>
+      <li><strong>Look for income-restricted housing.</strong> Many cities offer affordable housing programs for renters who meet income guidelines. These units may be available at below-market rates and are worth investigating, especially in high-cost areas.</li>
+      <li><strong>Reduce your space requirements.</strong> A studio or efficiency apartment costs 20 to 40 percent less than a one-bedroom in most markets. If you can comfortably live in a smaller space, the savings can be substantial.</li>
+    </ol>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>How much rent can I afford on my salary?</summary>
+        <p>The most common guideline is the 30 percent rule, which recommends spending no more than 30 percent of your gross monthly income on rent. For example, if you earn $5,000 per month before taxes, your maximum rent should be $1,500. However, this is a general guideline and your actual affordable rent depends on your debts, savings goals, and local cost of living. Use the calculator above to get a personalized estimate based on your full financial picture.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is the 30 percent rule for rent?</summary>
+        <p>The 30 percent rule states that you should spend no more than 30 percent of your gross monthly income on housing costs including rent and renter's insurance. This guideline originated from the United States National Housing Act and has been widely adopted by financial advisors and landlords as a benchmark for housing affordability. While useful as a starting point, it does not account for individual debt levels, savings goals, or local cost of living variations.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Should I use gross or net income for rent calculations?</summary>
+        <p>The traditional 30 percent rule uses gross income (before taxes), which is also what most landlords use when screening tenants. However, for a more conservative and realistic assessment of what you can actually afford, many financial advisors recommend calculating based on your net (take-home) income. Using net income gives you a clearer picture of your true budget since it accounts for taxes, retirement contributions, and insurance premiums.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What rent-to-income ratio do landlords require?</summary>
+        <p>Most landlords require that your gross annual income is at least 40 times the monthly rent, which translates to a rent-to-income ratio of about 30 percent or less. Some landlords in competitive markets may require income of 50 times the monthly rent. If you do not meet the income requirement on your own, you may need a co-signer or guarantor whose income combined with yours meets the threshold.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Is the 50/30/20 rule better than the 30 percent rule for rent?</summary>
+        <p>The 50/30/20 rule is a broader budgeting framework that allocates 50 percent of after-tax income to needs (including rent), 30 percent to wants, and 20 percent to savings and debt repayment. Under this rule, rent is just one part of your needs category, so your rent would typically be less than 50 percent of net income. Both rules are useful guidelines, and the best approach depends on your individual financial situation, debt levels, and savings goals.</p>
+      </details>
+    </div>
+    <h2>Related Calculators</h2>
+    <ul>
+      <li><a href="/financial-calculators/debt-to-income-calculator/">Debt-to-Income Calculator</a> - Check your DTI ratio to see where you stand for loans.</li>
+      <li><a href="/financial-calculators/home-affordability-calculator/">Home Affordability Calculator</a> - See how much home you can afford to buy.</li>
+      <li><a href="/financial-calculators/savings-goal-calculator/">Savings Goal Calculator</a> - Plan monthly savings to reach your financial targets.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+  <RelatedArticles calculatorSlug="rent-affordability-calculator" />
+  <RelatedCalculators currentSlug="rent-affordability-calculator" />
+</BaseLayout>
+
+<style>
+  .rule-buttons {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .rule-buttons-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+  .rule-btn {
+    padding: 6px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .rule-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  .rule-btn.active {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+  }
+  .breakdown-container {
+    margin-top: 20px;
+    padding: 16px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+  }
+  .breakdown-container h4 {
+    margin: 0 0 12px;
+    font-size: 0.95rem;
+    color: var(--color-text);
+  }
+  .breakdown-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+  .breakdown-table th,
+  .breakdown-table td {
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .breakdown-table th {
+    font-weight: 600;
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .breakdown-table td:nth-child(2),
+  .breakdown-table td:nth-child(3),
+  .breakdown-table th:nth-child(2),
+  .breakdown-table th:nth-child(3) {
+    text-align: right;
+  }
+  .breakdown-table tr:last-child td {
+    border-bottom: none;
+    font-weight: 600;
+  }
+  .last-updated { font-size: 0.75rem; color: var(--color-text-muted); margin: 4px 0 0; }
+
+  @media (max-width: 640px) {
+    .calc-inputs { grid-template-columns: 1fr; }
+    .result-cards { grid-template-columns: 1fr; }
+    .rule-buttons { justify-content: center; }
+  }
+</style>
+
+<script is:inline>
+  var currentRule = 30;
+
+  function formatMoney(n) {
+    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+
+  function formatPct(n) {
+    return n.toFixed(1) + '%';
+  }
+
+  function calculate() {
+    var grossIncome = parseFloat(document.getElementById('grossIncome').value) || 0;
+    var debtPayments = parseFloat(document.getElementById('debtPayments').value) || 0;
+    var savingsGoal = parseFloat(document.getElementById('savingsGoal').value) || 0;
+
+    var ruleFraction = currentRule / 100;
+
+    // Max Rent based on selected rule (% of gross income)
+    var maxRentRule = grossIncome * ruleFraction;
+
+    // Max Rent after debts: (gross income - debts) * 30%
+    var incomeAfterDebt = Math.max(grossIncome - debtPayments, 0);
+    var maxRentDebts = incomeAfterDebt * 0.30;
+
+    // Comfortable Rent: (gross income - debts - savings) * 40%
+    var incomeAfterDebtSavings = Math.max(grossIncome - debtPayments - savingsGoal, 0);
+    var comfortableRent = incomeAfterDebtSavings * 0.40;
+
+    // Use the comfortable rent for breakdown calculations
+    var rentForBreakdown = comfortableRent;
+
+    // Rent-to-Income Ratio (based on comfortable rent)
+    var rentRatio = grossIncome > 0 ? (rentForBreakdown / grossIncome) * 100 : 0;
+
+    // Remaining After Rent + Debts
+    var remaining = grossIncome - rentForBreakdown - debtPayments;
+
+    // Update results
+    document.getElementById('ruleLabel').textContent = currentRule + '%';
+    document.getElementById('maxRentRule').textContent = formatMoney(Math.round(maxRentRule));
+    document.getElementById('maxRentDebts').textContent = formatMoney(Math.round(maxRentDebts));
+    document.getElementById('comfortableRent').textContent = formatMoney(Math.round(comfortableRent));
+    document.getElementById('rentRatio').textContent = formatPct(rentRatio);
+    document.getElementById('remaining').textContent = formatMoney(Math.round(remaining));
+
+    // Breakdown table
+    var livingExpenses = grossIncome - rentForBreakdown - debtPayments - savingsGoal;
+    document.getElementById('bkRent').textContent = formatMoney(Math.round(rentForBreakdown));
+    document.getElementById('bkRentPct').textContent = grossIncome > 0 ? formatPct((rentForBreakdown / grossIncome) * 100) : '0%';
+    document.getElementById('bkDebt').textContent = formatMoney(Math.round(debtPayments));
+    document.getElementById('bkDebtPct').textContent = grossIncome > 0 ? formatPct((debtPayments / grossIncome) * 100) : '0%';
+    document.getElementById('bkSave').textContent = formatMoney(Math.round(savingsGoal));
+    document.getElementById('bkSavePct').textContent = grossIncome > 0 ? formatPct((savingsGoal / grossIncome) * 100) : '0%';
+    document.getElementById('bkLiving').textContent = formatMoney(Math.round(livingExpenses));
+    document.getElementById('bkLivingPct').textContent = grossIncome > 0 ? formatPct((livingExpenses / grossIncome) * 100) : '0%';
+  }
+
+  document.getElementById('calculateBtn').addEventListener('click', calculate);
+
+  // Rule buttons
+  var ruleBtns = document.querySelectorAll('.rule-btn');
+  for (var i = 0; i < ruleBtns.length; i++) {
+    ruleBtns[i].addEventListener('click', function() {
+      for (var j = 0; j < ruleBtns.length; j++) {
+        ruleBtns[j].classList.remove('active');
+      }
+      this.classList.add('active');
+      currentRule = parseInt(this.getAttribute('data-rule'));
+      calculate();
+    });
+  }
+
+  // Auto-calculate on load
+  calculate();
+</script>

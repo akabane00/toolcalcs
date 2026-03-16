@@ -1,0 +1,1223 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import GameShare from '../../components/GameShare.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import { getGameBySlug, getRating } from '../../data/games';
+import '../../styles/game.css';
+
+const game = getGameBySlug('sudoku')!;
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tests & Games", "item": "https://toolcalcs.com/test/" },
+      { "@type": "ListItem", "position": 3, "name": "Sudoku" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Sudoku",
+    "url": "https://toolcalcs.com/test/sudoku/",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Play free Sudoku puzzles online. Choose Easy, Medium, or Hard difficulty. Fill the 9x9 grid so every row, column, and 3x3 box contains 1-9."
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What are the rules of Sudoku?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Sudoku is played on a 9x9 grid divided into nine 3x3 boxes. The goal is to fill every empty cell with a digit from 1 to 9 so that each row, each column, and each 3x3 box contains all digits from 1 to 9 exactly once. No digit may repeat within any row, column, or box."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I solve a Sudoku puzzle?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Start by scanning each row, column, and 3x3 box for missing numbers. Use the naked singles technique: if a cell can only contain one possible number, fill it in. Use hidden singles: if a number can only go in one cell within a row, column, or box, place it there. For harder puzzles, use pencil marks to track candidates and apply advanced techniques like pointing pairs and box-line reduction."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between Easy, Medium, and Hard Sudoku?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Difficulty is determined by how many clues (pre-filled numbers) are given. Easy puzzles have around 40 clues and can be solved with basic techniques. Medium puzzles have about 32 clues and require some intermediate strategies. Hard puzzles have approximately 25 clues and demand advanced solving techniques like pointing pairs and hidden pairs."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is every Sudoku puzzle solvable?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A properly constructed Sudoku puzzle has exactly one unique solution. Our generator creates a fully solved board first, then removes cells to create the puzzle. This guarantees that every puzzle you play has a valid solution. If a puzzle had multiple solutions or no solution, it would not be a valid Sudoku."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Sudoku - Free Online Puzzle Game | ToolCalcs"
+  description="Play free Sudoku puzzles online. Choose Easy, Medium, or Hard difficulty. 9x9 grid with timer, hints, notes mode, and mistake tracking. Train your brain with the world's most popular number puzzle."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/test/">Tests & Games</a> &rsaquo;
+    <span>Sudoku</span>
+  </nav>
+
+  <h1>Sudoku</h1>
+  <p class="page-desc">Fill the 9&times;9 grid so every row, column, and 3&times;3 box contains digits 1 through 9.</p>
+
+  <div class="game-box">
+    <div class="game-area sudoku-area" id="gameArea" role="region" aria-label="Sudoku puzzle" aria-live="polite">
+      <div class="game-instructions" id="instructionsView">
+        <h2>Sudoku Puzzle</h2>
+        <p>Select a difficulty and start playing. Fill every cell so that each row, column, and 3&times;3 box contains all digits from 1 to 9. You have 3 mistakes allowed and 3 hints available.</p>
+        <p style="font-size:0.85rem;color:var(--color-text-muted);">Timer starts when you click your first cell.</p>
+        <div class="sudoku-difficulty-select" id="difficultySelect">
+          <button class="game-btn difficulty-btn active" data-diff="easy" type="button">Easy</button>
+          <button class="game-btn difficulty-btn" data-diff="medium" type="button">Medium</button>
+          <button class="game-btn difficulty-btn" data-diff="hard" type="button">Hard</button>
+        </div>
+        <button class="game-btn primary" id="startBtn" type="button" style="margin-top:16px;">New Game</button>
+      </div>
+
+      <div class="play-view" id="playView" style="display:none;">
+        <div class="sudoku-controls-bar">
+          <span class="sudoku-stat" id="timerDisplay">00:00</span>
+          <span class="sudoku-stat" id="difficultyLabel">Easy</span>
+          <span class="sudoku-stat" id="mistakeDisplay">Mistakes: 0/3</span>
+        </div>
+        <div class="sudoku-board-wrap">
+          <table class="sudoku-board" id="sudokuBoard" role="grid" aria-label="Sudoku grid"></table>
+        </div>
+        <div class="sudoku-actions">
+          <button class="sudoku-action-btn" id="undoBtn" type="button" title="Undo">&#x21A9; Undo</button>
+          <button class="sudoku-action-btn" id="eraseBtn" type="button" title="Erase">&#x232B; Erase</button>
+          <button class="sudoku-action-btn" id="notesBtn" type="button" title="Toggle Notes">&#x270E; Notes</button>
+          <button class="sudoku-action-btn" id="hintBtn" type="button" title="Hint">&#x1F4A1; Hint <span id="hintCount">3</span></button>
+        </div>
+        <div class="sudoku-numpad" id="numpad">
+          <button class="numpad-btn" data-num="1" type="button">1</button>
+          <button class="numpad-btn" data-num="2" type="button">2</button>
+          <button class="numpad-btn" data-num="3" type="button">3</button>
+          <button class="numpad-btn" data-num="4" type="button">4</button>
+          <button class="numpad-btn" data-num="5" type="button">5</button>
+          <button class="numpad-btn" data-num="6" type="button">6</button>
+          <button class="numpad-btn" data-num="7" type="button">7</button>
+          <button class="numpad-btn" data-num="8" type="button">8</button>
+          <button class="numpad-btn" data-num="9" type="button">9</button>
+        </div>
+        <button class="game-btn" id="newGameBtn" type="button" style="margin-top:12px;">New Game</button>
+      </div>
+
+      <div class="result-view" id="resultView" style="display:none;">
+        <div class="result-icon" aria-hidden="true">&#x1F3C6;</div>
+        <div class="result-label" id="resultLabel">Puzzle Complete!</div>
+        <div class="score-display">
+          <span class="score-value" id="finalTime">0:00</span>
+          <span class="score-unit">time</span>
+        </div>
+        <div class="sudoku-result-details" id="resultDetails"></div>
+        <div class="rating-badge" id="ratingBadge">&mdash;</div>
+        <button class="game-btn primary" id="playAgainBtn" type="button" style="margin-top:16px;">Play Again</button>
+      </div>
+
+      <div class="result-view" id="gameOverView" style="display:none;">
+        <div class="result-icon" aria-hidden="true">&#x274C;</div>
+        <div class="result-label">Game Over</div>
+        <p style="color:var(--color-text-muted);margin-bottom:16px;">You made 3 mistakes. Better luck next time!</p>
+        <button class="game-btn primary" id="retryBtn" type="button">Try Again</button>
+      </div>
+    </div>
+
+    <GameShare />
+
+    <div class="attempt-history" id="attemptHistory" hidden>
+      <h3>Recent Games</h3>
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="game-mid" format="horizontal" />
+
+  <article class="content-section">
+    <h2>What Is Sudoku?</h2>
+    <p>Sudoku is a logic-based number placement puzzle played on a 9 by 9 grid that is subdivided into nine 3 by 3 boxes. The objective is straightforward: fill every empty cell with a digit from 1 to 9 so that each row, each column, and each 3 by 3 box contains all nine digits exactly once. No mathematics is required beyond counting. The puzzle relies entirely on logical deduction, pattern recognition, and systematic elimination of candidates.</p>
+    <p>Each Sudoku puzzle begins with a partially completed grid. The number of pre-filled cells, called clues or givens, determines the difficulty of the puzzle. An easy puzzle might provide 40 or more clues, leaving relatively few cells to fill and requiring only basic techniques. A hard puzzle might provide as few as 22 to 25 clues, demanding advanced strategies and careful bookkeeping of candidate numbers. The minimum number of clues required for a puzzle to have a unique solution has been mathematically proven to be 17, though such puzzles are extremely difficult and rare.</p>
+    <p>Sudoku puzzles are designed to have exactly one solution. A well-constructed puzzle guides the solver through a logical chain of deductions, with each solved cell revealing new information that makes subsequent cells solvable. If a puzzle has more than one solution, it is considered flawed and does not meet the standard definition of a valid Sudoku puzzle.</p>
+
+    <h2>The History of Sudoku</h2>
+    <p>The roots of Sudoku trace back to the 18th century and the mathematical concept of Latin squares, studied by Swiss mathematician Leonhard Euler in 1783. A Latin square is an n by n array filled with n different symbols, each occurring exactly once in each row and column. Sudoku extends this concept by adding the constraint that each 3 by 3 sub-grid must also contain all symbols.</p>
+    <p>The modern form of Sudoku was created in 1979 by Howard Garns, a retired architect from Indianapolis, Indiana. He published the puzzle under the name "Number Place" in Dell Pencil Puzzles and Word Games magazine. The puzzle gained moderate popularity in the United States but did not become a worldwide phenomenon until it reached Japan.</p>
+    <p>In 1984, the Japanese puzzle company Nikoli introduced Number Place to Japan under the name "Suuji wa dokushin ni kagiru," meaning "the digits must remain single." This was later abbreviated to "Sudoku." Nikoli made two key improvements that helped popularize the puzzle: they required that the pattern of givens be rotationally symmetric, and they limited the number of givens to no more than 32. These constraints created more elegant and aesthetically pleasing puzzles.</p>
+    <p>The global Sudoku craze began in 2004 when Wayne Gould, a retired Hong Kong judge from New Zealand, developed a computer program to generate Sudoku puzzles and convinced The Times of London to publish them. Within months, Sudoku spread to newspapers around the world. By 2005, it had become one of the most popular puzzle games in history, appearing in hundreds of newspapers, books, websites, and mobile applications. The first World Sudoku Championship was held in Lucca, Italy, in 2006, and the competition continues annually, attracting elite puzzle solvers from dozens of countries.</p>
+
+    <h2>How to Solve Sudoku: Basic Strategies</h2>
+    <p>Solving Sudoku efficiently requires a systematic approach. Beginners should master the fundamental techniques before moving on to advanced strategies. The two most important basic techniques are naked singles and hidden singles.</p>
+    <p><strong>Naked Singles:</strong> A naked single occurs when a cell has only one possible candidate number. To find naked singles, examine each empty cell and determine which numbers are already present in its row, column, and 3 by 3 box. If eight of the nine digits are accounted for, the remaining digit must go in that cell. This is the simplest and most commonly used technique, and many easy puzzles can be solved using naked singles alone.</p>
+    <p><strong>Hidden Singles:</strong> A hidden single occurs when a particular number can only go in one cell within a row, column, or box, even though that cell might have multiple candidates overall. For example, if the number 7 can only be placed in one cell within a specific row (because it already appears elsewhere in the row, or because its other possible cells are blocked by column or box constraints), then 7 must go in that cell regardless of what other numbers might also be candidates for the same cell.</p>
+    <p><strong>Scanning:</strong> Scanning is the practice of systematically checking each row, column, and box for places where a specific number can be placed. Cross-hatching is a visual scanning technique where you mentally extend the lines of existing instances of a number across the grid to eliminate cells in other boxes. This method is especially effective for numbers that appear frequently in the puzzle and have limited remaining placement options.</p>
+
+    <h2>Advanced Sudoku Solving Techniques</h2>
+    <p>When basic techniques are not sufficient to progress, advanced strategies become necessary. These techniques involve analyzing the relationships between candidate numbers across multiple cells, rows, columns, and boxes.</p>
+    <p><strong>Pointing Pairs and Pointing Triples:</strong> When all instances of a candidate number within a box are confined to a single row or column, that number can be eliminated as a candidate from all other cells in that row or column outside the box. For example, if the number 5 can only appear in cells in row 2 within box 1, then 5 cannot appear anywhere else in row 2. This technique is called a pointing pair when two cells are involved and a pointing triple when three cells are involved.</p>
+    <p><strong>Box-Line Reduction:</strong> This is the reverse of pointing pairs. When all instances of a candidate number within a row or column are confined to a single box, that number can be eliminated from all other cells in that box. If the number 3 in row 4 can only appear within box 4, then 3 can be removed as a candidate from all other cells in box 4 that are not in row 4.</p>
+    <p><strong>Naked Pairs, Triples, and Quads:</strong> A naked pair occurs when two cells in the same row, column, or box contain exactly the same two candidates and no other candidates. Since those two numbers must occupy those two cells, they can be eliminated as candidates from all other cells in the same row, column, or box. The same logic extends to naked triples (three cells sharing three candidates) and naked quads (four cells sharing four candidates).</p>
+    <p><strong>Hidden Pairs, Triples, and Quads:</strong> A hidden pair occurs when two candidates appear only in two cells within a row, column, or box. Even if those cells contain other candidates, the other candidates can be eliminated because the two hidden candidates must occupy those two cells. Hidden triples and quads follow the same logic with three or four candidates respectively.</p>
+    <p><strong>X-Wing:</strong> The X-Wing pattern occurs when a candidate number appears in exactly two cells in each of two different rows, and those cells align in the same two columns. The number can then be eliminated from all other cells in those two columns. The X-Wing is named for the cross pattern formed by the four cells involved.</p>
+
+    <h2>Understanding Sudoku Difficulty Levels</h2>
+    <p>Sudoku difficulty is not solely determined by the number of clues, although that is the most significant factor. The techniques required to solve the puzzle play an equally important role in determining how challenging it feels to the solver.</p>
+    <p><strong>Easy puzzles</strong> typically provide 36 to 45 clues and can be solved entirely with naked singles and hidden singles. The solving path is relatively linear, meaning that each solved cell immediately reveals another solvable cell. Easy puzzles are ideal for beginners learning the mechanics of Sudoku and for experienced solvers who want a quick, relaxing game.</p>
+    <p><strong>Medium puzzles</strong> usually have 28 to 35 clues and require some intermediate techniques beyond basic singles. Solvers may need to use pencil marks (candidate notation) to track possible numbers and apply techniques like pointing pairs or naked pairs. Medium puzzles often have moments where the solver must pause and think more carefully rather than simply filling cells in sequence.</p>
+    <p><strong>Hard puzzles</strong> typically feature 22 to 27 clues and demand a full arsenal of advanced solving techniques. These puzzles frequently require extensive use of pencil marks, pattern recognition across multiple units, and techniques like X-Wing or hidden triples. Hard puzzles may have long chains of dependent deductions where a single misstep can lead to contradictions that are difficult to trace back to the source.</p>
+
+    <h2>Mental Health Benefits of Sudoku</h2>
+    <p>Research suggests that engaging in logic puzzles like Sudoku offers several cognitive and mental health benefits. A 2019 study published in the International Journal of Geriatric Psychiatry found that adults over 50 who regularly engaged in number puzzles had cognitive function equivalent to people 10 years younger, particularly in measures of attention, reasoning, and memory.</p>
+    <p>Sudoku requires sustained concentration, which can serve as a form of mindfulness practice. When deeply engaged in solving a puzzle, the mind is fully focused on the task at hand, providing a break from rumination and everyday worries. This flow state, described by psychologist Mihaly Csikszentmihalyi, is associated with reduced anxiety and improved mood.</p>
+    <p>The puzzle also exercises working memory, the cognitive system responsible for temporarily holding and manipulating information. Solving Sudoku requires keeping track of multiple constraints simultaneously: which numbers are present in a row, column, and box, and which candidates remain for each empty cell. Regular practice may help maintain and strengthen working memory capacity, which naturally declines with age.</p>
+    <p>Sudoku promotes logical thinking and systematic problem-solving skills that transfer to other domains. The process of forming hypotheses, testing them against constraints, and revising conclusions mirrors the scientific method and analytical thinking used in professional and academic contexts. Parents and educators often recommend Sudoku for children as a way to develop these critical thinking skills in an engaging, game-like format.</p>
+
+    <h2>Competitive Sudoku</h2>
+    <p>Competitive Sudoku has grown into a structured international sport since the first World Sudoku Championship in 2006. The championship is organized by the World Puzzle Federation and attracts teams from over 30 countries. Competitors solve a series of Sudoku puzzles of varying difficulty under strict time constraints, and scores are based on speed and accuracy.</p>
+    <p>Elite competitive solvers can complete easy puzzles in under 30 seconds and hard puzzles in two to four minutes. The top performers develop pattern recognition skills that allow them to identify solving techniques almost instantly, bypassing the step-by-step process that recreational solvers use. Many champions have backgrounds in mathematics, computer science, or puzzle design, though the skill set for competitive Sudoku is distinct from traditional academic mathematics.</p>
+    <p>Beyond the world championship, numerous national and regional Sudoku competitions exist. Online platforms host daily and weekly contests where players compete for the fastest completion times. Speed solving communities have developed their own ranking systems and leaderboards, creating a vibrant ecosystem of competitive puzzle solving that welcomes newcomers and veterans alike.</p>
+
+    <h2>Tips for Using This Sudoku Game</h2>
+    <ul>
+      <li><strong>Use Notes mode:</strong> Toggle Notes mode to write small pencil marks in cells. This helps track which numbers are possible for each empty cell, especially in medium and hard puzzles where you cannot immediately determine the correct number.</li>
+      <li><strong>Watch the highlights:</strong> When you select a cell, all cells containing the same number are highlighted. Use this visual cue to spot patterns and identify where that number is missing in rows, columns, or boxes.</li>
+      <li><strong>Save your hints:</strong> You have three hints per game. Use them strategically when you are truly stuck, rather than spending them on cells you could figure out with a bit more thought. Each hint reveals the correct number for one cell.</li>
+      <li><strong>Manage mistakes carefully:</strong> Three mistakes end the game. If you are unsure about a number, use Notes mode to record candidates rather than guessing. A wrong answer costs you one of your limited mistakes and can disrupt your solving flow.</li>
+      <li><strong>Start with Easy:</strong> If you are new to Sudoku, begin with Easy difficulty to learn the interface and basic techniques. Progress to Medium once you can solve Easy puzzles consistently, and move to Hard when Medium puzzles feel comfortable.</li>
+      <li><strong>Keyboard shortcuts:</strong> Use number keys 1 through 9 to enter digits. Press Delete or Backspace to erase. Press N to toggle Notes mode. Use arrow keys to navigate between cells for faster gameplay.</li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What are the rules of Sudoku?</h3>
+    <p>Sudoku is played on a 9 by 9 grid divided into nine 3 by 3 boxes. The goal is to fill every empty cell with a digit from 1 to 9 so that each row, each column, and each 3 by 3 box contains all digits from 1 to 9 exactly once. No digit may repeat within any row, column, or box.</p>
+
+    <h3>How do I solve a Sudoku puzzle?</h3>
+    <p>Start by scanning each row, column, and 3 by 3 box for missing numbers. Use the naked singles technique to find cells that can only contain one number. Use hidden singles to find numbers that can only go in one cell within a unit. For harder puzzles, use pencil marks and apply advanced techniques like pointing pairs, naked pairs, and X-Wing patterns.</p>
+
+    <h3>What is the difference between Easy, Medium, and Hard Sudoku?</h3>
+    <p>Difficulty is determined by the number of clues provided. Easy puzzles have around 40 clues and can be solved with basic techniques. Medium puzzles have about 32 clues and require intermediate strategies. Hard puzzles have approximately 25 clues and demand advanced solving techniques and careful candidate tracking.</p>
+
+    <h3>Is every Sudoku puzzle solvable?</h3>
+    <p>A properly constructed Sudoku puzzle has exactly one unique solution. Our generator creates a fully solved board first, then removes cells to create the puzzle. This guarantees that every puzzle you play has a valid solution.</p>
+  </article>
+
+  <CrossLinks links={[
+    { href: '/test/chimp-test/', label: 'Chimp Test', icon: '\uD83D\uDC35' },
+    { href: '/test/number-memory-test/', label: 'Number Memory Test', icon: '\uD83E\uDDE0' },
+    { href: '/test/sequence-memory-test/', label: 'Sequence Memory Test', icon: '\uD83D\uDD22' },
+  ]} />
+  <AdUnit slot="game-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .sudoku-area {
+    cursor: default;
+    user-select: none;
+    -webkit-user-select: none;
+    max-width: 720px;
+    min-height: 480px;
+  }
+
+  .sudoku-difficulty-select {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 16px;
+  }
+  .difficulty-btn {
+    padding: 8px 20px;
+    border: 2px solid var(--color-border);
+    background: var(--color-bg);
+    color: var(--color-text);
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .difficulty-btn.active {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: #fff;
+  }
+
+  .sudoku-controls-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .sudoku-stat {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--color-text);
+  }
+
+  .sudoku-board-wrap {
+    display: flex;
+    justify-content: center;
+    padding: 0 8px;
+    overflow-x: auto;
+  }
+  .sudoku-board {
+    border-collapse: collapse;
+    border: 3px solid var(--color-text);
+  }
+  .sudoku-board td {
+    width: 44px;
+    height: 44px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 1.25rem;
+    font-weight: 400;
+    border: 1px solid var(--color-border);
+    cursor: pointer;
+    position: relative;
+    transition: background 0.1s;
+    color: var(--color-text);
+    background: var(--color-bg);
+  }
+  .sudoku-board td.given {
+    font-weight: 700;
+    background: var(--color-surface);
+    color: var(--color-text);
+  }
+  .sudoku-board td.user-val {
+    color: #2563eb;
+  }
+  .sudoku-board td.selected {
+    background: #dbeafe !important;
+  }
+  .sudoku-board td.highlight-num {
+    background: #e0f2fe;
+  }
+  .sudoku-board td.highlight-unit {
+    background: #f1f5f9;
+  }
+  .sudoku-board td.error {
+    color: #ef4444 !important;
+    background: #fef2f2 !important;
+  }
+  .sudoku-board td.error-flash {
+    animation: error-shake 0.3s;
+  }
+
+  /* 3x3 box borders */
+  .sudoku-board td:nth-child(3),
+  .sudoku-board td:nth-child(6) {
+    border-right: 3px solid var(--color-text);
+  }
+  .sudoku-board tr:nth-child(3) td,
+  .sudoku-board tr:nth-child(6) td {
+    border-bottom: 3px solid var(--color-text);
+  }
+
+  .sudoku-board .notes-cell {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+  }
+  .sudoku-board .note-digit {
+    font-size: 0.55rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-muted);
+  }
+
+  .sudoku-actions {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 12px 0 8px;
+    flex-wrap: wrap;
+  }
+  .sudoku-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 14px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .sudoku-action-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  .sudoku-action-btn.active {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: #fff;
+  }
+
+  .sudoku-numpad {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 6px;
+    max-width: 420px;
+    margin: 8px auto 0;
+    padding: 0 8px;
+  }
+  .numpad-btn {
+    width: 100%;
+    aspect-ratio: 1;
+    font-size: 1.3rem;
+    font-weight: 700;
+    border: 2px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .numpad-btn:hover {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: #fff;
+  }
+  .numpad-btn.completed {
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  .sudoku-result-details {
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+    line-height: 1.8;
+  }
+
+  .result-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 320px;
+    padding: 24px;
+  }
+  .result-icon { font-size: 3rem; margin-bottom: 8px; }
+  .result-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+
+  @keyframes error-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+
+  @media (max-width: 640px) {
+    .sudoku-board td {
+      width: 36px;
+      height: 36px;
+      font-size: 1.05rem;
+    }
+    .sudoku-board .note-digit {
+      font-size: 0.45rem;
+    }
+    .sudoku-numpad {
+      gap: 4px;
+    }
+    .numpad-btn {
+      font-size: 1.1rem;
+    }
+    .sudoku-action-btn {
+      padding: 6px 10px;
+      font-size: 0.78rem;
+    }
+  }
+  @media (max-width: 420px) {
+    .sudoku-board td {
+      width: 32px;
+      height: 32px;
+      font-size: 0.95rem;
+    }
+  }
+
+  /* Dark mode overrides */
+  :global(.dark) .sudoku-board td.selected {
+    background: #1e3a5f !important;
+  }
+  :global(.dark) .sudoku-board td.highlight-num {
+    background: #1e3a5f80;
+  }
+  :global(.dark) .sudoku-board td.highlight-unit {
+    background: #1e293b;
+  }
+  :global(.dark) .sudoku-board td.error {
+    background: #451a1a !important;
+  }
+</style>
+
+<script is:inline>
+(function () {
+  'use strict';
+
+  var gameName = 'Sudoku';
+  var gameSlug = 'sudoku';
+  var gameIcon = '\uD83D\uDD22';
+  var metricLabel = 'Completion Time';
+  var metricUnit = 'sec';
+
+  // ===== DOM refs =====
+  var instructionsView = document.getElementById('instructionsView');
+  var playView = document.getElementById('playView');
+  var resultView = document.getElementById('resultView');
+  var gameOverView = document.getElementById('gameOverView');
+  var startBtn = document.getElementById('startBtn');
+  var playAgainBtn = document.getElementById('playAgainBtn');
+  var retryBtn = document.getElementById('retryBtn');
+  var newGameBtn = document.getElementById('newGameBtn');
+  var timerDisplay = document.getElementById('timerDisplay');
+  var difficultyLabel = document.getElementById('difficultyLabel');
+  var mistakeDisplay = document.getElementById('mistakeDisplay');
+  var boardEl = document.getElementById('sudokuBoard');
+  var numpad = document.getElementById('numpad');
+  var eraseBtn = document.getElementById('eraseBtn');
+  var notesBtn = document.getElementById('notesBtn');
+  var hintBtn = document.getElementById('hintBtn');
+  var hintCount = document.getElementById('hintCount');
+  var undoBtn = document.getElementById('undoBtn');
+  var finalTime = document.getElementById('finalTime');
+  var resultDetails = document.getElementById('resultDetails');
+  var ratingBadge = document.getElementById('ratingBadge');
+  var attemptHistorySection = document.getElementById('attemptHistory');
+  var historyList = document.getElementById('historyList');
+
+  // ===== State =====
+  var solution = [];    // 9x9 solved board
+  var puzzle = [];      // 9x9 initial puzzle (0 = empty)
+  var board = [];       // 9x9 current state
+  var notes = [];       // 9x9 array of arrays (pencil marks)
+  var selectedRow = -1;
+  var selectedCol = -1;
+  var mistakes = 0;
+  var maxMistakes = 3;
+  var hintsLeft = 3;
+  var notesMode = false;
+  var timerStarted = false;
+  var startTime = 0;
+  var timerInterval = null;
+  var elapsedSeconds = 0;
+  var difficulty = 'easy';
+  var moveHistory = [];
+
+  var CLUES = { easy: 40, medium: 32, hard: 25 };
+
+  var RATING_SCALE = [
+    { max: 120, label: 'Lightning!', color: '#16a34a' },
+    { max: 300, label: 'Fast!', color: '#22c55e' },
+    { max: 600, label: 'Good', color: '#2563eb' },
+    { max: 1200, label: 'Average', color: '#f59e0b' },
+    { max: Infinity, label: 'Slow', color: '#ef4444' }
+  ];
+
+  var STORAGE_KEY = 'toolcalcs_sudoku_history';
+  var SAVE_KEY = 'toolcalcs_sudoku_progress';
+  var MAX_HISTORY = 20;
+
+  // ===== Utility =====
+  function getRatingForTime(sec) {
+    for (var i = 0; i < RATING_SCALE.length; i++) {
+      if (sec <= RATING_SCALE[i].max) return RATING_SCALE[i];
+    }
+    return RATING_SCALE[RATING_SCALE.length - 1];
+  }
+
+  function formatTime(sec) {
+    var m = Math.floor(sec / 60);
+    var s = sec % 60;
+    return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  function showView(view) {
+    instructionsView.style.display = 'none';
+    playView.style.display = 'none';
+    resultView.style.display = 'none';
+    gameOverView.style.display = 'none';
+    view.style.display = '';
+  }
+
+  function deepCopy(arr) {
+    var r = [];
+    for (var i = 0; i < arr.length; i++) {
+      r.push(arr[i].slice());
+    }
+    return r;
+  }
+
+  // ===== Board Generation =====
+  function createEmptyGrid() {
+    var g = [];
+    for (var i = 0; i < 9; i++) {
+      g.push([0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    }
+    return g;
+  }
+
+  function shuffle(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+
+  function isValid(grid, row, col, num) {
+    for (var i = 0; i < 9; i++) {
+      if (grid[row][i] === num) return false;
+      if (grid[i][col] === num) return false;
+    }
+    var br = Math.floor(row / 3) * 3;
+    var bc = Math.floor(col / 3) * 3;
+    for (var r = br; r < br + 3; r++) {
+      for (var c = bc; c < bc + 3; c++) {
+        if (grid[r][c] === num) return false;
+      }
+    }
+    return true;
+  }
+
+  function fillDiagonalBoxes(grid) {
+    for (var box = 0; box < 3; box++) {
+      var nums = shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+      var idx = 0;
+      var sr = box * 3;
+      var sc = box * 3;
+      for (var r = sr; r < sr + 3; r++) {
+        for (var c = sc; c < sc + 3; c++) {
+          grid[r][c] = nums[idx++];
+        }
+      }
+    }
+  }
+
+  function solveSudoku(grid) {
+    for (var r = 0; r < 9; r++) {
+      for (var c = 0; c < 9; c++) {
+        if (grid[r][c] === 0) {
+          var nums = shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+          for (var i = 0; i < 9; i++) {
+            if (isValid(grid, r, c, nums[i])) {
+              grid[r][c] = nums[i];
+              if (solveSudoku(grid)) return true;
+              grid[r][c] = 0;
+            }
+          }
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  function generateSolvedBoard() {
+    var grid = createEmptyGrid();
+    fillDiagonalBoxes(grid);
+    solveSudoku(grid);
+    return grid;
+  }
+
+  function generatePuzzle(solved, clueCount) {
+    var puz = deepCopy(solved);
+    var cells = [];
+    for (var r = 0; r < 9; r++) {
+      for (var c = 0; c < 9; c++) {
+        cells.push([r, c]);
+      }
+    }
+    shuffle(cells);
+    var toRemove = 81 - clueCount;
+    var removed = 0;
+    for (var i = 0; i < cells.length && removed < toRemove; i++) {
+      var row = cells[i][0];
+      var col = cells[i][1];
+      puz[row][col] = 0;
+      removed++;
+    }
+    return puz;
+  }
+
+  // ===== Board Rendering =====
+  function buildBoard() {
+    var html = '';
+    for (var r = 0; r < 9; r++) {
+      html += '<tr>';
+      for (var c = 0; c < 9; c++) {
+        html += '<td data-row="' + r + '" data-col="' + c + '"></td>';
+      }
+      html += '</tr>';
+    }
+    boardEl.innerHTML = html;
+  }
+
+  function renderBoard() {
+    for (var r = 0; r < 9; r++) {
+      for (var c = 0; c < 9; c++) {
+        var cell = boardEl.rows[r].cells[c];
+        var val = board[r][c];
+        var isGiven = puzzle[r][c] !== 0;
+
+        // Clear classes
+        cell.className = '';
+        if (isGiven) cell.classList.add('given');
+        else if (val !== 0) cell.classList.add('user-val');
+
+        // Check error
+        if (!isGiven && val !== 0 && val !== solution[r][c]) {
+          cell.classList.add('error');
+        }
+
+        // Highlights
+        if (r === selectedRow && c === selectedCol) {
+          cell.classList.add('selected');
+        } else if (selectedRow >= 0 && selectedCol >= 0) {
+          // Highlight same unit
+          if (r === selectedRow || c === selectedCol ||
+              (Math.floor(r / 3) === Math.floor(selectedRow / 3) &&
+               Math.floor(c / 3) === Math.floor(selectedCol / 3))) {
+            cell.classList.add('highlight-unit');
+          }
+          // Highlight same number
+          var selVal = board[selectedRow][selectedCol];
+          if (selVal !== 0 && val === selVal) {
+            cell.classList.add('highlight-num');
+          }
+        }
+
+        // Content
+        if (val !== 0) {
+          cell.textContent = val;
+        } else if (notes[r] && notes[r][c] && notes[r][c].length > 0) {
+          cell.textContent = '';
+          var notesDiv = document.createElement('div');
+          notesDiv.className = 'notes-cell';
+          for (var n = 1; n <= 9; n++) {
+            var nd = document.createElement('span');
+            nd.className = 'note-digit';
+            if (notes[r][c].indexOf(n) >= 0) {
+              nd.textContent = n;
+            }
+            notesDiv.appendChild(nd);
+          }
+          cell.appendChild(notesDiv);
+        } else {
+          cell.textContent = '';
+        }
+      }
+    }
+    updateNumpadCompletion();
+  }
+
+  function updateNumpadCompletion() {
+    var counts = {};
+    for (var n = 1; n <= 9; n++) counts[n] = 0;
+    for (var r = 0; r < 9; r++) {
+      for (var c = 0; c < 9; c++) {
+        if (board[r][c] !== 0) counts[board[r][c]]++;
+      }
+    }
+    var btns = numpad.querySelectorAll('.numpad-btn');
+    for (var i = 0; i < btns.length; i++) {
+      var num = parseInt(btns[i].getAttribute('data-num'));
+      if (counts[num] >= 9) {
+        btns[i].classList.add('completed');
+      } else {
+        btns[i].classList.remove('completed');
+      }
+    }
+  }
+
+  // ===== Timer =====
+  function startTimer() {
+    if (timerStarted) return;
+    timerStarted = true;
+    startTime = Date.now();
+    timerInterval = setInterval(function () {
+      elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+      timerDisplay.textContent = formatTime(elapsedSeconds);
+    }, 1000);
+  }
+
+  function stopTimer() {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+    elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+  }
+
+  // ===== Cell Interaction =====
+  function selectCell(r, c) {
+    selectedRow = r;
+    selectedCol = c;
+    renderBoard();
+  }
+
+  function placeNumber(num) {
+    if (selectedRow < 0 || selectedCol < 0) return;
+    if (puzzle[selectedRow][selectedCol] !== 0) return; // given cell
+
+    startTimer();
+
+    if (notesMode) {
+      // Toggle note
+      if (!notes[selectedRow]) notes[selectedRow] = [];
+      if (!notes[selectedRow][selectedCol]) notes[selectedRow][selectedCol] = [];
+      if (board[selectedRow][selectedCol] !== 0) return; // cell already filled
+      var idx = notes[selectedRow][selectedCol].indexOf(num);
+      moveHistory.push({ type: 'note', row: selectedRow, col: selectedCol, notes: notes[selectedRow][selectedCol].slice(), val: board[selectedRow][selectedCol] });
+      if (idx >= 0) {
+        notes[selectedRow][selectedCol].splice(idx, 1);
+      } else {
+        notes[selectedRow][selectedCol].push(num);
+      }
+      renderBoard();
+      saveProgress();
+      return;
+    }
+
+    // Place value
+    var prevVal = board[selectedRow][selectedCol];
+    var prevNotes = notes[selectedRow] && notes[selectedRow][selectedCol] ? notes[selectedRow][selectedCol].slice() : [];
+    moveHistory.push({ type: 'place', row: selectedRow, col: selectedCol, val: prevVal, notes: prevNotes });
+
+    board[selectedRow][selectedCol] = num;
+    // Clear notes for this cell
+    if (notes[selectedRow] && notes[selectedRow][selectedCol]) {
+      notes[selectedRow][selectedCol] = [];
+    }
+
+    // Validate
+    if (num !== solution[selectedRow][selectedCol]) {
+      mistakes++;
+      mistakeDisplay.textContent = 'Mistakes: ' + mistakes + '/' + maxMistakes;
+      var cell = boardEl.rows[selectedRow].cells[selectedCol];
+      cell.classList.add('error-flash');
+      setTimeout(function () { cell.classList.remove('error-flash'); }, 300);
+      if (mistakes >= maxMistakes) {
+        stopTimer();
+        showView(gameOverView);
+        clearProgress();
+        return;
+      }
+    } else {
+      // Remove this number from notes in same row/col/box
+      removeNotesForPlacement(selectedRow, selectedCol, num);
+    }
+
+    renderBoard();
+    saveProgress();
+
+    // Check win
+    if (checkWin()) {
+      stopTimer();
+      showWin();
+    }
+  }
+
+  function eraseCell() {
+    if (selectedRow < 0 || selectedCol < 0) return;
+    if (puzzle[selectedRow][selectedCol] !== 0) return;
+
+    var prevVal = board[selectedRow][selectedCol];
+    var prevNotes = notes[selectedRow] && notes[selectedRow][selectedCol] ? notes[selectedRow][selectedCol].slice() : [];
+    moveHistory.push({ type: 'erase', row: selectedRow, col: selectedCol, val: prevVal, notes: prevNotes });
+
+    board[selectedRow][selectedCol] = 0;
+    if (notes[selectedRow] && notes[selectedRow][selectedCol]) {
+      notes[selectedRow][selectedCol] = [];
+    }
+    renderBoard();
+    saveProgress();
+  }
+
+  function undoMove() {
+    if (moveHistory.length === 0) return;
+    var move = moveHistory.pop();
+    board[move.row][move.col] = move.val;
+    if (!notes[move.row]) notes[move.row] = [];
+    notes[move.row][move.col] = move.notes || [];
+    selectedRow = move.row;
+    selectedCol = move.col;
+    renderBoard();
+    saveProgress();
+  }
+
+  function useHint() {
+    if (hintsLeft <= 0) return;
+
+    startTimer();
+
+    // Find an empty or wrong cell
+    var emptyCells = [];
+    for (var r = 0; r < 9; r++) {
+      for (var c = 0; c < 9; c++) {
+        if (board[r][c] !== solution[r][c]) {
+          emptyCells.push([r, c]);
+        }
+      }
+    }
+    if (emptyCells.length === 0) return;
+
+    // Prefer selected cell if it's empty/wrong
+    var target;
+    if (selectedRow >= 0 && selectedCol >= 0 && board[selectedRow][selectedCol] !== solution[selectedRow][selectedCol]) {
+      target = [selectedRow, selectedCol];
+    } else {
+      target = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+    }
+
+    hintsLeft--;
+    hintCount.textContent = hintsLeft;
+    board[target[0]][target[1]] = solution[target[0]][target[1]];
+    if (notes[target[0]] && notes[target[0]][target[1]]) {
+      notes[target[0]][target[1]] = [];
+    }
+    removeNotesForPlacement(target[0], target[1], solution[target[0]][target[1]]);
+    selectedRow = target[0];
+    selectedCol = target[1];
+    renderBoard();
+    saveProgress();
+
+    if (checkWin()) {
+      stopTimer();
+      showWin();
+    }
+  }
+
+  function removeNotesForPlacement(row, col, num) {
+    var br = Math.floor(row / 3) * 3;
+    var bc = Math.floor(col / 3) * 3;
+    for (var i = 0; i < 9; i++) {
+      // Same row
+      if (notes[row] && notes[row][i]) {
+        var idx = notes[row][i].indexOf(num);
+        if (idx >= 0) notes[row][i].splice(idx, 1);
+      }
+      // Same col
+      if (notes[i] && notes[i][col]) {
+        var idx2 = notes[i][col].indexOf(num);
+        if (idx2 >= 0) notes[i][col].splice(idx2, 1);
+      }
+    }
+    // Same box
+    for (var r = br; r < br + 3; r++) {
+      for (var c = bc; c < bc + 3; c++) {
+        if (notes[r] && notes[r][c]) {
+          var idx3 = notes[r][c].indexOf(num);
+          if (idx3 >= 0) notes[r][c].splice(idx3, 1);
+        }
+      }
+    }
+  }
+
+  function checkWin() {
+    for (var r = 0; r < 9; r++) {
+      for (var c = 0; c < 9; c++) {
+        if (board[r][c] !== solution[r][c]) return false;
+      }
+    }
+    return true;
+  }
+
+  function showWin() {
+    var rating = getRatingForTime(elapsedSeconds);
+    showView(resultView);
+    finalTime.textContent = formatTime(elapsedSeconds);
+    resultDetails.innerHTML = 'Difficulty: ' + difficulty.charAt(0).toUpperCase() + difficulty.slice(1) +
+      '<br>Mistakes: ' + mistakes +
+      '<br>Hints Used: ' + (3 - hintsLeft);
+    ratingBadge.textContent = rating.label;
+    ratingBadge.style.background = rating.color;
+
+    addToHistory(elapsedSeconds);
+    renderHistory();
+    clearProgress();
+
+    if (window.GameShare) {
+      window.GameShare.show({
+        gameName: gameName,
+        gameSlug: gameSlug,
+        gameIcon: gameIcon,
+        score: elapsedSeconds,
+        unit: metricUnit,
+        metricLabel: metricLabel,
+        ratingLabel: rating.label,
+        ratingColor: rating.color
+      });
+    }
+  }
+
+  // ===== Persistence =====
+  function loadHistory() {
+    try { var r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch (e) {}
+    return [];
+  }
+  function saveHistory(h) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, MAX_HISTORY))); } catch (e) {}
+  }
+  function addToHistory(sec) {
+    var h = loadHistory();
+    h.unshift({ score: sec, date: new Date().toISOString(), rating: getRatingForTime(sec).label, difficulty: difficulty });
+    saveHistory(h);
+  }
+  function renderHistory() {
+    var history = loadHistory();
+    if (history.length === 0) { attemptHistorySection.hidden = true; return; }
+    attemptHistorySection.hidden = false;
+    historyList.innerHTML = history.map(function (e) {
+      var r = getRatingForTime(e.score);
+      return '<div class="history-item">' +
+        '<span class="history-score">' + formatTime(e.score) + '</span>' +
+        '<span class="history-rating" style="background:' + r.color + '">' + r.label + '</span>' +
+        '<span class="history-time">' + (e.difficulty ? e.difficulty.charAt(0).toUpperCase() + e.difficulty.slice(1) + ' &middot; ' : '') + formatDate(e.date) + '</span>' +
+        '</div>';
+    }).join('');
+  }
+  function formatDate(iso) {
+    try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    catch (e) { return ''; }
+  }
+
+  function saveProgress() {
+    try {
+      localStorage.setItem(SAVE_KEY, JSON.stringify({
+        solution: solution,
+        puzzle: puzzle,
+        board: board,
+        notes: notes,
+        mistakes: mistakes,
+        hintsLeft: hintsLeft,
+        difficulty: difficulty,
+        elapsed: timerStarted ? Math.floor((Date.now() - startTime) / 1000) : 0,
+        timerStarted: timerStarted
+      }));
+    } catch (e) {}
+  }
+  function loadProgress() {
+    try {
+      var d = localStorage.getItem(SAVE_KEY);
+      if (d) return JSON.parse(d);
+    } catch (e) {}
+    return null;
+  }
+  function clearProgress() {
+    try { localStorage.removeItem(SAVE_KEY); } catch (e) {}
+  }
+
+  // ===== Game Flow =====
+  function newGame() {
+    solution = generateSolvedBoard();
+    puzzle = generatePuzzle(solution, CLUES[difficulty]);
+    board = deepCopy(puzzle);
+    notes = [];
+    for (var r = 0; r < 9; r++) {
+      notes.push([]);
+      for (var c = 0; c < 9; c++) {
+        notes[r].push([]);
+      }
+    }
+    mistakes = 0;
+    hintsLeft = 3;
+    notesMode = false;
+    timerStarted = false;
+    elapsedSeconds = 0;
+    selectedRow = -1;
+    selectedCol = -1;
+    moveHistory = [];
+
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = null;
+    timerDisplay.textContent = '00:00';
+    mistakeDisplay.textContent = 'Mistakes: 0/' + maxMistakes;
+    difficultyLabel.textContent = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
+    hintCount.textContent = '3';
+    notesBtn.classList.remove('active');
+
+    buildBoard();
+    renderBoard();
+    showView(playView);
+    clearProgress();
+  }
+
+  function resumeGame(save) {
+    solution = save.solution;
+    puzzle = save.puzzle;
+    board = save.board;
+    notes = save.notes || [];
+    // Ensure notes array structure
+    for (var r = 0; r < 9; r++) {
+      if (!notes[r]) notes[r] = [];
+      for (var c = 0; c < 9; c++) {
+        if (!notes[r][c]) notes[r][c] = [];
+      }
+    }
+    mistakes = save.mistakes || 0;
+    hintsLeft = typeof save.hintsLeft === 'number' ? save.hintsLeft : 3;
+    difficulty = save.difficulty || 'easy';
+    notesMode = false;
+    selectedRow = -1;
+    selectedCol = -1;
+    moveHistory = [];
+
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = null;
+
+    var prevElapsed = save.elapsed || 0;
+    if (save.timerStarted && prevElapsed > 0) {
+      timerStarted = true;
+      startTime = Date.now() - prevElapsed * 1000;
+      elapsedSeconds = prevElapsed;
+      timerDisplay.textContent = formatTime(prevElapsed);
+      timerInterval = setInterval(function () {
+        elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+        timerDisplay.textContent = formatTime(elapsedSeconds);
+      }, 1000);
+    } else {
+      timerStarted = false;
+      elapsedSeconds = 0;
+      timerDisplay.textContent = '00:00';
+    }
+
+    mistakeDisplay.textContent = 'Mistakes: ' + mistakes + '/' + maxMistakes;
+    difficultyLabel.textContent = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
+    hintCount.textContent = String(hintsLeft);
+    notesBtn.classList.remove('active');
+
+    buildBoard();
+    renderBoard();
+    showView(playView);
+  }
+
+  // ===== Event Listeners =====
+  // Difficulty buttons
+  var diffBtns = document.querySelectorAll('.difficulty-btn');
+  for (var i = 0; i < diffBtns.length; i++) {
+    diffBtns[i].addEventListener('click', function () {
+      for (var j = 0; j < diffBtns.length; j++) diffBtns[j].classList.remove('active');
+      this.classList.add('active');
+      difficulty = this.getAttribute('data-diff');
+    });
+  }
+
+  startBtn.addEventListener('click', function () { newGame(); });
+  playAgainBtn.addEventListener('click', function () { showView(instructionsView); });
+  retryBtn.addEventListener('click', function () { showView(instructionsView); });
+  newGameBtn.addEventListener('click', function () { newGame(); });
+
+  // Board click
+  boardEl.addEventListener('click', function (e) {
+    var td = e.target.closest('td');
+    if (!td) return;
+    var r = parseInt(td.getAttribute('data-row'));
+    var c = parseInt(td.getAttribute('data-col'));
+    if (isNaN(r) || isNaN(c)) return;
+    selectCell(r, c);
+  });
+
+  // Numpad
+  numpad.addEventListener('click', function (e) {
+    var btn = e.target.closest('.numpad-btn');
+    if (!btn) return;
+    var num = parseInt(btn.getAttribute('data-num'));
+    if (num >= 1 && num <= 9) placeNumber(num);
+  });
+
+  eraseBtn.addEventListener('click', function () { eraseCell(); });
+  notesBtn.addEventListener('click', function () {
+    notesMode = !notesMode;
+    notesBtn.classList.toggle('active', notesMode);
+  });
+  hintBtn.addEventListener('click', function () { useHint(); });
+  undoBtn.addEventListener('click', function () { undoMove(); });
+
+  // Keyboard
+  document.addEventListener('keydown', function (e) {
+    if (playView.style.display === 'none') return;
+
+    var key = e.key;
+    if (key >= '1' && key <= '9') {
+      e.preventDefault();
+      placeNumber(parseInt(key));
+    } else if (key === 'Backspace' || key === 'Delete') {
+      e.preventDefault();
+      eraseCell();
+    } else if (key === 'n' || key === 'N') {
+      e.preventDefault();
+      notesMode = !notesMode;
+      notesBtn.classList.toggle('active', notesMode);
+    } else if (key === 'ArrowUp' && selectedRow > 0) {
+      e.preventDefault();
+      selectCell(selectedRow - 1, selectedCol);
+    } else if (key === 'ArrowDown' && selectedRow < 8) {
+      e.preventDefault();
+      selectCell(selectedRow + 1, selectedCol);
+    } else if (key === 'ArrowLeft' && selectedCol > 0) {
+      e.preventDefault();
+      selectCell(selectedRow, selectedCol - 1);
+    } else if (key === 'ArrowRight' && selectedCol < 8) {
+      e.preventDefault();
+      selectCell(selectedRow, selectedCol + 1);
+    } else if ((e.ctrlKey || e.metaKey) && key === 'z') {
+      e.preventDefault();
+      undoMove();
+    }
+  });
+
+  // ===== Init =====
+  var saved = loadProgress();
+  if (saved && saved.solution && saved.board) {
+    resumeGame(saved);
+  } else {
+    renderHistory();
+  }
+
+})();
+</script>

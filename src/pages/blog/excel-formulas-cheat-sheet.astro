@@ -1,0 +1,292 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import AuthorBio from '../../components/AuthorBio.astro';
+import '../../styles/blog.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Excel Formulas Cheat Sheet: 30 Essential Functions with Examples",
+    "description": "Master 30 essential Excel functions organized by category including VLOOKUP, INDEX-MATCH, XLOOKUP, SUMIFS, COUNTIFS, IF, IFERROR, and more with syntax breakdowns and real-world examples.",
+    "datePublished": "2026-03-16",
+    "dateModified": "2026-03-16",
+    "author": { "@type": "Organization", "name": "ToolCalcs", "url": "https://toolcalcs.com" },
+    "publisher": { "@type": "Organization", "name": "ToolCalcs", "url": "https://toolcalcs.com", "logo": { "@type": "ImageObject", "url": "https://toolcalcs.com/logo.png" } },
+    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://toolcalcs.com/blog/excel-formulas-cheat-sheet/" }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the difference between VLOOKUP and INDEX-MATCH?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "VLOOKUP searches for a value in the first column of a range and returns a value from a specified column. INDEX-MATCH is a two-function combination where MATCH finds the row position and INDEX returns the value from any column. INDEX-MATCH is more flexible because it can look left (VLOOKUP can only look right), it does not break when columns are inserted or deleted, and it is slightly faster on large datasets. For new Excel users, XLOOKUP combines the simplicity of VLOOKUP with the flexibility of INDEX-MATCH."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I use SUMIFS with multiple criteria?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "SUMIFS adds values in a sum range that meet multiple criteria. The syntax is =SUMIFS(sum_range, criteria_range1, criteria1, criteria_range2, criteria2, ...). For example, =SUMIFS(D2:D100, B2:B100, 'Sales', C2:C100, '>=2026-01-01') sums all values in column D where column B equals 'Sales' and column C is on or after January 1, 2026. You can add as many criteria pairs as needed, and all criteria must be met for a value to be included in the sum."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What does the IFERROR function do?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "IFERROR wraps around another formula and returns a custom value if that formula produces an error (such as #N/A, #DIV/0!, #VALUE!, or #REF!). The syntax is =IFERROR(value, value_if_error). For example, =IFERROR(VLOOKUP(A2, DataTable, 3, FALSE), 'Not Found') performs a VLOOKUP and displays 'Not Found' instead of a #N/A error if the lookup value does not exist. This is essential for creating clean, professional spreadsheets."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I calculate the number of business days between two dates in Excel?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Use the NETWORKDAYS function with the syntax =NETWORKDAYS(start_date, end_date, [holidays]). This function automatically excludes weekends (Saturday and Sunday) and can optionally exclude a list of holiday dates. For example, =NETWORKDAYS('2026-01-01', '2026-12-31') returns the number of working days in 2026. If you have a list of company holidays in cells H1:H10, use =NETWORKDAYS('2026-01-01', '2026-12-31', H1:H10) to exclude those as well."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between COUNT, COUNTA, and COUNTIFS?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "COUNT counts only cells containing numbers. COUNTA counts all non-empty cells regardless of data type (numbers, text, dates, logical values). COUNTIFS counts cells that meet one or more criteria. For example, COUNT(A1:A100) tells you how many numeric entries exist, COUNTA(A1:A100) tells you how many cells have any content, and COUNTIFS(A1:A100, '>=50', A1:A100, '<=100') counts how many numeric values fall between 50 and 100."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout title="Excel Formulas Cheat Sheet: 30 Essential Functions with Examples | ToolCalcs" description="Master 30 essential Excel functions organized by category including VLOOKUP, INDEX-MATCH, XLOOKUP, SUMIFS, COUNTIFS, IF, IFERROR, and more with syntax breakdowns and real-world examples." structuredData={structuredData}>
+  <Breadcrumb items={[
+    { name: 'Home', url: '/' },
+    { name: 'Blog', url: '/blog/' },
+    { name: 'Excel Formulas Cheat Sheet' }
+  ]} />
+
+  <article class="blog-article">
+    <header class="article-header">
+      <p class="article-meta">Published March 16, 2026 · By ToolCalcs Team</p>
+      <h1>Excel Formulas Cheat Sheet: 30 Essential Functions with Examples</h1>
+      <p class="article-intro">Whether you are building financial models, analyzing sales data, or managing project timelines, mastering Excel formulas is one of the most valuable productivity skills you can develop. This comprehensive cheat sheet covers 30 essential functions organized into six categories: Lookup, Math, Text, Date, Logic, and Count. Each entry includes the full syntax, a plain-English explanation, and a practical real-world example you can start using immediately.</p>
+    </header>
+
+    <h2>Lookup Functions</h2>
+    <p>Lookup functions let you search for data across your spreadsheet, connecting related information from different columns or tables. These are among the most frequently used and most valuable Excel functions to learn.</p>
+
+    <h3>1. VLOOKUP</h3>
+    <p><strong>Syntax:</strong> <code>=VLOOKUP(lookup_value, table_array, col_index_num, [range_lookup])</code></p>
+    <p>VLOOKUP searches for a value in the first column of a table and returns a corresponding value from a specified column. The last parameter should almost always be FALSE for an exact match.</p>
+    <p><strong>Example:</strong> You have an employee table in A1:D500 with columns for Employee ID, Name, Department, and Salary. To look up the salary for employee ID 1042: <code>=VLOOKUP(1042, A1:D500, 4, FALSE)</code>. This searches column A for 1042 and returns the value from the 4th column (Salary).</p>
+
+    <h3>2. INDEX-MATCH</h3>
+    <p><strong>Syntax:</strong> <code>=INDEX(return_range, MATCH(lookup_value, lookup_range, 0))</code></p>
+    <p>INDEX-MATCH is a two-function combination that overcomes VLOOKUP's limitations. MATCH finds the row position of your lookup value, and INDEX returns the value from your desired column at that row position. Unlike VLOOKUP, it can look in any direction and is not affected by column insertions or deletions.</p>
+    <p><strong>Example:</strong> Using the same employee table, to find the name (column B) for an employee whose salary (column D) is a specific amount: <code>=INDEX(B1:B500, MATCH(75000, D1:D500, 0))</code>. This looks "leftward," something VLOOKUP cannot do.</p>
+
+    <h3>3. XLOOKUP</h3>
+    <p><strong>Syntax:</strong> <code>=XLOOKUP(lookup_value, lookup_array, return_array, [if_not_found], [match_mode], [search_mode])</code></p>
+    <p>XLOOKUP is Microsoft's modern replacement for VLOOKUP, available in Excel 365 and Excel 2021+. It searches any column or row and returns results from any other column or row, includes a built-in error handler, and defaults to exact match.</p>
+    <p><strong>Example:</strong> <code>=XLOOKUP(1042, A1:A500, D1:D500, "Not Found")</code> searches for employee 1042 in column A and returns their salary from column D. If the ID is not found, it displays "Not Found" instead of an error.</p>
+
+    <h2>Math Functions</h2>
+    <p>Math functions handle calculations from simple addition to complex conditional aggregation. These are the workhorses of any spreadsheet that involves numbers.</p>
+
+    <h3>4. SUM</h3>
+    <p><strong>Syntax:</strong> <code>=SUM(number1, [number2], ...)</code></p>
+    <p>The most basic and most used Excel function. SUM adds all numbers in a range or a list of values. It ignores text and blank cells.</p>
+    <p><strong>Example:</strong> <code>=SUM(B2:B100)</code> adds all values in cells B2 through B100. You can also sum non-contiguous ranges: <code>=SUM(B2:B50, D2:D50, F2:F50)</code>.</p>
+
+    <h3>5. SUMIFS</h3>
+    <p><strong>Syntax:</strong> <code>=SUMIFS(sum_range, criteria_range1, criteria1, [criteria_range2, criteria2], ...)</code></p>
+    <p>SUMIFS adds values that meet multiple conditions simultaneously. It is one of the most powerful functions for data analysis without pivot tables.</p>
+    <p><strong>Example:</strong> To sum sales amounts in column D where the region (column B) is "West" and the product (column C) is "Widget": <code>=SUMIFS(D2:D1000, B2:B1000, "West", C2:C1000, "Widget")</code>. You can also use comparison operators: <code>=SUMIFS(D2:D1000, E2:E1000, "&gt;=2026-01-01")</code> sums values where dates in column E are in 2026 or later.</p>
+
+    <h3>6. AVERAGE</h3>
+    <p><strong>Syntax:</strong> <code>=AVERAGE(number1, [number2], ...)</code></p>
+    <p>Returns the arithmetic mean of the provided numbers. Like SUM, it ignores text and blank cells, but be aware that cells containing zero are included in the calculation.</p>
+    <p><strong>Example:</strong> <code>=AVERAGE(C2:C50)</code> returns the average of all numeric values in the range. For conditional averages, use <code>=AVERAGEIFS(C2:C50, B2:B50, "Sales")</code> to average only rows where column B equals "Sales".</p>
+
+    <h3>7. ROUND</h3>
+    <p><strong>Syntax:</strong> <code>=ROUND(number, num_digits)</code></p>
+    <p>Rounds a number to a specified number of decimal places. Use positive num_digits for decimal places and negative for rounding to tens, hundreds, etc.</p>
+    <p><strong>Example:</strong> <code>=ROUND(3.14159, 2)</code> returns 3.14. <code>=ROUND(1547, -2)</code> returns 1500. This is especially important for financial calculations where you need to round to cents: <code>=ROUND(price * tax_rate, 2)</code>. For calculations involving currency, you may want to use our <a href="/calculators/percentage-calculator/">percentage calculator</a> to double-check your work.</p>
+
+    <h2>Text Functions</h2>
+    <p>Text functions manipulate, extract, and transform strings of text. They are essential for cleaning imported data, standardizing formats, and combining information from multiple cells.</p>
+
+    <h3>8. CONCAT (or CONCATENATE)</h3>
+    <p><strong>Syntax:</strong> <code>=CONCAT(text1, [text2], ...)</code></p>
+    <p>Joins multiple text strings into one. CONCAT is the modern version that can accept ranges; CONCATENATE requires individual cell references.</p>
+    <p><strong>Example:</strong> To combine first name (A2) and last name (B2) with a space between: <code>=CONCAT(A2, " ", B2)</code> or equivalently <code>=A2 &amp; " " &amp; B2</code>. To create a full address: <code>=CONCAT(A2, ", ", B2, ", ", C2, " ", D2)</code> produces something like "123 Main St, Austin, TX 78701".</p>
+
+    <h3>9. LEFT</h3>
+    <p><strong>Syntax:</strong> <code>=LEFT(text, [num_chars])</code></p>
+    <p>Extracts a specified number of characters from the beginning (left side) of a text string.</p>
+    <p><strong>Example:</strong> If cell A2 contains "INV-2026-0042", then <code>=LEFT(A2, 3)</code> returns "INV". This is useful for extracting codes, prefixes, or area codes from phone numbers like <code>=LEFT(A2, 3)</code> on "(512) 555-1234" returning "(51".</p>
+
+    <h3>10. RIGHT</h3>
+    <p><strong>Syntax:</strong> <code>=RIGHT(text, [num_chars])</code></p>
+    <p>Extracts characters from the end (right side) of a text string. Works identically to LEFT but from the opposite direction.</p>
+    <p><strong>Example:</strong> <code>=RIGHT("INV-2026-0042", 4)</code> returns "0042". This is commonly used to extract file extensions, suffixes, or the last few digits of an account number.</p>
+
+    <h3>11. TRIM</h3>
+    <p><strong>Syntax:</strong> <code>=TRIM(text)</code></p>
+    <p>Removes all extra spaces from text, leaving only single spaces between words. This is critical when working with imported or pasted data that often contains invisible leading, trailing, or double spaces that cause lookup functions to fail.</p>
+    <p><strong>Example:</strong> <code>=TRIM("  John   Smith  ")</code> returns "John Smith". A common pattern is wrapping VLOOKUP values in TRIM: <code>=VLOOKUP(TRIM(A2), table, 2, FALSE)</code> to prevent space-related lookup failures.</p>
+
+    <h3>12. SUBSTITUTE</h3>
+    <p><strong>Syntax:</strong> <code>=SUBSTITUTE(text, old_text, new_text, [instance_num])</code></p>
+    <p>Replaces specific text within a string. Unlike Find and Replace, SUBSTITUTE works within formulas and can target specific occurrences.</p>
+    <p><strong>Example:</strong> <code>=SUBSTITUTE("Q1-2026-Sales", "-", "/")</code> returns "Q1/2026/Sales". To replace only the first dash: <code>=SUBSTITUTE("Q1-2026-Sales", "-", "/", 1)</code> returns "Q1/2026-Sales". This is also useful for removing unwanted characters: <code>=SUBSTITUTE(A2, ",", "")</code> removes all commas.</p>
+
+    <h2>Date Functions</h2>
+    <p>Date functions handle calculations involving dates, from simple differences to complex business day calculations. Excel stores dates as serial numbers (days since January 1, 1900), which is why these functions exist to make date math readable.</p>
+
+    <h3>13. TODAY</h3>
+    <p><strong>Syntax:</strong> <code>=TODAY()</code></p>
+    <p>Returns the current date. This is a volatile function, meaning it recalculates every time the spreadsheet opens or recalculates. It takes no arguments.</p>
+    <p><strong>Example:</strong> <code>=TODAY()-A2</code> calculates the number of days between the date in A2 and today. <code>=YEAR(TODAY())-YEAR(A2)</code> gives a rough age calculation. For a more precise age calculation, try our <a href="/calculators/age-calculator/">age calculator</a>.</p>
+
+    <h3>14. DATEDIF</h3>
+    <p><strong>Syntax:</strong> <code>=DATEDIF(start_date, end_date, unit)</code></p>
+    <p>Calculates the difference between two dates in years ("Y"), months ("M"), or days ("D"). This is an undocumented function (it does not appear in autocomplete) but has been in Excel for decades and works reliably.</p>
+    <p><strong>Example:</strong> <code>=DATEDIF(A2, TODAY(), "Y")</code> returns the number of complete years between the date in A2 and today, perfect for calculating age or tenure. <code>=DATEDIF("2020-03-15", "2026-03-16", "M")</code> returns 72, the number of complete months between those dates.</p>
+
+    <h3>15. NETWORKDAYS</h3>
+    <p><strong>Syntax:</strong> <code>=NETWORKDAYS(start_date, end_date, [holidays])</code></p>
+    <p>Calculates the number of working days (excluding weekends) between two dates. The optional holidays parameter lets you exclude specific dates like company holidays.</p>
+    <p><strong>Example:</strong> <code>=NETWORKDAYS("2026-01-01", "2026-03-31")</code> returns the number of business days in Q1 2026. If you have company holidays listed in H1:H5: <code>=NETWORKDAYS("2026-01-01", "2026-03-31", H1:H5)</code>. This is invaluable for project planning and deadline estimation.</p>
+
+    <h2>Logic Functions</h2>
+    <p>Logic functions let you build conditional formulas that return different results based on whether specified conditions are true or false. These functions transform static spreadsheets into dynamic decision-making tools.</p>
+
+    <h3>16. IF</h3>
+    <p><strong>Syntax:</strong> <code>=IF(logical_test, value_if_true, value_if_false)</code></p>
+    <p>The foundational logic function. IF evaluates a condition and returns one value if true and another if false. You can nest up to 64 IF functions, though using IFS (below) is cleaner for multiple conditions.</p>
+    <p><strong>Example:</strong> <code>=IF(B2&gt;=90, "A", IF(B2&gt;=80, "B", IF(B2&gt;=70, "C", IF(B2&gt;=60, "D", "F"))))</code> converts a numeric score into a letter grade. A simpler example: <code>=IF(A2&gt;0, "Profit", "Loss")</code>.</p>
+
+    <h3>17. IFS</h3>
+    <p><strong>Syntax:</strong> <code>=IFS(logical_test1, value1, [logical_test2, value2], ...)</code></p>
+    <p>Evaluates multiple conditions in order and returns the value associated with the first TRUE condition. Available in Excel 2019 and later, IFS eliminates the need for nested IF statements.</p>
+    <p><strong>Example:</strong> The grade formula above becomes much cleaner: <code>=IFS(B2&gt;=90, "A", B2&gt;=80, "B", B2&gt;=70, "C", B2&gt;=60, "D", TRUE, "F")</code>. The final <code>TRUE, "F"</code> serves as a default/else case.</p>
+
+    <h3>18. AND</h3>
+    <p><strong>Syntax:</strong> <code>=AND(logical1, [logical2], ...)</code></p>
+    <p>Returns TRUE only if all conditions are true. Typically used inside an IF function to test multiple conditions simultaneously.</p>
+    <p><strong>Example:</strong> <code>=IF(AND(B2&gt;=18, C2="Active"), "Eligible", "Not Eligible")</code> checks whether someone is both 18 or older AND has Active status. All conditions must be met for the result to be "Eligible".</p>
+
+    <h3>19. OR</h3>
+    <p><strong>Syntax:</strong> <code>=OR(logical1, [logical2], ...)</code></p>
+    <p>Returns TRUE if any condition is true. Like AND, it is most often used inside IF functions.</p>
+    <p><strong>Example:</strong> <code>=IF(OR(B2="Manager", B2="Director", B2="VP"), "Leadership", "Staff")</code> categorizes employees into leadership or staff based on their title matching any of the listed values.</p>
+
+    <h3>20. IFERROR</h3>
+    <p><strong>Syntax:</strong> <code>=IFERROR(value, value_if_error)</code></p>
+    <p>Returns a custom value if a formula evaluates to an error, and the normal result otherwise. This is essential for creating polished spreadsheets that handle edge cases gracefully.</p>
+    <p><strong>Example:</strong> <code>=IFERROR(B2/C2, 0)</code> performs division and returns 0 instead of a #DIV/0! error when C2 is zero. Wrapping lookups is even more common: <code>=IFERROR(VLOOKUP(A2, PriceTable, 2, FALSE), "Price not available")</code>.</p>
+
+    <h2>Count Functions</h2>
+    <p>Count functions tally cells based on various criteria. They are fundamental for data analysis, quality checks, and building dashboard summaries.</p>
+
+    <h3>21. COUNT</h3>
+    <p><strong>Syntax:</strong> <code>=COUNT(value1, [value2], ...)</code></p>
+    <p>Counts the number of cells that contain numeric values. Text, blanks, and errors are ignored.</p>
+    <p><strong>Example:</strong> <code>=COUNT(A1:A1000)</code> tells you how many cells in that range contain numbers. This is useful for data validation: if you expect 500 numeric entries and COUNT returns 487, you know 13 entries are missing or contain text.</p>
+
+    <h3>22. COUNTA</h3>
+    <p><strong>Syntax:</strong> <code>=COUNTA(value1, [value2], ...)</code></p>
+    <p>Counts all non-empty cells regardless of data type. It counts numbers, text, dates, logical values, and even errors. Only truly blank cells are excluded.</p>
+    <p><strong>Example:</strong> <code>=COUNTA(A2:A1000)</code> tells you the total number of filled cells. To find the number of blank cells, subtract: <code>=ROWS(A2:A1000)-COUNTA(A2:A1000)</code> gives you the count of empty cells in the range.</p>
+
+    <h3>23. COUNTIFS</h3>
+    <p><strong>Syntax:</strong> <code>=COUNTIFS(criteria_range1, criteria1, [criteria_range2, criteria2], ...)</code></p>
+    <p>Counts cells that meet one or more conditions. It is the multi-criteria version of COUNTIF and works similarly to SUMIFS but counts instead of summing.</p>
+    <p><strong>Example:</strong> <code>=COUNTIFS(B2:B1000, "Sales", D2:D1000, "&gt;50000")</code> counts how many employees in the Sales department have values greater than 50,000 in column D. You can also count within date ranges: <code>=COUNTIFS(E2:E1000, "&gt;=2026-01-01", E2:E1000, "&lt;=2026-03-31")</code> counts Q1 2026 entries.</p>
+
+    <h2>Additional Essential Functions</h2>
+    <p>Beyond the core categories above, these functions round out your Excel toolkit and handle common needs that arise in everyday spreadsheet work.</p>
+
+    <h3>24. MIN and MAX</h3>
+    <p><strong>Syntax:</strong> <code>=MIN(number1, [number2], ...)</code> and <code>=MAX(number1, [number2], ...)</code></p>
+    <p>Return the smallest and largest values in a range, respectively. Use MINIFS and MAXIFS (Excel 2016+) for conditional minimum and maximum.</p>
+    <p><strong>Example:</strong> <code>=MAX(B2:B500)-MIN(B2:B500)</code> calculates the range (spread) of a dataset. <code>=MAXIFS(D2:D500, B2:B500, "Sales")</code> returns the highest value in column D for the Sales department.</p>
+
+    <h3>25. LEN</h3>
+    <p><strong>Syntax:</strong> <code>=LEN(text)</code></p>
+    <p>Returns the number of characters in a text string, including spaces.</p>
+    <p><strong>Example:</strong> <code>=LEN(A2)</code> is useful for validating data entry. For instance, <code>=IF(LEN(A2)=10, "Valid", "Invalid")</code> checks whether a phone number (without formatting) has exactly 10 digits.</p>
+
+    <h3>26. PROPER, UPPER, and LOWER</h3>
+    <p><strong>Syntax:</strong> <code>=PROPER(text)</code>, <code>=UPPER(text)</code>, <code>=LOWER(text)</code></p>
+    <p>PROPER capitalizes the first letter of each word. UPPER converts all text to uppercase. LOWER converts all text to lowercase. These are essential for standardizing data.</p>
+    <p><strong>Example:</strong> <code>=PROPER("john smith")</code> returns "John Smith". <code>=UPPER("widget")</code> returns "WIDGET". These are particularly useful when cleaning imported data or combining lists from different sources with inconsistent capitalization.</p>
+
+    <h3>27. TEXT</h3>
+    <p><strong>Syntax:</strong> <code>=TEXT(value, format_text)</code></p>
+    <p>Converts a number or date into text with a specific format. This is useful when you need to combine formatted numbers or dates with text strings.</p>
+    <p><strong>Example:</strong> <code>=TEXT(0.15, "0.0%")</code> returns "15.0%". <code>=TEXT(TODAY(), "MMMM D, YYYY")</code> returns something like "March 16, 2026". <code>="Invoice total: " &amp; TEXT(B10, "#,##0.00")</code> creates "Invoice total: 1,234.56".</p>
+
+    <h3>28. UNIQUE (Excel 365)</h3>
+    <p><strong>Syntax:</strong> <code>=UNIQUE(array, [by_col], [exactly_once])</code></p>
+    <p>Returns a list of unique values from a range. This dynamic array function spills results into adjacent cells automatically.</p>
+    <p><strong>Example:</strong> <code>=UNIQUE(B2:B500)</code> extracts all unique department names from a list. <code>=SORT(UNIQUE(B2:B500))</code> does the same but sorted alphabetically. Set the third parameter to TRUE to return values that appear exactly once.</p>
+
+    <h3>29. FILTER (Excel 365)</h3>
+    <p><strong>Syntax:</strong> <code>=FILTER(array, include, [if_empty])</code></p>
+    <p>Returns a filtered subset of an array based on criteria you define. Like UNIQUE, it is a dynamic array function that spills results.</p>
+    <p><strong>Example:</strong> <code>=FILTER(A2:D500, C2:C500="Sales", "No results")</code> returns all rows where column C is "Sales". You can combine conditions: <code>=FILTER(A2:D500, (C2:C500="Sales")*(D2:D500&gt;50000))</code> filters for Sales department with values over 50,000.</p>
+
+    <h3>30. SUMPRODUCT</h3>
+    <p><strong>Syntax:</strong> <code>=SUMPRODUCT(array1, [array2], ...)</code></p>
+    <p>Multiplies corresponding elements of given arrays and returns the sum of those products. It is incredibly versatile for weighted calculations, conditional sums in older Excel versions, and multi-criteria analysis.</p>
+    <p><strong>Example:</strong> To calculate weighted average grades where column B has scores and column C has weights: <code>=SUMPRODUCT(B2:B10, C2:C10)/SUM(C2:C10)</code>. For calculating total order value where column B has quantities and column C has unit prices: <code>=SUMPRODUCT(B2:B100, C2:C100)</code>. Our <a href="/calculators/percentage-calculator/">percentage calculator</a> can help verify weighted average calculations.</p>
+
+    <h2>Tips for Working with Excel Formulas</h2>
+    <p>Knowing the formulas is only half the battle. These practical tips will help you use them more effectively in real work.</p>
+
+    <h3>Use Named Ranges</h3>
+    <p>Instead of referencing A2:A500, name that range "EmployeeIDs" and use <code>=VLOOKUP(1042, EmployeeData, 4, FALSE)</code>. Named ranges make formulas self-documenting and easier to maintain. Define them through Formulas > Name Manager.</p>
+
+    <h3>Absolute vs. Relative References</h3>
+    <p>Use the dollar sign to lock cell references when copying formulas. <code>$A$1</code> is fully locked, <code>$A1</code> locks only the column, and <code>A$1</code> locks only the row. Press F4 to cycle through reference types while editing a formula.</p>
+
+    <h3>Audit Your Formulas</h3>
+    <p>Use Formulas > Trace Precedents and Trace Dependents to visually see which cells feed into your formula and which cells depend on it. Press Ctrl+` (backtick) to toggle between showing formula results and the formulas themselves.</p>
+
+    <h3>Error Checking Strategy</h3>
+    <p>Build formulas incrementally. Start with the innermost function, verify it works, then wrap it in the next layer. For complex nested formulas, use the Evaluate Formula tool (Formulas > Evaluate Formula) to step through the calculation one layer at a time. For quick math verification outside Excel, use our <a href="/data-convert/">data conversion tools</a> to cross-check your results.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <details class="faq-item">
+      <summary>What is the difference between VLOOKUP and INDEX-MATCH?</summary>
+      <div class="faq-answer"><p>VLOOKUP searches the first column of a range and returns from a specified column number. INDEX-MATCH uses MATCH to find the row position and INDEX to return from any column, allowing leftward lookups and remaining stable when columns are inserted. XLOOKUP, available in Excel 365, combines the simplicity of VLOOKUP with the flexibility of INDEX-MATCH.</p></div>
+    </details>
+    <details class="faq-item">
+      <summary>How do I use SUMIFS with multiple criteria?</summary>
+      <div class="faq-answer"><p>SUMIFS syntax is =SUMIFS(sum_range, criteria_range1, criteria1, criteria_range2, criteria2, ...). Each criteria pair adds an additional condition that must be met. For example, =SUMIFS(D2:D100, B2:B100, "Sales", C2:C100, "&gt;=2026-01-01") sums values in column D where column B is "Sales" and column C dates are in 2026 or later.</p></div>
+    </details>
+    <details class="faq-item">
+      <summary>What does the IFERROR function do?</summary>
+      <div class="faq-answer"><p>IFERROR wraps around another formula and returns a custom value if that formula produces any error (#N/A, #DIV/0!, #VALUE!, #REF!). For example, =IFERROR(VLOOKUP(A2, Table, 3, FALSE), "Not Found") displays "Not Found" instead of a #N/A error when the lookup value does not exist.</p></div>
+    </details>
+    <details class="faq-item">
+      <summary>How do I calculate the number of business days between two dates in Excel?</summary>
+      <div class="faq-answer"><p>Use =NETWORKDAYS(start_date, end_date, [holidays]). This automatically excludes weekends and can optionally exclude a list of holiday dates you provide as a range. For custom weekend configurations, use NETWORKDAYS.INTL which lets you define which days of the week are non-working days.</p></div>
+    </details>
+    <details class="faq-item">
+      <summary>What is the difference between COUNT, COUNTA, and COUNTIFS?</summary>
+      <div class="faq-answer"><p>COUNT counts only cells containing numbers. COUNTA counts all non-empty cells regardless of data type. COUNTIFS counts cells that meet one or more conditions you specify. Use COUNT for data validation, COUNTA for completeness checks, and COUNTIFS for conditional analysis.</p></div>
+    </details>
+
+    <AuthorBio />
+  </article>
+</BaseLayout>

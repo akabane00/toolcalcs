@@ -996,6 +996,47 @@ export const calculators: Calculator[] = [
     categorySlug: 'math-calculators',
     icon: '📐',
   },
+  // Content Sprint 2 - New Calculators
+  {
+    title: 'Hourly to Salary Calculator',
+    slug: 'hourly-to-salary-calculator',
+    description: 'Convert hourly wages to annual salary, monthly, biweekly, and weekly pay. Adjust for hours per week and weeks per year.',
+    category: 'Everyday Calculators',
+    categorySlug: 'everyday-calculators',
+    icon: '💵',
+  },
+  {
+    title: 'Rent Affordability Calculator',
+    slug: 'rent-affordability-calculator',
+    description: 'Find out how much rent you can afford based on income, debts, and savings goals using the 30% rule and other methods.',
+    category: 'Financial Calculators',
+    categorySlug: 'financial-calculators',
+    icon: '🏢',
+  },
+  {
+    title: 'Calorie Deficit Calculator',
+    slug: 'calorie-deficit-calculator',
+    description: 'Calculate your daily calorie target for weight loss using the Mifflin-St Jeor equation with safe deficit recommendations.',
+    category: 'Health Calculators',
+    categorySlug: 'health-calculators',
+    icon: '🔥',
+  },
+  {
+    title: 'Love Calculator',
+    slug: 'love-calculator',
+    description: 'Test your love compatibility with a fun name-based love calculator. Enter two names and see your love score.',
+    category: 'Everyday Calculators',
+    categorySlug: 'everyday-calculators',
+    icon: '❤️',
+  },
+  {
+    title: 'Time Card Calculator',
+    slug: 'time-card-calculator',
+    description: 'Calculate hours worked, overtime, and gross pay from daily clock in/out times for the entire week.',
+    category: 'Everyday Calculators',
+    categorySlug: 'everyday-calculators',
+    icon: '⏱️',
+  },
 ];
 
 export function getCalculatorsByCategory(categorySlug: string): Calculator[] {
@@ -1005,15 +1046,15 @@ export function getCalculatorsByCategory(categorySlug: string): Calculator[] {
 // Semantic relationship groups for internal linking
 const relatedGroups: Record<string, string[]> = {
   // Financial - Loans & Mortgages
-  'loans-mortgages': ['mortgage-calculator', 'loan-amortization-calculator', 'refinance-calculator', 'home-affordability-calculator', 'down-payment-calculator', 'rent-vs-buy-calculator', 'auto-loan-calculator', 'student-loan-calculator', 'business-loan-calculator', 'mortgage-amortization-calculator', 'car-lease-calculator'],
+  'loans-mortgages': ['mortgage-calculator', 'loan-amortization-calculator', 'refinance-calculator', 'home-affordability-calculator', 'down-payment-calculator', 'rent-vs-buy-calculator', 'auto-loan-calculator', 'student-loan-calculator', 'business-loan-calculator', 'mortgage-amortization-calculator', 'car-lease-calculator', 'rent-affordability-calculator'],
   // Financial - Income & Tax
-  'income-tax': ['take-home-pay-calculator', 'paycheck-calculator', 'tax-calculator', 'payroll-tax-calculator', 'capital-gains-tax-calculator', 'estate-tax-calculator'],
+  'income-tax': ['take-home-pay-calculator', 'paycheck-calculator', 'tax-calculator', 'payroll-tax-calculator', 'capital-gains-tax-calculator', 'estate-tax-calculator', 'hourly-to-salary-calculator', 'time-card-calculator'],
   // Financial - Savings & Investment
   'savings-investment': ['compound-interest-calculator', 'investment-calculator', '401k-calculator', 'retirement-savings-calculator', 'savings-goal-calculator', 'fire-calculator', 'dca-calculator', 'roi-calculator'],
   // Financial - Business & Wealth
   'business-wealth': ['margin-calculator', 'breakeven-calculator', 'crypto-profit-calculator', 'rental-yield-calculator', 'net-worth-calculator', 'debt-to-income-calculator', 'credit-card-payoff-calculator', 'debt-payoff-calculator'],
   // Health - Body Composition
-  'body-composition': ['bmi-calculator', 'bmr-calculator', 'tdee-calculator', 'calorie-calculator', 'body-fat-calculator', 'ideal-weight-calculator', 'macro-calculator', 'water-intake-calculator', 'protein-intake-calculator', 'bac-calculator'],
+  'body-composition': ['bmi-calculator', 'bmr-calculator', 'tdee-calculator', 'calorie-calculator', 'body-fat-calculator', 'ideal-weight-calculator', 'macro-calculator', 'water-intake-calculator', 'protein-intake-calculator', 'bac-calculator', 'calorie-deficit-calculator'],
   // Health - Wellness
   'wellness': ['sleep-calculator', 'pace-calculator', 'pregnancy-due-date-calculator', 'ovulation-calculator', 'pregnancy-weight-gain-calculator'],
   // Math
@@ -1021,7 +1062,7 @@ const relatedGroups: Record<string, string[]> = {
   // Date & Time
   'date-time': ['age-calculator', 'date-difference-calculator', 'days-until-calculator', 'time-zone-converter', 'business-days-calculator', 'time-duration-calculator', 'timestamp-calculator', 'day-of-week-calculator', 'hours-between-calculator'],
   // Everyday
-  'everyday': ['tip-calculator', 'discount-calculator', 'hours-calculator', 'square-footage-calculator', 'gas-cost-calculator', 'electricity-cost-calculator', 'word-counter', 'dog-age-calculator', 'sales-tax-calculator', 'grade-calculator', 'cat-age-calculator', 'fuel-economy-calculator', 'age-difference-calculator'],
+  'everyday': ['tip-calculator', 'discount-calculator', 'hours-calculator', 'square-footage-calculator', 'gas-cost-calculator', 'electricity-cost-calculator', 'word-counter', 'dog-age-calculator', 'sales-tax-calculator', 'grade-calculator', 'cat-age-calculator', 'fuel-economy-calculator', 'age-difference-calculator', 'hourly-to-salary-calculator', 'love-calculator', 'time-card-calculator'],
   // Construction
   'construction': ['concrete-calculator', 'paint-calculator', 'roofing-calculator', 'flooring-calculator', 'mulch-calculator', 'fence-calculator', 'drywall-calculator', 'deck-calculator', 'solar-panel-calculator', 'gravel-calculator', 'stair-calculator', 'tile-calculator'],
   // Conversion
