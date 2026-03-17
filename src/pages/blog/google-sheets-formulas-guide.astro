@@ -1,0 +1,220 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import AuthorBio from '../../components/AuthorBio.astro';
+import '../../styles/blog.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Google Sheets Formulas: 25 Must-Know Functions",
+    "description": "Master 25 essential Google Sheets formulas organized by category, including VLOOKUP, QUERY, ARRAYFORMULA, IMPORTRANGE, GOOGLEFINANCE, SPARKLINE, and more with practical examples.",
+    "datePublished": "2026-03-17",
+    "dateModified": "2026-03-17",
+    "author": { "@type": "Organization", "name": "ToolCalcs", "url": "https://toolcalcs.com" },
+    "publisher": { "@type": "Organization", "name": "ToolCalcs", "url": "https://toolcalcs.com", "logo": { "@type": "ImageObject", "url": "https://toolcalcs.com/logo.png" } },
+    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://toolcalcs.com/blog/google-sheets-formulas-guide/" }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the difference between VLOOKUP and INDEX MATCH in Google Sheets?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "VLOOKUP searches for a value in the first column of a range and returns a value from a specified column to the right. It can only look right, which means the lookup column must be the leftmost column in your range. INDEX MATCH is a combination of two functions that can look in any direction — left, right, or even across different sheets. INDEX MATCH is also more flexible and less prone to breaking when you insert or delete columns, since it references a specific column range rather than a column number. For new spreadsheets, many experts recommend INDEX MATCH over VLOOKUP."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does ARRAYFORMULA work in Google Sheets?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "ARRAYFORMULA allows a single formula to apply across an entire column or range of cells automatically. Instead of writing a formula in each row, you write one ARRAYFORMULA in the first cell and it expands down to fill every row with data. For example, ARRAYFORMULA(A2:A * B2:B) multiplies every value in column A by the corresponding value in column B. This feature is unique to Google Sheets and does not exist in the same form in Excel. ARRAYFORMULA is essential for working with IMPORTRANGE data and for building dynamic dashboards."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I use SQL-like queries in Google Sheets?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. The QUERY function lets you use a simplified version of SQL (called Google Visualization API Query Language) to filter, sort, group, and aggregate data directly within your spreadsheet. The syntax looks like QUERY(data_range, query_string, headers). For example, QUERY(A1:D100, \"SELECT A, SUM(D) WHERE C = 'Sales' GROUP BY A ORDER BY SUM(D) DESC\", 1) would group and sum data like a SQL query. QUERY is one of the most powerful functions unique to Google Sheets."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I pull data from another Google Sheet?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Use the IMPORTRANGE function with the syntax IMPORTRANGE(spreadsheet_url, range_string). The first argument is the full URL of the source spreadsheet (or just the spreadsheet key), and the second is the sheet name and cell range in quotes, like \"Sheet1!A1:D100\". The first time you use IMPORTRANGE to connect two spreadsheets, you will need to click Allow Access to authorize the connection. Once authorized, the data updates automatically whenever the source sheet changes."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What Google Sheets functions are not available in Excel?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Several powerful functions are exclusive to Google Sheets or work differently than in Excel. QUERY uses SQL-like syntax for data analysis. IMPORTRANGE pulls data from other spreadsheets. IMPORTDATA fetches CSV or TSV data from a URL. IMPORTHTML extracts tables or lists from web pages. GOOGLEFINANCE retrieves real-time and historical stock data. SPARKLINE creates mini charts inside a cell. ARRAYFORMULA applies a formula across an entire range automatically. IMAGE displays an image from a URL inside a cell. These functions make Google Sheets especially powerful for web-connected data and automation."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout title="Google Sheets Formulas: 25 Must-Know Functions | ToolCalcs" description="Master 25 essential Google Sheets formulas organized by category, including VLOOKUP, QUERY, ARRAYFORMULA, IMPORTRANGE, GOOGLEFINANCE, SPARKLINE, and more with practical examples." structuredData={structuredData}>
+  <Breadcrumb items={[
+    { name: 'Home', url: '/' },
+    { name: 'Blog', url: '/blog/' },
+    { name: 'Google Sheets Formulas Guide' }
+  ]} />
+
+  <article class="blog-article">
+    <header class="article-header">
+      <p class="article-meta">Published March 17, 2026 · By ToolCalcs Team</p>
+      <h1>Google Sheets Formulas: 25 Must-Know Functions</h1>
+      <p class="article-intro">Google Sheets is far more powerful than most people realize. Beyond basic addition and formatting, it offers functions that can query databases, pull live stock prices, import data from other spreadsheets and websites, and create mini charts inside a single cell. Whether you are managing a personal budget, building a business dashboard, or analyzing data for a project, mastering these 25 functions will transform how you work with spreadsheets. We have organized them by category so you can jump straight to what you need, with practical examples you can copy and adapt today.</p>
+    </header>
+
+    <h2>Lookup and Reference Functions</h2>
+    <p>These functions let you find and retrieve data from other parts of your spreadsheet, saving you from manual searching and cross-referencing.</p>
+
+    <h3>1. VLOOKUP</h3>
+    <p>VLOOKUP searches for a value in the first column of a range and returns a value from another column in the same row. The syntax is <code>VLOOKUP(search_key, range, index, is_sorted)</code>. For example, <code>=VLOOKUP("Widget A", A2:D100, 3, FALSE)</code> looks for "Widget A" in column A and returns the value from the third column of that range. Always use FALSE for the last argument unless your data is sorted and you want an approximate match. VLOOKUP is the most commonly used lookup function, but it has a limitation: it can only search the leftmost column and return values to the right.</p>
+
+    <h3>2. INDEX and MATCH</h3>
+    <p>INDEX and MATCH together form a more flexible alternative to VLOOKUP. MATCH finds the position of a value within a range, and INDEX returns the value at that position in another range. The syntax looks like <code>=INDEX(return_range, MATCH(search_key, lookup_range, 0))</code>. For example, <code>=INDEX(D2:D100, MATCH("Widget A", B2:B100, 0))</code> finds "Widget A" in column B and returns the corresponding value from column D. Unlike VLOOKUP, INDEX MATCH can look left, works with columns in any order, and does not break when you insert or delete columns.</p>
+
+    <h3>3. XLOOKUP</h3>
+    <p>Google Sheets now supports XLOOKUP, which combines the simplicity of VLOOKUP with the flexibility of INDEX MATCH. The syntax is <code>=XLOOKUP(search_key, lookup_range, result_range, if_not_found, match_mode, search_mode)</code>. For example, <code>=XLOOKUP("Widget A", B2:B100, D2:D100, "Not found")</code> searches column B and returns from column D, with a custom error message if nothing matches. XLOOKUP can search in any direction, return multiple columns, and handle errors gracefully with its built-in not-found parameter.</p>
+
+    <h2>Google Sheets Exclusive Functions</h2>
+    <p>These functions are unique to Google Sheets or work significantly differently than their Excel counterparts. They are some of the most powerful tools in the platform.</p>
+
+    <h3>4. QUERY</h3>
+    <p>The QUERY function is arguably the most powerful function in Google Sheets. It lets you use SQL-like syntax to filter, sort, group, pivot, and aggregate data. The syntax is <code>=QUERY(data, query, headers)</code>. Here are some practical examples:</p>
+    <p><code>=QUERY(A1:E100, "SELECT A, C WHERE B = 'Sales' ORDER BY C DESC", 1)</code> — selects columns A and C where column B equals "Sales," sorted by C in descending order.</p>
+    <p><code>=QUERY(A1:E100, "SELECT A, SUM(D) GROUP BY A LABEL SUM(D) 'Total Revenue'", 1)</code> — groups data by column A and sums column D, with a custom header label.</p>
+    <p><code>=QUERY(A1:E100, "SELECT A, AVG(D) WHERE C &gt; 100 GROUP BY A HAVING AVG(D) &gt; 50", 1)</code> — filters, groups, and applies a HAVING clause, just like SQL.</p>
+    <p>QUERY replaces the need for many helper columns, complex nested formulas, and even pivot tables in many cases. Once you learn the query language, you will use it constantly.</p>
+
+    <h3>5. ARRAYFORMULA</h3>
+    <p>ARRAYFORMULA applies a formula to an entire range at once, producing multiple results from a single cell. Instead of dragging a formula down hundreds of rows, write one ARRAYFORMULA and it expands automatically. The syntax is <code>=ARRAYFORMULA(formula)</code>. For example, <code>=ARRAYFORMULA(B2:B * C2:C)</code> multiplies every value in column B by the corresponding value in column C and fills the results down the column. You can combine ARRAYFORMULA with IF, IFERROR, and other functions: <code>=ARRAYFORMULA(IF(A2:A &lt;&gt; "", B2:B * C2:C, ""))</code> only calculates for rows where column A is not empty.</p>
+
+    <h3>6. IMPORTRANGE</h3>
+    <p>IMPORTRANGE pulls data from another Google Sheets spreadsheet into your current one. The syntax is <code>=IMPORTRANGE("spreadsheet_url", "SheetName!A1:D100")</code>. The first time you use it to connect two files, you will see a prompt to allow access — click it once and the connection persists. IMPORTRANGE is invaluable for consolidating data from multiple team spreadsheets into a master dashboard, or for referencing a shared data source without duplicating it.</p>
+
+    <h3>7. IMPORTDATA</h3>
+    <p>IMPORTDATA fetches data from a URL that serves CSV or TSV formatted content. The syntax is simply <code>=IMPORTDATA("https://example.com/data.csv")</code>. The data populates into your sheet starting from the cell where you enter the formula. This is incredibly useful for pulling in public datasets, API endpoints that return CSV, or any regularly updated data source. The data refreshes automatically, typically every hour.</p>
+
+    <h3>8. GOOGLEFINANCE</h3>
+    <p>GOOGLEFINANCE retrieves real-time and historical financial data directly into your spreadsheet. For current stock prices, use <code>=GOOGLEFINANCE("GOOG")</code> to get the latest price of Alphabet stock. For more detail: <code>=GOOGLEFINANCE("AAPL", "price")</code> returns the price, <code>=GOOGLEFINANCE("AAPL", "marketcap")</code> returns market capitalization, and <code>=GOOGLEFINANCE("AAPL", "close", "1/1/2025", "12/31/2025", "WEEKLY")</code> returns historical weekly closing prices for all of 2025. You can also get currency exchange rates with <code>=GOOGLEFINANCE("CURRENCY:USDEUR")</code>. This function makes Google Sheets a surprisingly capable tool for portfolio tracking and financial analysis.</p>
+
+    <h3>9. SPARKLINE</h3>
+    <p>SPARKLINE creates a miniature chart inside a single cell. The basic syntax is <code>=SPARKLINE(data, options)</code>. For a simple line chart: <code>=SPARKLINE(B2:M2)</code> creates a tiny line graph of 12 months of data in one cell. For a bar chart: <code>=SPARKLINE(B2:M2, &lbrace;"charttype","bar"; "color","steelblue"&rbrace;)</code>. You can also create win-loss charts and column charts. Sparklines are perfect for dashboards where you want to show trends at a glance without taking up the space of a full chart. Combine them with GOOGLEFINANCE to show stock price mini-charts right next to your portfolio data.</p>
+
+    <h3>10. IMAGE</h3>
+    <p>The IMAGE function displays an image from a URL inside a cell. The syntax is <code>=IMAGE("https://example.com/photo.jpg", mode)</code>. Mode 1 resizes the image to fit the cell while maintaining aspect ratio. Mode 2 stretches to fill. Mode 3 shows the original size. Mode 4 lets you specify custom width and height. This is useful for product catalogs, inventory sheets, and team directories where you want visual references alongside your data.</p>
+
+    <h2>Data Cleaning and Text Functions</h2>
+    <p>Messy data is inevitable. These functions help you clean, format, and transform text so it is ready for analysis.</p>
+
+    <h3>11. TRIM</h3>
+    <p>TRIM removes all leading, trailing, and repeated internal spaces from text. <code>=TRIM(" Hello   World ")</code> returns "Hello World." This is essential when working with imported data or copy-pasted text that often contains invisible extra spaces that can break VLOOKUP matches and other functions.</p>
+
+    <h3>12. CLEAN</h3>
+    <p>CLEAN removes non-printable characters from text. When you import data from websites or external systems, invisible characters can sneak in and cause formulas to fail. <code>=CLEAN(A1)</code> strips them out. Combine with TRIM for maximum cleaning power: <code>=TRIM(CLEAN(A1))</code>.</p>
+
+    <h3>13. SPLIT</h3>
+    <p>SPLIT divides text into separate cells based on a delimiter. <code>=SPLIT("John, Doe, Manager", ", ")</code> puts "John" in one cell, "Doe" in the next, and "Manager" in the third. This is invaluable for parsing names, addresses, CSV data, and any text that follows a consistent pattern.</p>
+
+    <h3>14. REGEXMATCH, REGEXEXTRACT, REGEXREPLACE</h3>
+    <p>Google Sheets has built-in regular expression support — something Excel lacks natively. REGEXMATCH returns TRUE or FALSE: <code>=REGEXMATCH(A1, "[0-9]{3}-[0-9]{4}")</code> checks if a cell contains a phone-number-like pattern. REGEXEXTRACT pulls out the matching portion: <code>=REGEXEXTRACT(A1, "[A-Za-z]+@[A-Za-z]+\.[a-z]+")</code> extracts an email address from a cell of text. REGEXREPLACE substitutes matches: <code>=REGEXREPLACE(A1, "[^0-9]", "")</code> strips everything except digits. These are power-user functions that can save hours of manual data cleaning.</p>
+
+    <h2>Math and Statistical Functions</h2>
+    <p>From basic sums to conditional averages, these are the workhorses of spreadsheet analysis.</p>
+
+    <h3>15. SUMIFS</h3>
+    <p>SUMIFS adds up values that meet multiple criteria. The syntax is <code>=SUMIFS(sum_range, criteria_range1, criterion1, criteria_range2, criterion2, ...)</code>. For example, <code>=SUMIFS(D2:D100, B2:B100, "Sales", C2:C100, "&gt;=2026-01-01")</code> sums the values in column D where column B is "Sales" and column C is on or after January 1, 2026. SUMIFS is the multi-criteria upgrade to SUMIF, and it is one of the most frequently used functions in business spreadsheets.</p>
+
+    <h3>16. COUNTIFS</h3>
+    <p>COUNTIFS counts cells that meet multiple criteria. The syntax mirrors SUMIFS: <code>=COUNTIFS(range1, criterion1, range2, criterion2)</code>. For example, <code>=COUNTIFS(B2:B100, "Sales", D2:D100, "&gt;1000")</code> counts how many rows have "Sales" in column B and a value greater than 1,000 in column D. This is essential for building summary tables and dashboards.</p>
+
+    <h3>17. AVERAGEIFS</h3>
+    <p>AVERAGEIFS calculates the average of cells that meet multiple criteria. <code>=AVERAGEIFS(D2:D100, B2:B100, "Sales", C2:C100, "Q1")</code> averages column D values only for rows where column B is "Sales" and column C is "Q1." Like SUMIFS and COUNTIFS, you can add as many criteria pairs as needed.</p>
+
+    <h3>18. ROUND, ROUNDUP, ROUNDDOWN</h3>
+    <p>These functions control decimal places. <code>=ROUND(3.14159, 2)</code> returns 3.14. <code>=ROUNDUP(3.141, 2)</code> returns 3.15. <code>=ROUNDDOWN(3.149, 2)</code> returns 3.14. Use them to ensure consistent formatting in financial reports and to avoid floating-point display issues.</p>
+
+    <h2>Logical Functions</h2>
+    <p>Logical functions let your spreadsheet make decisions based on conditions.</p>
+
+    <h3>19. IF and IFS</h3>
+    <p>IF evaluates a condition and returns one value if true and another if false: <code>=IF(A1 &gt; 100, "Over Budget", "Within Budget")</code>. For multiple conditions, nest IF statements or use the cleaner IFS function: <code>=IFS(A1 &gt;= 90, "A", A1 &gt;= 80, "B", A1 &gt;= 70, "C", A1 &gt;= 60, "D", TRUE, "F")</code>. IFS evaluates conditions in order and returns the result for the first TRUE condition.</p>
+
+    <h3>20. IFERROR</h3>
+    <p>IFERROR catches errors and returns a custom value instead. <code>=IFERROR(VLOOKUP(A1, Data!A:D, 3, FALSE), "Not Found")</code> performs the VLOOKUP and shows "Not Found" instead of an ugly error if no match exists. Wrap any formula that might produce an error in IFERROR to keep your spreadsheet clean and professional.</p>
+
+    <h3>21. AND, OR</h3>
+    <p>AND returns TRUE only if all conditions are true: <code>=AND(A1 &gt; 0, B1 &lt; 100, C1 = "Active")</code>. OR returns TRUE if any condition is true: <code>=OR(A1 = "Red", A1 = "Blue", A1 = "Green")</code>. These are most useful inside IF statements for complex decision-making: <code>=IF(AND(B1 &gt;= 90, C1 = "Submitted"), "Pass", "Review")</code>.</p>
+
+    <h2>Date and Time Functions</h2>
+    <p>Working with dates in spreadsheets can be tricky. These functions handle the complexity for you.</p>
+
+    <h3>22. TODAY and NOW</h3>
+    <p>TODAY returns the current date: <code>=TODAY()</code> might return 2026-03-17. NOW returns the current date and time. These update automatically every time the sheet recalculates. Use them for deadline tracking: <code>=IF(A1 &lt; TODAY(), "Overdue", "On Track")</code> or to calculate age: <code>=DATEDIF(A1, TODAY(), "Y")</code> returns the number of full years between a birthdate in A1 and today.</p>
+
+    <h3>23. DATEDIF</h3>
+    <p>DATEDIF calculates the difference between two dates in years, months, or days. The syntax is <code>=DATEDIF(start_date, end_date, unit)</code>. Units include "Y" for complete years, "M" for complete months, and "D" for days. <code>=DATEDIF("1990-05-15", TODAY(), "Y")</code> returns the person's age in years. This undocumented function (it does not appear in autocomplete) is one of the most useful date functions available.</p>
+
+    <h2>Array and Filter Functions</h2>
+    <p>These functions let you manipulate, filter, and sort data dynamically without modifying your source data.</p>
+
+    <h3>24. FILTER</h3>
+    <p>FILTER returns a filtered version of a range based on conditions. <code>=FILTER(A2:D100, C2:C100 &gt; 1000, B2:B100 = "Sales")</code> returns all columns for rows where column C is greater than 1,000 and column B is "Sales." Unlike the built-in filter feature, FILTER produces a dynamic result in a new location without affecting the source data. It updates automatically when the source data changes, making it perfect for dashboards and reports.</p>
+
+    <h3>25. SORT and UNIQUE</h3>
+    <p>SORT returns a sorted version of a range: <code>=SORT(A2:D100, 3, FALSE)</code> sorts by the third column in descending order. UNIQUE returns only the distinct values from a range: <code>=UNIQUE(B2:B100)</code> gives you a deduplicated list of values in column B. Combine them: <code>=SORT(UNIQUE(B2:B100))</code> produces a sorted list of unique values. These functions are building blocks for dynamic dropdown menus and summary tables.</p>
+
+    <h2>Putting It All Together: Practical Combinations</h2>
+    <p>The real power of Google Sheets emerges when you combine these functions. Here are several real-world combinations that solve common problems.</p>
+    <p><strong>Dynamic dashboard summary:</strong> Use QUERY to aggregate your raw data, SPARKLINE to visualize trends, and GOOGLEFINANCE to pull in market benchmarks — all updating automatically.</p>
+    <p><strong>Multi-sheet consolidation:</strong> Use IMPORTRANGE to pull data from team spreadsheets into a master sheet, then QUERY or FILTER to extract the specific data you need for reporting.</p>
+    <p><strong>Automated data cleaning pipeline:</strong> Chain TRIM, CLEAN, REGEXREPLACE, and SPLIT to transform messy imported data into analysis-ready columns, wrapped in ARRAYFORMULA so one formula handles the entire column.</p>
+    <p><strong>Live portfolio tracker:</strong> Use GOOGLEFINANCE for prices, ARRAYFORMULA to calculate gains and losses across all holdings, SPARKLINE for price charts, and conditional formatting to highlight winners and losers.</p>
+    <p>For more spreadsheet tools and data utilities, explore our <a href="/tools/">web tools collection</a> which includes converters and calculators that complement your spreadsheet workflows.</p>
+
+    <h2>Tips for Writing Better Formulas</h2>
+    <p><strong>Use named ranges.</strong> Instead of referencing A2:A100, give your range a name like "ProductNames" through Data, Named ranges. This makes formulas self-documenting: <code>=VLOOKUP("Widget", ProductData, 3, FALSE)</code> is much clearer than <code>=VLOOKUP("Widget", A2:D100, 3, FALSE)</code>.</p>
+    <p><strong>Use absolute references when needed.</strong> Dollar signs lock a reference: $A$1 always refers to cell A1 regardless of where you copy the formula. A$1 locks the row, and $A1 locks the column. This is critical when building lookup tables and when copying formulas across rows and columns.</p>
+    <p><strong>Comment complex formulas.</strong> Google Sheets lets you add notes to cells. For any formula longer than a single function, add a note explaining what it does and why. Your future self will thank you.</p>
+    <p><strong>Break complex formulas into steps.</strong> Instead of one massive nested formula, use helper columns to compute intermediate results. This makes debugging easier and your spreadsheet more maintainable. Once everything works, you can consolidate into a single formula if space is a concern.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <details class="faq-item">
+      <summary>What is the difference between VLOOKUP and INDEX MATCH in Google Sheets?</summary>
+      <div class="faq-answer"><p>VLOOKUP searches for a value in the first column of a range and returns a value from a specified column to the right. It can only look right. INDEX MATCH is a combination of two functions that can look in any direction and does not break when you insert or delete columns. For new spreadsheets, many experts recommend INDEX MATCH or the newer XLOOKUP over VLOOKUP.</p></div>
+    </details>
+    <details class="faq-item">
+      <summary>How does ARRAYFORMULA work in Google Sheets?</summary>
+      <div class="faq-answer"><p>ARRAYFORMULA allows a single formula to apply across an entire column or range of cells automatically. Instead of writing a formula in each row, you write one ARRAYFORMULA in the first cell and it expands down to fill every row with data. For example, ARRAYFORMULA(A2:A * B2:B) multiplies every value in column A by the corresponding value in column B. This feature is unique to Google Sheets.</p></div>
+    </details>
+    <details class="faq-item">
+      <summary>Can I use SQL-like queries in Google Sheets?</summary>
+      <div class="faq-answer"><p>Yes. The QUERY function lets you use a simplified version of SQL to filter, sort, group, and aggregate data directly within your spreadsheet. The syntax looks like QUERY(data_range, query_string, headers). QUERY is one of the most powerful functions unique to Google Sheets and can replace many complex nested formulas and even pivot tables.</p></div>
+    </details>
+    <details class="faq-item">
+      <summary>How do I pull data from another Google Sheet?</summary>
+      <div class="faq-answer"><p>Use the IMPORTRANGE function with the syntax IMPORTRANGE(spreadsheet_url, range_string). The first argument is the full URL of the source spreadsheet, and the second is the sheet name and cell range in quotes. The first time you use IMPORTRANGE to connect two spreadsheets, you will need to click Allow Access to authorize the connection. Once authorized, the data updates automatically.</p></div>
+    </details>
+    <details class="faq-item">
+      <summary>What Google Sheets functions are not available in Excel?</summary>
+      <div class="faq-answer"><p>Several powerful functions are exclusive to Google Sheets. QUERY uses SQL-like syntax. IMPORTRANGE pulls data from other spreadsheets. IMPORTDATA fetches CSV data from a URL. IMPORTHTML extracts tables from web pages. GOOGLEFINANCE retrieves stock data. SPARKLINE creates mini charts in a cell. ARRAYFORMULA applies formulas across ranges automatically. IMAGE displays images from URLs. These make Google Sheets powerful for web-connected data and automation.</p></div>
+    </details>
+
+    <AuthorBio />
+  </article>
+</BaseLayout>
