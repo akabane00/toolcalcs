@@ -1,0 +1,352 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Insurance Calculators",
+        "item": "https://toolcalcs.com/insurance-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Home Insurance Calculator"
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What does homeowners insurance cover?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A standard homeowners insurance policy (HO-3) covers four main areas: dwelling coverage (repairs or rebuilding your home structure), personal property coverage (furniture, electronics, clothing, and belongings), liability protection (legal and medical costs if someone is injured on your property), and additional living expenses (hotel and meals if your home is uninhabitable after a covered loss). Most policies also include other structures coverage for detached garages, fences, and sheds."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is homeowners insurance required?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Homeowners insurance is not required by law, but it is effectively required if you have a mortgage. Virtually all mortgage lenders require borrowers to maintain a homeowners insurance policy with minimum dwelling coverage equal to the loan balance or the home's replacement cost. If you let your policy lapse, the lender can force-place insurance on your behalf — which is typically far more expensive and provides less coverage. If you own your home outright with no mortgage, you are not legally obligated to carry insurance, though it is strongly advisable to protect your largest asset."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is not covered by standard homeowners insurance?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Standard homeowners insurance policies exclude several common risks. Flood damage is not covered and requires a separate flood insurance policy, typically through the National Flood Insurance Program (NFIP). Earthquake damage is also excluded and requires a separate earthquake endorsement or policy. Normal wear and tear, gradual deterioration, and maintenance-related damage (like a roof that simply aged out) are not covered. Other common exclusions include sewer backups (unless an endorsement is added), mold from neglect, pest infestations, and damage from power outages or mechanical breakdown."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Home Insurance Calculator - Estimate Your Homeowners Insurance Cost"
+  description="Free home insurance calculator. Estimate your annual homeowners insurance premium based on home value, location risk, coverage level, and deductible."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/insurance-calculators/">Insurance Calculators</a> &rsaquo;
+    <span>Home Insurance Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Home Insurance Calculator</h1>
+  <p class="page-desc">Estimate your annual homeowners insurance premium based on your home's replacement value, coverage selections, location risk, and deductible.</p>
+
+  <!-- Calculator Tool -->
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="homeValue">Home Replacement Value ($)</label>
+        <input type="number" id="homeValue" value="350000" min="0" step="5000" />
+        <span class="input-hint">Rebuilding cost, not market value</span>
+      </div>
+      <div class="input-group">
+        <label for="personalProperty">Personal Property Coverage ($)</label>
+        <input type="number" id="personalProperty" value="100000" min="0" step="5000" />
+        <span class="input-hint">Furniture, electronics, clothing, etc.</span>
+      </div>
+      <div class="input-group">
+        <label for="liabilityCoverage">Liability Coverage</label>
+        <select id="liabilityCoverage">
+          <option value="100000">$100,000</option>
+          <option value="300000" selected>$300,000 (recommended)</option>
+          <option value="500000">$500,000</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="deductible">Deductible</label>
+        <select id="deductible">
+          <option value="500">$500</option>
+          <option value="1000" selected>$1,000 (most common)</option>
+          <option value="2500">$2,500</option>
+          <option value="5000">$5,000</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="locationRisk">Location Risk</label>
+        <select id="locationRisk">
+          <option value="low">Low – Rural / Low-Crime Area</option>
+          <option value="medium" selected>Medium – Suburban</option>
+          <option value="high">High – Coastal / High-Crime Area</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="homeAge">Home Age (years)</label>
+        <input type="number" id="homeAge" value="20" min="0" max="200" step="1" />
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate Premium</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Estimated Annual Premium</span>
+          <span class="result-value" id="annualPremium">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Monthly Premium</span>
+          <span class="result-value" id="monthlyPremium">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Dwelling Coverage</span>
+          <span class="result-value" id="dwellingCoverage">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Personal Property</span>
+          <span class="result-value" id="propertyCoverage">$0</span>
+        </div>
+        <div class="result-card success">
+          <span class="result-label">Liability Coverage</span>
+          <span class="result-value" id="liabilityDisplay">$0</span>
+        </div>
+      </div>
+      <p class="result-disclaimer">Estimate only. Actual premiums vary by insurer, credit score, claims history, and local market conditions. Get quotes from multiple insurers for accurate pricing.</p>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <!-- SEO Content Article -->
+  <article class="content-section">
+    <h2>What Does Homeowners Insurance Cover?</h2>
+    <p>A standard homeowners insurance policy — most commonly the HO-3 form — provides broad protection for your home and belongings against a wide range of risks. Understanding what is and is not included is essential for making sure you have the right level of coverage before a loss occurs.</p>
+    <p>The four main coverage areas found in a typical HO-3 policy are:</p>
+    <ul>
+      <li><strong>Dwelling Coverage (Coverage A):</strong> Pays to repair or rebuild the physical structure of your home — walls, roof, foundation, built-in appliances, and attached structures like a garage — if damaged by a covered peril such as fire, wind, hail, lightning, or vandalism. Coverage should equal your home's full replacement cost, which is what it would cost to rebuild from scratch at today's construction prices.</li>
+      <li><strong>Other Structures Coverage (Coverage B):</strong> Covers detached structures on your property, such as a detached garage, fence, storage shed, or guest house. This is usually set at 10% of your dwelling coverage automatically.</li>
+      <li><strong>Personal Property Coverage (Coverage C):</strong> Reimburses you for belongings like furniture, electronics, clothing, jewelry, and appliances if they are stolen or damaged by a covered peril. Coverage typically applies both at home and away — so belongings stolen from your car or hotel room may also be covered.</li>
+      <li><strong>Liability Coverage (Coverage E):</strong> Protects you financially if someone is injured on your property or if you accidentally damage someone else's property. It covers legal defense costs, medical bills, and court judgments up to your policy limit. Standard policies offer $100,000, but $300,000 to $500,000 is recommended for most homeowners.</li>
+      <li><strong>Additional Living Expenses (Coverage D):</strong> Also called loss of use coverage, this pays for hotel stays, restaurant meals, and other increased living costs if a covered loss makes your home temporarily uninhabitable.</li>
+    </ul>
+    <p>HO-3 policies cover your dwelling on an open-peril basis, meaning all causes of loss are covered unless specifically excluded. Personal property, however, is usually covered on a named-peril basis, meaning only the specific perils listed in the policy are covered.</p>
+
+    <h2>How Much Home Insurance Do You Need?</h2>
+    <p>The most critical figure in your homeowners policy is your dwelling coverage amount, which should be based on your home's <em>replacement cost</em> — not its market value or what you paid for it. Replacement cost is the amount it would take to rebuild your home from the ground up using current labor and material costs in your area.</p>
+    <p>Replacement cost and market value often diverge significantly. In a desirable neighborhood, your home might sell for $500,000, but the cost to rebuild the structure itself might only be $320,000 because land value is not included in the rebuild equation. Conversely, in some markets or for older homes with unique architectural features, replacement cost can exceed market value.</p>
+    <p>Most insurers will provide a replacement cost estimate using construction cost calculators based on your home's square footage, age, construction type, and local labor rates. It is worth requesting this estimate and reviewing it carefully. Being underinsured — having a dwelling coverage limit below your home's actual replacement cost — means you could face a significant out-of-pocket gap after a total loss.</p>
+    <p>For personal property coverage, a useful starting point is to conduct a home inventory. Walk through each room and estimate the replacement value of your belongings. A furnished 2,000 square foot home can easily have $80,000 to $150,000 or more in personal property, including furniture, electronics, appliances, clothing, and valuables. Many homeowners discover they are significantly underinsured for personal property only after filing a claim.</p>
+    <p>For liability coverage, the minimum $100,000 standard in many policies is usually insufficient. A single serious injury lawsuit can easily exceed that amount. Most financial advisors recommend at least $300,000 in liability coverage, and homeowners with significant assets or high-risk features like a pool or trampoline should consider $500,000 or an umbrella policy.</p>
+
+    <h2>Factors That Affect Your Homeowners Insurance Premium</h2>
+    <p>Insurers use dozens of rating factors to determine your premium. Understanding these factors can help you anticipate your cost and identify areas where you might qualify for discounts.</p>
+    <p><strong>Home replacement cost</strong> is the primary driver of your dwelling premium. Higher-value homes with more square footage, premium finishes, or complex architecture cost more to rebuild and therefore cost more to insure.</p>
+    <p><strong>Location</strong> has a major impact on your premium. Homes in areas prone to hurricanes, wildfires, tornadoes, hailstorms, or flooding command significantly higher premiums. Coastal properties in states like Florida, Texas, and Louisiana often face some of the highest premiums in the country. Urban neighborhoods with higher crime rates also tend to have elevated theft-related losses, which increases premiums. By contrast, rural homes in low-crime, low-risk areas typically qualify for lower rates.</p>
+    <p><strong>Home age and condition</strong> affect the risk of loss. Older homes may have aging electrical systems (like knob-and-tube wiring or aluminum wiring), galvanized steel plumbing, or outdated HVAC systems that are more likely to cause fires, water damage, or other losses. Insurers often charge higher premiums for homes over 30 years old or require certain updates before issuing a policy. Newer construction with modern building codes, impact-resistant roofing, and updated systems generally earns lower premiums.</p>
+    <p><strong>Deductible selection</strong> directly affects your premium. A higher deductible means you absorb more cost out of pocket after a claim, so the insurer lowers your premium. Choosing a $2,500 deductible instead of a $500 deductible could reduce your annual premium by 10-20%.</p>
+    <p><strong>Credit-based insurance score</strong> is used in most states. Insurers have found a statistical correlation between credit history and insurance claims, so those with poor credit typically pay higher premiums. Improving your credit score can lower your home insurance costs over time.</p>
+    <p><strong>Claims history</strong> — both yours personally and the property's history — can raise your premium. A home with a history of water damage or fire claims, or a policyholder with multiple prior claims, represents higher risk to the insurer.</p>
+    <p><strong>Home features</strong> can cut both ways. A pool, trampoline, or certain dog breeds can increase your liability risk and raise your premium. On the other hand, a monitored security system, smoke detectors, sprinkler systems, new roof, or storm shutters can earn you meaningful discounts.</p>
+
+    <h2>Understanding Your Policy: Actual Cash Value vs. Replacement Cost</h2>
+    <p>One of the most important distinctions in homeowners insurance is whether your policy pays claims on an <strong>actual cash value (ACV)</strong> basis or a <strong>replacement cost value (RCV)</strong> basis. The difference can amount to tens of thousands of dollars in a major claim.</p>
+    <p><strong>Actual cash value</strong> pays you the depreciated value of your property at the time of the loss. If your 10-year-old roof is destroyed in a hailstorm and a new roof costs $15,000, an ACV policy might pay only $7,000 after accounting for the roof's depreciation. You are responsible for the remaining $8,000 out of pocket.</p>
+    <p><strong>Replacement cost value</strong> pays what it actually costs to repair or replace damaged property with new materials of like kind and quality, without deducting for depreciation. Using the same example, an RCV policy would pay $15,000 for a new roof (minus your deductible). Most homeowners insurance policies cover the dwelling structure on a replacement cost basis, but personal property coverage is often ACV by default. Upgrading to replacement cost for personal property usually costs a modest additional premium and is generally worth it.</p>
+    <p>A third option is <strong>extended or guaranteed replacement cost coverage</strong>, which pays to rebuild your home even if the cost exceeds your policy limit, up to a specified percentage (often 20-50% above the limit). This protects you against unexpected construction cost inflation following a widespread disaster when material and labor prices spike due to high demand.</p>
+
+    <h2>How to Lower Your Home Insurance Costs</h2>
+    <p>Homeowners insurance is a significant recurring expense, but there are many ways to reduce your premium without sacrificing essential coverage.</p>
+    <ol>
+      <li><strong>Bundle your policies.</strong> Most major insurers offer a multi-policy discount of 5-25% when you purchase both home and auto insurance from the same company. This is one of the easiest and most consistent ways to lower your total insurance costs.</li>
+      <li><strong>Raise your deductible.</strong> Increasing your deductible from $500 to $1,000 or $2,500 can lower your annual premium meaningfully. Just make sure you have sufficient emergency savings to cover the higher deductible if you need to file a claim.</li>
+      <li><strong>Install safety and security features.</strong> A monitored burglar alarm, smoke detectors, carbon monoxide detectors, deadbolt locks, and fire sprinklers can earn you discounts of 5-15%. Some insurers offer larger discounts for smart home monitoring systems.</li>
+      <li><strong>Upgrade your roof.</strong> A new roof — especially one with impact-resistant shingles — can substantially reduce your premium in hail-prone areas. Many insurers offer specific discounts for roofs less than 10 years old or roofs built to the latest building codes.</li>
+      <li><strong>Improve your credit score.</strong> In most states, a better insurance credit score leads to a lower premium. Paying bills on time, reducing credit card balances, and avoiding new credit inquiries can improve your score over time.</li>
+      <li><strong>Shop around and compare quotes annually.</strong> Rates vary significantly between insurers. Get at least three quotes each year at renewal time. Independent insurance agents can compare multiple insurers on your behalf.</li>
+      <li><strong>Ask about loyalty and other discounts.</strong> Many insurers reward long-term customers. You may also qualify for discounts based on your profession (firefighter, teacher, military), your age, or if your home is new construction.</li>
+      <li><strong>Avoid small claims.</strong> Filing a claim typically raises your premium and can even result in non-renewal. Reserve insurance for truly significant losses and pay for minor repairs out of pocket to keep your claims history clean.</li>
+    </ol>
+    <p>If you are also budgeting for a mortgage, our <a href="/financial-calculators/mortgage-calculator/">mortgage calculator</a> can help you factor in insurance costs alongside principal, interest, and taxes to see your full monthly housing expense.</p>
+
+    <h2>What Homeowners Insurance Does NOT Cover</h2>
+    <p>Just as important as knowing what your policy covers is understanding its exclusions. Many homeowners are surprised to discover coverage gaps after a loss. The most common exclusions in a standard homeowners policy include:</p>
+    <ul>
+      <li><strong>Flood damage:</strong> Standard homeowners policies do not cover flooding from external sources — storm surge, overflowing rivers, heavy rain runoff, or flash floods. You need a separate flood insurance policy, available through the National Flood Insurance Program (NFIP) or private insurers. Even homes far from rivers or coastlines can flood. FEMA estimates that just one inch of water can cause $25,000 in damage.</li>
+      <li><strong>Earthquake damage:</strong> Ground movement from earthquakes is excluded from standard policies. Separate earthquake coverage is available as an endorsement or standalone policy, and is particularly important in California, the Pacific Northwest, and other seismically active regions.</li>
+      <li><strong>Maintenance and wear and tear:</strong> Homeowners insurance is not a home warranty. Gradual damage from aging, deferred maintenance, or normal deterioration is not covered. A roof that simply reaches the end of its useful life, slow plumbing leaks, pest infestations, and mold resulting from neglect are examples of excluded losses.</li>
+      <li><strong>Sewer or drain backup:</strong> Water that backs up through a sewer line or drain is often excluded unless you add a specific water backup endorsement. This is a relatively inexpensive add-on that many homeowners overlook until they face a basement full of sewage.</li>
+      <li><strong>High-value items above limits:</strong> Standard personal property coverage has sub-limits for certain categories of valuables, including jewelry (often $1,500 limit), fine art, collectibles, and firearms. If you own high-value items in these categories, you should add a scheduled personal property endorsement to cover them at their full appraised value.</li>
+      <li><strong>Business-related losses:</strong> If you run a business from home, standard homeowners insurance offers very limited coverage for business equipment or liability. You may need a home business endorsement or a separate business owners policy (BOP).</li>
+      <li><strong>Intentional damage and criminal acts by the insured:</strong> Damage you intentionally cause is not covered, nor are losses resulting from illegal activities by household members.</li>
+    </ul>
+    <p>If you rent your home, a homeowners policy does not apply. Instead, look into <a href="/insurance-calculators/renters-insurance-calculator/">renters insurance</a>, which covers your personal belongings and liability without the dwelling component.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>What does homeowners insurance cover?</summary>
+        <p>A standard homeowners insurance policy covers dwelling damage (fire, wind, hail, vandalism), other structures (fences, detached garages), personal property (furniture, electronics, clothing), liability (if someone is injured on your property), and additional living expenses if your home is temporarily uninhabitable. It does not automatically cover floods, earthquakes, or maintenance-related damage.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Is homeowners insurance required?</summary>
+        <p>Homeowners insurance is not legally required, but it is effectively mandatory if you carry a mortgage. Lenders require borrowers to maintain a policy covering at least the replacement cost of the dwelling for the duration of the loan. Owners who let their coverage lapse risk having the lender purchase expensive force-placed insurance on their behalf. Even homeowners without a mortgage are strongly advised to carry coverage to protect their most valuable asset.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is not covered by standard homeowners insurance?</summary>
+        <p>The most significant exclusions are flood damage, earthquake damage, and normal wear and tear. Floods require a separate NFIP or private flood insurance policy. Earthquakes require a separate endorsement or policy. Other common exclusions include sewer backup (unless an endorsement is added), pest damage, mold from neglect, high-value jewelry above sub-limits, and home-based business liability.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How much does homeowners insurance cost on average?</summary>
+        <p>The national average homeowners insurance premium in the United States is approximately $1,400 to $2,000 per year for $300,000 in dwelling coverage with standard deductibles. However, premiums vary enormously by state, location risk, home age, and insurer. Florida homeowners often pay $3,000 to $5,000 or more due to hurricane risk, while Midwest homeowners in low-risk areas may pay under $1,000. Using this calculator gives you a rough starting estimate, but getting actual quotes from multiple insurers is the best way to know what you will pay.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Should I choose actual cash value or replacement cost coverage?</summary>
+        <p>Replacement cost coverage is almost always the better choice, even though it costs more. With actual cash value coverage, depreciation is subtracted from claim payouts, meaning you could receive far less than it costs to actually repair or replace damaged property. For a 10-year-old roof costing $15,000 to replace, an ACV policy might pay only $6,000-$8,000 after depreciation. The premium difference between ACV and replacement cost is typically small relative to the potential claim difference. For personal property coverage in particular, upgrading from ACV to replacement cost is generally very cost-effective.</p>
+      </details>
+    </div>
+
+    <h2>Related Resources</h2>
+    <ul>
+      <li><a href="/insurance-calculators/renters-insurance-calculator/">Renters Insurance Calculator</a> — Estimate coverage needs if you rent your home.</li>
+      <li><a href="/financial-calculators/mortgage-calculator/">Mortgage Calculator</a> — Factor home insurance into your total monthly housing payment.</li>
+      <li><a href="/blog/guide-to-home-buying-costs/">Guide to Home Buying Costs</a> — A full breakdown of upfront and ongoing costs of homeownership.</li>
+    </ul>
+  </article>
+
+  <RelatedCalculators currentSlug="home-insurance-calculator" />
+  <RelatedArticles calculatorSlug="home-insurance-calculator" />
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .input-hint {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin-top: 4px;
+  }
+  .result-disclaimer {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    margin-top: 16px;
+    line-height: 1.5;
+    text-align: center;
+  }
+  .last-updated {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin: 4px 0 0;
+  }
+</style>
+
+<script>
+  function formatCurrency(n) {
+    return '$' + Math.round(n).toLocaleString('en-US');
+  }
+
+  function calculate() {
+    var homeValue = parseFloat(document.getElementById('homeValue').value) || 0;
+    var personalProperty = parseFloat(document.getElementById('personalProperty').value) || 0;
+    var liabilityVal = parseInt(document.getElementById('liabilityCoverage').value) || 300000;
+    var deductibleVal = parseInt(document.getElementById('deductible').value) || 1000;
+    var locationRisk = document.getElementById('locationRisk').value;
+    var homeAge = parseFloat(document.getElementById('homeAge').value) || 0;
+
+    // Base rate: 0.5% of replacement value
+    var base = homeValue * 0.005;
+
+    // Personal property addition: 0.3% of personal property value
+    var propertyAddition = personalProperty * 0.003;
+
+    // Liability adjustment
+    var liabilityAdjustment = 0;
+    if (liabilityVal === 100000) {
+      liabilityAdjustment = 0;
+    } else if (liabilityVal === 300000) {
+      liabilityAdjustment = 50;
+    } else if (liabilityVal === 500000) {
+      liabilityAdjustment = 100;
+    }
+
+    // Deductible adjustment
+    var deductibleAdjustment = 0;
+    if (deductibleVal === 500) {
+      deductibleAdjustment = 200;
+    } else if (deductibleVal === 1000) {
+      deductibleAdjustment = 0;
+    } else if (deductibleVal === 2500) {
+      deductibleAdjustment = -150;
+    } else if (deductibleVal === 5000) {
+      deductibleAdjustment = -300;
+    }
+
+    // Location risk multiplier
+    var locationFactor = 1.0;
+    if (locationRisk === 'low') {
+      locationFactor = 0.85;
+    } else if (locationRisk === 'medium') {
+      locationFactor = 1.0;
+    } else if (locationRisk === 'high') {
+      locationFactor = 1.35;
+    }
+
+    // Home age multiplier
+    var ageFactor = 1.0;
+    if (homeAge < 10) {
+      ageFactor = 0.95;
+    } else if (homeAge <= 30) {
+      ageFactor = 1.0;
+    } else {
+      ageFactor = 1.15;
+    }
+
+    // Annual premium
+    var annualPremium = (base + propertyAddition + liabilityAdjustment + deductibleAdjustment) * locationFactor * ageFactor;
+    var monthlyPremium = annualPremium / 12;
+
+    document.getElementById('annualPremium').textContent = formatCurrency(annualPremium);
+    document.getElementById('monthlyPremium').textContent = formatCurrency(monthlyPremium);
+    document.getElementById('dwellingCoverage').textContent = formatCurrency(homeValue);
+    document.getElementById('propertyCoverage').textContent = formatCurrency(personalProperty);
+    document.getElementById('liabilityDisplay').textContent = formatCurrency(liabilityVal);
+  }
+
+  document.getElementById('calculateBtn').addEventListener('click', calculate);
+
+  // Auto-calculate on load
+  calculate();
+</script>

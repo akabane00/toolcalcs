@@ -1,0 +1,281 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Insurance Calculators",
+        "item": "https://toolcalcs.com/insurance-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Auto Insurance Calculator"
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What factors affect my car insurance premium?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Your car insurance premium is influenced by several key factors: your age (younger and older drivers typically pay more), your driving record (accidents and violations raise rates), the type and value of your vehicle, your location (urban areas tend to cost more), your annual mileage, the coverage type you choose, your deductible amount, and in many states your credit score. Improving your driving record and increasing your deductible are among the most effective ways to lower your premium."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the minimum car insurance required by law?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Minimum car insurance requirements vary by state, but almost every state requires at least liability coverage. Most states mandate bodily injury liability (which covers injuries to others if you cause an accident) and property damage liability (which covers damage to other people's vehicles or property). Minimum limits commonly look like 25/50/25, meaning $25,000 per person for bodily injury, $50,000 per accident for bodily injury, and $25,000 for property damage. Some states also require uninsured motorist coverage or personal injury protection (PIP). State minimums are often too low to cover serious accidents, so experts recommend carrying higher limits."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Should I get comprehensive and collision coverage?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Whether to add comprehensive and collision coverage depends primarily on your vehicle's current market value. A common guideline is to consider dropping these coverages when the annual cost of the coverage exceeds 10% of your car's actual cash value. For example, if your car is worth $5,000 and comprehensive plus collision costs you $600 per year, you're paying 12% of the car's value annually for coverage that could only pay out $5,000 minus your deductible. If your car is worth $20,000 or more, or if you could not easily afford to replace it out of pocket, keeping full coverage is typically the smarter financial choice."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Auto Insurance Calculator - Estimate Your Car Insurance Cost"
+  description="Free auto insurance calculator. Estimate your car insurance premium based on vehicle value, coverage type, deductible, and driver profile."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/insurance-calculators/">Insurance Calculators</a> &rsaquo;
+    <span>Auto Insurance Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Auto Insurance Calculator</h1>
+  <p class="page-desc">Estimate your annual and monthly car insurance premium based on your vehicle, coverage type, deductible, and driver profile. Results are estimates for budgeting purposes — actual quotes will vary by insurer and state.</p>
+
+  <!-- Calculator Tool -->
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="vehicleValue">Vehicle Value ($)</label>
+        <input type="number" id="vehicleValue" value="25000" min="1000" max="500000" step="500" />
+      </div>
+      <div class="input-group">
+        <label for="coverageType">Coverage Type</label>
+        <select id="coverageType">
+          <option value="liability">Liability Only</option>
+          <option value="collision">Liability + Collision</option>
+          <option value="full" selected>Full Coverage</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="deductible">Annual Deductible ($)</label>
+        <select id="deductible">
+          <option value="250">$250</option>
+          <option value="500" selected>$500</option>
+          <option value="1000">$1,000</option>
+          <option value="2000">$2,000</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="driverAge">Driver Age</label>
+        <input type="number" id="driverAge" value="35" min="16" max="100" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="drivingRecord">Driving Record</label>
+        <select id="drivingRecord">
+          <option value="clean" selected>Clean</option>
+          <option value="minor">1 Minor Violation</option>
+          <option value="major">1 Major Violation</option>
+          <option value="multiple">Multiple Violations</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="annualMileage">Annual Mileage</label>
+        <input type="number" id="annualMileage" value="12000" min="1000" max="100000" step="500" />
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate Premium</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Estimated Annual Premium</span>
+          <span class="result-value" id="annualPremium">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Estimated Monthly</span>
+          <span class="result-value" id="monthlyPremium">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Coverage Type</span>
+          <span class="result-value" id="coverageLabel">Full Coverage</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Deductible</span>
+          <span class="result-value" id="deductibleLabel">$500</span>
+        </div>
+      </div>
+      <p class="result-note">This is a simplified estimate for budgeting purposes. Get quotes from multiple insurers for accurate pricing.</p>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <!-- SEO Content Article -->
+  <article class="content-section">
+    <h2>What Determines Your Auto Insurance Rate?</h2>
+    <p>Auto insurance premiums are calculated using a complex set of variables that insurers use to assess how likely you are to file a claim and how costly that claim might be. Understanding what drives your rate gives you actionable ways to reduce it.</p>
+    <p><strong>Driver age</strong> is one of the most significant factors. Teenagers and drivers in their early twenties have statistically higher accident rates, so insurers charge them substantially more — often 50% above the average adult rate. Drivers between 25 and 65 generally pay the lowest rates. Once drivers pass age 65, rates can climb again as reaction times and vision tend to decline.</p>
+    <p><strong>Driving record</strong> directly reflects your risk to the insurer. A clean record with no accidents or violations earns you the best available rates. A single minor violation — such as a speeding ticket — typically raises your premium by 10% to 20%. A major violation like a DUI or reckless driving charge can increase your rate by 30% to 50% or more and can remain on your record for three to seven years, depending on your state. Multiple violations signal a pattern of risky behavior and result in the highest rate increases, sometimes making standard insurance unavailable and forcing drivers into state-assigned risk pools at very high premiums.</p>
+    <p><strong>Annual mileage</strong> matters because more time on the road means more exposure to potential accidents. Low-mileage drivers — those who drive fewer than 7,500 miles per year — often qualify for discounts of 10% to 15%. Drivers who commute long distances or use their vehicle for work may pay more than the average driver who uses their car primarily for weekend errands.</p>
+    <p><strong>Vehicle type and value</strong> influence premiums significantly. Expensive vehicles cost more to repair or replace, so they carry higher comprehensive and collision premiums. Sports cars and high-performance vehicles often attract higher rates due to their speed capabilities and higher theft rates. Vehicles with strong safety ratings and advanced driver assistance features may qualify for discounts from many insurers.</p>
+    <p><strong>Location</strong> is a powerful rate driver that this calculator does not account for individually. Urban areas with higher traffic density, higher theft rates, and higher repair costs typically result in higher premiums than rural areas. Even within a city, your specific ZIP code can cause significant rate differences. States also vary enormously in their insurance regulations, which affects baseline pricing.</p>
+
+    <h2>Understanding Coverage Types: Liability, Collision, and Comprehensive</h2>
+    <p>Auto insurance is not a single product — it is a bundle of different coverage types, each protecting you in different scenarios. Understanding what each covers helps you make informed decisions about which coverages you need.</p>
+    <p><strong>Liability coverage</strong> is the foundation of any auto insurance policy and is legally required in almost every state. It comes in two parts: bodily injury liability, which pays for injuries to other people if you cause an accident, and property damage liability, which pays to repair or replace other people's vehicles or property you damage. Liability coverage does not pay for your own injuries or vehicle damage — it only covers what you owe to others.</p>
+    <p>Liability limits are expressed as three numbers, such as 100/300/100. The first number is the maximum paid per person injured, the second is the maximum paid per accident for all injuries combined, and the third is the maximum paid for property damage. State minimums are often too low to cover serious accidents. Many experts recommend carrying at least 100/300/100 liability limits to adequately protect your assets.</p>
+    <p><strong>Collision coverage</strong> pays to repair or replace your own vehicle when it is damaged in a collision with another car or object — regardless of who is at fault. If you hit a guardrail, back into a pole, or get into a crash with another driver, collision coverage handles your vehicle repairs after you pay your deductible. This coverage is typically required by lenders if you have an auto loan or lease.</p>
+    <p><strong>Comprehensive coverage</strong> (sometimes called "other than collision") pays for damage to your vehicle from events that are not collisions — including theft, vandalism, fire, flood, hail, falling objects, and animal strikes. If a deer runs into your car or a hailstorm dents your hood, comprehensive coverage pays for the repairs after your deductible. Like collision, comprehensive is typically required by lenders on financed vehicles.</p>
+    <p><strong>Full coverage</strong> is not an official insurance term but generally refers to a policy that includes liability, collision, and comprehensive coverage together. It provides the most complete protection but also carries the highest premium.</p>
+    <p>Other optional coverages you may encounter include uninsured/underinsured motorist coverage (protects you if you are hit by a driver with no or insufficient insurance), personal injury protection or PIP (covers your medical bills and lost wages regardless of fault), rental reimbursement, and roadside assistance. Bundling the coverages that match your situation rather than paying for everything you do not need is key to optimizing your insurance spend.</p>
+
+    <h2>How to Lower Your Car Insurance Premium</h2>
+    <p>Auto insurance is often the second largest vehicle-related expense after the car payment itself, but there are many legitimate ways to reduce what you pay without sacrificing the coverage you need.</p>
+    <p><strong>Shop around and compare quotes.</strong> Insurance pricing varies enormously between companies for identical coverage. Getting quotes from at least three to five insurers every one to two years is one of the most effective ways to ensure you are not overpaying. Online comparison tools make this process faster than it has ever been.</p>
+    <p><strong>Bundle your policies.</strong> Most insurers offer a multi-policy discount — typically 10% to 25% — when you purchase both auto and home (or renters) insurance from the same company. If you have not bundled yet, getting a combined quote could yield meaningful savings. See our <a href="/insurance-calculators/home-insurance-calculator/">home insurance calculator</a> to estimate your home insurance costs.</p>
+    <p><strong>Increase your deductible.</strong> Raising your deductible from $500 to $1,000 typically reduces your collision and comprehensive premium by 15% to 20%. The trade-off is that you pay more out of pocket if you do file a claim. This strategy makes the most sense if you have adequate savings to cover a higher deductible comfortably.</p>
+    <p><strong>Maintain a clean driving record.</strong> Avoiding accidents and traffic violations is the single most sustainable way to keep your rates low over time. Many insurers also offer accident forgiveness programs that prevent your first at-fault accident from raising your rate.</p>
+    <p><strong>Take advantage of discounts.</strong> Most insurers offer a variety of discounts that drivers fail to ask about or claim. Common discounts include: good student discount (for young drivers with a B average or better), defensive driving course discount, low-mileage discount, vehicle safety feature discount (for cars with anti-lock brakes, airbags, anti-theft systems), loyalty discount, and paperless billing or autopay discounts. Ask your insurer for a full list of available discounts and whether you qualify.</p>
+    <p><strong>Improve your credit score.</strong> In most states, insurers use a credit-based insurance score to help determine your rate. Drivers with excellent credit often pay significantly less than drivers with poor credit for identical coverage. Paying bills on time, keeping credit card balances low, and avoiding new credit inquiries can gradually improve your credit-based insurance score.</p>
+    <p><strong>Drive a vehicle with lower insurance costs.</strong> If you are buying a new car, research insurance costs before you purchase. Vehicles with high safety ratings, modest horsepower, lower theft rates, and reasonable repair costs generally carry lower premiums. Some popular SUVs and family sedans cost significantly less to insure than sports cars or luxury vehicles of similar price.</p>
+
+    <h2>State Minimum Requirements vs. Recommended Coverage</h2>
+    <p>Every state (except New Hampshire and Virginia, which have alternative options) requires drivers to carry at least a minimum amount of auto insurance. However, state minimums are set as a floor, not a recommendation. In many cases, relying only on minimum coverage exposes you to significant financial risk.</p>
+    <p>To illustrate: California's minimum liability limits are 15/30/5 — $15,000 per person for bodily injury, $30,000 per accident, and $5,000 for property damage. A single serious car accident with injuries can easily generate medical bills that exceed $100,000, and new vehicles regularly cost $30,000 to $60,000 or more. If you cause an accident and your liability limits are exhausted, you are personally responsible for the remaining damages. Your savings, home equity, and future wages could be at risk in a lawsuit.</p>
+    <p>Most personal finance experts and insurance advisors recommend carrying liability limits of at least 100/300/100 for drivers with significant assets to protect. If you have a high net worth, consider umbrella insurance, which provides an additional layer of liability protection — typically $1 million or more — at a relatively low cost.</p>
+    <p>Uninsured motorist coverage is another area where state minimums may be inadequate. Roughly one in eight drivers in the United States is uninsured. If you are hit by an uninsured driver and your damages exceed what their (nonexistent) policy would cover, uninsured motorist coverage steps in to pay your medical bills and vehicle repair costs. In states where this coverage is not mandatory, strongly consider adding it.</p>
+    <p>For a full picture of your insurance needs, compare your auto coverage with a life insurance estimate using our <a href="/insurance-calculators/life-insurance-calculator/">life insurance calculator</a>, especially if your family depends on your income.</p>
+
+    <h2>When to Drop Collision Coverage on an Older Car</h2>
+    <p>One of the most common auto insurance questions is whether to keep or drop collision and comprehensive coverage as a vehicle ages and loses value. The answer depends on a straightforward financial calculation.</p>
+    <p>The maximum amount an insurer will pay for your vehicle is its actual cash value (ACV) — what the car is worth in the current market — minus your deductible. If your car's ACV is $6,000 and your deductible is $1,000, the most you can collect on a collision claim is $5,000. If you pay $800 per year for collision and comprehensive coverage on that car, you are spending 16% of the maximum potential payout annually. Most financial advisors suggest dropping comprehensive and collision when the annual premium for those coverages exceeds 10% of the car's ACV.</p>
+    <p>Another way to think about it: if you would not replace or repair the vehicle after a total loss — because the car is old and you would use the insurance money to buy something different anyway — then the collision coverage is providing limited value beyond its cost.</p>
+    <p>Before dropping coverage, consider a few questions. Can you afford to replace the car out of pocket if it were totaled or stolen? Do you have an emergency fund large enough to cover a major repair or a replacement vehicle? Is the car paid off, or do you still have a loan? (Lenders typically require full coverage on financed vehicles.) If you answer yes to the first two questions and the car is paid off, dropping collision and comprehensive on an older, low-value car is often the financially sound choice.</p>
+    <p>You can use our <a href="/financial-calculators/auto-loan-calculator/">auto loan calculator</a> to check if your remaining loan balance is close to — or above — your vehicle's current value, which affects your coverage decisions as well.</p>
+    <p>Keep in mind that comprehensive coverage is typically very inexpensive relative to collision, often only $100 to $200 per year. Because it covers events like theft, fire, and weather damage that are difficult to predict, many drivers choose to keep comprehensive even after dropping collision on lower-value vehicles.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>What factors affect my car insurance premium?</summary>
+        <p>Your car insurance premium is influenced by several key factors: your age (younger and older drivers typically pay more), your driving record (accidents and violations raise rates), the type and value of your vehicle, your location (urban areas tend to cost more), your annual mileage, the coverage type you choose, your deductible amount, and in many states your credit score. Improving your driving record and increasing your deductible are among the most effective ways to lower your premium.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is the minimum car insurance required by law?</summary>
+        <p>Minimum car insurance requirements vary by state, but almost every state requires at least liability coverage — specifically bodily injury liability and property damage liability. Minimum limits commonly look like 25/50/25, meaning $25,000 per person for bodily injury, $50,000 per accident for all bodily injuries, and $25,000 for property damage. Some states also require uninsured motorist coverage or personal injury protection (PIP). State minimums are often too low to cover a serious accident, so most experts recommend carrying limits well above the legal minimum.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Should I get comprehensive and collision coverage?</summary>
+        <p>Whether to add comprehensive and collision coverage depends primarily on your vehicle's current market value and your ability to self-insure. A common guideline is to consider dropping these coverages when their annual cost exceeds 10% of your car's actual cash value. For example, if your car is worth $5,000 and comprehensive plus collision costs $600 per year, you are paying 12% of the car's value annually for coverage that could pay out a maximum of $5,000 minus your deductible. If your car is worth $20,000 or more, or if you could not easily afford to replace it out of pocket, keeping full coverage is typically the smarter choice. Also note that lenders require comprehensive and collision on any financed vehicle.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How can I reduce my auto insurance premium without losing coverage?</summary>
+        <p>The most effective strategies for reducing your premium include: shopping for quotes from multiple insurers every one to two years, bundling your auto policy with home or renters insurance, raising your deductible (if you can afford the higher out-of-pocket cost), maintaining a clean driving record, asking your insurer about every available discount, and improving your credit score over time. Choosing a vehicle with lower insurance costs when you next buy a car is another long-term strategy. Avoid reducing liability limits too aggressively, as the cost savings are modest and the financial risk from inadequate liability coverage can be severe.</p>
+      </details>
+    </div>
+  </article>
+
+  <RelatedCalculators currentSlug="auto-insurance-calculator" />
+  <RelatedArticles calculatorSlug="auto-insurance-calculator" />
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function formatCurrency(n) {
+    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+
+  function calculate() {
+    var vehicleValue = parseFloat(document.getElementById('vehicleValue').value) || 25000;
+    var coverageType = document.getElementById('coverageType').value;
+    var deductible = parseInt(document.getElementById('deductible').value) || 500;
+    var driverAge = parseInt(document.getElementById('driverAge').value) || 35;
+    var drivingRecord = document.getElementById('drivingRecord').value;
+    var annualMileage = parseInt(document.getElementById('annualMileage').value) || 12000;
+
+    // Base rate by coverage type
+    var baseRate = 600;
+    if (coverageType === 'collision') baseRate = 1200;
+    if (coverageType === 'full') baseRate = 1800;
+
+    // Age factor
+    var ageFactor = 1.0;
+    if (driverAge < 25) ageFactor = 1.5;
+    else if (driverAge > 65) ageFactor = 1.2;
+
+    // Driving record factor
+    var recordFactor = 1.0;
+    if (drivingRecord === 'minor') recordFactor = 1.15;
+    else if (drivingRecord === 'major') recordFactor = 1.35;
+    else if (drivingRecord === 'multiple') recordFactor = 1.6;
+
+    // Deductible factor
+    var deductibleFactor = 1.0;
+    if (deductible === 250) deductibleFactor = 1.1;
+    else if (deductible === 500) deductibleFactor = 1.0;
+    else if (deductible === 1000) deductibleFactor = 0.85;
+    else if (deductible === 2000) deductibleFactor = 0.75;
+
+    // Mileage factor
+    var mileageFactor = 1.0;
+    if (annualMileage < 7500) mileageFactor = 0.85;
+    else if (annualMileage > 15000) mileageFactor = 1.15;
+
+    // Annual premium
+    var annualPremium = baseRate * ageFactor * recordFactor * deductibleFactor * mileageFactor;
+    var monthlyPremium = annualPremium / 12;
+
+    // Coverage label
+    var coverageLabels = {
+      liability: 'Liability Only',
+      collision: 'Liability + Collision',
+      full: 'Full Coverage'
+    };
+
+    document.getElementById('annualPremium').textContent = formatCurrency(annualPremium);
+    document.getElementById('monthlyPremium').textContent = formatCurrency(monthlyPremium);
+    document.getElementById('coverageLabel').textContent = coverageLabels[coverageType] || 'Full Coverage';
+    document.getElementById('deductibleLabel').textContent = formatCurrency(deductible);
+  }
+
+  document.getElementById('calculateBtn').addEventListener('click', calculate);
+
+  // Auto-calculate on load
+  calculate();
+</script>

@@ -75,15 +75,6 @@ export const blogArticles: BlogArticle[] = [
     relatedCalculatorSlugs: ['credit-card-payoff-calculator', 'debt-to-income-calculator', 'loan-amortization-calculator', 'debt-payoff-calculator'],
   },
   {
-    title: 'How to Calculate Your BMI (And What It Actually Means)',
-    slug: 'how-to-calculate-your-bmi',
-    description: 'Step-by-step BMI calculation with the formula, BMI ranges, what your number means, and when BMI falls short.',
-    datePublished: '2026-03-05',
-    dateModified: '2026-03-05',
-    category: 'Health',
-    relatedCalculatorSlugs: ['bmi-calculator', 'body-fat-calculator', 'ideal-weight-calculator', 'tdee-calculator'],
-  },
-  {
     title: 'First-Time Homebuyer: Mortgage Basics Explained',
     slug: 'mortgage-basics-explained',
     description: 'Everything first-time buyers need to know about mortgages: how they work, fixed vs. adjustable rates, down payments, and how to estimate your monthly payment.',
@@ -824,33 +815,6 @@ export const blogArticles: BlogArticle[] = [
     category: 'Health',
     relatedCalculatorSlugs: [],
   },
-  {
-    title: 'Macros for Beginners: How to Count Macronutrients',
-    slug: 'macros-for-beginners',
-    description: 'A beginner-friendly guide to counting macros including protein, carbs, and fat calculations, tracking methods, and meal planning.',
-    datePublished: '2026-03-12',
-    dateModified: '2026-03-12',
-    category: 'Health',
-    relatedCalculatorSlugs: ['bmr-calculator'],
-  },
-  {
-    title: 'Running Pace Guide: From Beginner to Advanced',
-    slug: 'running-pace-guide-for-beginners',
-    description: 'Complete running pace guide covering training zones, improvement strategies, and race pace planning for all levels.',
-    datePublished: '2026-03-12',
-    dateModified: '2026-03-12',
-    category: 'Health',
-    relatedCalculatorSlugs: [],
-  },
-  {
-    title: 'Pregnancy Week by Week: A Complete Trimester Guide',
-    slug: 'pregnancy-week-by-week-what-to-expect',
-    description: 'Week-by-week pregnancy guide covering baby development, symptoms, prenatal care, and nutrition for all three trimesters.',
-    datePublished: '2026-03-12',
-    dateModified: '2026-03-12',
-    category: 'Health',
-    relatedCalculatorSlugs: ['bmi-calculator'],
-  },
   // Content Expansion Sprint - Finance (March 2026)
   {
     title: 'How Much Is $25 an Hour Annually? Full Salary Breakdown',
@@ -917,15 +881,6 @@ export const blogArticles: BlogArticle[] = [
     relatedCalculatorSlugs: [],
   },
   {
-    title: 'Emotional Intelligence at Work: Why EQ Matters More Than IQ',
-    slug: 'emotional-intelligence-at-work',
-    description: 'How emotional intelligence impacts workplace success, the 5 components of EQ, and evidence-based strategies to improve your EQ.',
-    datePublished: '2026-03-12',
-    dateModified: '2026-03-12',
-    category: 'Psychology',
-    relatedCalculatorSlugs: [],
-  },
-  {
     title: 'Introvert vs Extrovert: What Science Actually Says',
     slug: 'introvert-vs-extrovert-science',
     description: 'The neuroscience behind introversion and extroversion, including brain differences, myths debunked, and tips for both personality types.',
@@ -965,13 +920,17 @@ export const blogArticles: BlogArticle[] = [
   { title: 'Intermittent Fasting: Methods, Benefits, and Beginner Guide', slug: 'intermittent-fasting-guide', description: 'Complete guide to intermittent fasting including 16:8, 5:2, and eat-stop-eat methods, scientific benefits, meal timing, and who should avoid it.', datePublished: '2026-03-17', dateModified: '2026-03-17', category: 'Health', relatedCalculatorSlugs: ['tdee-calculator', 'calorie-calculator'] },
   { title: 'How to Build an Emergency Fund: Step-by-Step Plan', slug: 'how-to-build-emergency-fund', description: 'Practical guide to building a 3-6 month emergency fund including how much to save, where to keep it, and strategies to reach your goal faster.', datePublished: '2026-03-17', dateModified: '2026-03-17', category: 'Finance', relatedCalculatorSlugs: ['savings-goal-calculator'] },
   { title: 'Home Workout Routine for Beginners: No Equipment Needed', slug: 'home-workout-routine-beginners', description: 'Complete bodyweight workout plan for beginners with warm-up, exercises for all muscle groups, cool-down stretches, and weekly progression schedule.', datePublished: '2026-03-17', dateModified: '2026-03-17', category: 'Health', relatedCalculatorSlugs: ['tdee-calculator', 'bmi-calculator'] },
-  { title: 'Understanding Macros: Protein, Carbs, and Fat Explained', slug: 'understanding-macros-guide', description: 'Learn what macronutrients are, how to calculate your ideal macro ratio for different goals, and how to track macros for weight loss or muscle gain.', datePublished: '2026-03-17', dateModified: '2026-03-17', category: 'Health', relatedCalculatorSlugs: ['macro-calculator', 'tdee-calculator'] },
   { title: 'How to Pay Off Student Loans Faster: 10 Strategies', slug: 'how-to-pay-off-student-loans', description: 'Proven strategies to pay off student loans faster including refinancing, income-driven plans, employer assistance, and the avalanche vs snowball approach.', datePublished: '2026-03-17', dateModified: '2026-03-17', category: 'Finance', relatedCalculatorSlugs: ['student-loan-calculator', 'debt-payoff-calculator'] },
   { title: 'Tax Filing Guide for Beginners: What You Need to Know', slug: 'tax-filing-guide-beginners', description: 'Step-by-step tax filing guide covering W-2 vs 1099, standard vs itemized deductions, tax brackets, common credits, and filing deadlines for 2026.', datePublished: '2026-03-17', dateModified: '2026-03-17', category: 'Finance', relatedCalculatorSlugs: ['tax-calculator', 'take-home-pay-calculator'] },
-  { title: 'How Much Water Should You Drink Per Day?', slug: 'how-much-water-per-day', description: 'Science-based guide to daily water intake including the 8x8 rule myth, factors affecting hydration needs, signs of dehydration, and tips to drink more water.', datePublished: '2026-03-17', dateModified: '2026-03-17', category: 'Health', relatedCalculatorSlugs: ['water-intake-calculator'] },
   { title: 'Rent vs Buy a Home: Complete Financial Comparison', slug: 'rent-vs-buy-comparison', description: 'Detailed financial analysis of renting vs buying including break-even timeline, hidden costs of homeownership, opportunity cost of down payment, and regional factors.', datePublished: '2026-03-17', dateModified: '2026-03-17', category: 'Finance', relatedCalculatorSlugs: ['rent-vs-buy-calculator', 'mortgage-calculator', 'rent-affordability-calculator'] },
   { title: 'Best Stretching Routine for Flexibility: 15-Minute Daily Plan', slug: 'stretching-routine-flexibility', description: 'Complete 15-minute daily stretching routine targeting all major muscle groups with detailed instructions, hold times, and progression tips.', datePublished: '2026-03-17', dateModified: '2026-03-17', category: 'Health', relatedCalculatorSlugs: ['bmi-calculator'] },
   { title: 'Google Sheets Formulas: 25 Must-Know Functions', slug: 'google-sheets-formulas-guide', description: 'Master essential Google Sheets formulas including VLOOKUP, QUERY, ARRAYFORMULA, IMPORTRANGE, and data analysis functions with practical examples.', datePublished: '2026-03-17', dateModified: '2026-03-17', category: 'Technology', relatedCalculatorSlugs: [] },
+  // Insurance Sprint (March 2026)
+  { title: 'How Much Life Insurance Do I Need? A Complete Guide', slug: 'how-much-life-insurance-do-i-need', description: 'Calculate your life insurance needs using the DIME method, income replacement rule, and life-stage analysis. Includes step-by-step examples and cost estimates.', datePublished: '2026-03-19', dateModified: '2026-03-19', category: 'Finance', relatedCalculatorSlugs: ['life-insurance-calculator', 'term-vs-whole-life-calculator'] },
+  { title: 'Term Life vs Whole Life Insurance: Which Is Better for You?', slug: 'term-life-vs-whole-life-insurance', description: 'Compare term life and whole life insurance with real premium examples, pros and cons, and the buy-term-invest-difference strategy explained with math.', datePublished: '2026-03-19', dateModified: '2026-03-19', category: 'Finance', relatedCalculatorSlugs: ['term-vs-whole-life-calculator', 'life-insurance-calculator', 'investment-calculator'] },
+  { title: 'How Much Car Insurance Do I Need? Coverage Guide by State', slug: 'how-much-car-insurance-do-i-need', description: 'State minimum car insurance requirements, coverage types explained, and how to choose the right liability limits. Includes a 10-state requirements table.', datePublished: '2026-03-19', dateModified: '2026-03-19', category: 'Finance', relatedCalculatorSlugs: ['auto-insurance-calculator'] },
+  { title: 'Homeowners Insurance Guide: What It Covers and How Much You Need', slug: 'homeowners-insurance-guide', description: 'Complete homeowners insurance guide covering dwelling, personal property, liability, what is NOT covered, replacement cost vs ACV, and 10 ways to lower your premium.', datePublished: '2026-03-19', dateModified: '2026-03-19', category: 'Finance', relatedCalculatorSlugs: ['home-insurance-calculator', 'mortgage-calculator'] },
+  { title: 'Is Renters Insurance Worth It? Cost vs Benefits Explained', slug: 'renters-insurance-worth-it', description: 'Is renters insurance worth $15-30/month? See what it covers, real claim scenarios, what it does not cover, and how to get the cheapest rate.', datePublished: '2026-03-19', dateModified: '2026-03-19', category: 'Finance', relatedCalculatorSlugs: ['renters-insurance-calculator', 'home-insurance-calculator'] },
 ];
 
 export function getArticlesForCalculator(calculatorSlug: string): BlogArticle[] {

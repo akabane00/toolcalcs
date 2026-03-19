@@ -63,6 +63,12 @@ export const categories: Category[] = [
     description: 'Zodiac sign, tarot reading, numerology, angel numbers, and compatibility tools for self-discovery.',
     icon: '🔮',
   },
+  {
+    name: 'Insurance Calculators',
+    slug: 'insurance-calculators',
+    description: 'Life insurance needs, auto insurance, home insurance, renters insurance, and term vs whole life comparison tools.',
+    icon: '🛡️',
+  },
 ];
 
 export const calculators: Calculator[] = [
@@ -1036,6 +1042,47 @@ export const calculators: Calculator[] = [
     category: 'Everyday Calculators',
     categorySlug: 'everyday-calculators',
     icon: '⏱️',
+  },
+  // Insurance Calculators
+  {
+    title: 'Life Insurance Calculator',
+    slug: 'life-insurance-calculator',
+    description: 'Calculate how much life insurance coverage you need based on income, debts, dependents, and existing assets.',
+    category: 'Insurance Calculators',
+    categorySlug: 'insurance-calculators',
+    icon: '🛡️',
+  },
+  {
+    title: 'Term vs Whole Life Insurance Calculator',
+    slug: 'term-vs-whole-life-calculator',
+    description: 'Compare term life vs whole life insurance costs and benefits. See which policy type saves you more money.',
+    category: 'Insurance Calculators',
+    categorySlug: 'insurance-calculators',
+    icon: '📋',
+  },
+  {
+    title: 'Auto Insurance Calculator',
+    slug: 'auto-insurance-calculator',
+    description: 'Estimate your car insurance premium based on coverage type, deductible, vehicle value, and driving history.',
+    category: 'Insurance Calculators',
+    categorySlug: 'insurance-calculators',
+    icon: '🚗',
+  },
+  {
+    title: 'Home Insurance Calculator',
+    slug: 'home-insurance-calculator',
+    description: 'Estimate your homeowners insurance cost based on home value, location, coverage level, and deductible.',
+    category: 'Insurance Calculators',
+    categorySlug: 'insurance-calculators',
+    icon: '🏠',
+  },
+  {
+    title: 'Renters Insurance Calculator',
+    slug: 'renters-insurance-calculator',
+    description: 'Calculate how much renters insurance you need and estimate your monthly premium for personal property and liability.',
+    category: 'Insurance Calculators',
+    categorySlug: 'insurance-calculators',
+    icon: '🏢',
   },
 ];
 

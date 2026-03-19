@@ -1,0 +1,387 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Insurance Calculators",
+        "item": "https://toolcalcs.com/insurance-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Renters Insurance Calculator"
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How much does renters insurance typically cost?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Renters insurance typically costs between $15 and $30 per month, or $180 to $360 per year. The exact cost depends on where you live, the value of your personal property, your chosen liability limit, and your deductible. Urban renters in high-crime areas pay more, while rural renters in low-risk areas often pay less than $15 per month."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What does renters insurance cover?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Renters insurance covers three main things: personal property (your belongings like furniture, electronics, and clothing damaged or stolen), liability (if someone is injured in your apartment or you accidentally damage someone else's property), and loss of use or additional living expenses (temporary housing costs if your unit becomes uninhabitable due to a covered event like fire or water damage)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is renters insurance worth it?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, renters insurance is almost always worth it. At $15 to $30 per month, the cost is minimal compared to the financial protection it provides. A single burglary, fire, or water damage event can result in thousands of dollars of losses. Liability coverage alone can save you from devastating lawsuits. Many renters are surprised to learn that their landlord's insurance does not cover their personal belongings at all."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Renters Insurance Calculator - Estimate Your Monthly Premium"
+  description="Free renters insurance calculator. Estimate your monthly and annual renters insurance cost based on personal property value, liability coverage, and location."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/insurance-calculators/">Insurance Calculators</a> &rsaquo;
+    <span>Renters Insurance Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Renters Insurance Calculator</h1>
+  <p class="page-desc">Estimate your monthly and annual renters insurance premium based on your personal property value, liability coverage, location, and optional riders.</p>
+
+  <!-- Calculator Tool -->
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="propertyValue">Personal Property Value ($)</label>
+        <input type="number" id="propertyValue" value="20000" min="0" step="1000" />
+        <span class="input-hint">Estimate the total replacement value of your belongings</span>
+      </div>
+      <div class="input-group">
+        <label for="liabilityCoverage">Liability Coverage</label>
+        <select id="liabilityCoverage">
+          <option value="25000">$25,000</option>
+          <option value="100000" selected>$100,000</option>
+          <option value="300000">$300,000</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="deductible">Deductible</label>
+        <select id="deductible">
+          <option value="250">$250 (lower deductible, higher premium)</option>
+          <option value="500" selected>$500 (standard)</option>
+          <option value="1000">$1,000 (higher deductible, lower premium)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="location">Location / Risk Level</label>
+        <select id="location">
+          <option value="0.8">Low-risk (rural / small town)</option>
+          <option value="1.0" selected>Medium-risk (suburban)</option>
+          <option value="1.3">High-risk (urban / high-crime area)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label class="group-label">Optional Riders</label>
+        <div class="checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="electronicsRider" />
+            <span>Electronics rider <em>(+$5/mo)</em> — covers laptops, cameras, gaming consoles</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="jewelryRider" />
+            <span>Jewelry rider <em>(+$3/mo)</em> — covers rings, watches, fine jewelry</span>
+          </label>
+        </div>
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate Premium</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Monthly Premium</span>
+          <span class="result-value" id="monthlyPremium">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Annual Premium</span>
+          <span class="result-value" id="annualPremium">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Personal Property Coverage</span>
+          <span class="result-value" id="propertyCoverage">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Liability Coverage</span>
+          <span class="result-value" id="liabilityDisplay">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Deductible</span>
+          <span class="result-value" id="deductibleDisplay">$0</span>
+        </div>
+      </div>
+      <p class="result-note" id="avgNote"></p>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <!-- SEO Content Article -->
+  <article class="content-section">
+
+    <h2>What Does Renters Insurance Cover?</h2>
+    <p>Renters insurance is a type of property and liability insurance designed for tenants who do not own the property they live in. Unlike homeowners insurance, which covers the building structure, renters insurance focuses exclusively on your personal belongings and personal liability. A standard renters insurance policy — often called HO-4 insurance — includes three core types of protection.</p>
+    <p><strong>Personal property coverage</strong> pays to repair or replace your belongings if they are damaged, destroyed, or stolen. This includes furniture, clothing, electronics, kitchen appliances, books, sporting equipment, and other items you own. Most policies cover losses from a defined list of "named perils" that includes fire, smoke, lightning, theft, vandalism, windstorm, and water damage from burst pipes. Note that standard flood and earthquake damage are typically excluded and require separate policies.</p>
+    <p><strong>Liability coverage</strong> protects you financially if someone is injured while visiting your home or if you accidentally damage someone else's property. For example, if a guest slips on your wet floor and sues you, your renters insurance liability coverage pays for legal defense costs and any resulting settlement up to your policy limit. Liability also covers incidents that occur outside your home — such as accidentally breaking a neighbor's window or your dog biting someone at the park.</p>
+    <p><strong>Loss of use coverage</strong>, also called additional living expenses (ALE), pays for temporary housing, meals, and other extra costs if your rental unit becomes uninhabitable due to a covered event like a fire or burst pipe. If your apartment burns down and you need to stay in a hotel for three weeks, your policy covers the hotel bill and other reasonable expenses above your normal cost of living.</p>
+    <p>Some policies also include <strong>medical payments to others</strong>, a no-fault coverage that pays small medical bills for guests injured in your home regardless of who is at fault. This is designed to resolve minor claims quickly without involving liability litigation.</p>
+
+    <h2>How Much Renters Insurance Do You Need?</h2>
+    <p>The right amount of renters insurance coverage depends on two primary factors: the total value of your personal property and your financial exposure to liability. Here is how to determine the right coverage levels for each.</p>
+    <h3>Personal Property Coverage</h3>
+    <p>Start by taking a home inventory. Walk through your rental unit and estimate the replacement cost of everything you own — furniture, electronics, clothing, kitchenware, books, sports equipment, and so on. Many renters underestimate the value of their belongings. A quick room-by-room assessment often reveals $20,000 to $30,000 or more in total property value, even for someone with a modest lifestyle.</p>
+    <p>When you have a total, choose a coverage amount that fully protects you. It is better to be over-insured than under-insured, because the additional premium cost for an extra $10,000 of coverage is usually only a few dollars per month. Most insurers also offer the choice between:</p>
+    <ul>
+      <li><strong>Actual Cash Value (ACV):</strong> Pays what your items were worth at the time of the loss, accounting for depreciation. A 5-year-old TV that cost $800 new may only be worth $200 under ACV.</li>
+      <li><strong>Replacement Cost Value (RCV):</strong> Pays what it costs to replace the item with a new equivalent today. Premiums are slightly higher, but the payout is significantly better after a loss.</li>
+    </ul>
+    <p>Replacement cost coverage is almost always worth the small additional premium.</p>
+    <h3>Liability Coverage</h3>
+    <p>Most renters insurance policies offer liability limits of $25,000, $100,000, or $300,000. The increase in premium from $25,000 to $100,000 of liability is typically only $1 to $2 per month, making the higher limit an easy choice. If you have significant assets to protect or frequently entertain guests, consider $300,000 of coverage or an additional umbrella policy. Our <a href="/insurance-calculators/auto-insurance-calculator/">auto insurance calculator</a> can also help you understand how umbrella policies interact with other coverage types.</p>
+
+    <h2>Average Renters Insurance Cost by State</h2>
+    <p>Renters insurance rates vary considerably by state, primarily due to differences in weather risk, crime rates, and the local cost of living. According to recent industry data, the national average cost of renters insurance is approximately $18 to $22 per month, or about $216 to $264 per year. However, your actual rate can be significantly higher or lower depending on where you live.</p>
+    <p>States with the highest average renters insurance premiums include Mississippi, Louisiana, Oklahoma, and Texas, where extreme weather events like tornadoes, hurricanes, and hailstorms are common. Renters in these states may pay $25 to $35 per month or more for standard coverage.</p>
+    <p>States with the lowest average premiums include North Dakota, South Dakota, Wisconsin, and Iowa, where severe weather is less frequent and urban crime rates tend to be lower. Renters in these states can often find policies for $10 to $15 per month.</p>
+    <p>Even within a state, your ZIP code matters enormously. An apartment in downtown Los Angeles or New York City will command a much higher premium than a comparable apartment in a small suburb of the same state, due to higher theft rates, greater population density, and higher costs of temporary housing if your unit becomes uninhabitable.</p>
+    <p>Here is a general breakdown of average monthly renters insurance costs by risk tier:</p>
+    <ul>
+      <li><strong>Low-risk areas (rural, small towns):</strong> $10 to $15 per month</li>
+      <li><strong>Medium-risk areas (suburban):</strong> $15 to $22 per month</li>
+      <li><strong>High-risk areas (urban, high crime):</strong> $22 to $35 per month</li>
+    </ul>
+    <p>These figures assume standard coverage of around $20,000 in personal property with a $500 deductible and $100,000 in liability. Higher coverage limits and lower deductibles will increase your premium accordingly.</p>
+
+    <h2>What Is NOT Covered by Renters Insurance</h2>
+    <p>Understanding the exclusions in your renters insurance policy is just as important as understanding what it covers. Many renters are surprised to discover coverage gaps after a loss. Here are the most common items that standard renters insurance does not cover.</p>
+    <p><strong>Floods.</strong> Standard renters insurance does not cover damage caused by flooding, whether from a nearby river overflowing, storm surge from a hurricane, or heavy rain overwhelming local drainage. If you live in a flood-prone area, you can purchase separate flood insurance through the National Flood Insurance Program (NFIP) or private insurers.</p>
+    <p><strong>Earthquakes.</strong> Earthquake damage is typically excluded from standard policies. Renters in seismically active areas like California, Oregon, Washington, and Alaska should consider a standalone earthquake insurance policy.</p>
+    <p><strong>Roommate's belongings.</strong> Your renters insurance only covers your own personal property. If you have a roommate, they need to purchase their own separate renters insurance policy to have their belongings covered.</p>
+    <p><strong>High-value items above the sublimit.</strong> Most policies have sublimits for specific categories of high-value items such as jewelry, fine art, musical instruments, firearms, and collectibles. For example, a policy might cover jewelry losses up to $1,500 total, even if your coverage limit is $30,000. If you own items that exceed these sublimits, you need to purchase a separate scheduled personal property rider (sometimes called a floater) for adequate protection.</p>
+    <p><strong>Your car.</strong> Damage to your vehicle is not covered by renters insurance. However, if items are stolen from your car, they may be covered under your personal property coverage. Vehicle damage must be covered by your <a href="/insurance-calculators/auto-insurance-calculator/">auto insurance</a> policy.</p>
+    <p><strong>Business property and liability.</strong> If you run a home business, your business equipment and business liability are typically excluded from your personal renters policy. Business owners often need a separate home business endorsement or commercial policy.</p>
+    <p><strong>Your landlord's structure and property.</strong> Renters insurance covers your stuff, not the building itself. Your landlord is responsible for insuring the structure of the building, the walls, flooring, and roof. However, if you accidentally cause damage to the landlord's property — like leaving a bathtub overflowing and damaging the floor — your liability coverage may help pay for those repairs.</p>
+
+    <h2>How to Choose the Right Deductible</h2>
+    <p>Your deductible is the amount you pay out of pocket before your insurance kicks in on a covered claim. Choosing the right deductible is a balancing act between your monthly premium and your financial preparedness to handle a loss.</p>
+    <p>Common renters insurance deductibles range from $250 to $1,000. Here is how the choice affects both your premium and your claims experience:</p>
+    <ul>
+      <li><strong>$250 deductible:</strong> Higher monthly premium, but you pay less out of pocket when you file a claim. Best if you have limited savings and would struggle to cover a large unexpected expense. However, small claims become more tempting to file, which can lead to premium increases at renewal.</li>
+      <li><strong>$500 deductible:</strong> The most common choice, offering a balance between monthly cost and out-of-pocket risk. Most renters can absorb a $500 loss without severe financial strain.</li>
+      <li><strong>$1,000 deductible:</strong> The lowest monthly premium option. If your property is worth $20,000 and the lower premium saves you $3 per month compared to a $500 deductible, you would need to go without a claim for about 42 months to "break even" on the deductible risk. Suitable for renters with a healthy emergency fund who rarely need to file claims.</li>
+    </ul>
+    <p>A useful rule of thumb: set your deductible at an amount you could comfortably pay from your emergency fund without hardship. If your emergency fund is $500, stick with a $500 deductible. If you have $1,500 or more in savings, a higher deductible may make financial sense. For a deeper dive on this decision, see our guide on <a href="/blog/understanding-insurance-deductibles/">understanding insurance deductibles</a>.</p>
+
+    <h2>Tips to Lower Your Renters Insurance Premium</h2>
+    <p>Renters insurance is already one of the most affordable types of insurance available, but there are still ways to reduce your premium without sacrificing important protection.</p>
+    <ol>
+      <li><strong>Bundle with auto insurance.</strong> Purchasing renters and auto insurance from the same company is one of the most effective ways to save money. Multi-policy discounts typically range from 5% to 15% on both policies. Use our <a href="/insurance-calculators/auto-insurance-calculator/">auto insurance calculator</a> to understand your full insurance picture. If you also own a home, compare with a <a href="/insurance-calculators/home-insurance-calculator/">home insurance calculator</a> for bundling options.</li>
+      <li><strong>Install safety devices.</strong> Many insurers offer discounts for security measures like deadbolt locks, burglar alarm systems, smoke detectors, fire extinguishers, and sprinkler systems. Let your insurer know about any safety features in your apartment — some discounts are applied automatically, while others require you to ask.</li>
+      <li><strong>Raise your deductible.</strong> Increasing your deductible from $500 to $1,000 can reduce your monthly premium by $3 to $5 or more, depending on your insurer and location. Only do this if you have an adequate emergency fund to cover the higher out-of-pocket cost.</li>
+      <li><strong>Maintain a good credit score.</strong> In most states, insurers use credit-based insurance scores as one factor in setting premiums. Renters with excellent credit typically pay lower premiums than those with poor credit. Paying bills on time and keeping credit utilization low can help improve your insurance score over time.</li>
+      <li><strong>Shop around annually.</strong> Renters insurance rates vary significantly between companies for identical coverage. Get quotes from at least three insurers when your policy comes up for renewal. Prices can change from year to year, and loyalty does not always save you money.</li>
+      <li><strong>Ask about all available discounts.</strong> Common discounts include being a non-smoker, being over 55 years old, being a student with good grades, being a member of certain professional or alumni associations, and having no prior claims history. Always ask your insurer what discounts you may qualify for — they are not always proactively offered.</li>
+      <li><strong>Only insure what you need.</strong> Review your coverage annually. If you moved to a smaller apartment with fewer belongings, or if you sold expensive items, lower your coverage limit accordingly. Do not pay to insure items you no longer own.</li>
+      <li><strong>Pay annually instead of monthly.</strong> Some insurers charge a monthly installment fee if you pay your premium monthly. Paying the full year upfront can save you $5 to $15 per year, depending on the insurer.</li>
+    </ol>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>How much does renters insurance typically cost?</summary>
+        <p>Renters insurance typically costs between $15 and $30 per month, or $180 to $360 per year. The national average is around $18 to $22 per month for a standard policy with $20,000 in personal property coverage, $100,000 in liability, and a $500 deductible. Your actual cost will vary based on your location, the total value of your belongings, your chosen coverage limits, and any optional riders you add.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What does renters insurance cover?</summary>
+        <p>Renters insurance covers three main areas: personal property (your belongings like furniture, electronics, and clothing if they are stolen or damaged by a covered event like fire, smoke, or burst pipes), personal liability (if someone is injured in your home or you accidentally damage others' property), and loss of use or additional living expenses (temporary housing costs if your unit becomes uninhabitable). Floods and earthquakes are typically not covered and require separate policies.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Is renters insurance worth it?</summary>
+        <p>Yes, renters insurance is almost always worth the cost. At $15 to $30 per month, a single covered event — like a burglary, apartment fire, or water damage from a burst pipe — can easily result in losses worth thousands of dollars. Many renters assume their landlord's insurance covers their belongings, but it does not. The landlord's policy only covers the building structure. Renters insurance is one of the most cost-effective financial protections available.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Does my landlord require renters insurance?</summary>
+        <p>Many landlords do require tenants to carry renters insurance as a condition of the lease. This protects both parties — if you accidentally cause a fire or water leak, your liability coverage can pay for damages to the building or neighboring units, which protects the landlord from having to file claims on their own policy. Even when not required, renters insurance is strongly recommended for every tenant.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can I get renters insurance if I have roommates?</summary>
+        <p>It depends. Some insurers will allow you to add a roommate to your policy, but most standard renters insurance policies only cover the named policyholder's belongings. Your roommate's personal property, and their share of the liability, would not be covered under your policy. It is generally safest for each roommate to carry their own separate renters insurance policy to ensure everyone is fully protected.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How quickly can I get renters insurance?</summary>
+        <p>Renters insurance can often be purchased online in less than 10 minutes and coverage can begin the same day. Many major insurers — including State Farm, Allstate, Lemonade, GEICO, and Progressive — offer instant online quotes and same-day policy issuance. If your landlord requires proof of insurance before move-in, this is rarely an obstacle since you can obtain coverage so quickly and easily.</p>
+      </details>
+    </div>
+
+  </article>
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+
+  <RelatedArticles calculatorSlug="renters-insurance-calculator" />
+  <RelatedCalculators currentSlug="renters-insurance-calculator" />
+
+</BaseLayout>
+
+<style>
+  .input-hint {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    margin-top: 4px;
+  }
+  .group-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 8px;
+  }
+  .checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--color-text);
+    line-height: 1.4;
+  }
+  .checkbox-label input[type="checkbox"] {
+    margin-top: 2px;
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--color-primary);
+  }
+  .checkbox-label em {
+    color: var(--color-primary);
+    font-style: normal;
+    font-weight: 600;
+  }
+  .result-note {
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    margin-top: 12px;
+    text-align: center;
+    font-style: italic;
+  }
+  .last-updated {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin: 4px 0 0;
+  }
+</style>
+
+<script>
+  function formatCurrency(n) {
+    return '$' + Math.round(n).toLocaleString('en-US');
+  }
+
+  function calculate() {
+    var propertyValue = parseFloat(document.getElementById('propertyValue').value) || 0;
+    var liabilityCoverage = parseInt(document.getElementById('liabilityCoverage').value) || 100000;
+    var deductible = parseInt(document.getElementById('deductible').value) || 500;
+    var locationMultiplier = parseFloat(document.getElementById('location').value) || 1.0;
+    var electronicsRider = document.getElementById('electronicsRider').checked;
+    var jewelryRider = document.getElementById('jewelryRider').checked;
+
+    // Base rate: property value * 0.006 / 12
+    var base = (propertyValue * 0.006) / 12;
+
+    // Liability adjustment
+    var liabilityAdj = 0;
+    if (liabilityCoverage === 100000) liabilityAdj = 2;
+    else if (liabilityCoverage === 300000) liabilityAdj = 5;
+
+    // Deductible adjustment
+    var deductibleAdj = 0;
+    if (deductible === 250) deductibleAdj = 3;
+    else if (deductible === 1000) deductibleAdj = -3;
+
+    // Rider costs
+    var riderCost = 0;
+    if (electronicsRider) riderCost += 5;
+    if (jewelryRider) riderCost += 3;
+
+    // Monthly = (base + liability + deductible + riders) * location
+    var monthly = (base + liabilityAdj + deductibleAdj + riderCost) * locationMultiplier;
+
+    // Clamp to a reasonable minimum
+    if (monthly < 5) monthly = 5;
+
+    var annual = monthly * 12;
+
+    document.getElementById('monthlyPremium').textContent = formatCurrency(monthly) + '/mo';
+    document.getElementById('annualPremium').textContent = formatCurrency(annual) + '/yr';
+    document.getElementById('propertyCoverage').textContent = formatCurrency(propertyValue);
+    document.getElementById('liabilityDisplay').textContent = formatCurrency(liabilityCoverage);
+    document.getElementById('deductibleDisplay').textContent = formatCurrency(deductible);
+
+    var noteEl = document.getElementById('avgNote');
+    if (monthly >= 15 && monthly <= 30) {
+      noteEl.textContent = 'Your estimate is within the national average of $15\u2013$30/month.';
+    } else if (monthly < 15) {
+      noteEl.textContent = 'Your estimate is below the national average of $15\u2013$30/month, reflecting low-risk factors.';
+    } else {
+      noteEl.textContent = 'Your estimate is above the national average of $15\u2013$30/month, reflecting higher coverage or risk level.';
+    }
+  }
+
+  document.getElementById('calculateBtn').addEventListener('click', calculate);
+
+  // Auto-calculate on any input change
+  ['propertyValue', 'liabilityCoverage', 'deductible', 'location', 'electronicsRider', 'jewelryRider'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('change', calculate);
+      if (el.type !== 'checkbox') {
+        el.addEventListener('input', calculate);
+      }
+    }
+  });
+
+  // Auto-calculate on load
+  calculate();
+</script>
