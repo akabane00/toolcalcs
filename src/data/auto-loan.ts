@@ -17,9 +17,9 @@ export interface AutoLoanPage {
   schedule: { month: number; payment: number; principal: number; interest: number; balance: number }[];
 }
 
-var LOAN_AMOUNTS = [5000, 8000, 10000, 12000, 15000, 18000, 20000, 25000, 30000, 35000, 40000, 45000, 50000, 60000, 70000, 80000];
-var RATES = [3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.9, 12];
-var TERMS = [36, 48, 60, 72, 84]; // months
+var LOAN_AMOUNTS = [5000, 10000, 15000, 20000, 25000, 30000, 40000, 50000];
+var RATES = [4.5, 5.5, 6.5, 7.5, 9.9];
+var TERMS = [36, 48, 60, 72]; // months
 
 function round2(n: number): number {
   return Math.round(n * 100) / 100;

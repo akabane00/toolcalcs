@@ -22,11 +22,11 @@ export interface GcfLcmPage {
   relationship: string;      // "12 × 18 = 216 = 6 × 36"
 }
 
-// All pairs from [2..30]
+// All pairs from [2..15]
 function smallPairs(): [number, number][] {
   const pairs: [number, number][] = [];
-  for (let a = 2; a <= 30; a++) {
-    for (let b = a + 1; b <= 30; b++) {
+  for (let a = 2; a <= 15; a++) {
+    for (let b = a + 1; b <= 15; b++) {
       pairs.push([a, b]);
     }
   }
@@ -79,7 +79,7 @@ function buildAllPages(): GcfLcmPage[] {
   const seen = new Set<string>();
   const pages: GcfLcmPage[] = [];
 
-  const allPairs = [...smallPairs(), ...mediumPairs(), ...EXTRA_PAIRS];
+  const allPairs = [...smallPairs(), ...EXTRA_PAIRS];
 
   for (const [a, b] of allPairs) {
     const numA = Math.min(a, b);

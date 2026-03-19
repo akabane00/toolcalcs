@@ -64,7 +64,7 @@ const PAIRS: [number, number][] = [
   [150, 100], [200, 100],
 ];
 
-const GRID_WHOLES = [10, 20, 25, 50, 75, 100, 150, 200, 250, 500];
+const GRID_WHOLES = [10, 25, 50, 100];
 
 function buildPage(x: number, y: number): WhatPercentPage {
   const pct = (x / y) * 100;
@@ -103,7 +103,7 @@ export function getAllWhatPercentPages(): WhatPercentPage[] {
 
   // Grid-generated pairs
   for (const y of GRID_WHOLES) {
-    for (var x = 1; x <= 50; x++) {
+    for (var x = 1; x <= 20; x++) {
       if (x >= y) continue;
       const slug = `${x}-of-${y}`;
       if (seen.has(slug)) continue;

@@ -31,58 +31,39 @@ const INGREDIENTS: Ingredient[] = [
   // Flours
   { name: 'All-Purpose Flour', slug: 'flour', gramsPerCup: 120, category: 'Flours & Starches' },
   { name: 'Bread Flour', slug: 'bread-flour', gramsPerCup: 127, category: 'Flours & Starches' },
-  { name: 'Cake Flour', slug: 'cake-flour', gramsPerCup: 114, category: 'Flours & Starches' },
   { name: 'Almond Flour', slug: 'almond-flour', gramsPerCup: 96, category: 'Flours & Starches' },
-  { name: 'Coconut Flour', slug: 'coconut-flour', gramsPerCup: 112, category: 'Flours & Starches' },
-  { name: 'Cornstarch', slug: 'cornstarch', gramsPerCup: 128, category: 'Flours & Starches' },
-  { name: 'Cornmeal', slug: 'cornmeal', gramsPerCup: 150, category: 'Flours & Starches' },
 
   // Sugars
   { name: 'Granulated Sugar', slug: 'sugar', gramsPerCup: 200, category: 'Sugars & Sweeteners' },
   { name: 'Brown Sugar (packed)', slug: 'brown-sugar', gramsPerCup: 220, category: 'Sugars & Sweeteners' },
   { name: 'Powdered Sugar', slug: 'powdered-sugar', gramsPerCup: 120, category: 'Sugars & Sweeteners' },
   { name: 'Honey', slug: 'honey', gramsPerCup: 340, category: 'Sugars & Sweeteners' },
-  { name: 'Maple Syrup', slug: 'maple-syrup', gramsPerCup: 312, category: 'Sugars & Sweeteners' },
 
   // Fats & Oils
   { name: 'Butter', slug: 'butter', gramsPerCup: 227, category: 'Fats & Oils' },
   { name: 'Vegetable Oil', slug: 'vegetable-oil', gramsPerCup: 218, category: 'Fats & Oils' },
-  { name: 'Olive Oil', slug: 'olive-oil', gramsPerCup: 216, category: 'Fats & Oils' },
-  { name: 'Coconut Oil', slug: 'coconut-oil', gramsPerCup: 218, category: 'Fats & Oils' },
 
   // Dairy
   { name: 'Milk', slug: 'milk', gramsPerCup: 244, category: 'Dairy' },
   { name: 'Heavy Cream', slug: 'heavy-cream', gramsPerCup: 238, category: 'Dairy' },
-  { name: 'Cream Cheese', slug: 'cream-cheese', gramsPerCup: 232, category: 'Dairy' },
-  { name: 'Yogurt', slug: 'yogurt', gramsPerCup: 245, category: 'Dairy' },
-  { name: 'Sour Cream', slug: 'sour-cream', gramsPerCup: 230, category: 'Dairy' },
 
   // Grains & Others
   { name: 'Rice (uncooked)', slug: 'rice', gramsPerCup: 185, category: 'Grains & Dry Goods' },
   { name: 'Rolled Oats', slug: 'oats', gramsPerCup: 90, category: 'Grains & Dry Goods' },
-  { name: 'Breadcrumbs', slug: 'breadcrumbs', gramsPerCup: 108, category: 'Grains & Dry Goods' },
   { name: 'Chocolate Chips', slug: 'chocolate-chips', gramsPerCup: 170, category: 'Grains & Dry Goods' },
-  { name: 'Peanut Butter', slug: 'peanut-butter', gramsPerCup: 258, category: 'Grains & Dry Goods' },
 
   // Liquids & Basics
-  { name: 'Water', slug: 'water', gramsPerCup: 237, category: 'Liquids & Basics' },
   { name: 'Cocoa Powder', slug: 'cocoa-powder', gramsPerCup: 86, category: 'Liquids & Basics' },
-  { name: 'Salt (table)', slug: 'salt', gramsPerCup: 288, category: 'Liquids & Basics' },
-  { name: 'Baking Powder', slug: 'baking-powder', gramsPerCup: 230, category: 'Liquids & Basics' },
 ];
 
-const GRAM_AMOUNTS = [25, 50, 75, 100, 125, 150, 175, 200, 250, 300, 400, 500];
+const GRAM_AMOUNTS = [50, 100, 150, 200, 300, 500];
 
 const CUP_AMOUNTS: { value: number; display: string; slug: string }[] = [
   { value: 0.25, display: '1/4 cup', slug: 'quarter-cup' },
-  { value: 1 / 3, display: '1/3 cup', slug: 'third-cup' },
   { value: 0.5, display: '1/2 cup', slug: 'half-cup' },
-  { value: 2 / 3, display: '2/3 cup', slug: 'two-thirds-cup' },
-  { value: 0.75, display: '3/4 cup', slug: 'three-quarters-cup' },
   { value: 1, display: '1 cup', slug: '1-cup' },
   { value: 1.5, display: '1 1/2 cups', slug: '1-and-half-cups' },
   { value: 2, display: '2 cups', slug: '2-cups' },
-  { value: 3, display: '3 cups', slug: '3-cups' },
 ];
 
 function round1(n: number): number {

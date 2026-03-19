@@ -33,7 +33,7 @@ function toDecimal(num: number, den: number): string {
 }
 
 // Generate target fractions
-const TARGET_DENOMINATORS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 20, 24, 25, 32, 40, 50, 100];
+const TARGET_DENOMINATORS = [2, 3, 4, 5, 6, 8, 10, 12];
 
 let _cache: FractionPage[] | null = null;
 

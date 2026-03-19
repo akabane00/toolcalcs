@@ -14,7 +14,7 @@ export interface GradeScorePage {
   passFail: string;     // "Pass"
 }
 
-export const GRADE_TOTALS = [5, 8, 10, 12, 15, 20, 25, 30, 35, 40, 45, 50, 60, 75, 80, 100, 120, 150, 200];
+export const GRADE_TOTALS = [10, 20, 25, 50, 100];
 
 const letterGradeScale = [
   { min: 97, grade: 'A+', gpa: '4.0' },

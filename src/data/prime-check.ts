@@ -20,9 +20,9 @@ export interface PrimeCheckPage {
   digitSum: number;
 }
 
-// 1-1000 continuous range for comprehensive coverage
+// 1-100 continuous range for comprehensive coverage
 const TARGET_NUMBERS = [
-  ...Array.from({ length: 1000 }, (_, i) => i + 1),
+  ...Array.from({ length: 100 }, (_, i) => i + 1),
 ];
 
 function getDigitSum(n: number): number {

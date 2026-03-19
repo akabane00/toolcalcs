@@ -156,8 +156,8 @@ function capitalize(s: string): string {
 // --- Target numbers ---
 
 const targetNumbers: number[] = [
-  // 1-500 continuous
-  ...Array.from({ length: 500 }, (_, i) => i + 1),
+  // 1-100 continuous
+  ...Array.from({ length: 100 }, (_, i) => i + 1),
   // Hundreds above 500
   600, 700, 800, 900,
   // Thousands
