@@ -69,6 +69,12 @@ export const categories: Category[] = [
     description: 'Life insurance needs, auto insurance, home insurance, renters insurance, and term vs whole life comparison tools.',
     icon: '🛡️',
   },
+  {
+    name: 'Tax Calculators',
+    slug: 'tax-calculators',
+    description: 'Federal income tax, self-employment tax, capital gains, tax withholding, sales tax, and property tax calculators.',
+    icon: '🧾',
+  },
 ];
 
 export const calculators: Calculator[] = [
@@ -1083,6 +1089,55 @@ export const calculators: Calculator[] = [
     category: 'Insurance Calculators',
     categorySlug: 'insurance-calculators',
     icon: '🏢',
+  },
+  // Tax Calculators
+  {
+    title: 'Federal Income Tax Calculator',
+    slug: 'federal-income-tax-calculator',
+    description: 'Calculate your 2026 federal income tax using current tax brackets. See your effective tax rate, marginal rate, and full tax breakdown.',
+    category: 'Tax Calculators',
+    categorySlug: 'tax-calculators',
+    icon: '🏛️',
+  },
+  {
+    title: 'Self-Employment Tax Calculator',
+    slug: 'self-employment-tax-calculator',
+    description: 'Calculate self-employment tax (Social Security + Medicare), the SE deduction, and your total tax bill as a freelancer or contractor.',
+    category: 'Tax Calculators',
+    categorySlug: 'tax-calculators',
+    icon: '💼',
+  },
+  {
+    title: 'Capital Gains Tax Calculator',
+    slug: 'capital-gains-tax-calculator',
+    description: 'Estimate capital gains tax on stocks, real estate, and other assets. Compare short-term vs long-term rates by income level.',
+    category: 'Tax Calculators',
+    categorySlug: 'tax-calculators',
+    icon: '📈',
+  },
+  {
+    title: 'Tax Withholding Calculator',
+    slug: 'tax-withholding-calculator',
+    description: 'Find out if you are withholding enough from your paycheck to avoid a tax bill — or if you are over-withholding and giving the IRS a free loan.',
+    category: 'Tax Calculators',
+    categorySlug: 'tax-calculators',
+    icon: '📋',
+  },
+  {
+    title: 'Sales Tax Calculator',
+    slug: 'sales-tax-calculator',
+    description: 'Add or remove sales tax from any price. Includes current sales tax rates for all 50 states and major cities.',
+    category: 'Tax Calculators',
+    categorySlug: 'tax-calculators',
+    icon: '🛒',
+  },
+  {
+    title: 'Property Tax Calculator',
+    slug: 'property-tax-calculator',
+    description: 'Estimate annual property taxes based on home value and local tax rate. See how your bill breaks down and compare rates by state.',
+    category: 'Tax Calculators',
+    categorySlug: 'tax-calculators',
+    icon: '🏡',
   },
 ];
 

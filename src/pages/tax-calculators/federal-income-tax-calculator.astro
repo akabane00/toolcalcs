@@ -1,0 +1,342 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tax Calculators", "item": "https://toolcalcs.com/tax-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Federal Income Tax Calculator" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "What are the 2026 federal income tax brackets?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "For 2026, the federal income tax brackets for single filers are: 10% on income up to $11,925; 12% on $11,926–$48,475; 22% on $48,476–$103,350; 24% on $103,351–$197,300; 32% on $197,301–$250,525; 35% on $250,526–$626,350; and 37% on income over $626,350. Married filing jointly thresholds are roughly double for most brackets. These are marginal rates — you only pay each rate on the income within that bracket."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "What is the difference between marginal and effective tax rate?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Your marginal tax rate is the rate applied to your last dollar of income — the highest bracket you fall into. Your effective tax rate is your total tax bill divided by your total taxable income. Because the U.S. uses a progressive (bracketed) system, your effective rate is always lower than your marginal rate. For example, if your marginal rate is 22%, your effective rate might be 14% because much of your income was taxed at lower rates of 10% and 12%."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "What is the standard deduction for 2026?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "For tax year 2026, the standard deduction is $15,000 for single filers, $30,000 for married filing jointly, and $22,500 for heads of household. These amounts are adjusted annually for inflation. The standard deduction reduces your taxable income dollar-for-dollar. About 90% of Americans take the standard deduction rather than itemizing because it is larger for most people."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Federal Income Tax Calculator 2026 - Estimate Your Tax Bill"
+  description="Free 2026 federal income tax calculator. Enter your income, filing status, and deductions to estimate your tax bill, effective tax rate, and marginal bracket."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/tax-calculators/">Tax Calculators</a> &rsaquo;
+    <span>Federal Income Tax Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Federal Income Tax Calculator 2026</h1>
+  <p class="page-desc">Estimate your 2026 federal income tax using current IRS tax brackets. See your effective tax rate, marginal rate, and full bracket breakdown.</p>
+
+  <div class="calc-box">
+    <div class="calc-grid-2">
+      <div class="input-group">
+        <label for="income">Annual Gross Income</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="income" value="75000" min="0" max="10000000" step="1000" /></div>
+      </div>
+      <div class="input-group">
+        <label for="filing">Filing Status</label>
+        <select id="filing">
+          <option value="single">Single</option>
+          <option value="mfj">Married Filing Jointly</option>
+          <option value="mfs">Married Filing Separately</option>
+          <option value="hoh">Head of Household</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="deduction">Deduction Type</label>
+        <select id="deduction">
+          <option value="standard">Standard Deduction</option>
+          <option value="itemized">Itemized Deductions</option>
+        </select>
+      </div>
+      <div class="input-group" id="itemized-group" style="display:none">
+        <label for="itemized">Total Itemized Deductions</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="itemized" value="0" min="0" max="1000000" step="500" /></div>
+      </div>
+      <div class="input-group">
+        <label for="credits">Tax Credits</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="credits" value="0" min="0" max="50000" step="100" /></div>
+      </div>
+    </div>
+    <button class="calc-btn" id="calcBtn">Calculate My Tax</button>
+
+    <div class="results" id="results" style="display:none">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <div class="result-label">Estimated Tax Bill</div>
+          <div class="result-value" id="res-tax">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Effective Tax Rate</div>
+          <div class="result-value" id="res-effective">0%</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Marginal Rate</div>
+          <div class="result-value" id="res-marginal">0%</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Taxable Income</div>
+          <div class="result-value" id="res-taxable">$0</div>
+        </div>
+      </div>
+      <div class="breakdown-table" id="bracket-breakdown"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <RelatedCalculators currentSlug="federal-income-tax-calculator" />
+
+  <article class="seo-content">
+    <h2>How Federal Income Tax Works in 2026</h2>
+    <p>The United States uses a <strong>progressive tax system</strong>, meaning different portions of your income are taxed at different rates. This is often misunderstood — being in the "22% tax bracket" does not mean all your income is taxed at 22%. It means only the income above the 22% threshold is taxed at that rate.</p>
+
+    <h3>2026 Federal Tax Brackets</h3>
+    <p>For the 2026 tax year, the IRS adjusted the brackets upward for inflation:</p>
+
+    <h4>Single Filers</h4>
+    <div class="data-table">
+      <table>
+        <thead><tr><th>Taxable Income</th><th>Tax Rate</th><th>Tax Owed</th></tr></thead>
+        <tbody>
+          <tr><td>$0 – $11,925</td><td>10%</td><td>Up to $1,192.50</td></tr>
+          <tr><td>$11,926 – $48,475</td><td>12%</td><td>Up to $4,386</td></tr>
+          <tr><td>$48,476 – $103,350</td><td>22%</td><td>Up to $12,072.50</td></tr>
+          <tr><td>$103,351 – $197,300</td><td>24%</td><td>Up to $22,548</td></tr>
+          <tr><td>$197,301 – $250,525</td><td>32%</td><td>Up to $17,030.40</td></tr>
+          <tr><td>$250,526 – $626,350</td><td>35%</td><td>Up to $131,529.25</td></tr>
+          <tr><td>Over $626,350</td><td>37%</td><td>37% on every dollar above</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4>Married Filing Jointly</h4>
+    <div class="data-table">
+      <table>
+        <thead><tr><th>Taxable Income</th><th>Tax Rate</th></tr></thead>
+        <tbody>
+          <tr><td>$0 – $23,850</td><td>10%</td></tr>
+          <tr><td>$23,851 – $96,950</td><td>12%</td></tr>
+          <tr><td>$96,951 – $206,700</td><td>22%</td></tr>
+          <tr><td>$206,701 – $394,600</td><td>24%</td></tr>
+          <tr><td>$394,601 – $501,050</td><td>32%</td></tr>
+          <tr><td>$501,051 – $751,600</td><td>35%</td></tr>
+          <tr><td>Over $751,600</td><td>37%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Standard Deduction for 2026</h3>
+    <p>Before applying tax brackets, you subtract your deductions from gross income to get <strong>taxable income</strong>. The standard deduction for 2026 is:</p>
+    <ul>
+      <li><strong>Single / Married Filing Separately:</strong> $15,000</li>
+      <li><strong>Married Filing Jointly:</strong> $30,000</li>
+      <li><strong>Head of Household:</strong> $22,500</li>
+    </ul>
+    <p>If your itemized deductions (mortgage interest, state taxes, charitable gifts) exceed the standard deduction, itemizing saves you more money. For most people, the standard deduction wins.</p>
+
+    <h3>Marginal vs. Effective Tax Rate — A Key Distinction</h3>
+    <p>Consider a single filer earning $80,000:</p>
+    <ul>
+      <li>Taxable income after standard deduction: $80,000 – $15,000 = <strong>$65,000</strong></li>
+      <li>10% on first $11,925 = $1,192.50</li>
+      <li>12% on $11,926–$48,475 = $4,386.00</li>
+      <li>22% on $48,476–$65,000 = $3,635.28</li>
+      <li><strong>Total tax: $9,213.78</strong></li>
+      <li><strong>Marginal rate:</strong> 22% (highest bracket reached)</li>
+      <li><strong>Effective rate:</strong> $9,213.78 / $80,000 = <strong>11.5%</strong></li>
+    </ul>
+    <p>This distinction matters for financial planning. Many people avoid raises or income because they fear "going into a higher tax bracket" — but only the income above the threshold gets taxed at the higher rate.</p>
+
+    <h3>Tax Credits vs. Tax Deductions</h3>
+    <p>These are not the same thing. Understanding the difference can save you money:</p>
+    <ul>
+      <li><strong>Tax deduction:</strong> Reduces your taxable income. A $1,000 deduction saves you $1,000 × your marginal rate (e.g., $220 in the 22% bracket).</li>
+      <li><strong>Tax credit:</strong> Directly reduces your tax bill dollar-for-dollar. A $1,000 tax credit saves you exactly $1,000 regardless of your bracket.</li>
+    </ul>
+    <p>Common federal tax credits include the Child Tax Credit (up to $2,000 per child), the Earned Income Tax Credit (for low-to-moderate income earners), the American Opportunity Credit (for college tuition), and the Saver's Credit (for retirement contributions).</p>
+
+    <h3>What Is NOT Included in This Calculator</h3>
+    <p>This tool estimates your <em>federal</em> income tax only. Your total tax obligation typically includes:</p>
+    <ul>
+      <li><strong>State income tax:</strong> Varies widely — from 0% (Texas, Florida) to over 13% (California). Use our state-specific resources to estimate.</li>
+      <li><strong>FICA taxes:</strong> Social Security (6.2% up to $176,100) and Medicare (1.45%) are withheld separately from wages.</li>
+      <li><strong>Self-employment tax:</strong> If you're self-employed, use our <a href="/tax-calculators/self-employment-tax-calculator/">Self-Employment Tax Calculator</a>.</li>
+      <li><strong>Alternative Minimum Tax (AMT):</strong> A parallel tax system that may apply to higher-income earners with many deductions.</li>
+    </ul>
+
+    <h3>How to Reduce Your Federal Income Tax</h3>
+    <p>Legal tax reduction strategies include:</p>
+    <ul>
+      <li><strong>Maximize retirement contributions:</strong> 401(k) contributions reduce your taxable income. The 2026 limit is $23,500 ($31,000 if 50+). IRA contributions may also be deductible.</li>
+      <li><strong>Contribute to an HSA:</strong> Health Savings Account contributions are fully deductible. The 2026 limit is $4,300 (individual) or $8,550 (family).</li>
+      <li><strong>Harvest capital losses:</strong> Selling investments at a loss offsets capital gains, reducing your taxable income.</li>
+      <li><strong>Bunch deductions:</strong> If your itemized deductions are close to the standard deduction, consider bunching two years of charitable donations into one year to exceed the threshold.</li>
+      <li><strong>Take advantage of tax credits:</strong> Many credits are overlooked. The Child and Dependent Care Credit, Education Credits, and Lifetime Learning Credit are worth reviewing.</li>
+    </ul>
+
+    <h3>When to Use This Calculator</h3>
+    <p>This federal income tax estimator is most useful for:</p>
+    <ul>
+      <li>Tax planning mid-year to avoid underpayment penalties</li>
+      <li>Comparing financial decisions (job offer salary differences, Roth vs traditional IRA)</li>
+      <li>Understanding how a pay raise actually affects your take-home pay</li>
+      <li>Estimating whether to itemize or take the standard deduction</li>
+    </ul>
+    <p>For precise filing, use IRS Form 1040 or tax software. This calculator provides a close estimate for planning purposes but does not capture every tax situation.</p>
+  </article>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <h3>What are the 2026 federal income tax brackets?</h3>
+        <p>For single filers: 10% up to $11,925; 12% up to $48,475; 22% up to $103,350; 24% up to $197,300; 32% up to $250,525; 35% up to $626,350; 37% above $626,350. Married filing jointly thresholds are roughly double. These are marginal rates applied only to income within each bracket.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What is the difference between marginal and effective tax rate?</h3>
+        <p>Your marginal rate is the tax rate on your last dollar of income — the highest bracket you reach. Your effective rate is total taxes divided by total income. Because the U.S. system is progressive, your effective rate is always lower. A person in the 22% bracket might have an effective rate of only 12–14%.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What is the standard deduction for 2026?</h3>
+        <p>$15,000 for single filers, $30,000 for married filing jointly, and $22,500 for heads of household. About 90% of filers take the standard deduction. You should only itemize if your deductible expenses (mortgage interest, state taxes capped at $10,000, charitable donations) exceed these amounts.</p>
+      </div>
+    </div>
+  </section>
+
+  <RelatedArticles calculatorSlug="federal-income-tax-calculator" />
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  const brackets = {
+    single: [
+      { min: 0, max: 11925, rate: 0.10 },
+      { min: 11925, max: 48475, rate: 0.12 },
+      { min: 48475, max: 103350, rate: 0.22 },
+      { min: 103350, max: 197300, rate: 0.24 },
+      { min: 197300, max: 250525, rate: 0.32 },
+      { min: 250525, max: 626350, rate: 0.35 },
+      { min: 626350, max: Infinity, rate: 0.37 },
+    ],
+    mfj: [
+      { min: 0, max: 23850, rate: 0.10 },
+      { min: 23850, max: 96950, rate: 0.12 },
+      { min: 96950, max: 206700, rate: 0.22 },
+      { min: 206700, max: 394600, rate: 0.24 },
+      { min: 394600, max: 501050, rate: 0.32 },
+      { min: 501050, max: 751600, rate: 0.35 },
+      { min: 751600, max: Infinity, rate: 0.37 },
+    ],
+    mfs: [
+      { min: 0, max: 11925, rate: 0.10 },
+      { min: 11925, max: 48475, rate: 0.12 },
+      { min: 48475, max: 103350, rate: 0.22 },
+      { min: 103350, max: 197300, rate: 0.24 },
+      { min: 197300, max: 250525, rate: 0.32 },
+      { min: 250525, max: 375800, rate: 0.35 },
+      { min: 375800, max: Infinity, rate: 0.37 },
+    ],
+    hoh: [
+      { min: 0, max: 17000, rate: 0.10 },
+      { min: 17000, max: 64850, rate: 0.12 },
+      { min: 64850, max: 103350, rate: 0.22 },
+      { min: 103350, max: 197300, rate: 0.24 },
+      { min: 197300, max: 250500, rate: 0.32 },
+      { min: 250500, max: 626350, rate: 0.35 },
+      { min: 626350, max: Infinity, rate: 0.37 },
+    ],
+  };
+
+  const stdDeductions = { single: 15000, mfj: 30000, mfs: 15000, hoh: 22500 };
+
+  function fmt(n) {
+    return '$' + Math.round(n).toLocaleString('en-US');
+  }
+
+  function calcTax(taxable, filing) {
+    var bracks = brackets[filing];
+    var tax = 0;
+    var marginal = 0;
+    var details = [];
+    for (var i = 0; i < bracks.length; i++) {
+      var b = bracks[i];
+      if (taxable <= b.min) break;
+      var taxed = Math.min(taxable, b.max) - b.min;
+      var amount = taxed * b.rate;
+      tax += amount;
+      marginal = b.rate;
+      details.push({ rate: b.rate, min: b.min, max: b.max, taxed: taxed, amount: amount });
+    }
+    return { tax: tax, marginal: marginal, details: details };
+  }
+
+  document.getElementById('deduction').addEventListener('change', function() {
+    document.getElementById('itemized-group').style.display = this.value === 'itemized' ? '' : 'none';
+  });
+
+  document.getElementById('calcBtn').addEventListener('click', function() {
+    var income = parseFloat(document.getElementById('income').value) || 0;
+    var filing = document.getElementById('filing').value;
+    var deducType = document.getElementById('deduction').value;
+    var credits = parseFloat(document.getElementById('credits').value) || 0;
+
+    var deduction = deducType === 'standard' ? stdDeductions[filing] :
+      (parseFloat(document.getElementById('itemized').value) || 0);
+
+    var taxable = Math.max(0, income - deduction);
+    var result = calcTax(taxable, filing);
+    var totalTax = Math.max(0, result.tax - credits);
+    var effective = income > 0 ? (totalTax / income * 100) : 0;
+
+    document.getElementById('res-tax').textContent = fmt(totalTax);
+    document.getElementById('res-effective').textContent = effective.toFixed(1) + '%';
+    document.getElementById('res-marginal').textContent = (result.marginal * 100).toFixed(0) + '%';
+    document.getElementById('res-taxable').textContent = fmt(taxable);
+
+    var html = '<h3 style="margin:20px 0 10px">Bracket Breakdown</h3><table class="amort-table"><thead><tr><th>Rate</th><th>Income in Bracket</th><th>Tax</th></tr></thead><tbody>';
+    for (var i = 0; i < result.details.length; i++) {
+      var d = result.details[i];
+      html += '<tr><td>' + (d.rate * 100).toFixed(0) + '%</td><td>' + fmt(d.taxed) + '</td><td>' + fmt(d.amount) + '</td></tr>';
+    }
+    html += '</tbody></table>';
+    document.getElementById('bracket-breakdown').innerHTML = html;
+    document.getElementById('results').style.display = '';
+  });
+</script>

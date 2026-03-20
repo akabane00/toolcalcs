@@ -1,0 +1,270 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tax Calculators", "item": "https://toolcalcs.com/tax-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Sales Tax Calculator" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "Which states have no sales tax?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Five states have no statewide sales tax: Alaska, Delaware, Montana, New Hampshire, and Oregon. However, Alaska allows local jurisdictions to impose their own sales taxes, so some Alaska localities do charge sales tax. Delaware has no sales tax but does charge a gross receipts tax on businesses. All other 45 states plus Washington D.C. have statewide sales taxes."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "What is the highest sales tax rate in the US?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "When combined state and local rates are considered, Louisiana and Tennessee consistently have the highest average combined rates, around 9.5–9.6%. Some specific localities can be even higher — for example, certain cities in Alabama, Oklahoma, and Illinois can exceed 10–11% when local rates are added. California has the highest base state rate at 7.25%, plus local add-ons that can push combined rates above 10%."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "Is sales tax deductible on federal taxes?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Yes, if you itemize deductions. Under the SALT (State and Local Tax) deduction, you can deduct either state and local income taxes OR state and local sales taxes paid during the year — but not both. The total SALT deduction is capped at $10,000 per year ($5,000 if married filing separately). For most people who pay more in income taxes than sales taxes, the income tax deduction is more valuable."
+        }
+      }
+    ]
+  }
+];
+
+// State sales tax rates (2026)
+const stateTaxRates: Record<string, number> = {
+  AL: 4.0, AK: 0.0, AZ: 5.6, AR: 6.5, CA: 7.25, CO: 2.9, CT: 6.35,
+  DE: 0.0, FL: 6.0, GA: 4.0, HI: 4.0, ID: 6.0, IL: 6.25, IN: 7.0,
+  IA: 6.0, KS: 6.5, KY: 6.0, LA: 4.45, ME: 5.5, MD: 6.0, MA: 6.25,
+  MI: 6.0, MN: 6.875, MS: 7.0, MO: 4.225, MT: 0.0, NE: 5.5, NV: 6.85,
+  NH: 0.0, NJ: 6.625, NM: 5.125, NY: 4.0, NC: 4.75, ND: 5.0, OH: 5.75,
+  OK: 4.5, OR: 0.0, PA: 6.0, RI: 7.0, SC: 6.0, SD: 4.2, TN: 7.0,
+  TX: 6.25, UT: 4.85, VT: 6.0, VA: 4.3, WA: 6.5, WV: 6.0, WI: 5.0,
+  WY: 4.0, DC: 6.0
+};
+
+const stateOptions = [
+  ['AL','Alabama'],['AK','Alaska'],['AZ','Arizona'],['AR','Arkansas'],['CA','California'],
+  ['CO','Colorado'],['CT','Connecticut'],['DE','Delaware'],['FL','Florida'],['GA','Georgia'],
+  ['HI','Hawaii'],['ID','Idaho'],['IL','Illinois'],['IN','Indiana'],['IA','Iowa'],
+  ['KS','Kansas'],['KY','Kentucky'],['LA','Louisiana'],['ME','Maine'],['MD','Maryland'],
+  ['MA','Massachusetts'],['MI','Michigan'],['MN','Minnesota'],['MS','Mississippi'],['MO','Missouri'],
+  ['MT','Montana'],['NE','Nebraska'],['NV','Nevada'],['NH','New Hampshire'],['NJ','New Jersey'],
+  ['NM','New Mexico'],['NY','New York'],['NC','North Carolina'],['ND','North Dakota'],['OH','Ohio'],
+  ['OK','Oklahoma'],['OR','Oregon'],['PA','Pennsylvania'],['RI','Rhode Island'],['SC','South Carolina'],
+  ['SD','South Dakota'],['TN','Tennessee'],['TX','Texas'],['UT','Utah'],['VT','Vermont'],
+  ['VA','Virginia'],['WA','Washington'],['WV','West Virginia'],['WI','Wisconsin'],['WY','Wyoming'],
+  ['DC','Washington D.C.']
+];
+
+const stateRatesJson = JSON.stringify(stateTaxRates);
+---
+
+<BaseLayout
+  title="Sales Tax Calculator 2026 - Calculate Sales Tax by State"
+  description="Calculate sales tax for any US state. Enter price and state to find the tax amount and total cost. Includes all 50 state sales tax rates for 2026."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/tax-calculators/">Tax Calculators</a> &rsaquo;
+    <span>Sales Tax Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Sales Tax Calculator 2026</h1>
+  <p class="page-desc">Calculate sales tax for any US state. Enter the price and your state to see the tax amount and total cost — or work backwards from a tax-inclusive price.</p>
+
+  <div class="calc-box">
+    <div class="calc-grid-2">
+      <div class="input-group">
+        <label for="st-price">Price (Before Tax)</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="st-price" value="100" min="0" max="1000000" step="1" /></div>
+      </div>
+      <div class="input-group">
+        <label for="st-state">State</label>
+        <select id="st-state">
+          {stateOptions.map(([code, name]) => (
+            <option value={code} selected={code === 'CA'}>{name}</option>
+          ))}
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="st-local">Local Tax Rate (optional)</label>
+        <div class="input-prefix"><span>+</span><input type="number" id="st-local" value="1.25" min="0" max="10" step="0.25" /><span style="margin-left:4px">%</span></div>
+        <small>Add your city/county rate if known</small>
+      </div>
+      <div class="input-group">
+        <label for="st-mode">Calculation Mode</label>
+        <select id="st-mode">
+          <option value="add">Add tax to price</option>
+          <option value="reverse">Remove tax from total</option>
+        </select>
+      </div>
+    </div>
+    <button class="calc-btn" id="calcBtnST">Calculate Sales Tax</button>
+
+    <div class="results" id="results-st" style="display:none">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <div class="result-label">Sales Tax Amount</div>
+          <div class="result-value" id="res-st-tax">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Total Price</div>
+          <div class="result-value" id="res-st-total">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">State Tax Rate</div>
+          <div class="result-value" id="res-st-state-rate">0%</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Combined Tax Rate</div>
+          <div class="result-value" id="res-st-combined-rate">0%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+  <RelatedCalculators currentSlug="sales-tax-calculator" />
+
+  <article class="seo-content">
+    <h2>US Sales Tax Guide 2026</h2>
+    <p>Sales tax is a consumption tax collected by retailers at the point of sale and remitted to state and local governments. Unlike a federal income tax, sales tax is administered at the state level — meaning rates, rules, and exemptions vary significantly by location.</p>
+
+    <h3>How Sales Tax Works</h3>
+    <p>When you make a purchase in most states, the retailer collects sales tax on top of the purchase price. The retailer holds these funds and periodically remits them to the state tax authority. Online purchases are also taxable in most states following the 2018 Supreme Court decision in <em>South Dakota v. Wayfair</em>, which allowed states to require out-of-state sellers to collect sales tax even without a physical presence.</p>
+
+    <h3>2026 State Sales Tax Rates</h3>
+    <div class="data-table">
+      <table>
+        <thead><tr><th>State</th><th>State Rate</th><th>Avg. Local Rate</th><th>Avg. Combined</th></tr></thead>
+        <tbody>
+          <tr><td>California</td><td>7.25%</td><td>1.57%</td><td>8.82%</td></tr>
+          <tr><td>Texas</td><td>6.25%</td><td>1.94%</td><td>8.19%</td></tr>
+          <tr><td>New York</td><td>4.00%</td><td>4.52%</td><td>8.52%</td></tr>
+          <tr><td>Florida</td><td>6.00%</td><td>1.04%</td><td>7.04%</td></tr>
+          <tr><td>Tennessee</td><td>7.00%</td><td>2.55%</td><td>9.55%</td></tr>
+          <tr><td>Louisiana</td><td>4.45%</td><td>5.10%</td><td>9.55%</td></tr>
+          <tr><td>Oregon</td><td>0.00%</td><td>0.00%</td><td>0.00%</td></tr>
+          <tr><td>Delaware</td><td>0.00%</td><td>0.00%</td><td>0.00%</td></tr>
+          <tr><td>Montana</td><td>0.00%</td><td>0.00%</td><td>0.00%</td></tr>
+          <tr><td>New Hampshire</td><td>0.00%</td><td>0.00%</td><td>0.00%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>States With No Sales Tax</h3>
+    <p>Five states have no statewide sales tax:</p>
+    <ul>
+      <li><strong>Alaska</strong> — No state tax, but local jurisdictions may impose up to 7.5%</li>
+      <li><strong>Delaware</strong> — No sales tax; has a gross receipts tax on businesses instead</li>
+      <li><strong>Montana</strong> — No sales tax; some resort areas impose local taxes</li>
+      <li><strong>New Hampshire</strong> — No general sales tax; taxed on meals and room rentals (9%)</li>
+      <li><strong>Oregon</strong> — No sales tax at state or local level</li>
+    </ul>
+
+    <h3>Common Sales Tax Exemptions</h3>
+    <p>Most states exempt certain categories from sales tax:</p>
+    <ul>
+      <li><strong>Groceries:</strong> Most states exempt unprepared food. Exceptions include Alabama, Mississippi, and South Dakota which tax groceries at full rate.</li>
+      <li><strong>Prescription drugs:</strong> Exempt in almost all states.</li>
+      <li><strong>Medical equipment:</strong> Usually exempt or taxed at reduced rates.</li>
+      <li><strong>Clothing:</strong> Some states (Minnesota, New York, Pennsylvania) exempt most clothing purchases.</li>
+      <li><strong>Agricultural supplies:</strong> Typically exempt in farming states.</li>
+      <li><strong>Manufacturing equipment:</strong> Often exempt or reduced to encourage economic activity.</li>
+    </ul>
+
+    <h3>Sales Tax Holidays</h3>
+    <p>Many states run annual <strong>sales tax holidays</strong> — brief periods (usually a weekend) when certain items are exempt from sales tax. Common categories include:</p>
+    <ul>
+      <li>Back-to-school clothing and supplies (August)</li>
+      <li>Energy-efficient appliances</li>
+      <li>Hurricane preparedness supplies</li>
+      <li>Firearms and hunting supplies (in some states)</li>
+    </ul>
+    <p>In 2025, over 20 states ran back-to-school tax holidays, with purchases up to specified dollar limits exempt from state and sometimes local sales tax.</p>
+
+    <h3>Online Purchases and Sales Tax</h3>
+    <p>Since the 2018 <em>South Dakota v. Wayfair</em> ruling, states can require online retailers to collect sales tax even without a physical store in the state. Most major online retailers (Amazon, Walmart, Target) now collect sales tax in all states that have it. Smaller online sellers may not collect if they fall below the state's economic nexus threshold (typically $100,000 in sales or 200 transactions annually).</p>
+
+    <h3>Reverse Sales Tax Calculation</h3>
+    <p>If you already paid a tax-inclusive price and want to find the pre-tax price:</p>
+    <p><strong>Pre-tax price = Total price ÷ (1 + tax rate)</strong></p>
+    <p>Example: You paid $107 total. Tax rate is 7%. Pre-tax price = $107 ÷ 1.07 = $100.00.</p>
+  </article>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <h3>Which states have no sales tax?</h3>
+        <p>Five states have no statewide sales tax: Alaska, Delaware, Montana, New Hampshire, and Oregon. Alaska allows local sales taxes, so some areas of Alaska do charge sales tax. All other 45 states plus Washington D.C. have statewide sales taxes ranging from 2.9% (Colorado) to 7.25% (California).</p>
+      </div>
+      <div class="faq-item">
+        <h3>What is the highest sales tax rate in the US?</h3>
+        <p>Louisiana and Tennessee have the highest average combined state + local rates, around 9.5–9.6%. Some specific localities in Alabama, Oklahoma, and Illinois exceed 10–11%. California has the highest base state rate at 7.25%, with local additions pushing some areas above 10%.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Is sales tax deductible on federal taxes?</h3>
+        <p>Yes, if you itemize. Under the SALT deduction, you can deduct either state/local income taxes OR state/local sales taxes — not both. The SALT deduction is capped at $10,000/year. Keep receipts or use the IRS optional sales tax tables to estimate your annual total without tracking every purchase.</p>
+      </div>
+    </div>
+  </section>
+
+  <RelatedArticles calculatorSlug="sales-tax-calculator" />
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<script define:vars={{ stateRatesJson }}>
+  var stateRates = JSON.parse(stateRatesJson);
+
+  function fmt(n) { return '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+  function fmtPct(n) { return n.toFixed(2) + '%'; }
+
+  document.getElementById('calcBtnST').addEventListener('click', function() {
+    var price = parseFloat(document.getElementById('st-price').value) || 0;
+    var state = document.getElementById('st-state').value;
+    var local = parseFloat(document.getElementById('st-local').value) || 0;
+    var mode = document.getElementById('st-mode').value;
+
+    var stateRate = stateRates[state] || 0;
+    var combinedRate = stateRate + local;
+    var combinedDecimal = combinedRate / 100;
+
+    var prePrice, taxAmount, total;
+    if (mode === 'add') {
+      prePrice = price;
+      taxAmount = prePrice * combinedDecimal;
+      total = prePrice + taxAmount;
+    } else {
+      // Reverse: price is the total (tax-inclusive)
+      total = price;
+      prePrice = total / (1 + combinedDecimal);
+      taxAmount = total - prePrice;
+    }
+
+    document.getElementById('res-st-tax').textContent = fmt(taxAmount);
+    document.getElementById('res-st-total').textContent = fmt(mode === 'add' ? total : prePrice);
+    document.getElementById('res-st-state-rate').textContent = fmtPct(stateRate);
+    document.getElementById('res-st-combined-rate').textContent = fmtPct(combinedRate);
+    document.getElementById('results-st').style.display = '';
+  });
+</script>

@@ -1,0 +1,227 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tax Calculators", "item": "https://toolcalcs.com/tax-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Property Tax Calculator" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "How is property tax calculated?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Property tax is calculated by multiplying the assessed value of your property by the local mill rate (tax rate). The formula is: Annual Property Tax = Assessed Value × Mill Rate ÷ 1,000. The assessed value is often a percentage of the market value (called the assessment ratio), which varies by jurisdiction. For example, if your home is worth $400,000, the assessment ratio is 80%, and the mill rate is 20, your tax is $400,000 × 0.80 × 20 ÷ 1,000 = $6,400."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "Which states have the highest property taxes?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "New Jersey consistently has the highest effective property tax rate in the US at around 2.23% of home value annually. Illinois (2.08%), Connecticut (2.06%), New Hampshire (1.89%), and Vermont (1.83%) also rank among the highest. In dollar terms, states with expensive real estate like New York, California, and Massachusetts often have among the highest absolute property tax bills, even if their effective rates are lower."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "Can I appeal my property tax assessment?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Yes. Most jurisdictions allow property owners to appeal their assessment if they believe it's inaccurate or unfair. The appeal process typically involves filing a formal appeal with your local assessor's office or a review board within a set deadline (often 30–90 days after receiving your assessment notice). You'll need to provide evidence such as recent comparable sales (comps), an independent appraisal, or evidence of errors in the property description. Many homeowners successfully reduce their assessments this way."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Property Tax Calculator 2026 - Estimate Annual Property Tax"
+  description="Calculate your annual property tax based on home value, assessment ratio, and local mill rate. Compare rates by state and learn how to appeal your assessment."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/tax-calculators/">Tax Calculators</a> &rsaquo;
+    <span>Property Tax Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Property Tax Calculator 2026</h1>
+  <p class="page-desc">Estimate your annual property tax using your home's market value, local assessment ratio, and mill rate. Understand what drives your property tax bill and how to reduce it.</p>
+
+  <div class="calc-box">
+    <div class="calc-grid-2">
+      <div class="input-group">
+        <label for="home-value">Home Market Value</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="home-value" value="400000" min="10000" max="10000000" step="5000" /></div>
+      </div>
+      <div class="input-group">
+        <label for="assess-ratio">Assessment Ratio</label>
+        <div class="input-prefix"><input type="number" id="assess-ratio" value="100" min="1" max="100" step="1" /><span style="margin-left:4px">%</span></div>
+        <small>Percent of market value that's taxed (varies by state)</small>
+      </div>
+      <div class="input-group">
+        <label for="mill-rate">Mill Rate (Tax Rate)</label>
+        <input type="number" id="mill-rate" value="15" min="0" max="100" step="0.1" />
+        <small>Mills = dollars of tax per $1,000 of assessed value</small>
+      </div>
+      <div class="input-group">
+        <label for="exemptions">Homestead / Other Exemptions</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="exemptions" value="0" min="0" max="500000" step="1000" /></div>
+        <small>Dollar amount deducted from assessed value</small>
+      </div>
+    </div>
+    <button class="calc-btn" id="calcBtnPT">Calculate Property Tax</button>
+
+    <div class="results" id="results-pt" style="display:none">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <div class="result-label">Annual Property Tax</div>
+          <div class="result-value" id="res-pt-annual">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Monthly Amount</div>
+          <div class="result-value" id="res-pt-monthly">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Assessed Value</div>
+          <div class="result-value" id="res-pt-assessed">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Effective Tax Rate</div>
+          <div class="result-value" id="res-pt-eff-rate">0%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+  <RelatedCalculators currentSlug="property-tax-calculator" />
+
+  <article class="seo-content">
+    <h2>Property Tax Guide 2026</h2>
+    <p>Property tax is an annual tax levied by local governments — counties, cities, school districts, and special districts — on the value of real estate you own. It's typically the largest source of local government revenue, funding schools, fire departments, roads, and other public services. Understanding how it's calculated can help you budget accurately and potentially reduce your bill.</p>
+
+    <h3>How Property Tax Is Calculated</h3>
+    <p>Property tax involves three key variables:</p>
+    <ol>
+      <li><strong>Market Value</strong> — What your property would sell for in an arm's-length transaction, as determined by your local assessor.</li>
+      <li><strong>Assessment Ratio</strong> — The percentage of market value that's used as the taxable base. Some states assess at 100% of market value; others use 60%, 80%, or other ratios.</li>
+      <li><strong>Mill Rate</strong> — The tax rate expressed in mills (one mill = $1 per $1,000 of assessed value). A 20-mill rate equals 2% of assessed value.</li>
+    </ol>
+    <p><strong>Formula:</strong> Annual Tax = (Market Value × Assessment Ratio − Exemptions) × Mill Rate ÷ 1,000</p>
+    <p><strong>Example:</strong> Home worth $400,000. Assessment ratio: 80%. Mill rate: 20. No exemptions.<br />
+    Assessed value = $400,000 × 80% = $320,000<br />
+    Annual tax = $320,000 × 20 ÷ 1,000 = $6,400</p>
+
+    <h3>Average Property Tax Rates by State (2026)</h3>
+    <div class="data-table">
+      <table>
+        <thead><tr><th>State</th><th>Avg. Effective Rate</th><th>Median Annual Tax</th></tr></thead>
+        <tbody>
+          <tr><td>New Jersey</td><td>2.23%</td><td>~$9,300</td></tr>
+          <tr><td>Illinois</td><td>2.08%</td><td>~$5,600</td></tr>
+          <tr><td>Connecticut</td><td>2.06%</td><td>~$6,200</td></tr>
+          <tr><td>New Hampshire</td><td>1.89%</td><td>~$6,100</td></tr>
+          <tr><td>Vermont</td><td>1.83%</td><td>~$5,100</td></tr>
+          <tr><td>Texas</td><td>1.68%</td><td>~$4,100</td></tr>
+          <tr><td>New York</td><td>1.62%</td><td>~$5,800</td></tr>
+          <tr><td>California</td><td>0.76%</td><td>~$4,800</td></tr>
+          <tr><td>Hawaii</td><td>0.32%</td><td>~$2,100</td></tr>
+          <tr><td>Alabama</td><td>0.41%</td><td>~$700</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Property Tax Exemptions</h3>
+    <p>Most jurisdictions offer exemptions that reduce your taxable assessed value:</p>
+    <ul>
+      <li><strong>Homestead exemption:</strong> The most common. Reduces assessed value for your primary residence, typically $25,000–$100,000. Florida offers a $50,000 homestead exemption.</li>
+      <li><strong>Senior citizen exemption:</strong> Many states offer reductions for homeowners above a certain age (usually 65+), often income-tested.</li>
+      <li><strong>Disability exemption:</strong> Available for disabled veterans and civilians in most states.</li>
+      <li><strong>Veterans exemption:</strong> Many jurisdictions exempt or reduce property taxes for veterans, especially those with service-related disabilities.</li>
+      <li><strong>Agricultural exemption:</strong> Land actively used for farming may qualify for lower agricultural assessment rates.</li>
+    </ul>
+
+    <h3>Property Tax Assessment Process</h3>
+    <p>Your local assessor (or assessment office) determines the market value of your property, typically through:</p>
+    <ul>
+      <li><strong>Mass appraisal:</strong> Computer-assisted mass appraisal (CAMA) using sales data from comparable properties, property characteristics, and statistical models.</li>
+      <li><strong>Physical inspection:</strong> Periodic on-site inspections to update property records for improvements or deterioration.</li>
+      <li><strong>Market sales:</strong> Actual sale prices in your area drive assessed values through comparable sales analysis.</li>
+    </ul>
+    <p>Reassessments happen on different schedules: annually in some states, every 2–5 years in others. Significant market movements between assessments can mean your property's market value and assessed value diverge substantially.</p>
+
+    <h3>How to Appeal Your Property Tax Assessment</h3>
+    <p>If you believe your assessment is too high — meaning your property is overvalued relative to what it would actually sell for — you can appeal:</p>
+    <ol>
+      <li><strong>Review your assessment notice:</strong> Check the details for errors (wrong square footage, bedroom count, lot size).</li>
+      <li><strong>Research comparable sales:</strong> Find 3–5 recent sales of similar properties in your area. If they sold for less than your assessed value, you have grounds to appeal.</li>
+      <li><strong>File the appeal:</strong> Submit to your local assessor's office or assessment review board within the deadline (typically 30–90 days after receiving your assessment).</li>
+      <li><strong>Present evidence:</strong> Bring comps, photos, your own appraisal, or documentation of needed repairs that affect value.</li>
+      <li><strong>Escalate if needed:</strong> If the local board denies your appeal, most states allow you to escalate to a state board or tax court.</li>
+    </ol>
+    <p>Studies suggest that 20–40% of properties are over-assessed, and the majority of homeowners who appeal successfully reduce their assessment. The process is free and typically takes a few hours of preparation.</p>
+
+    <h3>Property Tax and Your Mortgage</h3>
+    <p>If you have a mortgage, your lender likely collects property taxes via an <strong>escrow account</strong> as part of your monthly payment. Each month you pay roughly 1/12 of your annual property tax (plus homeowners insurance) into escrow. When taxes are due (often twice a year), your lender pays from escrow. Check your annual escrow statement for accuracy — assessment increases mean your monthly payment will rise at the next annual escrow review.</p>
+  </article>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <h3>How is property tax calculated?</h3>
+        <p>Multiply your home's assessed value (market value × assessment ratio) by the local mill rate, then divide by 1,000. Subtract any exemptions (homestead, senior, veteran) from the assessed value first. Example: $400,000 home × 80% assessment × 20 mills ÷ 1,000 = $6,400/year.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Which states have the highest property taxes?</h3>
+        <p>New Jersey (2.23%), Illinois (2.08%), and Connecticut (2.06%) have the highest effective property tax rates. The lowest rates are in Hawaii (0.32%), Alabama (0.41%), and Colorado (0.51%). Note that states with high home values (California, New York) often have high absolute dollar bills even with moderate rates.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Can I appeal my property tax assessment?</h3>
+        <p>Yes, and it's often worth trying. File a formal appeal with your local assessor's office within the deadline (usually 30–90 days after your assessment notice). Bring evidence: recent comparable sales at lower prices, a third-party appraisal, or documented errors in your property records. Around 30–40% of homeowners who appeal succeed in reducing their assessment.</p>
+      </div>
+    </div>
+  </section>
+
+  <RelatedArticles calculatorSlug="property-tax-calculator" />
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function fmt(n) { return '$' + Math.round(n).toLocaleString('en-US'); }
+
+  document.getElementById('calcBtnPT').addEventListener('click', function() {
+    var homeValue = parseFloat(document.getElementById('home-value').value) || 0;
+    var assessRatio = (parseFloat(document.getElementById('assess-ratio').value) || 100) / 100;
+    var millRate = parseFloat(document.getElementById('mill-rate').value) || 0;
+    var exemptions = parseFloat(document.getElementById('exemptions').value) || 0;
+
+    var assessedValue = homeValue * assessRatio;
+    var taxableValue = Math.max(0, assessedValue - exemptions);
+    var annualTax = taxableValue * millRate / 1000;
+    var monthlyTax = annualTax / 12;
+    var effRate = homeValue > 0 ? (annualTax / homeValue * 100) : 0;
+
+    document.getElementById('res-pt-annual').textContent = fmt(annualTax);
+    document.getElementById('res-pt-monthly').textContent = fmt(monthlyTax);
+    document.getElementById('res-pt-assessed').textContent = fmt(assessedValue);
+    document.getElementById('res-pt-eff-rate').textContent = effRate.toFixed(2) + '%';
+    document.getElementById('results-pt').style.display = '';
+  });
+</script>

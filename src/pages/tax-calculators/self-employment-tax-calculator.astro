@@ -1,0 +1,262 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tax Calculators", "item": "https://toolcalcs.com/tax-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Self-Employment Tax Calculator" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "What is the self-employment tax rate?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "The self-employment tax rate is 15.3% on net self-employment income up to the Social Security wage base ($176,100 in 2026). This breaks down as 12.4% for Social Security and 2.9% for Medicare. Above $176,100, only the 2.9% Medicare portion applies. High earners above $200,000 (single) or $250,000 (married) also pay an additional 0.9% Medicare surtax."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "Can I deduct the self-employment tax?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Yes. You can deduct half of your self-employment tax as an above-the-line deduction on your federal income tax return (Schedule 1 of Form 1040). This deduction reduces your adjusted gross income, lowering your income tax bill. If you owe $7,650 in self-employment tax, you can deduct $3,825 from your taxable income for income tax purposes."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "Do I have to pay self-employment tax if I earn under a certain amount?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "You must pay self-employment tax if your net self-employment income is $400 or more in a year. Below $400, no SE tax is owed (though income tax may still apply if your total income exceeds the filing threshold). This $400 threshold applies to net profit — gross revenue minus business expenses."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Self-Employment Tax Calculator 2026 - Freelancer & 1099 Tax"
+  description="Calculate your 2026 self-employment tax (Social Security + Medicare), the SE deduction, and your total tax bill as a freelancer, contractor, or small business owner."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/tax-calculators/">Tax Calculators</a> &rsaquo;
+    <span>Self-Employment Tax Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Self-Employment Tax Calculator 2026</h1>
+  <p class="page-desc">Estimate your self-employment tax (SE tax) as a freelancer, contractor, or small business owner. See your Social Security, Medicare, deductions, and total federal tax bill.</p>
+
+  <div class="calc-box">
+    <div class="calc-grid-2">
+      <div class="input-group">
+        <label for="net-income">Net Self-Employment Income</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="net-income" value="60000" min="0" max="2000000" step="1000" /></div>
+        <small>Revenue minus business expenses</small>
+      </div>
+      <div class="input-group">
+        <label for="other-income">Other Income (W-2, etc.)</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="other-income" value="0" min="0" max="2000000" step="1000" /></div>
+      </div>
+      <div class="input-group">
+        <label for="filing-se">Filing Status</label>
+        <select id="filing-se">
+          <option value="single">Single</option>
+          <option value="mfj">Married Filing Jointly</option>
+          <option value="hoh">Head of Household</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="deductions-se">Other Deductions / Credits</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="deductions-se" value="0" min="0" max="500000" step="500" /></div>
+        <small>401(k) contributions, HSA, etc.</small>
+      </div>
+    </div>
+    <button class="calc-btn" id="calcBtnSE">Calculate SE Tax</button>
+
+    <div class="results" id="results-se" style="display:none">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <div class="result-label">Self-Employment Tax</div>
+          <div class="result-value" id="res-se-tax">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">SE Tax Deduction (50%)</div>
+          <div class="result-value" id="res-se-ded">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Federal Income Tax</div>
+          <div class="result-value" id="res-income-tax">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Total Federal Tax</div>
+          <div class="result-value" id="res-total-tax">$0</div>
+        </div>
+      </div>
+      <div class="result-cards" style="margin-top:12px">
+        <div class="result-card">
+          <div class="result-label">Social Security Portion</div>
+          <div class="result-value" id="res-ss">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Medicare Portion</div>
+          <div class="result-value" id="res-medicare">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Effective Total Rate</div>
+          <div class="result-value" id="res-eff-rate">0%</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Quarterly Est. Payment</div>
+          <div class="result-value" id="res-quarterly">$0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+  <RelatedCalculators currentSlug="self-employment-tax-calculator" />
+
+  <article class="seo-content">
+    <h2>Self-Employment Tax: Everything Freelancers and Contractors Need to Know</h2>
+    <p>When you work as an employee, your employer pays half of your Social Security and Medicare taxes. When you're self-employed, you pay <strong>both halves</strong> — that's the self-employment (SE) tax. Understanding SE tax is essential for freelancers, consultants, gig workers, and small business owners.</p>
+
+    <h3>What Is Self-Employment Tax?</h3>
+    <p>Self-employment tax consists of two components:</p>
+    <ul>
+      <li><strong>Social Security tax:</strong> 12.4% on net self-employment income up to the wage base ($176,100 in 2026)</li>
+      <li><strong>Medicare tax:</strong> 2.9% on all net self-employment income (no cap)</li>
+    </ul>
+    <p>Combined, SE tax is <strong>15.3%</strong> up to the Social Security wage base, and 2.9% on everything above it. An additional 0.9% Medicare surtax applies to income over $200,000 (single) or $250,000 (married).</p>
+
+    <h3>How SE Tax Is Calculated</h3>
+    <p>The IRS computes SE tax on 92.35% of your net self-employment income, not the full amount. This is because employees pay their half of FICA on gross wages, but as a self-employed person, your "net" is after expenses. The 92.35% adjustment accounts for the employer portion being deductible.</p>
+    <p><strong>Formula:</strong> Net SE income × 0.9235 × 15.3% = SE tax</p>
+    <p><strong>Example:</strong> $80,000 net SE income × 0.9235 × 0.153 = $11,307 SE tax</p>
+
+    <h3>The Self-Employment Tax Deduction</h3>
+    <p>Here's a tax benefit that many self-employed people miss: you can deduct <strong>half of your SE tax</strong> as an above-the-line deduction on your income tax return. This reduces your adjusted gross income (AGI), which in turn lowers your federal income tax bill.</p>
+    <p>In the example above: $11,307 × 50% = $5,654 deduction. If you're in the 22% bracket, this saves you about $1,244 in income taxes.</p>
+
+    <h3>Quarterly Estimated Tax Payments</h3>
+    <p>Self-employed people don't have taxes withheld from a paycheck. Instead, you must make <strong>quarterly estimated tax payments</strong> to avoid a penalty at filing time. The 2026 due dates are:</p>
+    <ul>
+      <li>Q1: April 15, 2026</li>
+      <li>Q2: June 16, 2026</li>
+      <li>Q3: September 15, 2026</li>
+      <li>Q4: January 15, 2027</li>
+    </ul>
+    <p>The safe harbor rule lets you avoid penalties by paying either 100% of last year's tax liability or 90% of your current year's estimated tax, whichever is less.</p>
+
+    <h3>Self-Employed Retirement Deductions</h3>
+    <p>Self-employed individuals have access to powerful retirement account options that reduce taxable income:</p>
+    <ul>
+      <li><strong>Solo 401(k):</strong> Contribute up to $70,000 in 2026 (employee + employer contributions combined)</li>
+      <li><strong>SEP-IRA:</strong> Contribute up to 25% of net self-employment income, max $70,000</li>
+      <li><strong>SIMPLE IRA:</strong> Up to $16,500 employee deferrals in 2026</li>
+    </ul>
+    <p>These contributions reduce both your income tax and, in some cases, the base on which SE tax is calculated.</p>
+
+    <h3>Business Deductions That Reduce SE Tax</h3>
+    <p>Unlike W-2 employees, self-employed individuals can deduct legitimate business expenses that reduce their net self-employment income — which in turn reduces both income tax and SE tax:</p>
+    <ul>
+      <li>Home office deduction (actual expense or simplified $5/sq ft method)</li>
+      <li>Self-employed health insurance premiums (100% deductible above the line)</li>
+      <li>Business use of vehicle (standard mileage or actual expenses)</li>
+      <li>Professional subscriptions, software, and equipment</li>
+      <li>Professional development and education</li>
+      <li>Half of self-employment tax (automatic above-the-line deduction)</li>
+    </ul>
+  </article>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <h3>What is the self-employment tax rate?</h3>
+        <p>15.3% total — 12.4% for Social Security (on income up to $176,100) and 2.9% for Medicare (on all income). Above $176,100, only the 2.9% Medicare portion applies. High earners also pay an additional 0.9% Medicare surtax above $200,000 (single) or $250,000 (married).</p>
+      </div>
+      <div class="faq-item">
+        <h3>Can I deduct the self-employment tax?</h3>
+        <p>Yes — you deduct exactly 50% of your SE tax as an above-the-line deduction on Form 1040, Schedule 1. This mimics the employee experience where employers pay half of FICA taxes. The deduction reduces your AGI and therefore your income tax bill.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Do I have to pay SE tax if I earn under $400?</h3>
+        <p>No. If your net self-employment income is under $400 for the year, no SE tax is owed. However, you may still owe federal income tax if your total income exceeds the filing threshold ($15,000 for single filers in 2026).</p>
+      </div>
+    </div>
+  </section>
+
+  <RelatedArticles calculatorSlug="self-employment-tax-calculator" />
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function fmt(n) { return '$' + Math.round(n).toLocaleString('en-US'); }
+
+  var stdDed = { single: 15000, mfj: 30000, hoh: 22500 };
+  var brackets = {
+    single: [[11925,0.10],[48475,0.12],[103350,0.22],[197300,0.24],[250525,0.32],[626350,0.35],[Infinity,0.37]],
+    mfj: [[23850,0.10],[96950,0.12],[206700,0.22],[394600,0.24],[501050,0.32],[751600,0.35],[Infinity,0.37]],
+    hoh: [[17000,0.10],[64850,0.12],[103350,0.22],[197300,0.24],[250500,0.32],[626350,0.35],[Infinity,0.37]],
+  };
+
+  function calcIncomeTax(taxable, filing) {
+    var bracks = brackets[filing];
+    var tax = 0; var prev = 0;
+    for (var i = 0; i < bracks.length; i++) {
+      var ceil = bracks[i][0]; var rate = bracks[i][1];
+      if (taxable <= prev) break;
+      tax += (Math.min(taxable, ceil) - prev) * rate;
+      prev = ceil;
+    }
+    return tax;
+  }
+
+  document.getElementById('calcBtnSE').addEventListener('click', function() {
+    var netSE = parseFloat(document.getElementById('net-income').value) || 0;
+    var otherIncome = parseFloat(document.getElementById('other-income').value) || 0;
+    var filing = document.getElementById('filing-se').value;
+    var otherDed = parseFloat(document.getElementById('deductions-se').value) || 0;
+
+    var SS_WAGE_BASE = 176100;
+    var seBase = netSE * 0.9235;
+    var ssTax = Math.min(seBase, SS_WAGE_BASE) * 0.124;
+    var medicTax = seBase * 0.029;
+    var seTax = ssTax + medicTax;
+    var seDed = seTax * 0.5;
+
+    var totalIncome = netSE + otherIncome;
+    var deduction = stdDed[filing];
+    var taxable = Math.max(0, totalIncome - deduction - seDed - otherDed);
+    var incomeTax = calcIncomeTax(taxable, filing);
+    var totalTax = seTax + incomeTax;
+    var effRate = totalIncome > 0 ? (totalTax / totalIncome * 100) : 0;
+
+    document.getElementById('res-se-tax').textContent = fmt(seTax);
+    document.getElementById('res-se-ded').textContent = fmt(seDed);
+    document.getElementById('res-income-tax').textContent = fmt(incomeTax);
+    document.getElementById('res-total-tax').textContent = fmt(totalTax);
+    document.getElementById('res-ss').textContent = fmt(ssTax);
+    document.getElementById('res-medicare').textContent = fmt(medicTax);
+    document.getElementById('res-eff-rate').textContent = effRate.toFixed(1) + '%';
+    document.getElementById('res-quarterly').textContent = fmt(totalTax / 4);
+    document.getElementById('results-se').style.display = '';
+  });
+</script>

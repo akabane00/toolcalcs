@@ -1,0 +1,295 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tax Calculators", "item": "https://toolcalcs.com/tax-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Tax Withholding Calculator" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "How do I know if I'm withholding the right amount?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Compare your estimated total federal income tax for the year with your total year-to-date withholding (found on your most recent pay stub). If withholding is less than 90% of your current-year tax liability — or less than 100% of last year's tax — you may face an underpayment penalty. If withholding is much higher, you're giving the IRS an interest-free loan and could adjust your W-4 to increase take-home pay."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "What is Form W-4 and how does it affect withholding?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Form W-4 (Employee's Withholding Certificate) tells your employer how much federal income tax to withhold from each paycheck. The 2020-redesigned W-4 uses dollar amounts instead of allowances. You can claim dependents, additional deductions, or other income to fine-tune your withholding. Submit a new W-4 to your employer whenever your situation changes (marriage, new job, new child, significant income change)."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "What happens if I don't withhold enough?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "If you underpay by more than $1,000 and don't meet the safe harbor rules, the IRS charges an underpayment penalty — currently around 7–8% annually on the shortfall. The safe harbor: withhold at least 90% of your current-year tax, or 100% of last year's tax (110% if your prior-year AGI exceeded $150,000). Self-employed taxpayers cover this with quarterly estimated tax payments."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Tax Withholding Calculator 2026 - W-4 & Paycheck Withholding"
+  description="Estimate whether your 2026 federal tax withholding is on track. See if you'll owe or get a refund, and learn how to adjust your W-4."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/tax-calculators/">Tax Calculators</a> &rsaquo;
+    <span>Tax Withholding Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Tax Withholding Calculator 2026</h1>
+  <p class="page-desc">Find out if your federal tax withholding is on track. Enter your income, filing status, and year-to-date withholding to see if you'll owe taxes or get a refund.</p>
+
+  <div class="calc-box">
+    <div class="calc-grid-2">
+      <div class="input-group">
+        <label for="annual-income-wh">Annual Gross Income</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="annual-income-wh" value="75000" min="0" max="5000000" step="1000" /></div>
+        <small>Total wages/salary before deductions</small>
+      </div>
+      <div class="input-group">
+        <label for="filing-wh">Filing Status</label>
+        <select id="filing-wh">
+          <option value="single">Single</option>
+          <option value="mfj">Married Filing Jointly</option>
+          <option value="mfs">Married Filing Separately</option>
+          <option value="hoh">Head of Household</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="ytd-withholding">YTD Federal Tax Withheld</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="ytd-withholding" value="8000" min="0" max="500000" step="100" /></div>
+        <small>From your most recent pay stub</small>
+      </div>
+      <div class="input-group">
+        <label for="pay-periods-done">Pay Periods Completed</label>
+        <input type="number" id="pay-periods-done" value="6" min="1" max="52" step="1" />
+        <small>Out of total pay periods in the year</small>
+      </div>
+      <div class="input-group">
+        <label for="pay-frequency">Pay Frequency</label>
+        <select id="pay-frequency">
+          <option value="52">Weekly (52/year)</option>
+          <option value="26">Bi-weekly (26/year)</option>
+          <option value="24">Semi-monthly (24/year)</option>
+          <option value="12" selected>Monthly (12/year)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="other-income-wh">Other Income (non-W-2)</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="other-income-wh" value="0" min="0" max="2000000" step="500" /></div>
+        <small>Freelance, investments, side income</small>
+      </div>
+      <div class="input-group">
+        <label for="deductions-wh">Additional Deductions</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="deductions-wh" value="0" min="0" max="200000" step="500" /></div>
+        <small>401(k), HSA, student loan interest, etc.</small>
+      </div>
+      <div class="input-group">
+        <label for="dependents-wh">Dependent Tax Credits ($2,000 each)</label>
+        <input type="number" id="dependents-wh" value="0" min="0" max="20" step="1" />
+        <small>Qualifying children under 17</small>
+      </div>
+    </div>
+    <button class="calc-btn" id="calcBtnWH">Check My Withholding</button>
+
+    <div class="results" id="results-wh" style="display:none">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <div class="result-label">Estimated Tax Owed / Refund</div>
+          <div class="result-value" id="res-wh-balance">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Estimated Annual Tax</div>
+          <div class="result-value" id="res-wh-annual-tax">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Projected Full-Year Withholding</div>
+          <div class="result-value" id="res-wh-projected">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Withholding Status</div>
+          <div class="result-value" id="res-wh-status">—</div>
+        </div>
+      </div>
+      <div id="wh-advice" style="margin-top:16px;padding:14px;border-radius:8px;font-size:0.95rem;"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+  <RelatedCalculators currentSlug="tax-withholding-calculator" />
+
+  <article class="seo-content">
+    <h2>Federal Tax Withholding Guide 2026</h2>
+    <p>Tax withholding is the money your employer deducts from each paycheck and sends directly to the IRS on your behalf. Getting it right means no surprise tax bill in April — and no over-withholding that gives the government an interest-free loan all year.</p>
+
+    <h3>How Withholding Works</h3>
+    <p>Your employer uses your Form W-4 and IRS withholding tables to estimate how much federal income tax to hold back from each paycheck. The amount depends on your income level, filing status, pay frequency, and any adjustments you've made on your W-4. At year-end, you reconcile the withholding against your actual tax liability on Form 1040.</p>
+
+    <h3>The W-4 Form (2020 Redesign)</h3>
+    <p>The W-4 was significantly redesigned in 2020. Key sections:</p>
+    <ul>
+      <li><strong>Step 1:</strong> Filing status (single/married/head of household)</li>
+      <li><strong>Step 2:</strong> Multiple jobs or working spouse — check the box or use the IRS estimator</li>
+      <li><strong>Step 3:</strong> Claim dependent credits (e.g., $2,000 per qualifying child)</li>
+      <li><strong>Step 4a:</strong> Other income not from jobs (dividends, freelance)</li>
+      <li><strong>Step 4b:</strong> Additional deductions beyond standard</li>
+      <li><strong>Step 4c:</strong> Extra withholding per pay period in dollar amount</li>
+    </ul>
+    <p>You can submit a new W-4 to your employer at any time — you don't have to wait for open enrollment or a life event.</p>
+
+    <h3>Underpayment Penalty</h3>
+    <p>If you owe more than $1,000 at filing time AND don't meet the safe harbor, the IRS charges an underpayment penalty on the shortfall. For 2026, the penalty rate is around 7–8% annually. The safe harbor rules exempt you from the penalty if you:</p>
+    <ul>
+      <li>Withhold/pay at least <strong>90%</strong> of your current-year tax liability, OR</li>
+      <li>Withhold/pay at least <strong>100%</strong> of last year's tax liability (110% if prior-year AGI exceeded $150,000)</li>
+    </ul>
+
+    <h3>Common Withholding Situations</h3>
+    <ul>
+      <li><strong>Two-income households:</strong> Each job withholds as if it's your only income, which can cause under-withholding. Use Step 2 on the W-4 or the IRS Tax Withholding Estimator.</li>
+      <li><strong>Freelance + W-2 job:</strong> Side income has no withholding. Add extra withholding on your W-4 (Step 4c) or make quarterly estimated payments.</li>
+      <li><strong>Major life events:</strong> Marriage, divorce, new child, or home purchase all affect your optimal withholding.</li>
+      <li><strong>Bonus income:</strong> Bonuses are often withheld at 22% flat (supplemental rate). If your total rate is lower, you may get a refund; if higher, you may owe more.</li>
+    </ul>
+
+    <h3>When to Adjust Your W-4</h3>
+    <p>Review your withholding whenever:</p>
+    <ul>
+      <li>You got married or divorced</li>
+      <li>You had or adopted a child</li>
+      <li>You started a second job or your spouse started/stopped working</li>
+      <li>You received a large refund last year (over-withholding)</li>
+      <li>You owed taxes last year (under-withholding)</li>
+      <li>You started receiving significant investment income</li>
+    </ul>
+  </article>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <h3>How do I know if I'm withholding the right amount?</h3>
+        <p>Check your pay stub for year-to-date federal tax withheld, then project that to the full year. Compare it to your estimated total tax liability. If projected withholding is within 10% of what you'll owe, you're likely on track. This calculator does that math for you.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What is Form W-4 and how does it affect withholding?</h3>
+        <p>W-4 tells your employer how much to withhold. The 2020 redesign eliminated the old allowances system. Now you enter dollar amounts for dependent credits, additional income, and extra withholding. Submit a new W-4 any time your tax situation changes.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What happens if I don't withhold enough?</h3>
+        <p>You'll owe the remaining tax when you file. If you owe more than $1,000 and don't meet safe harbor rules, you'll also pay an underpayment penalty (currently 7–8% annually on the shortfall). Add extra withholding on line 4c of your W-4 or make quarterly estimated payments to avoid this.</p>
+      </div>
+    </div>
+  </section>
+
+  <RelatedArticles calculatorSlug="tax-withholding-calculator" />
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function fmt(n) { return '$' + Math.round(Math.abs(n)).toLocaleString('en-US'); }
+
+  var stdDed = { single: 15000, mfj: 30000, mfs: 15000, hoh: 22500 };
+  var brackets = {
+    single: [[11925,0.10],[48475,0.12],[103350,0.22],[197300,0.24],[250525,0.32],[626350,0.35],[Infinity,0.37]],
+    mfj: [[23850,0.10],[96950,0.12],[206700,0.22],[394600,0.24],[501050,0.32],[751600,0.35],[Infinity,0.37]],
+    mfs: [[11925,0.10],[48475,0.12],[103350,0.22],[197300,0.24],[250525,0.32],[375800,0.35],[Infinity,0.37]],
+    hoh: [[17000,0.10],[64850,0.12],[103350,0.22],[197300,0.24],[250500,0.32],[626350,0.35],[Infinity,0.37]],
+  };
+
+  function calcTax(taxable, filing) {
+    var bracks = brackets[filing];
+    var tax = 0; var prev = 0;
+    for (var i = 0; i < bracks.length; i++) {
+      var ceil = bracks[i][0]; var rate = bracks[i][1];
+      if (taxable <= prev) break;
+      tax += (Math.min(taxable, ceil) - prev) * rate;
+      prev = ceil;
+    }
+    return tax;
+  }
+
+  document.getElementById('calcBtnWH').addEventListener('click', function() {
+    var annualIncome = parseFloat(document.getElementById('annual-income-wh').value) || 0;
+    var filing = document.getElementById('filing-wh').value;
+    var ytdWithholding = parseFloat(document.getElementById('ytd-withholding').value) || 0;
+    var periodsDone = parseInt(document.getElementById('pay-periods-done').value) || 1;
+    var totalPeriods = parseInt(document.getElementById('pay-frequency').value) || 12;
+    var otherIncome = parseFloat(document.getElementById('other-income-wh').value) || 0;
+    var extraDed = parseFloat(document.getElementById('deductions-wh').value) || 0;
+    var dependents = parseInt(document.getElementById('dependents-wh').value) || 0;
+
+    // Project full-year withholding
+    var projectedWithholding = periodsDone > 0 ? (ytdWithholding / periodsDone) * totalPeriods : 0;
+
+    // Estimated annual tax
+    var totalIncome = annualIncome + otherIncome;
+    var taxable = Math.max(0, totalIncome - stdDed[filing] - extraDed);
+    var dependentCredit = Math.min(dependents * 2000, calcTax(taxable, filing));
+    var annualTax = Math.max(0, calcTax(taxable, filing) - dependentCredit);
+
+    // Balance
+    var balance = annualTax - projectedWithholding;
+
+    var statusEl = document.getElementById('res-wh-status');
+    var adviceEl = document.getElementById('wh-advice');
+
+    document.getElementById('res-wh-annual-tax').textContent = fmt(annualTax);
+    document.getElementById('res-wh-projected').textContent = fmt(projectedWithholding);
+
+    if (balance > 0) {
+      document.getElementById('res-wh-balance').textContent = 'Owe ' + fmt(balance);
+      statusEl.textContent = 'Under-withheld';
+      statusEl.style.color = '#dc2626';
+      var safeHarbor = annualTax * 0.10;
+      if (balance > 1000 && balance > safeHarbor) {
+        adviceEl.style.background = '#fef2f2';
+        adviceEl.style.border = '1px solid #fecaca';
+        adviceEl.innerHTML = '<strong>Action needed:</strong> You may owe ' + fmt(balance) + ' at filing and could face an underpayment penalty. Consider increasing your W-4 withholding by roughly ' + fmt(balance / (totalPeriods - periodsDone)) + ' per remaining pay period, or make a quarterly estimated payment.';
+      } else {
+        adviceEl.style.background = '#fffbeb';
+        adviceEl.style.border = '1px solid #fde68a';
+        adviceEl.innerHTML = '<strong>Minor shortfall:</strong> You may owe ' + fmt(balance) + ' at filing, but this is likely within safe harbor limits and no penalty should apply. Monitor through year-end.';
+      }
+    } else {
+      document.getElementById('res-wh-balance').textContent = 'Refund ' + fmt(balance);
+      statusEl.textContent = 'Over-withheld';
+      statusEl.style.color = '#16a34a';
+      if (Math.abs(balance) > 2000) {
+        adviceEl.style.background = '#f0fdf4';
+        adviceEl.style.border = '1px solid #bbf7d0';
+        adviceEl.innerHTML = '<strong>Consider adjusting:</strong> You\'re on track for a ' + fmt(balance) + ' refund — meaning you\'re over-withholding by ' + fmt(Math.abs(balance)) + '. You could reduce withholding to get that money in each paycheck instead. Update Step 3 or Step 4b on your W-4.';
+      } else {
+        adviceEl.style.background = '#f0fdf4';
+        adviceEl.style.border = '1px solid #bbf7d0';
+        adviceEl.innerHTML = '<strong>On track:</strong> You\'re projected to receive a ' + fmt(balance) + ' refund. Your withholding looks reasonable — no immediate action needed.';
+      }
+    }
+
+    document.getElementById('results-wh').style.display = '';
+  });
+</script>

@@ -1,0 +1,286 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tax Calculators", "item": "https://toolcalcs.com/tax-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Capital Gains Tax Calculator" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "What is the long-term capital gains tax rate?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Long-term capital gains tax rates for 2026 are 0%, 15%, or 20% depending on your taxable income. Single filers pay 0% up to $47,025; 15% from $47,026 to $518,900; and 20% above $518,900. Married filing jointly thresholds are $94,050 (0%), $583,750 (15%), and 20% above. High-income earners may also owe the 3.8% Net Investment Income Tax on top."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "What is the difference between short-term and long-term capital gains?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Short-term capital gains apply to assets held one year or less and are taxed as ordinary income at your regular federal tax rate (10% to 37%). Long-term capital gains apply to assets held more than one year and are taxed at preferential rates of 0%, 15%, or 20%. Holding an investment for more than one year before selling can significantly reduce your tax bill."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "What is tax-loss harvesting?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Tax-loss harvesting is the practice of selling investments at a loss to offset capital gains. If you have $10,000 in capital gains and you sell another investment at a $4,000 loss, your net taxable capital gains are only $6,000. You can also use losses to offset up to $3,000 of ordinary income per year. Unused losses carry forward to future tax years."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Capital Gains Tax Calculator 2026 - Stocks, Real Estate & More"
+  description="Estimate 2026 capital gains tax on stocks, real estate, and other investments. Compare short-term vs long-term tax rates by income level and filing status."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/tax-calculators/">Tax Calculators</a> &rsaquo;
+    <span>Capital Gains Tax Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Capital Gains Tax Calculator 2026</h1>
+  <p class="page-desc">Calculate your capital gains tax on stocks, real estate, or other investments. Compare short-term vs long-term rates based on your income and filing status.</p>
+
+  <div class="calc-box">
+    <div class="calc-grid-2">
+      <div class="input-group">
+        <label for="sale-price">Sale Price</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="sale-price" value="50000" min="0" max="10000000" step="500" /></div>
+      </div>
+      <div class="input-group">
+        <label for="purchase-price">Purchase Price (Cost Basis)</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="purchase-price" value="30000" min="0" max="10000000" step="500" /></div>
+      </div>
+      <div class="input-group">
+        <label for="holding">Holding Period</label>
+        <select id="holding">
+          <option value="short">Short-Term (1 year or less)</option>
+          <option value="long" selected>Long-Term (more than 1 year)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="filing-cg">Filing Status</label>
+        <select id="filing-cg">
+          <option value="single">Single</option>
+          <option value="mfj">Married Filing Jointly</option>
+          <option value="mfs">Married Filing Separately</option>
+          <option value="hoh">Head of Household</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="ordinary-income">Annual Ordinary Income</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="ordinary-income" value="75000" min="0" max="5000000" step="1000" /></div>
+        <small>Wages, salary, self-employment income</small>
+      </div>
+    </div>
+    <button class="calc-btn" id="calcBtnCG">Calculate Capital Gains Tax</button>
+
+    <div class="results" id="results-cg" style="display:none">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <div class="result-label">Capital Gains Tax</div>
+          <div class="result-value" id="res-cg-tax">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Capital Gain Amount</div>
+          <div class="result-value" id="res-gain">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Tax Rate Applied</div>
+          <div class="result-value" id="res-cg-rate">0%</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Net Proceeds After Tax</div>
+          <div class="result-value" id="res-net-proceeds">$0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+  <RelatedCalculators currentSlug="capital-gains-tax-calculator" />
+
+  <article class="seo-content">
+    <h2>Capital Gains Tax Guide 2026</h2>
+    <p>When you sell an investment — stocks, mutual funds, real estate, cryptocurrency, or other assets — for more than you paid, the profit is a <strong>capital gain</strong>. The IRS taxes this gain, but the rate depends on how long you held the asset and your income level.</p>
+
+    <h3>Short-Term vs. Long-Term Capital Gains</h3>
+    <p>This is the single most important distinction in capital gains taxation:</p>
+    <ul>
+      <li><strong>Short-term:</strong> Assets held 1 year or less. Taxed as ordinary income at your regular bracket (10%–37%). If you sell a stock after 6 months, the profit is taxed just like a paycheck.</li>
+      <li><strong>Long-term:</strong> Assets held more than 1 year. Taxed at preferential rates of 0%, 15%, or 20%. Holding an investment one additional day past the one-year mark can dramatically lower your tax bill.</li>
+    </ul>
+
+    <h3>2026 Long-Term Capital Gains Tax Rates</h3>
+    <div class="data-table">
+      <table>
+        <thead><tr><th>Filing Status</th><th>0% Rate</th><th>15% Rate</th><th>20% Rate</th></tr></thead>
+        <tbody>
+          <tr><td>Single</td><td>Up to $47,025</td><td>$47,026 – $518,900</td><td>Over $518,900</td></tr>
+          <tr><td>Married Filing Jointly</td><td>Up to $94,050</td><td>$94,051 – $583,750</td><td>Over $583,750</td></tr>
+          <tr><td>Married Filing Separately</td><td>Up to $47,025</td><td>$47,026 – $291,850</td><td>Over $291,850</td></tr>
+          <tr><td>Head of Household</td><td>Up to $63,000</td><td>$63,001 – $551,350</td><td>Over $551,350</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Note: Long-term capital gains income is "stacked on top" of ordinary income to determine which rate applies. Your capital gains rate is based on your total taxable income including the gains.</p>
+
+    <h3>The 3.8% Net Investment Income Tax (NIIT)</h3>
+    <p>High earners may also owe the Net Investment Income Tax: an additional 3.8% on capital gains (and other investment income like dividends and rental income) for taxpayers whose modified AGI exceeds $200,000 (single) or $250,000 (married). This effectively raises the top rate on capital gains to 23.8%.</p>
+
+    <h3>Special Rules for Real Estate</h3>
+    <p>If you sell your primary home at a gain, you may qualify for the <strong>home sale exclusion</strong>:</p>
+    <ul>
+      <li>Exclude up to $250,000 in gains (single) or $500,000 (married)</li>
+      <li>You must have owned the home for at least 2 years</li>
+      <li>You must have lived in it as your primary residence for at least 2 of the last 5 years</li>
+    </ul>
+    <p>For investment properties, gains are taxed at long-term capital gains rates if held over a year, but depreciation recapture is taxed at up to 25%.</p>
+
+    <h3>Tax-Loss Harvesting: Offsetting Your Gains</h3>
+    <p>If you have both gains and losses in your portfolio, you can <strong>offset gains with losses</strong>:</p>
+    <ul>
+      <li>Short-term losses offset short-term gains first, then long-term gains</li>
+      <li>Long-term losses offset long-term gains first, then short-term gains</li>
+      <li>Net losses can deduct up to $3,000 against ordinary income per year</li>
+      <li>Unused losses carry forward indefinitely to future tax years</li>
+    </ul>
+    <p>Important: The <strong>wash-sale rule</strong> prevents you from selling a security at a loss and immediately rebuying the same or substantially identical security within 30 days before or after the sale. If you trigger the wash-sale rule, the loss is disallowed.</p>
+
+    <h3>Cryptocurrency Capital Gains</h3>
+    <p>The IRS treats cryptocurrency as property, not currency. Every time you sell, exchange, or spend crypto, it's a taxable event. The same short-term and long-term rules apply. Mining and staking income is taxed as ordinary income at the time received, and your cost basis is the fair market value on the day you received it.</p>
+  </article>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <h3>What is the long-term capital gains tax rate?</h3>
+        <p>0%, 15%, or 20% depending on your taxable income. Single filers pay 0% up to $47,025 in total taxable income; 15% from $47,026–$518,900; and 20% above that. High earners may also owe the 3.8% NIIT, pushing the maximum effective rate to 23.8%.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What is the difference between short-term and long-term capital gains?</h3>
+        <p>Short-term gains (assets held 1 year or less) are taxed as ordinary income at your regular rate (up to 37%). Long-term gains (assets held over 1 year) are taxed at preferential rates of 0%, 15%, or 20%. Holding one extra day past the 1-year mark can save thousands in taxes.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What is tax-loss harvesting?</h3>
+        <p>Selling investments at a loss to offset gains. $10,000 in gains minus $4,000 in losses = $6,000 net taxable gain. You can also deduct up to $3,000 of net losses against ordinary income per year, with any unused losses carrying forward to future years.</p>
+      </div>
+    </div>
+  </section>
+
+  <RelatedArticles calculatorSlug="capital-gains-tax-calculator" />
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function fmt(n) { return '$' + Math.round(n).toLocaleString('en-US'); }
+
+  var ltRates = {
+    single: [[47025,0],[518900,0.15],[Infinity,0.20]],
+    mfj: [[94050,0],[583750,0.15],[Infinity,0.20]],
+    mfs: [[47025,0],[291850,0.15],[Infinity,0.20]],
+    hoh: [[63000,0],[551350,0.15],[Infinity,0.20]],
+  };
+
+  var stBrackets = {
+    single: [[11925,0.10],[48475,0.12],[103350,0.22],[197300,0.24],[250525,0.32],[626350,0.35],[Infinity,0.37]],
+    mfj: [[23850,0.10],[96950,0.12],[206700,0.22],[394600,0.24],[501050,0.32],[751600,0.35],[Infinity,0.37]],
+    mfs: [[11925,0.10],[48475,0.12],[103350,0.22],[197300,0.24],[250525,0.32],[375800,0.35],[Infinity,0.37]],
+    hoh: [[17000,0.10],[64850,0.12],[103350,0.22],[197300,0.24],[250500,0.32],[626350,0.35],[Infinity,0.37]],
+  };
+
+  var stdDed = { single: 15000, mfj: 30000, mfs: 15000, hoh: 22500 };
+
+  function calcOrdinary(taxable, filing) {
+    var bracks = stBrackets[filing];
+    var tax = 0; var prev = 0;
+    for (var i = 0; i < bracks.length; i++) {
+      var ceil = bracks[i][0]; var rate = bracks[i][1];
+      if (taxable <= prev) break;
+      tax += (Math.min(taxable, ceil) - prev) * rate;
+      prev = ceil;
+    }
+    return tax;
+  }
+
+  document.getElementById('calcBtnCG').addEventListener('click', function() {
+    var sale = parseFloat(document.getElementById('sale-price').value) || 0;
+    var purchase = parseFloat(document.getElementById('purchase-price').value) || 0;
+    var holding = document.getElementById('holding').value;
+    var filing = document.getElementById('filing-cg').value;
+    var ordinaryIncome = parseFloat(document.getElementById('ordinary-income').value) || 0;
+
+    var gain = Math.max(0, sale - purchase);
+    if (gain === 0) {
+      document.getElementById('res-gain').textContent = '$0';
+      document.getElementById('res-cg-tax').textContent = '$0';
+      document.getElementById('res-cg-rate').textContent = '0%';
+      document.getElementById('res-net-proceeds').textContent = fmt(sale);
+      document.getElementById('results-cg').style.display = '';
+      return;
+    }
+
+    var taxableOrdinary = Math.max(0, ordinaryIncome - stdDed[filing]);
+    var cgTax = 0;
+    var rateUsed = 0;
+
+    if (holding === 'short') {
+      // Short-term: ordinary income rates stacked on ordinary income
+      var totalWithGain = taxableOrdinary + gain;
+      cgTax = calcOrdinary(totalWithGain, filing) - calcOrdinary(taxableOrdinary, filing);
+      var bracks = stBrackets[filing];
+      var prev = 0;
+      for (var i = 0; i < bracks.length; i++) {
+        if (totalWithGain > prev) rateUsed = bracks[i][1];
+        prev = bracks[i][0];
+      }
+    } else {
+      // Long-term: stack on top of ordinary income
+      var totalIncome = taxableOrdinary + gain;
+      var rates = ltRates[filing];
+      var gainRemaining = gain;
+      var incomeAtStart = taxableOrdinary;
+      for (var j = 0; j < rates.length; j++) {
+        var ceiling = rates[j][0];
+        var rate = rates[j][1];
+        if (incomeAtStart >= ceiling) continue;
+        var room = ceiling - incomeAtStart;
+        var taxedAtRate = Math.min(gainRemaining, room);
+        cgTax += taxedAtRate * rate;
+        rateUsed = rate;
+        incomeAtStart += taxedAtRate;
+        gainRemaining -= taxedAtRate;
+        if (gainRemaining <= 0) break;
+      }
+    }
+
+    document.getElementById('res-gain').textContent = fmt(gain);
+    document.getElementById('res-cg-tax').textContent = fmt(cgTax);
+    document.getElementById('res-cg-rate').textContent = (rateUsed * 100).toFixed(0) + '%';
+    document.getElementById('res-net-proceeds').textContent = fmt(sale - cgTax);
+    document.getElementById('results-cg').style.display = '';
+  });
+</script>
