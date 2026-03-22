@@ -1,0 +1,260 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Real Estate Calculators", "item": "https://toolcalcs.com/real-estate-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Mortgage Refinance Calculator" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "When does it make sense to refinance a mortgage?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Refinancing generally makes sense when you can lower your interest rate by at least 0.5–1%, you plan to stay in the home long enough to recoup the closing costs (the break-even point), and your credit score has improved significantly since your original loan. The break-even point is calculated by dividing total closing costs by your monthly savings. If closing costs are $5,000 and you save $200/month, break-even is 25 months. If you plan to stay at least 25 more months, refinancing is likely worthwhile."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "What are typical refinance closing costs?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Refinance closing costs typically range from 2–5% of the loan balance. Common fees include loan origination fee (0.5–1% of loan), appraisal ($400–$700), title search and insurance ($700–$1,200), recording fees ($50–$200), prepaid interest, and escrow setup costs. Some lenders offer no-closing-cost refinances, but they typically offset the cost with a higher interest rate or by rolling costs into the loan balance."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "Should I refinance to a 15-year or 30-year mortgage?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "A 15-year mortgage has higher monthly payments but significantly lower total interest and a faster payoff. A 30-year refinance lowers monthly payments more dramatically and frees up cash flow, but you pay more interest over time and may extend your payoff date. Refinancing from a 30-year to a 15-year is popular for borrowers who want to accelerate equity building and can afford the higher payment. Refinancing to another 30-year loan maximizes monthly savings but extends your loan duration."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Mortgage Refinance Calculator 2026 - Break-Even & Monthly Savings"
+  description="Calculate your refinance break-even point, monthly savings, and total interest saved. See if refinancing your mortgage at today's rates makes financial sense."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/real-estate-calculators/">Real Estate Calculators</a> &rsaquo;
+    <span>Mortgage Refinance Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Mortgage Refinance Calculator 2026</h1>
+  <p class="page-desc">Find out if refinancing makes sense. Calculate your monthly savings, break-even point, and total interest saved over the life of the new loan.</p>
+
+  <div class="calc-box">
+    <h3 style="font-size:1rem;font-weight:600;margin-bottom:12px;color:var(--color-text-muted)">Current Loan</h3>
+    <div class="calc-grid-2">
+      <div class="input-group">
+        <label for="ref-balance">Remaining Loan Balance</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="ref-balance" value="280000" min="10000" max="5000000" step="5000" /></div>
+      </div>
+      <div class="input-group">
+        <label for="ref-curr-rate">Current Interest Rate</label>
+        <div class="input-prefix"><input type="number" id="ref-curr-rate" value="7.5" min="0.1" max="20" step="0.1" /><span style="margin-left:4px">%</span></div>
+      </div>
+      <div class="input-group">
+        <label for="ref-curr-payment">Current Monthly Payment (P+I)</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="ref-curr-payment" value="1958" min="0" max="50000" step="10" /></div>
+      </div>
+      <div class="input-group">
+        <label for="ref-months-left">Months Remaining</label>
+        <input type="number" id="ref-months-left" value="300" min="12" max="360" step="1" />
+        <small>e.g. 300 = 25 years left on a 30yr loan</small>
+      </div>
+    </div>
+    <h3 style="font-size:1rem;font-weight:600;margin:16px 0 12px;color:var(--color-text-muted)">New Loan</h3>
+    <div class="calc-grid-2">
+      <div class="input-group">
+        <label for="ref-new-rate">New Interest Rate</label>
+        <div class="input-prefix"><input type="number" id="ref-new-rate" value="6.5" min="0.1" max="20" step="0.1" /><span style="margin-left:4px">%</span></div>
+      </div>
+      <div class="input-group">
+        <label for="ref-new-term">New Loan Term</label>
+        <select id="ref-new-term">
+          <option value="360" selected>30 years</option>
+          <option value="240">20 years</option>
+          <option value="180">15 years</option>
+          <option value="120">10 years</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="ref-closing">Closing Costs</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="ref-closing" value="5000" min="0" max="50000" step="500" /></div>
+        <small>Typically 2–5% of loan balance</small>
+      </div>
+      <div class="input-group">
+        <label for="ref-roll-costs">Roll costs into loan?</label>
+        <select id="ref-roll-costs">
+          <option value="no" selected>No — pay out of pocket</option>
+          <option value="yes">Yes — add to loan balance</option>
+        </select>
+      </div>
+    </div>
+    <button class="calc-btn" id="calcBtnRef">Calculate Refinance Savings</button>
+
+    <div class="results" id="results-ref" style="display:none">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <div class="result-label">Monthly Savings</div>
+          <div class="result-value" id="res-ref-monthly">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Break-Even Point</div>
+          <div class="result-value" id="res-ref-breakeven">0 months</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">New Monthly Payment</div>
+          <div class="result-value" id="res-ref-new-pmt">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Total Interest Saved</div>
+          <div class="result-value" id="res-ref-interest">$0</div>
+        </div>
+      </div>
+      <div id="ref-advice" style="margin-top:16px;padding:14px;border-radius:8px;font-size:0.95rem;"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+  <RelatedCalculators currentSlug="mortgage-refinance-calculator" />
+
+  <article class="seo-content">
+    <h2>Mortgage Refinance Guide 2026</h2>
+    <p>Refinancing replaces your existing mortgage with a new one — ideally at a lower rate, shorter term, or both. In a rate-dropping environment, refinancing can save hundreds of dollars per month. But it comes with closing costs, so the decision requires careful math to determine whether the savings justify the upfront expense.</p>
+
+    <h3>The Break-Even Calculation</h3>
+    <p>The most important number in any refinance decision is the break-even point — how many months it takes for your accumulated savings to equal your closing costs.</p>
+    <p><strong>Break-Even Months = Closing Costs ÷ Monthly Savings</strong></p>
+    <p>Example: $5,000 in closing costs ÷ $200/month savings = 25 months. If you plan to stay in the home at least 25 more months, refinancing makes financial sense. If you might sell or move sooner, you will not recoup the closing costs.</p>
+
+    <h3>When Refinancing Makes Sense</h3>
+    <ul>
+      <li><strong>Rate reduction of 0.5–1%+:</strong> The larger the rate drop, the faster you break even. A 2% rate reduction on a $300,000 loan saves roughly $400/month — breaking even in just over a year even with $5,000 in closing costs.</li>
+      <li><strong>Improved credit score:</strong> If your score has risen significantly (e.g., from 680 to 760), you may qualify for a much better rate than your original loan.</li>
+      <li><strong>Changing from ARM to fixed:</strong> If you have an adjustable-rate mortgage that is about to reset higher, refinancing into a fixed rate provides payment certainty.</li>
+      <li><strong>Shortening the term:</strong> Refinancing from 30 years to 15 years costs more per month but dramatically reduces total interest paid and builds equity faster.</li>
+      <li><strong>Cash-out refinance:</strong> Access home equity for home improvements, debt consolidation, or investments. Note: cash-out rates are typically higher than rate-and-term refinances.</li>
+    </ul>
+
+    <h3>When Not to Refinance</h3>
+    <ul>
+      <li>You are close to paying off your mortgage — refinancing resets the amortization schedule, meaning early payments are again mostly interest.</li>
+      <li>You plan to sell within 1–2 years and cannot break even in time.</li>
+      <li>Your credit score has dropped since your original loan, making new rates unfavorable.</li>
+      <li>Your home value has declined, limiting your equity and possibly requiring PMI on the new loan.</li>
+    </ul>
+
+    <h3>No-Closing-Cost Refinances</h3>
+    <p>Some lenders offer no-closing-cost refinances where you pay no upfront fees. In exchange, the lender typically raises your interest rate by 0.125–0.375% (compared to the rate with closing costs). This trades a lower monthly savings for immediate savings at closing. It can make sense if you plan to sell within 2–3 years — before a typical break-even period — or if you lack the cash for closing costs.</p>
+  </article>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <h3>When does it make sense to refinance a mortgage?</h3>
+        <p>When you can lower your rate by at least 0.5–1%, you plan to stay long enough to break even (closing costs ÷ monthly savings), and your financial situation has improved since the original loan. The break-even timeline is the most critical factor.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What are typical refinance closing costs?</h3>
+        <p>2–5% of the loan balance. Common fees include origination (0.5–1%), appraisal ($400–$700), title insurance ($700–$1,200), and recording fees. No-closing-cost refinances exist but typically come with a higher interest rate.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Should I refinance to a 15-year or 30-year mortgage?</h3>
+        <p>A 15-year has higher payments but much lower total interest. A 30-year maximizes monthly savings but extends your payoff. If you can comfortably afford the higher 15-year payment, it typically saves tens of thousands in interest. If cash flow is tight, the 30-year gives more flexibility.</p>
+      </div>
+    </div>
+  </section>
+
+  <RelatedArticles calculatorSlug="mortgage-refinance-calculator" />
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function fmt(n) { return '$' + Math.round(Math.abs(n)).toLocaleString('en-US'); }
+
+  function calcPayment(principal, annualRate, months) {
+    var r = annualRate / 100 / 12;
+    if (r === 0) return principal / months;
+    return principal * (r * Math.pow(1 + r, months)) / (Math.pow(1 + r, months) - 1);
+  }
+
+  function totalInterest(payment, principal, months) {
+    return (payment * months) - principal;
+  }
+
+  document.getElementById('calcBtnRef').addEventListener('click', function() {
+    var balance = parseFloat(document.getElementById('ref-balance').value) || 0;
+    var currRate = parseFloat(document.getElementById('ref-curr-rate').value) || 0;
+    var currPayment = parseFloat(document.getElementById('ref-curr-payment').value) || 0;
+    var monthsLeft = parseInt(document.getElementById('ref-months-left').value) || 300;
+    var newRate = parseFloat(document.getElementById('ref-new-rate').value) || 0;
+    var newTerm = parseInt(document.getElementById('ref-new-term').value) || 360;
+    var closing = parseFloat(document.getElementById('ref-closing').value) || 0;
+    var rollCosts = document.getElementById('ref-roll-costs').value === 'yes';
+
+    var newBalance = rollCosts ? balance + closing : balance;
+    var newPayment = calcPayment(newBalance, newRate, newTerm);
+    var savings = currPayment - newPayment;
+
+    // Break-even
+    var breakeven = savings > 0 ? Math.ceil(closing / savings) : Infinity;
+
+    // Total interest comparison
+    var currTotalInterest = totalInterest(currPayment, balance, monthsLeft);
+    var newTotalInterest = totalInterest(newPayment, newBalance, newTerm);
+    var interestSaved = currTotalInterest - newTotalInterest - (rollCosts ? 0 : closing);
+
+    var adviceEl = document.getElementById('ref-advice');
+
+    document.getElementById('res-ref-monthly').textContent = savings >= 0 ? fmt(savings) : '-' + fmt(savings);
+    document.getElementById('res-ref-new-pmt').textContent = fmt(newPayment);
+    document.getElementById('res-ref-interest').textContent = (interestSaved >= 0 ? '' : '-') + fmt(interestSaved);
+
+    if (breakeven === Infinity || savings <= 0) {
+      document.getElementById('res-ref-breakeven').textContent = 'Never';
+      adviceEl.style.background = '#fef2f2';
+      adviceEl.style.border = '1px solid #fecaca';
+      adviceEl.innerHTML = '<strong>Not recommended:</strong> The new rate does not reduce your payment. Refinancing would increase your monthly costs.';
+    } else {
+      document.getElementById('res-ref-breakeven').textContent = breakeven + ' months (' + (breakeven / 12).toFixed(1) + ' years)';
+      if (breakeven <= 24) {
+        adviceEl.style.background = '#f0fdf4';
+        adviceEl.style.border = '1px solid #bbf7d0';
+        adviceEl.innerHTML = '<strong>Excellent opportunity:</strong> You break even in ' + breakeven + ' months. If you plan to stay at least that long, refinancing makes strong financial sense.';
+      } else if (breakeven <= 48) {
+        adviceEl.style.background = '#fffbeb';
+        adviceEl.style.border = '1px solid #fde68a';
+        adviceEl.innerHTML = '<strong>Reasonable:</strong> Break-even in ' + breakeven + ' months (' + (breakeven/12).toFixed(1) + ' years). If you plan to stay at least that long, refinancing is worthwhile.';
+      } else {
+        adviceEl.style.background = '#fffbeb';
+        adviceEl.style.border = '1px solid #fde68a';
+        adviceEl.innerHTML = '<strong>Consider carefully:</strong> Break-even takes ' + breakeven + ' months (' + (breakeven/12).toFixed(1) + ' years). Only worthwhile if you are very confident you will stay that long.';
+      }
+    }
+
+    document.getElementById('results-ref').style.display = '';
+  });
+</script>

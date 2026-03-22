@@ -1,0 +1,271 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Real Estate Calculators", "item": "https://toolcalcs.com/real-estate-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Home Affordability Calculator" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "How much house can I afford on my salary?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "A common guideline is to spend no more than 28% of gross monthly income on housing costs (mortgage, taxes, insurance) and no more than 36% on total debt (housing + car loans + student loans + credit cards). At 7% mortgage rate with 20% down: $60,000 income → ~$200,000 home. $80,000 → ~$270,000. $100,000 → ~$335,000. $150,000 → ~$500,000. These are guidelines — actual approval depends on your credit score, debt levels, and the lender's specific underwriting."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "What is the 28/36 rule for home affordability?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "The 28/36 rule is a traditional guideline for home affordability. The '28' means your monthly housing costs (principal, interest, property taxes, homeowner's insurance, and HOA fees) should not exceed 28% of your gross monthly income. The '36' means your total monthly debt payments — housing plus all other debts (car loans, student loans, credit card minimums) — should not exceed 36% of gross income. Lenders call these the 'front-end' and 'back-end' debt-to-income ratios. Most conventional lenders allow back-end DTI up to 43–45%."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "How much do I need for a down payment?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Minimum down payments vary by loan type: Conventional loans require as little as 3% (but PMI applies below 20% down). FHA loans require 3.5% down with a 580+ credit score (or 10% with 500–579). VA loans (veterans) and USDA loans (rural areas) allow 0% down. Putting less than 20% down on a conventional loan requires PMI (Private Mortgage Insurance), adding $50–$300+ per month. A larger down payment reduces your loan amount, monthly payment, and total interest — but requires more upfront cash."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Home Affordability Calculator 2026 - How Much House Can I Afford?"
+  description="Find out how much house you can afford based on income, debts, down payment, and mortgage rate. See max home price, monthly payment, and DTI ratios."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/real-estate-calculators/">Real Estate Calculators</a> &rsaquo;
+    <span>Home Affordability Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Home Affordability Calculator 2026</h1>
+  <p class="page-desc">Determine how much house you can realistically afford based on your income, debts, down payment, and local costs. See your maximum home price and estimated monthly payment.</p>
+
+  <div class="calc-box">
+    <div class="calc-grid-2">
+      <div class="input-group">
+        <label for="ha-income">Annual Gross Income</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="ha-income" value="90000" min="10000" max="2000000" step="1000" /></div>
+        <small>Combined if buying with a partner</small>
+      </div>
+      <div class="input-group">
+        <label for="ha-monthly-debts">Monthly Debt Payments</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="ha-monthly-debts" value="400" min="0" max="20000" step="50" /></div>
+        <small>Car loans, student loans, credit card minimums</small>
+      </div>
+      <div class="input-group">
+        <label for="ha-down">Down Payment</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="ha-down" value="60000" min="0" max="2000000" step="5000" /></div>
+      </div>
+      <div class="input-group">
+        <label for="ha-rate">Mortgage Rate</label>
+        <div class="input-prefix"><input type="number" id="ha-rate" value="6.75" min="1" max="20" step="0.125" /><span style="margin-left:4px">%</span></div>
+      </div>
+      <div class="input-group">
+        <label for="ha-term">Loan Term</label>
+        <select id="ha-term">
+          <option value="30" selected>30 years</option>
+          <option value="20">20 years</option>
+          <option value="15">15 years</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="ha-tax-rate">Annual Property Tax Rate</label>
+        <div class="input-prefix"><input type="number" id="ha-tax-rate" value="1.2" min="0" max="5" step="0.1" /><span style="margin-left:4px">% of price</span></div>
+      </div>
+      <div class="input-group">
+        <label for="ha-insurance">Annual Home Insurance</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="ha-insurance" value="1500" min="0" max="20000" step="100" /></div>
+      </div>
+      <div class="input-group">
+        <label for="ha-hoa">Monthly HOA Fees</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="ha-hoa" value="0" min="0" max="2000" step="25" /></div>
+      </div>
+    </div>
+    <button class="calc-btn" id="calcBtnHA">Calculate Affordability</button>
+
+    <div class="results" id="results-ha" style="display:none">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <div class="result-label">Max Home Price</div>
+          <div class="result-value" id="res-ha-price">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Monthly Payment (PITI)</div>
+          <div class="result-value" id="res-ha-piti">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Front-End DTI</div>
+          <div class="result-value" id="res-ha-front">0%</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Back-End DTI</div>
+          <div class="result-value" id="res-ha-back">0%</div>
+        </div>
+      </div>
+      <div class="result-cards" style="margin-top:12px">
+        <div class="result-card">
+          <div class="result-label">Loan Amount</div>
+          <div class="result-value" id="res-ha-loan">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Monthly Principal + Interest</div>
+          <div class="result-value" id="res-ha-pi">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Monthly Tax + Insurance</div>
+          <div class="result-value" id="res-ha-ti">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Monthly Gross Income</div>
+          <div class="result-value" id="res-ha-income">$0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+  <RelatedCalculators currentSlug="home-affordability-calculator" />
+
+  <article class="seo-content">
+    <h2>Home Affordability Guide 2026</h2>
+    <p>Buying a home is the largest financial decision most people ever make. Knowing how much you can afford — not just what a lender will approve — is essential to buying a home that fits comfortably within your budget without stretching your finances to the breaking point.</p>
+
+    <h3>The 28/36 Rule</h3>
+    <p>Lenders use two key ratios to evaluate affordability:</p>
+    <ul>
+      <li><strong>Front-end ratio (28% rule):</strong> Monthly housing costs (PITI — principal, interest, taxes, insurance) should not exceed 28% of gross monthly income.</li>
+      <li><strong>Back-end ratio (36% rule):</strong> Total monthly debt payments (housing + all other debts) should not exceed 36% of gross monthly income. Many lenders allow up to 43–45% for conventional loans.</li>
+    </ul>
+    <p>Example: $7,500 gross monthly income. Front-end max: $2,100. Back-end max: $2,700 (or $3,225 at 43%). If you have $500/month in other debts, your maximum housing payment in the 36% scenario is $2,200.</p>
+
+    <h3>How Mortgage Rate Affects Affordability</h3>
+    <p>The interest rate dramatically affects how much house your monthly budget can support. On a $300,000 loan over 30 years:</p>
+    <ul>
+      <li>At 5%: $1,610/month</li>
+      <li>At 6%: $1,799/month</li>
+      <li>At 7%: $1,996/month</li>
+      <li>At 8%: $2,201/month</li>
+    </ul>
+    <p>Each 1% rate increase reduces the loan amount you can afford at a given monthly payment by roughly 10–12%. In today's rate environment, affordability is tighter than it was in 2020–2021 when rates were below 3%.</p>
+
+    <h3>The True Cost of Homeownership</h3>
+    <p>Mortgage and insurance alone do not capture the full cost. Budget for:</p>
+    <ul>
+      <li><strong>Property taxes:</strong> 0.5–2.5% of home value annually depending on your state and county.</li>
+      <li><strong>Home insurance:</strong> $1,000–$3,000/year for most homes.</li>
+      <li><strong>PMI:</strong> If your down payment is under 20%, add 0.5–1.5% of the loan amount annually until you reach 20% equity.</li>
+      <li><strong>Maintenance:</strong> Budget 1–2% of home value per year for ongoing upkeep.</li>
+      <li><strong>Utilities:</strong> Electricity, gas, water, trash — often $200–$500/month more than renting.</li>
+      <li><strong>HOA fees:</strong> $100–$600/month for condos and planned communities.</li>
+    </ul>
+
+    <h3>Down Payment Strategies</h3>
+    <p>A larger down payment reduces your loan amount and monthly payment, eliminates PMI at 20%, and demonstrates financial strength to lenders. But putting too much down can deplete your emergency fund and leave you house-poor. A balanced approach: aim for 20% down if possible, but do not sacrifice your emergency fund (3–6 months of expenses) or retirement contributions to get there.</p>
+  </article>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <h3>How much house can I afford on my salary?</h3>
+        <p>At 7% rate with 20% down: $60K income ≈ $200K home, $80K ≈ $270K, $100K ≈ $335K, $150K ≈ $500K. These are rough guidelines — your actual approval depends on your debts, credit score, and the lender's underwriting criteria.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What is the 28/36 rule for home affordability?</h3>
+        <p>Housing costs should not exceed 28% of gross monthly income (front-end). Total debt payments (housing + other debts) should not exceed 36% (back-end). Most conventional lenders allow up to 43–45% back-end DTI with compensating factors like excellent credit or large reserves.</p>
+      </div>
+      <div class="faq-item">
+        <h3>How much do I need for a down payment?</h3>
+        <p>Conventional: as little as 3% (PMI applies under 20%). FHA: 3.5% with 580+ credit score. VA/USDA: 0% for eligible borrowers. Less than 20% down means paying PMI ($50–$300+/month). 20%+ down eliminates PMI and gives you the best rates.</p>
+      </div>
+    </div>
+  </section>
+
+  <RelatedArticles calculatorSlug="home-affordability-calculator" />
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function fmt(n) { return '$' + Math.round(n).toLocaleString('en-US'); }
+
+  function calcPayment(principal, annualRate, months) {
+    var r = annualRate / 100 / 12;
+    if (r === 0) return principal / months;
+    return principal * (r * Math.pow(1 + r, months)) / (Math.pow(1 + r, months) - 1);
+  }
+
+  document.getElementById('calcBtnHA').addEventListener('click', function() {
+    var annualIncome = parseFloat(document.getElementById('ha-income').value) || 0;
+    var monthlyDebts = parseFloat(document.getElementById('ha-monthly-debts').value) || 0;
+    var downPayment = parseFloat(document.getElementById('ha-down').value) || 0;
+    var rate = parseFloat(document.getElementById('ha-rate').value) || 6.75;
+    var term = parseInt(document.getElementById('ha-term').value) || 30;
+    var taxRate = (parseFloat(document.getElementById('ha-tax-rate').value) || 1.2) / 100;
+    var annualInsurance = parseFloat(document.getElementById('ha-insurance').value) || 0;
+    var hoa = parseFloat(document.getElementById('ha-hoa').value) || 0;
+
+    var monthlyIncome = annualIncome / 12;
+    var maxFrontEnd = monthlyIncome * 0.28;
+    var maxBackEnd = monthlyIncome * 0.36 - monthlyDebts;
+    var maxHousing = Math.min(maxFrontEnd, maxBackEnd);
+    var monthlyInsurance = annualInsurance / 12;
+
+    // Iteratively find max home price where PITI <= maxHousing
+    // PITI = P+I + tax/12 + insurance/12 + HOA
+    // P+I depends on purchase price (via loan = price - down)
+    // tax depends on price
+    // Binary search for max price
+    var lo = downPayment;
+    var hi = 5000000;
+    for (var i = 0; i < 50; i++) {
+      var mid = (lo + hi) / 2;
+      var loan = Math.max(0, mid - downPayment);
+      var pi = calcPayment(loan, rate, term * 12);
+      var tax = mid * taxRate / 12;
+      var piti = pi + tax + monthlyInsurance + hoa;
+      if (piti <= maxHousing) lo = mid;
+      else hi = mid;
+    }
+    var maxPrice = Math.floor(lo / 1000) * 1000;
+    var maxLoan = Math.max(0, maxPrice - downPayment);
+    var maxPI = calcPayment(maxLoan, rate, term * 12);
+    var maxTax = maxPrice * taxRate / 12;
+    var maxPITI = maxPI + maxTax + monthlyInsurance + hoa;
+
+    var frontDTI = monthlyIncome > 0 ? (maxPITI / monthlyIncome * 100) : 0;
+    var backDTI = monthlyIncome > 0 ? ((maxPITI + monthlyDebts) / monthlyIncome * 100) : 0;
+
+    document.getElementById('res-ha-price').textContent = fmt(maxPrice);
+    document.getElementById('res-ha-piti').textContent = fmt(maxPITI);
+    document.getElementById('res-ha-front').textContent = frontDTI.toFixed(1) + '%';
+    document.getElementById('res-ha-back').textContent = backDTI.toFixed(1) + '%';
+    document.getElementById('res-ha-loan').textContent = fmt(maxLoan);
+    document.getElementById('res-ha-pi').textContent = fmt(maxPI);
+    document.getElementById('res-ha-ti').textContent = fmt(maxTax + monthlyInsurance + hoa);
+    document.getElementById('res-ha-income').textContent = fmt(monthlyIncome);
+    document.getElementById('results-ha').style.display = '';
+  });
+</script>

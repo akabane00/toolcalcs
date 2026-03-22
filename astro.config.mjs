@@ -42,13 +42,13 @@ export default defineConfig({
 
       // High-priority: homepage, category indexes
       if (url === 'https://toolcalcs.com/' ||
-          url.match(/toolcalcs\.com\/(financial|health|math|date-time|conversion|everyday|construction|astrology|insurance|tax)-calculators\/$/) ||
+          url.match(/toolcalcs\.com\/(financial|health|math|date-time|conversion|everyday|construction|astrology|insurance|tax|real-estate)-calculators\/$/) ||
           url.match(/toolcalcs\.com\/(test|tools|blog|worksheets)\/$/)) {
         item.priority = 1.0;
         item.changefreq = 'weekly';
       }
       // High: individual calculators, games, tools, worksheets, blog articles
-      else if (url.match(/toolcalcs\.com\/(financial|health|math|date-time|conversion|everyday|construction|astrology|insurance|tax)-calculators\/[^/]+\/$/) ||
+      else if (url.match(/toolcalcs\.com\/(financial|health|math|date-time|conversion|everyday|construction|astrology|insurance|tax|real-estate)-calculators\/[^/]+\/$/) ||
                url.match(/toolcalcs\.com\/(test|tools|worksheets|blog)\/[^/]+\/$/)) {
         item.priority = 0.8;
         item.changefreq = 'monthly';

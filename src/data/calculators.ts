@@ -75,6 +75,12 @@ export const categories: Category[] = [
     description: 'Federal income tax, self-employment tax, capital gains, tax withholding, sales tax, and property tax calculators.',
     icon: '🧾',
   },
+  {
+    name: 'Real Estate Calculators',
+    slug: 'real-estate-calculators',
+    description: 'Rental property ROI, cap rate, mortgage refinance, home affordability, closing costs, and real estate investment calculators.',
+    icon: '🏘️',
+  },
 ];
 
 export const calculators: Calculator[] = [
@@ -1139,6 +1145,55 @@ export const calculators: Calculator[] = [
     categorySlug: 'tax-calculators',
     icon: '🏡',
   },
+  // Real Estate Calculators
+  {
+    title: 'Rental Property Calculator',
+    slug: 'rental-property-calculator',
+    description: 'Analyze rental property profitability with monthly cash flow, cap rate, cash-on-cash return, and gross rental yield in one tool.',
+    category: 'Real Estate Calculators',
+    categorySlug: 'real-estate-calculators',
+    icon: '🏘️',
+  },
+  {
+    title: 'Cap Rate Calculator',
+    slug: 'cap-rate-calculator',
+    description: 'Calculate the capitalization rate of any investment property. Enter NOI and property value to evaluate and compare real estate deals.',
+    category: 'Real Estate Calculators',
+    categorySlug: 'real-estate-calculators',
+    icon: '📊',
+  },
+  {
+    title: 'Mortgage Refinance Calculator',
+    slug: 'mortgage-refinance-calculator',
+    description: 'Calculate monthly savings, break-even point, and total interest saved when refinancing your mortgage to a lower rate.',
+    category: 'Real Estate Calculators',
+    categorySlug: 'real-estate-calculators',
+    icon: '🔄',
+  },
+  {
+    title: 'Home Affordability Calculator',
+    slug: 'home-affordability-calculator',
+    description: 'Find out how much house you can afford based on income, debts, down payment, and interest rate. See max purchase price and monthly payment.',
+    category: 'Real Estate Calculators',
+    categorySlug: 'real-estate-calculators',
+    icon: '🏠',
+  },
+  {
+    title: 'Closing Cost Calculator',
+    slug: 'closing-cost-calculator',
+    description: 'Estimate buyer and seller closing costs for your home purchase or sale. See itemized fees including title, escrow, origination, and taxes.',
+    category: 'Real Estate Calculators',
+    categorySlug: 'real-estate-calculators',
+    icon: '📝',
+  },
+  {
+    title: 'Real Estate ROI Calculator',
+    slug: 'real-estate-roi-calculator',
+    description: 'Calculate total return on real estate investment including appreciation, rental income, equity paydown, and tax benefits.',
+    category: 'Real Estate Calculators',
+    categorySlug: 'real-estate-calculators',
+    icon: '📈',
+  },
 ];
 
 export function getCalculatorsByCategory(categorySlug: string): Calculator[] {
@@ -1148,7 +1203,8 @@ export function getCalculatorsByCategory(categorySlug: string): Calculator[] {
 // Semantic relationship groups for internal linking
 const relatedGroups: Record<string, string[]> = {
   // Financial - Loans & Mortgages
-  'loans-mortgages': ['mortgage-calculator', 'loan-amortization-calculator', 'refinance-calculator', 'home-affordability-calculator', 'down-payment-calculator', 'rent-vs-buy-calculator', 'auto-loan-calculator', 'student-loan-calculator', 'business-loan-calculator', 'mortgage-amortization-calculator', 'car-lease-calculator', 'rent-affordability-calculator'],
+  'loans-mortgages': ['mortgage-calculator', 'loan-amortization-calculator', 'refinance-calculator', 'home-affordability-calculator', 'down-payment-calculator', 'rent-vs-buy-calculator', 'auto-loan-calculator', 'student-loan-calculator', 'business-loan-calculator', 'mortgage-amortization-calculator', 'car-lease-calculator', 'rent-affordability-calculator', 'mortgage-refinance-calculator', 'closing-cost-calculator'],
+  'real-estate': ['rental-property-calculator', 'cap-rate-calculator', 'real-estate-roi-calculator', 'mortgage-refinance-calculator', 'home-affordability-calculator', 'closing-cost-calculator', 'rent-vs-buy-calculator', 'down-payment-calculator'],
   // Financial - Income & Tax
   'income-tax': ['take-home-pay-calculator', 'paycheck-calculator', 'tax-calculator', 'payroll-tax-calculator', 'capital-gains-tax-calculator', 'estate-tax-calculator', 'hourly-to-salary-calculator', 'time-card-calculator'],
   // Financial - Savings & Investment
@@ -1183,6 +1239,9 @@ const crossCategoryLinks: Record<string, string[]> = {
   'everyday-calculators': ['percentage-calculator', 'tax-calculator', 'mortgage-calculator', 'bmi-calculator'],
   'construction-calculators': ['square-footage-calculator', 'area-calculator', 'percentage-calculator', 'concrete-calculator'],
   'astrology-calculators': ['age-calculator', 'random-number-generator', 'date-difference-calculator'],
+  'real-estate-calculators': ['mortgage-calculator', 'compound-interest-calculator', 'investment-calculator', 'loan-amortization-calculator'],
+  'tax-calculators': ['take-home-pay-calculator', 'self-employment-tax-calculator', 'rental-property-calculator'],
+  'insurance-calculators': ['mortgage-calculator', 'home-affordability-calculator', 'take-home-pay-calculator'],
 };
 
 export function getRelatedCalculators(currentSlug: string, limit: number = 5): Calculator[] {

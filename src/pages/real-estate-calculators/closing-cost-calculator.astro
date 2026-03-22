@@ -1,0 +1,276 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Real Estate Calculators", "item": "https://toolcalcs.com/real-estate-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Closing Cost Calculator" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "How much are closing costs for a home buyer?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Buyers typically pay 2–5% of the purchase price in closing costs. On a $350,000 home, that is $7,000–$17,500. Costs include loan origination fees (0.5–1%), appraisal ($400–$700), title search and insurance ($700–$1,500), escrow fees ($500–$1,000), prepaid property taxes and homeowner's insurance, and government recording fees ($50–$250). The lender must provide a Loan Estimate within 3 business days of your application showing a detailed breakdown of expected closing costs."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "Who pays closing costs — buyer or seller?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Both buyer and seller typically pay closing costs, but different ones. Buyers pay loan-related fees (origination, appraisal, title insurance for lender), prepaid expenses, and government taxes. Sellers typically pay real estate agent commissions (2–3% each for buyer and seller agent, though this is now negotiable post-NAR settlement), transfer taxes in many states, and their own attorney fees. In buyer's markets, sellers often agree to 'seller concessions' — paying some of the buyer's closing costs to close the deal."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "Can closing costs be rolled into the mortgage?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "In most cases, no — closing costs are due at settlement in cash. However, some lenders offer 'no-closing-cost' loans where the costs are either rolled into the loan balance (increasing the amount you owe) or covered through a higher interest rate (lender credit). Some states and programs allow certain fees to be financed, and sellers can pay concessions toward buyer closing costs. FHA loans allow sellers to pay up to 6% of the sale price toward buyer costs."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Closing Cost Calculator 2026 - Buyer & Seller Costs"
+  description="Estimate buyer and seller closing costs for any home purchase. See itemized fees including title, escrow, origination, taxes, and agent commissions."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/real-estate-calculators/">Real Estate Calculators</a> &rsaquo;
+    <span>Closing Cost Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Closing Cost Calculator 2026</h1>
+  <p class="page-desc">Estimate your closing costs as a buyer or seller. See itemized fees for title, escrow, origination, agent commissions, and taxes so you can plan your cash needs.</p>
+
+  <div class="calc-box">
+    <div class="calc-grid-2">
+      <div class="input-group">
+        <label for="cc-price">Home Purchase Price</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="cc-price" value="350000" min="50000" max="10000000" step="5000" /></div>
+      </div>
+      <div class="input-group">
+        <label for="cc-down-pct">Down Payment</label>
+        <div class="input-prefix"><input type="number" id="cc-down-pct" value="20" min="0" max="100" step="1" /><span style="margin-left:4px">%</span></div>
+      </div>
+      <div class="input-group">
+        <label for="cc-role">I am the</label>
+        <select id="cc-role">
+          <option value="buyer" selected>Buyer</option>
+          <option value="seller">Seller</option>
+          <option value="both">Both (estimate both sides)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="cc-state">State</label>
+        <select id="cc-state">
+          <option value="low">Low transfer tax state (OR, TX, CO...)</option>
+          <option value="mid" selected>Average state (most states)</option>
+          <option value="high">High transfer tax state (NY, PA, DE...)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="cc-agent">Seller Agent Commission</label>
+        <div class="input-prefix"><input type="number" id="cc-agent" value="5" min="0" max="10" step="0.25" /><span style="margin-left:4px">% total</span></div>
+        <small>Post-NAR settlement: now negotiable</small>
+      </div>
+      <div class="input-group">
+        <label for="cc-prepaid-months">Prepaid Escrow (months)</label>
+        <input type="number" id="cc-prepaid-months" value="3" min="1" max="6" step="1" />
+        <small>Months of tax + insurance collected upfront</small>
+      </div>
+    </div>
+    <button class="calc-btn" id="calcBtnCC">Estimate Closing Costs</button>
+
+    <div class="results" id="results-cc" style="display:none">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <div class="result-label" id="cc-total-label">Total Closing Costs</div>
+          <div class="result-value" id="res-cc-total">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">As % of Purchase Price</div>
+          <div class="result-value" id="res-cc-pct">0%</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Cash to Close (Buyer)</div>
+          <div class="result-value" id="res-cc-cash">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Net Seller Proceeds</div>
+          <div class="result-value" id="res-cc-net">$0</div>
+        </div>
+      </div>
+      <div id="cc-breakdown" style="margin-top:16px;font-size:0.9rem;"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+  <RelatedCalculators currentSlug="closing-cost-calculator" />
+
+  <article class="seo-content">
+    <h2>Closing Costs Explained: Buyer and Seller Guide 2026</h2>
+    <p>Closing costs are the fees and expenses paid at the settlement of a real estate transaction — separate from the down payment. They catch many first-time buyers off guard. Understanding what these costs are, who pays them, and how to minimize them can save thousands of dollars.</p>
+
+    <h3>Typical Buyer Closing Costs (2–5% of Purchase Price)</h3>
+    <ul>
+      <li><strong>Loan origination fee:</strong> 0.5–1% of loan amount. Compensation for the lender processing your loan. Sometimes expressed as "points."</li>
+      <li><strong>Appraisal fee:</strong> $400–$700. Required by lender to confirm the property's value supports the loan amount.</li>
+      <li><strong>Credit report fee:</strong> $30–$75. The lender's cost to pull your credit reports.</li>
+      <li><strong>Title search:</strong> $200–$400. Examines public records to confirm the seller has clear ownership.</li>
+      <li><strong>Lender's title insurance:</strong> $500–$1,000. One-time premium protecting the lender against title defects. Required by all mortgage lenders.</li>
+      <li><strong>Owner's title insurance:</strong> $500–$1,500. Optional but highly recommended — protects you against title claims discovered after closing.</li>
+      <li><strong>Escrow/settlement fee:</strong> $500–$1,500. Paid to the escrow company or attorney managing the transaction.</li>
+      <li><strong>Recording fees:</strong> $50–$250. Government charges to record the new deed and mortgage.</li>
+      <li><strong>Transfer taxes:</strong> Varies widely by state — 0% (Texas, Oregon) to 2–4% (Pennsylvania, New York, Delaware).</li>
+      <li><strong>Prepaid interest:</strong> Interest from closing date to end of the month (1–30 days of daily interest).</li>
+      <li><strong>Prepaid homeowner's insurance:</strong> First year paid upfront at closing.</li>
+      <li><strong>Escrow setup:</strong> 2–6 months of property taxes and insurance deposited into escrow account.</li>
+    </ul>
+
+    <h3>Typical Seller Closing Costs</h3>
+    <ul>
+      <li><strong>Real estate agent commissions:</strong> Historically 5–6% total. Post-NAR settlement (2024), buyer and seller agent fees are now separately negotiated. Sellers are no longer required to offer compensation to the buyer's agent through MLS.</li>
+      <li><strong>Transfer taxes:</strong> In many states, sellers pay some or all transfer taxes. Varies significantly by state and county.</li>
+      <li><strong>Owner's title insurance (in some states):</strong> In states where sellers customarily provide this, the cost is a seller expense.</li>
+      <li><strong>Prorated property taxes:</strong> Taxes for the portion of the year before closing are credited to the buyer.</li>
+      <li><strong>HOA fees:</strong> Any outstanding dues or transfer fees owed to the HOA.</li>
+      <li><strong>Attorney fees:</strong> Required in some states (attorney states) for closing — typically $500–$1,500.</li>
+      <li><strong>Home warranty:</strong> Often offered to buyers as an incentive — typically $400–$700.</li>
+    </ul>
+
+    <h3>Reducing Closing Costs: Strategies</h3>
+    <ul>
+      <li><strong>Shop lenders:</strong> Origination fees and points vary significantly. Get Loan Estimates from 3–4 lenders and compare the APR, not just the rate.</li>
+      <li><strong>Shop title and escrow:</strong> In most states, you can choose your own title and escrow company. Prices vary by 20–40% between providers.</li>
+      <li><strong>Negotiate seller concessions:</strong> Ask the seller to pay some of your closing costs. In buyer's markets, sellers often agree. There are limits (FHA: 6%, conventional: 2–9% depending on LTV).</li>
+      <li><strong>Close at end of the month:</strong> Prepaid interest is calculated from closing date to end of month. Closing on the 29th instead of the 1st reduces your prepaid interest by 28 days.</li>
+      <li><strong>Negotiate agent commission:</strong> Post-NAR settlement, agent fees are more openly negotiable than before. Some discount brokerages charge 1–1.5% listing fees.</li>
+    </ul>
+  </article>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <h3>How much are closing costs for a home buyer?</h3>
+        <p>Typically 2–5% of the purchase price. On a $350,000 home: $7,000–$17,500. Includes loan origination, appraisal, title insurance, escrow fees, prepaid taxes and insurance, and recording fees. Your lender must provide a Loan Estimate within 3 business days of your application.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Who pays closing costs — buyer or seller?</h3>
+        <p>Both pay different costs. Buyers pay loan-related fees and prepaids. Sellers pay agent commissions (now negotiable post-NAR settlement), transfer taxes, and prorated expenses. In buyer's markets, sellers often agree to "concessions" — covering some of the buyer's closing costs.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Can closing costs be rolled into the mortgage?</h3>
+        <p>Generally no — they are due in cash at settlement. However, "no-closing-cost" loans either add costs to the loan balance or cover them with a slightly higher interest rate. Sellers can also pay buyer closing costs up to certain limits (FHA: 6% of price, conventional: 2–9% depending on down payment).</p>
+      </div>
+    </div>
+  </section>
+
+  <RelatedArticles calculatorSlug="closing-cost-calculator" />
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function fmt(n) { return '$' + Math.round(Math.abs(n)).toLocaleString('en-US'); }
+
+  document.getElementById('calcBtnCC').addEventListener('click', function() {
+    var price = parseFloat(document.getElementById('cc-price').value) || 0;
+    var downPct = (parseFloat(document.getElementById('cc-down-pct').value) || 20) / 100;
+    var role = document.getElementById('cc-role').value;
+    var state = document.getElementById('cc-state').value;
+    var agentCommPct = (parseFloat(document.getElementById('cc-agent').value) || 5) / 100;
+    var prepaidMonths = parseInt(document.getElementById('cc-prepaid-months').value) || 3;
+
+    var loan = price * (1 - downPct);
+    var down = price * downPct;
+
+    // Transfer tax rates by state category
+    var transferTaxBuyerPct = state === 'high' ? 0.015 : state === 'mid' ? 0.005 : 0;
+    var transferTaxSellerPct = state === 'high' ? 0.015 : state === 'mid' ? 0.005 : 0;
+
+    // BUYER costs
+    var origination = loan * 0.007;
+    var appraisal = 550;
+    var creditReport = 50;
+    var titleSearch = 300;
+    var lenderTitle = 750;
+    var ownerTitle = 900;
+    var escrowFee = 900;
+    var recording = 150;
+    var transferTaxBuyer = price * transferTaxBuyerPct;
+    var prepaidInterest = loan * 0.065 / 12 * 15; // ~15 days avg
+    var prepaidInsurance = 1600; // typical year 1
+    var escrowSetup = (price * 0.012 / 12 + prepaidInsurance / 12) * prepaidMonths;
+    var buyerTotal = origination + appraisal + creditReport + titleSearch + lenderTitle + ownerTitle + escrowFee + recording + transferTaxBuyer + prepaidInterest + prepaidInsurance + escrowSetup;
+
+    // SELLER costs
+    var agentComm = price * agentCommPct;
+    var transferTaxSeller = price * transferTaxSellerPct;
+    var prorations = price * 0.012 / 2; // ~6 months property tax proration avg
+    var sellerAtty = 800;
+    var sellerTotal = agentComm + transferTaxSeller + prorations + sellerAtty;
+
+    var totalLabel = document.getElementById('cc-total-label');
+    var total, netProceeds, cashToClose;
+
+    if (role === 'buyer') {
+      total = buyerTotal;
+      cashToClose = down + buyerTotal;
+      netProceeds = price - sellerTotal;
+      totalLabel.textContent = 'Buyer Closing Costs';
+    } else if (role === 'seller') {
+      total = sellerTotal;
+      cashToClose = down + buyerTotal;
+      netProceeds = price - sellerTotal;
+      totalLabel.textContent = 'Seller Closing Costs';
+    } else {
+      total = buyerTotal + sellerTotal;
+      cashToClose = down + buyerTotal;
+      netProceeds = price - sellerTotal;
+      totalLabel.textContent = 'Total Closing Costs (Both Sides)';
+    }
+
+    document.getElementById('res-cc-total').textContent = fmt(total);
+    document.getElementById('res-cc-pct').textContent = (total / price * 100).toFixed(1) + '%';
+    document.getElementById('res-cc-cash').textContent = fmt(cashToClose);
+    document.getElementById('res-cc-net').textContent = fmt(netProceeds);
+
+    var breakdown = '<strong>Buyer cost breakdown:</strong><br>';
+    breakdown += 'Loan origination: ' + fmt(origination) + '<br>';
+    breakdown += 'Appraisal: ' + fmt(appraisal) + '<br>';
+    breakdown += 'Title (lender + owner): ' + fmt(lenderTitle + ownerTitle) + '<br>';
+    breakdown += 'Escrow & settlement: ' + fmt(escrowFee) + '<br>';
+    breakdown += 'Transfer tax (buyer): ' + fmt(transferTaxBuyer) + '<br>';
+    breakdown += 'Prepaid interest: ' + fmt(prepaidInterest) + '<br>';
+    breakdown += 'Prepaid insurance + escrow setup: ' + fmt(prepaidInsurance + escrowSetup) + '<br>';
+    breakdown += '<br><strong>Seller cost breakdown:</strong><br>';
+    breakdown += 'Agent commissions: ' + fmt(agentComm) + '<br>';
+    breakdown += 'Transfer tax (seller): ' + fmt(transferTaxSeller) + '<br>';
+    breakdown += 'Property tax proration: ' + fmt(prorations) + '<br>';
+    breakdown += 'Attorney/other: ' + fmt(sellerAtty);
+
+    document.getElementById('cc-breakdown').innerHTML = breakdown;
+    document.getElementById('results-cc').style.display = '';
+  });
+</script>

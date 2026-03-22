@@ -1,0 +1,246 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Real Estate Calculators", "item": "https://toolcalcs.com/real-estate-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Cap Rate Calculator" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "What is a good cap rate for a rental property?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "A good cap rate depends on the market and property type. Generally: 4–5% is typical for primary markets (NYC, San Francisco, Los Angeles) where investors accept lower yields for appreciation and stability. 5–7% is common in secondary markets (Austin, Denver, Nashville). 7–10%+ is expected in tertiary or high-risk markets. Class A properties (newer, premium locations) typically have lower cap rates than Class C properties (older, lower-income areas). There is no universal 'good' cap rate — it must be compared to local market averages and your risk tolerance."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "What is NOI (Net Operating Income)?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Net Operating Income (NOI) is the annual income a property generates after all operating expenses but before mortgage payments and income taxes. NOI = Gross Rental Income − Vacancy Losses − Operating Expenses. Operating expenses include property taxes, insurance, property management, maintenance, and utilities (if landlord-paid). NOI does NOT include mortgage principal or interest — this makes it independent of financing, allowing direct comparison of properties regardless of how they are financed."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "How is cap rate different from cash-on-cash return?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Cap rate measures a property's income potential independent of financing (NOI divided by purchase price). Cash-on-cash return measures the actual return on your invested cash after the mortgage payment (annual cash flow divided by cash invested). Cap rate is useful for comparing properties or estimating market value. Cash-on-cash return is more relevant to leveraged investors because it shows the actual return on the money you put in. A property can have a 6% cap rate but a 12% cash-on-cash return if mortgage leverage amplifies the returns."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Cap Rate Calculator 2026 - Calculate Capitalization Rate"
+  description="Calculate cap rate for any rental property or commercial real estate. Enter NOI and property value or work backwards from cap rate to find a property's value."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/real-estate-calculators/">Real Estate Calculators</a> &rsaquo;
+    <span>Cap Rate Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Cap Rate Calculator 2026</h1>
+  <p class="page-desc">Calculate the capitalization rate of any investment property. Enter income and expenses to find the cap rate, or use cap rate to determine property value.</p>
+
+  <div class="calc-box">
+    <div class="input-group" style="margin-bottom:16px">
+      <label>Calculation Mode</label>
+      <select id="cap-mode">
+        <option value="find-cap">Find Cap Rate (I know price + income)</option>
+        <option value="find-value">Find Property Value (I know cap rate + NOI)</option>
+        <option value="find-noi">Find Required NOI (I know cap rate + price)</option>
+      </select>
+    </div>
+    <div class="calc-grid-2">
+      <div class="input-group" id="cap-price-group">
+        <label for="cap-price">Property Price / Value</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="cap-price" value="400000" min="10000" max="50000000" step="5000" /></div>
+      </div>
+      <div class="input-group" id="cap-rate-group" style="display:none">
+        <label for="cap-rate-input">Target Cap Rate</label>
+        <div class="input-prefix"><input type="number" id="cap-rate-input" value="6" min="0.1" max="30" step="0.1" /><span style="margin-left:4px">%</span></div>
+      </div>
+      <div class="input-group">
+        <label for="cap-gross">Annual Gross Rent</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="cap-gross" value="30000" min="0" max="5000000" step="1000" /></div>
+      </div>
+      <div class="input-group">
+        <label for="cap-vacancy">Vacancy Rate</label>
+        <div class="input-prefix"><input type="number" id="cap-vacancy" value="5" min="0" max="50" step="1" /><span style="margin-left:4px">%</span></div>
+      </div>
+      <div class="input-group">
+        <label for="cap-taxes">Annual Property Tax</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="cap-taxes" value="4800" min="0" max="500000" step="100" /></div>
+      </div>
+      <div class="input-group">
+        <label for="cap-insurance">Annual Insurance</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="cap-insurance" value="1500" min="0" max="50000" step="100" /></div>
+      </div>
+      <div class="input-group">
+        <label for="cap-mgmt">Management Fees</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="cap-mgmt" value="2400" min="0" max="100000" step="100" /></div>
+      </div>
+      <div class="input-group">
+        <label for="cap-other">Other Annual Expenses</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="cap-other" value="2000" min="0" max="100000" step="100" /></div>
+        <small>Maintenance, repairs, utilities</small>
+      </div>
+    </div>
+    <button class="calc-btn" id="calcBtnCap">Calculate Cap Rate</button>
+
+    <div class="results" id="results-cap" style="display:none">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <div class="result-label" id="cap-primary-label">Cap Rate</div>
+          <div class="result-value" id="res-cap-rate">0%</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Net Operating Income (NOI)</div>
+          <div class="result-value" id="res-cap-noi">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Effective Gross Income</div>
+          <div class="result-value" id="res-cap-egi">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Total Operating Expenses</div>
+          <div class="result-value" id="res-cap-expenses">$0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+  <RelatedCalculators currentSlug="cap-rate-calculator" />
+
+  <article class="seo-content">
+    <h2>Cap Rate Guide for Real Estate Investors</h2>
+    <p>The capitalization rate — or cap rate — is the foundational metric of commercial and residential real estate investment. It tells you the rate of return a property would generate if purchased entirely with cash, making it the purest measure of a property's income potential independent of how it is financed.</p>
+
+    <h3>Cap Rate Formula</h3>
+    <p><strong>Cap Rate = Net Operating Income (NOI) ÷ Current Market Value × 100</strong></p>
+    <p>Or rearranged to find property value: <strong>Value = NOI ÷ Cap Rate</strong></p>
+    <p>And to find required NOI: <strong>NOI = Value × Cap Rate</strong></p>
+
+    <h3>What Is NOI?</h3>
+    <p>Net Operating Income = Gross Rental Income − Vacancy − Operating Expenses (taxes, insurance, management, maintenance, utilities). It does NOT include mortgage payments, depreciation, or income taxes. NOI represents the property's cash-generating power before financing — which is why cap rate is useful for comparing properties regardless of how individual buyers might finance them.</p>
+
+    <h3>Average Cap Rates by Market (2026)</h3>
+    <div class="data-table">
+      <table>
+        <thead><tr><th>Market</th><th>Multifamily</th><th>Single Family</th><th>Commercial</th></tr></thead>
+        <tbody>
+          <tr><td>New York City</td><td>3.5–4.5%</td><td>3–4%</td><td>4–5%</td></tr>
+          <tr><td>San Francisco</td><td>3.5–4.5%</td><td>3–4%</td><td>4–5%</td></tr>
+          <tr><td>Los Angeles</td><td>4–5%</td><td>3.5–4.5%</td><td>4.5–5.5%</td></tr>
+          <tr><td>Austin</td><td>5–6.5%</td><td>5–6%</td><td>5.5–7%</td></tr>
+          <tr><td>Nashville</td><td>5–6.5%</td><td>5–6%</td><td>5.5–7%</td></tr>
+          <tr><td>Chicago</td><td>5.5–7%</td><td>5–6.5%</td><td>6–8%</td></tr>
+          <tr><td>Cleveland</td><td>7–9%</td><td>7–10%</td><td>7–10%</td></tr>
+          <tr><td>Detroit</td><td>8–11%</td><td>8–12%</td><td>8–11%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Why Lower Cap Rates Exist</h3>
+    <p>Lower cap rates are not inherently bad — they reflect investor confidence. Properties in markets with strong appreciation, low vacancy, high-quality tenants, and stable demand command lower cap rates because buyers are willing to pay more for the income stream. A 4% cap rate in Manhattan means investors believe the income is extremely reliable and the property will appreciate. A 10% cap rate in a rural market suggests higher risk or lower confidence in future appreciation.</p>
+
+    <h3>Using Cap Rate for Property Valuation</h3>
+    <p>Cap rates allow you to estimate a property's value based on market data: if comparable properties in a neighborhood trade at a 6% cap rate and your property has a $24,000 NOI, the implied value is $24,000 ÷ 0.06 = $400,000. This is how commercial appraisers value income properties — using the income approach with comparable market cap rates.</p>
+  </article>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <h3>What is a good cap rate for a rental property?</h3>
+        <p>It depends on the market. Primary markets (NYC, LA, SF): 4–5%. Secondary markets (Austin, Denver): 5–7%. Tertiary/high-risk markets: 7–10%+. Always compare to local comparables — a 6% cap rate might be excellent in Chicago and terrible in Cleveland.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What is NOI (Net Operating Income)?</h3>
+        <p>NOI = Gross Rental Income − Vacancy − Operating Expenses (taxes, insurance, management, maintenance). It excludes mortgage payments and depreciation. NOI is the property's income power before financing, making cap rate a financing-neutral comparison tool.</p>
+      </div>
+      <div class="faq-item">
+        <h3>How is cap rate different from cash-on-cash return?</h3>
+        <p>Cap rate ignores financing (NOI ÷ price). Cash-on-cash includes financing (annual cash flow after mortgage ÷ cash invested). Use cap rate to compare properties and estimate market value. Use cash-on-cash to see your actual return on invested dollars. A 6% cap rate property with 25% down at 7% financing might have a negative cash-on-cash return — or a 12% CoC with favorable leverage.</p>
+      </div>
+    </div>
+  </section>
+
+  <RelatedArticles calculatorSlug="cap-rate-calculator" />
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function fmt(n) { return '$' + Math.round(Math.abs(n)).toLocaleString('en-US'); }
+
+  var modeEl = document.getElementById('cap-mode');
+  var priceGroup = document.getElementById('cap-price-group');
+  var rateGroup = document.getElementById('cap-rate-group');
+
+  modeEl.addEventListener('change', function() {
+    var mode = modeEl.value;
+    priceGroup.style.display = (mode === 'find-value') ? 'none' : '';
+    rateGroup.style.display = (mode === 'find-cap') ? 'none' : '';
+  });
+
+  document.getElementById('calcBtnCap').addEventListener('click', function() {
+    var mode = modeEl.value;
+    var price = parseFloat(document.getElementById('cap-price').value) || 0;
+    var capRateInput = (parseFloat(document.getElementById('cap-rate-input').value) || 6) / 100;
+    var grossRent = parseFloat(document.getElementById('cap-gross').value) || 0;
+    var vacancyPct = (parseFloat(document.getElementById('cap-vacancy').value) || 5) / 100;
+    var taxes = parseFloat(document.getElementById('cap-taxes').value) || 0;
+    var insurance = parseFloat(document.getElementById('cap-insurance').value) || 0;
+    var mgmt = parseFloat(document.getElementById('cap-mgmt').value) || 0;
+    var other = parseFloat(document.getElementById('cap-other').value) || 0;
+
+    var egi = grossRent * (1 - vacancyPct);
+    var totalOpEx = taxes + insurance + mgmt + other;
+    var noi = egi - totalOpEx;
+
+    var capRate, displayValue;
+    var labelEl = document.getElementById('cap-primary-label');
+
+    if (mode === 'find-cap') {
+      capRate = price > 0 ? (noi / price * 100) : 0;
+      displayValue = capRate.toFixed(2) + '%';
+      labelEl.textContent = 'Cap Rate';
+    } else if (mode === 'find-value') {
+      var impliedValue = capRateInput > 0 ? (noi / capRateInput) : 0;
+      displayValue = fmt(impliedValue);
+      labelEl.textContent = 'Implied Property Value';
+    } else {
+      var requiredNoi = price * capRateInput;
+      displayValue = fmt(requiredNoi);
+      labelEl.textContent = 'Required Annual NOI';
+    }
+
+    document.getElementById('res-cap-rate').textContent = displayValue;
+    document.getElementById('res-cap-noi').textContent = fmt(noi);
+    document.getElementById('res-cap-egi').textContent = fmt(egi);
+    document.getElementById('res-cap-expenses').textContent = fmt(totalOpEx);
+    document.getElementById('results-cap').style.display = '';
+  });
+</script>
