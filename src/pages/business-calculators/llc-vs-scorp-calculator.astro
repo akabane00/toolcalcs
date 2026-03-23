@@ -1,0 +1,252 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Business Calculators", "item": "https://toolcalcs.com/business-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "LLC vs S-Corp Tax Calculator" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "When does it make sense to elect S-Corp status?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Converting to S-Corp typically makes sense when your net business profit exceeds $40,000–$50,000 per year. The S-Corp allows you to pay yourself a 'reasonable salary' and take the remaining profits as distributions — which are not subject to the 15.3% self-employment tax. The savings on the distribution portion must exceed the additional costs of running an S-Corp (payroll processing, corporate tax return, etc.), which typically run $1,500–$3,000 per year. At $60,000 net profit with a $40,000 salary, the S-Corp saves about $3,060/year on SE tax."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "What is a 'reasonable salary' for S-Corp purposes?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "The IRS requires S-Corp owner-employees to pay themselves a 'reasonable compensation' — a salary comparable to what you would pay someone else to do the same work. There is no exact formula, but the IRS looks at comparable market wages, your role, hours worked, and the business's revenue. A common approach: pay yourself a salary in the range of 40–60% of net business income. For a solo professional making $150,000, a salary of $60,000–$80,000 is often considered reasonable. Taking too low a salary is an IRS audit red flag."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "What are the costs and downsides of S-Corp status?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "S-Corp costs include: payroll processing ($500–$1,500/year for software or service), a separate corporate tax return Form 1120-S ($500–$1,500 if CPA-prepared), quarterly payroll tax deposits, state registration fees, and potential state franchise taxes. Some states also require S-Corps to pay a minimum franchise tax regardless of income. Total S-Corp overhead typically runs $1,500–$3,000/year. The tax savings must exceed these costs — which usually requires net business income of at least $40,000–$60,000 to make it worthwhile."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="LLC vs S-Corp Tax Calculator 2026 - Find Your Tax Savings"
+  description="Compare LLC self-employment tax vs S-Corp salary/distribution split. Calculate exact annual tax savings and find the break-even profit level for S-Corp election."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/business-calculators/">Business Calculators</a> &rsaquo;
+    <span>LLC vs S-Corp Tax Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>LLC vs S-Corp Tax Calculator 2026</h1>
+  <p class="page-desc">Compare your total tax liability as a single-member LLC versus an S-Corp. Find how much you can save in self-employment taxes by electing S-Corp status.</p>
+
+  <div class="calc-box">
+    <div class="calc-grid-2">
+      <div class="input-group">
+        <label for="sc-profit">Annual Net Business Profit</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="sc-profit" value="100000" min="0" max="10000000" step="5000" /></div>
+        <small>Revenue minus all business expenses (before owner's pay)</small>
+      </div>
+      <div class="input-group">
+        <label for="sc-salary-pct">S-Corp Reasonable Salary</label>
+        <div class="input-prefix"><input type="number" id="sc-salary-pct" value="50" min="20" max="100" step="5" /><span style="margin-left:4px">% of profit</span></div>
+        <small>IRS requires a market-rate salary (typically 40–60%)</small>
+      </div>
+      <div class="input-group">
+        <label for="sc-tax-bracket">Income Tax Bracket</label>
+        <select id="sc-tax-bracket">
+          <option value="0.12">12%</option>
+          <option value="0.22" selected>22%</option>
+          <option value="0.24">24%</option>
+          <option value="0.32">32%</option>
+          <option value="0.37">37%</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="sc-scorp-costs">Annual S-Corp Overhead Costs</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="sc-scorp-costs" value="2000" min="0" max="20000" step="100" /></div>
+        <small>Payroll service + corporate tax return (typically $1,500–$3,000)</small>
+      </div>
+    </div>
+    <button class="calc-btn" id="calcBtnSC">Compare LLC vs S-Corp</button>
+
+    <div class="results" id="results-sc" style="display:none">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <div class="result-label">Annual Tax Savings (S-Corp)</div>
+          <div class="result-value" id="res-sc-savings">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Net Savings After S-Corp Costs</div>
+          <div class="result-value" id="res-sc-net-savings">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">LLC Self-Employment Tax</div>
+          <div class="result-value" id="res-sc-llc-se">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">S-Corp SE Tax (on salary only)</div>
+          <div class="result-value" id="res-sc-scorp-se">$0</div>
+        </div>
+      </div>
+      <div class="result-cards" style="margin-top:12px">
+        <div class="result-card">
+          <div class="result-label">S-Corp Salary</div>
+          <div class="result-value" id="res-sc-salary">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">S-Corp Distribution (no SE tax)</div>
+          <div class="result-value" id="res-sc-dist">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Break-Even Profit for S-Corp</div>
+          <div class="result-value" id="res-sc-breakeven">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Payback Period</div>
+          <div class="result-value" id="res-sc-payback">—</div>
+        </div>
+      </div>
+      <div id="sc-advice" style="margin-top:16px;padding:14px;border-radius:8px;font-size:0.95rem;"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+  <RelatedCalculators currentSlug="llc-vs-scorp-calculator" />
+
+  <article class="seo-content">
+    <h2>LLC vs S-Corp: Understanding the Tax Difference</h2>
+    <p>One of the most impactful financial decisions a self-employed person can make is choosing the right business structure. While LLCs are popular for their simplicity, electing S-Corporation status can save thousands of dollars in self-employment taxes each year — if your income is high enough to justify it. Understanding the mechanics of each structure is essential before making this decision.</p>
+
+    <h3>How LLC Taxation Works</h3>
+    <p>A single-member LLC is taxed as a sole proprietorship by default. The entire net profit of the business flows to your personal tax return and is subject to self-employment (SE) tax. SE tax is 15.3% on the first $176,100 of net earnings (2026) and 2.9% above that. This covers both the employee and employer portions of Social Security and Medicare that W-2 employees split with their employer.</p>
+    <p>On $100,000 of net profit: SE tax = $100,000 × 0.9235 × 0.153 = ~$14,130. (The 0.9235 factor accounts for the deduction of the employer-equivalent SE tax.)</p>
+
+    <h3>How S-Corp Taxation Works</h3>
+    <p>An S-Corp allows you to split your income into two parts: a salary (subject to payroll/SE taxes) and distributions (not subject to SE taxes). You pay SE tax only on the salary portion. The distribution goes directly to you without Medicare and Social Security taxes.</p>
+    <p>On $100,000 profit with a $50,000 salary: SE tax = $50,000 × 0.9235 × 0.153 = ~$7,065. Plus you pay $50,000 in distributions with no SE tax. Total SE tax: ~$7,065 vs ~$14,130 under LLC — saving ~$7,065 per year.</p>
+
+    <h3>The "Reasonable Salary" Requirement</h3>
+    <p>The IRS requires S-Corp owners who work in the business to pay themselves a "reasonable compensation" — a salary comparable to what the business would pay a third party to do the same work. Taking too low a salary to minimize SE tax is an IRS audit trigger. Common benchmarks:</p>
+    <ul>
+      <li>Solo professional (consultant, lawyer, designer): 40–60% of net profit or market rate salary for your role</li>
+      <li>Trade businesses: Pay comparable to a journeyman or experienced worker in your trade</li>
+      <li>For higher-earning professionals ($200K+), many CPAs recommend a salary of $60,000–$80,000 if market rates support it</li>
+    </ul>
+    <p>Work with a CPA to document the reasoning for your salary based on industry data (Bureau of Labor Statistics, industry surveys).</p>
+
+    <h3>S-Corp Costs to Factor In</h3>
+    <ul>
+      <li><strong>Payroll processing:</strong> $500–$1,500/year for software like Gusto, Rippling, or ADP</li>
+      <li><strong>Corporate tax return (1120-S):</strong> $500–$1,500/year if CPA-prepared</li>
+      <li><strong>State franchise taxes:</strong> Some states charge annual fees (California: $800 minimum, Texas: franchise tax based on revenue)</li>
+      <li><strong>Additional complexity:</strong> Quarterly payroll deposits, W-2 forms for yourself, more bookkeeping</li>
+    </ul>
+    <p>Total overhead typically runs $1,500–$3,000/year. The S-Corp makes financial sense only when SE tax savings significantly exceed these costs.</p>
+
+    <h3>At What Income Level Does S-Corp Make Sense?</h3>
+    <p>As a rule of thumb, an S-Corp election typically makes financial sense when your net business profit exceeds $40,000–$60,000 per year. Below that threshold, the overhead costs often equal or exceed the tax savings. Many CPAs use $60,000 as a practical minimum. At $60,000 net profit with a $35,000 salary, SE tax savings are roughly $1,900 — barely covering S-Corp overhead costs. At $100,000+ net profit, savings are typically $5,000–$10,000/year.</p>
+  </article>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <h3>When does it make sense to elect S-Corp status?</h3>
+        <p>Generally when net business profit exceeds $40,000–$60,000/year. S-Corp saves SE tax on distributions but adds $1,500–$3,000/year in overhead (payroll + corporate return). At $60,000 profit with a $35,000 salary, savings barely exceed costs. At $100,000+ profit, savings are typically $5,000–$10,000/year.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What is a "reasonable salary" for S-Corp purposes?</h3>
+        <p>A salary comparable to what you would pay someone else to do your job. The IRS provides no exact formula, but 40–60% of net profit is commonly used as a starting point. Taking too low a salary is an audit red flag. Work with a CPA to document market-rate justification.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What are the costs and downsides of S-Corp status?</h3>
+        <p>Payroll processing ($500–$1,500/yr), corporate tax return ($500–$1,500/yr), state fees, and additional complexity. Total: $1,500–$3,000/year typically. Some states also impose minimum franchise taxes on S-Corps. These costs must be weighed against the SE tax savings.</p>
+      </div>
+    </div>
+  </section>
+
+  <RelatedArticles calculatorSlug="llc-vs-scorp-calculator" />
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function fmt(n) { return '$' + Math.round(Math.abs(n)).toLocaleString('en-US'); }
+
+  document.getElementById('calcBtnSC').addEventListener('click', function() {
+    var profit = parseFloat(document.getElementById('sc-profit').value) || 0;
+    var salaryPct = (parseFloat(document.getElementById('sc-salary-pct').value) || 50) / 100;
+    var bracket = parseFloat(document.getElementById('sc-tax-bracket').value) || 0.22;
+    var scorpCosts = parseFloat(document.getElementById('sc-scorp-costs').value) || 0;
+
+    // SE tax rate: 15.3% on first $176,100 net earnings × 0.9235
+    var seRate = 0.9235 * 0.153;
+
+    // LLC: SE tax on full profit
+    var llcSE = profit * seRate;
+
+    // S-Corp: SE tax only on salary portion
+    var salary = profit * salaryPct;
+    var distribution = profit - salary;
+    var scorpSE = salary * seRate;
+
+    // Savings
+    var grossSavings = llcSE - scorpSE;
+    var netSavings = grossSavings - scorpCosts;
+
+    // Break-even calculation: minimum profit where net savings > 0
+    // netSavings = profit * salaryPct * seRate * (1 - salaryPct) ... simplified
+    // Actually: grossSavings = (profit - salary) * seRate = profit*(1-salaryPct)*seRate
+    // netSavings = profit*(1-salaryPct)*seRate - scorpCosts > 0
+    // profit > scorpCosts / ((1-salaryPct)*seRate)
+    var breakevenProfit = scorpCosts / ((1 - salaryPct) * seRate);
+
+    var adviceEl = document.getElementById('sc-advice');
+
+    document.getElementById('res-sc-savings').textContent = fmt(grossSavings);
+    document.getElementById('res-sc-net-savings').textContent = (netSavings >= 0 ? '' : '-') + fmt(netSavings);
+    document.getElementById('res-sc-llc-se').textContent = fmt(llcSE);
+    document.getElementById('res-sc-scorp-se').textContent = fmt(scorpSE);
+    document.getElementById('res-sc-salary').textContent = fmt(salary);
+    document.getElementById('res-sc-dist').textContent = fmt(distribution);
+    document.getElementById('res-sc-breakeven').textContent = fmt(breakevenProfit);
+
+    if (netSavings > 0) {
+      var paybackMonths = scorpCosts > 0 ? Math.ceil(scorpCosts / (netSavings / 12)) : 0;
+      document.getElementById('res-sc-payback').textContent = paybackMonths + ' months';
+      adviceEl.style.background = '#f0fdf4';
+      adviceEl.style.border = '1px solid #bbf7d0';
+      adviceEl.innerHTML = '<strong>S-Corp election recommended:</strong> You save ' + fmt(grossSavings) + ' in SE taxes, net of S-Corp overhead: ' + fmt(netSavings) + '/year. Consult a CPA to confirm your salary is reasonable and handle the election (Form 2553).';
+    } else {
+      document.getElementById('res-sc-payback').textContent = 'Not beneficial';
+      adviceEl.style.background = '#fffbeb';
+      adviceEl.style.border = '1px solid #fde68a';
+      adviceEl.innerHTML = '<strong>S-Corp may not be worthwhile yet:</strong> At this profit level, S-Corp overhead costs (' + fmt(scorpCosts) + '/yr) exceed or closely match the SE tax savings. S-Corp election typically makes sense when net profit exceeds ' + fmt(breakevenProfit) + '.';
+    }
+
+    document.getElementById('results-sc').style.display = '';
+  });
+</script>

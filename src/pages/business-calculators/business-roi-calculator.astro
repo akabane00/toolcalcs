@@ -1,0 +1,245 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Business Calculators", "item": "https://toolcalcs.com/business-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Business ROI Calculator" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "What is ROI and how is it calculated?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "ROI (Return on Investment) measures the profitability of an investment relative to its cost. Formula: ROI = (Net Profit ÷ Total Investment) × 100. Net profit = Total Returns − Total Investment. Example: You invest $10,000 in equipment that generates $15,000 in additional revenue with $2,000 in ongoing costs. Net profit = $15,000 − $2,000 − $10,000 = $3,000. ROI = $3,000 ÷ $10,000 × 100 = 30%. For multi-year investments, use annualized ROI to compare against other opportunities fairly."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "What is a good ROI for a business investment?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "A 'good' ROI depends on the investment type, risk level, and time horizon. General benchmarks: Marketing spend: 200–500%+ ROI is typical for well-executed campaigns (5:1 to 10:1 return). Equipment: 15–30%+ annualized ROI is considered strong. Hiring: Difficult to measure directly, but a new sales hire should generate at least 3–5x their total cost in revenue. Real estate: 8–12% cash-on-cash. Compare against your opportunity cost — if you could earn 8% in the stock market, a business investment should generate significantly more to justify the risk and effort."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "What is the payback period and why does it matter?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "The payback period is how long it takes for the cumulative returns from an investment to equal the initial investment cost. Payback Period = Initial Investment ÷ Annual Net Cash Flow. Example: $20,000 investment generating $5,000/year net = 4 year payback period. Shorter payback periods reduce risk — the faster you recover your investment, the less exposure you have to business changes, competition, or economic shifts. For business investments, most owners target payback periods of 1–3 years. Long payback periods (5+ years) are often only acceptable for strategic assets like real estate."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Business ROI Calculator 2026 - Return on Investment Analysis"
+  description="Calculate ROI, payback period, and annualized return for any business investment — marketing, equipment, hiring, or expansion. Make data-driven decisions."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/business-calculators/">Business Calculators</a> &rsaquo;
+    <span>Business ROI Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Business ROI Calculator 2026</h1>
+  <p class="page-desc">Calculate return on investment, payback period, and annualized ROI for any business decision. Turn financial guesswork into data-driven decisions.</p>
+
+  <div class="calc-box">
+    <div class="calc-grid-2">
+      <div class="input-group">
+        <label for="roi-invest">Initial Investment</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="roi-invest" value="20000" min="0" max="100000000" step="500" /></div>
+        <small>Purchase price, upfront costs, one-time fees</small>
+      </div>
+      <div class="input-group">
+        <label for="roi-annual-return">Annual Revenue / Savings Generated</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="roi-annual-return" value="12000" min="0" max="100000000" step="500" /></div>
+        <small>Additional revenue or cost savings from this investment per year</small>
+      </div>
+      <div class="input-group">
+        <label for="roi-annual-cost">Annual Ongoing Costs</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="roi-annual-cost" value="2000" min="0" max="100000000" step="100" /></div>
+        <small>Maintenance, subscriptions, staff time, operating costs</small>
+      </div>
+      <div class="input-group">
+        <label for="roi-years">Investment Horizon</label>
+        <select id="roi-years">
+          <option value="1">1 year</option>
+          <option value="2">2 years</option>
+          <option value="3" selected>3 years</option>
+          <option value="4">4 years</option>
+          <option value="5">5 years</option>
+          <option value="7">7 years</option>
+          <option value="10">10 years</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="roi-residual">Residual / Salvage Value</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="roi-residual" value="5000" min="0" max="100000000" step="500" /></div>
+        <small>Value of the asset at end of investment period (0 if fully depreciated)</small>
+      </div>
+      <div class="input-group">
+        <label for="roi-discount">Discount Rate (opportunity cost)</label>
+        <div class="input-prefix"><input type="number" id="roi-discount" value="8" min="0" max="50" step="0.5" /><span style="margin-left:4px">%</span></div>
+        <small>Your alternative return rate (S&P avg: 10%, risk-free: 4–5%)</small>
+      </div>
+    </div>
+    <button class="calc-btn" id="calcBtnROIB">Calculate Business ROI</button>
+
+    <div class="results" id="results-roib" style="display:none">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <div class="result-label">Total ROI</div>
+          <div class="result-value" id="res-roib-roi">0%</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Annualized ROI</div>
+          <div class="result-value" id="res-roib-annual">0%/yr</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Net Profit (over period)</div>
+          <div class="result-value" id="res-roib-profit">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Payback Period</div>
+          <div class="result-value" id="res-roib-payback">0 months</div>
+        </div>
+      </div>
+      <div class="result-cards" style="margin-top:12px">
+        <div class="result-card">
+          <div class="result-label">Annual Net Cash Flow</div>
+          <div class="result-value" id="res-roib-cashflow">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Total Returns (incl. residual)</div>
+          <div class="result-value" id="res-roib-returns">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Net Present Value (NPV)</div>
+          <div class="result-value" id="res-roib-npv">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Decision</div>
+          <div class="result-value" id="res-roib-decision" style="font-size:1rem">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+  <RelatedCalculators currentSlug="business-roi-calculator" />
+
+  <article class="seo-content">
+    <h2>Business ROI: Making Investment Decisions with Data</h2>
+    <p>Return on investment is the most universal metric for evaluating business decisions — from marketing campaigns to equipment purchases, hiring decisions to expansion projects. Every dollar your business spends is an investment. The question is whether the return justifies the cost and the risk compared to alternative uses of that capital.</p>
+
+    <h3>The ROI Formula</h3>
+    <p><strong>ROI = (Net Profit ÷ Investment Cost) × 100</strong></p>
+    <p>Where Net Profit = Total Returns − Total Investment (including ongoing costs over the period)</p>
+    <p>Example: A $15,000 investment in a CRM system over 3 years generates $8,000/year in time savings and additional revenue, with $2,000/year in license fees. Net annual cash flow: $6,000. Total 3-year returns: $18,000. Net profit: $18,000 − $15,000 = $3,000. ROI = $3,000 ÷ $15,000 = 20%. Annualized: approximately 6.3%/year.</p>
+
+    <h3>ROI by Investment Type</h3>
+
+    <h4>Marketing ROI</h4>
+    <p>Marketing ROI is calculated as (Revenue Attributed to Marketing − Marketing Cost) ÷ Marketing Cost. A well-run digital marketing campaign should return $3–$5 for every $1 spent (200–400% ROI). Email marketing typically returns $36–$40 per $1 spent. However, attribution is the challenge — not all marketing impact is directly measurable. Use UTM tracking, CRM data, and cohort analysis to improve accuracy.</p>
+
+    <h4>Equipment ROI</h4>
+    <p>Equipment ROI requires quantifying productivity gains, labor savings, or revenue increases the equipment enables. A $20,000 machine that replaces 20 hours of labor per week at $25/hour generates $26,000/year in labor savings. After a $3,000/year maintenance cost, annual net return = $23,000. ROI on a $20,000 investment = 115% in year 1 alone — an outstanding return. Factor in residual value and total useful life for a complete picture.</p>
+
+    <h4>Hiring ROI</h4>
+    <p>Quantifying the ROI of a new hire is more complex. For sales roles: measure revenue generated per salesperson vs. their total employment cost. A sales rep costing $80,000/year who closes $400,000 in new business has a 5:1 revenue-to-cost ratio. For support roles, measure productivity increase, error reduction, or customer satisfaction improvement in dollar terms. Always factor in the 3–6 month ramp-up period when projecting first-year returns.</p>
+
+    <h3>Net Present Value (NPV): A Better Long-Term Metric</h3>
+    <p>ROI treats all future cash flows as equal to today's dollars, but money received in the future is worth less than money today due to opportunity cost and inflation. NPV adjusts for this by discounting future cash flows at your required rate of return. If NPV is positive, the investment creates value above your alternative. If NPV is negative, you would do better investing that capital elsewhere at your discount rate. NPV is particularly important for investments with returns spread over 3+ years.</p>
+
+    <h3>Payback Period: Risk Management</h3>
+    <p>The payback period tells you how quickly you recover your initial investment. In volatile business environments, faster payback = lower risk. Target payback periods by investment type:</p>
+    <ul>
+      <li>Marketing campaigns: Less than 12 months</li>
+      <li>Software/technology: 12–24 months</li>
+      <li>Equipment: 12–36 months</li>
+      <li>Commercial real estate: 5–10+ years (acceptable due to asset appreciation)</li>
+    </ul>
+  </article>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <h3>What is ROI and how is it calculated?</h3>
+        <p>ROI = (Net Profit ÷ Investment Cost) × 100. Net profit = total returns minus total investment including ongoing costs. Example: $10,000 investment generating $4,000/year net over 3 years = $12,000 returns, $2,000 net profit, 20% total ROI. Annualize by using: (1 + ROI)^(1/years) − 1.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What is a good ROI for a business investment?</h3>
+        <p>It depends on investment type and risk. Marketing: 200–500%+ (5:1 to 10:1 return). Equipment: 20–50%+ annualized. Hiring (sales): 5x revenue to cost ratio. Compare against your opportunity cost — if the stock market returns 10%, your business investment should return significantly more to justify the risk.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What is the payback period and why does it matter?</h3>
+        <p>Payback Period = Initial Investment ÷ Annual Net Cash Flow. It tells you when you break even on the investment. Shorter is better — faster payback reduces risk. Targets: marketing &lt;12 months, technology 12–24 months, equipment 12–36 months. Commercial real estate can justify 5–10+ years due to appreciation.</p>
+      </div>
+    </div>
+  </section>
+
+  <RelatedArticles calculatorSlug="business-roi-calculator" />
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function fmt(n) { return '$' + Math.round(Math.abs(n)).toLocaleString('en-US'); }
+
+  document.getElementById('calcBtnROIB').addEventListener('click', function() {
+    var invest = parseFloat(document.getElementById('roi-invest').value) || 0;
+    var annualReturn = parseFloat(document.getElementById('roi-annual-return').value) || 0;
+    var annualCost = parseFloat(document.getElementById('roi-annual-cost').value) || 0;
+    var years = parseInt(document.getElementById('roi-years').value) || 3;
+    var residual = parseFloat(document.getElementById('roi-residual').value) || 0;
+    var discountRate = (parseFloat(document.getElementById('roi-discount').value) || 8) / 100;
+
+    var annualNetCF = annualReturn - annualCost;
+    var totalReturns = annualNetCF * years + residual;
+    var netProfit = totalReturns - invest;
+    var roi = invest > 0 ? (netProfit / invest * 100) : 0;
+    var annualROI = years > 0 ? (Math.pow(1 + roi / 100, 1 / years) - 1) * 100 : 0;
+
+    // Payback period in months
+    var paybackMonths = annualNetCF > 0 ? Math.ceil((invest / annualNetCF) * 12) : Infinity;
+
+    // NPV calculation
+    var npv = -invest;
+    for (var i = 1; i <= years; i++) {
+      npv += annualNetCF / Math.pow(1 + discountRate, i);
+    }
+    npv += residual / Math.pow(1 + discountRate, years);
+
+    var decision = npv > 0 && annualROI > discountRate * 100 ? 'Invest ✓' : 'Reconsider ✗';
+
+    document.getElementById('res-roib-roi').textContent = roi.toFixed(1) + '%';
+    document.getElementById('res-roib-annual').textContent = annualROI.toFixed(1) + '%/yr';
+    document.getElementById('res-roib-profit').textContent = (netProfit >= 0 ? '' : '-') + fmt(netProfit);
+    document.getElementById('res-roib-payback').textContent = paybackMonths === Infinity ? 'Never' : paybackMonths + ' months';
+    document.getElementById('res-roib-cashflow').textContent = (annualNetCF >= 0 ? '' : '-') + fmt(annualNetCF);
+    document.getElementById('res-roib-returns').textContent = fmt(totalReturns);
+    document.getElementById('res-roib-npv').textContent = (npv >= 0 ? '' : '-') + fmt(npv);
+    document.getElementById('res-roib-decision').textContent = decision;
+    document.getElementById('results-roib').style.display = '';
+  });
+</script>

@@ -1,0 +1,258 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Business Calculators", "item": "https://toolcalcs.com/business-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Break-Even Calculator" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "What is the break-even point formula?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Break-Even Units = Fixed Costs ÷ (Selling Price per Unit − Variable Cost per Unit). The denominator is called the contribution margin per unit — the amount each sale contributes to covering fixed costs. Once total contributions equal fixed costs, you break even. Every unit sold beyond that point is pure profit. Example: $10,000 fixed costs ÷ ($50 price − $20 variable cost) = 333 units to break even."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "What is contribution margin?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Contribution margin is the selling price minus the variable cost per unit. It represents how much each sale 'contributes' toward covering fixed costs and generating profit. If you sell a product for $50 with $20 in variable costs, the contribution margin is $30. The contribution margin ratio is $30/$50 = 60% — meaning 60 cents of every dollar goes toward fixed costs and profit. A higher contribution margin ratio means you reach break-even faster."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "What is margin of safety?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Margin of safety is the difference between your expected (or current) sales and the break-even point. It shows how much sales can drop before you start losing money. If your break-even is 333 units and you expect to sell 500 units, your margin of safety is 167 units (or 33%). A higher margin of safety means lower business risk. If your margin of safety is very thin (under 10%), a small drop in sales could push you into a loss."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Break-Even Calculator 2026 - Units, Revenue & Contribution Margin"
+  description="Calculate your business break-even point in units and revenue. Find contribution margin, margin of safety, and profit at any sales volume instantly."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/business-calculators/">Business Calculators</a> &rsaquo;
+    <span>Break-Even Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Break-Even Calculator 2026</h1>
+  <p class="page-desc">Find out exactly how many units you need to sell — and how much revenue you need to generate — before your business becomes profitable.</p>
+
+  <div class="calc-box">
+    <div class="calc-grid-2">
+      <div class="input-group">
+        <label for="be-fixed">Total Fixed Costs (per period)</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="be-fixed" value="10000" min="0" max="10000000" step="100" /></div>
+        <small>Rent, salaries, insurance, loan payments — costs that don't change with sales volume</small>
+      </div>
+      <div class="input-group">
+        <label for="be-price">Selling Price per Unit</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="be-price" value="50" min="0.01" max="1000000" step="1" /></div>
+      </div>
+      <div class="input-group">
+        <label for="be-variable">Variable Cost per Unit</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="be-variable" value="20" min="0" max="999999" step="1" /></div>
+        <small>Materials, commissions, shipping — costs that vary with each unit sold</small>
+      </div>
+      <div class="input-group">
+        <label for="be-expected">Expected Unit Sales (optional)</label>
+        <input type="number" id="be-expected" value="500" min="0" max="10000000" step="10" />
+        <small>Used to calculate margin of safety and profit</small>
+      </div>
+    </div>
+    <button class="calc-btn" id="calcBtnBE">Calculate Break-Even Point</button>
+
+    <div class="results" id="results-be" style="display:none">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <div class="result-label">Break-Even Units</div>
+          <div class="result-value" id="res-be-units">0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Break-Even Revenue</div>
+          <div class="result-value" id="res-be-revenue">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Contribution Margin / Unit</div>
+          <div class="result-value" id="res-be-cm">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Contribution Margin Ratio</div>
+          <div class="result-value" id="res-be-cmr">0%</div>
+        </div>
+      </div>
+      <div class="result-cards" style="margin-top:12px">
+        <div class="result-card">
+          <div class="result-label">Margin of Safety (units)</div>
+          <div class="result-value" id="res-be-mos-units">0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Margin of Safety (%)</div>
+          <div class="result-value" id="res-be-mos-pct">0%</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Profit at Expected Volume</div>
+          <div class="result-value" id="res-be-profit">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Net Profit Margin</div>
+          <div class="result-value" id="res-be-npm">0%</div>
+        </div>
+      </div>
+      <div id="be-advice" style="margin-top:16px;padding:14px;border-radius:8px;font-size:0.95rem;"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+  <RelatedCalculators currentSlug="break-even-calculator" />
+
+  <article class="seo-content">
+    <h2>Break-Even Analysis: The Foundation of Business Profitability</h2>
+    <p>Break-even analysis is one of the most fundamental tools in business finance. It answers the critical question every entrepreneur needs to know before launching: "How many units do I need to sell before I stop losing money?" Understanding your break-even point helps you set realistic sales targets, price products correctly, and evaluate the financial viability of your business model.</p>
+
+    <h3>The Break-Even Formula</h3>
+    <p><strong>Break-Even Units = Fixed Costs ÷ Contribution Margin per Unit</strong></p>
+    <p>Where: <strong>Contribution Margin = Selling Price − Variable Cost per Unit</strong></p>
+    <p>Example: A bakery has $8,000/month in fixed costs (rent, salaries, utilities). Each loaf of bread sells for $6 and costs $2 in ingredients and packaging (variable cost). The contribution margin is $4 per loaf. Break-even = $8,000 ÷ $4 = 2,000 loaves per month.</p>
+
+    <h3>Fixed vs. Variable Costs</h3>
+    <p>Understanding which costs are fixed and which are variable is essential for accurate break-even analysis:</p>
+    <ul>
+      <li><strong>Fixed costs</strong> remain constant regardless of sales volume: rent, salaries, insurance, loan payments, equipment depreciation, software subscriptions. These are your "overhead."</li>
+      <li><strong>Variable costs</strong> change directly with production or sales: raw materials, direct labor per unit, sales commissions, shipping, credit card processing fees, packaging.</li>
+      <li><strong>Semi-variable costs</strong> have both components: a phone plan with a fixed monthly fee plus per-minute charges, or a salesperson's base salary plus commission.</li>
+    </ul>
+    <p>A common mistake is misclassifying costs. If you're unsure whether a cost is fixed or variable, ask: "Would this cost change if I sold twice as many units?" If yes, it's variable.</p>
+
+    <h3>Contribution Margin: The Key Metric</h3>
+    <p>The contribution margin tells you how much each sale contributes toward covering fixed costs — and eventually generating profit. There are two ways to express it:</p>
+    <ul>
+      <li><strong>Contribution margin per unit:</strong> Price − Variable cost per unit. On a $50 product with $20 variable cost, it's $30.</li>
+      <li><strong>Contribution margin ratio (CMR):</strong> Contribution margin ÷ Price. In the example above, $30 ÷ $50 = 60%. This means 60 cents of every dollar goes toward fixed costs and profit.</li>
+    </ul>
+    <p>The CMR is especially useful for service businesses or businesses with multiple products at different price points. A CMR of 60% means you need to generate $1.67 in revenue for every $1 of fixed costs you need to cover.</p>
+
+    <h3>Margin of Safety</h3>
+    <p>The margin of safety measures how much your actual (or projected) sales exceed the break-even point:</p>
+    <p><strong>Margin of Safety = Expected Sales − Break-Even Sales</strong></p>
+    <p>Expressed as a percentage: (Expected Sales − Break-Even) ÷ Expected Sales</p>
+    <p>If your break-even is 2,000 units and you sell 2,500 units, your margin of safety is 500 units (20%). This means sales can drop 20% before you start losing money. A higher margin of safety = lower business risk. Many financial advisors recommend targeting a margin of safety of at least 20–25%.</p>
+
+    <h3>Multi-Product Break-Even Analysis</h3>
+    <p>If you sell multiple products, calculate a weighted average contribution margin based on your sales mix. For example, if 60% of sales are Product A (CM = $30) and 40% are Product B (CM = $15), the weighted average CM = 0.6 × $30 + 0.4 × $15 = $18 + $6 = $24. Use this weighted average in your break-even formula.</p>
+
+    <h3>Practical Uses of Break-Even Analysis</h3>
+    <ul>
+      <li><strong>Pricing decisions:</strong> If your current price doesn't give you enough contribution margin to break even at a realistic sales volume, you need to raise prices or cut costs.</li>
+      <li><strong>Sales target setting:</strong> Your break-even point is the absolute minimum your sales team must hit. Realistic targets should be 25–50% above break-even.</li>
+      <li><strong>New product evaluation:</strong> Before launching, calculate whether you can realistically sell enough units to break even given your market size and competitive position.</li>
+      <li><strong>Hiring decisions:</strong> Adding a new employee increases your fixed costs. Calculate how many additional units you need to sell to cover that new salary.</li>
+      <li><strong>Loan evaluation:</strong> A new loan increases fixed costs (monthly payment). Calculate whether the investment the loan finances will generate enough additional contribution margin to cover the payment.</li>
+    </ul>
+  </article>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <h3>What is the break-even point formula?</h3>
+        <p>Break-Even Units = Fixed Costs ÷ (Selling Price − Variable Cost per Unit). The denominator is the contribution margin per unit. Break-even revenue = Break-even units × Selling price. Example: $10,000 fixed costs ÷ ($50 − $20) = 333 units. Break-even revenue = 333 × $50 = $16,667.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What is contribution margin?</h3>
+        <p>Contribution margin = Selling price − Variable cost per unit. It's the amount each sale contributes toward fixed costs and profit. The contribution margin ratio = contribution margin ÷ price. A 60% CMR means 60 cents of every revenue dollar covers fixed costs and profit.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What is margin of safety?</h3>
+        <p>Margin of safety = Expected Sales − Break-Even Sales. It shows how much sales can drop before you lose money. A 20% margin of safety means sales can decline 20% before you reach the break-even point. Aim for at least 20–25% for a financially stable business.</p>
+      </div>
+    </div>
+  </section>
+
+  <RelatedArticles calculatorSlug="break-even-calculator" />
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function fmt(n) { return '$' + Math.round(Math.abs(n)).toLocaleString('en-US'); }
+
+  document.getElementById('calcBtnBE').addEventListener('click', function() {
+    var fixed = parseFloat(document.getElementById('be-fixed').value) || 0;
+    var price = parseFloat(document.getElementById('be-price').value) || 0;
+    var variable = parseFloat(document.getElementById('be-variable').value) || 0;
+    var expected = parseFloat(document.getElementById('be-expected').value) || 0;
+
+    var cm = price - variable;
+    var cmr = price > 0 ? (cm / price) : 0;
+
+    var beUnits = cm > 0 ? Math.ceil(fixed / cm) : Infinity;
+    var beRevenue = beUnits === Infinity ? 0 : beUnits * price;
+
+    var mosUnits = expected > beUnits ? expected - beUnits : 0;
+    var mosPct = expected > 0 ? ((expected - beUnits) / expected * 100) : 0;
+
+    var profit = cm * expected - fixed;
+    var revenue = price * expected;
+    var npm = revenue > 0 ? (profit / revenue * 100) : 0;
+
+    var adviceEl = document.getElementById('be-advice');
+
+    if (cm <= 0) {
+      document.getElementById('res-be-units').textContent = 'N/A';
+      document.getElementById('res-be-revenue').textContent = 'N/A';
+      adviceEl.style.background = '#fef2f2';
+      adviceEl.style.border = '1px solid #fecaca';
+      adviceEl.innerHTML = '<strong>Warning:</strong> Your variable cost equals or exceeds your selling price. You lose money on every sale. Raise your price or reduce variable costs.';
+    } else {
+      document.getElementById('res-be-units').textContent = beUnits.toLocaleString('en-US');
+      document.getElementById('res-be-revenue').textContent = fmt(beRevenue);
+
+      if (mosPct >= 20) {
+        adviceEl.style.background = '#f0fdf4';
+        adviceEl.style.border = '1px solid #bbf7d0';
+        adviceEl.innerHTML = '<strong>Healthy margin of safety:</strong> You need ' + beUnits.toLocaleString() + ' units to break even. At your expected volume of ' + expected.toLocaleString() + ' units, you have a ' + Math.max(0, mosPct).toFixed(1) + '% margin of safety — sales can drop that much before you lose money.';
+      } else if (mosPct > 0) {
+        adviceEl.style.background = '#fffbeb';
+        adviceEl.style.border = '1px solid #fde68a';
+        adviceEl.innerHTML = '<strong>Thin margin of safety:</strong> Your margin of safety is only ' + mosPct.toFixed(1) + '%. Consider reducing fixed costs, raising prices, or finding ways to increase sales volume.';
+      } else {
+        adviceEl.style.background = '#fef2f2';
+        adviceEl.style.border = '1px solid #fecaca';
+        adviceEl.innerHTML = '<strong>Below break-even:</strong> At your expected sales of ' + expected.toLocaleString() + ' units, you are ' + Math.abs(mosUnits).toLocaleString() + ' units short of break-even. You need to increase sales, raise prices, or reduce costs.';
+      }
+    }
+
+    document.getElementById('res-be-cm').textContent = fmt(cm);
+    document.getElementById('res-be-cmr').textContent = (cmr * 100).toFixed(1) + '%';
+    document.getElementById('res-be-mos-units').textContent = Math.max(0, mosUnits).toLocaleString('en-US');
+    document.getElementById('res-be-mos-pct').textContent = Math.max(0, mosPct).toFixed(1) + '%';
+    document.getElementById('res-be-profit').textContent = (profit >= 0 ? '' : '-') + fmt(profit);
+    document.getElementById('res-be-npm').textContent = npm.toFixed(1) + '%';
+    document.getElementById('results-be').style.display = '';
+  });
+</script>

@@ -1,0 +1,293 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Business Calculators", "item": "https://toolcalcs.com/business-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Profit Margin Calculator" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "What is gross profit margin?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Gross profit margin = (Revenue − Cost of Goods Sold) ÷ Revenue × 100. It measures how much profit remains after paying direct production costs. A retail company with $500,000 revenue and $300,000 COGS has a gross margin of 40%. Gross margin benchmarks vary widely: Software/SaaS: 60–80%. Manufacturing: 25–40%. Retail: 20–50%. Restaurants: 60–70% (food cost 30–40%). Gross margin should be high enough to cover operating expenses and leave profit."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "What is the difference between margin and markup?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Margin is calculated as a percentage of selling price (profit ÷ price). Markup is calculated as a percentage of cost (profit ÷ cost). If you buy a product for $60 and sell it for $100: Margin = ($100 − $60) ÷ $100 = 40%. Markup = ($100 − $60) ÷ $60 = 67%. The same dollar profit looks larger as markup than as margin because the base (cost) is smaller. Retailers commonly use markup when pricing products, while accountants and investors use margin to evaluate business performance."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "What is a good net profit margin?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Net profit margin varies significantly by industry. General benchmarks: Above 20% is excellent in most industries. 10–20% is strong. 5–10% is average. Below 5% is thin (common in retail and food service). Industry-specific averages: Software: 20–30%. Healthcare: 10–15%. Retail: 2–5%. Construction: 3–7%. Restaurants: 3–9%. Financial services: 20–30%. Compare your margin to industry peers rather than a universal standard — a 4% margin is excellent in grocery retail and terrible in SaaS."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Profit Margin Calculator 2026 - Gross, Operating & Net Margin"
+  description="Calculate gross profit margin, operating margin, and net profit margin instantly. Also convert between markup and margin percentages for any product or business."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/business-calculators/">Business Calculators</a> &rsaquo;
+    <span>Profit Margin Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Profit Margin Calculator 2026</h1>
+  <p class="page-desc">Calculate gross, operating, and net profit margins for your business. Includes markup-to-margin converter and industry benchmark comparisons.</p>
+
+  <div class="calc-box">
+    <div class="input-group" style="margin-bottom:16px">
+      <label>Calculation Mode</label>
+      <select id="pm-mode">
+        <option value="full">Full P&L (Gross + Operating + Net)</option>
+        <option value="simple">Simple (Revenue + Cost only)</option>
+        <option value="markup">Markup ↔ Margin Converter</option>
+      </select>
+    </div>
+
+    <div id="pm-full-inputs">
+      <div class="calc-grid-2">
+        <div class="input-group">
+          <label for="pm-revenue">Revenue / Net Sales</label>
+          <div class="input-prefix"><span>$</span><input type="number" id="pm-revenue" value="500000" min="0" max="1000000000" step="1000" /></div>
+        </div>
+        <div class="input-group">
+          <label for="pm-cogs">Cost of Goods Sold (COGS)</label>
+          <div class="input-prefix"><span>$</span><input type="number" id="pm-cogs" value="300000" min="0" max="1000000000" step="1000" /></div>
+          <small>Direct materials, labor, and production costs</small>
+        </div>
+        <div class="input-group" id="pm-opex-group">
+          <label for="pm-opex">Operating Expenses</label>
+          <div class="input-prefix"><span>$</span><input type="number" id="pm-opex" value="120000" min="0" max="1000000000" step="1000" /></div>
+          <small>Rent, salaries, marketing, admin — excludes COGS</small>
+        </div>
+        <div class="input-group" id="pm-other-group">
+          <label for="pm-other">Taxes + Interest + Other</label>
+          <div class="input-prefix"><span>$</span><input type="number" id="pm-other" value="20000" min="0" max="1000000000" step="1000" /></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="pm-markup-inputs" style="display:none">
+      <div class="calc-grid-2">
+        <div class="input-group">
+          <label for="pm-markup-cost">Cost Price</label>
+          <div class="input-prefix"><span>$</span><input type="number" id="pm-markup-cost" value="60" min="0" max="1000000" step="1" /></div>
+        </div>
+        <div class="input-group">
+          <label for="pm-markup-sell">Selling Price</label>
+          <div class="input-prefix"><span>$</span><input type="number" id="pm-markup-sell" value="100" min="0" max="1000000" step="1" /></div>
+        </div>
+      </div>
+    </div>
+
+    <button class="calc-btn" id="calcBtnPM">Calculate Margins</button>
+
+    <div class="results" id="results-pm" style="display:none">
+      <div class="result-cards" id="pm-full-results">
+        <div class="result-card primary">
+          <div class="result-label">Gross Profit Margin</div>
+          <div class="result-value" id="res-pm-gross">0%</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Gross Profit</div>
+          <div class="result-value" id="res-pm-gross-amt">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Operating Margin</div>
+          <div class="result-value" id="res-pm-op">0%</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Net Profit Margin</div>
+          <div class="result-value" id="res-pm-net">0%</div>
+        </div>
+      </div>
+      <div class="result-cards" id="pm-markup-results" style="margin-top:12px;display:none">
+        <div class="result-card primary">
+          <div class="result-label">Profit Margin</div>
+          <div class="result-value" id="res-pm-margin">0%</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Markup</div>
+          <div class="result-value" id="res-pm-markup">0%</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Gross Profit</div>
+          <div class="result-value" id="res-pm-profit">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">ROI on Cost</div>
+          <div class="result-value" id="res-pm-roi">0%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+  <RelatedCalculators currentSlug="profit-margin-calculator" />
+
+  <article class="seo-content">
+    <h2>Understanding Profit Margins: Gross, Operating, and Net</h2>
+    <p>Profit margin is the percentage of revenue that becomes profit after expenses. It is the single most important indicator of a business's financial health and efficiency. Understanding the three types of profit margin — gross, operating, and net — gives you a complete picture of where money is made and where it is lost in your business.</p>
+
+    <h3>The Three Profit Margin Types</h3>
+
+    <h4>1. Gross Profit Margin</h4>
+    <p><strong>Gross Margin = (Revenue − COGS) ÷ Revenue × 100</strong></p>
+    <p>Gross margin measures efficiency at the production level — how much you keep from each sale after paying for what you sell. A retailer buying goods for $60 and selling for $100 has a 40% gross margin. This must be high enough to cover all operating expenses and still leave profit. If your gross margin is 30% but your operating expenses are 35% of revenue, you will lose money no matter how much you sell.</p>
+
+    <h4>2. Operating Profit Margin (EBIT Margin)</h4>
+    <p><strong>Operating Margin = (Revenue − COGS − Operating Expenses) ÷ Revenue × 100</strong></p>
+    <p>Operating margin includes overhead: rent, salaries, marketing, insurance, and other expenses required to run the business. It shows how profitable your core business operations are before accounting for financing and taxes. A positive operating margin is essential — it means your business model works. A negative operating margin means you are losing money on operations, regardless of financing.</p>
+
+    <h4>3. Net Profit Margin</h4>
+    <p><strong>Net Margin = Net Income ÷ Revenue × 100</strong></p>
+    <p>Net margin is the "bottom line" — what remains after all expenses including taxes, interest, and depreciation. This is what the business owners actually earn. Net margin is the most comprehensive measure and the one investors, lenders, and buyers focus on when evaluating a business.</p>
+
+    <h3>Margin vs. Markup: The Important Distinction</h3>
+    <p>Margin and markup both measure profitability but use different bases:</p>
+    <ul>
+      <li><strong>Margin</strong> = Profit ÷ Selling Price. A $40 profit on a $100 sale = 40% margin.</li>
+      <li><strong>Markup</strong> = Profit ÷ Cost. A $40 profit on a $60 cost = 67% markup.</li>
+    </ul>
+    <p>Many business owners confuse these. A common mistake: pricing at a "50% markup" expecting 50% margin, but actually getting a 33% margin. To convert: Margin = Markup ÷ (1 + Markup). A 50% markup gives only 33% margin.</p>
+
+    <h3>Industry Margin Benchmarks (2026)</h3>
+    <div class="data-table">
+      <table>
+        <thead><tr><th>Industry</th><th>Gross Margin</th><th>Net Margin</th></tr></thead>
+        <tbody>
+          <tr><td>Software / SaaS</td><td>65–85%</td><td>15–30%</td></tr>
+          <tr><td>Healthcare</td><td>40–60%</td><td>10–15%</td></tr>
+          <tr><td>Financial Services</td><td>50–70%</td><td>20–35%</td></tr>
+          <tr><td>Manufacturing</td><td>25–40%</td><td>5–10%</td></tr>
+          <tr><td>Construction</td><td>20–30%</td><td>3–7%</td></tr>
+          <tr><td>Retail (general)</td><td>30–50%</td><td>2–5%</td></tr>
+          <tr><td>Grocery / Food retail</td><td>20–30%</td><td>1–3%</td></tr>
+          <tr><td>Restaurants</td><td>60–70%*</td><td>3–9%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:0.85rem;color:var(--color-text-muted)">*Restaurant gross margin = revenue minus food/beverage cost only; labor and overhead are separate.</p>
+
+    <h3>How to Improve Profit Margins</h3>
+    <ul>
+      <li><strong>Raise prices:</strong> Even a 5–10% price increase with minimal volume loss dramatically improves margins. Price sensitivity is often lower than business owners fear.</li>
+      <li><strong>Reduce COGS:</strong> Negotiate better supplier pricing, reduce waste, improve production efficiency, or find alternative suppliers.</li>
+      <li><strong>Cut underperforming products:</strong> Products or services with negative margins drag down overall profitability even if they generate revenue.</li>
+      <li><strong>Increase average order value:</strong> Upselling and bundling increase revenue without proportionally increasing fixed costs, boosting margins.</li>
+      <li><strong>Automate or systemize:</strong> Reducing labor hours per unit of output directly improves gross margin without price changes.</li>
+    </ul>
+  </article>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <h3>What is gross profit margin?</h3>
+        <p>Gross margin = (Revenue − COGS) ÷ Revenue × 100. It measures profitability at the production/sales level before overhead. Industry averages vary widely: 65–85% for software, 25–40% for manufacturing, 2–5% net for retail. Always compare to your industry, not a universal standard.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What is the difference between margin and markup?</h3>
+        <p>Margin is profit as a % of selling price. Markup is profit as a % of cost. A $40 profit on a $100 sale = 40% margin and 67% markup. To convert: Margin = Markup ÷ (1 + Markup). A 50% markup = 33% margin — a common source of pricing errors.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What is a good net profit margin?</h3>
+        <p>Benchmarks by industry: Software: 15–30%. Healthcare: 10–15%. Retail: 2–5%. Restaurants: 3–9%. A margin above your industry average is "good." Focus on whether your margins are sustainable and improving over time, not just whether they exceed an arbitrary percentage.</p>
+      </div>
+    </div>
+  </section>
+
+  <RelatedArticles calculatorSlug="profit-margin-calculator" />
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function fmt(n) { return '$' + Math.round(Math.abs(n)).toLocaleString('en-US'); }
+
+  var modeEl = document.getElementById('pm-mode');
+  var fullInputs = document.getElementById('pm-full-inputs');
+  var markupInputs = document.getElementById('pm-markup-inputs');
+  var opexGroup = document.getElementById('pm-opex-group');
+  var otherGroup = document.getElementById('pm-other-group');
+  var fullResults = document.getElementById('pm-full-results');
+  var markupResults = document.getElementById('pm-markup-results');
+
+  modeEl.addEventListener('change', function() {
+    var mode = modeEl.value;
+    fullInputs.style.display = (mode === 'markup') ? 'none' : '';
+    markupInputs.style.display = (mode === 'markup') ? '' : 'none';
+    opexGroup.style.display = (mode === 'simple') ? 'none' : '';
+    otherGroup.style.display = (mode === 'simple') ? 'none' : '';
+  });
+
+  document.getElementById('calcBtnPM').addEventListener('click', function() {
+    var mode = modeEl.value;
+
+    if (mode === 'markup') {
+      var cost = parseFloat(document.getElementById('pm-markup-cost').value) || 0;
+      var sell = parseFloat(document.getElementById('pm-markup-sell').value) || 0;
+      var profit = sell - cost;
+      var margin = sell > 0 ? (profit / sell * 100) : 0;
+      var markup = cost > 0 ? (profit / cost * 100) : 0;
+      var roi = cost > 0 ? (profit / cost * 100) : 0;
+
+      fullResults.style.display = 'none';
+      markupResults.style.display = '';
+      document.getElementById('res-pm-margin').textContent = margin.toFixed(1) + '%';
+      document.getElementById('res-pm-markup').textContent = markup.toFixed(1) + '%';
+      document.getElementById('res-pm-profit').textContent = fmt(profit);
+      document.getElementById('res-pm-roi').textContent = roi.toFixed(1) + '%';
+    } else {
+      var revenue = parseFloat(document.getElementById('pm-revenue').value) || 0;
+      var cogs = parseFloat(document.getElementById('pm-cogs').value) || 0;
+      var opex = mode === 'full' ? (parseFloat(document.getElementById('pm-opex').value) || 0) : 0;
+      var other = mode === 'full' ? (parseFloat(document.getElementById('pm-other').value) || 0) : 0;
+
+      var grossProfit = revenue - cogs;
+      var operatingProfit = grossProfit - opex;
+      var netProfit = operatingProfit - other;
+
+      var grossMargin = revenue > 0 ? (grossProfit / revenue * 100) : 0;
+      var opMargin = revenue > 0 ? (operatingProfit / revenue * 100) : 0;
+      var netMargin = revenue > 0 ? (netProfit / revenue * 100) : 0;
+
+      fullResults.style.display = '';
+      markupResults.style.display = 'none';
+      document.getElementById('res-pm-gross').textContent = grossMargin.toFixed(1) + '%';
+      document.getElementById('res-pm-gross-amt').textContent = fmt(grossProfit);
+      document.getElementById('res-pm-op').textContent = opMargin.toFixed(1) + '%';
+      document.getElementById('res-pm-net').textContent = netMargin.toFixed(1) + '%';
+    }
+
+    document.getElementById('results-pm').style.display = '';
+  });
+</script>

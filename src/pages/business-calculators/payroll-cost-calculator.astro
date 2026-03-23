@@ -1,0 +1,231 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Business Calculators", "item": "https://toolcalcs.com/business-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Payroll Cost Calculator" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "What is the true cost of an employee beyond their salary?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "The true cost of an employee is typically 1.25–1.4 times their base salary. On top of salary, employers pay: FICA taxes (7.65% of wages — Social Security 6.2% + Medicare 1.45%), FUTA federal unemployment tax (0.6% on first $7,000 = $42 max/year), SUTA state unemployment tax (averaging 2.7% on first $7,000–$40,000 depending on state), workers compensation insurance (averaging 1–2% of payroll), health insurance ($6,000–$15,000/year per employee), and other benefits (PTO, retirement match, etc.)."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "What are FICA taxes and who pays them?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "FICA (Federal Insurance Contributions Act) taxes fund Social Security and Medicare. Both employee and employer each pay 7.65%: Social Security is 6.2% on wages up to $176,100 (2026 wage base), and Medicare is 1.45% on all wages with no limit. The employer pays an additional 0.9% Medicare surtax on wages above $200,000. So the employer's share is always 7.65% (plus potential Medicare surtax on high earners). This is separate from what is withheld from the employee's paycheck."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "How do I calculate the total cost of hiring a new employee?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Total employee cost = Base salary + Employer FICA (7.65%) + FUTA ($42/year max) + SUTA (varies by state, typically 2–3% on first $7K–$40K) + Health insurance premium (employer portion) + Workers comp insurance (1–3% of payroll) + Other benefits (401k match, PTO, training) + Overhead (desk, equipment, software, recruiting). A common rule of thumb: multiply salary by 1.25–1.4 to estimate total cost. For a $60,000 salary, budget $75,000–$84,000 in total employer cost."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Payroll Cost Calculator 2026 - True Cost of an Employee"
+  description="Calculate the true total cost of hiring an employee including salary, payroll taxes, benefits, workers comp, and overhead. See your real cost per employee."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/business-calculators/">Business Calculators</a> &rsaquo;
+    <span>Payroll Cost Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Payroll Cost Calculator 2026</h1>
+  <p class="page-desc">Find out what an employee actually costs your business. Goes beyond salary to include payroll taxes, benefits, workers comp, and overhead — your true total employer cost.</p>
+
+  <div class="calc-box">
+    <div class="calc-grid-2">
+      <div class="input-group">
+        <label for="pc-salary">Annual Salary</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="pc-salary" value="60000" min="10000" max="1000000" step="1000" /></div>
+      </div>
+      <div class="input-group">
+        <label for="pc-health">Health Insurance (employer share/yr)</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="pc-health" value="6000" min="0" max="50000" step="500" /></div>
+        <small>Avg employer cost: $6,000–$12,000/yr per employee (2026)</small>
+      </div>
+      <div class="input-group">
+        <label for="pc-401k">401k Match</label>
+        <div class="input-prefix"><input type="number" id="pc-401k" value="3" min="0" max="10" step="0.5" /><span style="margin-left:4px">% of salary</span></div>
+      </div>
+      <div class="input-group">
+        <label for="pc-workers-comp">Workers Comp Rate</label>
+        <div class="input-prefix"><input type="number" id="pc-workers-comp" value="1.5" min="0" max="20" step="0.1" /><span style="margin-left:4px">% of payroll</span></div>
+        <small>Varies widely by industry: office 0.3% to construction 5%+</small>
+      </div>
+      <div class="input-group">
+        <label for="pc-pto">PTO Days per Year</label>
+        <input type="number" id="pc-pto" value="15" min="0" max="50" step="1" />
+        <small>Paid time off, sick days, holidays</small>
+      </div>
+      <div class="input-group">
+        <label for="pc-other">Other Annual Benefits</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="pc-other" value="1200" min="0" max="20000" step="100" /></div>
+        <small>Life insurance, dental, vision, training, equipment</small>
+      </div>
+    </div>
+    <button class="calc-btn" id="calcBtnPC">Calculate Total Employee Cost</button>
+
+    <div class="results" id="results-pc" style="display:none">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <div class="result-label">Total Annual Cost</div>
+          <div class="result-value" id="res-pc-total">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Cost Multiplier</div>
+          <div class="result-value" id="res-pc-multiplier">0x</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Monthly Cost</div>
+          <div class="result-value" id="res-pc-monthly">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Cost per Hour Worked</div>
+          <div class="result-value" id="res-pc-hourly">$0</div>
+        </div>
+      </div>
+      <div id="pc-breakdown" style="margin-top:16px;font-size:0.9rem;"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+  <RelatedCalculators currentSlug="payroll-cost-calculator" />
+
+  <article class="seo-content">
+    <h2>The True Cost of Hiring: What Employers Actually Pay</h2>
+    <p>One of the most common financial mistakes small business owners make is planning their hiring budget based on salary alone. The reality is that a $60,000 salary costs your business $75,000–$84,000 or more per year when you factor in all the mandatory and optional costs of employment. Understanding these costs before hiring helps you price your services correctly and avoid cash flow surprises.</p>
+
+    <h3>Mandatory Payroll Taxes (Employer's Portion)</h3>
+    <ul>
+      <li><strong>Social Security tax:</strong> 6.2% of wages up to $176,100 (2026 wage base). On a $60,000 salary, that's $3,720.</li>
+      <li><strong>Medicare tax:</strong> 1.45% of all wages with no cap. On $60,000, that's $870. Additional 0.9% surtax applies to wages over $200,000.</li>
+      <li><strong>FUTA (Federal Unemployment):</strong> 0.6% on the first $7,000 of wages = $42 per employee per year. (Gross rate is 6%, but most employers get a 5.4% credit for state taxes paid.)</li>
+      <li><strong>SUTA (State Unemployment):</strong> Varies by state — typically 1–5% on the first $7,000–$40,000 of wages. New employer rates are often 2.5–3.5%.</li>
+      <li><strong>Workers compensation insurance:</strong> Varies dramatically by industry. Office workers: 0.3–0.5%. Restaurant workers: 2–4%. Construction: 5–20%.</li>
+    </ul>
+
+    <h3>Common Employee Benefits (Optional but Expected)</h3>
+    <ul>
+      <li><strong>Health insurance:</strong> The largest discretionary benefit. Average employer contribution (2026): ~$7,900/year for single coverage, ~$22,500/year for family coverage. Most employers cover 70–80% of the premium.</li>
+      <li><strong>401(k) matching:</strong> The most common employer match is 3–4% of salary. On a $60,000 salary with 3% match, that's $1,800/year.</li>
+      <li><strong>Paid time off:</strong> PTO has a hidden cost — you pay employees for time they are not working. 15 days of PTO on a $60,000 salary = $3,462 in paid non-working time (15 ÷ 261 working days × $60,000).</li>
+      <li><strong>Other common benefits:</strong> Dental and vision insurance ($500–$1,500/yr), life insurance ($200–$600/yr), training and development ($500–$2,000/yr), cell phone allowance, commuter benefits.</li>
+    </ul>
+
+    <h3>Hidden Costs Often Overlooked</h3>
+    <ul>
+      <li><strong>Recruiting costs:</strong> Posting jobs, background checks, interview time — typically 10–30% of first-year salary for professional roles.</li>
+      <li><strong>Onboarding and training:</strong> New employees take 3–6 months to reach full productivity. Calculate the cost of reduced output during this period.</li>
+      <li><strong>Equipment and software:</strong> Laptop, phone, software licenses, desk space — $2,000–$10,000+ upfront plus ongoing costs.</li>
+      <li><strong>Management time:</strong> Each employee requires supervision, review, and support — typically 10–20% of a manager's time.</li>
+    </ul>
+
+    <h3>Contractor vs. Employee Comparison</h3>
+    <p>Hiring a contractor (1099) avoids most of these employer costs — no payroll taxes, no benefits, no PTO. However, contractors typically charge 20–40% more per hour than equivalent employees to cover their own self-employment taxes and benefits. The IRS has strict rules on who qualifies as an independent contractor vs. employee — misclassification can result in significant penalties and back taxes.</p>
+  </article>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <h3>What is the true cost of an employee beyond their salary?</h3>
+        <p>Typically 1.25–1.4x base salary. On a $60,000 salary: add $4,590 FICA (7.65%), $42 FUTA, ~$1,000 SUTA, $6,000+ health insurance, $1,800 401k match (3%), $900 workers comp (1.5%) = roughly $74,000–$80,000 total cost before overhead.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What are FICA taxes and who pays them?</h3>
+        <p>FICA = Social Security (6.2% up to $176,100 wage base in 2026) + Medicare (1.45% unlimited). Both employee and employer each pay 7.65%. On a $60,000 salary, the employer pays $4,590 in FICA — in addition to what is withheld from the employee's check.</p>
+      </div>
+      <div class="faq-item">
+        <h3>How do I calculate the total cost of hiring a new employee?</h3>
+        <p>Base salary + employer FICA (7.65%) + FUTA ($42) + SUTA (~2.7%) + health insurance + 401k match + workers comp (1–5%) + other benefits + overhead. Quick estimate: multiply salary by 1.3 for a rough total. For precise planning, add each cost individually using this calculator.</p>
+      </div>
+    </div>
+  </section>
+
+  <RelatedArticles calculatorSlug="payroll-cost-calculator" />
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function fmt(n) { return '$' + Math.round(Math.abs(n)).toLocaleString('en-US'); }
+
+  document.getElementById('calcBtnPC').addEventListener('click', function() {
+    var salary = parseFloat(document.getElementById('pc-salary').value) || 0;
+    var health = parseFloat(document.getElementById('pc-health').value) || 0;
+    var match401k = (parseFloat(document.getElementById('pc-401k').value) || 0) / 100;
+    var workersComp = (parseFloat(document.getElementById('pc-workers-comp').value) || 0) / 100;
+    var ptoDays = parseFloat(document.getElementById('pc-pto').value) || 0;
+    var otherBenefits = parseFloat(document.getElementById('pc-other').value) || 0;
+
+    // Mandatory taxes
+    var ficaEmployer = salary * 0.0765; // 6.2% SS + 1.45% Medicare
+    var futa = Math.min(salary, 7000) * 0.006; // 0.6% on first $7,000
+    var suta = Math.min(salary, 15000) * 0.027; // avg 2.7% on first $15,000
+    var workersCompCost = salary * workersComp;
+
+    // Benefits
+    var match401kAmt = salary * match401k;
+    var ptoCost = ptoDays > 0 ? (salary / 261) * ptoDays : 0;
+
+    var totalMandatory = ficaEmployer + futa + suta + workersCompCost;
+    var totalBenefits = health + match401kAmt + ptoCost + otherBenefits;
+    var totalCost = salary + totalMandatory + totalBenefits;
+    var multiplier = salary > 0 ? (totalCost / salary) : 1;
+
+    var workingHours = (261 - ptoDays) * 8;
+    var hourlyRate = workingHours > 0 ? (totalCost / workingHours) : 0;
+
+    document.getElementById('res-pc-total').textContent = fmt(totalCost);
+    document.getElementById('res-pc-multiplier').textContent = multiplier.toFixed(2) + 'x';
+    document.getElementById('res-pc-monthly').textContent = fmt(totalCost / 12);
+    document.getElementById('res-pc-hourly').textContent = fmt(hourlyRate);
+
+    var bd = '<strong>Cost Breakdown:</strong><br>';
+    bd += 'Base salary: ' + fmt(salary) + '<br>';
+    bd += '<br><em>Mandatory Taxes:</em><br>';
+    bd += 'Employer FICA (7.65%): ' + fmt(ficaEmployer) + '<br>';
+    bd += 'FUTA (federal unemployment): ' + fmt(futa) + '<br>';
+    bd += 'SUTA (state unemployment, est.): ' + fmt(suta) + '<br>';
+    bd += 'Workers compensation: ' + fmt(workersCompCost) + '<br>';
+    bd += '<br><em>Benefits:</em><br>';
+    bd += 'Health insurance (employer): ' + fmt(health) + '<br>';
+    bd += '401(k) match: ' + fmt(match401kAmt) + '<br>';
+    bd += 'PTO cost (' + ptoDays + ' days): ' + fmt(ptoCost) + '<br>';
+    bd += 'Other benefits: ' + fmt(otherBenefits) + '<br>';
+    bd += '<br><strong>Total Employer Cost: ' + fmt(totalCost) + '</strong>';
+
+    document.getElementById('pc-breakdown').innerHTML = bd;
+    document.getElementById('results-pc').style.display = '';
+  });
+</script>

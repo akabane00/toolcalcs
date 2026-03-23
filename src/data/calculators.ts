@@ -81,6 +81,12 @@ export const categories: Category[] = [
     description: 'Rental property ROI, cap rate, mortgage refinance, home affordability, closing costs, and real estate investment calculators.',
     icon: '🏘️',
   },
+  {
+    name: 'Business Calculators',
+    slug: 'business-calculators',
+    description: 'Break-even, profit margin, LLC vs S-Corp, payroll cost, SBA loan, and ROI calculators for entrepreneurs and small business owners.',
+    icon: '💼',
+  },
 ];
 
 export const calculators: Calculator[] = [
@@ -1145,6 +1151,55 @@ export const calculators: Calculator[] = [
     categorySlug: 'tax-calculators',
     icon: '🏡',
   },
+  // Business Calculators
+  {
+    title: 'Break-Even Calculator',
+    slug: 'break-even-calculator',
+    description: 'Calculate your business break-even point in units and revenue. See contribution margin, margin of safety, and profit at any sales volume.',
+    category: 'Business Calculators',
+    categorySlug: 'business-calculators',
+    icon: '📊',
+  },
+  {
+    title: 'Profit Margin Calculator',
+    slug: 'profit-margin-calculator',
+    description: 'Calculate gross margin, operating margin, and net profit margin. Convert between markup and margin percentages for any product or business.',
+    category: 'Business Calculators',
+    categorySlug: 'business-calculators',
+    icon: '💰',
+  },
+  {
+    title: 'LLC vs S-Corp Tax Calculator',
+    slug: 'llc-vs-scorp-calculator',
+    description: 'Compare self-employment tax under LLC vs S-Corp structure. Find the optimal salary/distribution split and annual tax savings.',
+    category: 'Business Calculators',
+    categorySlug: 'business-calculators',
+    icon: '🏢',
+  },
+  {
+    title: 'Payroll Cost Calculator',
+    slug: 'payroll-cost-calculator',
+    description: 'Calculate the true cost of an employee including salary, payroll taxes, benefits, and overhead. See total employer cost and cost multiplier.',
+    category: 'Business Calculators',
+    categorySlug: 'business-calculators',
+    icon: '👥',
+  },
+  {
+    title: 'SBA Loan Calculator',
+    slug: 'sba-loan-calculator',
+    description: 'Calculate monthly payments and total cost for SBA 7(a) and 504 loans. Compare SBA vs conventional business loan rates and terms.',
+    category: 'Business Calculators',
+    categorySlug: 'business-calculators',
+    icon: '🏦',
+  },
+  {
+    title: 'Business ROI Calculator',
+    slug: 'business-roi-calculator',
+    description: 'Calculate return on investment for any business decision — marketing, equipment, hiring, or expansion. See payback period and annualized ROI.',
+    category: 'Business Calculators',
+    categorySlug: 'business-calculators',
+    icon: '📈',
+  },
   // Real Estate Calculators
   {
     title: 'Rental Property Calculator',
@@ -1205,6 +1260,7 @@ const relatedGroups: Record<string, string[]> = {
   // Financial - Loans & Mortgages
   'loans-mortgages': ['mortgage-calculator', 'loan-amortization-calculator', 'refinance-calculator', 'home-affordability-calculator', 'down-payment-calculator', 'rent-vs-buy-calculator', 'auto-loan-calculator', 'student-loan-calculator', 'business-loan-calculator', 'mortgage-amortization-calculator', 'car-lease-calculator', 'rent-affordability-calculator', 'mortgage-refinance-calculator', 'closing-cost-calculator'],
   'real-estate': ['rental-property-calculator', 'cap-rate-calculator', 'real-estate-roi-calculator', 'mortgage-refinance-calculator', 'home-affordability-calculator', 'closing-cost-calculator', 'rent-vs-buy-calculator', 'down-payment-calculator'],
+  'business': ['break-even-calculator', 'profit-margin-calculator', 'llc-vs-scorp-calculator', 'payroll-cost-calculator', 'sba-loan-calculator', 'business-roi-calculator', 'breakeven-calculator', 'business-loan-calculator', 'net-worth-calculator'],
   // Financial - Income & Tax
   'income-tax': ['take-home-pay-calculator', 'paycheck-calculator', 'tax-calculator', 'payroll-tax-calculator', 'capital-gains-tax-calculator', 'estate-tax-calculator', 'hourly-to-salary-calculator', 'time-card-calculator'],
   // Financial - Savings & Investment
@@ -1241,6 +1297,7 @@ const crossCategoryLinks: Record<string, string[]> = {
   'astrology-calculators': ['age-calculator', 'random-number-generator', 'date-difference-calculator'],
   'real-estate-calculators': ['mortgage-calculator', 'compound-interest-calculator', 'investment-calculator', 'loan-amortization-calculator'],
   'tax-calculators': ['take-home-pay-calculator', 'self-employment-tax-calculator', 'rental-property-calculator'],
+  'business-calculators': ['compound-interest-calculator', 'loan-amortization-calculator', 'investment-calculator', 'take-home-pay-calculator'],
   'insurance-calculators': ['mortgage-calculator', 'home-affordability-calculator', 'take-home-pay-calculator'],
 };
 
