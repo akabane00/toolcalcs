@@ -1,0 +1,439 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import ReviewedBy from '../../components/ReviewedBy.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Education Calculators",
+        "item": "https://toolcalcs.com/education-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Student Loan Repayment Planner"
+      }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is the best student loan repayment plan?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The best repayment plan depends on your financial situation and career goals. If you can afford the payments, the Standard 10-year plan saves the most money on interest. If your payments are too high relative to your income, income-driven repayment plans like IBR, PAYE, or SAVE cap payments at 10 to 20 percent of your discretionary income and offer loan forgiveness after 20 to 25 years. If you work in public service, PSLF can forgive your remaining balance after just 10 years of qualifying payments under an IDR plan. Use the comparison table above to see how each plan affects your monthly payment, total cost, and timeline.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How does Public Service Loan Forgiveness (PSLF) work?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Public Service Loan Forgiveness forgives the remaining balance on your federal Direct Loans after you make 120 qualifying monthly payments (10 years) while working full-time for an eligible employer. Eligible employers include government organizations at any level, 501(c)(3) nonprofit organizations, and certain other nonprofits that provide qualifying public services. You must be enrolled in an income-driven repayment plan for your payments to count. The forgiven amount under PSLF is not taxable as income, unlike forgiveness under standard IDR plans.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Should I refinance my student loans?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Refinancing makes sense if you have strong credit, stable high income, and want a lower interest rate — especially for private loans that do not offer federal protections. However, refinancing federal loans into a private loan means permanently losing access to income-driven repayment plans, PSLF, deferment, forbearance, and other federal borrower protections. If there is any chance you might need those benefits in the future, do not refinance your federal loans. Consider refinancing only your private loans or only if you are certain you will not need federal protections.',
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Student Loan Repayment Planner - Compare Plans | ToolCalcs"
+  description="Free student loan repayment planner. Compare Standard, Graduated, Extended, IBR, PAYE, and SAVE repayment plans side by side. See monthly payments, total interest, and forgiveness amounts."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/education-calculators/">Education Calculators</a> &rsaquo;
+    <span>Student Loan Repayment Planner</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Student Loan Repayment Planner</h1>
+  <p class="page-desc">Compare federal student loan repayment plans side by side. See your monthly payment, total interest, and potential loan forgiveness amount under each plan.</p>
+
+  <ReviewedBy />
+
+  <!-- Calculator Tool -->
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="loanBalance">Total Loan Balance ($)</label>
+        <input type="number" id="loanBalance" value="35000" min="0" max="500000" step="1000" />
+      </div>
+      <div class="input-group">
+        <label for="interestRate">Interest Rate (%)</label>
+        <input type="number" id="interestRate" value="5.5" min="1" max="12" step="0.1" />
+      </div>
+      <div class="input-group">
+        <label for="annualIncome">Annual Income ($)</label>
+        <input type="number" id="annualIncome" value="55000" min="0" max="300000" step="1000" />
+      </div>
+      <div class="input-group">
+        <label for="familySize">Family Size</label>
+        <input type="number" id="familySize" value="1" min="1" max="8" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="repaymentPlan">Repayment Plan</label>
+        <select id="repaymentPlan">
+          <option value="standard">Standard (10-Year)</option>
+          <option value="graduated">Graduated</option>
+          <option value="extended">Extended (25-Year)</option>
+          <option value="ibr">Income-Based Repayment (IBR)</option>
+          <option value="paye">Pay As You Earn (PAYE)</option>
+          <option value="save">REPAYE / SAVE</option>
+        </select>
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate Payments</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Monthly Payment</span>
+          <span class="result-value" id="monthlyPayment">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Paid</span>
+          <span class="result-value" id="totalPaid">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Interest</span>
+          <span class="result-value" id="totalInterest">$0</span>
+        </div>
+        <div class="result-card success">
+          <span class="result-label">Forgiveness Amount</span>
+          <span class="result-value" id="forgivenessAmount">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Time to Payoff</span>
+          <span class="result-value" id="timeToPayoff">--</span>
+        </div>
+      </div>
+
+      <h3 style="margin-top:1.5rem;">All Plans Comparison</h3>
+      <div class="table-wrap">
+        <table class="result-table" id="comparisonTable">
+          <thead>
+            <tr>
+              <th>Plan</th>
+              <th>Monthly Payment</th>
+              <th>Total Paid</th>
+              <th>Total Interest</th>
+              <th>Forgiveness</th>
+              <th>Payoff Time</th>
+            </tr>
+          </thead>
+          <tbody id="comparisonBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="mid" format="rectangle" />
+
+  <!-- SEO Content Article -->
+  <article class="content-article">
+    <h2>Understanding Federal Student Loan Repayment Plans</h2>
+    <p>After graduating, one of the most consequential financial decisions borrowers face is choosing the right student loan repayment plan. The federal government offers several distinct repayment options, each designed for different financial situations. Choosing the wrong plan can cost you thousands of dollars in unnecessary interest, while choosing the right one can keep your payments manageable and potentially lead to loan forgiveness. This guide explains each plan in detail so you can make an informed decision using the comparison tool above.</p>
+    <p>Federal student loan repayment plans fall into two broad categories: fixed-payment plans and income-driven repayment (IDR) plans. Fixed-payment plans — Standard, Graduated, and Extended — set your payment based on your loan balance and interest rate. IDR plans — IBR, PAYE, and REPAYE/SAVE — calculate your payment based on your income and family size, typically capping it at a percentage of your discretionary income. IDR plans also offer loan forgiveness after 20 to 25 years of qualifying payments.</p>
+
+    <h2>Standard Repayment Plan (10 Years)</h2>
+    <p>The Standard Repayment Plan is the default option for all federal student loans. Under this plan, you pay a fixed monthly amount over a 10-year (120-month) period. Your payment is calculated to fully repay the loan, including all interest, within those 120 months. For a borrower with $35,000 in loans at 5.5 percent interest, the standard monthly payment would be approximately $380.</p>
+    <p>The Standard plan is the best choice for borrowers who can comfortably afford the monthly payment. Because the repayment period is the shortest of any plan, you pay the least total interest over the life of the loan. There is no forgiveness component, but you also do not need one — your loan is fully repaid in 10 years. This plan is ideal for borrowers with moderate loan balances relative to their income and those who want to be debt-free as quickly as possible.</p>
+
+    <h2>Graduated Repayment Plan</h2>
+    <p>The Graduated Repayment Plan also has a 10-year repayment period, but your payments start low and increase every two years. Initial payments may be as low as interest-only, then rise to a higher level that accelerates principal repayment in later years. This structure is designed for borrowers who expect their income to grow significantly over time, such as recent graduates entering fields with strong salary progression.</p>
+    <p>While the lower initial payments can be attractive, the graduated plan costs more in total interest than the standard plan because you pay down principal more slowly during the early years. For a $35,000 loan at 5.5 percent, you might start at around $200 per month but end near $600 per month. The total interest paid is typically 10 to 20 percent higher than under the standard plan. This plan is worth considering only if your current income truly cannot support the standard payment but you are confident it will increase substantially within a few years.</p>
+
+    <h2>Extended Repayment Plan (25 Years)</h2>
+    <p>The Extended Repayment Plan stretches your repayment period to 25 years (300 months), which significantly reduces your monthly payment compared to the standard plan. To qualify, you must have more than $30,000 in outstanding Direct Loans or FFEL Program loans. You can choose fixed or graduated payments under this plan.</p>
+    <p>The primary advantage is a much lower monthly payment — often 40 to 50 percent less than the standard plan. However, the dramatically longer repayment period means you pay substantially more total interest. A $35,000 loan at 5.5 percent under the extended plan would cost roughly $215 per month but result in approximately $29,000 in total interest over 25 years, compared to roughly $11,000 under the standard plan. This plan is generally not recommended unless you specifically need the lower monthly payment and do not qualify for a more favorable income-driven plan.</p>
+
+    <h2>Income-Based Repayment (IBR)</h2>
+    <p>Income-Based Repayment caps your monthly payment at 10 to 15 percent of your discretionary income, depending on when you first borrowed. For borrowers who took out loans after July 1, 2014, payments are capped at 10 percent of discretionary income with forgiveness after 20 years. For those who borrowed before that date, payments are capped at 15 percent with forgiveness after 25 years.</p>
+    <p>Discretionary income is defined as the difference between your adjusted gross income (AGI) and 150 percent of the federal poverty guideline for your family size and state of residence. If your IBR payment would be higher than your standard 10-year payment, you are not eligible for IBR, as the plan is designed specifically for borrowers with high debt relative to their income.</p>
+    <p>The key advantage of IBR is payment affordability. If you have a large loan balance relative to your income, your monthly payment may be significantly lower than under the standard plan. The trade-off is that you pay more total interest because of the extended repayment period, and any forgiven balance after 20 or 25 years is currently treated as taxable income by the IRS.</p>
+
+    <h2>Pay As You Earn (PAYE)</h2>
+    <p>Pay As You Earn is similar to IBR but with slightly more favorable terms. Payments are capped at 10 percent of discretionary income, and any remaining balance is forgiven after 20 years. To be eligible, you must be a new borrower as of October 1, 2007, and must have received a disbursement of a Direct Loan on or after October 1, 2011. Your calculated PAYE payment must also be less than what you would pay under the standard 10-year plan.</p>
+    <p>PAYE is generally the better choice compared to IBR for eligible borrowers because it offers the same 10 percent payment cap with a 20-year forgiveness timeline regardless of when you borrowed. The calculation methodology is the same, so payments are identical to the post-2014 IBR formula. Like IBR, any amount forgiven after 20 years may be subject to federal income tax.</p>
+
+    <h2>REPAYE / SAVE Plan</h2>
+    <p>The Saving on a Valuable Education (SAVE) plan, which replaced the older REPAYE plan, is the newest and in many cases the most generous income-driven repayment option. Under SAVE, payments for undergraduate loans are capped at 5 percent of discretionary income, while graduate loan payments are 10 percent. The discretionary income calculation is also more generous — it uses 225 percent of the federal poverty guideline instead of 150 percent, which significantly increases the income excluded from the payment calculation.</p>
+    <p>SAVE offers several additional advantages. It eliminates the capitalization of unpaid interest, meaning your balance does not grow even if your payment does not cover all the interest that accrues. For borrowers with original balances of $12,000 or less, forgiveness comes after just 10 years, with one additional year of repayment for each $1,000 borrowed above $12,000. Unlike IBR and PAYE, there is no requirement that your IDR payment be lower than the standard payment to be eligible.</p>
+    <p>The SAVE plan is particularly beneficial for borrowers with lower incomes, those with exclusively undergraduate loans, and married borrowers who file taxes separately, as SAVE only considers the borrower's individual income when filing separately. However, borrowers should stay informed about the plan's legal status, as it has faced court challenges. Check the Department of Education's website for the most current information on SAVE plan availability.</p>
+
+    <h2>Public Service Loan Forgiveness (PSLF)</h2>
+    <p>Public Service Loan Forgiveness is a separate program that works in conjunction with any income-driven repayment plan. Under PSLF, your remaining federal Direct Loan balance is forgiven after you make 120 qualifying monthly payments (10 years) while working full-time for an eligible public service employer. Eligible employers include federal, state, local, and tribal government organizations, as well as 501(c)(3) nonprofit organizations and certain other nonprofits providing qualifying services.</p>
+    <p>PSLF is enormously valuable for eligible borrowers because it provides forgiveness after only 10 years instead of 20 to 25 years under standard IDR forgiveness, and the forgiven amount is not taxable as income. To maximize the benefit, enroll in the IDR plan that provides the lowest monthly payment — often SAVE or PAYE — so that your qualifying payments are as small as possible and the forgiven amount is as large as possible.</p>
+    <p>To track your progress toward PSLF, submit an Employer Certification Form annually and each time you change employers. The PSLF Help Tool on the Federal Student Aid website can verify your employer's eligibility and count your qualifying payments. Given the significant value of this program, it is worth verifying your eligibility early in your career if you work in the public sector.</p>
+
+    <h2>When to Choose Each Plan</h2>
+    <p>Selecting the right repayment plan requires evaluating your current financial situation, career trajectory, and long-term goals. Here are general guidelines for when each plan makes the most sense.</p>
+    <p><strong>Choose Standard</strong> if your monthly payment is manageable on your current income and you want to minimize total interest paid. This is the default and best option for most borrowers with moderate debt-to-income ratios.</p>
+    <p><strong>Choose Graduated</strong> if your income is temporarily low but you have strong confidence it will rise substantially within the next few years — for example, medical residents, law associates, or recent MBA graduates starting at below-peak salaries.</p>
+    <p><strong>Choose Extended</strong> if you have a large balance, need lower payments, and do not qualify for IDR plans. This is rarely the optimal choice, as IDR plans typically offer lower payments and forgiveness.</p>
+    <p><strong>Choose IBR or PAYE</strong> if your student loan debt is high relative to your income and you need payments capped at a percentage of your earnings. These plans are especially useful for borrowers in public service who plan to pursue PSLF.</p>
+    <p><strong>Choose SAVE</strong> if you are eligible and have undergraduate loans, as the 5 percent payment cap and more generous discretionary income calculation typically result in the lowest payment of any IDR plan.</p>
+
+    <h2>Refinancing Considerations</h2>
+    <p>Refinancing involves taking out a new private loan to replace your existing student loans at a potentially lower interest rate. This can make sense for borrowers with strong credit, high income, and no need for federal borrower protections. Refinancing a federal loan into a private loan permanently eliminates your access to IDR plans, PSLF, deferment, and forbearance — federal protections that are irreplaceable.</p>
+    <p>If you have high-interest private student loans, refinancing those into a lower-rate private loan is a straightforward decision with no downside. For federal loans, refinance only if you are certain you will never need federal protections and the interest rate reduction is substantial enough to justify the trade-off. Use our <a href="/financial-calculators/student-loan-calculator/">student loan calculator</a> to model different interest rate scenarios and our <a href="/financial-calculators/loan-amortization-calculator/">loan amortization calculator</a> to see detailed payment schedules. If you are working on paying off multiple debts simultaneously, our <a href="/financial-calculators/debt-payoff-calculator/">debt payoff calculator</a> can help you prioritize which loans to target first.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>What is the best student loan repayment plan?</summary>
+        <p>The best repayment plan depends on your financial situation and career goals. If you can afford the payments, the Standard 10-year plan saves the most money on interest. If your payments are too high relative to your income, income-driven repayment plans like IBR, PAYE, or SAVE cap payments at 10 to 20 percent of your discretionary income and offer loan forgiveness after 20 to 25 years. If you work in public service, PSLF can forgive your remaining balance after just 10 years of qualifying payments under an IDR plan. Use the comparison table above to see how each plan affects your monthly payment, total cost, and timeline.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How does Public Service Loan Forgiveness (PSLF) work?</summary>
+        <p>Public Service Loan Forgiveness forgives the remaining balance on your federal Direct Loans after you make 120 qualifying monthly payments (10 years) while working full-time for an eligible employer. Eligible employers include government organizations at any level, 501(c)(3) nonprofit organizations, and certain other nonprofits that provide qualifying public services. You must be enrolled in an income-driven repayment plan for your payments to count. The forgiven amount under PSLF is not taxable as income, unlike forgiveness under standard IDR plans.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Should I refinance my student loans?</summary>
+        <p>Refinancing makes sense if you have strong credit, stable high income, and want a lower interest rate — especially for private loans that do not offer federal protections. However, refinancing federal loans into a private loan means permanently losing access to income-driven repayment plans, PSLF, deferment, forbearance, and other federal borrower protections. If there is any chance you might need those benefits in the future, do not refinance your federal loans. Consider refinancing only your private loans or only if you are certain you will not need federal protections.</p>
+      </details>
+    </div>
+  </article>
+
+  <RelatedCalculators currentSlug="student-loan-repayment-planner" />
+  <RelatedArticles calculatorSlug="student-loan-repayment-planner" />
+
+  <CrossLinks links={[
+    { href: '/loan/', label: 'Loan Payment Tables', icon: '💳' },
+    { href: '/savings/', label: 'Savings Growth Tables', icon: '💰' },
+  ]} />
+
+  <AdUnit slot="bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function formatMoney(n) {
+    return '$' + Math.round(n).toLocaleString('en-US');
+  }
+
+  // 2026 Federal Poverty Guidelines (continental US)
+  var povertyGuidelines = [0, 15650, 21150, 26650, 32150, 37650, 43150, 48650, 54150];
+
+  function getPovertyLine(familySize) {
+    if (familySize >= povertyGuidelines.length) {
+      return povertyGuidelines[povertyGuidelines.length - 1] + (familySize - (povertyGuidelines.length - 1)) * 5500;
+    }
+    return povertyGuidelines[familySize] || 15650;
+  }
+
+  function calcStandardPayment(balance, rate, months) {
+    var r = rate / 12;
+    if (r === 0) return balance / months;
+    return balance * (r * Math.pow(1 + r, months)) / (Math.pow(1 + r, months) - 1);
+  }
+
+  function calcPlanDetails(balance, rate, income, familySize, plan) {
+    var monthlyRate = rate / 12;
+    var povertyLine = getPovertyLine(familySize);
+    var result = { payment: 0, totalPaid: 0, totalInterest: 0, forgiveness: 0, months: 0, planName: '' };
+
+    if (plan === 'standard') {
+      result.planName = 'Standard (10yr)';
+      var months = 120;
+      result.payment = calcStandardPayment(balance, rate, months);
+      result.totalPaid = result.payment * months;
+      result.totalInterest = result.totalPaid - balance;
+      result.months = months;
+      result.forgiveness = 0;
+    } else if (plan === 'graduated') {
+      result.planName = 'Graduated';
+      var stdPayment = calcStandardPayment(balance, rate, 120);
+      var initialPayment = stdPayment * 0.5;
+      var remaining = balance;
+      var totalPaid = 0;
+      var monthCount = 0;
+
+      for (var period = 0; period < 5; period++) {
+        var periodPayment = initialPayment * Math.pow(1.15, period);
+        for (var m = 0; m < 24 && remaining > 0; m++) {
+          var interest = remaining * monthlyRate;
+          var actual = Math.min(periodPayment, remaining + interest);
+          remaining = remaining + interest - actual;
+          totalPaid += actual;
+          monthCount++;
+          if (remaining < 0.01) remaining = 0;
+        }
+      }
+
+      result.payment = initialPayment;
+      result.totalPaid = totalPaid;
+      result.totalInterest = totalPaid - balance;
+      result.months = monthCount;
+      result.forgiveness = 0;
+    } else if (plan === 'extended') {
+      result.planName = 'Extended (25yr)';
+      var months = 300;
+      result.payment = calcStandardPayment(balance, rate, months);
+      result.totalPaid = result.payment * months;
+      result.totalInterest = result.totalPaid - balance;
+      result.months = months;
+      result.forgiveness = 0;
+    } else if (plan === 'ibr') {
+      result.planName = 'IBR';
+      var discretionary = Math.max(0, income - povertyLine * 1.5);
+      var idrPayment = (discretionary * 0.10) / 12;
+      var stdPmt = calcStandardPayment(balance, rate, 120);
+      var payment = Math.min(idrPayment, stdPmt);
+      var remaining = balance;
+      var totalPaid = 0;
+      var monthCount = 0;
+      var maxMonths = 240;
+
+      for (var m = 0; m < maxMonths && remaining > 0; m++) {
+        var interest = remaining * monthlyRate;
+        var actual = Math.min(payment, remaining + interest);
+        remaining = remaining + interest - actual;
+        totalPaid += actual;
+        monthCount++;
+        if (remaining < 0.01) remaining = 0;
+      }
+
+      result.payment = payment;
+      result.totalPaid = totalPaid;
+      result.totalInterest = totalPaid - balance + Math.max(0, remaining);
+      result.months = monthCount;
+      result.forgiveness = Math.max(0, remaining);
+    } else if (plan === 'paye') {
+      result.planName = 'PAYE';
+      var discretionary = Math.max(0, income - povertyLine * 1.5);
+      var idrPayment = (discretionary * 0.10) / 12;
+      var stdPmt = calcStandardPayment(balance, rate, 120);
+      var payment = Math.min(idrPayment, stdPmt);
+      var remaining = balance;
+      var totalPaid = 0;
+      var monthCount = 0;
+      var maxMonths = 240;
+
+      for (var m = 0; m < maxMonths && remaining > 0; m++) {
+        var interest = remaining * monthlyRate;
+        var actual = Math.min(payment, remaining + interest);
+        remaining = remaining + interest - actual;
+        totalPaid += actual;
+        monthCount++;
+        if (remaining < 0.01) remaining = 0;
+      }
+
+      result.payment = payment;
+      result.totalPaid = totalPaid;
+      result.totalInterest = totalPaid - balance + Math.max(0, remaining);
+      result.months = monthCount;
+      result.forgiveness = Math.max(0, remaining);
+    } else if (plan === 'save') {
+      result.planName = 'SAVE';
+      var discretionary = Math.max(0, income - povertyLine * 2.25);
+      var idrPayment = (discretionary * 0.05) / 12;
+      var remaining = balance;
+      var totalPaid = 0;
+      var monthCount = 0;
+      var maxMonths = 300;
+      var forgivenessMonths = Math.min(300, Math.max(120, 120 + Math.max(0, Math.ceil((balance - 12000) / 1000)) * 12));
+
+      for (var m = 0; m < forgivenessMonths && remaining > 0; m++) {
+        var interest = remaining * monthlyRate;
+        var actual = Math.min(idrPayment, remaining + interest);
+        // SAVE: no interest capitalization, balance does not grow
+        var principalPaid = actual - interest;
+        if (principalPaid < 0) {
+          remaining = remaining; // balance stays the same (no negative amort)
+        } else {
+          remaining = remaining - principalPaid;
+        }
+        totalPaid += actual;
+        monthCount++;
+        if (remaining < 0.01) remaining = 0;
+      }
+
+      result.payment = idrPayment;
+      result.totalPaid = totalPaid;
+      result.totalInterest = totalPaid - balance + Math.max(0, remaining);
+      result.months = monthCount;
+      result.forgiveness = Math.max(0, remaining);
+    }
+
+    return result;
+  }
+
+  function formatTime(months) {
+    var years = Math.floor(months / 12);
+    var rem = months % 12;
+    if (years === 0) return rem + ' mo';
+    if (rem === 0) return years + ' yr';
+    return years + ' yr ' + rem + ' mo';
+  }
+
+  function calculate() {
+    var balance = parseFloat(document.getElementById('loanBalance').value) || 0;
+    var rate = (parseFloat(document.getElementById('interestRate').value) || 0) / 100;
+    var income = parseFloat(document.getElementById('annualIncome').value) || 0;
+    var familySize = parseInt(document.getElementById('familySize').value) || 1;
+    var selectedPlan = document.getElementById('repaymentPlan').value;
+
+    // Calculate selected plan
+    var selected = calcPlanDetails(balance, rate, income, familySize, selectedPlan);
+    document.getElementById('monthlyPayment').textContent = formatMoney(selected.payment);
+    document.getElementById('totalPaid').textContent = formatMoney(selected.totalPaid);
+    document.getElementById('totalInterest').textContent = formatMoney(Math.max(0, selected.totalInterest));
+    document.getElementById('forgivenessAmount').textContent = formatMoney(selected.forgiveness);
+    document.getElementById('timeToPayoff').textContent = formatTime(selected.months);
+
+    // Build comparison table
+    var plans = ['standard', 'graduated', 'extended', 'ibr', 'paye', 'save'];
+    var tbody = document.getElementById('comparisonBody');
+    tbody.innerHTML = '';
+
+    for (var i = 0; i < plans.length; i++) {
+      var p = calcPlanDetails(balance, rate, income, familySize, plans[i]);
+      var row = document.createElement('tr');
+      if (plans[i] === selectedPlan) {
+        row.style.backgroundColor = 'var(--primary-light, #e8f4fd)';
+        row.style.fontWeight = '600';
+      }
+      row.innerHTML =
+        '<td>' + p.planName + '</td>' +
+        '<td>' + formatMoney(p.payment) + '</td>' +
+        '<td>' + formatMoney(p.totalPaid) + '</td>' +
+        '<td>' + formatMoney(Math.max(0, p.totalInterest)) + '</td>' +
+        '<td>' + formatMoney(p.forgiveness) + '</td>' +
+        '<td>' + formatTime(p.months) + '</td>';
+      tbody.appendChild(row);
+    }
+  }
+
+  document.getElementById('calculateBtn').addEventListener('click', calculate);
+  calculate();
+</script>

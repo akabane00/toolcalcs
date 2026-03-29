@@ -1,0 +1,351 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import ReviewedBy from '../../components/ReviewedBy.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Education Calculators",
+        "item": "https://toolcalcs.com/education-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "College Cost Calculator"
+      }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How much does 4 years of college cost in 2026?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The average total cost for 4 years of college in 2026 varies significantly by school type. In-state public universities average around $108,000 to $120,000 for tuition, fees, room, and board combined over four years. Out-of-state public universities run approximately $180,000 to $200,000, while private universities can cost $220,000 to $280,000 or more. These figures include tuition, mandatory fees, room and board, books, and basic living expenses. Annual tuition increases of 3 to 5 percent mean students entering college today will pay more by their senior year than they do as freshmen.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What hidden costs should I plan for beyond tuition?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Beyond tuition and room and board, students should budget for textbooks and course materials ($1,200 to $1,800 per year), technology fees, lab fees, health insurance if not covered by a parent plan, transportation costs for getting to and from campus, personal expenses like clothing and toiletries, and social activities. Many students also face costs for study abroad programs, professional exam prep, or graduate school applications during their final year. A realistic budget adds $3,000 to $6,000 per year beyond the published cost of attendance.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How can I reduce the total cost of college?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'There are several proven strategies to reduce college costs. Start at a community college and transfer to a four-year university to save on the first two years of tuition. Apply aggressively for scholarships and grants, which do not need to be repaid. Choose an in-state public university over an out-of-state or private school. Consider living off campus or at home if feasible. Take AP or dual-enrollment courses in high school to earn college credit for free. Graduate in four years or fewer by taking summer courses and maintaining a full course load each semester to avoid paying for additional semesters.',
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="College Cost Calculator - Estimate Total 4-Year Cost | ToolCalcs"
+  description="Free college cost calculator. Estimate total 4-year college expenses including tuition, room and board, books, and fees with annual inflation adjustments and financial aid."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/education-calculators/">Education Calculators</a> &rsaquo;
+    <span>College Cost Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>College Cost Calculator</h1>
+  <p class="page-desc">Estimate the total cost of college including tuition, room and board, books, fees, and annual inflation. See your out-of-pocket expense after financial aid and scholarships.</p>
+
+  <ReviewedBy />
+
+  <!-- Calculator Tool -->
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="annualTuition">Annual Tuition ($)</label>
+        <input type="number" id="annualTuition" value="12000" min="0" max="80000" step="500" />
+      </div>
+      <div class="input-group">
+        <label for="roomBoard">Room & Board per Year ($)</label>
+        <input type="number" id="roomBoard" value="12000" min="0" max="25000" step="500" />
+      </div>
+      <div class="input-group">
+        <label for="booksSupplies">Books & Supplies per Year ($)</label>
+        <input type="number" id="booksSupplies" value="1200" min="500" max="3000" step="100" />
+      </div>
+      <div class="input-group">
+        <label for="otherFees">Other Fees per Year ($)</label>
+        <input type="number" id="otherFees" value="2000" min="0" max="5000" step="100" />
+      </div>
+      <div class="input-group">
+        <label for="increaseRate">Annual Tuition Increase Rate (%)</label>
+        <input type="number" id="increaseRate" value="3" min="0" max="8" step="0.5" />
+      </div>
+      <div class="input-group">
+        <label for="financialAid">Financial Aid / Scholarships per Year ($)</label>
+        <input type="number" id="financialAid" value="5000" min="0" max="50000" step="500" />
+      </div>
+      <div class="input-group">
+        <label for="numYears">Number of Years</label>
+        <select id="numYears">
+          <option value="2">2 Years</option>
+          <option value="4" selected>4 Years</option>
+          <option value="5">5 Years</option>
+          <option value="6">6 Years</option>
+        </select>
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate Total Cost</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Total Cost (All Years)</span>
+          <span class="result-value" id="totalCost">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Financial Aid</span>
+          <span class="result-value" id="totalAid">$0</span>
+        </div>
+        <div class="result-card success">
+          <span class="result-label">Total Out-of-Pocket</span>
+          <span class="result-value" id="totalOutOfPocket">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Estimated Loan Needed</span>
+          <span class="result-value" id="loanNeeded">$0</span>
+        </div>
+      </div>
+
+      <h3 style="margin-top:1.5rem;">Year-by-Year Breakdown</h3>
+      <div class="table-wrap">
+        <table class="result-table" id="yearTable">
+          <thead>
+            <tr>
+              <th>Year</th>
+              <th>Tuition</th>
+              <th>Room & Board</th>
+              <th>Books & Fees</th>
+              <th>Year Total</th>
+              <th>After Aid</th>
+            </tr>
+          </thead>
+          <tbody id="yearTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="mid" format="rectangle" />
+
+  <!-- SEO Content Article -->
+  <article class="content-article">
+    <h2>How Much Does College Cost in 2026?</h2>
+    <p>Understanding the true cost of a college education is the essential first step in making sound financial decisions about higher education. College costs have risen steadily for decades, consistently outpacing general inflation, and showing no signs of slowing down. For the 2025-2026 academic year, the average annual cost of attending a four-year institution in the United States ranges from approximately $27,000 for in-state public universities to $60,000 or more for elite private colleges when you factor in tuition, fees, room and board, books, transportation, and personal expenses.</p>
+    <p>These headline numbers, however, only tell part of the story. The sticker price is what the school publishes, but the net price — what you actually pay after grants, scholarships, and other financial aid — can be significantly lower. According to the College Board, the average net price for in-state public university students receiving grant aid is roughly $15,000 to $18,000 per year. For private university students receiving aid, the average net price drops to between $28,000 and $35,000. Our calculator above helps you model both the gross and net cost of your specific situation over the full duration of your degree program, including the impact of annual tuition increases.</p>
+
+    <h2>Average College Costs by School Type (2025-2026)</h2>
+    <p>The following table summarizes the average annual costs at different types of institutions across the United States. These figures represent the full cost of attendance, including tuition, mandatory fees, room and board, books, and estimated personal expenses.</p>
+
+    <div class="table-wrap">
+      <table class="info-table">
+        <thead>
+          <tr>
+            <th>School Type</th>
+            <th>Annual Tuition & Fees</th>
+            <th>Room & Board</th>
+            <th>Total per Year</th>
+            <th>4-Year Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>In-State Public</td>
+            <td>$11,000 - $13,000</td>
+            <td>$12,000 - $14,000</td>
+            <td>$23,000 - $27,000</td>
+            <td>$92,000 - $108,000</td>
+          </tr>
+          <tr>
+            <td>Out-of-State Public</td>
+            <td>$23,000 - $30,000</td>
+            <td>$12,000 - $14,000</td>
+            <td>$35,000 - $44,000</td>
+            <td>$140,000 - $176,000</td>
+          </tr>
+          <tr>
+            <td>Private Non-Profit</td>
+            <td>$42,000 - $62,000</td>
+            <td>$14,000 - $18,000</td>
+            <td>$56,000 - $80,000</td>
+            <td>$224,000 - $320,000</td>
+          </tr>
+          <tr>
+            <td>Community College</td>
+            <td>$3,800 - $5,500</td>
+            <td>N/A (commuter)</td>
+            <td>$3,800 - $5,500</td>
+            <td>$7,600 - $11,000 (2yr)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Keep in mind that these are national averages. Individual states and institutions vary widely. For example, public universities in states like California, Texas, and Florida tend to offer below-average tuition for residents, while those in the Northeast and certain Midwest states tend to be above average. Private institutions range from small liberal arts colleges with moderate tuition to Ivy League and other elite schools where the sticker price can exceed $85,000 per year before financial aid.</p>
+
+    <h2>In-State vs Out-of-State vs Private: Choosing Wisely</h2>
+    <p>The single biggest cost decision most families face is the type of institution. Attending an in-state public university is often the most financially prudent path. The tuition subsidy your state provides to resident students can save $15,000 to $25,000 per year compared to out-of-state or private alternatives. Over four years, this adds up to $60,000 to $100,000 in savings — a difference that can shape your financial life for a decade after graduation.</p>
+    <p>Out-of-state public universities are popular because some offer programs not available at your home state school, or because they have a stronger reputation in your intended field. However, the financial calculus is often similar to attending a private university at that point. Some states have reciprocity agreements, such as the Western Undergraduate Exchange (WUE) or the Midwest Student Exchange Program, that offer reduced tuition for students from neighboring states. Researching these programs can deliver substantial savings.</p>
+    <p>Private universities often provide the most generous financial aid packages relative to their sticker price. A school with a $65,000 annual sticker price may offer a $40,000 aid package to an admitted student, making the net price competitive with an in-state public school. However, this varies enormously from school to school. Schools with large endowments, such as Harvard, Stanford, Princeton, and MIT, often meet 100 percent of demonstrated financial need without requiring students to take on loans. Smaller private schools may offer merit scholarships but still leave a significant gap. Always compare the net price, not the sticker price, when evaluating private versus public institutions.</p>
+
+    <h2>Hidden Costs Many Families Overlook</h2>
+    <p>The published cost of attendance is just the beginning. Numerous additional expenses catch students and families by surprise, and planning for these costs upfront is essential for an accurate budget.</p>
+
+    <h3>Textbooks and Course Materials</h3>
+    <p>Despite the growth of digital textbooks and open educational resources, textbooks remain a significant expense. Students spend an average of $1,200 to $1,800 per year on required course materials. STEM and pre-professional programs often have the highest textbook costs, with individual science or engineering textbooks costing $200 to $350 each. Strategies to reduce this cost include renting textbooks, buying used copies, using the campus library reserves, and searching for free or low-cost open-access alternatives.</p>
+
+    <h3>Technology and Equipment</h3>
+    <p>Most colleges expect students to have a laptop and may require specific software for coursework. Architecture, graphic design, engineering, and music production students may need more powerful or specialized equipment. Budget $1,000 to $2,500 for a laptop and any required software licenses during your first year, with ongoing software costs in subsequent years.</p>
+
+    <h3>Health Insurance</h3>
+    <p>Students under 26 can typically remain on a parent's health insurance plan under the Affordable Care Act. If that is not an option, most colleges require students to purchase the school's health insurance plan, which can cost $2,000 to $4,000 per year. Dental and vision coverage are usually not included and may require separate policies.</p>
+
+    <h3>Transportation</h3>
+    <p>Whether you are commuting to campus daily, flying home for holidays, or maintaining a car on campus, transportation costs add up quickly. Commuter students may spend $3,000 to $5,000 per year on gas, parking, and vehicle maintenance. Students who live on campus and fly home several times per year can easily spend $1,500 to $3,000 on airfare. Campus parking permits alone can cost $200 to $1,000 per year depending on the school.</p>
+
+    <h3>Personal Expenses and Social Life</h3>
+    <p>Clothing, laundry, toiletries, dining out, entertainment, and social activities are real costs that students need to budget for. A conservative estimate is $2,000 to $4,000 per year, though spending varies widely based on location and lifestyle choices. Students in high cost-of-living cities will inevitably spend more than those in smaller college towns.</p>
+
+    <h2>Understanding Annual Tuition Increases</h2>
+    <p>One of the most important factors our calculator accounts for is the annual rate of tuition increase. Historically, college tuition has risen at approximately 3 to 5 percent per year — roughly double the rate of general consumer inflation. This means a student starting college in 2026 paying $12,000 in tuition will pay approximately $13,500 by their senior year if tuition increases 4 percent annually. Over a four-year period, this compounding effect adds thousands of dollars to the total cost of a degree.</p>
+    <p>Some schools have implemented tuition guarantees that lock in a fixed rate for entering freshmen. If your prospective school offers this program, it can simplify your budgeting and potentially save money if tuition increases exceed expectations. Be sure to confirm whether the guarantee covers only tuition or also includes fees, room, and board.</p>
+
+    <h2>Proven Strategies to Reduce College Costs</h2>
+    <p>While the total cost of college can seem overwhelming, there are well-proven strategies that can meaningfully reduce what you or your family will ultimately pay.</p>
+
+    <h3>Start at a Community College</h3>
+    <p>Completing your first two years at a community college and then transferring to a four-year university is one of the most effective cost-reduction strategies available. Community college tuition averages just $3,800 to $5,500 per year, compared to $11,000 or more at a public four-year school. By completing general education requirements at a community college, you can save $15,000 to $50,000 over two years. Many states have articulation agreements that guarantee community college credits transfer seamlessly to the state university system.</p>
+
+    <h3>Maximize Scholarships and Grants</h3>
+    <p>Unlike loans, scholarships and grants represent free money that does not need to be repaid. File the FAFSA (Free Application for Federal Student Aid) every year, regardless of your family income — many merit-based and need-based grants require a completed FAFSA on file. Apply for scholarships from your school, local community organizations, professional associations in your field, employers, and national scholarship databases. Even small scholarships of $500 or $1,000 add up over four years.</p>
+
+    <h3>Earn College Credit in High School</h3>
+    <p>Advanced Placement (AP) courses, International Baccalaureate (IB) programs, and dual-enrollment courses taken during high school can earn you college credit at little or no cost. Students who enter college with 15 to 30 credits already completed can potentially graduate a semester or full year early, saving one to two semesters of full-price tuition, room, and board. This strategy alone can save $15,000 to $40,000 depending on the institution.</p>
+
+    <h3>Graduate on Time or Early</h3>
+    <p>Only about 45 percent of bachelor's degree students graduate within four years. Each additional semester adds a full semester of tuition, fees, room, and board to your total cost, plus the opportunity cost of delayed entry into the workforce. Taking a full course load, attending summer sessions, and careful academic planning help ensure you finish in four years or fewer. A fifth year of college can add $25,000 to $60,000 to your total education cost.</p>
+
+    <h3>Consider Work-Study and Part-Time Employment</h3>
+    <p>Federal work-study programs provide part-time jobs for students with financial need, allowing them to earn money while gaining work experience. Even without work-study, many students work 10 to 15 hours per week during the school year without a significant impact on academic performance. Earning $5,000 to $8,000 per year through part-time employment can meaningfully reduce your need to borrow.</p>
+
+    <h2>Planning Ahead: The Role of Savings</h2>
+    <p>If you are a parent planning for a child's future college expenses, starting to save early is the most powerful tool at your disposal. A 529 college savings plan offers tax-advantaged growth, and contributions grow tax-free when used for qualified education expenses. Even modest monthly contributions of $200 to $300 starting when a child is born can grow to $60,000 to $100,000 by the time they reach college age, depending on investment returns.</p>
+    <p>Use our <a href="/financial-calculators/savings-goal-calculator/">savings goal calculator</a> to determine how much you need to save each month to reach your target college fund balance. Pair that with our <a href="/financial-calculators/compound-interest-calculator/">compound interest calculator</a> to see how different contribution levels and time horizons affect the growth of your education savings.</p>
+
+    <h2>Estimating Student Loan Needs</h2>
+    <p>After subtracting savings, scholarships, grants, and family contributions from your total estimated cost, the remaining gap is typically covered by student loans. Our calculator estimates this figure to help you understand how much borrowing may be required. Federal student loans should always be your first choice for borrowing because they offer fixed interest rates, income-driven repayment options, and potential loan forgiveness programs that private loans do not provide.</p>
+    <p>For undergraduate students, federal direct subsidized and unsubsidized loan limits range from $5,500 to $7,500 per year depending on your year in school and dependency status. If your borrowing needs exceed these limits, parent PLUS loans or private student loans may be necessary, but both come with higher interest rates and fewer repayment protections. Use our <a href="/financial-calculators/student-loan-calculator/">student loan calculator</a> to model your projected monthly payments and total repayment cost based on different borrowing scenarios.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>How much does 4 years of college cost in 2026?</summary>
+        <p>The average total cost for 4 years of college in 2026 varies significantly by school type. In-state public universities average around $108,000 to $120,000 for tuition, fees, room, and board combined over four years. Out-of-state public universities run approximately $180,000 to $200,000, while private universities can cost $220,000 to $280,000 or more. These figures include tuition, mandatory fees, room and board, books, and basic living expenses. Annual tuition increases of 3 to 5 percent mean students entering college today will pay more by their senior year than they do as freshmen.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What hidden costs should I plan for beyond tuition?</summary>
+        <p>Beyond tuition and room and board, students should budget for textbooks and course materials ($1,200 to $1,800 per year), technology fees, lab fees, health insurance if not covered by a parent plan, transportation costs for getting to and from campus, personal expenses like clothing and toiletries, and social activities. Many students also face costs for study abroad programs, professional exam prep, or graduate school applications during their final year. A realistic budget adds $3,000 to $6,000 per year beyond the published cost of attendance.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How can I reduce the total cost of college?</summary>
+        <p>There are several proven strategies to reduce college costs. Start at a community college and transfer to a four-year university to save on the first two years of tuition. Apply aggressively for scholarships and grants, which do not need to be repaid. Choose an in-state public university over an out-of-state or private school. Consider living off campus or at home if feasible. Take AP or dual-enrollment courses in high school to earn college credit for free. Graduate in four years or fewer by taking summer courses and maintaining a full course load each semester to avoid paying for additional semesters.</p>
+      </details>
+    </div>
+  </article>
+
+  <RelatedCalculators currentSlug="college-cost-calculator" />
+  <RelatedArticles calculatorSlug="college-cost-calculator" />
+
+  <CrossLinks links={[
+    { href: '/savings/', label: 'Savings Growth Tables', icon: '💰' },
+    { href: '/down-payment/', label: 'Down Payment Calculator', icon: '🏠' },
+  ]} />
+
+  <AdUnit slot="bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function formatMoney(n) {
+    return '$' + Math.round(n).toLocaleString('en-US');
+  }
+
+  function calculate() {
+    var tuition = parseFloat(document.getElementById('annualTuition').value) || 0;
+    var roomBoard = parseFloat(document.getElementById('roomBoard').value) || 0;
+    var books = parseFloat(document.getElementById('booksSupplies').value) || 0;
+    var otherFees = parseFloat(document.getElementById('otherFees').value) || 0;
+    var rate = (parseFloat(document.getElementById('increaseRate').value) || 0) / 100;
+    var aid = parseFloat(document.getElementById('financialAid').value) || 0;
+    var years = parseInt(document.getElementById('numYears').value) || 4;
+
+    var totalCost = 0;
+    var totalAidSum = 0;
+    var tbody = document.getElementById('yearTableBody');
+    tbody.innerHTML = '';
+
+    for (var i = 0; i < years; i++) {
+      var factor = Math.pow(1 + rate, i);
+      var yearTuition = tuition * factor;
+      var yearRoomBoard = roomBoard * factor;
+      var yearBooksOther = (books + otherFees) * factor;
+      var yearTotal = yearTuition + yearRoomBoard + yearBooksOther;
+      var yearAfterAid = Math.max(0, yearTotal - aid);
+
+      totalCost += yearTotal;
+      totalAidSum += Math.min(aid, yearTotal);
+
+      var row = document.createElement('tr');
+      row.innerHTML =
+        '<td>Year ' + (i + 1) + '</td>' +
+        '<td>' + formatMoney(yearTuition) + '</td>' +
+        '<td>' + formatMoney(yearRoomBoard) + '</td>' +
+        '<td>' + formatMoney(yearBooksOther) + '</td>' +
+        '<td>' + formatMoney(yearTotal) + '</td>' +
+        '<td>' + formatMoney(yearAfterAid) + '</td>';
+      tbody.appendChild(row);
+    }
+
+    var outOfPocket = Math.max(0, totalCost - totalAidSum);
+
+    document.getElementById('totalCost').textContent = formatMoney(totalCost);
+    document.getElementById('totalAid').textContent = formatMoney(totalAidSum);
+    document.getElementById('totalOutOfPocket').textContent = formatMoney(outOfPocket);
+    document.getElementById('loanNeeded').textContent = formatMoney(outOfPocket);
+  }
+
+  document.getElementById('calculateBtn').addEventListener('click', calculate);
+  calculate();
+</script>

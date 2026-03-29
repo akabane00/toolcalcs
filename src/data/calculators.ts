@@ -87,6 +87,12 @@ export const categories: Category[] = [
     description: 'Break-even, profit margin, LLC vs S-Corp, payroll cost, SBA loan, and ROI calculators for entrepreneurs and small business owners.',
     icon: '💼',
   },
+  {
+    name: 'Education Calculators',
+    slug: 'education-calculators',
+    description: 'GPA, college cost, student loan repayment, scholarship impact, SAT score, and teacher salary calculators for students and educators.',
+    icon: '🎓',
+  },
 ];
 
 export const calculators: Calculator[] = [
@@ -1249,6 +1255,47 @@ export const calculators: Calculator[] = [
     categorySlug: 'real-estate-calculators',
     icon: '📈',
   },
+  // Education Calculators
+  {
+    title: 'GPA Calculator',
+    slug: 'gpa-calculator',
+    description: 'Calculate your weighted and unweighted GPA. Add courses, credit hours, and grades to see your cumulative and semester GPA.',
+    category: 'Education Calculators',
+    categorySlug: 'education-calculators',
+    icon: '🎓',
+  },
+  {
+    title: 'College Cost Calculator',
+    slug: 'college-cost-calculator',
+    description: 'Estimate the total 4-year cost of college including tuition, room and board, books, and fees with inflation adjustments.',
+    category: 'Education Calculators',
+    categorySlug: 'education-calculators',
+    icon: '🏫',
+  },
+  {
+    title: 'Student Loan Repayment Planner',
+    slug: 'student-loan-repayment-planner',
+    description: 'Compare student loan repayment plans: Standard, Graduated, Extended, IBR, PAYE, and REPAYE. See monthly payments and total interest.',
+    category: 'Education Calculators',
+    categorySlug: 'education-calculators',
+    icon: '💳',
+  },
+  {
+    title: 'Scholarship Impact Calculator',
+    slug: 'scholarship-calculator',
+    description: 'See how scholarships and grants reduce your total college cost and student loan burden. Compare multiple award scenarios.',
+    category: 'Education Calculators',
+    categorySlug: 'education-calculators',
+    icon: '🏆',
+  },
+  {
+    title: 'SAT Score Calculator',
+    slug: 'sat-score-calculator',
+    description: 'Convert SAT raw scores to scaled scores, see section breakdowns, and check your competitiveness for target colleges.',
+    category: 'Education Calculators',
+    categorySlug: 'education-calculators',
+    icon: '📝',
+  },
 ];
 
 export function getCalculatorsByCategory(categorySlug: string): Calculator[] {
@@ -1283,6 +1330,8 @@ const relatedGroups: Record<string, string[]> = {
   'conversion': ['unit-converter', 'currency-converter', 'temperature-converter', 'cooking-measurement-converter', 'length-converter', 'weight-converter', 'speed-converter', 'data-size-converter'],
   // Astrology
   'astrology': ['zodiac-sign-calculator', 'zodiac-compatibility-calculator', 'numerology-calculator', 'angel-number-calculator', 'tarot-reading', 'chinese-zodiac-calculator'],
+  // Education
+  'education': ['gpa-calculator', 'college-cost-calculator', 'student-loan-repayment-planner', 'scholarship-calculator', 'sat-score-calculator'],
 };
 
 // Cross-category links for broader discovery
@@ -1299,6 +1348,7 @@ const crossCategoryLinks: Record<string, string[]> = {
   'tax-calculators': ['take-home-pay-calculator', 'self-employment-tax-calculator', 'rental-property-calculator'],
   'business-calculators': ['compound-interest-calculator', 'loan-amortization-calculator', 'investment-calculator', 'take-home-pay-calculator'],
   'insurance-calculators': ['mortgage-calculator', 'home-affordability-calculator', 'take-home-pay-calculator'],
+  'education-calculators': ['student-loan-calculator', 'compound-interest-calculator', 'savings-goal-calculator', 'take-home-pay-calculator'],
 };
 
 export function getRelatedCalculators(currentSlug: string, limit: number = 5): Calculator[] {

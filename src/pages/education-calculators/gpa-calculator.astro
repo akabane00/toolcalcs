@@ -1,0 +1,346 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import ReviewedBy from '../../components/ReviewedBy.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Education Calculators", "item": "https://toolcalcs.com/education-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "GPA Calculator" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "How is GPA calculated?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "GPA is calculated by assigning a numeric value to each letter grade (A=4.0, B=3.0, C=2.0, D=1.0, F=0.0), multiplying each grade value by the credit hours for that course to get quality points, summing all quality points, and dividing by total credit hours. For example, an A in a 3-credit course gives 12 quality points. If you also earn a B in a 4-credit course (12 points), your GPA is (12+12)/(3+4) = 3.43."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "What is the difference between weighted and unweighted GPA?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "An unweighted GPA uses the standard 4.0 scale for all courses. A weighted GPA adds extra points for advanced courses: typically +0.5 for honors classes and +1.0 for AP or IB courses. This means a weighted GPA can exceed 4.0. For example, an A in an AP course would be worth 5.0 on a weighted scale instead of 4.0. Colleges consider both scales when evaluating applicants."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "What GPA do I need for college admission?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "GPA requirements vary widely by institution. Most four-year colleges require a minimum 2.0 GPA, but competitive schools typically expect 3.5 or higher. Ivy League and top-tier universities often see admitted students with 3.9+ unweighted GPAs. However, GPA is just one factor — colleges also consider test scores, extracurriculars, essays, and course rigor. Taking AP/IB courses and earning slightly lower grades may be viewed more favorably than earning straight As in easier courses."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="GPA Calculator - Calculate Weighted & Unweighted GPA | ToolCalcs"
+  description="Calculate your semester and cumulative GPA instantly. Supports weighted GPA for honors, AP, and IB courses. Free GPA calculator for high school and college students."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/education-calculators/">Education Calculators</a> &rsaquo;
+    <span>GPA Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>GPA Calculator</h1>
+  <p class="page-desc">Enter your courses, credit hours, and grades to calculate your semester GPA. Toggle weighted mode to account for honors, AP, and IB course bonuses.</p>
+
+  <ReviewedBy />
+
+  <div class="calc-box">
+    <div class="gpa-options" style="margin-bottom:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+        <input type="checkbox" id="gpa-weighted" />
+        <span>Weighted GPA (Honors +0.5, AP/IB +1.0)</span>
+      </label>
+    </div>
+
+    <div class="gpa-cumulative" style="margin-bottom:16px;padding:14px;border:1px solid var(--color-border);border-radius:8px;background:var(--color-surface);">
+      <strong>Prior Cumulative GPA (optional)</strong>
+      <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;">
+        <div class="input-group" style="flex:1;min-width:140px;">
+          <label for="gpa-prior-gpa">Previous GPA</label>
+          <input type="number" id="gpa-prior-gpa" value="" min="0" max="5" step="0.01" placeholder="e.g. 3.50" />
+        </div>
+        <div class="input-group" style="flex:1;min-width:140px;">
+          <label for="gpa-prior-credits">Previous Credits</label>
+          <input type="number" id="gpa-prior-credits" value="" min="0" max="300" step="1" placeholder="e.g. 60" />
+        </div>
+      </div>
+      <small>Enter your existing cumulative GPA and total credits to calculate an updated cumulative GPA.</small>
+    </div>
+
+    <table class="gpa-table" id="gpa-table" style="width:100%;border-collapse:collapse;margin-bottom:12px;">
+      <thead>
+        <tr>
+          <th style="text-align:left;padding:8px;">Course Name</th>
+          <th style="text-align:center;padding:8px;width:100px;">Credits</th>
+          <th style="text-align:center;padding:8px;width:120px;">Grade</th>
+          <th class="gpa-col-type" style="text-align:center;padding:8px;width:120px;display:none;">Course Type</th>
+          <th style="width:40px;"></th>
+        </tr>
+      </thead>
+      <tbody id="gpa-rows">
+        <tr class="gpa-row">
+          <td style="padding:4px;"><input type="text" class="gpa-course" placeholder="Course 1" style="width:100%;" /></td>
+          <td style="padding:4px;"><select class="gpa-credits"><option value="1">1</option><option value="2">2</option><option selected value="3">3</option><option value="4">4</option><option value="5">5</option></select></td>
+          <td style="padding:4px;"><select class="gpa-grade"><option value="4.0">A+</option><option value="4.0" selected>A</option><option value="3.7">A-</option><option value="3.3">B+</option><option value="3.0">B</option><option value="2.7">B-</option><option value="2.3">C+</option><option value="2.0">C</option><option value="1.7">C-</option><option value="1.3">D+</option><option value="1.0">D</option><option value="0.7">D-</option><option value="0.0">F</option></select></td>
+          <td class="gpa-col-type" style="padding:4px;display:none;"><select class="gpa-type"><option value="regular">Regular</option><option value="honors">Honors</option><option value="ap">AP/IB</option></select></td>
+          <td style="padding:4px;text-align:center;"><button class="gpa-remove-btn" title="Remove" style="background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--color-text-muted);">&#10005;</button></td>
+        </tr>
+        <tr class="gpa-row">
+          <td style="padding:4px;"><input type="text" class="gpa-course" placeholder="Course 2" style="width:100%;" /></td>
+          <td style="padding:4px;"><select class="gpa-credits"><option value="1">1</option><option value="2">2</option><option selected value="3">3</option><option value="4">4</option><option value="5">5</option></select></td>
+          <td style="padding:4px;"><select class="gpa-grade"><option value="4.0">A+</option><option value="4.0" selected>A</option><option value="3.7">A-</option><option value="3.3">B+</option><option value="3.0">B</option><option value="2.7">B-</option><option value="2.3">C+</option><option value="2.0">C</option><option value="1.7">C-</option><option value="1.3">D+</option><option value="1.0">D</option><option value="0.7">D-</option><option value="0.0">F</option></select></td>
+          <td class="gpa-col-type" style="padding:4px;display:none;"><select class="gpa-type"><option value="regular">Regular</option><option value="honors">Honors</option><option value="ap">AP/IB</option></select></td>
+          <td style="padding:4px;text-align:center;"><button class="gpa-remove-btn" title="Remove" style="background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--color-text-muted);">&#10005;</button></td>
+        </tr>
+        <tr class="gpa-row">
+          <td style="padding:4px;"><input type="text" class="gpa-course" placeholder="Course 3" style="width:100%;" /></td>
+          <td style="padding:4px;"><select class="gpa-credits"><option value="1">1</option><option value="2">2</option><option selected value="3">3</option><option value="4">4</option><option value="5">5</option></select></td>
+          <td style="padding:4px;"><select class="gpa-grade"><option value="4.0">A+</option><option value="4.0" selected>A</option><option value="3.7">A-</option><option value="3.3">B+</option><option value="3.0">B</option><option value="2.7">B-</option><option value="2.3">C+</option><option value="2.0">C</option><option value="1.7">C-</option><option value="1.3">D+</option><option value="1.0">D</option><option value="0.7">D-</option><option value="0.0">F</option></select></td>
+          <td class="gpa-col-type" style="padding:4px;display:none;"><select class="gpa-type"><option value="regular">Regular</option><option value="honors">Honors</option><option value="ap">AP/IB</option></select></td>
+          <td style="padding:4px;text-align:center;"><button class="gpa-remove-btn" title="Remove" style="background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--color-text-muted);">&#10005;</button></td>
+        </tr>
+        <tr class="gpa-row">
+          <td style="padding:4px;"><input type="text" class="gpa-course" placeholder="Course 4" style="width:100%;" /></td>
+          <td style="padding:4px;"><select class="gpa-credits"><option value="1">1</option><option value="2">2</option><option selected value="3">3</option><option value="4">4</option><option value="5">5</option></select></td>
+          <td style="padding:4px;"><select class="gpa-grade"><option value="4.0">A+</option><option value="4.0" selected>A</option><option value="3.7">A-</option><option value="3.3">B+</option><option value="3.0">B</option><option value="2.7">B-</option><option value="2.3">C+</option><option value="2.0">C</option><option value="1.7">C-</option><option value="1.3">D+</option><option value="1.0">D</option><option value="0.7">D-</option><option value="0.0">F</option></select></td>
+          <td class="gpa-col-type" style="padding:4px;display:none;"><select class="gpa-type"><option value="regular">Regular</option><option value="honors">Honors</option><option value="ap">AP/IB</option></select></td>
+          <td style="padding:4px;text-align:center;"><button class="gpa-remove-btn" title="Remove" style="background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--color-text-muted);">&#10005;</button></td>
+        </tr>
+        <tr class="gpa-row">
+          <td style="padding:4px;"><input type="text" class="gpa-course" placeholder="Course 5" style="width:100%;" /></td>
+          <td style="padding:4px;"><select class="gpa-credits"><option value="1">1</option><option value="2">2</option><option selected value="3">3</option><option value="4">4</option><option value="5">5</option></select></td>
+          <td style="padding:4px;"><select class="gpa-grade"><option value="4.0">A+</option><option value="4.0" selected>A</option><option value="3.7">A-</option><option value="3.3">B+</option><option value="3.0">B</option><option value="2.7">B-</option><option value="2.3">C+</option><option value="2.0">C</option><option value="1.7">C-</option><option value="1.3">D+</option><option value="1.0">D</option><option value="0.7">D-</option><option value="0.0">F</option></select></td>
+          <td class="gpa-col-type" style="padding:4px;display:none;"><select class="gpa-type"><option value="regular">Regular</option><option value="honors">Honors</option><option value="ap">AP/IB</option></select></td>
+          <td style="padding:4px;text-align:center;"><button class="gpa-remove-btn" title="Remove" style="background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--color-text-muted);">&#10005;</button></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <button class="calc-btn" id="addCourseBtn" style="background:var(--color-surface);color:var(--color-primary);border:1px solid var(--color-primary);margin-bottom:12px;">+ Add Course</button>
+    <button class="calc-btn" id="calcGpaBtn">Calculate GPA</button>
+
+    <div class="results" id="gpa-results" style="display:none">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <div class="result-label">Semester GPA</div>
+          <div class="result-value" id="res-semester-gpa">0.00</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Cumulative GPA</div>
+          <div class="result-value" id="res-cumulative-gpa">0.00</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Total Credits</div>
+          <div class="result-value" id="res-total-credits">0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Total Quality Points</div>
+          <div class="result-value" id="res-quality-points">0.00</div>
+        </div>
+      </div>
+      <div id="gpa-advice" style="margin-top:16px;padding:14px;border-radius:8px;font-size:0.95rem;"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+  <RelatedCalculators currentSlug="gpa-calculator" />
+
+  <article class="seo-content">
+    <h2>How GPA Works: A Complete Guide</h2>
+    <p>Grade Point Average (GPA) is the standard measure of academic achievement used by high schools, colleges, and universities across the United States. Your GPA converts letter grades into a numeric scale, typically 0.0 to 4.0, and weights them by credit hours to produce a single number that represents your overall academic performance. Whether you are a high school student planning for college applications or a college student tracking your progress toward graduation, understanding how GPA is calculated is essential for academic planning.</p>
+    <p>The GPA system dates back to the early 20th century when universities needed a standardized way to compare student performance across different courses and departments. Today, GPA is used for everything from college admissions and scholarship eligibility to graduate school applications and employer screening. A strong GPA opens doors to honors programs, Dean's List recognition, and competitive internships. Our calculator supports both unweighted and weighted GPA, making it useful for high school students in AP, IB, or honors programs as well as college students.</p>
+
+    <h2>How to Calculate Your GPA Step by Step</h2>
+    <p>GPA calculation involves three simple steps. First, convert each letter grade to its numeric equivalent on the 4.0 scale: A+ and A = 4.0, A- = 3.7, B+ = 3.3, B = 3.0, B- = 2.7, C+ = 2.3, C = 2.0, C- = 1.7, D+ = 1.3, D = 1.0, D- = 0.7, and F = 0.0. Second, multiply each grade value by the number of credit hours for that course to calculate quality points. For example, a B+ (3.3) in a 4-credit course produces 13.2 quality points. Third, add up all quality points and divide by total credit hours.</p>
+    <p>Here is a worked example. Suppose you are taking five courses this semester: English (3 credits, A), Chemistry (4 credits, B+), History (3 credits, A-), Math (4 credits, B), and Art (2 credits, A). Your quality points are: English = 3 x 4.0 = 12.0, Chemistry = 4 x 3.3 = 13.2, History = 3 x 3.7 = 11.1, Math = 4 x 3.0 = 12.0, Art = 2 x 4.0 = 8.0. Total quality points = 56.3, total credits = 16. Semester GPA = 56.3 / 16 = 3.52.</p>
+    <p>To calculate your cumulative GPA, you need your total quality points and total credits from all previous semesters combined. Add your new semester's quality points and credits to the running totals, then divide. If you had a 3.40 GPA over 48 prior credits (163.2 quality points), adding 56.3 quality points and 16 credits gives you (163.2 + 56.3) / (48 + 16) = 219.5 / 64 = 3.43 cumulative GPA.</p>
+
+    <h2>Weighted vs. Unweighted GPA</h2>
+    <p>An unweighted GPA treats all courses equally on the standard 4.0 scale, regardless of difficulty. An A in gym class counts the same as an A in AP Physics. While straightforward, this system does not reward students who challenge themselves with advanced coursework.</p>
+    <p>A weighted GPA adjusts for course difficulty by adding extra grade points to advanced courses. The most common weighting system adds 0.5 points for honors courses and 1.0 points for AP (Advanced Placement) or IB (International Baccalaureate) courses. Under this system, an A in an AP course is worth 5.0 instead of 4.0, and an A in an honors course is worth 4.5. This means weighted GPAs can exceed 4.0 and theoretically reach 5.0.</p>
+    <p>Most high schools report both weighted and unweighted GPAs on transcripts. Colleges look at both but often recalculate GPAs using their own weighting systems. Admissions officers generally prefer to see students who took rigorous courses and earned B's over students who took easy courses and earned all A's. A 3.5 unweighted GPA with a schedule full of AP courses is typically viewed more favorably than a 4.0 from basic-level classes.</p>
+
+    <h2>How Colleges Evaluate Your GPA</h2>
+    <p>College admissions offices use GPA as one of several factors in holistic review. Your GPA provides a quick snapshot of academic consistency over four years. However, colleges look beyond the raw number. They consider the rigor of your course load, whether your grades trended upward over time, the competitiveness of your high school, and how your GPA compares to your class rank.</p>
+    <p>Many selective colleges recalculate applicant GPAs using their own formulas. Some only count core academic subjects (English, math, science, history, and foreign language), excluding PE, art, and electives. Others weight AP and honors courses differently than your high school does. The University of California system, for example, caps the number of honors/AP bonus points at 8 semesters of courses.</p>
+    <p>For graduate school admissions, your major GPA (GPA in courses within your declared major) often matters more than your overall GPA. A 3.2 overall GPA with a 3.8 in your major field shows strong subject-area competence. Medical schools calculate a separate science GPA (BCPM: biology, chemistry, physics, math) in addition to your cumulative GPA. Law schools rely heavily on your LSAC-calculated GPA, which may differ from your transcript GPA.</p>
+
+    <h2>GPA Scales Around the World</h2>
+    <p>The 4.0 GPA scale is primarily used in the United States and Canada. Other countries use different grading systems that can make international comparisons challenging. In the United Kingdom, universities use a classification system: First Class Honours (70 percent and above), Upper Second Class (60 to 69 percent), Lower Second Class (50 to 59 percent), and Third Class (40 to 49 percent). A UK First is roughly equivalent to a 3.7+ GPA.</p>
+    <p>Germany uses a 1.0 to 5.0 scale where 1.0 is the best grade (Very Good) and 5.0 is a fail. France grades on a 0 to 20 scale, where 10 is passing and scores above 16 are rare. Australia uses a 7-point scale at most universities, with 7 being High Distinction and 4 being a Pass. India uses a 10-point CGPA (Cumulative Grade Point Average) scale at many institutions, while others use percentage-based grading. Japan typically uses an A-to-F system similar to the US but may calculate GPA on different scales depending on the university.</p>
+    <p>If you are an international student applying to US colleges, admissions offices have experience converting foreign grades to the US scale. Many use services like WES (World Education Services) for official credential evaluations. When in doubt, contact the admissions office directly to understand how your grades will be interpreted.</p>
+
+    <h2>Tips to Improve Your GPA</h2>
+    <p>Raising your GPA requires a strategic approach, especially if you are several semesters into your college career. The more credits you have accumulated, the harder it is to move your cumulative GPA because each new course represents a smaller fraction of your total. A student with 30 credits can raise their GPA much faster than a student with 90 credits.</p>
+    <p>Start by identifying your weakest subject areas and seeking help early. Visit professors during office hours, form study groups, and use campus tutoring centers. These resources are included in your tuition and can make a significant difference. Many students avoid asking for help until it is too late; the students who visit office hours regularly tend to earn higher grades.</p>
+    <p>Consider your course load carefully. Taking 18 credits while working a part-time job may result in lower grades than taking 15 credits and performing well in each course. Five A's produce a higher GPA than four A's and two B's. Some students strategically take easier electives during challenging semesters to maintain their GPA, while saving difficult required courses for semesters when they can focus more fully.</p>
+    <p>Check your school's policies on grade replacement or academic forgiveness. Many universities allow you to retake a course and replace the original grade. Some have "freshman forgiveness" policies that exclude poor first-year grades from your cumulative GPA calculation. These policies vary widely, so consult your academic advisor about options available at your institution.</p>
+
+    <h2>GPA Requirements for Scholarships and Honors</h2>
+    <p>Many scholarships set minimum GPA thresholds for eligibility. Merit-based scholarships at state universities typically require a 3.0 to 3.5 GPA for initial eligibility and a minimum GPA (often 2.5 to 3.0) to maintain the scholarship each year. Competitive national scholarships like the Goldwater, Truman, or Rhodes often expect GPAs of 3.7 or higher.</p>
+    <p>Dean's List recognition usually requires a semester GPA of 3.5 or higher with a full course load (typically 12+ credits). Graduating with honors typically follows these thresholds: cum laude (3.5+), magna cum laude (3.7+), and summa cum laude (3.9+), though exact cutoffs vary by institution. Some schools use class rank percentiles instead of fixed GPA thresholds for Latin honors.</p>
+    <p>Graduate and professional programs have varying GPA expectations. Most MBA programs expect a 3.0+ GPA, though top programs like Harvard, Stanford, and Wharton see average GPAs of 3.6 to 3.7. Medical schools expect a 3.5+ GPA with particularly strong science grades. Law school admissions weight your LSAT score heavily alongside GPA, with top-14 law schools typically expecting a 3.7+ GPA. Engineering and STEM graduate programs may be more lenient on GPA (3.0 to 3.3 is often competitive) because they weigh research experience and GRE scores heavily.</p>
+
+    <h2>Common GPA Mistakes to Avoid</h2>
+    <p>One of the most common mistakes students make is not understanding how much a single poor grade can damage their GPA. An F (0.0) in a 4-credit course can drop your GPA by several tenths of a point. If you are struggling in a course, investigate your school's withdrawal deadline. A "W" (withdrawal) on your transcript is far better than an F, though too many W's can raise questions with admissions committees.</p>
+    <p>Another mistake is ignoring the impact of plus and minus grades. The difference between a B+ (3.3) and a B- (2.7) is 0.6 grade points per credit hour. In a 4-credit course, that is 2.4 quality points — enough to noticeably affect your semester GPA. When you are on the borderline between grades, putting in the extra effort to earn the plus instead of the minus pays dividends.</p>
+    <p>Transfer students should be aware that most receiving institutions do not include transfer credits in their GPA calculation. Your GPA starts fresh at the new school, even though the transfer credits count toward graduation requirements. This can be an advantage if your early grades were poor, but it also means your new GPA is entirely based on a smaller number of credits and thus more volatile.</p>
+
+    <h2>GPA vs. Other Academic Metrics</h2>
+    <p>While GPA is the most widely used academic metric, it is not the only one. Class rank shows where your GPA falls relative to your peers and adds context that a raw GPA number cannot provide. A 3.5 GPA that ranks in the top 5 percent of your class is more impressive than a 3.5 that ranks in the top 30 percent, and colleges understand this.</p>
+    <p>Standardized test scores (SAT, ACT, GRE, GMAT) provide another data point that is comparable across schools. A high test score can partially offset a lower GPA, and vice versa. Many admissions offices use an "academic index" that combines GPA and test scores into a single metric for initial screening.</p>
+    <p>Some educators and institutions have moved toward competency-based assessment, where students demonstrate mastery of specific skills rather than earning letter grades. A growing number of colleges are also adopting test-optional or test-free admissions policies, which has increased the relative importance of GPA in the admissions process. Regardless of these trends, GPA remains the most universal measure of academic performance and will likely continue to play a central role in educational evaluation for the foreseeable future.</p>
+  </article>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <h3>How is GPA calculated?</h3>
+        <p>Multiply each course's grade value (A=4.0, B=3.0, etc.) by its credit hours to get quality points. Sum all quality points and divide by total credit hours. For example, an A (4.0) in a 3-credit course and a B (3.0) in a 4-credit course: (12 + 12) / 7 = 3.43 GPA.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What is the difference between weighted and unweighted GPA?</h3>
+        <p>Unweighted GPA uses the standard 4.0 scale for all courses. Weighted GPA adds bonus points for advanced courses: +0.5 for honors and +1.0 for AP/IB. A weighted GPA can exceed 4.0, with a maximum of 5.0. Colleges consider both when evaluating applicants.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What GPA do I need for college admission?</h3>
+        <p>Requirements vary widely. Most four-year colleges require a minimum 2.0 GPA. Competitive schools expect 3.5+, while Ivy League admits typically have 3.9+ unweighted GPAs. GPA is one factor among many — course rigor, test scores, essays, and extracurriculars all matter.</p>
+      </div>
+    </div>
+  </section>
+
+  <RelatedArticles calculatorSlug="gpa-calculator" />
+
+  <CrossLinks links={[
+    { href: '/education-calculators/', label: 'All Education Calculators', icon: '🎓' },
+    { href: '/financial-calculators/', label: 'Financial Calculators', icon: '💰' },
+  ]} />
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  var courseCount = 5;
+  var weightedCheckbox = document.getElementById('gpa-weighted');
+  var tbody = document.getElementById('gpa-rows');
+
+  function createRow(num) {
+    var tr = document.createElement('tr');
+    tr.className = 'gpa-row';
+    var isWeighted = weightedCheckbox.checked;
+    var typeDisplay = isWeighted ? '' : 'none';
+    tr.innerHTML = '<td style="padding:4px;"><input type="text" class="gpa-course" placeholder="Course ' + num + '" style="width:100%;" /></td>' +
+      '<td style="padding:4px;"><select class="gpa-credits"><option value="1">1</option><option value="2">2</option><option selected value="3">3</option><option value="4">4</option><option value="5">5</option></select></td>' +
+      '<td style="padding:4px;"><select class="gpa-grade"><option value="4.0">A+</option><option value="4.0" selected>A</option><option value="3.7">A-</option><option value="3.3">B+</option><option value="3.0">B</option><option value="2.7">B-</option><option value="2.3">C+</option><option value="2.0">C</option><option value="1.7">C-</option><option value="1.3">D+</option><option value="1.0">D</option><option value="0.7">D-</option><option value="0.0">F</option></select></td>' +
+      '<td class="gpa-col-type" style="padding:4px;display:' + typeDisplay + ';"><select class="gpa-type"><option value="regular">Regular</option><option value="honors">Honors</option><option value="ap">AP/IB</option></select></td>' +
+      '<td style="padding:4px;text-align:center;"><button class="gpa-remove-btn" title="Remove" style="background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--color-text-muted);">&#10005;</button></td>';
+    return tr;
+  }
+
+  document.getElementById('addCourseBtn').addEventListener('click', function() {
+    courseCount++;
+    tbody.appendChild(createRow(courseCount));
+  });
+
+  tbody.addEventListener('click', function(e) {
+    if (e.target.classList.contains('gpa-remove-btn')) {
+      var rows = tbody.querySelectorAll('.gpa-row');
+      if (rows.length > 1) {
+        e.target.closest('.gpa-row').remove();
+      }
+    }
+  });
+
+  weightedCheckbox.addEventListener('change', function() {
+    var typeCols = document.querySelectorAll('.gpa-col-type');
+    var display = weightedCheckbox.checked ? '' : 'none';
+    for (var i = 0; i < typeCols.length; i++) {
+      typeCols[i].style.display = display;
+    }
+  });
+
+  document.getElementById('calcGpaBtn').addEventListener('click', function() {
+    var rows = tbody.querySelectorAll('.gpa-row');
+    var totalQP = 0;
+    var totalCredits = 0;
+    var isWeighted = weightedCheckbox.checked;
+
+    for (var i = 0; i < rows.length; i++) {
+      var row = rows[i];
+      var credits = parseInt(row.querySelector('.gpa-credits').value) || 0;
+      var grade = parseFloat(row.querySelector('.gpa-grade').value) || 0;
+      var bonus = 0;
+
+      if (isWeighted) {
+        var courseType = row.querySelector('.gpa-type').value;
+        if (courseType === 'honors') bonus = 0.5;
+        if (courseType === 'ap') bonus = 1.0;
+      }
+
+      totalQP += (grade + bonus) * credits;
+      totalCredits += credits;
+    }
+
+    var semesterGPA = totalCredits > 0 ? (totalQP / totalCredits) : 0;
+
+    var priorGPA = parseFloat(document.getElementById('gpa-prior-gpa').value) || 0;
+    var priorCredits = parseFloat(document.getElementById('gpa-prior-credits').value) || 0;
+    var priorQP = priorGPA * priorCredits;
+
+    var cumulativeCredits = totalCredits + priorCredits;
+    var cumulativeQP = totalQP + priorQP;
+    var cumulativeGPA = cumulativeCredits > 0 ? (cumulativeQP / cumulativeCredits) : 0;
+
+    document.getElementById('res-semester-gpa').textContent = semesterGPA.toFixed(2);
+    document.getElementById('res-cumulative-gpa').textContent = cumulativeGPA.toFixed(2);
+    document.getElementById('res-total-credits').textContent = cumulativeCredits;
+    document.getElementById('res-quality-points').textContent = cumulativeQP.toFixed(2);
+
+    var adviceEl = document.getElementById('gpa-advice');
+    var displayGPA = priorCredits > 0 ? cumulativeGPA : semesterGPA;
+
+    if (displayGPA >= 3.7) {
+      adviceEl.style.background = '#f0fdf4';
+      adviceEl.style.border = '1px solid #bbf7d0';
+      adviceEl.innerHTML = '<strong>Excellent!</strong> A ' + displayGPA.toFixed(2) + ' GPA puts you in a strong position for competitive scholarships, honors programs, and selective graduate school admissions.';
+    } else if (displayGPA >= 3.0) {
+      adviceEl.style.background = '#f0fdf4';
+      adviceEl.style.border = '1px solid #bbf7d0';
+      adviceEl.innerHTML = '<strong>Good standing.</strong> A ' + displayGPA.toFixed(2) + ' GPA meets the requirements for most scholarships and graduate programs. Focus on your strongest subjects to push higher.';
+    } else if (displayGPA >= 2.0) {
+      adviceEl.style.background = '#fffbeb';
+      adviceEl.style.border = '1px solid #fde68a';
+      adviceEl.innerHTML = '<strong>Room for improvement.</strong> A ' + displayGPA.toFixed(2) + ' GPA meets minimum graduation requirements at most schools but may limit scholarship and graduate school options. Consider tutoring and office hours to boost your grades.';
+    } else {
+      adviceEl.style.background = '#fef2f2';
+      adviceEl.style.border = '1px solid #fecaca';
+      adviceEl.innerHTML = '<strong>Academic warning.</strong> A ' + displayGPA.toFixed(2) + ' GPA is below the minimum required by most institutions. Speak with your academic advisor about support resources and consider reducing your course load.';
+    }
+
+    document.getElementById('gpa-results').style.display = '';
+  });
+</script>
