@@ -1,0 +1,109 @@
+---
+// Share calculator results — copy link & native share
+---
+
+<div class="share-results" id="share-results" style="display:none">
+  <button class="share-btn copy-link-btn" id="copy-link-btn" type="button" title="Copy link with results">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+    <span>Copy Link</span>
+  </button>
+  <button class="share-btn native-share-btn" id="native-share-btn" type="button" title="Share results" style="display:none">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+    <span>Share</span>
+  </button>
+</div>
+
+<script>
+  (function() {
+    var container = document.getElementById('share-results');
+    var copyBtn = document.getElementById('copy-link-btn');
+    var shareBtn = document.getElementById('native-share-btn');
+    if (!container || !copyBtn) return;
+
+    // Show share buttons after first calculation
+    window.showShareResults = function() {
+      container.style.display = 'flex';
+    };
+
+    // Build URL with current input values
+    function buildShareUrl() {
+      var inputs = document.querySelectorAll('.calculator-box input, .calculator-box select, .calc-box input, .calc-box select');
+      var params = new URLSearchParams();
+      inputs.forEach(function(input) {
+        var name = input.name || input.id;
+        if (name && input.value) {
+          params.set(name, input.value);
+        }
+      });
+      return location.origin + location.pathname + '?' + params.toString();
+    }
+
+    // Copy link
+    copyBtn.addEventListener('click', function() {
+      var url = buildShareUrl();
+      navigator.clipboard.writeText(url).then(function() {
+        var span = copyBtn.querySelector('span');
+        span.textContent = 'Copied!';
+        setTimeout(function() { span.textContent = 'Copy Link'; }, 2000);
+      });
+    });
+
+    // Native share API
+    if (navigator.share) {
+      shareBtn.style.display = 'inline-flex';
+      shareBtn.addEventListener('click', function() {
+        navigator.share({
+          title: document.title,
+          url: buildShareUrl()
+        });
+      });
+    }
+
+    // Restore inputs from URL params on page load
+    var urlParams = new URLSearchParams(location.search);
+    if (urlParams.toString()) {
+      var inputs = document.querySelectorAll('.calculator-box input, .calculator-box select, .calc-box input, .calc-box select');
+      inputs.forEach(function(input) {
+        var name = input.name || input.id;
+        if (name && urlParams.has(name)) {
+          input.value = urlParams.get(name);
+        }
+      });
+      // Auto-calculate after restoring
+      setTimeout(function() {
+        var calcBtn = document.querySelector('.calc-btn');
+        if (calcBtn) calcBtn.click();
+        container.style.display = 'flex';
+      }, 300);
+    }
+  })();
+</script>
+
+<style>
+  .share-results {
+    display: none;
+    gap: 8px;
+    margin: 16px 0;
+    flex-wrap: wrap;
+  }
+  .share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .share-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  .share-btn svg {
+    flex-shrink: 0;
+  }
+</style>
