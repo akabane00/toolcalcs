@@ -5,19 +5,42 @@ import { blogArticles } from '../../data/blog-articles';
 const articles = [...blogArticles]
   .sort((a, b) => b.datePublished.localeCompare(a.datePublished));
 
+// Get unique categories with counts
+const categoryMap = new Map<string, number>();
+for (const a of articles) {
+  categoryMap.set(a.category, (categoryMap.get(a.category) || 0) + 1);
+}
+const categoryList = [...categoryMap.entries()].sort((a, b) => b[1] - a[1]);
+
 function formatDate(iso: string): string {
   const d = new Date(iso + 'T00:00:00');
   return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 ---
 
-<BaseLayout title="Blog - Guides & Tips | ToolCalcs" description="Practical guides on finance, health, math, and everyday calculations. Learn how to use percentages, understand your paycheck, calculate compound interest, and more.">
+<BaseLayout
+  title="Blog - 190+ Expert Guides on Finance, Health & Education | ToolCalcs"
+  description="190+ expert guides on personal finance, investing, health, education, and more. CPA-reviewed articles with data tables, calculators, and actionable advice."
+>
   <h1>Guides & Articles</h1>
-  <p class="blog-intro">Practical guides to help you understand the math behind everyday decisions.</p>
+  <p class="blog-intro">{articles.length} practical guides to help you understand the math behind everyday decisions.</p>
 
-  <div class="article-grid">
+  <!-- Category Filter -->
+  <div class="filter-bar" id="filter-bar">
+    <button class="filter-chip active" data-category="all">All ({articles.length})</button>
+    {categoryList.map(([cat, count]) => (
+      <button class="filter-chip" data-category={cat}>{cat} ({count})</button>
+    ))}
+  </div>
+
+  <!-- Search -->
+  <div class="blog-search">
+    <input type="text" id="blog-search-input" placeholder="Search articles..." class="blog-search-input" />
+  </div>
+
+  <div class="article-grid" id="article-grid">
     {articles.map(article => (
-      <a href={`/blog/${article.slug}/`} class="article-card">
+      <a href={`/blog/${article.slug}/`} class="article-card" data-category={article.category} data-title={article.title.toLowerCase()} data-desc={article.description.toLowerCase()}>
         <span class="article-category">{article.category}</span>
         <h2>{article.title}</h2>
         <p>{article.description}</p>
@@ -25,6 +48,8 @@ function formatDate(iso: string): string {
       </a>
     ))}
   </div>
+
+  <p class="no-results" id="no-results" style="display:none">No articles found. Try a different search term or category.</p>
 
   <section class="explore-more">
     <h2>Explore More on ToolCalcs</h2>
@@ -54,18 +79,120 @@ function formatDate(iso: string): string {
         <strong>Web Tools</strong>
         <p>QR codes, color pickers, text tools & more</p>
       </a>
-      <a href="/math-calculators/" class="explore-card">
-        <span class="explore-icon">🔢</span>
-        <strong>Math Calculators</strong>
-        <p>Percentage, fraction & algebra solvers</p>
+      <a href="/education-calculators/" class="explore-card">
+        <span class="explore-icon">🎓</span>
+        <strong>Education Calculators</strong>
+        <p>GPA, college cost, student loan & SAT tools</p>
       </a>
     </div>
   </section>
+
+  <script>
+    (function() {
+      var chips = document.querySelectorAll('.filter-chip');
+      var cards = document.querySelectorAll('.article-card');
+      var searchInput = document.getElementById('blog-search-input');
+      var noResults = document.getElementById('no-results');
+      var activeCategory = 'all';
+
+      function filterCards() {
+        var query = (searchInput ? searchInput.value.toLowerCase().trim() : '');
+        var visible = 0;
+
+        cards.forEach(function(card) {
+          var cat = card.getAttribute('data-category');
+          var title = card.getAttribute('data-title') || '';
+          var desc = card.getAttribute('data-desc') || '';
+
+          var catMatch = (activeCategory === 'all' || cat === activeCategory);
+          var searchMatch = (!query || title.indexOf(query) !== -1 || desc.indexOf(query) !== -1);
+
+          if (catMatch && searchMatch) {
+            card.style.display = '';
+            visible++;
+          } else {
+            card.style.display = 'none';
+          }
+        });
+
+        if (noResults) {
+          noResults.style.display = visible === 0 ? 'block' : 'none';
+        }
+      }
+
+      chips.forEach(function(chip) {
+        chip.addEventListener('click', function() {
+          chips.forEach(function(c) { c.classList.remove('active'); });
+          chip.classList.add('active');
+          activeCategory = chip.getAttribute('data-category') || 'all';
+          filterCards();
+        });
+      });
+
+      if (searchInput) {
+        searchInput.addEventListener('input', filterCards);
+      }
+    })();
+  </script>
 </BaseLayout>
 
 <style>
   h1 { font-size: 1.8rem; margin-bottom: 8px; }
-  .blog-intro { color: var(--color-text-muted); margin-bottom: 2rem; }
+  .blog-intro { color: var(--color-text-muted); margin-bottom: 1.5rem; }
+
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .filter-chip {
+    padding: 6px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .filter-chip:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  .filter-chip.active {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+  }
+
+  .blog-search {
+    margin-bottom: 20px;
+  }
+  .blog-search-input {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    background: var(--color-surface);
+    color: var(--color-text);
+  }
+  .blog-search-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+
+  .no-results {
+    text-align: center;
+    color: var(--color-text-muted);
+    padding: 40px 0;
+    font-size: 0.95rem;
+  }
+
   .article-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -151,5 +278,9 @@ function formatDate(iso: string): string {
     font-size: 0.85rem;
     color: var(--color-text-muted);
     margin: 0;
+  }
+  @media (max-width: 640px) {
+    .article-grid { grid-template-columns: 1fr; }
+    .explore-grid { grid-template-columns: 1fr; }
   }
 </style>
