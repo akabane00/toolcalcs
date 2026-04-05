@@ -1,0 +1,76 @@
+---
+// Lightweight embeddable BMI calculator
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>BMI Calculator Widget — ToolCalcs</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #fff; color: #1a1a1a; padding: 16px; }
+    .widget { max-width: 400px; }
+    .widget h3 { font-size: 1.1rem; margin-bottom: 12px; }
+    .w-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .w-group { display: flex; flex-direction: column; gap: 3px; }
+    .w-group label { font-size: 0.78rem; font-weight: 600; color: #666; }
+    .w-group input, .w-group select { padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.9rem; }
+    .w-group input:focus { outline: none; border-color: #2563eb; }
+    .w-btn { width: 100%; padding: 10px; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+    .w-btn:hover { background: #1d4ed8; }
+    .w-result-box { text-align: center; margin-top: 14px; padding: 16px; border-radius: 8px; background: #f8fafc; display: none; }
+    .w-bmi-val { font-size: 2rem; font-weight: 800; }
+    .w-bmi-cat { font-size: 0.9rem; font-weight: 600; margin-top: 4px; }
+    .w-powered { text-align: center; margin-top: 12px; font-size: 0.72rem; color: #aaa; }
+    .w-powered a { color: #2563eb; text-decoration: none; }
+    .w-powered a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="widget">
+    <h3>BMI Calculator</h3>
+    <div class="w-grid">
+      <div class="w-group">
+        <label>Height (feet)</label>
+        <input type="number" id="feet" value="5" min="3" max="8" />
+      </div>
+      <div class="w-group">
+        <label>Height (inches)</label>
+        <input type="number" id="inches" value="10" min="0" max="11" />
+      </div>
+      <div class="w-group" style="grid-column:span 2">
+        <label>Weight (lbs)</label>
+        <input type="number" id="weight" value="170" min="50" max="700" />
+      </div>
+    </div>
+    <button class="w-btn" id="calc-btn">Calculate BMI</button>
+    <div class="w-result-box" id="result-box">
+      <div class="w-bmi-val" id="bmi-val">-</div>
+      <div class="w-bmi-cat" id="bmi-cat">-</div>
+    </div>
+    <div class="w-powered">Powered by <a href="https://toolcalcs.com/health-calculators/bmi-calculator/" target="_blank" rel="noopener">ToolCalcs</a></div>
+  </div>
+  <script>
+    document.getElementById('calc-btn').addEventListener('click', function() {
+      var feet = parseFloat(document.getElementById('feet').value) || 0;
+      var inches = parseFloat(document.getElementById('inches').value) || 0;
+      var weight = parseFloat(document.getElementById('weight').value) || 0;
+      var totalInches = feet * 12 + inches;
+      var bmi = (weight / (totalInches * totalInches)) * 703;
+      var cat, color;
+      if (bmi < 18.5) { cat = 'Underweight'; color = '#3b82f6'; }
+      else if (bmi < 25) { cat = 'Normal Weight'; color = '#22c55e'; }
+      else if (bmi < 30) { cat = 'Overweight'; color = '#f59e0b'; }
+      else { cat = 'Obese'; color = '#ef4444'; }
+      var box = document.getElementById('result-box');
+      document.getElementById('bmi-val').textContent = bmi.toFixed(1);
+      document.getElementById('bmi-val').style.color = color;
+      document.getElementById('bmi-cat').textContent = cat;
+      document.getElementById('bmi-cat').style.color = color;
+      box.style.display = 'block';
+    });
+  </script>
+</body>
+</html>

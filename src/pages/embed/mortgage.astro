@@ -1,0 +1,88 @@
+---
+// Lightweight embeddable mortgage calculator — no layout, minimal CSS
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Mortgage Calculator Widget — ToolCalcs</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #fff; color: #1a1a1a; padding: 16px; }
+    .widget { max-width: 480px; }
+    .widget h3 { font-size: 1.1rem; margin-bottom: 12px; }
+    .w-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .w-group { display: flex; flex-direction: column; gap: 3px; }
+    .w-group label { font-size: 0.78rem; font-weight: 600; color: #666; }
+    .w-group input, .w-group select { padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.9rem; }
+    .w-group input:focus, .w-group select:focus { outline: none; border-color: #2563eb; }
+    .w-btn { width: 100%; padding: 10px; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+    .w-btn:hover { background: #1d4ed8; }
+    .w-results { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+    .w-result { background: #f8fafc; border-radius: 6px; padding: 10px; text-align: center; }
+    .w-result .val { font-size: 1.2rem; font-weight: 700; color: #2563eb; }
+    .w-result .lbl { font-size: 0.72rem; color: #888; margin-top: 2px; }
+    .w-result.primary { background: #eff6ff; }
+    .w-powered { text-align: center; margin-top: 12px; font-size: 0.72rem; color: #aaa; }
+    .w-powered a { color: #2563eb; text-decoration: none; }
+    .w-powered a:hover { text-decoration: underline; }
+    @media (max-width: 400px) { .w-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="widget">
+    <h3>Mortgage Calculator</h3>
+    <div class="w-grid">
+      <div class="w-group">
+        <label>Home Price ($)</label>
+        <input type="number" id="price" value="350000" min="10000" step="5000" />
+      </div>
+      <div class="w-group">
+        <label>Down Payment ($)</label>
+        <input type="number" id="down" value="70000" min="0" step="1000" />
+      </div>
+      <div class="w-group">
+        <label>Interest Rate (%)</label>
+        <input type="number" id="rate" value="6.5" min="0" max="15" step="0.125" />
+      </div>
+      <div class="w-group">
+        <label>Loan Term</label>
+        <select id="term">
+          <option value="360" selected>30 Years</option>
+          <option value="180">15 Years</option>
+          <option value="240">20 Years</option>
+        </select>
+      </div>
+    </div>
+    <button class="w-btn" id="calc-btn">Calculate</button>
+    <div class="w-results" id="results" style="display:none">
+      <div class="w-result primary"><div class="val" id="r-payment">-</div><div class="lbl">Monthly Payment</div></div>
+      <div class="w-result"><div class="val" id="r-total">-</div><div class="lbl">Total Paid</div></div>
+      <div class="w-result"><div class="val" id="r-interest">-</div><div class="lbl">Total Interest</div></div>
+      <div class="w-result"><div class="val" id="r-loan">-</div><div class="lbl">Loan Amount</div></div>
+    </div>
+    <div class="w-powered">Powered by <a href="https://toolcalcs.com/financial-calculators/mortgage-calculator/" target="_blank" rel="noopener">ToolCalcs</a></div>
+  </div>
+  <script>
+    document.getElementById('calc-btn').addEventListener('click', function() {
+      var price = parseFloat(document.getElementById('price').value) || 0;
+      var down = parseFloat(document.getElementById('down').value) || 0;
+      var rate = parseFloat(document.getElementById('rate').value) || 0;
+      var term = parseInt(document.getElementById('term').value) || 360;
+      var loan = price - down;
+      var r = rate / 100 / 12;
+      var payment = r > 0 ? loan * (r * Math.pow(1 + r, term)) / (Math.pow(1 + r, term) - 1) : loan / term;
+      var total = payment * term;
+      var interest = total - loan;
+      function fmt(n) { return n.toLocaleString('en-US', {style:'currency',currency:'USD',maximumFractionDigits:0}); }
+      document.getElementById('r-payment').textContent = fmt(payment);
+      document.getElementById('r-total').textContent = fmt(total);
+      document.getElementById('r-interest').textContent = fmt(interest);
+      document.getElementById('r-loan').textContent = fmt(loan);
+      document.getElementById('results').style.display = 'grid';
+    });
+  </script>
+</body>
+</html>
