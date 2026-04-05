@@ -93,6 +93,12 @@ export const categories: Category[] = [
     description: 'GPA, college cost, student loan repayment, scholarship impact, SAT score, and teacher salary calculators for students and educators.',
     icon: '🎓',
   },
+  {
+    name: 'Automotive Calculators',
+    slug: 'automotive-calculators',
+    description: 'Car payment, depreciation, fuel cost, EV vs gas comparison, car affordability, and auto insurance estimator calculators.',
+    icon: '🚗',
+  },
 ];
 
 export const calculators: Calculator[] = [
@@ -1296,6 +1302,55 @@ export const calculators: Calculator[] = [
     categorySlug: 'education-calculators',
     icon: '📝',
   },
+  // Automotive Calculators
+  {
+    title: 'Car Payment Calculator',
+    slug: 'car-payment-calculator',
+    description: 'Calculate your monthly car payment with trade-in value, down payment, sales tax, and interest rate. Compare loan terms side by side.',
+    category: 'Automotive Calculators',
+    categorySlug: 'automotive-calculators',
+    icon: '🚗',
+  },
+  {
+    title: 'Car Depreciation Calculator',
+    slug: 'car-depreciation-calculator',
+    description: 'Estimate how much your car will be worth over time. See year-by-year depreciation based on make, age, and mileage.',
+    category: 'Automotive Calculators',
+    categorySlug: 'automotive-calculators',
+    icon: '📉',
+  },
+  {
+    title: 'Fuel Cost Calculator',
+    slug: 'fuel-cost-calculator',
+    description: 'Calculate fuel costs for any trip or commute. Enter distance, fuel economy, and gas price to see total and per-mile cost.',
+    category: 'Automotive Calculators',
+    categorySlug: 'automotive-calculators',
+    icon: '⛽',
+  },
+  {
+    title: 'EV vs Gas Cost Calculator',
+    slug: 'ev-vs-gas-calculator',
+    description: 'Compare the total cost of owning an electric vehicle vs a gas car. Includes purchase price, fuel, maintenance, insurance, and tax credits.',
+    category: 'Automotive Calculators',
+    categorySlug: 'automotive-calculators',
+    icon: '⚡',
+  },
+  {
+    title: 'Car Affordability Calculator',
+    slug: 'car-affordability-calculator',
+    description: 'Find out how much car you can afford based on your income, monthly budget, down payment, and credit score.',
+    category: 'Automotive Calculators',
+    categorySlug: 'automotive-calculators',
+    icon: '💰',
+  },
+  {
+    title: 'Total Cost of Ownership Calculator',
+    slug: 'total-cost-of-ownership-calculator',
+    description: 'Calculate the true 5-year cost of owning a car: loan payments, insurance, fuel, maintenance, depreciation, and registration fees.',
+    category: 'Automotive Calculators',
+    categorySlug: 'automotive-calculators',
+    icon: '🔧',
+  },
 ];
 
 export function getCalculatorsByCategory(categorySlug: string): Calculator[] {
@@ -1332,6 +1387,7 @@ const relatedGroups: Record<string, string[]> = {
   'astrology': ['zodiac-sign-calculator', 'zodiac-compatibility-calculator', 'numerology-calculator', 'angel-number-calculator', 'tarot-reading', 'chinese-zodiac-calculator'],
   // Education
   'education': ['gpa-calculator', 'college-cost-calculator', 'student-loan-repayment-planner', 'scholarship-calculator', 'sat-score-calculator'],
+  'automotive': ['car-payment-calculator', 'car-depreciation-calculator', 'fuel-cost-calculator', 'ev-vs-gas-calculator', 'car-affordability-calculator', 'total-cost-of-ownership-calculator'],
 };
 
 // Cross-category links for broader discovery
@@ -1349,6 +1405,7 @@ const crossCategoryLinks: Record<string, string[]> = {
   'business-calculators': ['compound-interest-calculator', 'loan-amortization-calculator', 'investment-calculator', 'take-home-pay-calculator'],
   'insurance-calculators': ['mortgage-calculator', 'home-affordability-calculator', 'take-home-pay-calculator'],
   'education-calculators': ['student-loan-calculator', 'compound-interest-calculator', 'savings-goal-calculator', 'take-home-pay-calculator'],
+  'automotive-calculators': ['auto-loan-calculator', 'auto-insurance-calculator', 'gas-cost-calculator', 'loan-amortization-calculator'],
 };
 
 export function getRelatedCalculators(currentSlug: string, limit: number = 5): Calculator[] {

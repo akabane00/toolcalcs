@@ -1,0 +1,320 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import ShareResults from '../../components/ShareResults.astro';
+import ReviewedBy from '../../components/ReviewedBy.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Automotive Calculators",
+        "item": "https://toolcalcs.com/automotive-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Car Affordability Calculator"
+      }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How much car can I afford on my salary?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'A widely recommended guideline is the 20/4/10 rule: put at least 20 percent down, finance for no more than 4 years, and keep total monthly transportation costs (payment, insurance, fuel) under 10 percent of your gross income. Alternatively, many financial advisors suggest your car payment alone should not exceed 10 to 15 percent of your take-home pay. For example, if you bring home $5,000 per month, your car payment should stay under $500 to $750.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What interest rate will I get on a car loan?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Your auto loan interest rate depends primarily on your credit score. Borrowers with excellent credit (750+) can expect rates of 4 to 6 percent, good credit (700-749) typically sees 6 to 8 percent, fair credit (650-699) often gets 8 to 12 percent, and poor credit (below 650) may face rates of 12 to 20 percent or higher. New car rates are generally 1 to 2 percent lower than used car rates for the same credit profile.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Should I buy a new or used car?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'From a financial perspective, buying a used car that is two to three years old is typically the best value because the vehicle has already undergone the steepest depreciation but still has many reliable years ahead. New cars lose roughly 20 percent of their value in the first year and 60 percent over five years. However, new cars come with full warranties, the latest safety features, and sometimes promotional financing rates. Consider your total cost of ownership, not just the purchase price, when making this decision.',
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Car Affordability Calculator (2026) - How Much Car Can You Afford?"
+  description="Find out how much car you can afford based on your income, expenses, credit score, and loan terms. Get a personalized maximum car price and monthly payment estimate."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/automotive-calculators/">Automotive Calculators</a> &rsaquo;
+    <span>Car Affordability Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Car Affordability Calculator</h1>
+  <p class="page-desc">Determine how much car you can comfortably afford based on your monthly income, existing expenses, down payment, trade-in value, and credit score.</p>
+
+  <ReviewedBy />
+
+  <!-- Calculator Tool -->
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="monthlyIncome">Monthly Income (take-home) ($)</label>
+        <input type="number" id="monthlyIncome" value="5000" min="0" step="100" />
+      </div>
+      <div class="input-group">
+        <label for="monthlyExpenses">Monthly Expenses (rent, bills, etc.) ($)</label>
+        <input type="number" id="monthlyExpenses" value="3000" min="0" step="100" />
+      </div>
+      <div class="input-group">
+        <label for="downPayment">Down Payment Available ($)</label>
+        <input type="number" id="downPayment" value="5000" min="0" step="500" />
+      </div>
+      <div class="input-group">
+        <label for="tradeIn">Trade-In Value ($)</label>
+        <input type="number" id="tradeIn" value="0" min="0" step="500" />
+      </div>
+      <div class="input-group">
+        <label for="creditScore">Credit Score Range</label>
+        <select id="creditScore">
+          <option value="excellent">Excellent (750+)</option>
+          <option value="good" selected>Good (700-749)</option>
+          <option value="fair">Fair (650-699)</option>
+          <option value="poor">Poor (below 650)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="loanTerm">Preferred Loan Term</label>
+        <select id="loanTerm">
+          <option value="36">36 Months</option>
+          <option value="48">48 Months</option>
+          <option value="60" selected>60 Months</option>
+          <option value="72">72 Months</option>
+        </select>
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate Affordability</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Max Car Price</span>
+          <span class="result-value" id="maxCarPrice">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Max Monthly Payment</span>
+          <span class="result-value" id="maxPayment">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Estimated Interest Rate</span>
+          <span class="result-value" id="estRate">0%</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total You Will Pay</span>
+          <span class="result-value" id="totalPaid">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Est. Insurance</span>
+          <span class="result-value" id="insurance">$150/mo</span>
+        </div>
+      </div>
+      <div id="advisory" style="margin-top:16px;padding:12px 16px;border-radius:8px;font-weight:600;text-align:center;display:none;"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="mid" format="rectangle" />
+
+  <ShareResults />
+
+  <article class="content-article">
+    <h2>How Much Car Can You Afford?</h2>
+    <p>Buying a car is one of the largest financial decisions most people make outside of purchasing a home. Yet many buyers focus exclusively on the sticker price or the monthly payment without considering whether the total cost fits comfortably within their budget. This can lead to financial strain, missed payments, and in the worst cases, repossession or negative equity that takes years to recover from.</p>
+    <p>Our car affordability calculator takes a holistic approach. Rather than simply telling you the maximum loan a lender might approve, it calculates what you can realistically afford while maintaining a healthy financial life. It considers your take-home income, existing monthly obligations, available down payment and trade-in value, and your credit score to produce a maximum vehicle price that keeps your transportation costs at a sustainable level.</p>
+    <p>The calculator uses the widely accepted guideline that your car payment should not exceed 15 percent of your disposable income (income minus essential expenses). This leaves adequate room for savings, emergency funds, and discretionary spending. While a lender might approve you for a much larger loan, borrowing to your maximum approval amount is one of the most common financial mistakes car buyers make.</p>
+
+    <h2>The 20/4/10 Rule for Car Buying</h2>
+    <p>The 20/4/10 rule is a straightforward framework that financial advisors frequently recommend for making smart car purchase decisions. Following this rule helps ensure that your vehicle purchase does not put undue strain on your finances.</p>
+    <ul>
+      <li><strong>20 percent down payment.</strong> Putting at least 20 percent down on your vehicle reduces the loan amount, lowers your monthly payment, decreases total interest paid, and provides an immediate equity cushion that protects against being upside down on the loan. On a $30,000 car, 20 percent means $6,000 down.</li>
+      <li><strong>4-year (48-month) maximum loan term.</strong> Keeping your loan term to 48 months or less ensures you pay less in total interest and build equity in the vehicle faster. While 60 and 72-month loans are common and reduce your monthly payment, they cost significantly more over the life of the loan and increase the risk that you will owe more than the car is worth.</li>
+      <li><strong>10 percent of gross income for total transportation costs.</strong> Your total monthly car expenses, including the loan payment, insurance, fuel, and maintenance, should not exceed 10 percent of your gross monthly income. If your gross income is $6,000 per month, your total car costs should stay under $600.</li>
+    </ul>
+    <p>Not every buyer can follow all three rules perfectly, especially first-time buyers or those with limited savings. However, meeting at least two of the three criteria significantly reduces the risk of financial stress from your vehicle purchase. If you cannot meet any of the criteria, it may be a sign that you should consider a less expensive vehicle or delay the purchase until your financial position improves.</p>
+
+    <h2>How Credit Score Affects Your Car Loan</h2>
+    <p>Your credit score is the single most important factor determining your auto loan interest rate. A higher score qualifies you for a lower rate, which directly impacts your monthly payment and total cost. The difference between excellent and poor credit on a car loan can cost thousands of dollars over the life of the loan.</p>
+    <div style="overflow-x:auto;">
+      <table class="data-table">
+        <thead>
+          <tr><th>Credit Score</th><th>Rating</th><th>Estimated Rate (New)</th><th>Estimated Rate (Used)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>750+</td><td>Excellent</td><td>4.5% - 5.5%</td><td>5.5% - 7.0%</td></tr>
+          <tr><td>700-749</td><td>Good</td><td>6.0% - 7.5%</td><td>7.5% - 9.0%</td></tr>
+          <tr><td>650-699</td><td>Fair</td><td>8.0% - 11.0%</td><td>10.0% - 13.0%</td></tr>
+          <tr><td>Below 650</td><td>Poor</td><td>12.0% - 18.0%</td><td>14.0% - 22.0%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>To illustrate the financial impact: on a $25,000 loan over 60 months, an excellent-credit borrower at 5 percent pays about $472 per month and $3,307 in total interest. A fair-credit borrower at 10 percent pays about $531 per month and $6,874 in total interest. That is an extra $3,567 in interest for the same car, solely due to the difference in credit scores.</p>
+    <p>If your credit score is in the fair or poor range, consider taking six to twelve months to improve it before purchasing a vehicle. Paying down credit card balances, disputing errors on your credit report, and making all payments on time can raise your score significantly. Even a 50-point improvement can save you a full percentage point or more on your auto loan rate.</p>
+
+    <h2>Common Car Buying Mistakes</h2>
+    <p>Even savvy consumers fall into traps when buying a car. Being aware of the most common mistakes helps you avoid overspending and protect your financial health.</p>
+    <ol>
+      <li><strong>Focusing only on the monthly payment.</strong> Dealers often ask "What monthly payment can you afford?" and then stretch the loan term to hit that number. A $400 monthly payment over 72 months costs far more than $400 over 48 months. Always negotiate the total price of the vehicle first, then discuss financing terms separately.</li>
+      <li><strong>Skipping the preapproval process.</strong> Walking into a dealership without a preapproved loan offer puts you at a negotiating disadvantage. The dealer knows you have no alternative financing and may offer a higher rate. Get preapproved from your bank or credit union before you shop, and use that as your baseline.</li>
+      <li><strong>Ignoring the total cost of ownership.</strong> The purchase price is only part of the equation. Insurance, fuel, maintenance, registration, and depreciation all contribute to how much the vehicle truly costs. A luxury car with a $500 monthly payment may cost $900 per month when all expenses are included.</li>
+      <li><strong>Rolling negative equity into a new loan.</strong> If you owe more on your current car than it is worth and roll that balance into a new auto loan, you start the new loan underwater from day one. This creates a cycle of negative equity that is difficult to escape and limits your financial flexibility for years.</li>
+      <li><strong>Buying too much car.</strong> Emotional attachment to a vehicle can override rational financial analysis. Test drives, marketing, and dealer sales techniques are designed to make you want a more expensive car than you planned to buy. Set your budget before visiting the dealership and stick to it, regardless of the pressure to upgrade.</li>
+      <li><strong>Neglecting insurance costs.</strong> Insurance premiums vary dramatically by vehicle type. Sports cars, luxury vehicles, and large SUVs typically cost more to insure than sedans and compact cars. Get insurance quotes for any vehicle you are seriously considering before committing to a purchase.</li>
+    </ol>
+
+    <h2>New vs Used: What Fits Your Budget?</h2>
+    <p>One of the most impactful decisions in the car buying process is whether to purchase new or used. Each option has distinct financial implications that should be weighed carefully against your budget and priorities.</p>
+    <p><strong>Buying new</strong> gives you the latest safety technology, a full manufacturer warranty, better financing rates (sometimes 0 percent APR), and the peace of mind of knowing the vehicle's complete history. However, new cars depreciate rapidly, losing approximately 20 percent of their value in the first year and roughly 60 percent over five years. If you drive 12,000 miles per year, your new $35,000 car may be worth only $14,000 after five years. That depreciation is effectively a cost of ownership whether or not you sell the vehicle.</p>
+    <p><strong>Buying used</strong> lets someone else absorb the steepest depreciation. A two to three-year-old vehicle has already lost 30 to 40 percent of its original value but still has many years of reliable service ahead. Used car interest rates are typically 1 to 2 percent higher than new car rates, but the significantly lower purchase price usually more than compensates. Certified pre-owned (CPO) vehicles offer a middle ground with manufacturer-backed warranties and inspections.</p>
+    <p>From a pure affordability standpoint, used cars allow you to get more vehicle for your money. The same monthly payment that buys a basic new compact sedan could buy a well-equipped used midsize SUV. If you follow the 20/4/10 rule, buying used makes it dramatically easier to hit all three criteria and stay within a comfortable budget.</p>
+
+    <h2>How to Finance a Car Purchase</h2>
+    <p>Understanding your financing options is essential to getting the best deal on a car purchase. The three most common sources of auto financing are banks, credit unions, and dealership financing, each with its own advantages and limitations.</p>
+    <p><strong>Credit unions</strong> frequently offer the lowest interest rates on auto loans because they are nonprofit organizations that return profits to members in the form of lower rates and fees. Many credit unions also have more flexible lending criteria than banks, making them a good option for borrowers with less-than-perfect credit. The main drawback is that you typically need to be a member, though many credit unions have broad eligibility requirements.</p>
+    <p><strong>Banks</strong> are a reliable source of auto financing, especially for existing customers. Some banks offer rate discounts for customers who have checking or savings accounts, or who set up autopay for their loan. Online banks may offer competitive rates due to lower overhead costs.</p>
+    <p><strong>Dealership financing</strong> is the most convenient option since you can arrange financing on the spot. Dealers work with multiple lenders and may be able to find competitive rates, especially for well-qualified buyers. Manufacturers sometimes subsidize rates, offering 0 percent or low APR deals as promotional incentives. However, dealership financing can also include rate markups, and the convenience may come at a cost if you do not compare against external offers.</p>
+    <p>The optimal strategy is to get preapproved from at least two external lenders before visiting the dealership. Then let the dealer try to beat your best offer. Multiple auto loan applications within a 14-day window are treated as a single inquiry on your credit report, so rate shopping does not harm your credit score.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>How much car can I afford on my salary?</summary>
+        <p>A widely recommended guideline is the 20/4/10 rule: put at least 20 percent down, finance for no more than 4 years, and keep total monthly transportation costs under 10 percent of your gross income. Alternatively, many financial advisors suggest your car payment alone should not exceed 10 to 15 percent of your take-home pay. For example, if you bring home $5,000 per month, your car payment should stay under $500 to $750.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What interest rate will I get on a car loan?</summary>
+        <p>Your auto loan interest rate depends primarily on your credit score. Excellent credit (750+) typically sees 4 to 6 percent, good credit (700-749) gets 6 to 8 percent, fair credit (650-699) faces 8 to 12 percent, and poor credit (below 650) may see rates of 12 to 20 percent or higher. New car rates are generally 1 to 2 percent lower than used car rates.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Should I buy a new or used car?</summary>
+        <p>From a financial perspective, buying a used car that is two to three years old is typically the best value because the vehicle has already undergone the steepest depreciation but still has many reliable years ahead. New cars lose roughly 20 percent of their value in the first year. However, new cars come with full warranties, the latest safety features, and sometimes promotional financing rates.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Is a longer loan term better?</summary>
+        <p>A longer loan term lowers your monthly payment but costs significantly more in total interest and increases the risk of negative equity. A 72-month loan on a $25,000 car at 7 percent costs approximately $2,700 more in interest than a 48-month loan. Most financial advisors recommend keeping auto loan terms at 48 to 60 months to balance affordability with total cost.</p>
+      </details>
+    </div>
+  </article>
+
+  <CrossLinks links={[
+    { href: '/automotive-calculators/car-payment-calculator/', label: 'Car Payment Calculator', icon: '🚗' },
+    { href: '/financial-calculators/debt-to-income-calculator/', label: 'Debt-to-Income Calculator', icon: '📊' },
+    { href: '/automotive-calculators/total-cost-of-ownership-calculator/', label: 'Total Cost of Ownership', icon: '🔧' },
+  ]} />
+  <RelatedCalculators currentSlug="car-affordability-calculator" />
+  <RelatedArticles calculatorSlug="car-affordability-calculator" />
+  <AdUnit slot="bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function formatMoney(n) {
+    return '$' + Math.round(n).toLocaleString('en-US');
+  }
+
+  function getRateFromCredit(credit) {
+    var rates = {
+      excellent: 5.0,
+      good: 7.0,
+      fair: 10.0,
+      poor: 15.0
+    };
+    return rates[credit] || 7.0;
+  }
+
+  function calculate() {
+    var income = parseFloat(document.getElementById('monthlyIncome').value) || 0;
+    var expenses = parseFloat(document.getElementById('monthlyExpenses').value) || 0;
+    var downPayment = parseFloat(document.getElementById('downPayment').value) || 0;
+    var tradeIn = parseFloat(document.getElementById('tradeIn').value) || 0;
+    var creditScore = document.getElementById('creditScore').value;
+    var months = parseInt(document.getElementById('loanTerm').value) || 60;
+
+    var disposable = income - expenses;
+    var maxMonthly = disposable * 0.15;
+    if (maxMonthly < 0) maxMonthly = 0;
+
+    var annualRate = getRateFromCredit(creditScore);
+    var r = annualRate / 100 / 12;
+
+    // Reverse-calculate max loan amount from monthly payment
+    var maxLoan = 0;
+    if (r === 0) {
+      maxLoan = maxMonthly * months;
+    } else {
+      // P = M * [(1+r)^n - 1] / [r * (1+r)^n]
+      var factor = Math.pow(1 + r, months);
+      maxLoan = maxMonthly * (factor - 1) / (r * factor);
+    }
+
+    var maxPrice = maxLoan + downPayment + tradeIn;
+    var totalPaid = (maxMonthly * months) + downPayment + tradeIn;
+    var insuranceEst = 150;
+
+    document.getElementById('maxCarPrice').textContent = formatMoney(maxPrice);
+    document.getElementById('maxPayment').textContent = formatMoney(maxMonthly);
+    document.getElementById('estRate').textContent = annualRate.toFixed(1) + '%';
+    document.getElementById('totalPaid').textContent = formatMoney(totalPaid);
+    document.getElementById('insurance').textContent = formatMoney(insuranceEst) + '/mo';
+
+    // Advisory message
+    var advisory = document.getElementById('advisory');
+    var ratio = income > 0 ? maxMonthly / income : 0;
+    advisory.style.display = 'block';
+
+    if (disposable <= 0) {
+      advisory.style.background = '#fee2e2';
+      advisory.style.color = '#991b1b';
+      advisory.textContent = 'Your expenses exceed your income. Focus on reducing expenses before taking on a car payment.';
+    } else if (ratio <= 0.10) {
+      advisory.style.background = '#dcfce7';
+      advisory.style.color = '#166534';
+      advisory.textContent = 'You can comfortably afford a car at this price. Your payment is well within safe limits.';
+    } else if (ratio <= 0.15) {
+      advisory.style.background = '#fef9c3';
+      advisory.style.color = '#854d0e';
+      advisory.textContent = 'This is affordable but stretching your budget. Consider a smaller down payment or longer term to free up monthly cash.';
+    } else {
+      advisory.style.background = '#fee2e2';
+      advisory.style.color = '#991b1b';
+      advisory.textContent = 'This payment would strain your budget. Consider a less expensive vehicle or a larger down payment.';
+    }
+  }
+
+  document.getElementById('calculateBtn').addEventListener('click', calculate);
+  calculate();
+</script>

@@ -1,0 +1,328 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import ShareResults from '../../components/ShareResults.astro';
+import ReviewedBy from '../../components/ReviewedBy.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Automotive Calculators",
+        "item": "https://toolcalcs.com/automotive-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "EV vs Gas Calculator"
+      }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'Is it cheaper to own an EV or a gas car?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'In most cases, electric vehicles are cheaper to own over five or more years despite higher upfront purchase prices. EVs have significantly lower fuel costs because electricity is cheaper per mile than gasoline, and maintenance costs are roughly 40 to 50 percent lower due to fewer moving parts, no oil changes, and less brake wear thanks to regenerative braking. When combined with the federal EV tax credit of up to $7,500, many EVs reach a break-even point within two to four years compared to a similarly priced gas vehicle.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How much does it cost to charge an EV?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The cost to charge an EV depends on your local electricity rate and the vehicle efficiency. At the national average of about $0.14 per kWh, an EV that gets 3.5 miles per kWh costs roughly $0.04 per mile, or about $4.80 to drive 120 miles. Home charging at off-peak rates can be even cheaper. Public DC fast charging is more expensive, typically $0.30 to $0.60 per kWh, but is used mainly for road trips rather than daily driving.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is the federal EV tax credit for 2026?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The federal EV tax credit under the Inflation Reduction Act provides up to $7,500 for qualifying new electric vehicles and up to $4,000 for qualifying used EVs. To qualify, the vehicle must meet price caps ($55,000 for sedans, $80,000 for SUVs and trucks), income limits apply, and the vehicle must meet domestic manufacturing and battery sourcing requirements. Some vehicles qualify for the full credit, while others receive a partial $3,750 credit depending on battery component sourcing.',
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="EV vs Gas Calculator (2026) - Compare Total Cost of Ownership"
+  description="Compare the total cost of owning an electric vehicle versus a gas car. Calculate fuel, maintenance, insurance, and purchase costs over 1 to 10 years with tax credits."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/automotive-calculators/">Automotive Calculators</a> &rsaquo;
+    <span>EV vs Gas Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>EV vs Gas Calculator</h1>
+  <p class="page-desc">Compare the total cost of owning an electric vehicle versus a gas car over 1 to 10 years, including purchase price, fuel, maintenance, insurance, and federal tax credits.</p>
+
+  <ReviewedBy />
+
+  <!-- Calculator Tool -->
+  <div class="calculator-box">
+    <div class="calc-inputs" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div style="grid-column:1/-1;"><strong>Gas Car</strong></div>
+      <div class="input-group">
+        <label for="gasPrice">Gas Car Price ($)</label>
+        <input type="number" id="gasPrice" value="35000" min="0" step="500" />
+      </div>
+      <div class="input-group">
+        <label for="gasMpg">Fuel Economy (MPG)</label>
+        <input type="number" id="gasMpg" value="25" min="1" max="100" step="0.5" />
+      </div>
+      <div class="input-group">
+        <label for="gasPricePerGal">Gas Price ($/gallon)</label>
+        <input type="number" id="gasPricePerGal" value="3.50" min="0" max="15" step="0.01" />
+      </div>
+
+      <div style="grid-column:1/-1;margin-top:8px;"><strong>Electric Vehicle</strong></div>
+      <div class="input-group">
+        <label for="evPrice">EV Price ($)</label>
+        <input type="number" id="evPrice" value="42000" min="0" step="500" />
+      </div>
+      <div class="input-group">
+        <label for="evEfficiency">EV Efficiency (mi/kWh)</label>
+        <input type="number" id="evEfficiency" value="3.5" min="0.5" max="10" step="0.1" />
+      </div>
+      <div class="input-group">
+        <label for="electricityRate">Electricity Rate ($/kWh)</label>
+        <input type="number" id="electricityRate" value="0.14" min="0" max="1" step="0.01" />
+      </div>
+
+      <div style="grid-column:1/-1;margin-top:8px;"><strong>Shared Assumptions</strong></div>
+      <div class="input-group">
+        <label for="annualMiles">Annual Miles</label>
+        <input type="number" id="annualMiles" value="12000" min="0" step="500" />
+      </div>
+      <div class="input-group">
+        <label for="yearsToOwn">Years to Own (1-10)</label>
+        <input type="number" id="yearsToOwn" value="5" min="1" max="10" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="evTaxCredit">Federal EV Tax Credit ($)</label>
+        <input type="number" id="evTaxCredit" value="7500" min="0" max="7500" step="500" />
+      </div>
+      <button class="calc-btn" id="calculateBtn" style="grid-column:1/-1;">Compare Costs</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card">
+          <span class="result-label">Gas Car Total Cost</span>
+          <span class="result-value" id="gasTotalCost">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">EV Total Cost</span>
+          <span class="result-value" id="evTotalCost">$0</span>
+        </div>
+        <div class="result-card primary" id="savingsCard">
+          <span class="result-label" id="savingsLabel">EV Savings</span>
+          <span class="result-value" id="totalSavings">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Break-Even Year</span>
+          <span class="result-value" id="breakEven">--</span>
+        </div>
+        <div class="result-card success">
+          <span class="result-label">Monthly Fuel Savings (EV)</span>
+          <span class="result-value" id="monthlyFuelSavings">$0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Year-by-Year Table -->
+    <div style="margin-top:20px;overflow-x:auto;">
+      <table class="data-table" id="yearTable" style="display:none;">
+        <thead>
+          <tr>
+            <th>Year</th>
+            <th>Gas Cumulative</th>
+            <th>EV Cumulative</th>
+            <th>EV Savings</th>
+          </tr>
+        </thead>
+        <tbody id="yearTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <AdUnit slot="mid" format="rectangle" />
+
+  <ShareResults />
+
+  <article class="content-article">
+    <h2>Electric vs Gas: The Total Cost of Ownership Comparison</h2>
+    <p>The question of whether an electric vehicle or a gasoline-powered car is more affordable is not as simple as comparing sticker prices. While EVs typically cost more upfront, they offer significant savings in fuel and maintenance costs over time. A thorough total cost of ownership (TCO) analysis considers every major expense category: purchase price (after incentives), fuel or energy costs, maintenance and repairs, insurance premiums, and depreciation.</p>
+    <p>Our calculator above performs this analysis for you, using real-world cost benchmarks to compare a gas car and an EV over your chosen ownership period. By adjusting the inputs to match your actual driving habits and local costs, you can see exactly when the EV becomes the less expensive option and how much you could save over time.</p>
+    <p>Understanding TCO is critical because it often reverses the initial impression created by sticker prices. A gas car priced at $35,000 may look like a better deal than a $42,000 EV, but when you factor in $7,500 in tax credits, lower fuel costs, and reduced maintenance, the EV frequently comes out ahead within three to five years of ownership. This calculator quantifies those differences so you can make an informed decision based on your specific circumstances.</p>
+
+    <h2>How Fuel Costs Compare: Gas vs Electricity</h2>
+    <p>Fuel cost is the area where EVs have the most dramatic advantage over gas cars. The cost per mile for electricity is substantially lower than for gasoline in nearly every part of the United States.</p>
+    <p>A gasoline car averaging 25 MPG at $3.50 per gallon costs approximately $0.14 per mile in fuel. An electric vehicle averaging 3.5 miles per kWh at $0.14 per kWh costs approximately $0.04 per mile. That means the EV costs roughly 71 percent less per mile to fuel. Over 12,000 miles per year, the gas car spends about $1,680 on fuel while the EV spends about $480 on electricity, a savings of $1,200 annually.</p>
+    <p>Home charging, which accounts for roughly 80 percent of EV charging, can be even cheaper if you take advantage of off-peak electricity rates offered by many utilities. Some utility companies offer EV-specific time-of-use rates as low as $0.06 to $0.08 per kWh during overnight hours, which reduces charging costs even further. Solar panels on your home can bring the marginal cost of charging close to zero after the initial installation investment.</p>
+    <p>Public charging is more expensive. Level 2 chargers at shopping centers and workplaces typically cost $0.20 to $0.35 per kWh, while DC fast chargers along highways charge $0.30 to $0.60 per kWh. Fast charging is convenient for road trips but should not be your primary charging method if you want to maximize savings.</p>
+
+    <h2>Maintenance Costs: EV vs Gas</h2>
+    <p>Electric vehicles have significantly fewer moving parts than internal combustion engine (ICE) vehicles, which translates directly to lower maintenance costs. A gasoline engine has hundreds of components that require regular service: oil changes, transmission fluid, coolant, timing belts, spark plugs, exhaust systems, and more. An electric motor has roughly 20 moving parts compared to over 2,000 in a typical gas engine.</p>
+    <p>Industry data from Consumer Reports and AAA estimates that gas car maintenance and repair costs average approximately $0.09 per mile over the first five years. EV maintenance costs average roughly $0.04 per mile over the same period, a reduction of about 55 percent. Over 60,000 miles (five years at 12,000 miles per year), that difference adds up to approximately $3,000 in savings.</p>
+    <p>Key maintenance items eliminated or reduced with EVs include oil changes (eliminated), transmission service (most EVs use a single-speed reduction gear that requires no service), brake pad replacements (reduced by 50 percent or more thanks to regenerative braking), exhaust system repairs (eliminated), and engine cooling system maintenance (reduced). EV owners still need to maintain tires, windshield wipers, cabin air filters, and brake fluid, and the 12-volt accessory battery needs replacement every four to five years.</p>
+    <p>Battery replacement is a concern for some EV shoppers, but modern EV batteries are designed to last the life of the vehicle. Most manufacturers warranty their batteries for 8 years or 100,000 miles, and real-world data shows that battery degradation is typically less than 10 percent after 200,000 miles for most popular EV models.</p>
+
+    <h2>Federal and State EV Tax Credits (2026)</h2>
+    <p>Government incentives can significantly reduce the effective purchase price of an electric vehicle. The federal EV tax credit, established under the Inflation Reduction Act, offers up to $7,500 for qualifying new EVs and up to $4,000 for qualifying used EVs.</p>
+    <p>To qualify for the full new vehicle credit, the EV must meet several criteria: the manufacturer's suggested retail price must be under $55,000 for sedans or $80,000 for SUVs, vans, and pickup trucks. The buyer's modified adjusted gross income must be under $150,000 for single filers or $300,000 for joint filers. The vehicle must also meet domestic manufacturing requirements and battery component sourcing rules. Starting in 2024, the credit can be applied at the point of sale as a dealer discount rather than claimed on your annual tax return, making it immediately accessible.</p>
+    <p>Many states offer additional incentives on top of the federal credit. California provides up to $7,500 in state rebates for income-qualifying buyers, Colorado offers $5,000, New York provides up to $2,000, and several other states offer rebates ranging from $1,000 to $5,000. Some states also waive sales tax on EV purchases, offer reduced registration fees, or provide free HOV lane access for EV owners. Checking your state's current incentives can reveal thousands of dollars in additional savings.</p>
+
+    <h2>Insurance Costs: EV vs Gas</h2>
+    <p>Insurance premiums for EVs tend to be higher than for comparable gas vehicles, though the gap has been narrowing as EVs become more common and insurers accumulate more claims data. On average, EV insurance costs 10 to 15 percent more than insurance for a similar gas vehicle. The higher cost reflects the expensive battery pack, specialized repair requirements, and higher average vehicle value of EVs.</p>
+    <p>This calculator uses an estimated $150 per month for gas car insurance and $170 per month for EV insurance, but your actual rates depend on your driving record, location, coverage level, and the specific vehicle. Shopping insurance quotes before purchasing either vehicle type is advisable. Some insurers specialize in EV coverage and may offer competitive rates, and bundling your auto and home insurance can also reduce costs.</p>
+
+    <h2>Best EVs for Total Cost Savings (2026)</h2>
+    <p>Not all EVs are created equal when it comes to total cost of ownership. Vehicles that combine an affordable purchase price with high efficiency and eligibility for the full federal tax credit offer the best value. Several models stand out in 2026 for their combination of affordability, range, and ownership costs.</p>
+    <p>Compact EVs in the $27,000 to $35,000 range (before tax credits) offer some of the lowest total costs of ownership of any new vehicle on the road. These models typically achieve 3.5 to 4.5 miles per kWh, offer 250 to 310 miles of range, and qualify for the full $7,500 federal tax credit, bringing the effective purchase price below $25,000 in many cases.</p>
+    <p>Mid-size EV sedans and crossovers in the $38,000 to $50,000 range compete directly with popular gas SUVs and offer compelling TCO advantages when the tax credit is applied. Their larger battery packs provide 300 to 350 miles of range, and their efficiency ratings of 3.0 to 3.8 miles per kWh keep charging costs low.</p>
+    <p>For buyers considering used EVs, two to three-year-old models often represent exceptional value. EV depreciation has been steeper than average in recent years due to rapid technology improvements and new model introductions, which means used EV prices are attractive. The $4,000 used EV tax credit applies to vehicles priced under $25,000, making many used models extremely affordable.</p>
+
+    <h2>Home Charging Setup and Costs</h2>
+    <p>Most EV owners charge at home overnight, which requires either a standard 120-volt outlet (Level 1 charging) or a dedicated 240-volt circuit (Level 2 charging). Level 1 charging adds roughly 4 to 5 miles of range per hour and is sufficient for drivers who travel fewer than 40 miles per day. Level 2 charging adds 25 to 40 miles of range per hour, fully replenishing most EV batteries overnight.</p>
+    <p>Installing a Level 2 home charger typically costs $500 to $2,000, including the charger unit and electrical work. Many utilities and states offer rebates that offset part or all of this cost. The federal government also offers a tax credit of up to 30 percent of the cost of home charger installation, capped at $1,000 for individuals. If your electrical panel has available capacity, installation is straightforward; if a panel upgrade is needed, costs can be higher.</p>
+    <p>The ongoing cost of home charging depends on your electricity rate. At the national average of $0.14 per kWh, charging a 60 kWh battery from 20 percent to 80 percent costs about $5.04. That provides roughly 180 miles of range, making home charging substantially cheaper than filling a gas tank for the same distance. Over a year of typical driving, home charging costs $400 to $600 compared to $1,500 to $2,000 for gasoline.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>Is it cheaper to own an EV or a gas car?</summary>
+        <p>In most cases, electric vehicles are cheaper to own over five or more years despite higher upfront purchase prices. EVs have significantly lower fuel costs because electricity is cheaper per mile than gasoline, and maintenance costs are roughly 40 to 50 percent lower. When combined with the federal EV tax credit of up to $7,500, many EVs reach a break-even point within two to four years compared to a similarly priced gas vehicle.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How much does it cost to charge an EV?</summary>
+        <p>At the national average of about $0.14 per kWh, an EV that gets 3.5 miles per kWh costs roughly $0.04 per mile, or about $4.80 to drive 120 miles. Home charging at off-peak rates can be even cheaper. Public DC fast charging is more expensive, typically $0.30 to $0.60 per kWh.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is the federal EV tax credit for 2026?</summary>
+        <p>The federal EV tax credit provides up to $7,500 for qualifying new electric vehicles and up to $4,000 for qualifying used EVs. Vehicles must meet price caps, income limits apply, and the vehicle must meet domestic manufacturing and battery sourcing requirements.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Do EVs really need less maintenance?</summary>
+        <p>Yes. Electric vehicles have roughly 20 moving parts in the drivetrain compared to over 2,000 in a gas engine. EVs eliminate oil changes, transmission service, spark plugs, exhaust system repairs, and significantly reduce brake wear through regenerative braking. Industry estimates put EV maintenance at roughly half the cost of gas vehicle maintenance over five years.</p>
+      </details>
+    </div>
+  </article>
+
+  <CrossLinks links={[
+    { href: '/automotive-calculators/car-payment-calculator/', label: 'Car Payment Calculator', icon: '🚗' },
+    { href: '/automotive-calculators/fuel-cost-calculator/', label: 'Fuel Cost Calculator', icon: '⛽' },
+    { href: '/automotive-calculators/total-cost-of-ownership-calculator/', label: 'Total Cost of Ownership', icon: '🔧' },
+  ]} />
+  <RelatedCalculators currentSlug="ev-vs-gas-calculator" />
+  <RelatedArticles calculatorSlug="ev-vs-gas-calculator" />
+  <AdUnit slot="bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function formatMoney(n) {
+    return '$' + Math.round(n).toLocaleString('en-US');
+  }
+
+  function calculate() {
+    var gasCarPrice = parseFloat(document.getElementById('gasPrice').value) || 0;
+    var gasMpg = parseFloat(document.getElementById('gasMpg').value) || 25;
+    var gasPricePerGal = parseFloat(document.getElementById('gasPricePerGal').value) || 3.50;
+    var evPrice = parseFloat(document.getElementById('evPrice').value) || 0;
+    var evEfficiency = parseFloat(document.getElementById('evEfficiency').value) || 3.5;
+    var electricityRate = parseFloat(document.getElementById('electricityRate').value) || 0.14;
+    var annualMiles = parseFloat(document.getElementById('annualMiles').value) || 12000;
+    var years = parseInt(document.getElementById('yearsToOwn').value) || 5;
+    var taxCredit = parseFloat(document.getElementById('evTaxCredit').value) || 0;
+
+    // Cost per mile
+    var gasFuelPerMile = gasPricePerGal / gasMpg;
+    var evFuelPerMile = electricityRate / evEfficiency;
+
+    // Maintenance per mile
+    var gasMaintPerMile = 0.09;
+    var evMaintPerMile = 0.04;
+
+    // Insurance per year
+    var gasInsuranceYr = 1800;
+    var evInsuranceYr = 2040;
+
+    // Annual costs
+    var gasAnnualFuel = gasFuelPerMile * annualMiles;
+    var evAnnualFuel = evFuelPerMile * annualMiles;
+    var gasAnnualMaint = gasMaintPerMile * annualMiles;
+    var evAnnualMaint = evMaintPerMile * annualMiles;
+
+    // Build year-by-year table
+    var tbody = document.getElementById('yearTableBody');
+    tbody.innerHTML = '';
+    var gasCum = gasCarPrice;
+    var evCum = evPrice - taxCredit;
+    var breakEvenYear = 0;
+
+    for (var y = 1; y <= years; y++) {
+      gasCum += gasAnnualFuel + gasAnnualMaint + gasInsuranceYr;
+      evCum += evAnnualFuel + evAnnualMaint + evInsuranceYr;
+
+      var savings = gasCum - evCum;
+      if (savings > 0 && breakEvenYear === 0) {
+        breakEvenYear = y;
+      }
+
+      var row = document.createElement('tr');
+      row.innerHTML = '<td>Year ' + y + '</td><td>' + formatMoney(gasCum) + '</td><td>' + formatMoney(evCum) + '</td><td style="color:' + (savings >= 0 ? 'green' : 'red') + '">' + (savings >= 0 ? '+' : '-') + formatMoney(Math.abs(savings)) + '</td>';
+      tbody.appendChild(row);
+    }
+
+    var gasTotalCost = gasCum;
+    var evTotalCost = evCum;
+    var totalSavings = gasTotalCost - evTotalCost;
+    var monthlyFuelSavings = (gasAnnualFuel - evAnnualFuel) / 12;
+
+    document.getElementById('gasTotalCost').textContent = formatMoney(gasTotalCost);
+    document.getElementById('evTotalCost').textContent = formatMoney(evTotalCost);
+
+    var savingsCard = document.getElementById('savingsCard');
+    if (totalSavings >= 0) {
+      document.getElementById('savingsLabel').textContent = 'EV Savings';
+      document.getElementById('totalSavings').textContent = formatMoney(totalSavings);
+      savingsCard.className = 'result-card primary';
+    } else {
+      document.getElementById('savingsLabel').textContent = 'Gas Car Savings';
+      document.getElementById('totalSavings').textContent = formatMoney(Math.abs(totalSavings));
+      savingsCard.className = 'result-card';
+    }
+
+    document.getElementById('breakEven').textContent = breakEvenYear > 0 ? 'Year ' + breakEvenYear : 'Not in ' + years + ' yrs';
+    document.getElementById('monthlyFuelSavings').textContent = formatMoney(monthlyFuelSavings);
+
+    document.getElementById('yearTable').style.display = 'table';
+  }
+
+  document.getElementById('calculateBtn').addEventListener('click', calculate);
+  calculate();
+</script>

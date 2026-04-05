@@ -1,0 +1,404 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import ShareResults from '../../components/ShareResults.astro';
+import ReviewedBy from '../../components/ReviewedBy.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Automotive Calculators", "item": "https://toolcalcs.com/automotive-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Car Payment Calculator" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "How is a car payment calculated?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "A car payment is calculated using the standard amortization formula: M = P * [r(1+r)^n] / [(1+r)^n - 1], where P is the loan amount (vehicle price minus down payment minus trade-in value plus sales tax), r is the monthly interest rate (annual rate divided by 12), and n is the number of monthly payments. For example, a $25,000 loan at 5.5% APR for 60 months gives a monthly payment of approximately $478. The total amount paid over the life of the loan would be $28,680, meaning you pay $3,680 in interest."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "What is a good interest rate for a car loan in 2026?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "In 2026, good car loan interest rates depend heavily on your credit score and whether the vehicle is new or used. For new cars, borrowers with excellent credit (750+) can expect rates between 3.5% and 5.5%. Good credit (670-749) typically sees rates of 5.5% to 8%. Fair credit (580-669) may receive rates of 8% to 12%. For used cars, add approximately 1 to 2 percentage points to these ranges. Credit union and bank rates are generally lower than dealer financing."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "How much should I spend on a car?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Financial experts recommend following the 20/4/10 rule: put at least 20% down, finance for no more than 4 years (48 months), and keep total monthly transportation costs (payment, insurance, fuel, maintenance) under 10% of your gross monthly income. Another common guideline is that your car payment alone should not exceed 15% of your monthly take-home pay. For someone earning $5,000 per month after taxes, that means a maximum car payment of $750."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Car Payment Calculator (2026) - Estimate Monthly Auto Loan Payments"
+  description="Free car payment calculator. Estimate your monthly auto loan payment with trade-in value, down payment, sales tax, and interest rate. Compare 24 to 84 month loan terms."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/automotive-calculators/">Automotive Calculators</a> &rsaquo;
+    <span>Car Payment Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Car Payment Calculator</h1>
+  <p class="page-desc">Estimate your monthly auto loan payment including down payment, trade-in value, sales tax, and interest. Compare loan terms from 24 to 84 months to find the right balance between monthly cost and total interest paid.</p>
+
+  <ReviewedBy />
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="vehiclePrice">Vehicle Price ($)</label>
+        <input type="number" id="vehiclePrice" value="35000" min="10000" max="100000" step="500" />
+      </div>
+      <div class="input-group">
+        <label for="downPayment">Down Payment ($)</label>
+        <input type="number" id="downPayment" value="5000" min="0" max="50000" step="500" />
+      </div>
+      <div class="input-group">
+        <label for="tradeIn">Trade-In Value ($)</label>
+        <input type="number" id="tradeIn" value="0" min="0" max="30000" step="500" />
+      </div>
+      <div class="input-group">
+        <label for="salesTax">Sales Tax Rate (%)</label>
+        <input type="number" id="salesTax" value="6" min="0" max="12" step="0.25" />
+      </div>
+      <div class="input-group">
+        <label for="interestRate">Interest Rate (%)</label>
+        <input type="number" id="interestRate" value="5.5" min="0" max="20" step="0.1" />
+      </div>
+      <div class="input-group">
+        <label for="loanTerm">Loan Term</label>
+        <select id="loanTerm">
+          <option value="24">24 Months (2 Years)</option>
+          <option value="36">36 Months (3 Years)</option>
+          <option value="48">48 Months (4 Years)</option>
+          <option value="60" selected>60 Months (5 Years)</option>
+          <option value="72">72 Months (6 Years)</option>
+          <option value="84">84 Months (7 Years)</option>
+        </select>
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate Payment</button>
+    </div>
+
+    <div class="calc-results" id="results" style="display:none">
+      <div class="result-cards">
+        <div class="result-card primary" id="paymentCard">
+          <span class="result-label">Monthly Payment</span>
+          <span class="result-value" id="monthlyPayment">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Amount Paid</span>
+          <span class="result-value" id="totalPaid">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Interest</span>
+          <span class="result-value" id="totalInterest">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Loan Amount</span>
+          <span class="result-value" id="loanAmount">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Sales Tax Amount</span>
+          <span class="result-value" id="taxAmount">$0</span>
+        </div>
+      </div>
+      <div id="paymentAdvice" style="margin-top:16px;padding:14px;border-radius:8px;font-size:0.95rem;"></div>
+    </div>
+  </div>
+
+  <ShareResults />
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="seo-content">
+    <h2>How Car Payments Work: The Complete Guide</h2>
+    <p>A car payment is a monthly installment you make to a lender to repay an auto loan. When you finance a vehicle, you borrow a specific amount of money and agree to repay it, plus interest, over a fixed number of months. Each monthly payment includes a portion that goes toward the principal (the original amount borrowed) and a portion that covers the interest charge.</p>
+    <p>In the early months of your loan, a larger share of your payment goes toward interest. As you pay down the principal balance, the interest portion shrinks and more of your payment goes toward the principal. This is called amortization, and it is the standard repayment structure for virtually all auto loans, mortgages, and personal loans.</p>
+    <p>Your car payment amount is determined by four key factors: the loan amount (vehicle price minus your down payment and trade-in, plus taxes and fees), the interest rate (expressed as an annual percentage rate or APR), the loan term (typically 24 to 84 months), and any additional fees rolled into the loan. Understanding how each factor affects your payment gives you the power to negotiate better terms and save thousands of dollars over the life of your loan.</p>
+
+    <h2>The Car Payment Formula Explained</h2>
+    <p>The standard amortization formula used to calculate a fixed monthly car payment is:</p>
+    <div class="formula-box">
+      <code>M = P &times; [r(1+r)<sup>n</sup>] / [(1+r)<sup>n</sup> - 1]</code>
+    </div>
+    <p>Where:</p>
+    <ul>
+      <li><strong>M</strong> = Monthly payment</li>
+      <li><strong>P</strong> = Principal (loan amount)</li>
+      <li><strong>r</strong> = Monthly interest rate (annual rate divided by 12)</li>
+      <li><strong>n</strong> = Total number of monthly payments</li>
+    </ul>
+    <p>The loan amount (P) is calculated as: Vehicle Price - Down Payment - Trade-In Value + Sales Tax. For example, if you buy a $35,000 car with $5,000 down, no trade-in, and 6% sales tax, your loan amount would be $35,000 - $5,000 + ($35,000 x 0.06) = $32,100. At 5.5% APR for 60 months, your monthly payment would be approximately $614.</p>
+
+    <h2>How to Get the Best Auto Loan Rate</h2>
+    <p>The interest rate you receive on your car loan has an enormous impact on your total cost. A 2% difference in rate on a $30,000 loan over 60 months translates to roughly $1,600 in additional interest. Here are proven strategies to secure the lowest rate possible:</p>
+    <h3>Check Your Credit Score First</h3>
+    <p>Your credit score is the single biggest factor that determines your interest rate. Before shopping for a car, check your credit score through a free service like Credit Karma or AnnualCreditReport.com. If your score is below 700, consider spending a few months improving it before applying for a loan. Paying down credit card balances, correcting errors on your credit report, and avoiding new credit applications can all boost your score.</p>
+    <h3>Get Pre-Approved Before Visiting the Dealer</h3>
+    <p>Walk into the dealership with a pre-approval letter from your bank or credit union. This gives you a baseline rate to compare against the dealer's financing offers. Dealers earn a profit by marking up the interest rate they receive from their lending partners, so having a competing offer forces them to be more competitive. Credit unions in particular tend to offer the lowest rates for auto loans, often 1 to 2 percentage points below bank and dealer financing.</p>
+    <h3>Keep Your Loan Term Short</h3>
+    <p>Shorter loan terms almost always come with lower interest rates. A 36-month loan might carry a rate 0.5% to 1% lower than a 72-month loan. While the monthly payment is higher on a shorter term, you pay significantly less in total interest. A $30,000 loan at 5% for 36 months costs $2,372 in interest, while the same loan at 5.5% for 72 months costs $5,337 in interest — more than double.</p>
+    <h3>Make a Larger Down Payment</h3>
+    <p>A larger down payment reduces the amount you need to borrow, which reduces your total interest cost. It also reduces the lender's risk, which may qualify you for a lower rate. Putting at least 20% down also helps you avoid being "upside down" on your loan, where you owe more than the car is worth.</p>
+
+    <h2>Average Auto Loan Rates by Credit Score (2026)</h2>
+    <p>The table below shows typical auto loan interest rates based on credit score tier. These are national averages and actual rates may vary by lender, vehicle type, and loan term.</p>
+    <div class="table-wrap">
+      <table class="info-table">
+        <thead>
+          <tr>
+            <th>Credit Score</th>
+            <th>Rating</th>
+            <th>New Car Rate</th>
+            <th>Used Car Rate</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>750 - 850</td>
+            <td>Excellent</td>
+            <td>3.5% - 5.5%</td>
+            <td>4.5% - 6.5%</td>
+          </tr>
+          <tr>
+            <td>700 - 749</td>
+            <td>Good</td>
+            <td>5.5% - 7.5%</td>
+            <td>6.5% - 8.5%</td>
+          </tr>
+          <tr>
+            <td>670 - 699</td>
+            <td>Fair</td>
+            <td>7.5% - 10%</td>
+            <td>8.5% - 11%</td>
+          </tr>
+          <tr>
+            <td>580 - 669</td>
+            <td>Below Average</td>
+            <td>10% - 14%</td>
+            <td>11% - 16%</td>
+          </tr>
+          <tr>
+            <td>Below 580</td>
+            <td>Poor</td>
+            <td>14% - 20%</td>
+            <td>16% - 22%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>If your credit score falls in the "Fair" or "Below Average" range, consider delaying your purchase by three to six months while you work on improving your score. Even a 50-point improvement can save you thousands of dollars in interest over the life of a loan.</p>
+
+    <h2>New Car vs Used Car: Financial Comparison</h2>
+    <p>Choosing between a new and used car is one of the biggest financial decisions in the car buying process. Each option has distinct financial advantages and trade-offs that go beyond the sticker price.</p>
+    <h3>New Car Advantages</h3>
+    <p>New cars come with full manufacturer warranties (typically 3 years/36,000 miles bumper-to-bumper and 5 years/60,000 miles powertrain), the latest safety features and technology, lower interest rates (often 0% APR promotional financing), and no hidden mechanical issues. You also get to choose the exact configuration you want. However, new cars depreciate rapidly — losing 20% to 30% of their value in the first year alone.</p>
+    <h3>Used Car Advantages</h3>
+    <p>Used cars cost significantly less upfront, and the steepest depreciation has already occurred. A 2 to 3-year-old certified pre-owned (CPO) vehicle can cost 30% to 40% less than a new model while still having remaining factory warranty coverage and relatively low mileage. Insurance premiums are also lower on used vehicles. The trade-offs include higher interest rates (typically 1% to 2% more than new car rates), potentially higher maintenance costs, and less certainty about the vehicle's history.</p>
+    <h3>The Sweet Spot</h3>
+    <p>Many financial experts recommend buying a 2 to 3-year-old certified pre-owned vehicle as the best value. At this age, the car has already absorbed its biggest depreciation hit while still having modern features, remaining warranty coverage, and many years of reliable service ahead. You get roughly 70% to 80% of the new car experience at 60% to 70% of the price.</p>
+
+    <h2>Loan Term Comparison: Short vs Long</h2>
+    <p>The length of your loan term has a dramatic effect on both your monthly payment and your total cost. Here is a comparison of different terms on a $30,000 loan at 5.5% APR:</p>
+    <div class="table-wrap">
+      <table class="info-table">
+        <thead>
+          <tr>
+            <th>Loan Term</th>
+            <th>Monthly Payment</th>
+            <th>Total Interest</th>
+            <th>Total Cost</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>24 Months</td>
+            <td>$1,322</td>
+            <td>$1,724</td>
+            <td>$31,724</td>
+          </tr>
+          <tr>
+            <td>36 Months</td>
+            <td>$905</td>
+            <td>$2,591</td>
+            <td>$32,591</td>
+          </tr>
+          <tr>
+            <td>48 Months</td>
+            <td>$697</td>
+            <td>$3,475</td>
+            <td>$33,475</td>
+          </tr>
+          <tr>
+            <td>60 Months</td>
+            <td>$573</td>
+            <td>$4,376</td>
+            <td>$34,376</td>
+          </tr>
+          <tr>
+            <td>72 Months</td>
+            <td>$491</td>
+            <td>$5,293</td>
+            <td>$35,293</td>
+          </tr>
+          <tr>
+            <td>84 Months</td>
+            <td>$432</td>
+            <td>$6,226</td>
+            <td>$36,226</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>As the table shows, extending from 36 to 84 months reduces the monthly payment by $473 but costs an additional $3,635 in interest. Longer terms also mean you spend more time being "upside down" on the loan, where you owe more than the car is worth. This is financially dangerous because if the car is totaled or you need to sell it, you will owe money to the lender even after the insurance payout or sale proceeds.</p>
+
+    <h2>The 20/4/10 Rule for Car Buying</h2>
+    <p>Financial advisors widely recommend the 20/4/10 rule as a guideline for responsible car buying:</p>
+    <ul>
+      <li><strong>20% down payment:</strong> Putting at least 20% down ensures you start with equity in the vehicle and reduces the risk of being upside down on the loan.</li>
+      <li><strong>4-year maximum term:</strong> Keeping the loan to 48 months or less minimizes total interest paid and ensures you build equity faster than the car depreciates.</li>
+      <li><strong>10% of gross income:</strong> Total monthly transportation costs (payment, insurance, fuel, maintenance) should not exceed 10% of your gross monthly income.</li>
+    </ul>
+    <p>For someone earning $60,000 per year ($5,000/month gross), the 10% rule means total transportation costs should stay under $500 per month. After accounting for insurance ($150), fuel ($100), and maintenance ($50), that leaves approximately $200 for the actual car payment. This is far less than what many buyers end up spending, which is why car debt is one of the biggest obstacles to building wealth.</p>
+    <p>Our calculator highlights your payment in green if it falls below 15% of a $5,000 monthly income benchmark, orange between 15% and 20%, and red if it exceeds 20% — helping you quickly assess whether a particular car fits your budget.</p>
+
+    <h2>Hidden Costs Beyond the Monthly Payment</h2>
+    <p>Your monthly car payment is only one component of the total cost of vehicle ownership. Before committing to a purchase, factor in these additional costs:</p>
+    <ul>
+      <li><strong>Insurance:</strong> Average annual car insurance costs $1,800 to $2,400, varying widely by state, age, driving record, and vehicle type. Sports cars and luxury vehicles cost more to insure.</li>
+      <li><strong>Fuel:</strong> At $3.50 per gallon and 12,000 miles per year, a car getting 25 MPG costs $1,680 annually in fuel. A car getting 35 MPG costs $1,200.</li>
+      <li><strong>Maintenance:</strong> Budget $500 to $1,000 per year for routine maintenance (oil changes, tires, brakes, filters). Older vehicles and luxury brands may cost more.</li>
+      <li><strong>Registration and taxes:</strong> Annual registration fees range from $50 to $500 depending on your state and vehicle value. Some states charge annual property tax on vehicles.</li>
+      <li><strong>Depreciation:</strong> The biggest hidden cost. A $35,000 new car may be worth only $21,000 after three years — a $14,000 loss that is not reflected in your monthly payment.</li>
+    </ul>
+    <p>Use our <a href="/automotive-calculators/total-cost-of-ownership-calculator/">Total Cost of Ownership Calculator</a> to see the full picture of what a vehicle will really cost you over five years, including all of these expenses.</p>
+
+    <h2>Tips for Negotiating a Better Deal</h2>
+    <p>The way you negotiate your car purchase can save you hundreds or even thousands of dollars on your monthly payment:</p>
+    <h3>Negotiate the Total Price, Not the Monthly Payment</h3>
+    <p>Dealers love to negotiate on monthly payments because they can adjust the loan term and other variables to make any number look affordable while maximizing their profit. Always negotiate the total vehicle price first, then discuss financing terms separately. Know the fair market value of the car by checking Kelley Blue Book, Edmunds, and TrueCar before you walk in.</p>
+    <h3>Time Your Purchase Strategically</h3>
+    <p>The best times to buy a car include the end of the month (when salespeople are trying to hit quotas), the end of the year (when dealers clear inventory for new models), and major holiday weekends when dealers run promotions. Shopping on weekday afternoons when the lot is quiet also tends to result in more attentive service and better willingness to negotiate.</p>
+    <h3>Be Willing to Walk Away</h3>
+    <p>The most powerful negotiating tool is your willingness to leave. If the dealer knows you are ready to walk, they are far more likely to offer their best price. Get quotes from multiple dealers and let each know you are comparing offers. This competition drives prices down naturally.</p>
+  </article>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <h3>How is a car payment calculated?</h3>
+        <p>A car payment uses the standard amortization formula: M = P x [r(1+r)^n] / [(1+r)^n - 1], where P is the loan amount (vehicle price minus down payment and trade-in, plus sales tax), r is the monthly interest rate, and n is the number of payments. For a $25,000 loan at 5.5% APR for 60 months, the monthly payment is approximately $478.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What is a good interest rate for a car loan in 2026?</h3>
+        <p>Good auto loan rates in 2026 depend on your credit score. Excellent credit (750+) can expect 3.5% to 5.5% for new cars. Good credit (670-749) typically sees 5.5% to 8%. Fair credit (580-669) may get 8% to 12%. Used cars add 1 to 2 percentage points. Credit unions usually offer the lowest rates.</p>
+      </div>
+      <div class="faq-item">
+        <h3>How much should I spend on a car?</h3>
+        <p>Follow the 20/4/10 rule: put at least 20% down, finance for no more than 4 years, and keep total monthly transportation costs under 10% of gross income. Your car payment alone should not exceed 15% of monthly take-home pay. For someone earning $5,000/month after taxes, that means a maximum payment of $750.</p>
+      </div>
+    </div>
+  </section>
+
+  <RelatedCalculators currentSlug="car-payment-calculator" />
+  <RelatedArticles calculatorSlug="car-payment-calculator" />
+
+  <CrossLinks links={[
+    { href: '/automotive-calculators/car-depreciation-calculator/', label: 'Car Depreciation Calculator', icon: '📉' },
+    { href: '/automotive-calculators/fuel-cost-calculator/', label: 'Fuel Cost Calculator', icon: '⛽' },
+    { href: '/auto-loan/', label: 'Auto Loan Tables', icon: '🚗' },
+  ]} />
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function fmt(n) { return '$' + Math.round(n).toLocaleString('en-US'); }
+
+  document.getElementById('calculateBtn').addEventListener('click', function() {
+    var price = parseFloat(document.getElementById('vehiclePrice').value) || 0;
+    var down = parseFloat(document.getElementById('downPayment').value) || 0;
+    var trade = parseFloat(document.getElementById('tradeIn').value) || 0;
+    var taxRate = (parseFloat(document.getElementById('salesTax').value) || 0) / 100;
+    var rate = (parseFloat(document.getElementById('interestRate').value) || 0) / 100;
+    var term = parseInt(document.getElementById('loanTerm').value) || 60;
+
+    var taxAmt = price * taxRate;
+    var loanAmt = price - down - trade + taxAmt;
+    if (loanAmt < 0) loanAmt = 0;
+
+    var monthly = 0;
+    var totalPaid = 0;
+    var totalInt = 0;
+
+    if (loanAmt > 0 && rate > 0) {
+      var r = rate / 12;
+      var n = term;
+      monthly = loanAmt * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+      totalPaid = monthly * n;
+      totalInt = totalPaid - loanAmt;
+    } else if (loanAmt > 0) {
+      monthly = loanAmt / term;
+      totalPaid = loanAmt;
+      totalInt = 0;
+    }
+
+    document.getElementById('monthlyPayment').textContent = fmt(monthly);
+    document.getElementById('totalPaid').textContent = fmt(totalPaid);
+    document.getElementById('totalInterest').textContent = fmt(totalInt);
+    document.getElementById('loanAmount').textContent = fmt(loanAmt);
+    document.getElementById('taxAmount').textContent = fmt(taxAmt);
+
+    var card = document.getElementById('paymentCard');
+    var advice = document.getElementById('paymentAdvice');
+    var benchmark = 5000;
+    var pct = monthly / benchmark * 100;
+
+    if (pct < 15) {
+      card.className = 'result-card primary';
+      advice.style.background = '#f0fdf4';
+      advice.style.border = '1px solid #bbf7d0';
+      advice.innerHTML = '<strong>Affordable:</strong> Your payment is ' + pct.toFixed(1) + '% of a $5,000/mo income benchmark. This is within the recommended range for car payments.';
+    } else if (pct <= 20) {
+      card.className = 'result-card primary';
+      card.style.borderColor = '#f59e0b';
+      advice.style.background = '#fffbeb';
+      advice.style.border = '1px solid #fde68a';
+      advice.innerHTML = '<strong>Moderate:</strong> Your payment is ' + pct.toFixed(1) + '% of a $5,000/mo income benchmark. Consider increasing your down payment or choosing a shorter term to reduce total cost.';
+    } else {
+      card.className = 'result-card primary';
+      card.style.borderColor = '#ef4444';
+      advice.style.background = '#fef2f2';
+      advice.style.border = '1px solid #fecaca';
+      advice.innerHTML = '<strong>High payment:</strong> Your payment is ' + pct.toFixed(1) + '% of a $5,000/mo income benchmark. This exceeds the recommended 15-20% threshold. Consider a less expensive vehicle or a larger down payment.';
+    }
+
+    document.getElementById('results').style.display = '';
+  });
+</script>

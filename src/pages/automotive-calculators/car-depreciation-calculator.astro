@@ -1,0 +1,429 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import ShareResults from '../../components/ShareResults.astro';
+import ReviewedBy from '../../components/ReviewedBy.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Automotive Calculators", "item": "https://toolcalcs.com/automotive-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Car Depreciation Calculator" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "How much does a car depreciate per year?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "On average, a new car depreciates approximately 20% in its first year, 15% in the second year, 12% in the third year, and 10% per year in years four and five. After five years, a typical vehicle retains about 40% of its original value. After year five, depreciation slows to roughly 7% per year. For example, a $35,000 new car would be worth about $28,000 after one year, $23,800 after two years, and approximately $14,000 after five years. Luxury vehicles and trucks tend to depreciate at different rates than economy cars."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "What cars hold their value the best?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Trucks and SUVs consistently hold their value better than sedans and coupes. Toyota and Lexus vehicles are widely recognized for the best resale value across all categories. Specific models known for strong value retention include the Toyota Tacoma, Toyota 4Runner, Jeep Wrangler, Porsche 911, and Honda Civic. Electric vehicles from Tesla also tend to hold value well due to strong demand. In general, vehicles from brands known for reliability, low maintenance costs, and strong brand loyalty depreciate the slowest."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "When is the best time to sell a car to minimize depreciation loss?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "The best time to sell a car from a depreciation perspective is typically between years 3 and 5 of ownership. By year 3, the steepest depreciation has already occurred (the car has lost roughly 40-45% of its value), but the vehicle is still new enough to command a premium as a used car. Selling before major maintenance milestones (such as the 60,000 or 100,000 mile mark) also helps preserve value. Seasonal timing matters too — convertibles and sports cars sell for more in spring and summer, while SUVs and trucks command premium prices in fall and winter."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Car Depreciation Calculator (2026) - Estimate Your Car's Future Value"
+  description="Free car depreciation calculator. Estimate your car's current and future value with year-by-year depreciation breakdown. See how much your vehicle loses in value over time."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/automotive-calculators/">Automotive Calculators</a> &rsaquo;
+    <span>Car Depreciation Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Car Depreciation Calculator</h1>
+  <p class="page-desc">Estimate how much your car will be worth over time. See year-by-year depreciation based on purchase price and age, and find the best time to sell or trade in your vehicle.</p>
+
+  <ReviewedBy />
+
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="purchasePrice">Purchase Price ($)</label>
+        <input type="number" id="purchasePrice" value="35000" min="5000" max="100000" step="500" />
+      </div>
+      <div class="input-group">
+        <label for="currentAge">Current Age of Vehicle (years)</label>
+        <input type="number" id="currentAge" value="0" min="0" max="15" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="holdingPeriod">Planned Holding Period (years)</label>
+        <input type="number" id="holdingPeriod" value="5" min="1" max="10" step="1" />
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate Depreciation</button>
+    </div>
+
+    <div class="calc-results" id="results" style="display:none">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Current Value</span>
+          <span class="result-value" id="currentValue">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Value After Holding Period</span>
+          <span class="result-value" id="futureValue">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Depreciation</span>
+          <span class="result-value" id="totalDepr">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Depreciation Per Year</span>
+          <span class="result-value" id="deprPerYear">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Depreciation Per Month</span>
+          <span class="result-value" id="deprPerMonth">$0</span>
+        </div>
+      </div>
+
+      <h3 style="margin-top:1.5rem;">Year-by-Year Breakdown</h3>
+      <div class="table-wrap">
+        <table class="result-table" id="deprTable">
+          <thead>
+            <tr>
+              <th>Year</th>
+              <th>Age</th>
+              <th>Depreciation Rate</th>
+              <th>Value Lost</th>
+              <th>Remaining Value</th>
+              <th>% of Original</th>
+            </tr>
+          </thead>
+          <tbody id="deprTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <ShareResults />
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <article class="seo-content">
+    <h2>How Car Depreciation Works</h2>
+    <p>Depreciation is the reduction in a vehicle's value over time due to wear, age, mileage, and market conditions. It is the single largest cost of vehicle ownership — often exceeding the combined cost of fuel, insurance, and maintenance. A new car loses value the moment you drive it off the dealer lot, and the rate of depreciation is steepest during the first few years of ownership.</p>
+    <p>Understanding depreciation is critical for making smart car buying and selling decisions. If you buy a $35,000 new car and sell it after three years, you may only receive $20,000 to $22,000 for it — meaning depreciation cost you $13,000 to $15,000, or roughly $4,300 to $5,000 per year. That is money you spent simply for the privilege of owning a newer vehicle, and it represents a real cost that should be factored into your car buying budget.</p>
+    <p>Our calculator uses industry-standard depreciation rates to estimate your vehicle's value at any point in its life. While actual depreciation varies by make, model, condition, and mileage, the general pattern is remarkably consistent across most vehicles: rapid depreciation in the first few years, followed by a gradual leveling off as the car ages.</p>
+
+    <h2>Average Depreciation Rates by Year</h2>
+    <p>The following table shows the typical depreciation rate for each year of a vehicle's life. These rates are based on industry averages published by automotive valuation services and represent the percentage of the car's remaining value that is lost each year.</p>
+    <div class="table-wrap">
+      <table class="info-table">
+        <thead>
+          <tr>
+            <th>Year</th>
+            <th>Depreciation Rate</th>
+            <th>Cumulative Loss</th>
+            <th>Value of $35,000 Car</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Year 1</td>
+            <td>20%</td>
+            <td>20%</td>
+            <td>$28,000</td>
+          </tr>
+          <tr>
+            <td>Year 2</td>
+            <td>15%</td>
+            <td>32%</td>
+            <td>$23,800</td>
+          </tr>
+          <tr>
+            <td>Year 3</td>
+            <td>12%</td>
+            <td>40%</td>
+            <td>$20,944</td>
+          </tr>
+          <tr>
+            <td>Year 4</td>
+            <td>10%</td>
+            <td>46%</td>
+            <td>$18,850</td>
+          </tr>
+          <tr>
+            <td>Year 5</td>
+            <td>10%</td>
+            <td>51%</td>
+            <td>$16,965</td>
+          </tr>
+          <tr>
+            <td>Year 6</td>
+            <td>7%</td>
+            <td>55%</td>
+            <td>$15,777</td>
+          </tr>
+          <tr>
+            <td>Year 7</td>
+            <td>7%</td>
+            <td>58%</td>
+            <td>$14,673</td>
+          </tr>
+          <tr>
+            <td>Year 8</td>
+            <td>7%</td>
+            <td>61%</td>
+            <td>$13,645</td>
+          </tr>
+          <tr>
+            <td>Year 9</td>
+            <td>7%</td>
+            <td>64%</td>
+            <td>$12,690</td>
+          </tr>
+          <tr>
+            <td>Year 10</td>
+            <td>7%</td>
+            <td>66%</td>
+            <td>$11,801</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>As the table illustrates, a $35,000 car loses nearly half its value in the first five years. The first year alone accounts for a $7,000 loss — more than any single year thereafter. This is why buying a one to two-year-old used car is often the best financial decision, as the steepest depreciation has already been absorbed by the first owner.</p>
+
+    <h2>Cars That Hold Their Value Best</h2>
+    <p>Not all vehicles depreciate at the same rate. Certain makes, models, and vehicle types are known for exceptional value retention, while others lose value faster than average. Understanding these patterns can help you choose a vehicle that will cost you less in depreciation over the years you own it.</p>
+    <h3>Trucks and Body-on-Frame SUVs</h3>
+    <p>Full-size trucks and body-on-frame SUVs consistently lead in value retention. The Toyota Tacoma is legendary for holding its value, often retaining 70% or more of its original price after five years. The Toyota 4Runner, Jeep Wrangler, and Ford F-150 also perform well. Strong demand in the used market, durability, and the practical utility of these vehicles drive their resale value.</p>
+    <h3>Toyota and Lexus</h3>
+    <p>Toyota and its luxury division Lexus dominate resale value rankings across nearly every vehicle category. Their reputation for reliability and low maintenance costs creates strong demand in the used market. A Toyota Camry or Honda Civic will typically retain 50% to 55% of its value after five years, compared to 40% to 45% for the average sedan.</p>
+    <h3>Electric Vehicles</h3>
+    <p>Tesla vehicles have established strong resale values due to brand loyalty, over-the-air software updates that keep older models current, and the growing demand for EVs. However, other electric vehicles from traditional manufacturers have experienced faster-than-average depreciation, partly due to rapidly improving technology and range in newer models that makes older EVs less desirable.</p>
+    <h3>Luxury Vehicles</h3>
+    <p>Most luxury cars depreciate faster than non-luxury vehicles. German luxury brands (BMW, Mercedes-Benz, Audi) typically lose 50% to 60% of their value in five years. The high cost of maintenance and repairs on used luxury vehicles suppresses demand in the used market. Exceptions include Porsche (especially the 911 and Cayenne) and certain Land Rover models, which hold value better than their luxury peers.</p>
+
+    <h2>Factors That Affect Depreciation</h2>
+    <p>While the year-by-year depreciation rates provide a useful baseline, several factors can cause your specific vehicle to depreciate faster or slower than average:</p>
+    <h3>Mileage</h3>
+    <p>Mileage is one of the most significant factors in a used car's value. The average American drives about 12,000 to 15,000 miles per year. Vehicles with significantly higher mileage depreciate faster, while low-mileage vehicles command a premium. As a rough rule, every 1,000 miles above or below average can affect a car's value by $200 to $500, depending on the vehicle.</p>
+    <h3>Condition and Maintenance History</h3>
+    <p>A well-maintained vehicle with a complete service history will retain more value than a neglected one. Major mechanical issues, accident history (reported through Carfax or AutoCheck), and cosmetic damage all accelerate depreciation. Keeping detailed maintenance records and addressing issues promptly helps preserve your car's resale value.</p>
+    <h3>Color and Features</h3>
+    <p>Believe it or not, color affects resale value. Neutral colors (white, black, silver, gray) tend to hold value best because they appeal to the widest range of buyers. Unusual colors (bright green, orange, yellow) can either hurt or help value depending on the vehicle type — a yellow sports car may retain value well, while a yellow minivan will not. Popular features like leather seats, sunroofs, advanced driver assistance systems, and upgraded audio systems also help preserve value.</p>
+    <h3>Market Conditions</h3>
+    <p>Supply and demand in the used car market fluctuate based on economic conditions, gas prices, and new vehicle availability. When gas prices spike, fuel-efficient cars appreciate while trucks and SUVs depreciate faster. During periods of new vehicle inventory shortages (as seen in 2021-2023), used car values can actually increase temporarily. Economic recessions typically accelerate depreciation as fewer buyers are in the market.</p>
+
+    <h2>When Is the Best Time to Sell?</h2>
+    <p>From a purely financial perspective, the optimal time to sell or trade in a vehicle depends on balancing depreciation costs against the cost of buying your next vehicle. Here are the key timing considerations:</p>
+    <h3>The 3 to 5-Year Sweet Spot</h3>
+    <p>Selling between years 3 and 5 is generally optimal if you purchased new. By this point, the steepest depreciation has occurred, but the car is still new enough to command a competitive price in the used market. Selling before major maintenance milestones (timing belt replacement, transmission service, brake system overhaul) avoids both the repair cost and the perception among buyers that the car is approaching expensive service intervals.</p>
+    <h3>Before Warranty Expiration</h3>
+    <p>Selling while the manufacturer warranty is still active makes your car more attractive to buyers. A vehicle with one to two years of remaining warranty coverage sells for a premium compared to one with no warranty. If your car has a 5-year/60,000-mile powertrain warranty, selling at year 4 lets the next owner benefit from the remaining coverage.</p>
+    <h3>Seasonal Timing</h3>
+    <p>The used car market has seasonal patterns. Convertibles and sports cars sell for more in spring and early summer. SUVs and trucks command premium prices in fall and early winter. Tax refund season (February through April) brings more buyers to the market, which can help you get a better price regardless of vehicle type.</p>
+    <h3>Mileage Milestones</h3>
+    <p>Selling before your odometer crosses major psychological thresholds (50,000, 75,000, or 100,000 miles) can preserve hundreds or even thousands of dollars in value. Buyers perceive a car with 49,500 miles as significantly more valuable than one with 51,000 miles, even though the actual mechanical difference is negligible.</p>
+
+    <h2>Depreciation Rates by Vehicle Type</h2>
+    <p>The following table compares the average 5-year depreciation rates across different vehicle categories, helping you understand how your type of vehicle is likely to perform:</p>
+    <div class="table-wrap">
+      <table class="info-table">
+        <thead>
+          <tr>
+            <th>Vehicle Type</th>
+            <th>5-Year Depreciation</th>
+            <th>Value Retained</th>
+            <th>Example Models</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Compact Trucks</td>
+            <td>30 - 35%</td>
+            <td>65 - 70%</td>
+            <td>Toyota Tacoma, Ford Ranger</td>
+          </tr>
+          <tr>
+            <td>Full-Size Trucks</td>
+            <td>35 - 40%</td>
+            <td>60 - 65%</td>
+            <td>Ford F-150, RAM 1500</td>
+          </tr>
+          <tr>
+            <td>SUVs / Crossovers</td>
+            <td>40 - 50%</td>
+            <td>50 - 60%</td>
+            <td>Toyota 4Runner, Honda CR-V</td>
+          </tr>
+          <tr>
+            <td>Compact Cars</td>
+            <td>45 - 55%</td>
+            <td>45 - 55%</td>
+            <td>Honda Civic, Toyota Corolla</td>
+          </tr>
+          <tr>
+            <td>Midsize Sedans</td>
+            <td>50 - 55%</td>
+            <td>45 - 50%</td>
+            <td>Toyota Camry, Honda Accord</td>
+          </tr>
+          <tr>
+            <td>Luxury Sedans</td>
+            <td>55 - 65%</td>
+            <td>35 - 45%</td>
+            <td>BMW 3 Series, Mercedes C-Class</td>
+          </tr>
+          <tr>
+            <td>Electric Vehicles</td>
+            <td>40 - 60%</td>
+            <td>40 - 60%</td>
+            <td>Tesla Model 3, Chevy Bolt</td>
+          </tr>
+          <tr>
+            <td>Minivans</td>
+            <td>50 - 60%</td>
+            <td>40 - 50%</td>
+            <td>Honda Odyssey, Toyota Sienna</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>These are average figures and individual models within each category can vary significantly. Research the specific make and model you are considering to get a more accurate depreciation estimate. Resources like Kelley Blue Book, Edmunds, and iSeeCars publish model-specific depreciation data that can supplement the general estimates from our calculator.</p>
+
+    <h2>How to Minimize Depreciation</h2>
+    <p>While you cannot eliminate depreciation entirely, you can take steps to slow it down and maximize your vehicle's resale value:</p>
+    <ul>
+      <li><strong>Buy used:</strong> Purchasing a 2 to 3-year-old vehicle lets the first owner absorb the steepest depreciation. You get a nearly-new car at a 30-40% discount.</li>
+      <li><strong>Choose wisely:</strong> Select makes and models known for strong value retention. Research 5-year depreciation rates before buying.</li>
+      <li><strong>Maintain meticulously:</strong> Follow the manufacturer's maintenance schedule, keep all records, and address issues promptly.</li>
+      <li><strong>Control mileage:</strong> Keep annual mileage near or below the 12,000-mile average. Excessive mileage accelerates depreciation.</li>
+      <li><strong>Protect the exterior:</strong> Garage your vehicle when possible, wash regularly, and consider paint protection film for high-impact areas.</li>
+      <li><strong>Choose popular colors:</strong> White, black, silver, and gray have the broadest appeal and retain value best.</li>
+      <li><strong>Avoid excessive modifications:</strong> Aftermarket modifications rarely increase resale value and often decrease it. Keep the vehicle close to stock.</li>
+    </ul>
+  </article>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <h3>How much does a car depreciate per year?</h3>
+        <p>A new car depreciates approximately 20% in the first year, 15% in year two, 12% in year three, and 10% per year in years four and five. After five years, depreciation slows to roughly 7% per year. A $35,000 car would be worth about $28,000 after one year and approximately $17,000 after five years.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What cars hold their value the best?</h3>
+        <p>Trucks and SUVs hold value best overall. The Toyota Tacoma, Toyota 4Runner, Jeep Wrangler, and Porsche 911 are among the top value holders. Toyota and Lexus vehicles consistently lead resale value rankings across most categories due to their reputation for reliability and low maintenance costs.</p>
+      </div>
+      <div class="faq-item">
+        <h3>When is the best time to sell a car to minimize depreciation loss?</h3>
+        <p>The best time to sell is typically between years 3 and 5, after the steepest depreciation has occurred but while the car is still new enough to command a good price. Selling before major maintenance milestones and while warranty coverage remains also helps preserve value. Seasonal timing matters too — trucks sell best in fall/winter, convertibles in spring/summer.</p>
+      </div>
+    </div>
+  </section>
+
+  <RelatedCalculators currentSlug="car-depreciation-calculator" />
+  <RelatedArticles calculatorSlug="car-depreciation-calculator" />
+
+  <CrossLinks links={[
+    { href: '/automotive-calculators/car-payment-calculator/', label: 'Car Payment Calculator', icon: '🚗' },
+    { href: '/automotive-calculators/total-cost-of-ownership-calculator/', label: 'Total Cost of Ownership', icon: '🔧' },
+    { href: '/automotive-calculators/car-affordability-calculator/', label: 'Car Affordability Calculator', icon: '💰' },
+  ]} />
+
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function fmt(n) { return '$' + Math.round(n).toLocaleString('en-US'); }
+
+  function getRate(year) {
+    if (year === 1) return 0.20;
+    if (year === 2) return 0.15;
+    if (year === 3) return 0.12;
+    if (year === 4 || year === 5) return 0.10;
+    return 0.07;
+  }
+
+  function getValueAtAge(price, age) {
+    var value = price;
+    for (var i = 1; i <= age; i++) {
+      value = value * (1 - getRate(i));
+    }
+    return value;
+  }
+
+  document.getElementById('calculateBtn').addEventListener('click', function() {
+    var price = parseFloat(document.getElementById('purchasePrice').value) || 0;
+    var currentAge = parseInt(document.getElementById('currentAge').value) || 0;
+    var holding = parseInt(document.getElementById('holdingPeriod').value) || 1;
+
+    var currentVal = getValueAtAge(price, currentAge);
+    var futureAge = currentAge + holding;
+    var futureVal = getValueAtAge(price, futureAge);
+    var totalDepr = currentVal - futureVal;
+    var deprYear = holding > 0 ? totalDepr / holding : 0;
+    var deprMonth = deprYear / 12;
+
+    document.getElementById('currentValue').textContent = fmt(currentVal);
+    document.getElementById('futureValue').textContent = fmt(futureVal);
+    document.getElementById('totalDepr').textContent = fmt(totalDepr);
+    document.getElementById('deprPerYear').textContent = fmt(deprYear);
+    document.getElementById('deprPerMonth').textContent = fmt(deprMonth);
+
+    var tbody = document.getElementById('deprTableBody');
+    tbody.innerHTML = '';
+
+    var runningValue = price;
+    var startYear = 1;
+    var endYear = futureAge;
+    if (endYear < 1) endYear = 1;
+
+    for (var y = startYear; y <= endYear; y++) {
+      var rate = getRate(y);
+      var lost = runningValue * rate;
+      runningValue = runningValue - lost;
+      var pctOriginal = (runningValue / price * 100).toFixed(1);
+
+      var row = document.createElement('tr');
+      var highlight = (y > currentAge) ? ' style="background:var(--color-surface-alt,#f8f9fa)"' : '';
+      row.innerHTML =
+        '<td>Year ' + y + '</td>' +
+        '<td>' + y + (y === 1 ? ' yr' : ' yrs') + '</td>' +
+        '<td>' + (rate * 100).toFixed(0) + '%</td>' +
+        '<td>' + fmt(lost) + '</td>' +
+        '<td>' + fmt(runningValue) + '</td>' +
+        '<td>' + pctOriginal + '%</td>';
+      if (y > currentAge) {
+        row.style.background = 'var(--color-surface-alt, #f8f9fa)';
+      }
+      tbody.appendChild(row);
+    }
+
+    document.getElementById('results').style.display = '';
+  });
+</script>

@@ -1,0 +1,300 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import ShareResults from '../../components/ShareResults.astro';
+import ReviewedBy from '../../components/ReviewedBy.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://toolcalcs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Automotive Calculators",
+        "item": "https://toolcalcs.com/automotive-calculators/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Fuel Cost Calculator"
+      }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How do I calculate fuel cost for a trip?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Divide the total trip distance in miles by your vehicle fuel economy in miles per gallon (MPG) to get the gallons of fuel needed. Multiply that by the current gas price per gallon to get the total fuel cost. For example, a 300-mile trip at 25 MPG with gas at $3.50 per gallon costs 12 gallons times $3.50, which equals $42.00.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is the average cost per mile to drive a car?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The average fuel cost per mile depends on gas prices and your vehicle fuel economy. At $3.50 per gallon and 25 MPG, the fuel cost is $0.14 per mile. The AAA estimates total driving costs, including fuel, insurance, maintenance, and depreciation, at roughly $0.65 to $0.80 per mile for an average sedan in 2026.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How can I improve my car fuel economy?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'You can improve fuel economy by maintaining proper tire pressure, avoiding aggressive acceleration and braking, using cruise control on highways, removing excess weight from the vehicle, keeping up with engine maintenance such as oil changes and air filter replacements, and minimizing idling. These habits can improve MPG by 10 to 30 percent depending on driving conditions.',
+        },
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Fuel Cost Calculator (2026) - Calculate Gas Cost for Any Trip"
+  description="Free fuel cost calculator. Enter trip distance, fuel economy (MPG), and gas price to calculate total fuel cost, cost per mile, and weekly or annual commute expenses."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/automotive-calculators/">Automotive Calculators</a> &rsaquo;
+    <span>Fuel Cost Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Fuel Cost Calculator</h1>
+  <p class="page-desc">Calculate the fuel cost for any trip or daily commute. Enter your distance, fuel economy, and gas price to see total cost, gallons needed, and cost per mile.</p>
+
+  <ReviewedBy />
+
+  <!-- Calculator Tool -->
+  <div class="calculator-box">
+    <div class="calc-inputs">
+      <div class="input-group">
+        <label for="distance">Trip Distance (miles)</label>
+        <input type="number" id="distance" value="100" min="0" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="mpg">Fuel Economy (MPG)</label>
+        <input type="number" id="mpg" value="25" min="1" max="200" step="0.1" />
+      </div>
+      <div class="input-group">
+        <label for="gasPrice">Gas Price ($/gallon)</label>
+        <input type="number" id="gasPrice" value="3.50" min="0" max="20" step="0.01" />
+      </div>
+      <div class="input-group" style="display:flex;align-items:center;gap:8px;">
+        <label for="roundTrip" style="margin:0;">Round Trip</label>
+        <input type="checkbox" id="roundTrip" />
+      </div>
+      <button class="calc-btn" id="calculateBtn">Calculate Trip Cost</button>
+    </div>
+
+    <div class="calc-results" id="results">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <span class="result-label">Total Fuel Cost</span>
+          <span class="result-value" id="totalCost">$0</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Fuel Needed</span>
+          <span class="result-value" id="fuelNeeded">0 gal</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Cost Per Mile</span>
+          <span class="result-value" id="costPerMile">$0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Commute Section -->
+    <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--color-border,#ddd);">
+      <h3 style="margin-bottom:12px;">Commute Cost Estimator</h3>
+      <div class="calc-inputs">
+        <div class="input-group">
+          <label for="commuteDistance">One-Way Commute (miles)</label>
+          <input type="number" id="commuteDistance" value="25" min="0" step="1" />
+        </div>
+        <div class="input-group">
+          <label for="workDays">Work Days Per Week</label>
+          <input type="number" id="workDays" value="5" min="1" max="7" step="1" />
+        </div>
+        <button class="calc-btn" id="commuteBtn">Calculate Commute Cost</button>
+      </div>
+      <div class="calc-results" id="commuteResults">
+        <div class="result-cards">
+          <div class="result-card">
+            <span class="result-label">Daily Commute Cost</span>
+            <span class="result-value" id="dailyCost">$0</span>
+          </div>
+          <div class="result-card">
+            <span class="result-label">Weekly Cost</span>
+            <span class="result-value" id="weeklyCost">$0</span>
+          </div>
+          <div class="result-card">
+            <span class="result-label">Monthly Cost</span>
+            <span class="result-value" id="monthlyCost">$0</span>
+          </div>
+          <div class="result-card primary">
+            <span class="result-label">Annual Commute Cost</span>
+            <span class="result-value" id="annualCost">$0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="mid" format="rectangle" />
+
+  <ShareResults />
+
+  <article class="content-article">
+    <h2>How to Calculate Fuel Cost for Any Trip</h2>
+    <p>Calculating the fuel cost for a trip is straightforward once you know three numbers: the distance you plan to drive, your vehicle's fuel economy rating in miles per gallon (MPG), and the current price of gasoline per gallon. The formula is simple: divide the trip distance by your MPG to get the number of gallons needed, then multiply by the gas price per gallon to get the total fuel cost.</p>
+    <div class="formula-box">
+      <code>Fuel Cost = (Distance / MPG) &times; Gas Price per Gallon</code>
+    </div>
+    <p>For example, a 300-mile road trip in a car that gets 25 miles per gallon with gas at $3.50 per gallon would require 12 gallons of fuel, costing $42.00. If you are making a round trip, simply double the distance before calculating. This calculator handles all of these computations automatically and also shows your cost per mile, which is a useful metric for comparing the true cost of driving different vehicles.</p>
+    <p>Understanding your fuel cost per mile is particularly valuable for people who drive for work, such as rideshare drivers, delivery workers, or independent contractors who claim mileage deductions on their taxes. The IRS standard mileage rate for 2026 is $0.70 per mile, which is meant to cover fuel plus wear and tear. Knowing your actual fuel cost per mile helps you determine whether that rate covers your expenses.</p>
+
+    <h2>Average Gas Prices by State (2026)</h2>
+    <p>Gas prices vary significantly depending on where you live and fill up. State taxes, proximity to refineries, environmental regulations, and local market competition all contribute to price differences that can exceed $1.50 per gallon between the cheapest and most expensive states. The table below shows approximate average gas prices as of early 2026 for selected states.</p>
+    <div style="overflow-x:auto;">
+      <table class="data-table">
+        <thead>
+          <tr><th>State</th><th>Avg. Regular ($/gal)</th><th>State</th><th>Avg. Regular ($/gal)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>California</td><td>$4.85</td><td>Texas</td><td>$2.95</td></tr>
+          <tr><td>Hawaii</td><td>$4.60</td><td>Mississippi</td><td>$2.85</td></tr>
+          <tr><td>Washington</td><td>$4.25</td><td>Oklahoma</td><td>$2.90</td></tr>
+          <tr><td>Nevada</td><td>$4.10</td><td>Arkansas</td><td>$2.90</td></tr>
+          <tr><td>Oregon</td><td>$4.05</td><td>Missouri</td><td>$2.95</td></tr>
+          <tr><td>Illinois</td><td>$3.85</td><td>Kansas</td><td>$3.00</td></tr>
+          <tr><td>Pennsylvania</td><td>$3.75</td><td>South Carolina</td><td>$3.00</td></tr>
+          <tr><td>New York</td><td>$3.70</td><td>Alabama</td><td>$3.00</td></tr>
+          <tr><td>Florida</td><td>$3.50</td><td>Ohio</td><td>$3.15</td></tr>
+          <tr><td>Colorado</td><td>$3.40</td><td>Georgia</td><td>$3.10</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>These prices fluctuate based on crude oil markets, seasonal demand, and refinery output. Gas tends to be most expensive in summer months when travel demand peaks, and prices in states like California are consistently higher due to stricter fuel blend requirements and higher state fuel taxes.</p>
+
+    <h2>Understanding Fuel Economy (MPG)</h2>
+    <p>Fuel economy, measured in miles per gallon (MPG), tells you how far your vehicle can travel on one gallon of fuel. A higher MPG number means your car is more fuel-efficient and costs less to drive per mile. The average fuel economy across all passenger vehicles in the United States is approximately 25.4 MPG as of 2026, though this varies widely by vehicle type.</p>
+    <p>The EPA requires all new vehicles sold in the United States to display a fuel economy rating on the window sticker, showing estimated city MPG, highway MPG, and a combined figure. City driving typically produces lower MPG due to frequent stops, starts, and idling, while highway driving is more efficient because the engine operates at a steady RPM. The combined rating is a weighted average of 55 percent city and 45 percent highway driving.</p>
+    <p>Compact cars and hybrids commonly achieve 30 to 60 MPG combined, while full-size trucks and SUVs may get 15 to 22 MPG. Your actual fuel economy depends on driving habits, vehicle condition, road conditions, weather, and load. Real-world MPG is often 10 to 15 percent lower than the EPA estimate, especially if you drive aggressively or in heavy stop-and-go traffic.</p>
+
+    <h2>Tips to Improve Your Fuel Economy</h2>
+    <p>Small changes in driving habits and vehicle maintenance can meaningfully improve your fuel economy and reduce your annual fuel costs. Here are proven strategies that can boost your MPG by 10 to 30 percent.</p>
+    <ol>
+      <li><strong>Maintain proper tire pressure.</strong> Under-inflated tires create more rolling resistance, forcing the engine to work harder. Keeping tires at the manufacturer-recommended pressure, usually found on a sticker inside the driver's door, can improve fuel economy by up to 3 percent. Check pressure monthly when tires are cold.</li>
+      <li><strong>Drive at moderate speeds.</strong> Fuel economy drops significantly at speeds above 50 mph. According to the Department of Energy, each 5 mph over 50 is roughly equivalent to paying an additional $0.20 to $0.30 per gallon of gas. Using cruise control on the highway helps maintain a consistent, fuel-efficient speed.</li>
+      <li><strong>Avoid aggressive driving.</strong> Rapid acceleration, hard braking, and excessive speeding can lower gas mileage by 15 to 33 percent on the highway and 10 to 40 percent in stop-and-go traffic. Smooth, gradual acceleration and anticipating stops ahead are among the most effective ways to save fuel.</li>
+      <li><strong>Reduce idling.</strong> Idling gets zero miles per gallon. Modern engines do not need to warm up before driving, and turning off the engine if you expect to wait more than 30 seconds uses less fuel than idling. Some newer vehicles have automatic start-stop systems that handle this for you.</li>
+      <li><strong>Remove excess weight.</strong> An extra 100 pounds in your vehicle can reduce MPG by approximately 1 percent. Remove roof racks, cargo carriers, and heavy items from the trunk when not in use. Roof racks and cargo boxes also increase aerodynamic drag, which further reduces fuel economy at highway speeds.</li>
+      <li><strong>Keep up with maintenance.</strong> Replace air filters, spark plugs, and oxygen sensors on schedule. A dirty air filter can reduce fuel economy by up to 10 percent on older carbureted engines, and fouled spark plugs can cause misfires that waste fuel. Regular oil changes with the manufacturer-recommended grade of motor oil also contribute to optimal engine efficiency.</li>
+      <li><strong>Plan and combine trips.</strong> Cold engines use more fuel during the first few miles after startup. Combining multiple short errands into one trip allows the engine to reach its efficient operating temperature and stay there, saving fuel compared to making several separate cold-start trips throughout the day.</li>
+    </ol>
+
+    <h2>Fuel Cost and Your Monthly Budget</h2>
+    <p>For most American households, fuel is one of the top five recurring transportation expenses, alongside car payments, insurance, maintenance, and parking. Understanding your true monthly fuel cost helps you build a realistic budget and identify potential savings.</p>
+    <p>The average American drives approximately 13,500 miles per year, or about 1,125 miles per month. At an average fuel economy of 25 MPG and a gas price of $3.50 per gallon, that translates to roughly $158 per month in fuel costs. However, commuters who drive 50 or more miles per day can easily spend $250 to $400 per month on fuel alone, making it a significant budget line item.</p>
+    <p>If fuel costs are consuming a large portion of your monthly income, consider strategies like carpooling, using public transit for part of your commute, working remotely when possible, or switching to a more fuel-efficient vehicle. Our commute cost estimator above makes it easy to see exactly how much your daily drive is costing you on a weekly, monthly, and annual basis, so you can make informed decisions about transportation spending.</p>
+    <p>When evaluating whether to upgrade to a more fuel-efficient vehicle, compare the annual fuel savings against the cost of the new car. If switching from a 20 MPG vehicle to a 35 MPG vehicle saves you $1,200 per year in fuel, it would take many years to recoup the cost of a new car purchase through fuel savings alone. However, fuel savings combined with lower maintenance costs and potential tax credits on hybrid or electric vehicles can make the switch more financially attractive. Use our <a href="/automotive-calculators/ev-vs-gas-calculator/">EV vs Gas calculator</a> to compare total ownership costs.</p>
+
+    <h2>Gas Cost vs. Other Transportation Options</h2>
+    <p>Driving is not the only way to get around, and comparing fuel costs against alternatives can reveal surprising savings opportunities. Public transit passes in most major U.S. cities cost between $75 and $150 per month, which is often less than fuel alone for a long daily commute, not counting parking, insurance, and wear on your vehicle.</p>
+    <p>Carpooling cuts per-person fuel costs proportionally. Sharing a ride with one other person halves your fuel expense; a three-person carpool reduces it by two-thirds. Many employers offer carpool matching programs, and apps make it easy to find commute partners along your route. Some cities also offer HOV lane access and reduced tolls for carpoolers, adding time savings to the financial benefit.</p>
+    <p>For shorter trips, cycling and walking cost nothing in fuel and provide health benefits. E-bikes have gained popularity as a commuting option, with electricity costs of roughly $0.01 to $0.02 per mile compared to $0.10 to $0.20 per mile for a gasoline vehicle. While these alternatives are not practical for everyone, they are worth considering as part of a broader strategy to reduce transportation costs.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>How do I calculate fuel cost for a trip?</summary>
+        <p>Divide the total trip distance in miles by your vehicle's fuel economy in miles per gallon (MPG) to get the gallons of fuel needed. Multiply that by the current gas price per gallon to get the total fuel cost. For example, a 300-mile trip at 25 MPG with gas at $3.50 per gallon costs 12 gallons times $3.50, which equals $42.00. If it is a round trip, double the distance first.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is the average cost per mile to drive a car?</summary>
+        <p>The average fuel cost per mile depends on gas prices and your vehicle's fuel economy. At $3.50 per gallon and 25 MPG, the fuel cost is about $0.14 per mile. The AAA estimates total driving costs, including fuel, insurance, maintenance, and depreciation, at roughly $0.65 to $0.80 per mile for an average sedan in 2026.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How can I improve my car's fuel economy?</summary>
+        <p>Maintain proper tire pressure, avoid aggressive acceleration and braking, use cruise control on highways, remove excess weight from the vehicle, keep up with engine maintenance such as oil changes and air filter replacements, and minimize idling. These habits can improve MPG by 10 to 30 percent depending on driving conditions.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Is premium gas worth the extra cost?</summary>
+        <p>Only if your vehicle requires it. Cars designed for regular unleaded gain no benefit from premium fuel. However, vehicles with high-compression or turbocharged engines that specify premium fuel may experience reduced performance and efficiency when using regular gas. Check your owner's manual for the recommended fuel grade and use that.</p>
+      </details>
+    </div>
+  </article>
+
+  <CrossLinks links={[
+    { href: '/everyday-calculators/gas-cost-calculator/', label: 'Gas Cost Calculator', icon: '⛽' },
+    { href: '/automotive-calculators/car-payment-calculator/', label: 'Car Payment Calculator', icon: '🚗' },
+    { href: '/automotive-calculators/ev-vs-gas-calculator/', label: 'EV vs Gas Calculator', icon: '⚡' },
+  ]} />
+  <RelatedCalculators currentSlug="fuel-cost-calculator" />
+  <RelatedArticles calculatorSlug="fuel-cost-calculator" />
+  <AdUnit slot="bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function formatMoney(n) {
+    return '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
+  function calculate() {
+    var distance = parseFloat(document.getElementById('distance').value) || 0;
+    var mpg = parseFloat(document.getElementById('mpg').value) || 25;
+    var gasPrice = parseFloat(document.getElementById('gasPrice').value) || 0;
+    var roundTrip = document.getElementById('roundTrip').checked;
+
+    var totalDistance = roundTrip ? distance * 2 : distance;
+    var gallons = totalDistance / mpg;
+    var totalCost = gallons * gasPrice;
+    var costPerMile = mpg > 0 ? gasPrice / mpg : 0;
+
+    document.getElementById('totalCost').textContent = formatMoney(totalCost);
+    document.getElementById('fuelNeeded').textContent = gallons.toFixed(2) + ' gal';
+    document.getElementById('costPerMile').textContent = formatMoney(costPerMile);
+  }
+
+  function calculateCommute() {
+    var commuteDistance = parseFloat(document.getElementById('commuteDistance').value) || 0;
+    var workDays = parseFloat(document.getElementById('workDays').value) || 5;
+    var mpg = parseFloat(document.getElementById('mpg').value) || 25;
+    var gasPrice = parseFloat(document.getElementById('gasPrice').value) || 3.50;
+
+    var dailyMiles = commuteDistance * 2;
+    var dailyCost = (dailyMiles / mpg) * gasPrice;
+    var weeklyCost = dailyCost * workDays;
+    var monthlyCost = weeklyCost * 4.33;
+    var annualCost = weeklyCost * 52;
+
+    document.getElementById('dailyCost').textContent = formatMoney(dailyCost);
+    document.getElementById('weeklyCost').textContent = formatMoney(weeklyCost);
+    document.getElementById('monthlyCost').textContent = formatMoney(monthlyCost);
+    document.getElementById('annualCost').textContent = formatMoney(annualCost);
+  }
+
+  document.getElementById('calculateBtn').addEventListener('click', calculate);
+  document.getElementById('commuteBtn').addEventListener('click', calculateCommute);
+
+  calculate();
+  calculateCommute();
+</script>
