@@ -99,6 +99,12 @@ export const categories: Category[] = [
     description: 'Car payment, depreciation, fuel cost, EV vs gas comparison, car affordability, and auto insurance estimator calculators.',
     icon: '🚗',
   },
+  {
+    name: 'Freelance Calculators',
+    slug: 'freelance-calculators',
+    description: 'Freelance hourly rate, project pricing, self-employment tax, invoice total, and side hustle profit calculators for independent workers.',
+    icon: '💼',
+  },
 ];
 
 export const calculators: Calculator[] = [
@@ -1351,6 +1357,47 @@ export const calculators: Calculator[] = [
     categorySlug: 'automotive-calculators',
     icon: '🔧',
   },
+  // Freelance Calculators
+  {
+    title: 'Freelance Hourly Rate Calculator',
+    slug: 'freelance-hourly-rate-calculator',
+    description: 'Calculate the hourly rate you need to charge as a freelancer based on target income, business expenses, tax rate, and billable hours.',
+    category: 'Freelance Calculators',
+    categorySlug: 'freelance-calculators',
+    icon: '⏱️',
+  },
+  {
+    title: 'Freelance Project Pricing Calculator',
+    slug: 'freelance-project-pricing-calculator',
+    description: 'Price freelance projects accurately by estimating hours, buffer time, complexity, and your hourly rate to avoid underpricing.',
+    category: 'Freelance Calculators',
+    categorySlug: 'freelance-calculators',
+    icon: '💵',
+  },
+  {
+    title: 'Self-Employment Tax Calculator',
+    slug: 'self-employment-tax-calculator-freelance',
+    description: 'Calculate your self-employment tax (Social Security + Medicare) plus income tax estimate for freelancers, contractors, and gig workers.',
+    category: 'Freelance Calculators',
+    categorySlug: 'freelance-calculators',
+    icon: '🧾',
+  },
+  {
+    title: 'Invoice Calculator',
+    slug: 'invoice-calculator',
+    description: 'Create invoice totals with line items, sales tax, discounts, and late fees. Export calculations for freelance and small business invoicing.',
+    category: 'Freelance Calculators',
+    categorySlug: 'freelance-calculators',
+    icon: '📄',
+  },
+  {
+    title: 'Side Hustle Profit Calculator',
+    slug: 'side-hustle-profit-calculator',
+    description: 'Calculate true profit from your side hustle after accounting for taxes, expenses, time invested, and effective hourly rate.',
+    category: 'Freelance Calculators',
+    categorySlug: 'freelance-calculators',
+    icon: '📈',
+  },
 ];
 
 export function getCalculatorsByCategory(categorySlug: string): Calculator[] {
@@ -1388,6 +1435,7 @@ const relatedGroups: Record<string, string[]> = {
   // Education
   'education': ['gpa-calculator', 'college-cost-calculator', 'student-loan-repayment-planner', 'scholarship-calculator', 'sat-score-calculator'],
   'automotive': ['car-payment-calculator', 'car-depreciation-calculator', 'fuel-cost-calculator', 'ev-vs-gas-calculator', 'car-affordability-calculator', 'total-cost-of-ownership-calculator'],
+  'freelance': ['freelance-hourly-rate-calculator', 'freelance-project-pricing-calculator', 'self-employment-tax-calculator-freelance', 'invoice-calculator', 'side-hustle-profit-calculator'],
 };
 
 // Cross-category links for broader discovery
@@ -1406,6 +1454,7 @@ const crossCategoryLinks: Record<string, string[]> = {
   'insurance-calculators': ['mortgage-calculator', 'home-affordability-calculator', 'take-home-pay-calculator'],
   'education-calculators': ['student-loan-calculator', 'compound-interest-calculator', 'savings-goal-calculator', 'take-home-pay-calculator'],
   'automotive-calculators': ['auto-loan-calculator', 'auto-insurance-calculator', 'gas-cost-calculator', 'loan-amortization-calculator'],
+  'freelance-calculators': ['take-home-pay-calculator', 'self-employment-tax-calculator', 'paycheck-calculator', 'break-even-calculator'],
 };
 
 export function getRelatedCalculators(currentSlug: string, limit: number = 5): Calculator[] {

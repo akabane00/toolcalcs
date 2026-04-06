@@ -1,0 +1,249 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import ShareResults from '../../components/ShareResults.astro';
+import ReviewedBy from '../../components/ReviewedBy.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Freelance Calculators", "item": "https://toolcalcs.com/freelance-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Side Hustle Profit Calculator" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "How do I calculate my true hourly rate for a side hustle?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Start with monthly revenue, subtract every expense (supplies, software, payment processing fees, marketing, mileage), and subtract a prorated portion of any one-time startup costs. That gives you gross profit. Multiply by (1 minus your tax rate) to get after-tax profit. Divide after-tax profit by the total hours you spent on the hustle that month. Most side hustlers are shocked to see their real hourly rate is 30 to 60 percent lower than their advertised rate once all the true costs are counted."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "What tax rate should I use for side hustle income?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "For planning purposes, assume 25 to 35 percent total. This covers federal income tax at your marginal bracket (typically 12 to 24 percent for most side hustlers), self-employment tax (15.3 percent, effectively about 14.1 percent after the 92.35 percent adjustment), and state income tax where applicable (0 to 13 percent). If your side income pushes you into a higher bracket, that incremental income is taxed at that higher rate, not your average rate. When in doubt, set aside 30 percent of every dollar you earn into a separate tax savings account."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "When should I quit my side hustle versus scale it?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Quit if your effective hourly rate after all costs and taxes is below your day job's hourly rate (or your best alternative use of time). Scale if your effective hourly rate exceeds your day job rate and demand is growing. A middle path is to raise prices first. If your hustle currently pays $12/hour effective but raising rates 30 percent would only cost you 10 percent of customers, your effective rate jumps to around $19/hour — same time, better return. Most side hustles underprice out of insecurity."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Side Hustle Profit Calculator (2026) - True Hourly Rate"
+  description="Calculate the true hourly rate of your side hustle after expenses, startup costs, and taxes. See your real take-home, break-even revenue, and annual projection."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/freelance-calculators/">Freelance Calculators</a> &rsaquo;
+    <span>Side Hustle Profit Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Side Hustle Profit Calculator 2026</h1>
+  <p class="page-desc">Find out what your side hustle actually pays per hour after expenses, startup costs, and taxes. Stop guessing and see the real numbers.</p>
+
+  <ReviewedBy />
+
+  <div class="calc-box">
+    <div class="calc-grid-2">
+      <div class="input-group">
+        <label for="sh-revenue">Monthly Revenue</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="sh-revenue" value="2000" min="0" max="1000000" step="50" /></div>
+        <small>Total gross sales before any deductions</small>
+      </div>
+      <div class="input-group">
+        <label for="sh-expenses">Monthly Expenses</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="sh-expenses" value="400" min="0" max="1000000" step="25" /></div>
+        <small>Supplies, software, fees, ads, mileage, etc.</small>
+      </div>
+      <div class="input-group">
+        <label for="sh-hours">Hours Worked Per Month</label>
+        <input type="number" id="sh-hours" value="40" min="0" max="744" step="1" />
+        <small>Include admin, prep, marketing — not just billable hours</small>
+      </div>
+      <div class="input-group">
+        <label for="sh-tax">Tax Rate</label>
+        <div class="input-suffix"><input type="number" id="sh-tax" value="25" min="0" max="60" step="1" /><span>percent</span></div>
+        <small>Federal + SE + state combined. 25-30 percent is a safe estimate.</small>
+      </div>
+      <div class="input-group">
+        <label for="sh-startup">Startup Costs (one-time)</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="sh-startup" value="1200" min="0" max="10000000" step="50" /></div>
+        <small>Amortized over 12 months in the calculation</small>
+      </div>
+    </div>
+    <button class="calc-btn" id="calcBtnSH">Calculate True Hourly Rate</button>
+
+    <div class="results" id="results-sh" style="display:none">
+      <div class="result-cards">
+        <div class="result-card">
+          <div class="result-label">Gross Profit (monthly)</div>
+          <div class="result-value" id="res-sh-gross">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">After-Tax Profit (monthly)</div>
+          <div class="result-value" id="res-sh-aftertax">$0</div>
+        </div>
+        <div class="result-card primary">
+          <div class="result-label">Effective Hourly Rate</div>
+          <div class="result-value" id="res-sh-rate">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Annual Profit Projection</div>
+          <div class="result-value" id="res-sh-annual">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Break-Even Revenue</div>
+          <div class="result-value" id="res-sh-breakeven">$0</div>
+        </div>
+      </div>
+      <div id="sh-verdict" style="margin-top:16px;padding:16px;border-radius:8px;font-size:1rem;font-weight:600;text-align:center;"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <ShareResults />
+
+  <article class="seo-content">
+    <h2>Why Most Side Hustles Secretly Underpay</h2>
+    <p>The typical side hustle pitch sounds irresistible: "Earn $50/hour driving for Uber" or "Make $5,000 per month on Etsy in your spare time." But these numbers almost always refer to gross revenue, not profit — and certainly not profit after taxes. When you back out the fuel, the depreciation, the supplies, the platform fees, the advertising, and Uncle Sam's share, that $50/hour gig often turns into $12 to $18/hour in real take-home pay. This calculator exists to show you the true number before you invest months of your life into a hustle that does not pencil out.</p>
+
+    <h3>The True Cost Analysis Framework</h3>
+    <p>A proper side hustle ROI analysis includes every cost, even the ones you do not want to count. These are the usual suspects that get ignored:</p>
+    <ul>
+      <li><strong>Platform and processing fees:</strong> Etsy takes roughly 6.5 percent plus listing fees. Fiverr takes 20 percent. Stripe and PayPal take 2.9 percent plus 30 cents. Uber and DoorDash keep 25 to 40 percent of gross before you see it.</li>
+      <li><strong>Vehicle wear and mileage:</strong> The IRS standard mileage rate for 2026 is 67 cents per mile. That number includes depreciation, maintenance, gas, and insurance combined. If you drive 200 miles per week for your hustle, that is $134 per week — $536/month — in real vehicle costs.</li>
+      <li><strong>Software subscriptions:</strong> Design tools, project management, scheduling, accounting, email marketing. Individually cheap, collectively $50 to $200+ per month.</li>
+      <li><strong>Marketing and ads:</strong> Facebook ads, Google ads, Etsy promoted listings, sponsored content, giveaway costs.</li>
+      <li><strong>Supplies and inventory:</strong> Especially brutal for craft, food, and reseller businesses. Inventory that does not sell is a sunk cost.</li>
+      <li><strong>Startup costs:</strong> Camera equipment, a website, legal fees, a business license, initial inventory. Amortize these over at least 12 months so they appear in your monthly P&amp;L.</li>
+      <li><strong>Taxes:</strong> 25 to 35 percent of profit vanishes to the IRS and your state. If you are not setting that money aside, you are not actually earning what your books say.</li>
+      <li><strong>Your time:</strong> Every hour spent on the hustle is an hour not spent on your day job (overtime, promotions), your family, or rest. Economists call this opportunity cost, and ignoring it is the biggest side hustle lie.</li>
+    </ul>
+
+    <h3>Opportunity Cost: The Hidden Killer</h3>
+    <p>Your time has a real dollar value based on your next-best alternative. If you earn $35/hour at your day job and could work 10 hours of overtime at time-and-a-half ($52.50/hour), your opportunity cost for side hustle time is $52.50/hour. A side hustle paying $20/hour effective is actually costing you $32.50/hour in lost overtime — you are paying to work.</p>
+    <p>This is why the effective hourly rate is the only number that matters. Comparing it to your day job rate tells you whether your side hustle is a financial win, a break-even hobby you enjoy, or a hidden money loser that you should stop doing.</p>
+
+    <h3>When to Quit, When to Scale</h3>
+    <p>Use these simple thresholds based on your effective hourly rate (color-coded in the calculator above):</p>
+    <ul>
+      <li><strong>Above $20/hour effective (green):</strong> This is a viable business. Scale it. Look for ways to raise prices, reduce hours, automate, or outsource. The next question is whether it can grow to replace your day job.</li>
+      <li><strong>$10 to $20/hour effective (orange):</strong> Borderline. If you enjoy the work or are building a skill, continue but do not expand. Raise prices aggressively — most side hustlers can hike rates 20 to 30 percent with minimal customer loss. Revisit the math in 3 months.</li>
+      <li><strong>Below $10/hour effective (red):</strong> This is a losing proposition unless it is pure hobby income. Either dramatically restructure (raise prices, cut costs) or quit and reclaim your time. Working for less than minimum wage on top of a full-time job leads to burnout, not wealth.</li>
+    </ul>
+
+    <h3>Tax Implications of Side Income</h3>
+    <p>All side hustle income is taxable, whether or not the platform issues you a 1099. In 2026, gig platforms must issue a 1099-K for every user who received more than $600 in payments (down from the previous $20,000 threshold). The IRS receives a copy, so non-reporting is not an option.</p>
+    <p>Your side hustle income stacks on top of your W-2 wages and is taxed at your marginal bracket, not your average. If your day job puts you in the 22 percent federal bracket, your side hustle profit is taxed at 22 percent federal plus 14.1 percent effective self-employment tax plus state tax. Many moderate-income side hustlers lose 30 to 35 percent of every profit dollar to taxes. The good news: you can deduct all legitimate business expenses on Schedule C, reducing taxable profit.</p>
+
+    <h3>Raising Prices Instead of Working More</h3>
+    <p>The single biggest lever most side hustlers ignore is pricing. Doubling your hours usually doubles your expenses and taxes, but raising prices 20 percent adds 20 percent straight to the bottom line — with no extra work. Run the calculator with a 20 percent price increase and see what it does to your effective hourly rate. If your demand is reasonably inelastic (clients care more about your skill than the exact price), price increases are a free upgrade.</p>
+
+    <h3>When a Side Hustle Becomes a Business</h3>
+    <p>If your effective hourly rate consistently exceeds your day job rate and demand continues to grow, you are no longer running a side hustle — you are running a business that happens to be part-time. At that point, consider forming an LLC, opening a business bank account, hiring a bookkeeper, setting up a retirement plan (Solo 401(k) or SEP-IRA), and planning your eventual transition to full-time. The math in this calculator is the starting point for that decision.</p>
+  </article>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <h3>How do I calculate my true hourly rate for a side hustle?</h3>
+        <p>Take monthly revenue, subtract expenses and amortized startup costs, multiply by (1 - tax rate) for after-tax profit, then divide by total hours worked. Include admin, marketing, and prep time, not just billable work. The result is usually 30 to 60 percent below your advertised rate.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What tax rate should I use for side hustle income?</h3>
+        <p>25 to 35 percent is a safe default. That covers your marginal federal rate (12 to 24 percent for most side hustlers), self-employment tax (about 14 percent effective), and state tax. Set aside 30 percent of every profit dollar in a dedicated tax account.</p>
+      </div>
+      <div class="faq-item">
+        <h3>When should I quit my side hustle versus scale it?</h3>
+        <p>Quit if your effective rate is below your day job rate or below minimum wage. Scale if it exceeds your day job rate and demand is growing. Middle path: raise prices 20 to 30 percent — most customers will stay, and your effective rate jumps sharply.</p>
+      </div>
+    </div>
+  </section>
+
+  <CrossLinks links={[
+    { href: '/freelance-calculators/self-employment-tax-calculator-freelance/', label: 'Self-Employment Tax Calculator', icon: '📝' },
+    { href: '/freelance-calculators/invoice-calculator/', label: 'Invoice Calculator', icon: '🧾' },
+    { href: '/business-calculators/break-even-calculator/', label: 'Break-Even Calculator', icon: '📈' },
+  ]} />
+  <RelatedCalculators currentSlug="side-hustle-profit-calculator" />
+  <RelatedArticles calculatorSlug="side-hustle-profit-calculator" />
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function fmtSH(n) {
+    var v = Math.round(Math.abs(n));
+    return (n < 0 ? '-$' : '$') + v.toLocaleString('en-US');
+  }
+
+  document.getElementById('calcBtnSH').addEventListener('click', function() {
+    var revenue = parseFloat(document.getElementById('sh-revenue').value) || 0;
+    var expenses = parseFloat(document.getElementById('sh-expenses').value) || 0;
+    var hours = parseFloat(document.getElementById('sh-hours').value) || 0;
+    var taxRate = parseFloat(document.getElementById('sh-tax').value) || 0;
+    var startup = parseFloat(document.getElementById('sh-startup').value) || 0;
+
+    var amortizedStartup = startup / 12;
+    var grossProfit = revenue - expenses - amortizedStartup;
+    var afterTaxProfit = grossProfit * (1 - taxRate / 100);
+    if (grossProfit < 0) afterTaxProfit = grossProfit;
+    var effectiveRate = hours > 0 ? (afterTaxProfit / hours) : 0;
+    var annualProjection = afterTaxProfit * 12;
+    var breakEvenRevenue = expenses + amortizedStartup;
+
+    document.getElementById('res-sh-gross').textContent = fmtSH(grossProfit);
+    document.getElementById('res-sh-aftertax').textContent = fmtSH(afterTaxProfit);
+    document.getElementById('res-sh-rate').textContent = fmtSH(effectiveRate) + '/hr';
+    document.getElementById('res-sh-annual').textContent = fmtSH(annualProjection);
+    document.getElementById('res-sh-breakeven').textContent = fmtSH(breakEvenRevenue);
+
+    var verdict = document.getElementById('sh-verdict');
+    if (effectiveRate >= 20) {
+      verdict.style.background = '#dcfce7';
+      verdict.style.color = '#166534';
+      verdict.style.border = '1px solid #bbf7d0';
+      verdict.innerHTML = 'Scale it. Your effective rate of ' + fmtSH(effectiveRate) + '/hour beats most day jobs. Look for ways to raise prices, automate, or expand.';
+    } else if (effectiveRate >= 10) {
+      verdict.style.background = '#ffedd5';
+      verdict.style.color = '#9a3412';
+      verdict.style.border = '1px solid #fed7aa';
+      verdict.innerHTML = 'Borderline. At ' + fmtSH(effectiveRate) + '/hour, this is okay if you enjoy it, but try a 20 to 30 percent price increase before expanding.';
+    } else {
+      verdict.style.background = '#fee2e2';
+      verdict.style.color = '#991b1b';
+      verdict.style.border = '1px solid #fecaca';
+      verdict.innerHTML = 'Reconsider. At ' + fmtSH(effectiveRate) + '/hour effective, you are likely losing money on opportunity cost. Raise prices sharply or quit and reclaim your time.';
+    }
+
+    document.getElementById('results-sh').style.display = '';
+  });
+
+  document.getElementById('calcBtnSH').click();
+</script>

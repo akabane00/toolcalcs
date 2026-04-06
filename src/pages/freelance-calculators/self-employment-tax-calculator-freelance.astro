@@ -1,0 +1,318 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import ShareResults from '../../components/ShareResults.astro';
+import ReviewedBy from '../../components/ReviewedBy.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Freelance Calculators", "item": "https://toolcalcs.com/freelance-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Self-Employment Tax Calculator" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "How is self-employment tax calculated in 2026?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Self-employment tax is 15.3 percent of 92.35 percent of your net self-employment earnings. This covers Social Security (12.4 percent on earnings up to the 2026 wage base of $168,600) and Medicare (2.9 percent on all earnings, plus an additional 0.9 percent on earnings above $200,000 single or $250,000 married). You multiply your net profit by 0.9235 first because the IRS lets you deduct the employer-equivalent half of SE tax before computing the tax itself."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "Do I really need to pay quarterly estimated taxes?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "If you expect to owe at least $1,000 in federal tax for the year after subtracting withholdings and credits, the IRS requires quarterly estimated payments. The four due dates for 2026 are April 15, June 15, September 15, and January 15, 2027. Missing these deadlines triggers an underpayment penalty even if you pay the full balance in April. Most freelancers should set aside 25 to 35 percent of every payment received to cover SE tax plus income tax."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "Can I deduct half of my self-employment tax?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Yes. The IRS lets you deduct the employer-equivalent portion of SE tax (roughly half of the 15.3 percent) as an above-the-line adjustment on Schedule 1 of your 1040. This reduces your adjusted gross income (AGI) but does not reduce the SE tax itself. It only lowers the income tax portion. This deduction is automatic if you file Schedule SE and does not require itemizing."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Self-Employment Tax Calculator (2026) - For Freelancers and Contractors"
+  description="Estimate your 2026 self-employment tax, income tax, and quarterly payments. Built for freelancers, 1099 contractors, and side hustlers. Social Security, Medicare, and federal brackets included."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/freelance-calculators/">Freelance Calculators</a> &rsaquo;
+    <span>Self-Employment Tax Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Self-Employment Tax Calculator 2026</h1>
+  <p class="page-desc">Calculate your exact self-employment tax, estimated federal income tax, and quarterly payment amount. Built for freelancers, independent contractors, and 1099 workers using 2026 IRS numbers.</p>
+
+  <ReviewedBy />
+
+  <div class="calc-box">
+    <div class="calc-grid-2">
+      <div class="input-group">
+        <label for="se-net">Net Self-Employment Income (annual)</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="se-net" value="80000" min="0" max="10000000" step="500" /></div>
+        <small>Gross freelance income minus business expenses</small>
+      </div>
+      <div class="input-group">
+        <label for="se-filing">Filing Status</label>
+        <select id="se-filing">
+          <option value="single" selected>Single</option>
+          <option value="married">Married Filing Jointly</option>
+          <option value="hoh">Head of Household</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="se-w2">Other W-2 Wages (for SS cap)</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="se-w2" value="0" min="0" max="10000000" step="500" /></div>
+        <small>Already-taxed Social Security wages from another job</small>
+      </div>
+      <div class="input-group">
+        <label for="se-deductions">Additional Business Deductions</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="se-deductions" value="0" min="0" max="10000000" step="100" /></div>
+        <small>Home office, mileage, supplies not already subtracted above</small>
+      </div>
+    </div>
+    <button class="calc-btn" id="calcBtnSE">Calculate Self-Employment Tax</button>
+
+    <div class="results" id="results-se" style="display:none">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <div class="result-label">SE Tax Total</div>
+          <div class="result-value" id="res-se-total">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Social Security Portion</div>
+          <div class="result-value" id="res-se-ss">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Medicare Portion</div>
+          <div class="result-value" id="res-se-medicare">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Income Tax Estimate</div>
+          <div class="result-value" id="res-se-income">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Quarterly Payment</div>
+          <div class="result-value" id="res-se-quarterly">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Total Tax Bill</div>
+          <div class="result-value" id="res-se-bill">$0</div>
+        </div>
+      </div>
+      <div id="se-advice" style="margin-top:16px;padding:14px;border-radius:8px;font-size:0.95rem;"></div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <ShareResults />
+
+  <article class="seo-content">
+    <h2>Self-Employment Tax Explained</h2>
+    <p>When you work for an employer, your paycheck automatically has 7.65 percent withheld for Social Security and Medicare (FICA), and your employer matches another 7.65 percent behind the scenes. When you are self-employed, you are both the employee and the employer, so you pay the full 15.3 percent yourself. That is self-employment tax, and it catches most new freelancers by surprise.</p>
+    <p>The 15.3 percent breaks down into two pieces: 12.4 percent for Social Security on earnings up to the annual wage base ($168,600 for 2026) and 2.9 percent for Medicare on every dollar of self-employment earnings with no cap. High earners pay an additional 0.9 percent Medicare surtax on self-employment income above $200,000 single or $250,000 married filing jointly.</p>
+
+    <h3>The 92.35 Percent Rule</h3>
+    <p>Before you multiply your net profit by 15.3 percent, you first multiply it by 92.35 percent. This represents the employer-equivalent deduction the IRS grants self-employed workers so they are not taxed on the "employer share" that a W-2 worker never sees on their paycheck. In practice, the effective SE tax rate on your net profit is closer to 14.13 percent (0.9235 x 0.153), not a flat 15.3 percent.</p>
+
+    <h3>Deductible Half of SE Tax</h3>
+    <p>On top of the 92.35 percent adjustment, the IRS also lets you deduct the "employer half" of SE tax (roughly 7.65 percent of 92.35 percent of net profit) as an above-the-line deduction on Schedule 1. This reduces your adjusted gross income (AGI) and therefore your income tax bill, but it does not reduce SE tax itself. The deduction is automatic when you file Schedule SE alongside your 1040 and does not require itemizing.</p>
+
+    <h3>Quarterly Estimated Payments</h3>
+    <p>If you expect to owe more than $1,000 in federal tax for the year, the IRS requires you to make quarterly estimated tax payments using Form 1040-ES. The 2026 due dates are April 15, June 15, September 15, and January 15, 2027. Each payment should cover roughly one-fourth of your projected annual tax bill. Missing a quarter triggers an underpayment penalty calculated at the IRS short-term rate plus 3 percent, prorated over the days late.</p>
+    <p>Two safe harbor rules protect you from the underpayment penalty: pay at least 90 percent of the current year tax, or pay 100 percent of last year's tax (110 percent if your AGI exceeded $150,000). Most freelancers find it easier to simply set aside 25 to 35 percent of every payment received in a dedicated tax savings account and send in quarterly checks from there.</p>
+
+    <h3>Common Freelancer Deductions</h3>
+    <ul>
+      <li><strong>Home office:</strong> A percentage of rent, utilities, and internet proportional to the square footage used exclusively for work. Alternatively, the simplified method at $5 per square foot (up to 300 sq ft) gives a maximum $1,500 deduction.</li>
+      <li><strong>Mileage:</strong> 67 cents per business mile driven in 2026 using the standard mileage rate, or actual vehicle expenses prorated by business use percentage.</li>
+      <li><strong>Health insurance premiums:</strong> Above-the-line deduction for self-employed individuals not eligible for an employer subsidized plan (yours or a spouse's).</li>
+      <li><strong>Retirement contributions:</strong> SEP-IRA, Solo 401(k), or SIMPLE IRA contributions reduce your taxable income substantially. Solo 401(k) allows up to $70,000 in 2026 for those under 50.</li>
+      <li><strong>Software and subscriptions:</strong> Accounting tools, design software, cloud storage, project management tools, stock photos, and website hosting.</li>
+      <li><strong>Education:</strong> Courses, books, and conferences directly related to maintaining or improving your current skills.</li>
+      <li><strong>Business meals:</strong> 50 percent of qualifying meals with clients or while traveling for business.</li>
+      <li><strong>Self-employment tax deduction:</strong> Half of your SE tax is automatically deductible on Schedule 1.</li>
+    </ul>
+
+    <h3>Schedule SE and Schedule C</h3>
+    <p>Self-employed workers file two extra schedules with their 1040. Schedule C reports your gross business income and expenses, producing a net profit or loss. Schedule SE then takes that net profit, applies the 92.35 percent rule, and computes the actual SE tax. The SE tax flows onto line 23 of your 1040, and the deductible half flows onto Schedule 1 as an adjustment to income.</p>
+
+    <h3>Setting Money Aside as You Go</h3>
+    <p>A simple system: open a separate high-yield savings account labeled "Taxes." Every time a client pays you, transfer 25 to 30 percent of the payment into that account. When quarterly due dates arrive, pay directly from that account using the IRS Direct Pay system. This prevents the temptation to spend money that the IRS already owns and ensures you never face a surprise April tax bill.</p>
+  </article>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <h3>How is self-employment tax calculated in 2026?</h3>
+        <p>SE tax equals 15.3 percent of 92.35 percent of your net self-employment profit. Social Security (12.4 percent) applies only to the first $168,600 of combined wages and SE earnings. Medicare (2.9 percent) applies to every dollar, plus an extra 0.9 percent on earnings above $200,000 single or $250,000 married.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Do I really need to pay quarterly estimated taxes?</h3>
+        <p>Yes, if you expect to owe at least $1,000 for the year. The 2026 deadlines are April 15, June 15, September 15, and January 15, 2027. Pay at least 90 percent of current year tax or 100 percent of last year's tax to avoid an underpayment penalty.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Can I deduct half of my self-employment tax?</h3>
+        <p>Yes. The employer-equivalent half of SE tax is an above-the-line deduction on Schedule 1. It lowers your AGI and your income tax, but it does not reduce the SE tax itself. The deduction is automatic when you file Schedule SE with your 1040.</p>
+      </div>
+    </div>
+  </section>
+
+  <CrossLinks links={[
+    { href: '/freelance-calculators/invoice-calculator/', label: 'Invoice Calculator', icon: '🧾' },
+    { href: '/freelance-calculators/side-hustle-profit-calculator/', label: 'Side Hustle Profit Calculator', icon: '💼' },
+    { href: '/business-calculators/llc-vs-scorp-calculator/', label: 'LLC vs S-Corp Calculator', icon: '⚖️' },
+  ]} />
+  <RelatedCalculators currentSlug="self-employment-tax-calculator-freelance" />
+  <RelatedArticles calculatorSlug="self-employment-tax-calculator-freelance" />
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function fmt(n) {
+    var v = Math.round(Math.abs(n));
+    return (n < 0 ? '-$' : '$') + v.toLocaleString('en-US');
+  }
+
+  // 2026 federal tax brackets (projected) - ordinary income
+  var BRACKETS = {
+    single: [
+      { cap: 11925, rate: 0.10 },
+      { cap: 48475, rate: 0.12 },
+      { cap: 103350, rate: 0.22 },
+      { cap: 197300, rate: 0.24 },
+      { cap: 250525, rate: 0.32 },
+      { cap: 626350, rate: 0.35 },
+      { cap: Infinity, rate: 0.37 }
+    ],
+    married: [
+      { cap: 23850, rate: 0.10 },
+      { cap: 96950, rate: 0.12 },
+      { cap: 206700, rate: 0.22 },
+      { cap: 394600, rate: 0.24 },
+      { cap: 501050, rate: 0.32 },
+      { cap: 751600, rate: 0.35 },
+      { cap: Infinity, rate: 0.37 }
+    ],
+    hoh: [
+      { cap: 17000, rate: 0.10 },
+      { cap: 64850, rate: 0.12 },
+      { cap: 103350, rate: 0.22 },
+      { cap: 197300, rate: 0.24 },
+      { cap: 250500, rate: 0.32 },
+      { cap: 626350, rate: 0.35 },
+      { cap: Infinity, rate: 0.37 }
+    ]
+  };
+
+  var STD_DED = {
+    single: 15750,
+    married: 31500,
+    hoh: 23625
+  };
+
+  var SS_WAGE_BASE = 168600;
+  var ADDL_MEDICARE_THRESH = {
+    single: 200000,
+    married: 250000,
+    hoh: 200000
+  };
+
+  function computeIncomeTax(taxable, filing) {
+    if (taxable <= 0) return 0;
+    var brackets = BRACKETS[filing];
+    var tax = 0;
+    var prev = 0;
+    for (var i = 0; i < brackets.length; i++) {
+      var b = brackets[i];
+      if (taxable > b.cap) {
+        tax += (b.cap - prev) * b.rate;
+        prev = b.cap;
+      } else {
+        tax += (taxable - prev) * b.rate;
+        return tax;
+      }
+    }
+    return tax;
+  }
+
+  document.getElementById('calcBtnSE').addEventListener('click', function() {
+    var net = parseFloat(document.getElementById('se-net').value) || 0;
+    var filing = document.getElementById('se-filing').value;
+    var w2 = parseFloat(document.getElementById('se-w2').value) || 0;
+    var extraDed = parseFloat(document.getElementById('se-deductions').value) || 0;
+
+    var netAdj = Math.max(0, net - extraDed);
+    var seBase = netAdj * 0.9235;
+
+    // Social Security portion: 12.4% up to wage base (net of W-2 wages already taxed)
+    var ssRemaining = Math.max(0, SS_WAGE_BASE - w2);
+    var ssTaxable = Math.min(seBase, ssRemaining);
+    var ssTax = ssTaxable * 0.124;
+
+    // Medicare: 2.9% on all SE base
+    var medicareTax = seBase * 0.029;
+
+    // Additional Medicare 0.9% on earnings above threshold (combined W-2 + SE base)
+    var combined = w2 + seBase;
+    var addlThresh = ADDL_MEDICARE_THRESH[filing];
+    var addlMedicare = 0;
+    if (combined > addlThresh) {
+      var addlBase = Math.min(seBase, combined - addlThresh);
+      addlMedicare = addlBase * 0.009;
+    }
+
+    var seTotal = ssTax + medicareTax + addlMedicare;
+
+    // Income tax: netAdj minus half SE tax minus standard deduction
+    var halfSe = seTotal / 2;
+    var agi = netAdj - halfSe + w2;
+    var taxable = Math.max(0, agi - STD_DED[filing]);
+    var incomeTax = computeIncomeTax(taxable, filing);
+
+    var totalBill = seTotal + incomeTax;
+    var quarterly = totalBill / 4;
+
+    document.getElementById('res-se-total').textContent = fmt(seTotal);
+    document.getElementById('res-se-ss').textContent = fmt(ssTax);
+    document.getElementById('res-se-medicare').textContent = fmt(medicareTax + addlMedicare);
+    document.getElementById('res-se-income').textContent = fmt(incomeTax);
+    document.getElementById('res-se-quarterly').textContent = fmt(quarterly);
+    document.getElementById('res-se-bill').textContent = fmt(totalBill);
+
+    var effective = netAdj > 0 ? (totalBill / netAdj * 100) : 0;
+    var advice = document.getElementById('se-advice');
+    advice.style.background = '#eff6ff';
+    advice.style.border = '1px solid #bfdbfe';
+    advice.innerHTML = '<strong>Set aside ' + effective.toFixed(1) + ' percent of every payment</strong> to cover your total tax bill. Your next quarterly estimate of ' + fmt(quarterly) + ' is due on the next IRS deadline (April 15, June 15, September 15, or January 15).';
+
+    document.getElementById('results-se').style.display = '';
+  });
+
+  document.getElementById('calcBtnSE').click();
+</script>

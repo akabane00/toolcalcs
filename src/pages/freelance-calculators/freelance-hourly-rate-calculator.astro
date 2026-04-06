@@ -1,0 +1,278 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import ShareResults from '../../components/ShareResults.astro';
+import ReviewedBy from '../../components/ReviewedBy.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Freelance Calculators", "item": "https://toolcalcs.com/freelance-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Freelance Hourly Rate Calculator" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "How do I calculate my freelance hourly rate?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Start with your target take-home income, then add business expenses and the cost of benefits you need to pay for yourself (health insurance, retirement, paid time off). Multiply the total by (1 + your tax rate) to account for income and self-employment taxes. Divide that grand total by your realistic billable hours per year — not total work hours. Example: $80,000 target + $5,000 expenses = $85,000. Add 15% for benefits = $97,750. Multiply by 1.30 for 30% taxes = $127,075. Divide by (25 billable hours × 48 weeks = 1,200 hours) = about $106/hour."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "Why can't I just use my old salary divided by 2,080 hours?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "An employee at $80,000 per year actually costs the employer roughly $100,000 to $110,000 once you include payroll taxes, health insurance, retirement match, paid time off, and overhead. As a freelancer you have to cover all of those costs yourself. Plus you will not bill 40 hours a week — most freelancers bill 50 to 60% of their working hours because the rest is spent on sales, admin, invoicing, and professional development. A $40/hour salary equivalent usually translates to $80 to $110/hour as a freelance rate."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "What are realistic billable hours per week for a freelancer?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Most established freelancers bill between 20 and 30 hours per week, not 40. The rest of the week goes to client acquisition, proposals, contracts, invoicing, bookkeeping, learning, and personal time off. New freelancers often bill less (15 to 20 hours) because they spend more time on marketing. Assuming 48 working weeks per year (accounting for vacation, holidays, and sick days), 25 billable hours per week equals 1,200 billable hours annually — a realistic baseline for calculating your rate."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Freelance Hourly Rate Calculator (2026) - Find Your Ideal Rate"
+  description="Calculate the freelance hourly rate you need to charge based on target income, expenses, taxes, benefits, and realistic billable hours. Free 2026 calculator."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/freelance-calculators/">Freelance Calculators</a> &rsaquo;
+    <span>Freelance Hourly Rate Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Freelance Hourly Rate Calculator 2026</h1>
+  <p class="page-desc">Stop guessing what to charge. Calculate the exact hourly rate you need to hit your income goals — after taxes, expenses, benefits, and realistic billable hours.</p>
+
+  <ReviewedBy />
+
+  <div class="calc-box">
+    <div class="calc-grid-2">
+      <div class="input-group">
+        <label for="fr-income">Target Annual Take-Home Income</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="fr-income" value="80000" min="0" max="10000000" step="1000" /></div>
+        <small>What you want to keep after taxes and expenses</small>
+      </div>
+      <div class="input-group">
+        <label for="fr-expenses">Business Expenses / Year</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="fr-expenses" value="5000" min="0" max="1000000" step="100" /></div>
+        <small>Software, equipment, office, accounting, marketing</small>
+      </div>
+      <div class="input-group">
+        <label for="fr-tax">Combined Tax Rate (percent)</label>
+        <div class="input-suffix"><input type="number" id="fr-tax" value="30" min="0" max="70" step="0.5" /><span>percent</span></div>
+        <small>Federal + state + self-employment tax (typically 25 to 35)</small>
+      </div>
+      <div class="input-group">
+        <label for="fr-hours">Billable Hours / Week</label>
+        <input type="number" id="fr-hours" value="25" min="1" max="80" step="1" />
+        <small>Not total work hours — only time you can invoice clients</small>
+      </div>
+      <div class="input-group">
+        <label for="fr-weeks">Weeks Worked / Year</label>
+        <input type="number" id="fr-weeks" value="48" min="1" max="52" step="1" />
+        <small>Subtract vacation, holidays, and sick days from 52</small>
+      </div>
+      <div class="input-group">
+        <label for="fr-benefits">Benefits / Retirement (percent)</label>
+        <div class="input-suffix"><input type="number" id="fr-benefits" value="15" min="0" max="60" step="0.5" /><span>percent</span></div>
+        <small>Health insurance, retirement contributions, PTO buffer</small>
+      </div>
+    </div>
+    <button class="calc-btn" id="calcBtnFR">Calculate My Hourly Rate</button>
+
+    <div class="results" id="results-fr" style="display:none">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <div class="result-label">Recommended Hourly Rate</div>
+          <div class="result-value" id="res-fr-rate">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Total Annual Revenue Needed</div>
+          <div class="result-value" id="res-fr-revenue">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Annual Billable Hours</div>
+          <div class="result-value" id="res-fr-hours">0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Effective After-Tax Rate</div>
+          <div class="result-value" id="res-fr-after">$0</div>
+        </div>
+      </div>
+      <div id="fr-advice" style="margin-top:16px;padding:14px;border-radius:8px;font-size:0.95rem;"></div>
+    </div>
+  </div>
+
+  <ShareResults />
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+  <RelatedCalculators currentSlug="freelance-hourly-rate-calculator" />
+
+  <article class="seo-content">
+    <h2>How to Calculate Your Ideal Freelance Hourly Rate</h2>
+    <p>Pricing yourself correctly is the single most important financial decision you will make as a freelancer. Charge too little and you will burn out, subsidize your clients' businesses, and never be able to save or reinvest. Charge too much without justification and you will lose pitches to cheaper competitors. The sweet spot is a rate that is backed by real math — your actual costs, your actual tax burden, and your actual billable capacity — not a number you pulled from a job board or copied from a Reddit thread.</p>
+
+    <p>The freelance hourly rate formula is deceptively simple:</p>
+    <p><strong>Hourly Rate = (Target Income + Expenses) × (1 + Benefits) × (1 + Tax Rate) ÷ (Billable Hours × Weeks Worked)</strong></p>
+    <p>But every variable in that equation is commonly miscalculated. Let us walk through each one so you can plug in realistic numbers.</p>
+
+    <h3>Why Your Old Salary Rate Does Not Translate to Freelance</h3>
+    <p>The most common freelancer pricing mistake is taking an old W-2 salary and dividing by 2,080 hours (40 hours × 52 weeks). If you used to earn $80,000 a year, that gives you $38.46 per hour, and many new freelancers use that as their starting rate. This is a recipe for financial disaster.</p>
+    <p>Here is what that calculation misses. When you were a salaried employee, your employer paid for roughly $20,000 to $30,000 in hidden compensation: half of your Social Security and Medicare taxes (7.65 percent), health insurance premiums ($6,000 to $15,000 per year for a family), 401(k) matching contributions, paid vacation, paid sick leave, short-term disability insurance, workers comp, unemployment insurance, and a share of office rent, equipment, and software licenses. Your "$80,000 salary" was actually a $100,000 to $110,000 cost to the employer.</p>
+    <p>As a freelancer, you pay for all of that yourself — and you pay the self-employment tax portion of Social Security and Medicare that your employer used to cover (an extra 7.65 percent). Before you even think about profit, your freelance rate needs to recover the full employer-equivalent cost of your labor.</p>
+
+    <h3>Billable Hours vs. Working Hours: The Biggest Blind Spot</h3>
+    <p>The second huge mistake is assuming you will bill 40 hours a week. You will not. Freelancers bill a fraction of their working hours because non-billable tasks consume the rest. A typical freelancer's week looks like this:</p>
+    <ul>
+      <li><strong>Billable work:</strong> 20 to 30 hours — actual client deliverables you can invoice</li>
+      <li><strong>Sales and marketing:</strong> 5 to 10 hours — pitching, proposals, networking, content creation, social media</li>
+      <li><strong>Admin and operations:</strong> 3 to 6 hours — invoicing, bookkeeping, email, contracts, scheduling</li>
+      <li><strong>Learning and improvement:</strong> 2 to 5 hours — courses, tutorials, experimentation, portfolio updates</li>
+      <li><strong>Breaks, meetings, lunch:</strong> several hours of buffer time that no one is paying for</li>
+    </ul>
+    <p>Even a very disciplined freelancer working a full 50-hour week might only bill 25 to 30 hours of it. If you are juggling multiple clients, the billable ratio can drop further because context-switching eats into productive time. When you calculate your rate, use a realistic billable-hours number — 25 per week is a reasonable baseline for experienced solo freelancers, and 20 is more honest for beginners who spend more time on marketing.</p>
+    <p>Also subtract real vacation, holidays, and sick days from 52 weeks. Most freelancers should use 46 to 48 weeks in their calculation, not 52. You need time off, and you will take it whether you budgeted for it or not.</p>
+
+    <h3>The True Cost of Freelance Taxes</h3>
+    <p>Tax planning is where most freelancers get crushed at year-end. As an independent contractor in the US, you pay:</p>
+    <ul>
+      <li><strong>Federal income tax</strong> — your normal bracket, typically 12 to 24 percent for most freelancers</li>
+      <li><strong>Self-employment tax</strong> — 15.3 percent on your first ~$168,600 of net earnings (2026), covering both halves of Social Security and Medicare</li>
+      <li><strong>State income tax</strong> — 0 to 13 percent depending on your state</li>
+      <li><strong>Local taxes</strong> — city or county taxes in some areas</li>
+    </ul>
+    <p>All in, most US freelancers owe 25 to 35 percent of their net earnings in taxes. High earners in high-tax states can push toward 40 percent. Use 30 percent as a starting estimate — it is realistic for most people and builds in a small safety cushion. Set that tax money aside in a separate savings account every time a client pays you. Never touch it until quarterly estimated taxes are due.</p>
+
+    <h3>Benefits and Retirement: The Costs You Have to Self-Fund</h3>
+    <p>When you were an employee, your employer quietly covered benefits that were worth $10,000 to $20,000 or more per year. As a freelancer, you fund those yourself. Budget for:</p>
+    <ul>
+      <li><strong>Health insurance:</strong> $4,000 to $15,000 per year depending on family size and marketplace plan</li>
+      <li><strong>Retirement contributions:</strong> aim for at least 10 to 15 percent of income into a SEP IRA, Solo 401(k), or traditional IRA</li>
+      <li><strong>Dental and vision insurance:</strong> $500 to $1,500 per year</li>
+      <li><strong>Disability insurance:</strong> critical for freelancers since you have no sick leave — $600 to $2,000 per year</li>
+      <li><strong>Paid time off:</strong> a self-funded buffer so you can take vacation without losing income</li>
+    </ul>
+    <p>Adding 15 percent to your target income to cover benefits is a reasonable default. If you have a family plan health insurance premium and max out a retirement account, that number can climb to 25 percent or more.</p>
+
+    <h3>Market Rate Research: Reality-Check Your Number</h3>
+    <p>Once you have calculated your math-based rate, compare it to what other freelancers in your niche actually charge. Good sources include:</p>
+    <ul>
+      <li>Industry salary surveys (Creative Group, Robert Half, Upwork reports)</li>
+      <li>Freelance forums and Slack communities in your niche</li>
+      <li>Public Upwork profiles from established freelancers</li>
+      <li>LinkedIn contract job postings that disclose rate ranges</li>
+      <li>Direct conversations with freelance peers (most will share ranges if you ask respectfully)</li>
+    </ul>
+    <p>If your calculated rate is dramatically higher than the market, you have two options: niche down to a specialty where the market supports it, or reduce your target income and expenses. If your calculated rate is lower than market, you are leaving money on the table — raise it to at least the median.</p>
+
+    <h3>Niche Down to Charge More</h3>
+    <p>The fastest way to raise your freelance rate is specialization. A "web developer" might charge $75 per hour. A "Shopify developer who migrates high-volume stores from BigCommerce" can charge $200 per hour for the same underlying skill. Clients pay premium rates when they believe you understand their specific problem better than a generalist would.</p>
+    <p>Look for niches defined by any of: industry (healthcare, fintech, SaaS), technology (a specific framework or platform), problem (conversion optimization, accessibility audits, performance), or outcome (increase signups, reduce churn). Even narrow specializations have more than enough clients to keep a solo freelancer booked — and those clients are less price-sensitive.</p>
+
+    <h3>When to Raise Your Rate</h3>
+    <p>Once you land on a rate, revisit it every 6 to 12 months. Raise it when:</p>
+    <ul>
+      <li>You are booked solid and turning down work</li>
+      <li>Your costs have risen (insurance, software, taxes)</li>
+      <li>You have gained a significant new skill or credential</li>
+      <li>You have delivered a standout result you can point to in pitches</li>
+      <li>Your closing rate on new proposals is higher than 50 percent — a signal you are leaving money on the table</li>
+    </ul>
+    <p>Most freelancers undercharge for years because raising rates feels confrontational. It is not. Your rate reflects your costs and your expertise, and both grow over time. New clients should be quoted the new rate from day one. Existing clients get 30 to 60 days notice before the increase takes effect.</p>
+  </article>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <h3>How do I calculate my freelance hourly rate?</h3>
+        <p>Add your target take-home income, business expenses, benefits cost (about 15 percent), and taxes (about 30 percent), then divide by realistic billable hours. Example: $80,000 target + $5,000 expenses = $85,000. Multiply by 1.15 for benefits = $97,750. Multiply by 1.30 for taxes = $127,075. Divide by (25 billable hours × 48 weeks = 1,200 hours) = about $106 per hour.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Why can I not just use my old salary divided by 2,080 hours?</h3>
+        <p>A W-2 employee making $80,000 actually costs their employer $100,000 to $110,000 once you include benefits, taxes, and overhead. Plus you will not bill 40 hours a week — most freelancers bill 20 to 30. A $40 per hour salary equivalent usually translates to $80 to $110 per hour as a freelance rate.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What are realistic billable hours per week for a freelancer?</h3>
+        <p>Most established freelancers bill 20 to 30 hours per week. The rest goes to sales, admin, invoicing, bookkeeping, and learning. Use 25 billable hours × 48 working weeks = 1,200 hours per year as a reasonable baseline. New freelancers should use a lower number until their client pipeline stabilizes.</p>
+      </div>
+    </div>
+  </section>
+
+  <CrossLinks links={[
+    { href: '/freelance-calculators/freelance-project-pricing-calculator/', label: 'Project Pricing Calculator', icon: '💵' },
+    { href: '/freelance-calculators/self-employment-tax-calculator-freelance/', label: 'Self-Employment Tax', icon: '🧾' },
+    { href: '/freelance-calculators/side-hustle-profit-calculator/', label: 'Side Hustle Profit', icon: '📈' },
+  ]} />
+
+  <RelatedArticles calculatorSlug="freelance-hourly-rate-calculator" />
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function fmtMoney(n) { return '$' + Math.round(Math.abs(n)).toLocaleString('en-US'); }
+
+  document.getElementById('calcBtnFR').addEventListener('click', function() {
+    var income = parseFloat(document.getElementById('fr-income').value) || 0;
+    var expenses = parseFloat(document.getElementById('fr-expenses').value) || 0;
+    var taxPct = parseFloat(document.getElementById('fr-tax').value) || 0;
+    var hoursPerWeek = parseFloat(document.getElementById('fr-hours').value) || 0;
+    var weeks = parseFloat(document.getElementById('fr-weeks').value) || 0;
+    var benefitsPct = parseFloat(document.getElementById('fr-benefits').value) || 0;
+
+    var billableHours = hoursPerWeek * weeks;
+    var withBenefits = (income + expenses) * (1 + benefitsPct / 100);
+    var totalNeeded = withBenefits * (1 + taxPct / 100);
+    var rate = billableHours > 0 ? totalNeeded / billableHours : 0;
+    var afterTaxRate = rate * (1 - taxPct / 100);
+
+    document.getElementById('res-fr-rate').textContent = fmtMoney(rate) + '/hr';
+    document.getElementById('res-fr-revenue').textContent = fmtMoney(totalNeeded);
+    document.getElementById('res-fr-hours').textContent = Math.round(billableHours).toLocaleString('en-US') + ' hrs';
+    document.getElementById('res-fr-after').textContent = fmtMoney(afterTaxRate) + '/hr';
+
+    var advice = document.getElementById('fr-advice');
+    if (rate < 50) {
+      advice.style.background = '#fffbeb';
+      advice.style.border = '1px solid #fde68a';
+      advice.innerHTML = '<strong>Rate check:</strong> A rate under $50/hr is below the freelance baseline in most US markets. Consider raising your target income, reducing billable hours you can sustainably deliver, or niching into a higher-paying specialty.';
+    } else if (rate >= 50 && rate < 100) {
+      advice.style.background = '#f0fdf4';
+      advice.style.border = '1px solid #bbf7d0';
+      advice.innerHTML = '<strong>Healthy starting rate:</strong> This is in the typical range for experienced freelancers in most fields. Revisit every 6 to 12 months and raise as your skills, credentials, and demand grow.';
+    } else if (rate >= 100 && rate < 200) {
+      advice.style.background = '#f0fdf4';
+      advice.style.border = '1px solid #bbf7d0';
+      advice.innerHTML = '<strong>Premium rate:</strong> At this level you need a clear specialty and a strong portfolio. Make sure your marketing positions you as a specialist, not a generalist — premium clients pay for expertise, not hours.';
+    } else {
+      advice.style.background = '#eff6ff';
+      advice.style.border = '1px solid #bfdbfe';
+      advice.innerHTML = '<strong>Expert-level rate:</strong> Rates above $200/hr typically require deep niche expertise, a track record of measurable results, and direct access to decision-makers. Consider value-based pricing for projects where your work drives significant revenue.';
+    }
+
+    document.getElementById('results-fr').style.display = '';
+  });
+</script>

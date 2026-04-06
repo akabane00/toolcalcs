@@ -1,0 +1,301 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import ShareResults from '../../components/ShareResults.astro';
+import ReviewedBy from '../../components/ReviewedBy.astro';
+import '../../styles/calculator.css';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Freelance Calculators", "item": "https://toolcalcs.com/freelance-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Freelance Project Pricing Calculator" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "How do I price a freelance project?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Start by estimating the hours the project will really take, then multiply by a complexity factor (1.0 for simple, 1.3 for medium, 1.6 for complex, 2.0 for very complex), add a 15 to 25 percent buffer for unexpected work, and multiply the adjusted hours by your hourly rate. If the project is rushed, apply a 1.5x rush multiplier. Example: 40 hours × 1.3 complexity × 1.2 buffer = 62.4 adjusted hours × $75 = $4,680 base price."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "Should I charge hourly or fixed price for projects?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Fixed pricing is almost always better for both you and the client — once you can estimate the work accurately. Fixed pricing rewards efficiency, protects the client's budget, and lets you capture the value you deliver instead of billing the hours it took. Use hourly pricing only when the scope is genuinely unknown (discovery, research, long-term retainers) or when the client explicitly requires it. For well-defined work, quote a fixed price derived from your hours estimate plus a healthy buffer."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "How do I protect myself from scope creep?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Write everything into the contract: exact deliverables, number of revision rounds, response-time expectations, and what counts as out-of-scope. Define a clear change-request process with documented pricing for additional work. Require written approval before starting any work that was not in the original scope. Include milestone payments so you are not carrying the whole project on credit. And always quote a buffer of 15 to 25 percent in your original estimate to absorb small scope drift without renegotiating."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Freelance Project Pricing Calculator (2026) - Price Projects Accurately"
+  description="Price freelance projects correctly using hours, complexity, buffer time, hourly rate, and rush multipliers. Free 2026 project pricing calculator for freelancers."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/freelance-calculators/">Freelance Calculators</a> &rsaquo;
+    <span>Freelance Project Pricing Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Freelance Project Pricing Calculator 2026</h1>
+  <p class="page-desc">Stop underpricing freelance projects. Calculate a defensible project price using realistic hours, complexity, buffer, and your real hourly rate.</p>
+
+  <ReviewedBy />
+
+  <div class="calc-box">
+    <div class="calc-grid-2">
+      <div class="input-group">
+        <label for="pp-hours">Estimated Project Hours</label>
+        <input type="number" id="pp-hours" value="40" min="0.5" max="10000" step="0.5" />
+        <small>Your honest estimate before buffer or complexity adjustments</small>
+      </div>
+      <div class="input-group">
+        <label for="pp-complexity">Complexity Multiplier</label>
+        <select id="pp-complexity">
+          <option value="1.0">Simple (1.0x)</option>
+          <option value="1.3" selected>Medium (1.3x)</option>
+          <option value="1.6">Complex (1.6x)</option>
+          <option value="2.0">Very Complex (2.0x)</option>
+        </select>
+        <small>How much harder is this than your typical project?</small>
+      </div>
+      <div class="input-group">
+        <label for="pp-buffer">Buffer (percent)</label>
+        <div class="input-suffix"><input type="number" id="pp-buffer" value="20" min="0" max="100" step="1" /><span>percent</span></div>
+        <small>Padding for unexpected work — 15 to 25 is standard</small>
+      </div>
+      <div class="input-group">
+        <label for="pp-rate">Hourly Rate</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="pp-rate" value="75" min="1" max="1000" step="1" /></div>
+        <small>Your calculated freelance hourly rate</small>
+      </div>
+      <div class="input-group">
+        <label for="pp-revisions">Revisions Included</label>
+        <input type="number" id="pp-revisions" value="3" min="0" max="20" step="1" />
+        <small>How many rounds of revisions are included in this price</small>
+      </div>
+      <div class="input-group">
+        <label for="pp-rush">Rush Multiplier</label>
+        <select id="pp-rush">
+          <option value="1.0" selected>Standard Timeline (1.0x)</option>
+          <option value="1.25">Slightly Rushed (1.25x)</option>
+          <option value="1.5">Rush Project (1.5x)</option>
+          <option value="2.0">Emergency / Same-Week (2.0x)</option>
+        </select>
+        <small>Rush projects deserve a premium</small>
+      </div>
+    </div>
+    <button class="calc-btn" id="calcBtnPP">Calculate Project Price</button>
+
+    <div class="results" id="results-pp" style="display:none">
+      <div class="result-cards">
+        <div class="result-card primary">
+          <div class="result-label">Recommended Project Price</div>
+          <div class="result-value" id="res-pp-price">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Effective Hourly Rate</div>
+          <div class="result-value" id="res-pp-effective">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Total Adjusted Hours</div>
+          <div class="result-value" id="res-pp-adjhours">0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Base Price (Before Rush)</div>
+          <div class="result-value" id="res-pp-base">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Rush Fee Added</div>
+          <div class="result-value" id="res-pp-rush">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Price Per Revision Included</div>
+          <div class="result-value" id="res-pp-revcost">$0</div>
+        </div>
+      </div>
+      <div id="pp-advice" style="margin-top:16px;padding:14px;border-radius:8px;font-size:0.95rem;"></div>
+    </div>
+  </div>
+
+  <ShareResults />
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+  <RelatedCalculators currentSlug="freelance-project-pricing-calculator" />
+
+  <article class="seo-content">
+    <h2>How to Price a Freelance Project Accurately</h2>
+    <p>Project pricing is where freelancers bleed the most money. Underestimate the hours and you work for pennies. Forget to include revisions and you spend weeks on unpaid rework. Skip a buffer and one surprise derails the whole budget. The good news: a handful of simple adjustments — complexity, buffer, rush, and clearly defined revisions — turn a gut-feel number into a defensible quote you can send with confidence.</p>
+
+    <p>The core project pricing formula is:</p>
+    <p><strong>Project Price = Estimated Hours × Complexity × (1 + Buffer) × Hourly Rate × Rush Multiplier</strong></p>
+    <p>Each factor exists to protect you from a specific type of pricing mistake. Let us walk through the three main pricing models, the adjustments that make estimates realistic, and the contract clauses that keep the price from getting eaten by scope creep.</p>
+
+    <h3>Hourly vs. Fixed vs. Value-Based Pricing</h3>
+    <p>There are three legitimate ways to price a freelance project, and each one fits a different situation.</p>
+    <ul>
+      <li><strong>Hourly pricing</strong> charges per hour worked. It is the safest model when the scope is genuinely unknown — discovery work, research projects, open-ended consulting, or long retainers. The downside is that you have to track time meticulously, clients hate unpredictable invoices, and efficient freelancers get punished for being fast.</li>
+      <li><strong>Fixed pricing</strong> charges a flat price for a defined deliverable. This is the default you should use for most client projects once you can estimate the hours with reasonable accuracy. Clients love it because they know exactly what they will pay. You love it because faster work means higher effective rates — and you can quote a healthy buffer without having to justify every hour.</li>
+      <li><strong>Value-based pricing</strong> charges based on the business value you deliver, not the hours or the deliverable. A landing page that generates $500,000 in new revenue is worth more than one that generates $5,000, even if both took the same 20 hours to build. Value-based pricing is the most profitable model, but it requires clear metrics, a confident pitch, and clients who understand their own numbers. Most freelancers start with fixed pricing and move toward value-based as their track record grows.</li>
+    </ul>
+    <p>The calculator above uses the fixed-price model because that is what most freelancers need to quote day-to-day. Use it to build a rock-solid price floor, then layer in value-based premiums on top when the opportunity is right.</p>
+
+    <h3>The Hours Estimate: Where Most Quotes Go Wrong</h3>
+    <p>Every experienced freelancer has the same admission: "My estimates are always too low." Research in software engineering and creative work consistently shows people underestimate time-to-completion by 25 to 100 percent. The reasons are psychological, not technical:</p>
+    <ul>
+      <li>We remember our fastest past projects as the baseline</li>
+      <li>We ignore setup, research, and admin time in the estimate</li>
+      <li>We assume ideal conditions with no distractions or blockers</li>
+      <li>We forget to budget for client communication and meetings</li>
+      <li>We do not include revision cycles in the original hours estimate</li>
+    </ul>
+    <p>To fight this, write down your honest hours estimate — and then multiply it by the buffer and complexity factors deliberately. That is not "inflating the price." It is pricing what the work actually costs.</p>
+
+    <h3>Complexity and Buffer: Why You Need Both</h3>
+    <p>Complexity and buffer solve different problems, so you need both in your calculation.</p>
+    <p><strong>Complexity</strong> accounts for known-unknowns — the parts of the project you can see will be harder than average. A blog layout with standard components is 1.0x. A checkout flow with payment integrations, edge cases, and mobile optimization is 1.6x. A multi-tenant SaaS feature with new architecture decisions is 2.0x. Complexity captures the difficulty ceiling.</p>
+    <p><strong>Buffer</strong> accounts for unknown-unknowns — the surprises you literally cannot predict. Every project has at least a few: a key plugin that breaks, a brand asset that needs to be recreated, a stakeholder who reviews at the last minute and requests major changes, a technical dependency that takes three days instead of three hours. A 20 percent buffer is standard. Use 15 percent if you have done this exact type of project many times. Use 25 to 30 percent if the work is new territory or the client is new.</p>
+
+    <h3>Defining Revisions: The Scope Creep Killer</h3>
+    <p>The single most important line in your contract is the one that defines how many revisions are included. Without it, clients will keep asking for "just one more small tweak" indefinitely — and you will end up paying for it with your time and sanity.</p>
+    <p>A good default for creative work is three revision rounds: one major revision after initial delivery, one refinement pass, and one final polish pass. For technical work, you might structure it as "two rounds of bug fixes and minor adjustments within 14 days of delivery." Whatever you choose, write it down explicitly: "This quote includes three rounds of revisions. Additional revisions are billed at $X per hour."</p>
+    <p>When the client exceeds the revision limit, do not just absorb it. Send a friendly note: "We have used the three revisions included in the original scope. I am happy to continue — additional rounds are billed at my hourly rate of $X. Want me to proceed?" Most clients respect the boundary and either approve the additional cost or decide they are done.</p>
+
+    <h3>Rush Fees: Charge Them Without Apology</h3>
+    <p>When a client wants a project delivered on a shorter timeline than your normal workflow allows, charge for it. Rush work costs you more in three ways: it bumps other clients, it requires evening or weekend hours, and it increases the risk of mistakes because there is less time for review. A rush fee of 1.25x to 2.0x is normal and expected by professional clients.</p>
+    <p>The rule of thumb: a 1.25x multiplier for projects that compress your normal timeline by a week. 1.5x for projects delivered in half the normal time. 2.0x for emergency turnarounds that require canceling other work or working weekends. Quote the rush fee upfront in your proposal: "Standard delivery is 3 weeks at $X. Rush delivery in 10 business days is available at $Y."</p>
+
+    <h3>Contract Essentials Every Freelancer Needs</h3>
+    <p>A great price with a bad contract is still a money loser. At minimum, every freelance contract should include:</p>
+    <ul>
+      <li><strong>Scope of work</strong> — exact deliverables, file formats, and acceptance criteria</li>
+      <li><strong>Revisions included</strong> — specific number of rounds and what qualifies as a revision vs. a new request</li>
+      <li><strong>Timeline</strong> — start date, milestone dates, and final delivery date</li>
+      <li><strong>Payment terms</strong> — deposit amount, milestone payments, final payment, due dates, late fees</li>
+      <li><strong>Change-order process</strong> — how additional work is quoted, approved, and billed</li>
+      <li><strong>Kill fee</strong> — what you get paid if the client cancels partway through</li>
+      <li><strong>IP ownership</strong> — when the client owns the work (usually upon final payment, not before)</li>
+      <li><strong>Warranty period</strong> — how long after delivery you will fix bugs or typos for free</li>
+    </ul>
+
+    <h3>Payment Milestones: Do Not Carry the Whole Project</h3>
+    <p>Never do a full project for full payment at the end. Split it into milestones so you are never exposed to more than a few weeks of unpaid work. A common structure:</p>
+    <ul>
+      <li><strong>25 to 50 percent deposit</strong> — paid before any work begins, non-refundable</li>
+      <li><strong>25 percent at midpoint milestone</strong> — paid when a defined deliverable is approved</li>
+      <li><strong>Final balance</strong> — paid upon delivery, before final files or code are transferred</li>
+    </ul>
+    <p>For long projects (over 8 weeks), break it into more milestones. For short projects (under 2 weeks), 50 percent up-front and 50 percent on delivery is fine. The key is never being owed more money than you are willing to lose.</p>
+
+    <h3>Common Project Pricing Mistakes to Avoid</h3>
+    <ul>
+      <li><strong>Quoting before understanding the scope</strong> — ask 10 to 20 questions before sending a number. If the client will not answer them, that is a bad client.</li>
+      <li><strong>Matching the client's "budget"</strong> — your price is based on your costs and expertise, not their wallet. If their budget is too low, pass.</li>
+      <li><strong>Forgetting non-deliverable work</strong> — kickoff calls, status updates, file delivery, and project wrap-up are all billable time.</li>
+      <li><strong>Not charging for discovery</strong> — scoping calls and written proposals for large projects should be billable, not free "sales" work.</li>
+      <li><strong>Giving discounts without trading for something</strong> — if you cut your price, require something in return (longer timeline, smaller scope, case study rights, upfront payment).</li>
+      <li><strong>Rounding down to feel friendly</strong> — $5,000 is the right price. Do not quote $4,500 because it sounds nicer. Round to the hundred, not down by 10 percent.</li>
+    </ul>
+  </article>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <h3>How do I price a freelance project?</h3>
+        <p>Estimate hours honestly, multiply by a complexity factor (1.0 to 2.0), add a 15 to 25 percent buffer, multiply adjusted hours by your hourly rate, then apply a rush multiplier if needed. Example: 40 hours × 1.3 complexity × 1.2 buffer = 62.4 adjusted hours × $75 = $4,680 base price. This gives you a defensible floor that accounts for complexity, surprises, and your real hourly cost.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Should I charge hourly or fixed price?</h3>
+        <p>Fixed pricing is better for both you and the client once the scope is well-defined — it rewards efficiency, gives the client a predictable budget, and lets you capture value. Use hourly only for genuinely open-ended work like discovery, research, or long-term retainers. For well-defined deliverables, always quote fixed.</p>
+      </div>
+      <div class="faq-item">
+        <h3>How do I protect myself from scope creep?</h3>
+        <p>Write exact deliverables and revision counts into the contract. Define a change-request process with per-hour pricing for extras. Require written approval before starting out-of-scope work. Use milestone payments so you are never carrying the whole project on credit. And always quote a 15 to 25 percent buffer to absorb small scope drift without renegotiating.</p>
+      </div>
+    </div>
+  </section>
+
+  <CrossLinks links={[
+    { href: '/freelance-calculators/freelance-hourly-rate-calculator/', label: 'Hourly Rate Calculator', icon: '⏱️' },
+    { href: '/freelance-calculators/invoice-calculator/', label: 'Invoice Calculator', icon: '📄' },
+    { href: '/freelance-calculators/self-employment-tax-calculator-freelance/', label: 'Self-Employment Tax', icon: '🧾' },
+  ]} />
+
+  <RelatedArticles calculatorSlug="freelance-project-pricing-calculator" />
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function fmtMoney(n) { return '$' + Math.round(Math.abs(n)).toLocaleString('en-US'); }
+
+  document.getElementById('calcBtnPP').addEventListener('click', function() {
+    var hours = parseFloat(document.getElementById('pp-hours').value) || 0;
+    var complexity = parseFloat(document.getElementById('pp-complexity').value) || 1;
+    var buffer = parseFloat(document.getElementById('pp-buffer').value) || 0;
+    var rate = parseFloat(document.getElementById('pp-rate').value) || 0;
+    var revisions = parseFloat(document.getElementById('pp-revisions').value) || 0;
+    var rush = parseFloat(document.getElementById('pp-rush').value) || 1;
+
+    var adjustedHours = hours * complexity * (1 + buffer / 100);
+    var basePrice = adjustedHours * rate;
+    var finalPrice = basePrice * rush;
+    var rushFee = finalPrice - basePrice;
+    var effectiveRate = hours > 0 ? finalPrice / hours : 0;
+    var perRevision = revisions > 0 ? finalPrice / (revisions + 1) : finalPrice;
+
+    document.getElementById('res-pp-price').textContent = fmtMoney(finalPrice);
+    document.getElementById('res-pp-effective').textContent = fmtMoney(effectiveRate) + '/hr';
+    document.getElementById('res-pp-adjhours').textContent = adjustedHours.toFixed(1) + ' hrs';
+    document.getElementById('res-pp-base').textContent = fmtMoney(basePrice);
+    document.getElementById('res-pp-rush').textContent = fmtMoney(rushFee);
+    document.getElementById('res-pp-revcost').textContent = fmtMoney(perRevision);
+
+    var advice = document.getElementById('pp-advice');
+    if (finalPrice < 500) {
+      advice.style.background = '#fffbeb';
+      advice.style.border = '1px solid #fde68a';
+      advice.innerHTML = '<strong>Small project:</strong> Projects under $500 often cost more in sales and admin time than they earn. Consider bundling with a larger package, charging a minimum project fee of $500 to $1,000, or turning this into a productized offer.';
+    } else if (finalPrice >= 500 && finalPrice < 5000) {
+      advice.style.background = '#f0fdf4';
+      advice.style.border = '1px solid #bbf7d0';
+      advice.innerHTML = '<strong>Standard project:</strong> This is a typical range for solo freelance work. Require a 25 to 50 percent deposit, define revision limits clearly, and invoice the balance on delivery.';
+    } else if (finalPrice >= 5000 && finalPrice < 25000) {
+      advice.style.background = '#f0fdf4';
+      advice.style.border = '1px solid #bbf7d0';
+      advice.innerHTML = '<strong>Mid-size project:</strong> Split into 3+ payment milestones so you are never carrying more than a few weeks of unpaid work. Write a detailed statement of work and require sign-off before each milestone.';
+    } else {
+      advice.style.background = '#eff6ff';
+      advice.style.border = '1px solid #bfdbfe';
+      advice.innerHTML = '<strong>Large project:</strong> At this size, use a formal contract with weekly or biweekly milestone payments, a kill fee, and explicit change-order pricing. Consider a discovery phase as a separate paid engagement before committing to the full scope.';
+    }
+
+    document.getElementById('results-pp').style.display = '';
+  });
+</script>

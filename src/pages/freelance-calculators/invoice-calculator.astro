@@ -1,0 +1,310 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import '../../styles/calculator.css';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import CrossLinks from '../../components/CrossLinks.astro';
+import ShareResults from '../../components/ShareResults.astro';
+import ReviewedBy from '../../components/ReviewedBy.astro';
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://toolcalcs.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Freelance Calculators", "item": "https://toolcalcs.com/freelance-calculators/" },
+      { "@type": "ListItem", "position": 3, "name": "Invoice Calculator" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "What should a freelance invoice include?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "A professional freelance invoice should contain your business name and contact info, the client's name and address, a unique invoice number, an issue date and due date, an itemized list of services with quantities and rates, the subtotal, any discounts, sales tax if applicable, a late fee policy, total amount due, accepted payment methods, and payment instructions. Including a clear due date and payment terms helps you get paid on time and provides legal backing if you ever need to pursue late payment."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "What do Net 15, Net 30, and Net 60 mean?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Net terms tell the client how many days they have to pay after the invoice date. Net 15 means payment is due 15 days after the invoice is issued, Net 30 means 30 days, and so on. Net 30 is the most common standard in the U.S. for B2B work, but freelancers often prefer Net 15 to improve cash flow. Always state the terms clearly on the invoice and pair them with a specific due date (e.g., 'Due by April 30') to avoid confusion."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "Should freelancers charge sales tax?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "It depends on your state and what you sell. Most U.S. states do not tax pure services like writing, design, or consulting, but some (Hawaii, New Mexico, South Dakota, West Virginia) tax almost all services. States increasingly tax digital goods and software-as-a-service. Physical products are almost always taxable. Check with your state's department of revenue or a local CPA before assuming your services are exempt. If you do owe sales tax, you must register for a seller's permit and remit collected tax to the state."
+        }
+      }
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Invoice Calculator (2026) - Line Items, Tax & Total"
+  description="Free invoice calculator for freelancers and small businesses. Add line items, apply discounts, calculate sales tax, and generate a total with a due date. No signup required."
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/freelance-calculators/">Freelance Calculators</a> &rsaquo;
+    <span>Invoice Calculator</span>
+  </nav>
+  <p class="last-updated">Last updated March 2026</p>
+  <h1>Invoice Calculator 2026</h1>
+  <p class="page-desc">Build a professional invoice total in seconds. Add line items, apply discounts, calculate sales tax, set payment terms, and see the due date instantly.</p>
+
+  <ReviewedBy />
+
+  <div class="calc-box">
+    <h3 style="margin-top:0;font-size:1.05rem;">Line Items</h3>
+    <div id="invoice-lines"></div>
+    <button type="button" class="calc-btn" id="addLineBtn" style="margin-top:8px;background:#e2e8f0;color:#1e293b;">+ Add Line</button>
+
+    <div class="calc-grid-2" style="margin-top:20px;">
+      <div class="input-group">
+        <label for="inv-discount">Discount Amount</label>
+        <div class="input-prefix"><span>$</span><input type="number" id="inv-discount" value="0" min="0" step="1" /></div>
+        <small>Flat dollar discount applied to subtotal</small>
+      </div>
+      <div class="input-group">
+        <label for="inv-discount-pct">Discount Percentage</label>
+        <div class="input-suffix"><input type="number" id="inv-discount-pct" value="0" min="0" max="100" step="0.5" /><span>percent</span></div>
+        <small>Percentage discount (applied in addition to flat)</small>
+      </div>
+      <div class="input-group">
+        <label for="inv-tax">Sales Tax Rate</label>
+        <div class="input-suffix"><input type="number" id="inv-tax" value="0" min="0" max="12" step="0.25" /><span>percent</span></div>
+        <small>0 to 12 percent; leave 0 if services are untaxed</small>
+      </div>
+      <div class="input-group">
+        <label for="inv-late">Late Fee</label>
+        <div class="input-suffix"><input type="number" id="inv-late" value="0" min="0" max="25" step="0.5" /><span>percent</span></div>
+        <small>Charged on unpaid balance after due date</small>
+      </div>
+      <div class="input-group">
+        <label for="inv-due">Payment Terms (Due Days)</label>
+        <select id="inv-due">
+          <option value="15">Net 15</option>
+          <option value="30" selected>Net 30</option>
+          <option value="45">Net 45</option>
+          <option value="60">Net 60</option>
+        </select>
+      </div>
+    </div>
+    <button class="calc-btn" id="calcBtnInv">Calculate Invoice Total</button>
+
+    <div class="results" id="results-inv" style="display:none">
+      <div class="result-cards">
+        <div class="result-card">
+          <div class="result-label">Subtotal</div>
+          <div class="result-value" id="res-inv-subtotal">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Discount</div>
+          <div class="result-value" id="res-inv-discount">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Sales Tax</div>
+          <div class="result-value" id="res-inv-tax">$0</div>
+        </div>
+        <div class="result-card primary">
+          <div class="result-label">Total Amount Due</div>
+          <div class="result-value" id="res-inv-total">$0</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">Due Date</div>
+          <div class="result-value" id="res-inv-due-date">-</div>
+        </div>
+      </div>
+
+      <div id="invoice-preview" style="margin-top:20px;padding:20px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-family:system-ui;">
+        <h3 style="margin:0 0 12px 0;font-size:1.1rem;color:#1e293b;">Invoice Preview</h3>
+        <div id="preview-items"></div>
+        <div id="preview-totals" style="margin-top:12px;padding-top:12px;border-top:1px solid #e2e8f0;"></div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="calc-mid" format="rectangle" />
+
+  <ShareResults />
+
+  <article class="seo-content">
+    <h2>Invoicing 101 for Freelancers</h2>
+    <p>A great invoice is more than a request for payment. It is a legal record, a marketing touchpoint, and a reflection of your professionalism. Sloppy invoices get paid late or not at all, while clear, well-structured invoices signal that you are organized and serious about your business. This calculator helps you nail the math so you can focus on the fundamentals that actually get you paid on time.</p>
+
+    <h3>What Every Invoice Must Include</h3>
+    <ul>
+      <li><strong>Your business info:</strong> Legal business name, address, phone, email, and website. If you operate under a DBA, list both names.</li>
+      <li><strong>Client info:</strong> The correct legal name of the billing entity, billing contact, and billing address. Wrong client names cause accounting delays.</li>
+      <li><strong>Invoice number:</strong> A unique sequential identifier (INV-2026-0042). Never reuse numbers.</li>
+      <li><strong>Issue date and due date:</strong> Both explicitly spelled out. "Net 30" alone confuses clients who do not know the terminology.</li>
+      <li><strong>Line items:</strong> Each service or product on its own row with a clear description, quantity, unit rate, and line total.</li>
+      <li><strong>Subtotal, discounts, tax, total:</strong> Broken out clearly so the math is auditable.</li>
+      <li><strong>Payment methods accepted:</strong> Bank transfer (ACH), check, credit card, PayPal, Stripe, Wise. Include account details or payment links.</li>
+      <li><strong>Late fee policy:</strong> A line like "Invoices unpaid after 30 days accrue a 1.5 percent monthly late fee" gives you legal ground to charge it.</li>
+    </ul>
+
+    <h3>Payment Terms Explained</h3>
+    <p>"Net X" is the traditional shorthand for "payment is due X days after the invoice date." Net 30 remains the most common default in U.S. B2B, but it is entirely negotiable. Many freelancers default to Net 15 or even "Due on receipt" to improve cash flow. Larger enterprises often push for Net 60 or Net 90. Unless your contract specifies a fixed term, you as the vendor get to set the terms on the invoice.</p>
+    <p>For new clients, consider requiring a deposit (25 to 50 percent) before work begins and the balance on delivery. This protects you from nonpayment on large projects and weeds out clients who cannot afford your services. For retainer arrangements, invoice at the beginning of each month rather than the end.</p>
+
+    <h3>Late Fee Strategies</h3>
+    <p>A late fee policy is your single most effective tool against chronically late-paying clients. The most common structures are a flat fee (e.g., $25 per late invoice) or a percentage of the unpaid balance (e.g., 1.5 percent monthly, which annualizes to 18 percent). Check your state's usury laws for the maximum legal rate, typically 1 to 2 percent per month.</p>
+    <p>To make late fees enforceable, your contract or engagement letter must explicitly mention them, and every invoice should restate the policy. Do not bury the late fee language in fine print. A prominent sentence near the due date ("A 1.5 percent late fee applies to balances unpaid after the due date") is what makes it work. When a client pays late, actually apply the fee. Waiving it teaches repeat offenders that your deadlines are flexible.</p>
+
+    <h3>Invoicing Software vs. Manual</h3>
+    <p>Services like FreshBooks, Wave, QuickBooks Self-Employed, Bonsai, and HoneyBook automate invoice creation, track who has paid and who has not, send polite reminders, and accept online payments directly. They cost $0 to $50 per month depending on features and client count. For freelancers issuing more than 3 to 5 invoices per month, the time saved pays for the tool many times over.</p>
+    <p>For very small operations or one-off projects, manual invoicing with a Google Doc, Word template, or PDF works fine. The math in this calculator is the same either way. The downside to manual invoicing is the lack of a central payment dashboard and no automatic reminders, which means you will spend more time chasing payments.</p>
+
+    <h3>Cash Flow Reality for Freelancers</h3>
+    <p>Even with Net 15 terms, many clients pay late. Budget for this reality by keeping 2 to 3 months of expenses in a business savings account as a buffer. Invoice promptly (same day or next business day after delivering work), follow up on day 31 if Net 30 has elapsed, and escalate politely but firmly at 45 and 60 days. Most disputes are simple misunderstandings that resolve with a friendly email.</p>
+  </article>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <h3>What should a freelance invoice include?</h3>
+        <p>Your business name and contact info, the client's billing address, a unique invoice number, issue and due dates, itemized services with quantities and rates, subtotal, discounts, tax, total due, payment methods, and a late fee policy. Clear due dates and payment terms protect you legally.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What do Net 15, Net 30, and Net 60 mean?</h3>
+        <p>Net X means payment is due X days after the invoice date. Net 30 is the U.S. B2B standard, but freelancers can set any term they prefer. Net 15 improves cash flow; Net 60 is common with large enterprise clients.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Should freelancers charge sales tax?</h3>
+        <p>It depends on your state and what you sell. Most states do not tax pure services like writing or design, but some do. Digital goods and physical products are usually taxable. Check with your state's department of revenue before assuming you are exempt.</p>
+      </div>
+    </div>
+  </section>
+
+  <CrossLinks links={[
+    { href: '/freelance-calculators/self-employment-tax-calculator-freelance/', label: 'Self-Employment Tax Calculator', icon: '📝' },
+    { href: '/freelance-calculators/side-hustle-profit-calculator/', label: 'Side Hustle Profit Calculator', icon: '💼' },
+    { href: '/business-calculators/profit-margin-calculator/', label: 'Profit Margin Calculator', icon: '📊' },
+  ]} />
+  <RelatedCalculators currentSlug="invoice-calculator" />
+  <RelatedArticles calculatorSlug="invoice-calculator" />
+  <AdUnit slot="calc-bottom" format="horizontal" />
+</BaseLayout>
+
+<script>
+  function fmtInv(n) {
+    var v = Math.abs(n);
+    return '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  var linesContainer = document.getElementById('invoice-lines');
+  var lineCount = 0;
+
+  function addLine(desc, qty, rate) {
+    lineCount++;
+    var idx = lineCount;
+    var row = document.createElement('div');
+    row.className = 'invoice-line';
+    row.style.cssText = 'display:grid;grid-template-columns:2fr 0.7fr 0.9fr auto;gap:8px;margin-bottom:8px;align-items:end;';
+    row.innerHTML = ''
+      + '<div class="input-group" style="margin-bottom:0;"><label style="font-size:0.75rem;">Description</label>'
+      + '<input type="text" class="inv-desc" placeholder="Service description" value="' + escapeHtml(desc || '') + '" /></div>'
+      + '<div class="input-group" style="margin-bottom:0;"><label style="font-size:0.75rem;">Qty</label>'
+      + '<input type="number" class="inv-qty" min="0" step="0.5" value="' + (qty || 1) + '" /></div>'
+      + '<div class="input-group" style="margin-bottom:0;"><label style="font-size:0.75rem;">Rate</label>'
+      + '<div class="input-prefix"><span>$</span><input type="number" class="inv-rate" min="0" step="1" value="' + (rate || 0) + '" /></div></div>'
+      + '<button type="button" class="inv-remove" style="background:#fee2e2;color:#991b1b;border:none;border-radius:6px;padding:8px 12px;cursor:pointer;font-weight:600;height:42px;">X</button>';
+    linesContainer.appendChild(row);
+    row.querySelector('.inv-remove').addEventListener('click', function() {
+      row.remove();
+    });
+  }
+
+  // Seed 3 starter rows
+  addLine('Design work', 10, 75);
+  addLine('Revisions', 2, 75);
+  addLine('Project management', 1, 150);
+
+  document.getElementById('addLineBtn').addEventListener('click', function() {
+    addLine('', 1, 0);
+  });
+
+  function formatDate(d) {
+    var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+  }
+
+  document.getElementById('calcBtnInv').addEventListener('click', function() {
+    var rows = linesContainer.querySelectorAll('.invoice-line');
+    var subtotal = 0;
+    var itemsHtml = '';
+
+    rows.forEach(function(row) {
+      var desc = row.querySelector('.inv-desc').value || 'Item';
+      var qty = parseFloat(row.querySelector('.inv-qty').value) || 0;
+      var rate = parseFloat(row.querySelector('.inv-rate').value) || 0;
+      var lineTotal = qty * rate;
+      subtotal += lineTotal;
+      itemsHtml += '<div style="display:flex;justify-content:space-between;padding:6px 0;font-size:0.9rem;color:#334155;">'
+        + '<span>' + escapeHtml(desc) + ' (' + qty + ' x ' + fmtInv(rate) + ')</span>'
+        + '<strong>' + fmtInv(lineTotal) + '</strong></div>';
+    });
+
+    var flatDisc = parseFloat(document.getElementById('inv-discount').value) || 0;
+    var pctDisc = parseFloat(document.getElementById('inv-discount-pct').value) || 0;
+    var taxRate = parseFloat(document.getElementById('inv-tax').value) || 0;
+    var dueDays = parseInt(document.getElementById('inv-due').value) || 30;
+
+    var pctDiscAmt = subtotal * (pctDisc / 100);
+    var totalDiscount = flatDisc + pctDiscAmt;
+    var afterDiscount = Math.max(0, subtotal - totalDiscount);
+    var taxAmt = afterDiscount * (taxRate / 100);
+    var total = afterDiscount + taxAmt;
+
+    var dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + dueDays);
+
+    document.getElementById('res-inv-subtotal').textContent = fmtInv(subtotal);
+    document.getElementById('res-inv-discount').textContent = fmtInv(totalDiscount);
+    document.getElementById('res-inv-tax').textContent = fmtInv(taxAmt);
+    document.getElementById('res-inv-total').textContent = fmtInv(total);
+    document.getElementById('res-inv-due-date').textContent = formatDate(dueDate);
+
+    document.getElementById('preview-items').innerHTML = itemsHtml;
+
+    var totalsHtml = '<div style="display:flex;justify-content:space-between;padding:4px 0;color:#64748b;"><span>Subtotal</span><span>' + fmtInv(subtotal) + '</span></div>';
+    if (totalDiscount > 0) {
+      totalsHtml += '<div style="display:flex;justify-content:space-between;padding:4px 0;color:#64748b;"><span>Discount</span><span>-' + fmtInv(totalDiscount) + '</span></div>';
+    }
+    if (taxAmt > 0) {
+      totalsHtml += '<div style="display:flex;justify-content:space-between;padding:4px 0;color:#64748b;"><span>Sales Tax (' + taxRate + ' percent)</span><span>' + fmtInv(taxAmt) + '</span></div>';
+    }
+    totalsHtml += '<div style="display:flex;justify-content:space-between;padding:8px 0 4px 0;border-top:1px solid #e2e8f0;margin-top:6px;font-size:1.05rem;color:#1e293b;"><strong>Total Due</strong><strong>' + fmtInv(total) + '</strong></div>';
+    totalsHtml += '<div style="display:flex;justify-content:space-between;padding:4px 0;color:#64748b;font-size:0.85rem;"><span>Due Date</span><span>' + formatDate(dueDate) + '</span></div>';
+    document.getElementById('preview-totals').innerHTML = totalsHtml;
+
+    document.getElementById('results-inv').style.display = '';
+  });
+
+  document.getElementById('calcBtnInv').click();
+</script>

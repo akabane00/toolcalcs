@@ -16,7 +16,7 @@ const schemaList: object[] = structuredData
   ? Array.isArray(structuredData) ? [...structuredData] : [structuredData]
   : [];
 
-// Auto-inject WebApplication schema for calculator/tool pages
+// Auto-inject WebApplication + HowTo schema for calculator/tool pages
 const path = Astro.url.pathname;
 const calcCategories: Record<string, string> = {
   'financial-calculators': 'FinanceApplication',
@@ -28,6 +28,12 @@ const calcCategories: Record<string, string> = {
   'construction-calculators': 'UtilityApplication',
   'education-calculators': 'UtilityApplication',
   'automotive-calculators': 'UtilityApplication',
+  'insurance-calculators': 'FinanceApplication',
+  'tax-calculators': 'FinanceApplication',
+  'business-calculators': 'BusinessApplication',
+  'real-estate-calculators': 'FinanceApplication',
+  'astrology-calculators': 'LifestyleApplication',
+  'freelance-calculators': 'BusinessApplication',
 };
 const segments = path.split('/').filter(Boolean);
 if (segments.length >= 2 && calcCategories[segments[0]]) {
@@ -40,6 +46,37 @@ if (segments.length >= 2 && calcCategories[segments[0]]) {
     applicationCategory: calcCategories[segments[0]],
     operatingSystem: 'All',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  });
+
+  // Auto-inject HowTo schema for AI search engine discoverability
+  schemaList.push({
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: `How to Use the ${appName}`,
+    description: description,
+    totalTime: 'PT1M',
+    supply: [],
+    tool: [{ '@type': 'HowToTool', name: appName }],
+    step: [
+      {
+        '@type': 'HowToStep',
+        position: 1,
+        name: 'Enter your values',
+        text: 'Fill in the required input fields with your specific numbers or information.',
+      },
+      {
+        '@type': 'HowToStep',
+        position: 2,
+        name: 'Click Calculate',
+        text: 'Click the Calculate button to process your inputs and generate results.',
+      },
+      {
+        '@type': 'HowToStep',
+        position: 3,
+        name: 'Review your results',
+        text: 'View the calculated results displayed in the results section, including any breakdowns or comparisons.',
+      },
+    ],
   });
 }
 
