@@ -416,7 +416,6 @@ export const blogArticles: BlogArticle[] = [
   },
   {
     title: 'Understanding Your Credit Score: Ranges, Factors, and Tips to Improve',
-    slug: 'understanding-your-credit-score',
     description: 'Learn how credit scores work, what ranges mean, the five factors that determine your FICO score, how to check your score for free, and proven strategies to improve your credit rating.',
     datePublished: '2026-03-07',
     dateModified: '2026-03-31',
@@ -443,7 +442,6 @@ export const blogArticles: BlogArticle[] = [
   },
   {
     title: 'Intermittent Fasting for Beginners: Methods, Benefits, and Tips',
-    slug: 'intermittent-fasting-beginners-guide',
     description: "A comprehensive beginner's guide to intermittent fasting covering popular methods like 16:8 and 5:2, science-backed benefits, who should avoid IF, how to get started, and common mistakes.",
     datePublished: '2026-03-07',
     dateModified: '2026-03-31',
@@ -481,7 +479,6 @@ export const blogArticles: BlogArticle[] = [
   },
   {
     title: 'Rent vs. Buy: How to Decide If You Should Rent or Buy a Home',
-    slug: 'rent-vs-buy-decision-guide',
     description: 'Compare the true costs of renting vs buying a home with breakeven analysis, price-to-rent ratios, hidden costs, and a decision framework to find the right choice for your situation.',
     datePublished: '2026-03-07',
     dateModified: '2026-03-31',
@@ -957,15 +954,12 @@ export const blogArticles: BlogArticle[] = [
   // Budgeting & Saving
   { title: 'How to Create a Budget That Actually Works', slug: 'how-to-create-a-budget', description: 'Step-by-step guide to building a realistic personal budget. Covers fixed vs variable expenses, budgeting methods, tools, and how to stick to your budget long-term.', datePublished: '2026-03-25', dateModified: '2026-03-31', category: 'Finance', relatedCalculatorSlugs: ['savings-goal-calculator', 'take-home-pay-calculator', 'debt-to-income-calculator'] },
   { title: '50/30/20 Rule Budget: The Simplest Way to Manage Your Money', slug: '50-30-20-rule-budget', description: 'The 50/30/20 rule divides your after-tax income into needs, wants, and savings. Learn how to apply it, adjust it for your income level, and use it to reach financial goals.', datePublished: '2026-03-25', dateModified: '2026-03-31', category: 'Finance', relatedCalculatorSlugs: ['take-home-pay-calculator', 'savings-goal-calculator', 'paycheck-calculator'] },
-  { title: 'How to Build an Emergency Fund (Step by Step)', slug: 'how-to-build-emergency-fund', description: 'How much emergency fund do you need, where to keep it, and how to build it fast? Complete guide with savings targets by income level and practical strategies.', datePublished: '2026-03-25', dateModified: '2026-03-31', category: 'Finance', relatedCalculatorSlugs: ['savings-goal-calculator', 'compound-interest-calculator', 'take-home-pay-calculator'] },
   { title: 'How Much Should You Have Saved by Age 30, 40, and 50?', slug: 'how-much-should-i-have-saved-by-age', description: 'Savings benchmarks by age based on income multiples and retirement readiness. See where you stand and what to do if you are behind.', datePublished: '2026-03-25', dateModified: '2026-03-31', category: 'Finance', relatedCalculatorSlugs: ['retirement-savings-calculator', 'net-worth-calculator', 'savings-goal-calculator'] },
   { title: 'Zero-Based Budgeting: How to Give Every Dollar a Job', slug: 'zero-based-budgeting-guide', description: 'Zero-based budgeting assigns every dollar of income to a specific purpose. Learn how it works, how it differs from other methods, and how to start in 5 steps.', datePublished: '2026-03-25', dateModified: '2026-03-31', category: 'Finance', relatedCalculatorSlugs: ['take-home-pay-calculator', 'savings-goal-calculator', 'paycheck-calculator'] },
   // Investing & Retirement
   { title: '401(k) vs IRA: Which Retirement Account Should You Prioritize?', slug: '401k-vs-ira', description: 'Compare 401(k) and IRA accounts — contribution limits, tax advantages, employer match, investment options, and the right order to fund them for maximum tax savings.', datePublished: '2026-03-25', dateModified: '2026-03-31', category: 'Finance', relatedCalculatorSlugs: ['retirement-savings-calculator', 'compound-interest-calculator', 'tax-calculator'] },
-  { title: 'How to Start Investing with $1,000 or Less', slug: 'how-to-start-investing', description: 'A beginner\'s roadmap to investing with a small amount. Covers index funds, ETFs, brokerage accounts, dollar-cost averaging, and the biggest mistakes first-time investors make.', datePublished: '2026-03-25', dateModified: '2026-03-31', category: 'Finance', relatedCalculatorSlugs: ['compound-interest-calculator', 'investment-calculator', 'dca-calculator'] },
   { title: 'Index Funds vs ETFs: What\'s the Difference and Which Should You Buy?', slug: 'index-funds-vs-etfs', description: 'Index funds and ETFs both offer low-cost diversification, but they differ in trading, costs, and tax efficiency. Learn which is better for your investment strategy.', datePublished: '2026-03-25', dateModified: '2026-03-31', category: 'Finance', relatedCalculatorSlugs: ['investment-calculator', 'compound-interest-calculator', 'dca-calculator'] },
   { title: 'The 4% Rule for Retirement: How Much Do You Really Need to Retire?', slug: '4-percent-rule-retirement', description: 'The 4% rule says you can withdraw 4% of your portfolio annually without running out of money. Learn how it works, its limitations, and how to calculate your retirement number.', datePublished: '2026-03-25', dateModified: '2026-03-31', category: 'Finance', relatedCalculatorSlugs: ['retirement-savings-calculator', 'fire-calculator', 'compound-interest-calculator'] },
-  { title: 'Roth IRA vs Traditional IRA: Complete Comparison Guide 2026', slug: 'roth-ira-vs-traditional-ira', description: 'Roth vs Traditional IRA: tax treatment, income limits, contribution rules, withdrawal rules, and which is better for your tax situation in 2026.', datePublished: '2026-03-25', dateModified: '2026-03-31', category: 'Finance', relatedCalculatorSlugs: ['retirement-savings-calculator', 'tax-calculator', 'compound-interest-calculator'] },
   { title: 'How to Improve Your Credit Score Fast: 7 Proven Methods', slug: 'how-to-improve-credit-score', description: 'The fastest and most effective ways to raise your credit score — from disputing errors to optimizing credit utilization, with timelines for how quickly each method works.', datePublished: '2026-03-25', dateModified: '2026-03-31', category: 'Finance', relatedCalculatorSlugs: ['debt-to-income-calculator', 'credit-card-payoff-calculator', 'mortgage-calculator'] },
   { title: 'Compound Interest Explained: How Money Grows Exponentially Over Time', slug: 'compound-interest-explained', description: 'How compound interest works, why starting early matters so much, the Rule of 72, and real examples showing how $10,000 grows at different rates and time horizons.', datePublished: '2026-03-25', dateModified: '2026-03-31', category: 'Finance', relatedCalculatorSlugs: ['compound-interest-calculator', 'investment-calculator', 'savings-goal-calculator'] },
   // Real Estate & Life
