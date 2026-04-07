@@ -750,6 +750,133 @@ export const worksheets: Worksheet[] = [
       { name: 'includeNegative', label: 'Include Negative', type: 'select', default: 'no', options: [{ value: 'yes', label: 'Yes' }, { value: 'no', label: 'No' }] },
     ],
   },
+
+  // Sprint 20 Phase A: English / Language Arts (10)
+  { title: 'Alphabet Tracing Worksheets', slug: 'alphabet-tracing-worksheets', description: 'Free printable alphabet tracing worksheets for preschool and kindergarten. Practice writing uppercase and lowercase letters A-Z with dotted guides.', icon: '🔤', gradeRange: 'Pre-K', mathTopic: 'Alphabet', configOptions: [
+    { name: 'letterCase', label: 'Letter Case', type: 'select', default: 'both', options: [{ value: 'upper', label: 'Uppercase Only' }, { value: 'lower', label: 'Lowercase Only' }, { value: 'both', label: 'Both' }] },
+    { name: 'lines', label: 'Lines per Letter', type: 'number', default: 4, min: 2, max: 8 },
+  ] },
+  { title: 'Sight Words Worksheets', slug: 'sight-words-worksheets', description: 'Free printable sight words worksheets for K-2. Practice high-frequency Dolch and Fry sight words with tracing, writing, and reading exercises.', icon: '👁️', gradeRange: 'K-2', mathTopic: 'Reading', configOptions: [
+    { name: 'level', label: 'Word List', type: 'select', default: 'kindergarten', options: [{ value: 'preprimer', label: 'Pre-Primer' }, { value: 'primer', label: 'Primer' }, { value: 'kindergarten', label: 'Kindergarten' }, { value: 'first', label: 'First Grade' }] },
+    { name: 'count', label: 'Words', type: 'number', default: 12, min: 6, max: 20 },
+  ] },
+  { title: 'Phonics Worksheets', slug: 'phonics-worksheets', description: 'Free printable phonics worksheets for K-2. Practice beginning sounds, ending sounds, blends, digraphs, and short and long vowels with picture-based exercises.', icon: '🔠', gradeRange: 'K-2', mathTopic: 'Phonics', configOptions: [
+    { name: 'focus', label: 'Phonics Focus', type: 'select', default: 'beginning', options: [{ value: 'beginning', label: 'Beginning Sounds' }, { value: 'ending', label: 'Ending Sounds' }, { value: 'blends', label: 'Blends' }, { value: 'shortVowels', label: 'Short Vowels' }] },
+  ] },
+  { title: 'Spelling Worksheets', slug: 'spelling-worksheets', description: 'Free printable spelling worksheets for grades 1-5. Practice grade-level spelling words with tracing, writing, and word search activities.', icon: '✍️', gradeRange: '1-5', mathTopic: 'Spelling', configOptions: [
+    { name: 'grade', label: 'Grade Level', type: 'select', default: '2', options: [{ value: '1', label: '1st Grade' }, { value: '2', label: '2nd Grade' }, { value: '3', label: '3rd Grade' }, { value: '4', label: '4th Grade' }, { value: '5', label: '5th Grade' }] },
+    { name: 'words', label: 'Number of Words', type: 'number', default: 10, min: 5, max: 20 },
+  ] },
+  { title: 'Vocabulary Worksheets', slug: 'vocabulary-worksheets', description: 'Free printable vocabulary worksheets for grades 2-6. Build word knowledge with definitions, synonyms, antonyms, and context clue exercises.', icon: '📖', gradeRange: '2-6', mathTopic: 'Vocabulary', configOptions: [
+    { name: 'grade', label: 'Grade Level', type: 'select', default: '3', options: [{ value: '2', label: '2nd Grade' }, { value: '3', label: '3rd Grade' }, { value: '4', label: '4th Grade' }, { value: '5', label: '5th Grade' }, { value: '6', label: '6th Grade' }] },
+  ] },
+  { title: 'Grammar Worksheets', slug: 'grammar-worksheets', description: 'Free printable grammar worksheets for grades 2-5. Practice nouns, verbs, adjectives, sentence structure, and basic punctuation rules.', icon: '📝', gradeRange: '2-5', mathTopic: 'Grammar', configOptions: [
+    { name: 'topic', label: 'Topic', type: 'select', default: 'nouns', options: [{ value: 'nouns', label: 'Nouns' }, { value: 'verbs', label: 'Verbs' }, { value: 'adjectives', label: 'Adjectives' }, { value: 'sentences', label: 'Sentence Types' }] },
+  ] },
+  { title: 'Punctuation Worksheets', slug: 'punctuation-worksheets', description: 'Free printable punctuation worksheets for grades 2-5. Practice periods, question marks, exclamation points, commas, and quotation marks.', icon: '❗', gradeRange: '2-5', mathTopic: 'Punctuation', configOptions: [
+    { name: 'focus', label: 'Focus', type: 'select', default: 'endmarks', options: [{ value: 'endmarks', label: 'End Marks' }, { value: 'commas', label: 'Commas' }, { value: 'quotation', label: 'Quotation Marks' }] },
+  ] },
+  { title: 'Capitalization Worksheets', slug: 'capitalization-worksheets', description: 'Free printable capitalization worksheets for grades 1-4. Practice capitalizing names, places, days, months, titles, and the first word of sentences.', icon: '🅰️', gradeRange: '1-4', mathTopic: 'Capitalization', configOptions: [
+    { name: 'sentences', label: 'Sentences', type: 'number', default: 10, min: 5, max: 20 },
+  ] },
+  { title: 'Synonyms and Antonyms Worksheets', slug: 'synonyms-antonyms-worksheets', description: 'Free printable synonyms and antonyms worksheets for grades 2-5. Build vocabulary by matching words with same and opposite meanings.', icon: '↔️', gradeRange: '2-5', mathTopic: 'Vocabulary', configOptions: [
+    { name: 'type', label: 'Type', type: 'select', default: 'both', options: [{ value: 'synonyms', label: 'Synonyms Only' }, { value: 'antonyms', label: 'Antonyms Only' }, { value: 'both', label: 'Both' }] },
+  ] },
+  { title: 'Parts of Speech Worksheets', slug: 'parts-of-speech-worksheets', description: 'Free printable parts of speech worksheets for grades 3-6. Identify nouns, verbs, adjectives, adverbs, pronouns, and prepositions in sentences.', icon: '🏷️', gradeRange: '3-6', mathTopic: 'Grammar', configOptions: [
+    { name: 'sentences', label: 'Sentences', type: 'number', default: 10, min: 5, max: 20 },
+  ] },
+
+  // Sprint 20 Phase B: Pre-K / Early Learning (8)
+  { title: 'Letter Tracing Worksheets', slug: 'letter-tracing-worksheets', description: 'Free printable letter tracing worksheets for preschoolers. Practice each letter A-Z with multiple tracing lines and visual cues.', icon: '✏️', gradeRange: 'Pre-K', mathTopic: 'Writing', configOptions: [
+    { name: 'letter', label: 'Letter', type: 'select', default: 'A', options: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(l => ({ value: l, label: l })) },
+  ] },
+  { title: 'Color by Number Worksheets', slug: 'color-by-number-worksheets', description: 'Free printable color by number worksheets for kids. Solve simple addition or matching to reveal colorful pictures.', icon: '🎨', gradeRange: 'K-2', mathTopic: 'Coloring', configOptions: [
+    { name: 'theme', label: 'Theme', type: 'select', default: 'animals', options: [{ value: 'animals', label: 'Animals' }, { value: 'vehicles', label: 'Vehicles' }, { value: 'shapes', label: 'Shapes' }] },
+  ] },
+  { title: 'Shape Recognition Worksheets', slug: 'shape-recognition-worksheets', description: 'Free printable shape recognition worksheets for preschool and kindergarten. Identify and trace circles, squares, triangles, rectangles, and more.', icon: '🔷', gradeRange: 'Pre-K', mathTopic: 'Shapes', configOptions: [
+    { name: 'shapes', label: 'Shape Set', type: 'select', default: 'basic', options: [{ value: 'basic', label: 'Basic (4 shapes)' }, { value: 'all', label: 'All Shapes' }] },
+  ] },
+  { title: 'Pattern Matching Worksheets', slug: 'pattern-matching-worksheets', description: 'Free printable pattern matching worksheets for preschool and K. Build logical thinking by completing visual patterns with shapes, colors, and pictures.', icon: '🧩', gradeRange: 'Pre-K', mathTopic: 'Patterns', configOptions: [
+    { name: 'difficulty', label: 'Difficulty', type: 'select', default: 'easy', options: [{ value: 'easy', label: 'Easy' }, { value: 'medium', label: 'Medium' }] },
+  ] },
+  { title: 'Connect the Dots Worksheets', slug: 'connect-the-dots-worksheets', description: 'Free printable connect the dots worksheets for kids. Practice number sequencing while creating fun pictures by connecting numbered dots.', icon: '🔢', gradeRange: 'Pre-K', mathTopic: 'Counting', configOptions: [
+    { name: 'maxNumber', label: 'Max Number', type: 'select', default: '20', options: [{ value: '10', label: '1-10' }, { value: '20', label: '1-20' }, { value: '50', label: '1-50' }] },
+  ] },
+  { title: 'Maze Worksheets', slug: 'maze-worksheets', description: 'Free printable maze worksheets for kids. Build problem-solving and motor skills with progressively challenging mazes.', icon: '🌀', gradeRange: 'K-3', mathTopic: 'Logic', configOptions: [
+    { name: 'difficulty', label: 'Difficulty', type: 'select', default: 'easy', options: [{ value: 'easy', label: 'Easy' }, { value: 'medium', label: 'Medium' }, { value: 'hard', label: 'Hard' }] },
+  ] },
+  { title: 'Same and Different Worksheets', slug: 'same-and-different-worksheets', description: 'Free printable same and different worksheets for preschool. Build visual discrimination skills by identifying matching and mismatched items.', icon: '👯', gradeRange: 'Pre-K', mathTopic: 'Visual Discrimination', configOptions: [
+    { name: 'rows', label: 'Rows', type: 'number', default: 6, min: 4, max: 10 },
+  ] },
+  { title: 'Counting Pictures Worksheets', slug: 'counting-pictures-worksheets', description: 'Free printable counting picture worksheets for preschool and kindergarten. Practice counting objects from 1 to 20 with engaging picture sets.', icon: '🍎', gradeRange: 'Pre-K', mathTopic: 'Counting', configOptions: [
+    { name: 'maxCount', label: 'Max Count', type: 'select', default: '10', options: [{ value: '5', label: '1-5' }, { value: '10', label: '1-10' }, { value: '20', label: '1-20' }] },
+  ] },
+
+  // Sprint 20 Phase C: Seasonal / Themed (10)
+  { title: 'Christmas Math Worksheets', slug: 'christmas-math-worksheets', description: 'Free printable Christmas-themed math worksheets for K-3. Holiday addition, subtraction, counting, and number recognition with festive pictures.', icon: '🎄', gradeRange: 'K-3', mathTopic: 'Seasonal', configOptions: [
+    { name: 'operation', label: 'Operation', type: 'select', default: 'addition', options: [{ value: 'addition', label: 'Addition' }, { value: 'subtraction', label: 'Subtraction' }, { value: 'counting', label: 'Counting' }] },
+  ] },
+  { title: 'Halloween Counting Worksheets', slug: 'halloween-counting-worksheets', description: 'Free printable Halloween-themed counting worksheets for preschool and K. Count pumpkins, ghosts, bats, and witches in spooky scenes.', icon: '🎃', gradeRange: 'Pre-K', mathTopic: 'Seasonal', configOptions: [
+    { name: 'maxCount', label: 'Max Count', type: 'select', default: '10', options: [{ value: '10', label: '1-10' }, { value: '20', label: '1-20' }] },
+  ] },
+  { title: 'Easter Word Worksheets', slug: 'easter-word-worksheets', description: 'Free printable Easter-themed word worksheets for K-2. Easter vocabulary, spelling, and word search with bunnies, eggs, and spring themes.', icon: '🐰', gradeRange: 'K-2', mathTopic: 'Seasonal', configOptions: [
+    { name: 'activity', label: 'Activity', type: 'select', default: 'wordSearch', options: [{ value: 'wordSearch', label: 'Word Search' }, { value: 'spelling', label: 'Spelling' }, { value: 'matching', label: 'Picture Matching' }] },
+  ] },
+  { title: 'Thanksgiving Reading Worksheets', slug: 'thanksgiving-reading-worksheets', description: 'Free printable Thanksgiving reading worksheets for grades 1-3. Short stories, comprehension questions, and vocabulary with Thanksgiving themes.', icon: '🦃', gradeRange: '1-3', mathTopic: 'Seasonal', configOptions: [
+    { name: 'level', label: 'Reading Level', type: 'select', default: '2', options: [{ value: '1', label: '1st Grade' }, { value: '2', label: '2nd Grade' }, { value: '3', label: '3rd Grade' }] },
+  ] },
+  { title: 'Valentine Crafts Worksheets', slug: 'valentine-crafts-worksheets', description: 'Free printable Valentines Day craft worksheets for kids. Heart templates, color-by-number, and Valentine-themed activities.', icon: '💝', gradeRange: 'Pre-K', mathTopic: 'Seasonal', configOptions: [
+    { name: 'craft', label: 'Craft Type', type: 'select', default: 'colorByNumber', options: [{ value: 'colorByNumber', label: 'Color by Number' }, { value: 'heartTrace', label: 'Heart Tracing' }, { value: 'cards', label: 'Card Templates' }] },
+  ] },
+  { title: 'Summer Review Worksheets', slug: 'summer-review-worksheets', description: 'Free printable summer review worksheets to prevent learning loss. Mixed math and reading practice covering the previous grade level.', icon: '☀️', gradeRange: '1-5', mathTopic: 'Seasonal', configOptions: [
+    { name: 'completedGrade', label: 'Just Completed', type: 'select', default: '2', options: [{ value: '1', label: '1st Grade' }, { value: '2', label: '2nd Grade' }, { value: '3', label: '3rd Grade' }, { value: '4', label: '4th Grade' }, { value: '5', label: '5th Grade' }] },
+  ] },
+  { title: 'Back to School Worksheets', slug: 'back-to-school-worksheets', description: 'Free printable back-to-school worksheets for K-3. About-me pages, name tracing, classroom vocabulary, and first day of school activities.', icon: '🎒', gradeRange: 'K-3', mathTopic: 'Seasonal', configOptions: [
+    { name: 'activity', label: 'Activity', type: 'select', default: 'aboutMe', options: [{ value: 'aboutMe', label: 'All About Me' }, { value: 'classroom', label: 'Classroom Words' }, { value: 'goals', label: 'My Goals' }] },
+  ] },
+  { title: 'St Patricks Day Worksheets', slug: 'st-patricks-day-worksheets', description: 'Free printable St Patricks Day worksheets for K-3. Shamrocks, rainbows, leprechauns with counting, math, and coloring activities.', icon: '🍀', gradeRange: 'K-3', mathTopic: 'Seasonal', configOptions: [
+    { name: 'activity', label: 'Activity', type: 'select', default: 'counting', options: [{ value: 'counting', label: 'Counting' }, { value: 'coloring', label: 'Color the Shamrocks' }, { value: 'maze', label: 'Rainbow Maze' }] },
+  ] },
+  { title: 'Earth Day Worksheets', slug: 'earth-day-worksheets', description: 'Free printable Earth Day worksheets for grades K-4. Recycling, conservation, plants, and environmental themes with reading and math activities.', icon: '🌍', gradeRange: 'K-4', mathTopic: 'Seasonal', configOptions: [
+    { name: 'topic', label: 'Topic', type: 'select', default: 'recycling', options: [{ value: 'recycling', label: 'Recycling' }, { value: 'plants', label: 'Plants & Trees' }, { value: 'water', label: 'Water Conservation' }] },
+  ] },
+  { title: 'Fall Activity Worksheets', slug: 'fall-activity-worksheets', description: 'Free printable fall and autumn worksheets for K-3. Leaves, pumpkins, apples, and harvest themes with counting, coloring, and word activities.', icon: '🍂', gradeRange: 'K-3', mathTopic: 'Seasonal', configOptions: [
+    { name: 'activity', label: 'Activity', type: 'select', default: 'counting', options: [{ value: 'counting', label: 'Leaf Counting' }, { value: 'coloring', label: 'Apple Coloring' }, { value: 'matching', label: 'Picture Matching' }] },
+  ] },
+
+  // Sprint 20 Phase D: Activity / Games (10)
+  { title: 'Word Search Worksheets', slug: 'word-search-worksheets', description: 'Free printable word search puzzles for kids. Generate themed word searches with vocabulary from various topics and grade levels.', icon: '🔍', gradeRange: '1-6', mathTopic: 'Puzzle', configOptions: [
+    { name: 'theme', label: 'Theme', type: 'select', default: 'animals', options: [{ value: 'animals', label: 'Animals' }, { value: 'food', label: 'Food' }, { value: 'sports', label: 'Sports' }, { value: 'colors', label: 'Colors' }] },
+    { name: 'size', label: 'Grid Size', type: 'select', default: '12', options: [{ value: '10', label: '10x10' }, { value: '12', label: '12x12' }, { value: '15', label: '15x15' }] },
+  ] },
+  { title: 'Crossword Worksheets', slug: 'crossword-worksheets', description: 'Free printable crossword puzzles for kids. Build vocabulary and spelling with themed crosswords for various reading levels.', icon: '#️⃣', gradeRange: '2-6', mathTopic: 'Puzzle', configOptions: [
+    { name: 'theme', label: 'Theme', type: 'select', default: 'general', options: [{ value: 'general', label: 'General' }, { value: 'animals', label: 'Animals' }, { value: 'science', label: 'Science' }] },
+  ] },
+  { title: 'Sudoku for Kids Worksheets', slug: 'sudoku-kids-worksheets', description: 'Free printable kid-friendly Sudoku puzzles. Easy 4x4 and 6x6 Sudoku grids perfect for elementary students learning logical reasoning.', icon: '🧮', gradeRange: '2-5', mathTopic: 'Puzzle', configOptions: [
+    { name: 'size', label: 'Grid Size', type: 'select', default: '4', options: [{ value: '4', label: '4x4 (Easy)' }, { value: '6', label: '6x6 (Medium)' }, { value: '9', label: '9x9 (Hard)' }] },
+  ] },
+  { title: 'Cryptogram Worksheets', slug: 'cryptogram-worksheets', description: 'Free printable cryptogram puzzles for kids. Decode secret messages by substituting letters in fun word puzzles.', icon: '🔐', gradeRange: '3-6', mathTopic: 'Puzzle', configOptions: [
+    { name: 'difficulty', label: 'Difficulty', type: 'select', default: 'easy', options: [{ value: 'easy', label: 'Easy' }, { value: 'medium', label: 'Medium' }] },
+  ] },
+  { title: 'Memory Match Worksheets', slug: 'memory-match-worksheets', description: 'Free printable memory match game cards. Print and cut to play classic memory matching with various themes and difficulty levels.', icon: '🃏', gradeRange: 'Pre-K', mathTopic: 'Game', configOptions: [
+    { name: 'pairs', label: 'Number of Pairs', type: 'select', default: '12', options: [{ value: '6', label: '6 Pairs' }, { value: '12', label: '12 Pairs' }, { value: '18', label: '18 Pairs' }] },
+  ] },
+  { title: 'Bingo Worksheets', slug: 'bingo-worksheets', description: 'Free printable bingo cards for kids. Generate themed bingo cards for classroom games, parties, and family fun nights.', icon: '🎰', gradeRange: 'Pre-K', mathTopic: 'Game', configOptions: [
+    { name: 'theme', label: 'Theme', type: 'select', default: 'numbers', options: [{ value: 'numbers', label: 'Numbers' }, { value: 'letters', label: 'Letters' }, { value: 'pictures', label: 'Pictures' }] },
+    { name: 'cards', label: 'Cards', type: 'number', default: 4, min: 2, max: 8 },
+  ] },
+  { title: 'Hangman Worksheets', slug: 'hangman-worksheets', description: 'Free printable hangman game worksheets for kids. Practice spelling and vocabulary with classic hangman puzzles in various themes.', icon: '🪢', gradeRange: '2-6', mathTopic: 'Game', configOptions: [
+    { name: 'theme', label: 'Word Theme', type: 'select', default: 'animals', options: [{ value: 'animals', label: 'Animals' }, { value: 'food', label: 'Food' }, { value: 'school', label: 'School' }] },
+  ] },
+  { title: 'Find the Difference Worksheets', slug: 'find-the-difference-worksheets', description: 'Free printable spot the difference worksheets for kids. Build observation skills by finding hidden differences between two pictures.', icon: '🔎', gradeRange: 'K-3', mathTopic: 'Visual', configOptions: [
+    { name: 'differences', label: 'Differences', type: 'select', default: '5', options: [{ value: '3', label: '3 Differences' }, { value: '5', label: '5 Differences' }, { value: '10', label: '10 Differences' }] },
+  ] },
+  { title: 'Logic Puzzle Worksheets', slug: 'logic-puzzle-worksheets', description: 'Free printable logic puzzles for kids and teens. Build deductive reasoning with grid-based logic puzzles and brain teasers.', icon: '🧠', gradeRange: '3-7', mathTopic: 'Logic', configOptions: [
+    { name: 'difficulty', label: 'Difficulty', type: 'select', default: 'easy', options: [{ value: 'easy', label: 'Easy' }, { value: 'medium', label: 'Medium' }, { value: 'hard', label: 'Hard' }] },
+  ] },
+  { title: 'Brain Teaser Worksheets', slug: 'brain-teaser-worksheets', description: 'Free printable brain teaser worksheets for kids. Riddles, lateral thinking puzzles, and tricky problems to challenge growing minds.', icon: '💡', gradeRange: '3-7', mathTopic: 'Logic', configOptions: [
+    { name: 'type', label: 'Type', type: 'select', default: 'riddles', options: [{ value: 'riddles', label: 'Riddles' }, { value: 'math', label: 'Math Brain Teasers' }, { value: 'visual', label: 'Visual Puzzles' }] },
+  ] },
 ];
 
 export function getWorksheetBySlug(slug: string): Worksheet | undefined {
