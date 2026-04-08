@@ -1,0 +1,289 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import AdUnit from '../../../components/AdUnit.astro';
+import '../../../styles/worksheet.css';
+
+export function getStaticPaths() {
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const wordExamples: Record<string, { words: string[], picture: string }> = {
+    A: { words: ['apple', 'ant', 'alligator', 'astronaut'], picture: 'apple' },
+    B: { words: ['ball', 'bear', 'banana', 'bird'], picture: 'ball' },
+    C: { words: ['cat', 'cake', 'cup', 'car'], picture: 'cat' },
+    D: { words: ['dog', 'duck', 'dolphin', 'door'], picture: 'dog' },
+    E: { words: ['egg', 'elephant', 'ear', 'eight'], picture: 'egg' },
+    F: { words: ['fish', 'frog', 'flag', 'flower'], picture: 'fish' },
+    G: { words: ['goat', 'grape', 'glass', 'guitar'], picture: 'goat' },
+    H: { words: ['hat', 'horse', 'house', 'hand'], picture: 'hat' },
+    I: { words: ['ice', 'igloo', 'iguana', 'ink'], picture: 'igloo' },
+    J: { words: ['jam', 'jet', 'jacket', 'jellyfish'], picture: 'jet' },
+    K: { words: ['kite', 'key', 'koala', 'kitten'], picture: 'kite' },
+    L: { words: ['lion', 'lamp', 'lemon', 'leaf'], picture: 'lion' },
+    M: { words: ['moon', 'mouse', 'milk', 'monkey'], picture: 'moon' },
+    N: { words: ['nest', 'nut', 'night', 'nose'], picture: 'nest' },
+    O: { words: ['orange', 'octopus', 'owl', 'ocean'], picture: 'orange' },
+    P: { words: ['pig', 'pizza', 'pencil', 'panda'], picture: 'pig' },
+    Q: { words: ['queen', 'quilt', 'question', 'quick'], picture: 'queen' },
+    R: { words: ['rabbit', 'rain', 'rose', 'robot'], picture: 'rabbit' },
+    S: { words: ['sun', 'snake', 'star', 'shoe'], picture: 'sun' },
+    T: { words: ['tree', 'tiger', 'turtle', 'truck'], picture: 'tree' },
+    U: { words: ['umbrella', 'unicorn', 'up', 'under'], picture: 'umbrella' },
+    V: { words: ['van', 'violin', 'vase', 'volcano'], picture: 'van' },
+    W: { words: ['water', 'whale', 'window', 'wolf'], picture: 'whale' },
+    X: { words: ['x-ray', 'xylophone', 'box', 'fox'], picture: 'xylophone' },
+    Y: { words: ['yarn', 'yo-yo', 'yellow', 'yawn'], picture: 'yo-yo' },
+    Z: { words: ['zebra', 'zero', 'zoo', 'zipper'], picture: 'zebra' },
+  };
+
+  return letters.split('').map(letter => ({
+    params: { letter: letter.toLowerCase() },
+    props: { letter, lower: letter.toLowerCase(), examples: wordExamples[letter] }
+  }));
+}
+
+interface Props {
+  letter: string;
+  lower: string;
+  examples: { words: string[]; picture: string };
+}
+
+const { letter, lower, examples } = Astro.props;
+
+const structuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://toolcalcs.com/' },
+      { '@type': 'ListItem', position: 2, name: 'Worksheets', item: 'https://toolcalcs.com/worksheets/' },
+      { '@type': 'ListItem', position: 3, name: 'Letter Tracing', item: 'https://toolcalcs.com/worksheets/letter-tracing-worksheets/' },
+      { '@type': 'ListItem', position: 4, name: 'Letter ' + letter },
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'LearningResource',
+    name: 'Letter ' + letter + ' Tracing Worksheet',
+    description: 'Free printable letter ' + letter + ' tracing worksheet for preschool and kindergarten.',
+    learningResourceType: 'worksheet',
+    educationalUse: 'practice',
+    isAccessibleForFree: true,
+    inLanguage: 'en',
+  },
+];
+---
+
+<BaseLayout
+  title={`Letter ${letter} Tracing Worksheet - Free Printable | ToolCalcs`}
+  description={`Free printable letter ${letter} tracing worksheet. Practice writing uppercase ${letter} and lowercase ${lower} with dotted-line guides. Words that start with ${letter}: ${examples.words.join(', ')}.`}
+  type="article"
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/worksheets/">Worksheets</a> &rsaquo;
+    <a href="/worksheets/letter-tracing-worksheets/">Letter Tracing</a> &rsaquo;
+    <span>Letter {letter}</span>
+  </nav>
+
+  <h1>Letter {letter} Tracing Worksheet</h1>
+  <p class="page-desc">Practice writing the uppercase letter <strong>{letter}</strong> and lowercase letter <strong>{lower}</strong>. Print this page and trace each letter with a pencil or crayon. Words that start with {letter}: {examples.words.join(', ')}.</p>
+
+  <div class="worksheet-box">
+    <div class="worksheet-actions">
+      <button class="ws-btn primary" onclick="window.print()">Print Worksheet</button>
+      <a href="/worksheets/letter-tracing-worksheets/" class="ws-btn">All Letters</a>
+    </div>
+
+    <div class="worksheet-content">
+      <div class="worksheet-header-print">
+        <h2>Letter {letter} {lower}</h2>
+        <div class="name-date">
+          <span>Name: ___________________</span>
+          <span>Date: ___________________</span>
+        </div>
+      </div>
+
+      <div class="lt-area">
+        <div class="lt-section">
+          <h3>Uppercase {letter}</h3>
+          <div class="lt-letter-row">
+            <span class="lt-big">{letter}</span>
+            <span class="lt-trace">{letter}</span>
+            <span class="lt-trace">{letter}</span>
+            <span class="lt-trace">{letter}</span>
+            <span class="lt-trace">{letter}</span>
+          </div>
+          <div class="lt-letter-row">
+            <span class="lt-trace">{letter}</span>
+            <span class="lt-trace">{letter}</span>
+            <span class="lt-trace">{letter}</span>
+            <span class="lt-trace">{letter}</span>
+            <span class="lt-trace">{letter}</span>
+          </div>
+        </div>
+
+        <div class="lt-section">
+          <h3>Lowercase {lower}</h3>
+          <div class="lt-letter-row">
+            <span class="lt-big">{lower}</span>
+            <span class="lt-trace">{lower}</span>
+            <span class="lt-trace">{lower}</span>
+            <span class="lt-trace">{lower}</span>
+            <span class="lt-trace">{lower}</span>
+          </div>
+          <div class="lt-letter-row">
+            <span class="lt-trace">{lower}</span>
+            <span class="lt-trace">{lower}</span>
+            <span class="lt-trace">{lower}</span>
+            <span class="lt-trace">{lower}</span>
+            <span class="lt-trace">{lower}</span>
+          </div>
+        </div>
+
+        <div class="lt-section">
+          <h3>Words that start with {letter}</h3>
+          <ul class="lt-words">
+            {examples.words.map(w => <li>{w}</li>)}
+          </ul>
+        </div>
+
+        <div class="lt-section">
+          <h3>Practice Writing</h3>
+          <div class="lt-blank-row"></div>
+          <div class="lt-blank-row"></div>
+          <div class="lt-blank-row"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <AdUnit slot="ws-mid" format="rectangle" />
+
+  <section class="letter-nav">
+    <h3>Browse All Letters</h3>
+    <div class="letter-grid">
+      {'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(L => (
+        <a href={`/worksheets/letter/${L.toLowerCase()}/`} class={L === letter ? 'letter-link active' : 'letter-link'}>{L}</a>
+      ))}
+    </div>
+  </section>
+
+  <article class="content-section">
+    <h2>How to Use This Letter {letter} Worksheet</h2>
+    <p>This printable worksheet is designed for preschool and kindergarten students learning to write the letter {letter}. Print as many copies as you need and have your child trace each letter, then practice writing it independently on the blank lines.</p>
+
+    <h2>Tips for Teaching Letter {letter}</h2>
+    <ul>
+      <li><strong>Say the letter sound.</strong> Each time your child writes the letter, have them say its sound aloud. This builds the letter-sound connection essential for reading.</li>
+      <li><strong>Use the example words.</strong> Read the words ({examples.words.join(', ')}) together and see if your child can think of more words that start with {letter}.</li>
+      <li><strong>Use proper letter formation.</strong> Show your child how to start at the top and follow the correct stroke order. Good habits formed early last for years.</li>
+      <li><strong>Keep sessions short.</strong> Five to ten minutes of focused practice is more effective than longer, frustrated sessions.</li>
+      <li><strong>Praise effort.</strong> Letters dont need to be perfect — just legible. Celebrate small improvements over time.</li>
+    </ul>
+
+    <h2>Related Worksheets</h2>
+    <ul>
+      <li><a href="/worksheets/alphabet-tracing-worksheets/">Alphabet Tracing Worksheets</a> - Practice all 26 letters at once.</li>
+      <li><a href="/worksheets/sight-words-worksheets/">Sight Words Worksheets</a> - Move from letters to words with high-frequency reading practice.</li>
+      <li><a href="/worksheets/phonics-worksheets/">Phonics Worksheets</a> - Build the letter-sound connection.</li>
+    </ul>
+  </article>
+
+  <AdUnit slot="ws-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .lt-area { padding: 20px 16px; }
+  .lt-section { margin-bottom: 30px; }
+  .lt-section h3 {
+    font-size: 1.05rem;
+    margin-bottom: 12px;
+    color: var(--color-text);
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 4px;
+  }
+  .lt-letter-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 14px;
+    align-items: center;
+  }
+  .lt-big {
+    font-family: 'Arial Rounded MT Bold', 'Helvetica Neue', sans-serif;
+    font-size: 4rem;
+    font-weight: 900;
+    color: #1a1a1a;
+    width: 70px;
+    text-align: center;
+  }
+  .lt-trace {
+    font-family: 'Arial Rounded MT Bold', 'Helvetica Neue', sans-serif;
+    font-size: 4rem;
+    font-weight: 900;
+    color: #d1d5db;
+    width: 70px;
+    text-align: center;
+  }
+  .lt-words {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .lt-words li {
+    font-size: 1.4rem;
+    font-family: 'Arial Rounded MT Bold', sans-serif;
+    color: #333;
+    padding: 6px 16px;
+    background: #f8fafc;
+    border-radius: 6px;
+  }
+  .lt-blank-row {
+    border-bottom: 2px solid #888;
+    height: 40px;
+    margin-bottom: 20px;
+  }
+  .letter-nav {
+    margin: 32px 0;
+    padding: 16px 20px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+  .letter-nav h3 {
+    font-size: 1rem;
+    margin-bottom: 12px;
+  }
+  .letter-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .letter-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.15s;
+  }
+  .letter-link:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  .letter-link.active {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+  }
+  @media (max-width: 600px) {
+    .lt-big, .lt-trace { font-size: 3rem; width: 50px; }
+    .lt-words li { font-size: 1.1rem; }
+  }
+</style>

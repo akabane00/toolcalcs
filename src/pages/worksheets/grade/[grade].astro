@@ -1,0 +1,310 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import AdUnit from '../../../components/AdUnit.astro';
+import { worksheets, type Worksheet } from '../../../data/worksheets';
+import '../../../styles/category.css';
+
+export function getStaticPaths() {
+  return [
+    { params: { grade: '1st-grade' }, props: { gradeNum: 1, gradeLabel: '1st Grade', gradeOrdinal: 'First Grade', age: '6-7' } },
+    { params: { grade: '2nd-grade' }, props: { gradeNum: 2, gradeLabel: '2nd Grade', gradeOrdinal: 'Second Grade', age: '7-8' } },
+    { params: { grade: '3rd-grade' }, props: { gradeNum: 3, gradeLabel: '3rd Grade', gradeOrdinal: 'Third Grade', age: '8-9' } },
+    { params: { grade: '4th-grade' }, props: { gradeNum: 4, gradeLabel: '4th Grade', gradeOrdinal: 'Fourth Grade', age: '9-10' } },
+    { params: { grade: '5th-grade' }, props: { gradeNum: 5, gradeLabel: '5th Grade', gradeOrdinal: 'Fifth Grade', age: '10-11' } },
+    { params: { grade: '6th-grade' }, props: { gradeNum: 6, gradeLabel: '6th Grade', gradeOrdinal: 'Sixth Grade', age: '11-12' } },
+    { params: { grade: 'kindergarten' }, props: { gradeNum: 0, gradeLabel: 'Kindergarten', gradeOrdinal: 'Kindergarten', age: '5-6' } },
+    { params: { grade: 'preschool' }, props: { gradeNum: -1, gradeLabel: 'Preschool', gradeOrdinal: 'Preschool', age: '3-5' } },
+  ];
+}
+
+interface Props {
+  gradeNum: number;
+  gradeLabel: string;
+  gradeOrdinal: string;
+  age: string;
+}
+
+const { gradeNum, gradeLabel, gradeOrdinal, age } = Astro.props;
+
+// Parse a gradeRange string into [min, max]
+function parseRange(range: string): [number, number] {
+  if (range === 'Pre-K') return [-1, -1];
+  if (range === 'K') return [0, 0];
+  // K-N pattern
+  if (range.startsWith('K-')) return [0, parseInt(range.slice(2), 10)];
+  // N-N pattern
+  if (range.includes('-')) {
+    const [a, b] = range.split('-');
+    const aNum = a === 'K' ? 0 : parseInt(a, 10);
+    const bNum = b === 'K' ? 0 : parseInt(b, 10);
+    return [aNum, bNum];
+  }
+  // Single number
+  const n = parseInt(range, 10);
+  if (!isNaN(n)) return [n, n];
+  return [0, 12];
+}
+
+// Filter worksheets matching this grade
+const matchingWorksheets = worksheets.filter(w => {
+  const [min, max] = parseRange(w.gradeRange);
+  return gradeNum >= min && gradeNum <= max;
+});
+
+// Group by topic for organization
+const mathSheets = matchingWorksheets.filter(w =>
+  ['Addition', 'Subtraction', 'Multiplication', 'Division', 'Fractions', 'Decimals', 'Geometry', 'Algebra', 'Counting', 'Number Writing', 'Place Value', 'Time', 'Money', 'Shapes', 'Measurement'].some(t => w.mathTopic.includes(t))
+);
+const readingSheets = matchingWorksheets.filter(w =>
+  ['Reading', 'Phonics', 'Vocabulary', 'Spelling', 'Grammar', 'Alphabet', 'Writing', 'Punctuation', 'Capitalization'].some(t => w.mathTopic.includes(t))
+);
+const seasonalSheets = matchingWorksheets.filter(w => w.mathTopic === 'Seasonal');
+const puzzleSheets = matchingWorksheets.filter(w =>
+  ['Puzzle', 'Game', 'Logic', 'Visual'].some(t => w.mathTopic.includes(t))
+);
+const otherSheets = matchingWorksheets.filter(w =>
+  !mathSheets.includes(w) && !readingSheets.includes(w) && !seasonalSheets.includes(w) && !puzzleSheets.includes(w)
+);
+
+const sections: { title: string; sheets: Worksheet[] }[] = [
+  { title: 'Math Worksheets', sheets: mathSheets },
+  { title: 'Reading & Language Arts', sheets: readingSheets },
+  { title: 'Seasonal & Themed', sheets: seasonalSheets },
+  { title: 'Puzzles & Games', sheets: puzzleSheets },
+  { title: 'Other', sheets: otherSheets },
+].filter(s => s.sheets.length > 0);
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://toolcalcs.com/' },
+    { '@type': 'ListItem', position: 2, name: 'Worksheets', item: 'https://toolcalcs.com/worksheets/' },
+    { '@type': 'ListItem', position: 3, name: gradeLabel + ' Worksheets' },
+  ],
+};
+---
+
+<BaseLayout
+  title={`Free ${gradeLabel} Worksheets - Math, Reading & More | ToolCalcs`}
+  description={`Free printable ${gradeLabel.toLowerCase()} worksheets. ${matchingWorksheets.length} math, reading, and language arts worksheets for ${gradeOrdinal.toLowerCase()} students (ages ${age}). Print unlimited copies.`}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/worksheets/">Worksheets</a> &rsaquo;
+    <span>{gradeLabel}</span>
+  </nav>
+
+  <h1>{gradeLabel} Worksheets</h1>
+  <p class="page-desc">{matchingWorksheets.length} free printable worksheets for {gradeOrdinal.toLowerCase()} students (ages {age}). Math, reading, language arts, seasonal activities, and puzzles — all aligned with typical {gradeOrdinal.toLowerCase()} curriculum.</p>
+
+  <section class="grade-intro">
+    <p>This page brings together every worksheet on ToolCalcs that fits the {gradeLabel.toLowerCase()} skill range. Whether you are a parent looking for after-school practice, a teacher building lesson plans, or a homeschool family planning curriculum, you will find grade-appropriate practice in math, reading, writing, vocabulary, and more. All worksheets are completely free, require no sign-up, and can be printed as many times as you need.</p>
+  </section>
+
+  <AdUnit slot="cat-top" format="horizontal" />
+
+  <div class="grade-nav">
+    <strong>Other grades:</strong>
+    <a href="/worksheets/grade/preschool/">Preschool</a>
+    <a href="/worksheets/grade/kindergarten/">Kindergarten</a>
+    <a href="/worksheets/grade/1st-grade/">1st</a>
+    <a href="/worksheets/grade/2nd-grade/">2nd</a>
+    <a href="/worksheets/grade/3rd-grade/">3rd</a>
+    <a href="/worksheets/grade/4th-grade/">4th</a>
+    <a href="/worksheets/grade/5th-grade/">5th</a>
+    <a href="/worksheets/grade/6th-grade/">6th</a>
+  </div>
+
+  {sections.map(section => (
+    <section class="ws-category">
+      <h2>{section.title}</h2>
+      <div class="calc-grid">
+        {section.sheets.map(ws => (
+          <a href={`/worksheets/${ws.slug}/`} class="calc-card">
+            <span class="calc-icon">{ws.icon}</span>
+            <h3>{ws.title}</h3>
+            <p>{ws.description}</p>
+            <span class="grade-badge">Grades {ws.gradeRange}</span>
+          </a>
+        ))}
+      </div>
+    </section>
+  ))}
+
+  <section class="grade-tips">
+    <h2>What {gradeOrdinal} Students Are Learning</h2>
+    {gradeNum === -1 && (
+      <div>
+        <p>Preschoolers (ages 3-5) are building the foundation skills that prepare them for kindergarten. Focus on letter recognition, counting to 20, basic shapes, fine motor control through tracing and coloring, and early phonics. At this age, learning happens best through play and short, focused sessions of 5 to 10 minutes.</p>
+        <ul>
+          <li><strong>Letter recognition</strong> - Identify all uppercase and lowercase letters</li>
+          <li><strong>Counting</strong> - Count objects 1 to 20 with one-to-one correspondence</li>
+          <li><strong>Shapes</strong> - Recognize circles, squares, triangles, and rectangles</li>
+          <li><strong>Fine motor</strong> - Trace lines, shapes, and letters</li>
+          <li><strong>Pre-reading</strong> - Beginning sounds and rhyming</li>
+        </ul>
+      </div>
+    )}
+    {gradeNum === 0 && (
+      <div>
+        <p>Kindergartners (ages 5-6) are learning to read, write, and do basic math. They master all letter sounds, begin sight word reading, count to 100, write numbers, and start adding small numbers within 10.</p>
+        <ul>
+          <li><strong>Reading</strong> - All letter sounds, blending CVC words, basic sight words</li>
+          <li><strong>Writing</strong> - Form all letters correctly, write own name, simple sentences</li>
+          <li><strong>Math</strong> - Count to 100, write numbers 0-20, add and subtract within 10</li>
+          <li><strong>Shapes</strong> - 2D and 3D shapes, comparing sizes</li>
+        </ul>
+      </div>
+    )}
+    {gradeNum === 1 && (
+      <div>
+        <p>First graders (ages 6-7) build reading fluency and tackle two-digit math. They master addition and subtraction facts within 20, learn to read independently, write complete sentences, and begin understanding place value.</p>
+        <ul>
+          <li><strong>Math</strong> - Addition and subtraction within 20, place value to 100, telling time to the hour</li>
+          <li><strong>Reading</strong> - Decode unfamiliar words with phonics, read 100+ sight words</li>
+          <li><strong>Writing</strong> - Capitalization, end punctuation, complete sentences</li>
+          <li><strong>Measurement</strong> - Compare lengths, basic time, money recognition</li>
+        </ul>
+      </div>
+    )}
+    {gradeNum === 2 && (
+      <div>
+        <p>Second graders (ages 7-8) extend math facts and read more complex texts. They master addition and subtraction within 100, learn money and time, build paragraph writing, and develop reading comprehension strategies.</p>
+        <ul>
+          <li><strong>Math</strong> - Add and subtract within 100, regrouping, time to nearest 5 minutes, money</li>
+          <li><strong>Reading</strong> - Comprehension of grade-level texts, main idea, vocabulary in context</li>
+          <li><strong>Writing</strong> - Multi-sentence paragraphs, basic punctuation, friendly letters</li>
+          <li><strong>Measurement</strong> - Length in inches and centimeters, weight, capacity</li>
+        </ul>
+      </div>
+    )}
+    {gradeNum === 3 && (
+      <div>
+        <p>Third graders (ages 8-9) make a significant leap as they learn multiplication and division. They read longer chapter books, write paragraphs with topic sentences, and apply math to real-world problems including measurement and fractions.</p>
+        <ul>
+          <li><strong>Math</strong> - Multiplication and division within 100, fractions, area, perimeter</li>
+          <li><strong>Reading</strong> - Chapter books, character analysis, inferences, multi-paragraph texts</li>
+          <li><strong>Writing</strong> - Paragraphs with topic sentences, narrative and informational writing</li>
+          <li><strong>Vocabulary</strong> - Context clues, prefixes and suffixes, dictionary skills</li>
+        </ul>
+      </div>
+    )}
+    {gradeNum === 4 && (
+      <div>
+        <p>Fourth graders (ages 9-10) work with multi-digit math, decimals, and complex texts. They write essays with multiple paragraphs, study U.S. history and geography, and develop research skills for grade-level projects.</p>
+        <ul>
+          <li><strong>Math</strong> - Multi-digit multiplication and division, fractions, decimals, geometry</li>
+          <li><strong>Reading</strong> - Literary and informational text analysis, theme, summarizing</li>
+          <li><strong>Writing</strong> - Essay structure, research projects, persuasive writing</li>
+          <li><strong>Grammar</strong> - Parts of speech, sentence types, punctuation</li>
+        </ul>
+      </div>
+    )}
+    {gradeNum === 5 && (
+      <div>
+        <p>Fifth graders (ages 10-11) prepare for middle school with more complex math and reading. They work with all four operations on fractions and decimals, analyze literature, and write detailed essays with research and citations.</p>
+        <ul>
+          <li><strong>Math</strong> - Fraction and decimal operations, volume, coordinate plane, order of operations</li>
+          <li><strong>Reading</strong> - Multiple texts on a topic, comparing texts, citing evidence</li>
+          <li><strong>Writing</strong> - Multi-paragraph essays, research with sources, narrative techniques</li>
+          <li><strong>Vocabulary</strong> - Academic vocabulary, figurative language, word relationships</li>
+        </ul>
+      </div>
+    )}
+    {gradeNum === 6 && (
+      <div>
+        <p>Sixth graders (ages 11-12) often start middle school. They tackle ratios, percentages, integers, and pre-algebra concepts. Reading focuses on complex literature and informational texts. Writing becomes more analytical and structured.</p>
+        <ul>
+          <li><strong>Math</strong> - Ratios and rates, percentages, integers, expressions, equations</li>
+          <li><strong>Reading</strong> - Complex literature, theme analysis, central ideas, evidence</li>
+          <li><strong>Writing</strong> - Argument writing, research, citing sources, formal essays</li>
+          <li><strong>Vocabulary</strong> - Academic language, Greek and Latin roots</li>
+        </ul>
+      </div>
+    )}
+
+    <h2>How to Use These Worksheets</h2>
+    <p>Pick a topic where your child needs practice and print as many copies as you need. Start with the easiest level and work up gradually. Five to ten minutes of focused practice is more effective than long, frustrated sessions. Make it fun with stickers, timed challenges, or small rewards. All worksheets are designed to print on standard 8.5 by 11 inch paper.</p>
+  </section>
+
+  <AdUnit slot="cat-bottom" format="horizontal" />
+</BaseLayout>
+
+<style>
+  .grade-intro {
+    padding: 16px 20px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: var(--color-text-muted);
+    margin-bottom: 24px;
+  }
+  .grade-nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    margin-bottom: 24px;
+    font-size: 0.88rem;
+  }
+  .grade-nav strong { color: var(--color-text); margin-right: 4px; }
+  .grade-nav a {
+    padding: 4px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: all 0.15s;
+  }
+  .grade-nav a:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  .grade-tips {
+    margin-top: 40px;
+    padding: 24px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+  .grade-tips h2 {
+    font-size: 1.2rem;
+    margin-top: 0;
+    margin-bottom: 12px;
+  }
+  .grade-tips h2:not(:first-child) { margin-top: 24px; }
+  .grade-tips p {
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  .grade-tips ul {
+    color: var(--color-text-muted);
+    line-height: 1.7;
+    margin-left: 20px;
+  }
+  .grade-tips li { margin-bottom: 4px; }
+  .grade-tips strong { color: var(--color-text); }
+
+  .grade-badge {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 2px 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #eff6ff;
+    color: var(--color-primary);
+    border-radius: 12px;
+  }
+  .ws-category { margin-bottom: 32px; }
+  .ws-category h2 { font-size: 1.3rem; margin-bottom: 12px; }
+  .calc-card h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 6px; }
+</style>
