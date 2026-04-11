@@ -21,9 +21,9 @@ export default defineConfig({
       // but we prioritize original content for sitemap-based discovery
       const programmaticPrefixes = [
         '/mortgage/', '/bmi/', '/loan/', '/savings/', '/down-payment/',
-        '/calorie/', '/paycheck/', '/macro/', '/data-convert/', '/pace/',
+        '/paycheck/', '/macro/', '/data-convert/', '/pace/',
         '/due-date/', '/math/', '/percentage/', '/cooking/', '/compound-interest/',
-        '/convert/', '/currency/', '/salary/', '/days-until/', '/days-ago/',
+        '/convert/', '/salary/', '/days-until/', '/days-ago/',
         '/days-from-now/', '/zodiac/', '/angel-number/', '/grade/', '/percent-off/',
         '/fraction/', '/roman-numerals/', '/number-to-words/', '/what-percent/',
         '/auto-loan/', '/decimal-to-fraction/', '/times-tables/', '/factors-of/',
