@@ -167,6 +167,30 @@ const props = Astro.props;
         }
       });
     });
+
+    // GA4: Track all calculate/submit buttons (broader selector)
+    document.querySelectorAll('.calc-btn, [id*="calculate"], [id*="btnCalc"]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        if (window.gtag) window.gtag('event', 'calculator_submit', {
+          calculator_name: document.querySelector('h1')?.textContent || '',
+          page_path: location.pathname
+        });
+      });
+    });
+
+    // GA4: Track copy-link/share-results clicks
+    document.getElementById('copy-link-btn')?.addEventListener('click', function() {
+      if (window.gtag) window.gtag('event', 'result_copy', {
+        calculator_name: document.querySelector('h1')?.textContent || '',
+        page_path: location.pathname
+      });
+    });
+    document.getElementById('native-share-btn')?.addEventListener('click', function() {
+      if (window.gtag) window.gtag('event', 'tool_share', {
+        calculator_name: document.querySelector('h1')?.textContent || '',
+        page_path: location.pathname
+      });
+    });
   </script>
 </body>
 </html>
