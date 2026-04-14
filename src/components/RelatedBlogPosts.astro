@@ -1,0 +1,112 @@
+---
+import { blogArticles, type BlogArticle } from '../data/blog-articles';
+
+interface Props {
+  currentSlug: string;
+  limit?: number;
+}
+
+const { currentSlug, limit = 4 } = Astro.props;
+
+// Find current article
+const current = blogArticles.find(a => a.slug === currentSlug);
+if (!current) return;
+
+// Score other articles by relevance
+const scored: { article: BlogArticle; score: number }[] = [];
+
+for (const article of blogArticles) {
+  if (article.slug === currentSlug) continue;
+  let score = 0;
+
+  // Same category = high relevance
+  if (article.category === current.category) score += 3;
+
+  // Shared related calculator slugs
+  const sharedCalcs = article.relatedCalculatorSlugs.filter(
+    s => current.relatedCalculatorSlugs.includes(s)
+  );
+  score += sharedCalcs.length * 2;
+
+  // Title word overlap (excluding common words)
+  const stopWords = new Set(['the','a','an','and','or','of','to','in','for','is','it','how','what','your','you','with','vs','by','on','at','from']);
+  const currentWords = new Set(
+    current.title.toLowerCase().split(/\W+/).filter(w => w.length > 2 && !stopWords.has(w))
+  );
+  const articleWords = article.title.toLowerCase().split(/\W+/).filter(w => w.length > 2 && !stopWords.has(w));
+  for (const w of articleWords) {
+    if (currentWords.has(w)) score += 1;
+  }
+
+  if (score > 0) scored.push({ article, score });
+}
+
+// Sort by score descending, take top N
+const related = scored
+  .sort((a, b) => b.score - a.score)
+  .slice(0, limit)
+  .map(s => s.article);
+---
+
+{related.length > 0 && (
+  <section class="related-posts">
+    <h2>You Might Also Like</h2>
+    <div class="rp-grid">
+      {related.map(article => (
+        <a href={`/blog/${article.slug}/`} class="rp-card">
+          <span class="rp-category">{article.category}</span>
+          <h3>{article.title}</h3>
+        </a>
+      ))}
+    </div>
+  </section>
+)}
+
+<style>
+  .related-posts {
+    margin: 32px 0;
+    padding: 24px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+  .related-posts h2 {
+    font-size: 1.1rem;
+    margin-bottom: 16px;
+  }
+  .rp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 12px;
+  }
+  .rp-card {
+    display: block;
+    padding: 14px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--color-text);
+    transition: border-color 0.15s;
+  }
+  .rp-card:hover {
+    border-color: var(--color-primary);
+    text-decoration: none;
+  }
+  .rp-category {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-primary);
+    margin-bottom: 4px;
+  }
+  .rp-card h3 {
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin: 0;
+  }
+  @media (max-width: 640px) {
+    .rp-grid { grid-template-columns: 1fr; }
+  }
+</style>
