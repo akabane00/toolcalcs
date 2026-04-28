@@ -1,22 +1,61 @@
 ---
-// AuthorBio.astro — Human author box
+interface Props {
+  desk?: 'finance' | 'health' | 'math' | 'general';
+}
+
+const { desk = 'general' } = Astro.props;
+
+const desks = {
+  finance: {
+    name: 'Personal Finance Desk',
+    avatar: '$',
+    focus: 'Mortgages, retirement, taxes, credit, debt payoff',
+    sources: 'IRS · SSA · CFPB · Federal Reserve · Freddie Mac · BLS',
+  },
+  health: {
+    name: 'Health & Wellness Desk',
+    avatar: '+',
+    focus: 'BMI, calories, macros, pregnancy, fitness benchmarks',
+    sources: 'WHO · NIH · CDC · ACSM · Academy of Nutrition and Dietetics',
+  },
+  math: {
+    name: 'Math & Education Desk',
+    avatar: 'x',
+    focus: 'Practice worksheets, formulas, conversions, GPA, test prep',
+    sources: 'Common Core · College Board · NCTM · NIST',
+  },
+  general: {
+    name: 'ToolCalcs Editorial',
+    avatar: 'TC',
+    focus: 'Practical calculators and explainers, tested in the browser',
+    sources: 'Government & academic primary sources cited inline',
+  },
+};
+
+const d = desks[desk];
 ---
 
-<div class="author-bio">
-  <div class="author-bio-avatar">JK</div>
+<aside class="author-bio" aria-label="About this article">
+  <div class="author-bio-avatar" aria-hidden="true">{d.avatar}</div>
   <div class="author-bio-content">
-    <strong class="author-bio-name">James Kim</strong>
-    <p class="author-bio-credentials">Finance nerd. Spreadsheet addict. Building free tools since 2024.</p>
-    <p class="author-bio-desc">I started ToolCalcs after getting frustrated with calculator sites that wanted my email before showing me a simple mortgage payment. I built the tools I wanted to use myself, then wrote the guides I wished existed when I was figuring out my own finances. I'm not a certified financial advisor — I'm a software developer who reads too many IRS publications. When the numbers matter (taxes, retirement, insurance), I cross-check against official sources and note them in the article. For everything else, I write from experience. <a href="/about/">More about me →</a></p>
+    <strong class="author-bio-name">Written by the {d.name}</strong>
+    <p class="author-bio-focus">{d.focus}</p>
+    <p class="author-bio-sources"><strong>Primary sources:</strong> {d.sources}</p>
+    <p class="author-bio-policy">
+      Every article cross-checks claims against primary sources cited inline. We refresh figures when the underlying laws, rates, or guidelines change. Read our <a href="/editorial-standards/">editorial standards</a> for the full methodology, source list, and corrections policy.
+    </p>
+    <p class="author-bio-disclaimer">
+      Educational content only — not legal, tax, financial, or medical advice. For decisions that turn on your specific situation, consult a licensed professional (CPA, CFP, attorney, physician).
+    </p>
   </div>
-</div>
+</aside>
 
 <style>
   .author-bio {
     display: flex;
     gap: 14px;
     align-items: flex-start;
-    margin-top: 20px;
+    margin-top: 24px;
     padding: 18px;
     background: var(--color-bg);
     border: 1px solid var(--color-border);
@@ -26,13 +65,13 @@
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: #1a1a1a;
+    background: var(--color-primary);
     color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 0.85rem;
+    font-size: 1rem;
     flex-shrink: 0;
   }
   .author-bio-content {
@@ -42,21 +81,39 @@
   .author-bio-name {
     font-size: 0.95rem;
     display: block;
-    margin-bottom: 2px;
+    margin-bottom: 4px;
   }
-  .author-bio-credentials {
-    font-size: 0.78rem;
+  .author-bio-focus {
+    font-size: 0.8rem;
     color: var(--color-text-muted);
-    font-style: italic;
-    margin: 0 0 6px;
+    margin: 0 0 8px;
   }
-  .author-bio-desc {
+  .author-bio-sources {
+    font-size: 0.8rem;
+    color: var(--color-text);
+    margin: 0 0 10px;
+    line-height: 1.5;
+  }
+  .author-bio-sources strong {
+    color: var(--color-text-muted);
+    font-weight: 500;
+  }
+  .author-bio-policy {
     font-size: 0.82rem;
     color: var(--color-text-muted);
     line-height: 1.6;
-    margin: 0;
+    margin: 0 0 8px;
   }
-  .author-bio-desc a {
+  .author-bio-policy a {
     color: var(--color-primary);
+  }
+  .author-bio-disclaimer {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    margin: 0;
+    padding-top: 8px;
+    border-top: 1px dashed var(--color-border);
+    font-style: italic;
   }
 </style>

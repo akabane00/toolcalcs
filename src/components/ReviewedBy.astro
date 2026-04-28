@@ -1,63 +1,100 @@
 ---
 interface Props {
   date?: string;
+  formula?: string;
+  sources?: string[];
 }
 
-const { date = '2026-03-31' } = Astro.props;
+const { date = '2026-03-31', formula, sources } = Astro.props;
 const formattedDate = new Date(date + 'T00:00:00').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 ---
 
-<div class="reviewed-by">
-  <span class="rb-icon">&#x2714;</span>
-  <span class="rb-text">
-    Formulas checked against official sources &middot; Last updated {formattedDate}
-  </span>
-  <a href="/editorial-standards/" class="rb-link">Our standards</a>
-</div>
+<aside class="page-meta" aria-label="Page metadata">
+  <div class="page-meta-row">
+    <span class="page-meta-label">Last updated</span>
+    <span class="page-meta-value">{formattedDate}</span>
+  </div>
+  {formula && (
+    <div class="page-meta-row">
+      <span class="page-meta-label">Formula</span>
+      <code class="page-meta-formula">{formula}</code>
+    </div>
+  )}
+  {sources && sources.length > 0 && (
+    <div class="page-meta-row">
+      <span class="page-meta-label">Primary sources</span>
+      <span class="page-meta-value">{sources.join(' · ')}</span>
+    </div>
+  )}
+  <div class="page-meta-row page-meta-links">
+    <a href="/editorial-standards/" class="page-meta-link">Editorial standards</a>
+    <span class="page-meta-sep">·</span>
+    <a href="/contact/" class="page-meta-link">Report an error</a>
+  </div>
+</aside>
 
 <style>
-  .reviewed-by {
+  .page-meta {
+    margin: 16px 0 24px;
+    padding: 12px 16px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-primary);
+    border-radius: var(--radius);
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+  .page-meta-row {
     display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    background: #f0fdf4;
-    border: 1px solid #bbf7d0;
-    border-radius: 8px;
-    font-size: 0.82rem;
-    color: #166534;
-    margin: 16px 0;
     flex-wrap: wrap;
+    gap: 8px;
+    align-items: baseline;
+    margin-bottom: 4px;
   }
-  [data-theme="dark"] .reviewed-by {
-    background: #052e16;
-    border-color: #166534;
-    color: #86efac;
+  .page-meta-row:last-child {
+    margin-bottom: 0;
   }
-  .rb-icon {
-    font-size: 1rem;
+  .page-meta-label {
+    color: var(--color-text-muted);
+    font-weight: 500;
+    min-width: 120px;
     flex-shrink: 0;
   }
-  .rb-text {
-    flex: 1;
-    min-width: 200px;
+  .page-meta-value {
+    color: var(--color-text);
   }
-  .rb-text strong {
-    color: #15803d;
+  .page-meta-formula {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.82rem;
+    background: var(--color-bg-alt, rgba(0,0,0,0.04));
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--color-text);
   }
-  [data-theme="dark"] .rb-text strong {
-    color: #4ade80;
+  [data-theme="dark"] .page-meta-formula {
+    background: rgba(255,255,255,0.06);
   }
-  .rb-link {
-    font-size: 0.78rem;
-    color: #15803d;
+  .page-meta-links {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--color-border);
+  }
+  .page-meta-link {
+    color: var(--color-primary);
     text-decoration: none;
-    white-space: nowrap;
+    font-size: 0.82rem;
   }
-  .rb-link:hover {
+  .page-meta-link:hover {
     text-decoration: underline;
   }
-  [data-theme="dark"] .rb-link {
-    color: #4ade80;
+  .page-meta-sep {
+    color: var(--color-text-muted);
+    font-size: 0.82rem;
+  }
+  @media (max-width: 480px) {
+    .page-meta-label {
+      min-width: 100%;
+      margin-bottom: 2px;
+    }
   }
 </style>

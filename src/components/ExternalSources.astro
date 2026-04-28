@@ -1,0 +1,81 @@
+---
+import { SOURCE_CLUSTERS, type ExternalSource } from '../data/external-sources';
+
+interface Props {
+  cluster?: keyof typeof SOURCE_CLUSTERS;
+  sources?: ExternalSource[];
+  title?: string;
+}
+
+const { cluster, sources, title = 'Sources & further reading' } = Astro.props;
+const items: ExternalSource[] = sources ?? (cluster ? SOURCE_CLUSTERS[cluster] : []);
+---
+
+{items.length > 0 && (
+  <section class="external-sources" aria-label="External sources">
+    <h2 class="external-sources-title">{title}</h2>
+    <p class="external-sources-intro">
+      Claims in this article are cross-checked against the following primary sources. Links open on the publisher's site.
+    </p>
+    <ol class="external-sources-list">
+      {items.map((s) => (
+        <li class="external-sources-item">
+          <a href={s.url} class="external-sources-link" target="_blank" rel="noopener external nofollow" aria-describedby={`src-desc-${s.name.replace(/\s+/g, '-').toLowerCase()}`}>
+            {s.name}
+          </a>
+          <p id={`src-desc-${s.name.replace(/\s+/g, '-').toLowerCase()}`} class="external-sources-desc">
+            {s.description}
+          </p>
+        </li>
+      ))}
+    </ol>
+  </section>
+)}
+
+<style>
+  .external-sources {
+    margin: 32px 0;
+    padding: 20px 22px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-primary);
+    border-radius: var(--radius);
+  }
+  .external-sources-title {
+    font-size: 1.05rem;
+    margin: 0 0 8px;
+    color: var(--color-text);
+  }
+  .external-sources-intro {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin: 0 0 14px;
+    line-height: 1.5;
+  }
+  .external-sources-list {
+    list-style: decimal;
+    margin: 0;
+    padding-left: 22px;
+  }
+  .external-sources-item {
+    margin-bottom: 14px;
+  }
+  .external-sources-item:last-child {
+    margin-bottom: 0;
+  }
+  .external-sources-link {
+    color: var(--color-primary);
+    font-weight: 600;
+    font-size: 0.92rem;
+    text-decoration: none;
+  }
+  .external-sources-link:hover {
+    text-decoration: underline;
+  }
+  .external-sources-desc {
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    margin: 4px 0 0;
+    line-height: 1.55;
+  }
+</style>
