@@ -1,0 +1,145 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { blogArticles } from '../../../data/blog-articles';
+
+export function getStaticPaths() {
+  // Build hub pages only for categories with >= 5 articles. Smaller buckets
+  // create thin category pages that hurt site quality scoring.
+  const counts = new Map<string, number>();
+  for (const a of blogArticles) {
+    counts.set(a.category, (counts.get(a.category) ?? 0) + 1);
+  }
+  const eligible = [...counts.entries()].filter(([_, n]) => n >= 5);
+
+  return eligible.map(([category]) => ({
+    params: { category: category.toLowerCase().replace(/\s+/g, '-') },
+    props: { category },
+  }));
+}
+
+interface Props { category: string }
+const { category } = Astro.props;
+
+const articles = blogArticles
+  .filter((a) => a.category === category)
+  .sort((a, b) => b.datePublished.localeCompare(a.datePublished));
+
+function formatDate(iso: string): string {
+  const d = new Date(iso + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+const categorySlug = category.toLowerCase().replace(/\s+/g, '-');
+const canonical = `https://toolcalcs.com/blog/category/${categorySlug}/`;
+
+const categoryDescriptions: Record<string, string> = {
+  Finance: 'In-depth guides on personal finance, taxes, retirement, mortgages, credit, and investing — cross-checked against IRS, SSA, CFPB, and Federal Reserve sources.',
+  Health: 'Evidence-based articles on BMI, calories, fitness, pregnancy, sleep, and nutrition — referencing CDC, NIH, WHO, and ACSM guidelines.',
+  Math: 'Practical math explainers covering percentages, fractions, GPA, statistics, and everyday formulas with step-by-step worked examples.',
+  Education: 'Guides for students and parents on FAFSA, SAT prep, GPA, college costs, and study techniques.',
+  Business: 'Articles for freelancers and small-business owners on profit margin, LLC vs S-Corp, payroll, SBA loans, and self-employment tax.',
+  Psychology: 'Explainers on personality types (MBTI/DISC/Enneagram), cognitive biases, mental health screening tools, and behavioral science.',
+  Technology: 'Beginner-friendly explainers on JWT, JSON, hashing, regex, QR codes, markdown, and other practical tech concepts.',
+  Everyday: 'Practical conversion and calculation guides for cooking, walking, units, time, and household measurements.',
+  Construction: 'How-to estimation guides for paint, concrete, flooring, roofing, fencing, and other DIY home projects.',
+  Automotive: 'Car-buying and ownership guides covering depreciation, EV vs gas, lease vs finance, fuel costs, and insurance.',
+  Astrology: 'Interpretive guides on zodiac signs, numerology, angel numbers, tarot, and Chinese zodiac traditions.',
+};
+const desc = categoryDescriptions[category] ?? `${articles.length} articles in the ${category} category on ToolCalcs.`;
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: `${category} Articles - ToolCalcs`,
+  description: desc,
+  url: canonical,
+  numberOfItems: articles.length,
+  mainEntity: {
+    '@type': 'ItemList',
+    itemListElement: articles.slice(0, 20).map((a, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      url: `https://toolcalcs.com/blog/${a.slug}/`,
+      name: a.title,
+    })),
+  },
+};
+---
+
+<BaseLayout
+  title={`${category} Articles (${articles.length}) | ToolCalcs Blog`}
+  description={desc}
+  canonical={canonical}
+  structuredData={structuredData}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/blog/">Blog</a> &rsaquo;
+    <span>{category}</span>
+  </nav>
+
+  <h1>{category} Articles</h1>
+  <p class="category-intro">{desc}</p>
+  <p class="category-count">{articles.length} guides in this category, sorted by most recent.</p>
+
+  <div class="article-grid">
+    {articles.map((article) => (
+      <a href={`/blog/${article.slug}/`} class="article-card">
+        <span class="article-category">{article.category}</span>
+        <h2>{article.title}</h2>
+        <p>{article.description}</p>
+        <span class="article-date">{formatDate(article.datePublished)}</span>
+      </a>
+    ))}
+  </div>
+
+  <section class="other-categories">
+    <h2>Other Categories</h2>
+    <p><a href="/blog/">Browse all {blogArticles.length} articles</a> or explore another topic from the <a href="/blog/">main blog index</a>.</p>
+  </section>
+</BaseLayout>
+
+<style>
+  .breadcrumb { font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 12px; }
+  .breadcrumb a { color: var(--color-primary); text-decoration: none; }
+  h1 { font-size: 1.85rem; margin: 8px 0 12px; }
+  .category-intro { font-size: 1rem; color: var(--color-text); line-height: 1.65; margin-bottom: 8px; }
+  .category-count { font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 24px; }
+  .article-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .article-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 16px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--color-text);
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .article-card:hover { border-color: var(--color-primary); box-shadow: var(--shadow-sm); }
+  .article-category {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-primary);
+  }
+  .article-card h2 { font-size: 1rem; line-height: 1.4; margin: 0; }
+  .article-card p { font-size: 0.85rem; color: var(--color-text-muted); margin: 0; line-height: 1.5; }
+  .article-date { font-size: 0.75rem; color: var(--color-text-muted); margin-top: auto; }
+  .other-categories {
+    padding: 20px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    margin-top: 32px;
+  }
+  .other-categories h2 { font-size: 1.05rem; margin: 0 0 8px; }
+  .other-categories a { color: var(--color-primary); }
+</style>

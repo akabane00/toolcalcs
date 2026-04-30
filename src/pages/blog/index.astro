@@ -25,13 +25,23 @@ function formatDate(iso: string): string {
   <h1>Guides & Articles</h1>
   <p class="blog-intro">{articles.length} practical guides to help you understand the math behind everyday decisions.</p>
 
-  <!-- Category Filter -->
+  <!-- Category Filter (in-page) -->
   <div class="filter-bar" id="filter-bar">
     <button class="filter-chip active" data-category="all">All ({articles.length})</button>
     {categoryList.map(([cat, count]) => (
       <button class="filter-chip" data-category={cat}>{cat} ({count})</button>
     ))}
   </div>
+
+  <!-- Category hubs (crawlable links - real <a> tags so Google can follow) -->
+  <nav class="category-hubs" aria-label="Browse by category">
+    <span class="hub-label">Browse hubs:</span>
+    {categoryList.filter(([_, count]) => count >= 5).map(([cat, count]) => (
+      <a href={`/blog/category/${cat.toLowerCase().replace(/\s+/g, '-')}/`} class="hub-link">
+        {cat} ({count})
+      </a>
+    ))}
+  </nav>
 
   <!-- Search -->
   <div class="blog-search">
@@ -144,7 +154,30 @@ function formatDate(iso: string): string {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+    margin-bottom: 12px;
+  }
+  .category-hubs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    align-items: center;
+    padding: 10px 14px;
     margin-bottom: 16px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 0.82rem;
+  }
+  .hub-label {
+    color: var(--color-text-muted);
+    font-weight: 500;
+  }
+  .hub-link {
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+  .hub-link:hover {
+    text-decoration: underline;
   }
   .filter-chip {
     padding: 6px 14px;

@@ -59,7 +59,11 @@ export default defineConfig({
         item.changefreq = 'monthly';
       }
 
-      delete item.lastmod;
+      // Set lastmod to build date (YYYY-MM-DD) on every URL — Google reads
+      // this as a "regenerated since" signal, which encourages re-crawl.
+      // The sitemap integration does not populate lastmod by default for
+      // SSG output, so we emit it here in W3C Datetime (date-only) form.
+      item.lastmod = new Date().toISOString().slice(0, 10);
       return item;
     },
   })],
