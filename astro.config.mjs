@@ -19,13 +19,18 @@ export default defineConfig({
       // Exclude all programmatic/templated sections from sitemap
       // These pages still exist and are crawlable via internal links,
       // but we prioritize original content for sitemap-based discovery
+      // Programmatic prefixes excluded from sitemap. Per GSC data (May 1, 2026)
+      // four categories — number-to-words, roman-numerals, currency, calorie —
+      // received meaningful organic impressions (combined ~5,200/month) and
+      // were promoted back to indexable status. The remaining 36 categories
+      // stay sitemap-excluded with meta noindex on child pages.
       const programmaticPrefixes = [
         '/mortgage/', '/bmi/', '/loan/', '/savings/', '/down-payment/',
-        '/calorie/', '/paycheck/', '/macro/', '/data-convert/', '/pace/',
+        '/paycheck/', '/macro/', '/data-convert/', '/pace/',
         '/due-date/', '/math/', '/percentage/', '/cooking/', '/compound-interest/',
-        '/convert/', '/currency/', '/salary/', '/days-until/', '/days-ago/',
+        '/convert/', '/salary/', '/days-until/', '/days-ago/',
         '/days-from-now/', '/zodiac/', '/angel-number/', '/grade/', '/percent-off/',
-        '/fraction/', '/roman-numerals/', '/number-to-words/', '/what-percent/',
+        '/fraction/', '/what-percent/',
         '/auto-loan/', '/decimal-to-fraction/', '/times-tables/', '/factors-of/',
         '/time-convert/', '/tip/', '/temperature/', '/born-in/', '/time-zone/',
         '/how-many/', '/random/',
