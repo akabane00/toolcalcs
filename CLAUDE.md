@@ -2,51 +2,63 @@
 
 ## Project Overview
 - **Domain**: toolcalcs.com
-- **Stack**: Astro (static site generator) + Vanilla CSS + Vanilla JS
+- **Stack**: Astro 6.x (static site generator) + Vanilla CSS + Vanilla JS
 - **Hosting**: Cloudflare Pages (free tier, $0/month)
 - **Revenue**: Google AdSense (CPM model)
 - **Target Audience**: English-speaking, primarily US
 - **Goal**: $5/day AdSense revenue within 6-9 months
 
+## Site Scale (as of 2026-05-15)
+- 15 calculator categories, 157 calculators
+- 225 blog articles
+- 98 worksheet pages
+- 26 tool pages
+- 43 test/game pages
+- 36+ programmatic prefixes (mortgage/, bmi/, percentage/, ...) — all `noindex,nofollow`
+- 4 programmatic categories re-promoted to indexable (number-to-words, roman-numerals, currency, calorie)
+
 ## Project Structure
 ```
-x:/toolcalcs/
+C:\Users\master\Projects\toolcalcs\
 ├── src/
-│   ├── layouts/BaseLayout.astro     # Main layout (header, footer, SEO head)
-│   ├── components/
-│   │   ├── Header.astro             # Site header with navigation
-│   │   ├── Footer.astro             # Site footer with links
-│   │   ├── SEOHead.astro            # Meta tags, OG, structured data
-│   │   └── AdUnit.astro             # AdSense ad wrapper
-│   ├── pages/                       # Each .astro file = one page
-│   │   ├── index.astro              # Homepage
-│   │   ├── financial-calculators/   # Finance category (7 calcs)
-│   │   ├── health-calculators/      # Health category (6 calcs)
-│   │   ├── math-calculators/        # Math category (4 calcs)
-│   │   ├── date-time-calculators/   # Date & Time category (3 calcs)
-│   │   ├── conversion-calculators/  # Conversion category (2 calcs)
-│   │   ├── everyday-calculators/    # Everyday category (3 calcs)
-│   │   ├── about.astro
-│   │   ├── contact.astro
-│   │   ├── privacy-policy.astro
-│   │   └── terms-of-service.astro
-│   ├── data/calculators.ts          # Calculator metadata registry
-│   └── styles/global.css            # Global CSS variables & reset
-├── public/                          # Static files (copied as-is)
-│   ├── favicon.svg
-│   ├── robots.txt
-│   └── ads.txt
-├── astro.config.mjs                 # Astro config (sitemap, site URL)
+│   ├── layouts/                     # Astro layouts
+│   ├── components/                  # Header, Footer, SEOHead, AdUnit, AuthorBio…
+│   ├── pages/                       # 15 calc categories + blog/ + worksheets/ + tools/ + test/
+│   ├── data/                        # 52 .ts data files (calculators registry, programmatic generators)
+│   └── styles/global.css
+├── public/                          # robots.txt, ads.txt, _redirects, manifest, sitemap helpers
+├── scripts/seo/                     # GSC automation (Indexing API + Performance API)
+│   ├── gsc-batch-reindex.js
+│   └── gsc-fetch.js
+├── data/                            # Optional reindex-queue.txt override (gitignored)
+├── logs/seo/                        # Daily reindex + fetch snapshots (gitignored)
+├── astro.config.mjs                 # Sitemap config: priority tiers, programmatic exclusions, lastmod
 └── dist/                            # Build output (do not edit)
 ```
 
 ## Commands
 ```bash
-cd x:/toolcalcs
 npm run dev          # Start dev server (localhost:4321)
 npm run build        # Build static site to dist/
 npm run preview      # Preview built site locally
+npm run seo:reindex  # GSC Indexing API: inspect + reindex priority URLs
+npm run seo:fetch    # GSC Performance API: 28d snapshot + sitemap status
 ```
+
+## SEO Automation (Indexing API + Performance API)
+- Service account: `search-console-reader@river-overview-384807.iam.gserviceaccount.com`
+  (Owner role on `sc-domain:toolcalcs.com` GSC property — shared with jupjupday.kr)
+- Credential JSON: `x:\www\storage\credentials\river-overview-384807-53137236c33c.json`
+- Daily quotas: URL Inspection 2000/day, Indexing API 200/day
+- `scripts/seo/gsc-batch-reindex.js` — default flow: P1 hubs (homepage + 19 category indexes) + P3 sitemap rotation; override with `data/reindex-queue.txt` for Sprint launches
+- Logs: `logs/seo/reindex-YYYY-MM-DD.json` and `gsc-fetch-YYYY-MM-DD.json` (both gitignored)
+
+## GSC State Baseline (2026-05-15 snapshot)
+- **28-day clicks: 2** / impressions 417 / avg position 34.83
+- **Sitemap: 688 submitted, 0 indexed** — every URL in sitemap rejected
+- All calculator category hubs return `Crawled - currently not indexed`
+- GSC overview reports 1 indexed page, 12,726 not indexed (the 12k+ are mostly programmatic noindexed pages still tracked)
+- Recovery hypothesis: indexing is gated on content-quality signals, not on crawl/submit. Reindex requests alone unlikely to flip "Crawled - not indexed" — content/E-E-A-T work has to land first.
 
 ## Adding a New Calculator
 1. Add entry to `src/data/calculators.ts` (title, slug, description, category)
