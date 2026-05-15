@@ -46,6 +46,11 @@ const arg = (n, d = null) => {
 };
 const URLS_FILE   = arg('urls', null);
 const MOBILE_ONLY = args.includes('--mobile-only');
+// PSI without API key is rate-limited ~1 req/sec; with key the limit is far
+// higher. Use 5s spacing when keyless, 1s when keyed.
+const REQ_DELAY_MS = process.env.PSI_API_KEY ? 1000 : 5000;
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 function loadUrls() {
   if (URLS_FILE && fs.existsSync(URLS_FILE)) {
@@ -56,7 +61,11 @@ function loadUrls() {
 }
 
 async function psi(url, strategy) {
-  const api = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&strategy=${strategy}&category=performance`;
+  // PSI without API key has a very tight rate limit (~1 req/sec per IP).
+  // Optionally pass PSI_API_KEY via env to use Google API key quota
+  // (25k requests/day, much higher per-second).
+  const key = process.env.PSI_API_KEY;
+  const api = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&strategy=${strategy}&category=performance${key ? `&key=${key}` : ''}`;
   const res = await fetch(api);
   if (!res.ok) throw new Error(`PSI HTTP ${res.status}`);
   const data = await res.json();
@@ -132,6 +141,8 @@ async function main() {
         r[strat] = { error: e.message };
         console.log(`  ${strat} ERROR: ${e.message.substring(0, 60)}`);
       }
+      // Rate-limit gap between requests (PSI keyless quota is tight)
+      await sleep(REQ_DELAY_MS);
     }
     results.push(r);
   }
