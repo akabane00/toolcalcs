@@ -38,20 +38,29 @@ C:\Users\master\Projects\toolcalcs\
 
 ## Commands
 ```bash
-npm run dev          # Start dev server (localhost:4321)
-npm run build        # Build static site to dist/
-npm run preview      # Preview built site locally
-npm run seo:reindex  # GSC Indexing API: inspect + reindex priority URLs
-npm run seo:fetch    # GSC Performance API: 28d snapshot + sitemap status
+npm run dev            # Start dev server (localhost:4321)
+npm run build          # Build static site to dist/
+npm run preview        # Preview built site locally
+npm run seo:reindex    # GSC Indexing API: inspect + reindex priority URLs
+npm run seo:fetch      # GSC Performance API: 28d snapshot + sitemap status
+npm run seo:diagnose   # Deep URL Inspection on sample URLs + live HTML parse
+npm run seo:cwv        # PageSpeed Insights (PSI_API_KEY in .env)
+npm run seo:link-graph # Internal link graph (orphans, dead-ends, hub coverage)
+npm run seo:audit      # Programmatic-prefix traffic audit (90d GSC)
+npm run seo:report     # Weekly aggregate markdown report
+npm run seo:efficacy   # Re-inspect reindexed URLs for state transitions
 ```
 
 ## SEO Automation (Indexing API + Performance API)
 - Service account: `search-console-reader@river-overview-384807.iam.gserviceaccount.com`
   (Owner role on `sc-domain:toolcalcs.com` GSC property — shared with jupjupday.kr)
 - Credential JSON: `x:\www\storage\credentials\river-overview-384807-53137236c33c.json`
+- PSI API key: in `.env` (gitignored) — same project, raises PSI quota to 25k/day
 - Daily quotas: URL Inspection 2000/day, Indexing API 200/day
 - `scripts/seo/gsc-batch-reindex.js` — default flow: P1 hubs (homepage + 19 category indexes) + P3 sitemap rotation; override with `data/reindex-queue.txt` for Sprint launches
-- Logs: `logs/seo/reindex-YYYY-MM-DD.json` and `gsc-fetch-YYYY-MM-DD.json` (both gitignored)
+- Task Scheduler `ToolCalcs-Daily-Reindex` runs `scripts/seo/daily-reindex.ps1` daily at **04:00 KST** (moved from 09:00 to avoid overlapping with the user's workday)
+- All scripts honor `TOOLCALCS_ROOT` env var (set in .env): worktree-launched runs still write to the main repo's `logs/seo/` and read `data/` from there
+- Logs: `logs/seo/{reindex,gsc-fetch,cwv,link-graph,programmatic-audit,efficacy,weekly}-*.json` (all gitignored)
 
 ## GSC State Baseline (2026-05-15 snapshot)
 - **28-day clicks: 2** / impressions 417 / avg position 34.83

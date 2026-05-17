@@ -36,7 +36,13 @@ import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname  = path.dirname(__filename);
-const ROOT       = path.join(__dirname, '..', '..');
+// ROOT defaults to the script's parent-of-parent directory, but can be
+// overridden via TOOLCALCS_ROOT env var (loaded from .env). This lets us run
+// scripts from a worktree while logs / data still resolve to the main repo —
+// matching where Task Scheduler runs the production daily campaign.
+const ROOT       = process.env.TOOLCALCS_ROOT
+  ? path.resolve(process.env.TOOLCALCS_ROOT)
+  : path.resolve(__dirname, '..', '..');
 
 // ── Config ──
 const KEY_PATH      = 'x:\\www\\storage\\credentials\\river-overview-384807-53137236c33c.json';

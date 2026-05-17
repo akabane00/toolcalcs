@@ -21,7 +21,9 @@ import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname  = path.dirname(__filename);
-const ROOT       = path.join(__dirname, '..', '..');
+const ROOT       = process.env.TOOLCALCS_ROOT
+  ? path.resolve(process.env.TOOLCALCS_ROOT)
+  : path.resolve(__dirname, '..', '..');
 const LOG_DIR    = path.join(ROOT, 'logs', 'seo');
 
 const KEY_PATH    = 'x:\\www\\storage\\credentials\\river-overview-384807-53137236c33c.json';
