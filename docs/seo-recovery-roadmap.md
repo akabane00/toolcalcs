@@ -254,6 +254,52 @@ P4 — 매일 (90 URLs/day):   sitemap 회전 (offset 매일 +90)
 
 ---
 
+## 6.5. AdSense 적용 절차 (사이트 정상화 후)
+
+**현재 상태 (2026-05-17)**: AdSense **미승인**. 자동 광고(Auto Ads) 계획.
+
+사이트에 남아 있는 AdSense 관련 코드:
+
+| 위치 | 내용 | 상태 |
+|---|---|---|
+| `BaseLayout.astro` | `<meta name="google-adsense-account" content="ca-pub-1658942662433818">` | ✅ 그대로 유지 (승인 신청 시 사이트 검증에 필요) |
+| `public/ads.txt` | `google.com, pub-1658942662433818, DIRECT, ...` | ✅ 그대로 유지 (AdSense 필수) |
+| `BaseLayout.astro` `<script>` | `adsbygoogle.js` 로드 | ⏸ **주석 처리됨** — 승인 신청 시 부활 |
+| `src/components/AdUnit.astro` | `isAdSenseActive = false` | ⏸ no-op 상태. 250+ 페이지에서 사용 중이지만 렌더 안 함 |
+
+**왜 스크립트를 비활성화했나**:
+- 광고 슬롯이 없는 상태에서 `adsbygoogle.js`를 로드해도 광고가 표시되지 않음
+- TBT(Total Blocking Time) 신호에 노이즈만 추가
+- 자동 광고 계획이라 manual ad slot은 어차피 불필요
+
+### 승인 신청 시점 체크리스트
+
+사이트 normalization (28일 클릭 100+, 사이트맵 indexed 비율 5%+ 정도)이 확인되면:
+
+1. **BaseLayout.astro 스크립트 재활성화**
+   - `// AdSense — disabled until approval` 블록의 주석 제거
+   - 그대로 `loadAdSense()` 함수와 user-interaction listeners를 부활
+   - PSI 점수 hit 감수 (대신 AdSense 크롤러가 스크립트 감지 가능)
+2. **빌드 + 배포** (`npm run build`, commit + push → Cloudflare 자동 배포)
+3. **AdSense 신청**: https://www.google.com/adsense/start/ → toolcalcs.com 등록
+4. **사이트 검증 대기** (며칠~몇 주)
+5. **승인 후**:
+   - AdSense 대시보드에서 **"자동 광고"** 활성화
+   - 자동 광고는 manual `<AdUnit>` 슬롯 없이 Google이 페이지 분석해 자동 배치
+   - 옵션: manual placement도 원하면 `AdUnit.astro`의 `isAdSenseActive = true`로 변경
+
+### 자동 광고 vs Manual 슬롯 비교
+
+| 옵션 | 장점 | 단점 |
+|---|---|---|
+| **자동 광고** (계획) | 코드 변경 없음, Google이 최적 위치 자동 결정, 운영 부담 0 | 광고 위치 제어 약함 |
+| Manual `<AdUnit>` 슬롯 | 위치 정확히 제어, RPM 최적화 가능 | 250+ 페이지에 slot ID 입력 필요, 운영 부담 |
+| 두 가지 병행 | 위 두 가지 동시 효과 | 가장 복잡 |
+
+운영자 메모: **자동 광고 단독 사용 권장** — 운영 부담 0, 사용자 명시 계획 일치.
+
+---
+
 ## 7. 이번 세션까지 완성된 자산
 
 ### 코드 (worktree 안, uncommitted)
