@@ -19,11 +19,15 @@ export default defineConfig({
       // Exclude all programmatic/templated sections from sitemap
       // These pages still exist and are crawlable via internal links,
       // but we prioritize original content for sitemap-based discovery
-      // Programmatic prefixes excluded from sitemap. Per GSC data (May 1, 2026)
-      // four categories — number-to-words, roman-numerals, currency, calorie —
-      // received meaningful organic impressions (combined ~5,200/month) and
-      // were promoted back to indexable status. The remaining 36 categories
-      // stay sitemap-excluded with meta noindex on child pages.
+      // Programmatic prefixes excluded from sitemap.
+      // History of promotions to indexable (each driven by GSC traffic data):
+      //   - May 1, 2026: number-to-words, roman-numerals, currency, calorie
+      //                  (~5,200 impressions/month combined)
+      //   - May 17, 2026: born-in (28,595 imp / 69 clk / pos 7.4 over 90 days,
+      //                  highest-ROI single remaining candidate)
+      // The remaining 35 prefixes stay sitemap-excluded with meta noindex on
+      // child pages — none of them showed comparable traffic in
+      // logs/seo/programmatic-audit-*.json.
       const programmaticPrefixes = [
         '/mortgage/', '/bmi/', '/loan/', '/savings/', '/down-payment/',
         '/paycheck/', '/macro/', '/data-convert/', '/pace/',
@@ -32,7 +36,7 @@ export default defineConfig({
         '/days-from-now/', '/zodiac/', '/angel-number/', '/grade/', '/percent-off/',
         '/fraction/', '/what-percent/',
         '/auto-loan/', '/decimal-to-fraction/', '/times-tables/', '/factors-of/',
-        '/time-convert/', '/tip/', '/temperature/', '/born-in/', '/time-zone/',
+        '/time-convert/', '/tip/', '/temperature/', '/time-zone/',
         '/how-many/', '/random/',
       ];
       const path = page.replace('https://toolcalcs.com', '');
