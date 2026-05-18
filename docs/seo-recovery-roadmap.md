@@ -254,6 +254,29 @@ P4 — 매일 (90 URLs/day):   sitemap 회전 (offset 매일 +90)
 
 ---
 
+## 6.4. /born-in/ noindex 전환 실험 (2026-05-17 시작)
+
+GSC 90일 audit (logs/seo/programmatic-audit-2026-05-15.json) 데이터 기반의 8개 high-traffic noindex prefix 중 **TOP 1: `/born-in/`** 단독 전환. May 1 commit `200c741`의 4개 일괄 전환 패턴 연장.
+
+**왜 단독 시작**:
+- `/born-in/` 단독 90일 28,595 imp / 69 click / avg pos 7.4 — 나머지 7개 합친 것의 ~2배
+- 5/1 batch 효력이 GSC에 아직 명확히 안 나타남 (사이트 전체 0/688 indexed). 추가로 한꺼번에 풀면 신호 섞임 → 분리 측정 불가
+- 102개 페이지로 적절한 실험 크기
+
+**Day 7 체크포인트 (~2026-05-24)** — `npm run seo:efficacy -- --days=7`:
+- ≥50% pages indexed → TOP 5 (`/fraction/`, `/salary/`, `/percentage/`, `/tip/`) 확장 GO
+- 10~50% indexed → 1주 추가 관찰 (5/31)
+- &lt;10% indexed → /born-in/ 전환 효과 없음, 다른 회복 전략으로 pivot
+- 도메인 평균 품질 신호 하락 (사이트 전체 indexed 비율 ↓) → 즉시 롤백
+
+**롤백 절차**:
+1. astro.config.mjs programmaticPrefixes 배열에 `/born-in/` 다시 추가
+2. src/pages/born-in/[slug].astro에 `noindex={true}` 부활
+3. src/pages/born-in/index.astro에 cross-canonical 부활
+4. 빌드 + 배포
+
+---
+
 ## 6.5. AdSense 적용 절차 (사이트 정상화 후)
 
 **현재 상태 (2026-05-17)**: AdSense **미승인**. 자동 광고(Auto Ads) 계획.
