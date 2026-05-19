@@ -11,7 +11,12 @@ interface Props {
 const { title, description, canonical, type = 'website', noindex = false, structuredData } = Astro.props;
 const siteUrl = 'https://toolcalcs.com';
 const pageUrl = canonical || `${siteUrl}${Astro.url.pathname}`;
-const fullTitle = title.includes('ToolCalcs') ? title : `${title} | ToolCalcs`;
+// Title is used as-is. The previous auto-append of " | ToolCalcs" was eating
+// 11 characters of SERP-visible title on every page — including pages where
+// the rendered title (e.g., calorie/walking 30 min, large number-to-words
+// entries) had no room to spare and was getting truncated. Pages that want
+// a brand suffix can include it explicitly in their `title` prop.
+const fullTitle = title;
 const schemaList: object[] = structuredData
   ? Array.isArray(structuredData) ? [...structuredData] : [structuredData]
   : [];
