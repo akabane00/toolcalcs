@@ -21,7 +21,8 @@
 
 import { google } from 'googleapis';
 
-const KEY_PATH     = 'x:\\www\\storage\\credentials\\river-overview-384807-53137236c33c.json';
+const KEY_PATH     = process.env.GSC_CREDENTIAL_PATH
+  || 'C:\\Users\\master\\.gsc-credentials\\river-overview-384807-53137236c33c.json';
 const SITE_DOMAIN  = 'sc-domain:toolcalcs.com';
 const SITEMAP_URL  = 'https://toolcalcs.com/sitemap-index.xml';
 const RECREATE     = process.argv.includes('--recreate');

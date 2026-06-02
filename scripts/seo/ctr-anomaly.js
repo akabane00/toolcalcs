@@ -31,7 +31,8 @@ const ROOT       = process.env.TOOLCALCS_ROOT
   ? path.resolve(process.env.TOOLCALCS_ROOT)
   : path.resolve(__dirname, '..', '..');
 
-const KEY_PATH    = 'x:\\www\\storage\\credentials\\river-overview-384807-53137236c33c.json';
+const KEY_PATH    = process.env.GSC_CREDENTIAL_PATH
+  || 'C:\\Users\\master\\.gsc-credentials\\river-overview-384807-53137236c33c.json';
 const SITE_DOMAIN = 'sc-domain:toolcalcs.com';
 const LOG_DIR     = path.join(ROOT, 'logs', 'seo');
 

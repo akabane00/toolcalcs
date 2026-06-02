@@ -23,19 +23,14 @@ if (-not (Test-Path $npmCmd)) {
   exit 1
 }
 
-# Pre-flight: the GSC service-account credential lives on x:\ — a RaiDrive
-# network mount (\\RaiDrive-master\jupjupday.kr) that is occasionally not yet
-# mounted when the 04:00 trigger fires (observed 2026-06-02). Wait/retry for it
-# rather than failing both steps with a generic ENOENT.
-$CredPath = 'x:\www\storage\credentials\river-overview-384807-53137236c33c.json'
-$credReady = $false
-for ($i = 1; $i -le 10; $i++) {
-  if (Test-Path $CredPath) { $credReady = $true; break }
-  "WARN: credential not reachable (attempt $i/10): $CredPath — waiting 30s for x:\ mount" | Add-Content $LogFile
-  Start-Sleep -Seconds 30
-}
-if (-not $credReady) {
-  "ERROR: credential still unreachable after 10 attempts (5 min). x:\ drive (RaiDrive) likely unmounted. Aborting — will retry at next 04:00 trigger." | Add-Content $LogFile
+# Pre-flight: confirm the GSC service-account credential is readable. As of
+# 2026-06-02 this lives on a stable LOCAL path (under the user profile), no
+# longer the x:\ RaiDrive mount that caused the 06-02 04:00 failure. The check
+# stays as a cheap guard against an accidental move/delete. GSC_CREDENTIAL_PATH
+# in .env can override; keep this default in sync with the JS scripts' fallback.
+$CredPath = if ($env:GSC_CREDENTIAL_PATH) { $env:GSC_CREDENTIAL_PATH } else { 'C:\Users\master\.gsc-credentials\river-overview-384807-53137236c33c.json' }
+if (-not (Test-Path $CredPath)) {
+  "ERROR: GSC credential not found at $CredPath — aborting. Restore the key or set GSC_CREDENTIAL_PATH." | Add-Content $LogFile
   exit 1
 }
 "OK: credential reachable at $CredPath" | Add-Content $LogFile

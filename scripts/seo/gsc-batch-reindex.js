@@ -45,7 +45,12 @@ const ROOT       = process.env.TOOLCALCS_ROOT
   : path.resolve(__dirname, '..', '..');
 
 // ── Config ──
-const KEY_PATH      = 'x:\\www\\storage\\credentials\\river-overview-384807-53137236c33c.json';
+// Credential path. Defaults to a stable local copy under the user profile so
+// the automation does not depend on the x:\ RaiDrive mount (a jupjupday.kr
+// network drive that was unrelated to toolcalcs and occasionally unmounted at
+// the 04:00 trigger). Override with GSC_CREDENTIAL_PATH in .env if needed.
+const KEY_PATH      = process.env.GSC_CREDENTIAL_PATH
+  || 'C:\\Users\\master\\.gsc-credentials\\river-overview-384807-53137236c33c.json';
 const SITE_DOMAIN   = 'sc-domain:toolcalcs.com';
 const SITE_URL_ALT  = 'https://toolcalcs.com/';
 const SITEMAP_INDEX = 'https://toolcalcs.com/sitemap-index.xml';
