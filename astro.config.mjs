@@ -23,20 +23,28 @@ export default defineConfig({
       // History of promotions to indexable (each driven by GSC traffic data):
       //   - May 1, 2026: number-to-words, roman-numerals, currency, calorie
       //                  (~5,200 impressions/month combined)
-      //   - May 17, 2026: born-in (28,595 imp / 69 clk / pos 7.4 over 90 days,
-      //                  highest-ROI single remaining candidate)
-      // The remaining 35 prefixes stay sitemap-excluded with meta noindex on
-      // child pages — none of them showed comparable traffic in
-      // logs/seo/programmatic-audit-*.json.
+      //   - May 17, 2026: born-in (28,595 imp / 69 clk / pos 7.4 over 90 days)
+      //   - Jun 5, 2026: fraction, salary, percentage, tip, time-zone, math,
+      //                  factors-of, grade — the 8 highest-traffic prefixes
+      //                  still noindexed. GSC revealed the site had ~7,500
+      //                  pages indexed in March (all programmatic) which
+      //                  collapsed to 1 after the 4/28 mass-noindex. No
+      //                  penalty (manual actions + security both clean), so
+      //                  restoring proven-traffic prefixes is index recovery,
+      //                  not new risk. Child pages only — index pages keep
+      //                  their cross-canonical to the main calculator to
+      //                  avoid 8 duplicate hubs competing with core pages.
+      // The remaining ~27 prefixes stay sitemap-excluded with meta noindex —
+      // none showed comparable traffic in logs/seo/programmatic-audit-*.json.
       const programmaticPrefixes = [
         '/mortgage/', '/bmi/', '/loan/', '/savings/', '/down-payment/',
         '/paycheck/', '/macro/', '/data-convert/', '/pace/',
-        '/due-date/', '/math/', '/percentage/', '/cooking/', '/compound-interest/',
-        '/convert/', '/salary/', '/days-until/', '/days-ago/',
-        '/days-from-now/', '/zodiac/', '/angel-number/', '/grade/', '/percent-off/',
-        '/fraction/', '/what-percent/',
-        '/auto-loan/', '/decimal-to-fraction/', '/times-tables/', '/factors-of/',
-        '/time-convert/', '/tip/', '/temperature/', '/time-zone/',
+        '/due-date/', '/cooking/', '/compound-interest/',
+        '/convert/', '/days-until/', '/days-ago/',
+        '/days-from-now/', '/zodiac/', '/angel-number/', '/percent-off/',
+        '/what-percent/',
+        '/auto-loan/', '/decimal-to-fraction/', '/times-tables/',
+        '/time-convert/', '/temperature/',
         '/how-many/', '/random/',
       ];
       const path = page.replace('https://toolcalcs.com', '');
