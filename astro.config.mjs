@@ -24,28 +24,28 @@ export default defineConfig({
       //   - May 1, 2026: number-to-words, roman-numerals, currency, calorie
       //                  (~5,200 impressions/month combined)
       //   - May 17, 2026: born-in (28,595 imp / 69 clk / pos 7.4 over 90 days)
-      //   - Jun 5, 2026: fraction, salary, percentage, tip, time-zone, math,
-      //                  factors-of, grade — the 8 highest-traffic prefixes
-      //                  still noindexed. GSC revealed the site had ~7,500
-      //                  pages indexed in March (all programmatic) which
-      //                  collapsed to 1 after the 4/28 mass-noindex. No
-      //                  penalty (manual actions + security both clean), so
-      //                  restoring proven-traffic prefixes is index recovery,
-      //                  not new risk. Child pages only — index pages keep
-      //                  their cross-canonical to the main calculator to
-      //                  avoid 8 duplicate hubs competing with core pages.
-      // The remaining ~27 prefixes stay sitemap-excluded with meta noindex —
-      // none showed comparable traffic in logs/seo/programmatic-audit-*.json.
+      //   - Jun 5, 2026 (batch 1): fraction, salary, percentage, tip,
+      //                  time-zone, math, factors-of, grade — top 8 by traffic.
+      //   - Jun 5, 2026 (batch 2, aggressive): mortgage, bmi, macro,
+      //                  data-convert, cooking, compound-interest, convert,
+      //                  days-until, days-from-now, percent-off, what-percent,
+      //                  auto-loan, times-tables, time-convert, random — every
+      //                  remaining prefix with >=10 impressions in the 90-day
+      //                  audit. GSC revealed the site had ~7,500 pages indexed
+      //                  in March (all programmatic) which collapsed to 1 after
+      //                  the 4/28 mass-noindex. No penalty (manual actions +
+      //                  security both clean), so restoring any prefix that
+      //                  Google was already ranking is recovery, not new risk.
+      //                  Child pages only — index pages keep their
+      //                  cross-canonical to the main calculator.
+      // Only LOW/ZERO-traffic prefixes remain noindexed: the audit measured
+      // <10 impressions (or zero) for each of these over 90 days, so there is
+      // no evidence they are worth indexing.
       const programmaticPrefixes = [
-        '/mortgage/', '/bmi/', '/loan/', '/savings/', '/down-payment/',
-        '/paycheck/', '/macro/', '/data-convert/', '/pace/',
-        '/due-date/', '/cooking/', '/compound-interest/',
-        '/convert/', '/days-until/', '/days-ago/',
-        '/days-from-now/', '/zodiac/', '/angel-number/', '/percent-off/',
-        '/what-percent/',
-        '/auto-loan/', '/decimal-to-fraction/', '/times-tables/',
-        '/time-convert/', '/temperature/',
-        '/how-many/', '/random/',
+        '/loan/', '/savings/', '/down-payment/', '/paycheck/',
+        '/pace/', '/due-date/', '/days-ago/',
+        '/zodiac/', '/angel-number/',
+        '/decimal-to-fraction/', '/temperature/', '/how-many/',
       ];
       const path = page.replace('https://toolcalcs.com', '');
       for (const prefix of programmaticPrefixes) {
