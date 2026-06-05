@@ -254,6 +254,29 @@ P4 — 매일 (90 URLs/day):   sitemap 회전 (offset 매일 +90)
 
 ---
 
+## 6.35. 🔴 색인 붕괴 진단 + 대량 복원 (2026-06-05)
+
+GSC 직접 확인으로 회생 전략의 근본 전제가 바뀜:
+- **수동조치/보안문제 모두 깨끗** — 페널티 아님
+- **3월에 ~7,500 페이지 색인 → 현재 1** (programmatic 페이지들이 색인돼 있었음)
+- **원인 = 4/28 대량 noindex 커밋** (2da5d96, 38443d4) — 자초한 붕괴
+- robots 차단 4,551 = stale (이미 해제, 0b1d80f의 잔재)
+
+**전략 전환**: "도메인 트러스트 부족"이 아니라 "우리가 막아서 떨어진 것". 과거 색인 = 색인 자격 입증. 복원 = 회복이지 신규 리스크 아님.
+
+**조치**: audit에서 노출 ≥10인 23개 prefix 전체를 indexable 복원 (2 배치):
+- batch 1 (cf59982): math, percentage, tip, factors-of, grade, time-zone, salary, fraction (8개)
+- batch 2 (acfedd8): mortgage, bmi, macro, data-convert, cooking, compound-interest, convert, days-until, days-from-now, percent-off, what-percent, auto-loan, times-tables, time-convert, random (15개)
+- child 페이지만 (index는 cross-canonical 유지)
+- sitemap: 1,218 → 5,414 URL (+4,196)
+- low/zero traffic 12개 prefix만 noindex 유지
+
+**6/12 체크포인트**: `npm run seo:efficacy` + `npm run seo:fetch`. indexed가 드디어 1에서 움직이는가? 
+- 움직임 → 복원 전략 성공, 나머지 정리
+- 여전히 0 → 그때야말로 도메인 트러스트가 진짜 병목 (외부 신호 필요)
+
+---
+
 ## 6.4. /born-in/ noindex 전환 실험 (2026-05-17 시작)
 
 GSC 90일 audit (logs/seo/programmatic-audit-2026-05-15.json) 데이터 기반의 8개 high-traffic noindex prefix 중 **TOP 1: `/born-in/`** 단독 전환. May 1 commit `200c741`의 4개 일괄 전환 패턴 연장.
