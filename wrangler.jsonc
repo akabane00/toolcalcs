@@ -1,0 +1,27 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "toolcalcs",
+  "compatibility_date": "2026-06-02",
+  "compatibility_flags": ["global_fetch_strictly_public"],
+  // toolcalcs is a 100% static Astro site (no adapter in astro.config.mjs,
+  // no _worker.js in dist). Cloudflare's auto-generated config
+  // (cloudflare/workers-autoconfig branch) wrongly set
+  //   "main": "@astrojs/cloudflare/entrypoints/server"
+  // which runs the Astro Cloudflare server runtime. That runtime pulls in
+  // Astro 5 Sessions, which requires a SESSION KV namespace, and `wrangler
+  // deploy` then tries to provision "toolcalcs-session" on every deploy —
+  // failing with code 10014 ("namespace already exists") once it exists.
+  // That broke all deploys from 2026-06-05 onward (the 6/2 Pages->Workers
+  // migration introduced it).
+  //
+  // This explicit config takes precedence over the autoconfig branch and
+  // deploys as a STATIC-ASSETS-ONLY Worker: no `main` entrypoint, so no
+  // server runtime, no Sessions, no SESSION KV provisioning. Just the dist/
+  // files served directly. This is exactly what the site needs.
+  "assets": {
+    "directory": "./dist"
+  },
+  "observability": {
+    "enabled": true
+  }
+}
